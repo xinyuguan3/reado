@@ -1018,8 +1018,12 @@ function injectKnowledgeMapBooks(html, books) {
         saveUnlocked(unlocked);
       }
 
+      const forceFirst = book.id === "wanli-fifteen";
+      if (forceFirst) {
+        localStorage.removeItem("reado_book_last_" + bookId);
+      }
       const last = localStorage.getItem("reado_book_last_" + bookId);
-      const canResume = Boolean(last && Array.isArray(book.moduleSlugs) && book.moduleSlugs.includes(last));
+      const canResume = !forceFirst && Boolean(last && Array.isArray(book.moduleSlugs) && book.moduleSlugs.includes(last));
       const entryHref = canResume
         ? "/experiences/" + last + ".html"
         : (book.firstModuleHref || book.hubHref || "");
@@ -1068,7 +1072,8 @@ function injectExperienceQuickNav(html, book, moduleSlug) {
   const nextModuleSlug = book
     ? (book.modules.find((module) => module.slug === moduleSlug) ? book.modules[book.modules.findIndex((module) => module.slug === moduleSlug) + 1]?.slug : "")
     : "";
-  const autoNextSnippet = book && nextModuleSlug
+  const disableAutoNext = Boolean(book && book.id === "wanli-fifteen");
+  const autoNextSnippet = book && nextModuleSlug && !disableAutoNext
     ? `
   const readoNextHref = ${JSON.stringify(`/experiences/${nextModuleSlug}.html`)};
   (() => {
@@ -3003,6 +3008,80 @@ function ensureGlobalStyle() {
       body.reado-shell-applied .reado-shell-side.open { transform: translateX(0); }
       body.reado-shell-applied .reado-shell-user-meta,
       body.reado-shell-applied .reado-shell-pill { display: none; }
+    }
+    @media (max-width: 900px) {
+      body.reado-shell-applied.reado-experience-mode {
+        overflow-x: hidden !important;
+      }
+      body.reado-shell-applied.reado-experience-mode .reado-shell-top {
+        top: 8px;
+        right: 8px;
+        height: 48px;
+        padding: 0 8px;
+        border-radius: 12px;
+        gap: 6px;
+        max-width: calc(100vw - 16px);
+      }
+      body.reado-shell-applied.reado-experience-mode .reado-shell-right {
+        gap: 6px;
+      }
+      body.reado-shell-applied.reado-experience-mode .reado-shell-pill.gems {
+        padding: 5px 8px;
+        font-size: 11px;
+      }
+      body.reado-shell-applied.reado-experience-mode .reado-shell-avatar {
+        width: 34px;
+        height: 34px;
+        border-width: 1px;
+        box-shadow: 0 0 0 1px rgba(19, 91, 236, 0.45);
+      }
+      body.reado-shell-applied.reado-experience-mode .reado-shell-exit {
+        padding: 6px 8px;
+        font-size: 11px;
+      }
+      body.reado-shell-applied.reado-experience-mode .reado-shell-toggle {
+        width: 30px;
+        height: 30px;
+      }
+      body.reado-shell-applied.reado-experience-mode .reado-shell-side {
+        width: min(84vw, 280px);
+      }
+      body.reado-shell-applied.reado-experience-mode .reado-shell-gain-hint {
+        right: 10px;
+        top: 64px;
+      }
+      body.reado-shell-applied.reado-experience-mode main {
+        height: auto !important;
+        max-height: none !important;
+        min-height: 100dvh !important;
+      }
+      body.reado-shell-applied.reado-experience-mode main.flex {
+        flex-direction: column !important;
+      }
+      body.reado-shell-applied.reado-experience-mode main[class*="grid-cols-12"] {
+        grid-template-columns: minmax(0, 1fr) !important;
+      }
+      body.reado-shell-applied.reado-experience-mode main > [class*="col-span-"] {
+        grid-column: 1 / -1 !important;
+      }
+      body.reado-shell-applied.reado-experience-mode main > aside,
+      body.reado-shell-applied.reado-experience-mode main > section {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+      }
+      body.reado-shell-applied.reado-experience-mode [class*="h-screen"],
+      body.reado-shell-applied.reado-experience-mode [class*="max-h-screen"],
+      body.reado-shell-applied.reado-experience-mode [class*="h-[calc(100vh"] {
+        height: auto !important;
+        max-height: none !important;
+      }
+      body.reado-shell-applied.reado-experience-mode [class*="w-["] {
+        max-width: 100% !important;
+      }
+      body.reado-shell-applied.reado-experience-mode [class*="min-w-["] {
+        min-width: 0 !important;
+      }
     }
     @keyframes reado-shell-pop {
       0% { transform: scale(1); }

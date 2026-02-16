@@ -64,8 +64,8 @@
     </style>
 </head>
 <body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-white h-screen overflow-hidden flex flex-col selection:bg-primary selection:text-white">
-<script src="/shared/book-catalog.js?v=1771241087232"></script>
-<script type="module" src="/shared/shell.js?v=1771241087232"></script>
+<script src="/shared/book-catalog.js?v=1771243282012"></script>
+<script type="module" src="/shared/shell.js?v=1771243282012"></script>
 <reado-app-shell data-page="knowledge-map"></reado-app-shell>
 <header class="h-20 flex-none z-50 px-6 py-4 flex items-center justify-between glass-panel sticky top-0">
 <div class="flex items-center gap-4">
@@ -546,8 +546,12 @@
         saveUnlocked(unlocked);
       }
 
+      const forceFirst = book.id === "wanli-fifteen";
+      if (forceFirst) {
+        localStorage.removeItem("reado_book_last_" + bookId);
+      }
       const last = localStorage.getItem("reado_book_last_" + bookId);
-      const canResume = Boolean(last && Array.isArray(book.moduleSlugs) && book.moduleSlugs.includes(last));
+      const canResume = !forceFirst && Boolean(last && Array.isArray(book.moduleSlugs) && book.moduleSlugs.includes(last));
       const entryHref = canResume
         ? "/experiences/" + last + ".html"
         : (book.firstModuleHref || book.hubHref || "");

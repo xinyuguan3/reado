@@ -73,8 +73,8 @@
     </style>
 </head>
 <body class="bg-wood-dark bg-wood-texture text-gray-200 min-h-screen flex flex-col relative overflow-hidden selection:bg-red-900 selection:text-white">
-<script src="/shared/book-catalog.js?v=1771241087232"></script>
-<script type="module" src="/shared/shell.js?v=1771241087232"></script>
+<script src="/shared/book-catalog.js?v=1771243282012"></script>
+<script type="module" src="/shared/shell.js?v=1771243282012"></script>
 <reado-app-shell data-page="knowledge-map"></reado-app-shell>
 <header class="bg-[#271a1a] border-b-4 border-[#1a1212] py-3 px-6 shadow-md z-50 flex justify-between items-center relative">
 <div class="flex items-center gap-4">
@@ -539,59 +539,6 @@
     } catch {}
   }
   
-  const readoNextHref = "/experiences/tax-reform-dilemma-5.html";
-  (() => {
-    let isNavigating = false;
-    const keywordList = ["开始", "继续", "下一", "进入", "模拟", "抉择", "选择", "确认", "提交", "挑战", "完成", "start", "next", "continue"];
-    const blacklist = ["EN", "ZH", "返回", "back", "帮助", "求助", "笔记", "术语", "设置", "菜单", "关闭", "取消"];
-    const normalize = (value) => String(value || "").replace(/\s+/g, " ").trim();
-    const hasKeyword = (text) => keywordList.some((keyword) => text.toLowerCase().includes(keyword.toLowerCase()));
-    const isBlocked = (text) => blacklist.some((word) => text === word || text.toLowerCase().includes(word.toLowerCase()));
-    const isOptionGroupButton = (node) => {
-      const parent = node.parentElement;
-      if (!parent) return false;
-      const peers = Array.from(parent.children).filter(
-        (child) => child instanceof HTMLElement && child.matches("button,[role='button'],.concept-card,.item-card,[data-choice],[data-option]")
-      );
-      return peers.length >= 2;
-    };
-    const goNext = (delay = 180) => {
-      if (isNavigating) return;
-      isNavigating = true;
-      window.setTimeout(() => {
-        window.location.href = readoNextHref;
-      }, delay);
-    };
-    document.addEventListener("click", (event) => {
-      const target = event.target;
-      if (!(target instanceof HTMLElement)) return;
-      if (target.closest(".reado-shell-wrap")) return;
-      const candidate = target.closest("[data-next-scene],button,a[href],.concept-card,.item-card,[data-choice],[data-option]");
-      if (!(candidate instanceof HTMLElement)) return;
-      if (!candidate.closest("main")) return;
-      if (candidate.hasAttribute("data-no-next")) return;
-      if (candidate.matches("a[href]")) {
-        const href = candidate.getAttribute("href") || "";
-        if (href && href !== "#" && !href.startsWith("javascript:")) return;
-      }
-      const text = normalize(candidate.textContent);
-      if (candidate.matches("[data-next-scene]")) {
-        event.preventDefault();
-        goNext(90);
-        return;
-      }
-      if (isBlocked(text)) return;
-      if (candidate.matches(".concept-card,.item-card,[data-choice],[data-option]")) {
-        goNext(180);
-        return;
-      }
-      if (candidate.matches("button")) {
-        if (hasKeyword(text) || (text.length >= 4 && isOptionGroupButton(candidate))) {
-          goNext(220);
-        }
-      }
-    });
-  })();
   
 })();
 </script>
