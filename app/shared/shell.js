@@ -657,6 +657,19 @@ function ensureGlobalStyle() {
       body.reado-shell-applied .reado-shell-pill { display: none; }
     }
     @media (max-width: 900px) {
+      body.reado-shell-applied:not(.reado-experience-mode) {
+        height: auto !important;
+        min-height: 100dvh !important;
+        overflow-y: auto !important;
+      }
+      body.reado-shell-applied:not(.reado-experience-mode) > .flex-1,
+      body.reado-shell-applied:not(.reado-experience-mode) > main {
+        height: auto !important;
+        min-height: calc(100dvh - 80px) !important;
+      }
+      body.reado-shell-applied:not(.reado-experience-mode) > .flex-1.flex.overflow-hidden {
+        overflow: visible !important;
+      }
       body.reado-shell-applied.reado-experience-mode {
         overflow-x: hidden !important;
       }
@@ -988,6 +1001,18 @@ class ReadoAppShell extends HTMLElement {
     }
     if (path === "/pages/simulator-library-level-selection-1.html") {
       document.body.classList.add("reado-page-warehouse");
+    }
+    if (path === "/pages/gamified-learning-hub-dashboard-1.html") {
+      document.body.classList.add("reado-page-map");
+    }
+    if (path === "/pages/gamified-learning-hub-dashboard-3.html") {
+      document.body.classList.add("reado-page-market");
+    }
+    if (path === "/pages/global-scholar-leaderboard.html") {
+      document.body.classList.add("reado-page-ranking");
+    }
+    if (path === "/pages/gamified-learning-hub-dashboard-2.html") {
+      document.body.classList.add("reado-page-profile");
     }
     enableMobileProportionalMode(isExperiencePage);
     if (isExperiencePage) {
