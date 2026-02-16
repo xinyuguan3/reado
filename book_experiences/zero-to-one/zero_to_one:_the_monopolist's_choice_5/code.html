@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html class="dark" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>reado: 商业秘密探索界面</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Source+Han+Sans+CN:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "cyan-glow": "#06b6d4",
+                        "dark-bg": "#0B1015",
+                        "panel-bg": "rgba(11, 16, 21, 0.85)",
+                        "grid-line": "rgba(6, 182, 212, 0.15)",
+                    },
+                    fontFamily: {
+                        "sans": ["Source Han Sans CN", "Source Han Sans", "Noto Sans SC", "sans-serif"],
+                        "mono": ["Courier New", "monospace"]
+                    },
+                    backgroundImage: {
+                        'radar-gradient': 'radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.1) 0%, transparent 60%)',
+                    },
+                    animation: {
+                        'spin-slow': 'spin 12s linear infinite',
+                        'ping-slow': 'ping 3s cubic-bezier(0, 0, 0.2, 1) infinite',
+                        'scan': 'scan 4s linear infinite',
+                    },
+                    keyframes: {
+                        scan: {
+                            '0%': { transform: 'rotate(0deg)' },
+                            '100%': { transform: 'rotate(360deg)' },
+                        }
+                    }
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        body {
+            font-family: 'Source Han Sans CN', sans-serif;
+            background-color: #0B1015;
+            color: #e5e7eb;
+        }
+        .scan-line {
+            background: linear-gradient(to bottom, transparent, rgba(6, 182, 212, 0.5));
+            height: 50%;
+            width: 2px;
+            position: absolute;
+            left: 50%;
+            top: 0;
+            transform-origin: bottom center;
+            animation: scan 4s linear infinite;
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.8);
+        }
+        .node {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            box-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
+        }
+        .node.active {
+            background-color: #06b6d4;
+            box-shadow: 0 0 15px #06b6d4, 0 0 30px #06b6d4;
+            z-index: 10;
+            width: 12px;
+            height: 12px;
+        }
+        .tech-border {
+            position: absolute;
+            pointer-events: none;
+            border: 1px solid rgba(6, 182, 212, 0.3);
+        }
+        .tech-corner {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-color: #06b6d4;
+            border-style: solid;
+        }
+        .tl { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
+        .tr { top: -1px; right: -1px; border-width: 2px 2px 0 0; }
+        .bl { bottom: -1px; left: -1px; border-width: 0 0 2px 2px; }
+        .br { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+        .crt-overlay {
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="h-screen w-full overflow-hidden relative selection:bg-cyan-500 selection:text-white">
+<div class="absolute inset-0 z-0 opacity-20 pointer-events-none" style="background-image: linear-gradient(rgba(6, 182, 212, 0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(6, 182, 212, 0.15) 1px, transparent 1px); background-size: 40px 40px;">
+</div>
+<div class="absolute inset-0 z-50 crt-overlay pointer-events-none"></div>
+<main class="relative z-10 w-full h-full flex flex-col items-center justify-center p-6">
+<div class="absolute top-8 left-8 flex flex-col gap-1">
+<div class="flex items-center gap-2 text-cyan-400">
+<span class="material-icons-outlined text-sm animate-pulse">leak_add</span>
+<span class="text-xs font-mono tracking-widest uppercase">侦测模式: 开启</span>
+</div>
+<div class="h-px w-32 bg-cyan-900"></div>
+<div class="text-[10px] text-gray-500 font-mono">SYS.VER.0.4.2 // SCANNING</div>
+</div>
+<div class="absolute top-8 right-8 text-right">
+<div class="text-xs font-mono text-cyan-700 mb-1">目标锁定</div>
+<div class="text-2xl font-bold text-cyan-500 tracking-tighter tabular-nums">1 / 1024</div>
+</div>
+<div class="relative w-[800px] h-[800px] flex items-center justify-center">
+<div class="absolute inset-0 border border-cyan-900/30 rounded-full"></div>
+<div class="absolute inset-[15%] border border-cyan-900/30 rounded-full border-dashed"></div>
+<div class="absolute inset-[30%] border border-cyan-900/20 rounded-full"></div>
+<div class="absolute inset-[45%] border border-cyan-500/10 rounded-full bg-radar-gradient"></div>
+<div class="absolute inset-0 rounded-full overflow-hidden">
+<div class="scan-line"></div>
+</div>
+<div class="node top-[20%] left-[30%] opacity-40"></div>
+<div class="node top-[25%] left-[75%] opacity-30"></div>
+<div class="node top-[60%] left-[80%] opacity-50"></div>
+<div class="node top-[80%] left-[40%] opacity-20"></div>
+<div class="node top-[15%] left-[55%] opacity-30"></div>
+<div class="node top-[45%] left-[15%] opacity-40"></div>
+<div class="node top-[70%] left-[20%] opacity-20"></div>
+<div class="node top-[35%] right-[25%] opacity-30"></div>
+<div class="absolute top-[42%] left-[58%] group cursor-pointer z-30">
+<div class="relative flex items-center justify-center">
+<div class="absolute w-full h-full bg-cyan-500/20 rounded-full animate-ping-slow"></div>
+<div class="w-4 h-4 bg-cyan-400 rounded-full shadow-[0_0_20px_rgba(6,182,212,1)] border-2 border-white relative z-10 transition-transform duration-300 group-hover:scale-125"></div>
+<div class="absolute left-4 bottom-4 w-16 h-[1px] bg-cyan-500 rotate-[-45deg] origin-bottom-left transition-all duration-500 group-hover:w-24 opacity-0 group-hover:opacity-100 delay-75"></div>
+<div class="absolute left-16 bottom-16 w-64 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-4 group-hover:translate-y-0 pointer-events-none group-hover:pointer-events-auto">
+<div class="bg-black/90 border border-cyan-500/50 p-4 backdrop-blur-md relative">
+<div class="tech-corner tl"></div>
+<div class="tech-corner tr"></div>
+<div class="tech-corner bl"></div>
+<div class="tech-corner br"></div>
+<h3 class="text-cyan-400 text-xs font-bold tracking-widest uppercase mb-1">检测到异常信号</h3>
+<div class="text-white font-bold text-lg mb-2">反直觉真相</div>
+<div class="h-px w-full bg-gray-800 mb-2"></div>
+<p class="text-xs text-gray-400 leading-relaxed mb-3">
+                                在这片充满"常识"的红海中，有一个被大多数人忽视的观点正在闪烁。
+                            </p>
+<div class="flex items-center justify-between">
+<span class="text-[10px] text-cyan-700 font-mono">ID: SEC-001</span>
+<span class="text-[10px] bg-cyan-900/30 text-cyan-300 px-1.5 py-0.5 rounded border border-cyan-800">可交互</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center z-40 pointer-events-none">
+<div class="w-2 h-2 bg-white rounded-full opacity-20"></div>
+</div>
+</div>
+<div class="absolute bottom-12 w-full max-w-2xl px-6">
+<div class="glass-panel bg-black/60 backdrop-blur-xl border border-gray-800 p-8 rounded-lg relative overflow-hidden">
+<div class="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-50"></div>
+<div class="flex flex-col md:flex-row gap-8 items-start md:items-center">
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-3">
+<span class="material-icons-outlined text-cyan-400 text-lg">psychology</span>
+<span class="text-xs font-bold text-cyan-500 uppercase tracking-widest">蒂尔测试 (Thiel Question)</span>
+</div>
+<h2 class="text-2xl md:text-3xl font-light text-white mb-4 leading-tight">
+                            "有哪些事，你和<span class="text-cyan-400 font-bold">绝大多数人</span>的看法是不一样的？"
+                        </h2>
+<div class="flex items-center gap-3 text-sm text-gray-400">
+<span class="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse"></span>
+<span>当前案例线索: <span class="text-gray-200">Airbnb</span></span>
+</div>
+</div>
+<div class="flex-shrink-0 w-full md:w-auto">
+<button id="decode-secret-btn" data-no-next="true" class="group relative w-full md:w-auto overflow-hidden bg-cyan-900/20 border border-cyan-500/30 hover:bg-cyan-500/10 hover:border-cyan-400 transition-all duration-300 rounded px-8 py-4 flex items-center justify-center gap-3">
+<div class="absolute inset-0 w-1 bg-cyan-500 transition-all duration-300 group-hover:w-full opacity-10"></div>
+<span class="material-icons-outlined text-cyan-400 group-hover:text-cyan-300 transition-colors">lock_open</span>
+<span class="font-bold text-cyan-100 tracking-wider group-hover:text-white z-10">解码秘密 (DECODE)</span>
+</button>
+<div class="mt-2 text-center">
+<span class="text-[10px] text-gray-600 font-mono uppercase">需消耗 50 认知点数</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="absolute top-1/4 left-12 opacity-10 font-mono text-xs text-cyan-300 hidden lg:block pointer-events-none select-none">
+<div>function scanNetwork(nodes) {</div>
+<div class="pl-4">return nodes.filter(n =&gt; n.isContrarian);</div>
+<div>}</div>
+<div class="mt-4">Analysis: <span class="text-white">PENDING</span></div>
+<div>Confidence: 0.05%</div>
+</div>
+<div class="absolute bottom-1/4 right-12 opacity-10 font-mono text-xs text-cyan-300 hidden lg:block pointer-events-none select-none text-right">
+<div>&gt; TARGET: "Sharing Economy"</div>
+<div>&gt; STATUS: HIDDEN</div>
+<div>&gt; VECTOR: TRUST_MECHANISM</div>
+<div class="mt-4 text-white">0x4921A...F29</div>
+</div>
+<div id="decode-result-panel" class="fixed inset-0 z-[120] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-200">
+<div class="w-full max-w-xl rounded-xl border border-cyan-500/40 bg-dark-bg/95 shadow-[0_0_40px_rgba(6,182,212,0.25)] p-6 relative">
+<div class="tech-corner tl"></div>
+<div class="tech-corner tr"></div>
+<div class="tech-corner bl"></div>
+<div class="tech-corner br"></div>
+<p class="text-[10px] font-mono uppercase tracking-[0.22em] text-cyan-400 mb-2">Secret Decrypted</p>
+<h3 class="text-xl font-bold text-white mb-3">反直觉秘密：真正的突破来自“非共识正确”</h3>
+<p class="text-sm text-gray-300 leading-relaxed mb-3">《从0到1》的核心不是“比别人更努力竞争”，而是先找到一个大多数人暂时不认可、但最终会被证明正确的洞见。</p>
+<div class="rounded-lg border border-cyan-900/60 bg-black/40 p-3 mb-4">
+<p class="text-xs text-gray-300 leading-relaxed">以 Airbnb 为例：主流意见认为“陌生人不会互相信任”，但其通过评价体系与担保机制，把“不可能的交易”变成了规模化市场。</p>
+</div>
+<div class="flex items-center justify-end gap-2">
+<button id="decode-close-btn" data-no-next="true" class="px-3 py-2 text-xs rounded border border-gray-700 text-gray-300 hover:bg-white/5 transition-colors">继续思考</button>
+<button id="decode-continue-btn" data-next-scene="decoded-secret" class="px-4 py-2 text-xs rounded bg-cyan-500 text-black font-bold hover:bg-cyan-400 transition-colors">进入下一幕</button>
+</div>
+</div>
+</div>
+</main>
+<script>
+(() => {
+  const trigger = document.getElementById("decode-secret-btn");
+  const panel = document.getElementById("decode-result-panel");
+  const close = document.getElementById("decode-close-btn");
+  if (!trigger || !panel || !close) return;
+  const show = () => {
+    panel.classList.remove("opacity-0", "pointer-events-none");
+    panel.classList.add("opacity-100");
+  };
+  const hide = () => {
+    panel.classList.remove("opacity-100");
+    panel.classList.add("opacity-0", "pointer-events-none");
+  };
+  trigger.addEventListener("click", show);
+  close.addEventListener("click", hide);
+})();
+</script>
+
+</body></html>

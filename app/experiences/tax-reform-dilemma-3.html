@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html class="dark" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>reado: 张居正 - 一条鞭法改革界面</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&amp;family=Noto+Serif+SC:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#b83b3b",
+                        "background-dark": "#0f0c0c",
+                        "imperial-gold": "#c5a059",
+                        "imperial-dark-gold": "#8a6d3b",
+                        "ink-black": "#1a1a1a",
+                        "ink-gray": "#2d2d2d",
+                        "paper": "#f0e6d2",
+                        "jade": "#4a7c59",
+                    },
+                    fontFamily: {
+                        "sans": ["Source Han Sans CN", "Noto Sans SC", "sans-serif"],
+                        "serif": ["Noto Serif SC", "serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "1rem"},
+                    backgroundImage: {
+                        'parchment': "url('https://www.transparenttextures.com/patterns/aged-paper.png')",
+                    }
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f0c0c; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3d3d3d; 
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #c5a059; 
+        }
+        .ink-panel {
+            background: rgba(15, 12, 12, 0.9);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(197, 160, 89, 0.15);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+        .map-province {
+            transition: all 0.4s ease;
+        }
+        .map-province:hover {
+            fill-opacity: 0.8;
+            stroke: #c5a059;
+            stroke-width: 2px;
+        }
+        .resource-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 4px;
+            background: #2d2d2d;
+            border-radius: 2px;
+            outline: none;
+        }
+        .resource-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #c5a059;
+            cursor: pointer;
+            border: 2px solid #0f0c0c;
+        }
+        .notification-toast {
+            animation: slideUp 0.5s ease-out forwards;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-background-dark text-gray-200 font-sans min-h-screen flex flex-col relative overflow-hidden selection:bg-imperial-gold selection:text-black">
+<script src="/shared/book-catalog.js?v=1771240921862"></script>
+<script type="module" src="/shared/shell.js?v=1771240921862"></script>
+<reado-app-shell data-page="knowledge-map"></reado-app-shell>
+<div class="absolute inset-0 z-0">
+<img alt="背景：水墨山水与朝堂隐喻" class="w-full h-full object-cover opacity-20 filter grayscale contrast-125" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDX8SBd_bwcsga-D8oyHP11Ls12LgxJHu0VAJewYjOc_KmdsFvgkJBdrm3l59kLoW51uTMzSxHdAnVN6RurzvhTsEeHxWRSEkHXq2ZB8uWYb2ta_BP4L4_DEB4WmB7MRZay_ndWQIuP_qHHPQLTHooWXkyh2Gg9IBb10flqGIfZd7ddoidDqfE0A0qD3o-GfJYBn66WprWCmQNz2PHkCGS39LTpn9b1IYFFg37kawBHVXGHHddhmxdDBFlT1MAvTq4KKX1arcaE5hE"/>
+<div class="absolute inset-0 bg-gradient-to-b from-background-dark via-background-dark/90 to-background-dark/95"></div>
+<div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/rice-paper-2.png')] opacity-10 mix-blend-overlay"></div>
+</div>
+<header class="relative z-30 px-6 py-4 flex justify-between items-center border-b border-white/5 bg-background-dark/50 backdrop-blur-md">
+<div class="flex items-center gap-4">
+<span class="text-2xl font-black tracking-tighter text-white">reado</span>
+<div class="h-6 w-px bg-white/20"></div>
+<div class="flex flex-col">
+<span class="text-xs text-imperial-gold font-medium tracking-[0.2em] uppercase">万历十五年 · 关卡二</span>
+<span class="text-lg font-bold text-gray-100 tracking-wide">平衡木上的改革者</span>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2 px-4 py-1.5 rounded bg-white/5 border border-white/10">
+<span class="material-symbols-outlined text-imperial-gold text-sm">hourglass_top</span>
+<span class="text-sm text-gray-300 font-mono">万历六年 · 春</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-xs text-gray-500">当前身份</span>
+<span class="text-sm font-bold text-gray-200">内阁首辅 张居正</span>
+</div>
+</div>
+</header>
+<main class="relative z-10 flex-grow grid grid-cols-12 gap-6 p-6 h-[calc(100vh-80px)]">
+<aside class="col-span-3 flex flex-col gap-6 h-full">
+<div class="ink-panel rounded-lg p-6 flex flex-col gap-6 relative overflow-hidden">
+<div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-imperial-gold to-transparent opacity-50"></div>
+<div class="flex justify-between items-center">
+<h3 class="text-imperial-gold tracking-widest text-sm font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">tune</span> 行政资源分配
+                    </h3>
+<span class="text-xs px-2 py-0.5 bg-imperial-gold/20 text-imperial-gold rounded border border-imperial-gold/30">剩余点数: 2</span>
+</div>
+<div class="space-y-6">
+<div class="group">
+<div class="flex justify-between items-end mb-2">
+<span class="text-gray-300 text-sm font-medium flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-gray-500">square_foot</span> 清丈土地
+                            </span>
+<span class="text-imperial-gold font-mono font-bold">LV. 3</span>
+</div>
+<input class="resource-slider" max="5" min="1" type="range" value="3"/>
+<p class="text-[10px] text-gray-500 mt-1.5 leading-relaxed">彻底清查隐田，打击豪强兼并。增加国库收入，但会激起士绅强烈反弹。</p>
+</div>
+<div class="group">
+<div class="flex justify-between items-end mb-2">
+<span class="text-gray-300 text-sm font-medium flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-gray-500">account_balance</span> 充实国库
+                            </span>
+<span class="text-imperial-gold font-mono font-bold">LV. 4</span>
+</div>
+<input class="resource-slider" max="5" min="1" type="range" value="4"/>
+<p class="text-[10px] text-gray-500 mt-1.5 leading-relaxed">通过考成法严催税收。国库充盈速度加快，但由于催逼过急，地方民怨暗生。</p>
+</div>
+<div class="group">
+<div class="flex justify-between items-end mb-2">
+<span class="text-gray-300 text-sm font-medium flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-gray-500">verified</span> 官场名声
+                            </span>
+<span class="text-primary font-mono font-bold">LV. 1</span>
+</div>
+<input class="resource-slider" max="5" min="1" type="range" value="1"/>
+<p class="text-[10px] text-primary/80 mt-1.5 leading-relaxed">独断专行，不恤人言。朝中树敌众多，言官弹劾如雪片飞来。</p>
+</div>
+</div>
+<button class="mt-4 w-full py-2 bg-imperial-gold/10 hover:bg-imperial-gold/20 border border-imperial-gold/30 text-imperial-gold text-sm tracking-widest transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-base">gavel</span> 执行本月政令
+                </button>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="ink-panel p-4 rounded-lg text-center">
+<div class="text-xs text-gray-500 mb-1">太仓银 (万两)</div>
+<div class="text-xl font-mono text-gray-200">4,280 <span class="text-xs text-green-500 align-middle">▲</span></div>
+</div>
+<div class="ink-panel p-4 rounded-lg text-center border-primary/30">
+<div class="text-xs text-gray-500 mb-1">朝野支持度</div>
+<div class="text-xl font-mono text-primary">28% <span class="text-xs text-primary align-middle">▼</span></div>
+</div>
+</div>
+</aside>
+<section class="col-span-6 flex flex-col h-full relative">
+<div class="ink-panel rounded-lg flex-grow relative overflow-hidden flex items-center justify-center p-8">
+<div class="absolute top-4 right-4 z-10">
+<div class="flex flex-col items-end gap-2">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 bg-imperial-gold rounded-sm"></div>
+<span class="text-xs text-gray-400">推行顺利</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 bg-imperial-dark-gold/50 rounded-sm"></div>
+<span class="text-xs text-gray-400">推行受阻</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 bg-gray-800 rounded-sm border border-gray-700"></div>
+<span class="text-xs text-gray-400">尚未波及</span>
+</div>
+</div>
+</div>
+<div class="absolute top-6 left-6 z-10">
+<h2 class="text-2xl font-serif font-bold text-gray-200 tracking-widest">一条鞭法推行图</h2>
+<p class="text-xs text-gray-500 mt-1">全国各省实施进度概览</p>
+</div>
+<svg class="w-full h-full max-h-[500px] drop-shadow-2xl" viewBox="0 0 800 600">
+<filter id="ink-blur">
+<feGaussianBlur in="SourceGraphic" stdDeviation="0.5"></feGaussianBlur>
+</filter>
+<pattern height="40" id="grid" patternUnits="userSpaceOnUse" width="40">
+<path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1"></path>
+</pattern>
+<rect fill="url(#grid)" height="100%" width="100%"></rect>
+<path class="map-province cursor-pointer" d="M 450 150 L 520 160 L 510 230 L 440 210 Z" fill="#c5a059" stroke="#5c4d35" stroke-width="1">
+<title>北直隶：推行进度 90%</title>
+</path>
+<path class="map-province cursor-pointer" d="M 520 160 L 580 170 L 570 240 L 510 230 Z" fill="#8a6d3b" fill-opacity="0.8" stroke="#5c4d35" stroke-width="1">
+<title>山东：推行进度 65%</title>
+</path>
+<path class="map-province cursor-pointer" d="M 380 180 L 450 150 L 440 210 L 390 260 Z" fill="#2d2d2d" stroke="#5c4d35" stroke-width="1">
+<title>山西：推行进度 15%</title>
+</path>
+<path class="map-province cursor-pointer" d="M 440 210 L 510 230 L 490 300 L 420 280 Z" fill="#8a6d3b" fill-opacity="0.6" stroke="#5c4d35" stroke-width="1">
+<title>河南：推行进度 45%</title>
+</path>
+<path class="map-province cursor-pointer" d="M 510 230 L 570 240 L 600 320 L 520 340 L 490 300 Z" fill="#c5a059" fill-opacity="0.9" stroke="#5c4d35" stroke-width="1">
+<title>南直隶：推行进度 85% (阻力极大)</title>
+</path>
+<path class="map-province cursor-pointer" d="M 520 340 L 600 320 L 580 380 L 510 370 Z" fill="#c5a059" stroke="#5c4d35" stroke-width="1">
+<title>浙江：推行进度 95%</title>
+</path>
+<path class="map-province cursor-pointer" d="M 390 260 L 440 210 L 420 280 L 490 300 L 520 340 L 510 370 L 450 400 L 380 350 Z" fill="#c5a059" stroke="#b83b3b" stroke-width="2">
+<title>湖广：推行进度 100% (改革核心区)</title>
+</path>
+<path class="map-province cursor-pointer" d="M 450 400 L 510 370 L 530 430 L 460 450 Z" fill="#8a6d3b" fill-opacity="0.7" stroke="#5c4d35" stroke-width="1">
+<title>江西：推行进度 55%</title>
+</path>
+<path d="M 480 190 L 470 240 L 540 280 L 450 330" fill="none" opacity="0.6" stroke="#b83b3b" stroke-dasharray="4 2" stroke-width="1"></path>
+<circle cx="480" cy="190" fill="#b83b3b" r="3"></circle>
+<circle cx="450" cy="330" fill="#b83b3b" r="3"></circle>
+</svg>
+<div class="absolute bottom-6 left-6 px-4 py-3 bg-black/60 backdrop-blur border-l-2 border-primary">
+<div class="text-[10px] text-gray-400 uppercase tracking-wider mb-1">改革总进度</div>
+<div class="text-2xl font-bold text-white font-mono">37.5%</div>
+</div>
+</div>
+<div class="absolute bottom-[-10px] left-1/2 transform -translate-x-1/2 w-[90%] notification-toast z-50">
+<div class="bg-[#1e1313] border border-primary/50 text-gray-300 px-4 py-3 rounded shadow-2xl flex items-start gap-3">
+<span class="material-symbols-outlined text-primary mt-0.5">warning</span>
+<div>
+<h4 class="text-primary font-bold text-sm mb-0.5">来自都察院的急报</h4>
+<p class="text-xs">御史刘台弹劾首辅“专权乱政，动摇国本”，奏折已递入司礼监。若不处理，官场名声将大幅下降。</p>
+<div class="mt-2 flex gap-3">
+<button class="text-xs text-gray-400 hover:text-white underline">暂且搁置</button>
+<button class="text-xs text-primary font-bold hover:text-red-400">驳回并廷杖</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<aside class="col-span-3 flex flex-col gap-6 h-full">
+<div class="ink-panel rounded-lg p-0 flex flex-col h-full overflow-hidden relative group">
+<div class="h-1/2 w-full relative overflow-hidden bg-[#242424]">
+<img alt="张居正画像" class="w-full h-full object-cover object-top opacity-80 mix-blend-luminosity hover:mix-blend-normal transition-all duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDN17QOn4h2AmxwMc7THA3FCFAMexL66VqS8WsiyPnrOMol9TKEytoN_SYnHbKKLy5cMAbunbhMO9I_RDPp37ziDJDd2ILQem3U8-Cnl2qc7TB0Whc6KoMn_F9nXwF_6i_aFF2NFthc9j4-NwLyf0zYqu5Rt1xsxUEQFhXIdmWmRyKdcLupDkBUDe6E0V0FZPlHazBC50NBOYa4F7o_s5t-3wzUwmS2pEcG4lEHQBATM0lJ1vFDqiqpn3AMt-ojPYNPZCwQbX_FQGk"/>
+<div class="absolute inset-0 bg-gradient-to-t from-[#0f0c0c] to-transparent"></div>
+<div class="absolute bottom-4 left-4">
+<div class="px-2 py-0.5 bg-primary text-white text-[10px] font-bold inline-block mb-1">改革派领袖</div>
+<h2 class="text-xl font-serif font-bold text-white tracking-widest">张居正</h2>
+</div>
+</div>
+<div class="flex-grow p-5 overflow-y-auto custom-scrollbar">
+<h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 border-b border-gray-800 pb-2">朝局动态日志</h3>
+<ul class="space-y-4">
+<li class="relative pl-4 border-l border-gray-700 pb-1">
+<div class="absolute -left-[5px] top-1 w-2.5 h-2.5 rounded-full bg-gray-600 border-2 border-[#0f0c0c]"></div>
+<span class="text-[10px] text-gray-500 block mb-1">万历五年 冬</span>
+<p class="text-xs text-gray-300 leading-relaxed">下令天下清丈田亩。虽有阻力，但湖广地区推行甚速。</p>
+</li>
+<li class="relative pl-4 border-l border-gray-700 pb-1">
+<div class="absolute -left-[5px] top-1 w-2.5 h-2.5 rounded-full bg-imperial-gold border-2 border-[#0f0c0c]"></div>
+<span class="text-[10px] text-imperial-gold block mb-1">万历六年 春 (当前)</span>
+<p class="text-xs text-white leading-relaxed font-medium">漕运总督奏报：江南多地士绅罢市，抗议丈量土地不公。需尽快定夺。</p>
+</li>
+<li class="relative pl-4 border-l border-gray-700 border-dashed">
+<div class="absolute -left-[5px] top-1 w-2.5 h-2.5 rounded-full bg-gray-800 border-2 border-[#0f0c0c]"></div>
+<span class="text-[10px] text-gray-600 block mb-1">待发生</span>
+<p class="text-xs text-gray-600 leading-relaxed italic">夺情之争...</p>
+</li>
+</ul>
+</div>
+<div class="p-4 bg-white/5 border-t border-white/5">
+<button class="w-full py-3 rounded bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs transition-all border border-gray-700 flex items-center justify-center gap-2 group-hover:border-gray-500">
+<span class="material-symbols-outlined text-sm">history_edu</span>
+                        查阅《实录》档案
+                    </button>
+</div>
+</div>
+</aside>
+</main>
+<div class="fixed inset-0 pointer-events-none opacity-[0.03] z-50 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]"></div>
+
+<script id="reado-wanli-stage3">
+(() => {
+  const STORAGE_KEY = "reado_wanli_campaign_v1";
+  const NEXT_HREF = "/experiences/tax-reform-dilemma-4.html";
+  const RESTART_HREF = "/experiences/tax-reform-dilemma-1.html";
+  const TOTAL_POINTS = 12;
+
+  const sliders = Array.from(document.querySelectorAll("input.resource-slider"));
+  if (sliders.length < 3) return;
+
+  const sliderBlocks = sliders.map((slider) => slider.closest(".group")).filter(Boolean);
+  const levelEls = sliderBlocks.map((block) => block.querySelector("span.font-mono.font-bold"));
+  const remainingEl = Array.from(document.querySelectorAll("aside .ink-panel span")).find((el) => (el.textContent || "").includes("剩余点数"));
+  const executeBtn = Array.from(document.querySelectorAll("button")).find((btn) => (btn.textContent || "").includes("执行本月政令"));
+  const archiveBtn = Array.from(document.querySelectorAll("button")).find((btn) => (btn.textContent || "").includes("查阅《实录》档案"));
+  if (!executeBtn) return;
+  executeBtn.innerHTML = '<span class="material-symbols-outlined text-base">task_alt</span> 结束本月政令';
+
+  const supportPanel = Array.from(document.querySelectorAll("aside .ink-panel.p-4.rounded-lg.text-center")).find((el) => {
+    const label = el.querySelector("div.text-xs");
+    return (label?.textContent || "").includes("朝野支持度");
+  });
+  const treasuryPanel = Array.from(document.querySelectorAll("aside .ink-panel.p-4.rounded-lg.text-center")).find((el) => {
+    const label = el.querySelector("div.text-xs");
+    return (label?.textContent || "").includes("太仓银");
+  });
+  const supportValueEl = supportPanel ? supportPanel.querySelector("div.text-xl") : null;
+  const treasuryValueEl = treasuryPanel ? treasuryPanel.querySelector("div.text-xl") : null;
+  const progressNum = Array.from(document.querySelectorAll("div.text-2xl.font-bold.font-mono")).find((el) => (el.textContent || "").includes("%"));
+
+  const urgentCard = document.querySelector(".notification-toast");
+  const urgentTitleEl = urgentCard ? urgentCard.querySelector("h4") : null;
+  const urgentDescEl = urgentCard ? urgentCard.querySelector("p") : null;
+  const urgentButtons = urgentCard ? Array.from(urgentCard.querySelectorAll("button")) : [];
+  const holdBtn = urgentButtons.find((btn) => (btn.textContent || "").includes("暂且搁置"));
+  const hardBtn = urgentButtons.find((btn) => (btn.textContent || "").includes("驳回并廷杖"));
+
+  const logList = document.querySelector("aside ul.space-y-4");
+  const mainSection = document.querySelector("main section.col-span-6");
+
+  if (urgentCard) {
+    urgentCard.style.position = "fixed";
+    urgentCard.style.left = "50%";
+    urgentCard.style.bottom = "16px";
+    urgentCard.style.transform = "translateX(-50%)";
+    urgentCard.style.width = "min(720px, calc(100vw - 32px))";
+    urgentCard.style.zIndex = "9000";
+    urgentCard.style.pointerEvents = "auto";
+  }
+
+  const missionPanel = document.createElement("div");
+  missionPanel.className = "bg-[#1e1313]/90 border border-primary/40 rounded px-4 py-3 mb-4 text-xs text-gray-200 leading-relaxed";
+  missionPanel.innerHTML = `
+    <div class="text-imperial-gold font-bold tracking-widest mb-1">本轮施政简报</div>
+    <div data-wanli-mission-title class="text-sm font-bold text-white mb-1">准备中...</div>
+    <div data-wanli-mission-text>请稍候...</div>
+    <div data-wanli-preview class="mt-2 text-[11px] text-slate-300">尚未分配资源。</div>
+    <div data-wanli-bonus class="mt-1 text-[11px] text-cyan-200">急报加成：未处理（可选）</div>
+  `;
+  if (mainSection) {
+    const mapPanel = mainSection.querySelector(".ink-panel");
+    if (mapPanel) mapPanel.insertAdjacentElement("afterend", missionPanel);
+  }
+
+  const missionTitleEl = missionPanel.querySelector("[data-wanli-mission-title]");
+  const missionTextEl = missionPanel.querySelector("[data-wanli-mission-text]");
+  const previewEl = missionPanel.querySelector("[data-wanli-preview]");
+  const bonusEl = missionPanel.querySelector("[data-wanli-bonus]");
+
+  const statusPanel = document.createElement("div");
+  statusPanel.className = "fixed right-5 top-24 z-[9998] bg-slate-900/90 border border-slate-600 rounded-lg px-3 py-2 text-[11px] text-slate-200 leading-5 shadow-xl";
+  document.body.appendChild(statusPanel);
+
+  const missions = [
+    {
+      title: "第一轮：江南清丈停摆",
+      desc: "江南士绅联名罢市，拒绝配合清丈。你的核心任务是让“纸面政令”变成“地方执行”。",
+      reading: "万历六年前后，清丈田亩触碰的是地方士绅和胥吏的既得利益。朝廷诏书可以一夜下达，县乡执行却要穿过宗族关系网。此时最怕的不是公开反对，而是“拖字诀”与“报表作假”。",
+      urgent: "都察院上奏：首辅以严刑逼迫里甲，破坏祖制。此急报为额外事件，可处理也可暂缓。",
+      bonus: {
+        hold: { exec: 0, resistance: -2, legitimacy: 2, silver: -30, support: 1, note: "你暂缓冲突，换来少量制度信任。" },
+        hard: { exec: 3, resistance: 4, legitimacy: -2, silver: 20, support: -1, note: "你压住言路，短期效率提升但敌意上升。" },
+        archive: { exec: 1, resistance: 0, legitimacy: 3, silver: 0, support: 1, note: "你用史料自证，获得温和加成。" }
+      }
+    },
+    {
+      title: "第二轮：夺情风波升级",
+      desc: "言官将改革议题政治化，你必须在“执行速度”与“合法性”之间再做取舍。",
+      reading: "在当时政治语境里，争议并不只看政策本身，而看是否符合礼制叙事。张居正每推进一步，都要同步回答“你是否僭越祖制”。因此改革常常要付出额外政治成本。",
+      urgent: "急报：御史联署弹章上呈司礼监。此急报只影响额外属性，不决定回合推进。",
+      bonus: {
+        hold: { exec: -1, resistance: -1, legitimacy: 2, silver: -20, support: 1, note: "你给足缓冲，冲突降温。" },
+        hard: { exec: 2, resistance: 3, legitimacy: -2, silver: 15, support: -1, note: "你守住主导，但加深“专权”观感。" },
+        archive: { exec: 1, resistance: 0, legitimacy: 3, silver: 0, support: 2, note: "你补齐证据链，争取了中间官员。" }
+      }
+    },
+    {
+      title: "第三轮：阳奉阴违蔓延",
+      desc: "多省出现“表面达标、实际走样”。你要决定收官时是冲刺还是固化制度。",
+      reading: "《万历十五年》的结构洞见是：若改革只能靠关键人物硬推，一旦人物失势，执行网络会迅速回到旧轨。收官回合比拼的不是胆量，而是“可持续制度能力”。",
+      urgent: "终局急报：地方报表与实地情形不符。你可选择额外处置来争取边际收益。",
+      bonus: {
+        hold: { exec: -1, resistance: -2, legitimacy: 2, silver: -10, support: 1, note: "你压低摩擦，稳住基本盘。" },
+        hard: { exec: 2, resistance: 4, legitimacy: -2, silver: 25, support: -1, note: "你换来冲刺成果，也抬高反扑概率。" },
+        archive: { exec: 1, resistance: -1, legitimacy: 3, silver: 5, support: 2, note: "你把经验沉淀为规则，收官更稳。" }
+      }
+    }
+  ];
+
+  let roundIndex = 0;
+  const score = { exec: 45, resistance: 55, legitimacy: 50 };
+  let silver = parseInt(String(treasuryValueEl?.textContent || "4280").replace(/[^\d]/g, ""), 10) || 4280;
+  let support = parseInt(String(supportValueEl?.textContent || "28").replace(/[^\d]/g, ""), 10) || 28;
+  const records = [];
+  let stageFailed = false;
+
+  let emergencyHandled = false;
+  let emergencyType = "none";
+  let emergencyBonus = { exec: 0, resistance: 0, legitimacy: 0, silver: 0, support: 0, note: "未处理急报，无额外加成。" };
+
+  function load() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); } catch { return {}; }
+  }
+
+  function saveStage(payload) {
+    const base = load();
+    base.zhang = payload;
+    base.lastUpdatedAt = new Date().toISOString();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(base));
+  }
+
+  function clearCampaignAndRestart() {
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.setItem("reado_book_last_wanli-fifteen", "tax-reform-dilemma-1");
+    } catch {}
+    window.location.href = RESTART_HREF;
+  }
+
+  function clamp(v) { return Math.max(0, Math.min(100, v)); }
+  function calcOverall() { return clamp(Math.round(score.exec * 0.55 + (100 - score.resistance) * 0.2 + score.legitimacy * 0.25)); }
+
+  function addLog(text) {
+    if (!logList) return;
+    const li = document.createElement("li");
+    li.className = "relative pl-4 border-l border-gray-700 pb-1";
+    li.innerHTML = `<div class="absolute -left-[5px] top-1 w-2.5 h-2.5 rounded-full bg-imperial-gold border-2 border-[#0f0c0c]"></div><span class="text-[10px] text-imperial-gold block mb-1">万历六年 · 更新</span><p class="text-xs text-white leading-relaxed font-medium">${text}</p>`;
+    logList.prepend(li);
+  }
+
+  function modal(title, body, actions) {
+    const w = document.createElement("div");
+    w.style.cssText = "position:fixed;inset:0;z-index:99999;background:rgba(2,6,23,.78);display:flex;align-items:center;justify-content:center;padding:16px;";
+    w.innerHTML = `<div style=\"max-width:780px;width:100%;background:#0f172a;border:1px solid rgba(148,163,184,.35);border-radius:14px;padding:18px;color:#e2e8f0\"><h3 style=\"font-size:22px;font-weight:800;margin:0 0 10px\">${title}</h3><div style=\"font-size:14px;line-height:1.75;color:#cbd5e1;white-space:pre-wrap\">${body}</div><div id=\"m-actions\" style=\"margin-top:14px;display:flex;gap:8px;flex-wrap:wrap\"></div></div>`;
+    document.body.appendChild(w);
+    const host = w.querySelector("#m-actions");
+    (actions || []).forEach((a) => {
+      const bt = document.createElement("button");
+      bt.textContent = a.label;
+      bt.style.cssText = "padding:8px 12px;border-radius:8px;border:1px solid rgba(148,163,184,.35);background:#1e293b;color:#fff;font-weight:700;cursor:pointer";
+      bt.onclick = () => { a.onClick?.(); w.remove(); };
+      host.appendChild(bt);
+    });
+  }
+
+  function disableRoundInputs() {
+    sliders.forEach((slider) => {
+      slider.disabled = true;
+      slider.style.opacity = "0.6";
+    });
+    executeBtn.disabled = true;
+    executeBtn.style.opacity = "0.6";
+    if (holdBtn) holdBtn.disabled = true;
+    if (hardBtn) hardBtn.disabled = true;
+    if (archiveBtn) archiveBtn.disabled = true;
+  }
+
+  function failStage(reason, detail) {
+    if (stageFailed) return;
+    stageFailed = true;
+    disableRoundInputs();
+    modal("第三幕失败", `${reason}\n\n${detail}\n\n结局：改革执行体系崩盘，你需要从第一幕重新开始。`, [
+      { label: "从第一幕重开", onClick: () => clearCampaignAndRestart() }
+    ]);
+  }
+
+  function showToast(text, tone = "info") {
+    const node = document.createElement("div");
+    const color = tone === "warn" ? "#fca5a5" : tone === "ok" ? "#67e8f9" : "#fde68a";
+    node.textContent = text;
+    node.style.cssText = `position:fixed;right:18px;top:94px;z-index:99999;padding:8px 12px;border-radius:10px;border:1px solid rgba(148,163,184,.35);background:rgba(15,23,42,.92);color:${color};font-size:12px;font-weight:700;opacity:0;transform:translateY(-6px);transition:all .22s ease;`;
+    document.body.appendChild(node);
+    requestAnimationFrame(() => { node.style.opacity = "1"; node.style.transform = "translateY(0)"; });
+    setTimeout(() => { node.style.opacity = "0"; node.style.transform = "translateY(-8px)"; }, 900);
+    setTimeout(() => node.remove(), 1200);
+  }
+
+  function ai(prompt, fallback) {
+    const key = localStorage.getItem("reado_deepseek_api_key") || "";
+    const ep = localStorage.getItem("reado_deepseek_endpoint") || "https://api.deepseek.com/chat/completions";
+    if (!key) return Promise.resolve(`【本地推演】${fallback}`);
+    return fetch(ep, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
+      body: JSON.stringify({
+        model: "deepseek-chat",
+        temperature: 0.7,
+        max_tokens: 280,
+        messages: [
+          { role: "system", content: "你是明代改革叙事引擎，给出结构后果与1条策略建议。" },
+          { role: "user", content: prompt }
+        ]
+      })
+    })
+      .then(async (res) => {
+        const d = await res.json();
+        const t = d?.choices?.[0]?.message?.content?.trim();
+        if (!res.ok || !t) throw new Error("bad");
+        return `【DeepSeek推演】${t}`;
+      })
+      .catch(() => `【本地推演】${fallback}`);
+  }
+
+  function readSliderState() {
+    return {
+      land: Number(sliders[0].value || 1),
+      fiscal: Number(sliders[1].value || 1),
+      reputation: Number(sliders[2].value || 1)
+    };
+  }
+
+  function updateLevelUI() {
+    const vals = sliders.map((s) => Number(s.value || 1));
+    vals.forEach((v, idx) => {
+      if (levelEls[idx]) levelEls[idx].textContent = `LV. ${v}`;
+    });
+    const used = vals.reduce((sum, v) => sum + v, 0);
+    const remain = TOTAL_POINTS - used;
+    if (remainingEl) {
+      remainingEl.textContent = `剩余点数: ${remain}`;
+      remainingEl.className = remain < 0
+        ? "text-xs px-2 py-0.5 bg-red-500/20 text-red-300 rounded border border-red-400/30"
+        : "text-xs px-2 py-0.5 bg-imperial-gold/20 text-imperial-gold rounded border border-imperial-gold/30";
+    }
+
+    const current = missions[roundIndex];
+    if (current && previewEl) {
+      const state = readSliderState();
+      const execPreview = state.land * 2 + state.fiscal - (state.reputation <= 1 ? 3 : 0);
+      const resistPreview = state.land * 2 + state.fiscal - state.reputation * 2;
+      previewEl.textContent = `资源预估：执行 ${execPreview >= 0 ? "+" : ""}${execPreview} / 阻力 ${resistPreview >= 0 ? "+" : ""}${resistPreview}`;
+    }
+
+    executeBtn.disabled = remain < 0;
+    executeBtn.style.opacity = remain < 0 ? "0.6" : "1";
+  }
+
+  function renderEconomy() {
+    const silverText = silver.toLocaleString("zh-CN");
+    const silverDir = silver >= 4280 ? "▲" : "▼";
+    const supportDir = support >= 28 ? "▲" : "▼";
+    if (treasuryValueEl) treasuryValueEl.textContent = `${silverText} ${silverDir}`;
+    if (supportValueEl) supportValueEl.textContent = `${support}% ${supportDir}`;
+  }
+
+  function renderStatus() {
+    const overall = calcOverall();
+    if (progressNum) progressNum.textContent = `${overall}%`;
+    statusPanel.innerHTML = [
+      '<div class="font-bold text-sky-200 mb-1">张居正调度面板</div>',
+      `<div>执行率：<span class="text-white font-bold">${score.exec}%</span></div>`,
+      `<div>官僚阻力：<span class="text-amber-200 font-bold">${score.resistance}%</span></div>`,
+      `<div>合法性：<span class="text-emerald-200 font-bold">${score.legitimacy}%</span></div>`,
+      `<div>太仓银：<span class="text-cyan-200 font-bold">${silver.toLocaleString("zh-CN")}</span></div>`,
+      `<div>朝野支持度：<span class="text-pink-200 font-bold">${support}%</span></div>`,
+      `<div class="mt-1 text-slate-400">回合 ${Math.min(roundIndex + 1, missions.length)}/${missions.length}</div>`
+    ].join("");
+    renderEconomy();
+  }
+
+  function resetEmergencyState() {
+    emergencyHandled = false;
+    emergencyType = "none";
+    emergencyBonus = { exec: 0, resistance: 0, legitimacy: 0, silver: 0, support: 0, note: "未处理急报，无额外加成。" };
+    if (bonusEl) bonusEl.textContent = "急报加成：未处理（可选）";
+    if (holdBtn) {
+      holdBtn.disabled = false;
+      holdBtn.style.color = "";
+      holdBtn.style.fontWeight = "";
+    }
+    if (hardBtn) {
+      hardBtn.disabled = false;
+      hardBtn.style.color = "";
+      hardBtn.style.fontWeight = "";
+    }
+    if (archiveBtn) archiveBtn.disabled = false;
+  }
+
+  function applyEmergency(type) {
+    if (emergencyHandled) {
+      showToast("本轮急报已处理，等待结束本月政令。", "info");
+      return;
+    }
+    const mission = missions[roundIndex];
+    if (!mission) return;
+    const bonus = mission.bonus?.[type];
+    if (!bonus) return;
+
+    emergencyHandled = true;
+    emergencyType = type;
+    emergencyBonus = { ...bonus };
+
+    if (holdBtn) holdBtn.disabled = true;
+    if (hardBtn) hardBtn.disabled = true;
+    if (archiveBtn) archiveBtn.disabled = true;
+
+    if (bonusEl) {
+      const label = type === "hard" ? "驳回并廷杖" : type === "archive" ? "查阅《实录》" : "暂且搁置";
+      bonusEl.textContent = `急报加成：${label}（执行 ${bonus.exec >= 0 ? "+" : ""}${bonus.exec} / 合法性 ${bonus.legitimacy >= 0 ? "+" : ""}${bonus.legitimacy}）`;
+    }
+
+    addLog(`急报处理：${bonus.note}`);
+    showToast(`急报已处理：${type === "hard" ? "强硬处置" : type === "archive" ? "调档佐证" : "暂缓"}`, type === "hard" ? "warn" : "ok");
+  }
+
+  function renderRound() {
+    const mission = missions[roundIndex];
+    if (!mission) return;
+
+    if (missionTitleEl) missionTitleEl.textContent = mission.title;
+    if (missionTextEl) missionTextEl.textContent = mission.desc;
+    if (urgentTitleEl) urgentTitleEl.textContent = "来自都察院的急报（可选加成）";
+    if (urgentDescEl) urgentDescEl.textContent = mission.urgent;
+
+    resetEmergencyState();
+    updateLevelUI();
+    renderStatus();
+
+    modal(`第 ${roundIndex + 1} 轮 · 时局简报`, `${mission.reading}\n\n当轮建议：\n1) 先分配左侧行政资源\n2) 右下急报可选处理以拿额外属性\n3) 仅点击“结束本月政令”才会推进回合`, [
+      { label: "开始本轮", onClick: () => {} }
+    ]);
+  }
+
+  function applyRound() {
+    if (stageFailed) return;
+    const mission = missions[roundIndex];
+    if (!mission) return;
+
+    const state = readSliderState();
+    const used = state.land + state.fiscal + state.reputation;
+    const remain = TOTAL_POINTS - used;
+    if (remain < 0) {
+      showToast("资源点数超限，请先调整。", "warn");
+      return;
+    }
+
+    const baseExec = state.land * 2 + state.fiscal - (state.reputation <= 1 ? 3 : 0);
+    const baseResist = state.land * 2 + state.fiscal - state.reputation * 2;
+    const baseLegit = state.reputation * 2 - Math.max(0, state.land - 3);
+    const baseSilver = state.fiscal * 120 + state.land * 30 - state.reputation * 25;
+    const baseSupport = state.reputation * 3 - state.land * 2;
+
+    score.exec = clamp(score.exec + baseExec + emergencyBonus.exec);
+    score.resistance = clamp(score.resistance + baseResist + emergencyBonus.resistance);
+    score.legitimacy = clamp(score.legitimacy + baseLegit + emergencyBonus.legitimacy);
+    silver = Math.max(0, silver + baseSilver + emergencyBonus.silver);
+    support = clamp(support + baseSupport + emergencyBonus.support);
+
+    const collapse =
+      score.legitimacy <= 25 ||
+      support <= 15 ||
+      silver < 1800 ||
+      (score.resistance >= 92 && score.exec <= 50);
+    if (collapse) {
+      renderStatus();
+      const failDetail = [
+        `当前状态：执行 ${score.exec}% / 阻力 ${score.resistance}% / 合法性 ${score.legitimacy}% / 太仓银 ${silver.toLocaleString("zh-CN")} / 支持度 ${support}%`,
+        score.legitimacy <= 25 ? "- 合法性跌穿底线，地方不再配合政令。" : "",
+        support <= 15 ? "- 朝野支持度过低，改革失去政治承载。" : "",
+        silver < 1800 ? "- 太仓银见底，政策无财力续航。" : "",
+        (score.resistance >= 92 && score.exec <= 50) ? "- 官僚阻力过高且执行率偏低，政令链路断裂。" : ""
+      ].filter(Boolean).join("\n");
+      failStage("你在本轮把改革推入了不可逆的失控区。", failDetail);
+      return;
+    }
+
+    const roundRecord = {
+      round: roundIndex + 1,
+      mission: mission.title,
+      sliders: { ...state },
+      emergency: emergencyType,
+      emergencyNote: emergencyBonus.note,
+      snapshot: { exec: score.exec, resistance: score.resistance, legitimacy: score.legitimacy, silver, support }
+    };
+    records.push(roundRecord);
+
+    addLog(`${mission.title}：本月政令已落地，执行反馈已归档。`);
+    renderStatus();
+
+    modal("本月政令执行反馈", [
+      `资源投入：清丈 LV.${state.land} / 国库 LV.${state.fiscal} / 名声 LV.${state.reputation}`,
+      `急报处理：${emergencyType === "none" ? "未处理" : emergencyType === "hard" ? "驳回并廷杖" : emergencyType === "archive" ? "查阅《实录》" : "暂且搁置"}`,
+      ``,
+      `即时变化：`,
+      `- 执行率 -> ${score.exec}%`,
+      `- 官僚阻力 -> ${score.resistance}%`,
+      `- 合法性 -> ${score.legitimacy}%`,
+      `- 太仓银 -> ${silver.toLocaleString("zh-CN")}`,
+      `- 朝野支持度 -> ${support}%`,
+      ``,
+      emergencyBonus.note
+    ].join("\n"), [
+      {
+        label: roundIndex >= missions.length - 1 ? "进入结算" : `继续本幕（${roundIndex + 1}/3）`,
+        onClick: () => {
+          roundIndex += 1;
+          if (roundIndex >= missions.length) {
+            finish();
+          } else {
+            renderRound();
+          }
+        }
+      }
+    ]);
+  }
+
+  function finish() {
+    if (stageFailed) return;
+    executeBtn.disabled = true;
+    if (holdBtn) holdBtn.disabled = true;
+    if (hardBtn) hardBtn.disabled = true;
+    if (archiveBtn) archiveBtn.disabled = true;
+
+    const decisionSummary = records.map((item) => {
+      const e = item.emergency === "hard" ? "驳回并廷杖" : item.emergency === "archive" ? "查阅档案" : item.emergency === "hold" ? "暂且搁置" : "未处理";
+      return `${item.round}. ${item.mission}\n   资源: 清丈${item.sliders.land}/国库${item.sliders.fiscal}/名声${item.sliders.reputation}，急报: ${e}`;
+    }).join("\n");
+
+    const overall = calcOverall();
+    const success =
+      overall >= 62 &&
+      score.exec >= 58 &&
+      score.legitimacy >= 46 &&
+      score.resistance <= 82 &&
+      support >= 24 &&
+      silver >= 3000;
+    if (!success) {
+      const failDetail = [
+        `当前状态：综合 ${overall}% / 执行 ${score.exec}% / 阻力 ${score.resistance}% / 合法性 ${score.legitimacy}% / 太仓银 ${silver.toLocaleString("zh-CN")} / 支持度 ${support}%`,
+        overall < 62 ? "- 综合治理分未达标，体系稳定性不足。" : "",
+        score.exec < 58 ? "- 执行率偏低，改革停留在纸面。" : "",
+        score.legitimacy < 46 ? "- 合法性不足，改革被持续政治化。" : "",
+        score.resistance > 82 ? "- 官僚阻力过高，执行链条无法闭环。" : "",
+        support < 24 ? "- 朝野支持不足，改革缺少社会承接。" : "",
+        silver < 3000 ? "- 财政缓冲不足，无法撑过下一阶段。" : ""
+      ].filter(Boolean).join("\n");
+      failStage("三轮调度后，你未能建立可持续的改革执行网络。", failDetail);
+      return;
+    }
+
+    const stageDigest = [
+      "【改革执行画像】",
+      `- 执行率：${score.exec}%`,
+      `- 官僚阻力：${score.resistance}%`,
+      `- 政策合法性：${score.legitimacy}%`,
+      `- 太仓银：${silver.toLocaleString("zh-CN")} 万两`,
+      `- 朝野支持度：${support}%`,
+      "",
+      "【结构性后果】",
+      score.exec >= 70 && score.resistance >= 70
+        ? "你实现了高压推进，但改革越来越依赖关键人物，离开人物后高概率回弹。"
+        : "你保持了可持续推进，但地方执行网络仍在持续折损改革效果。",
+      "",
+      "【带着问题进入下一幕】",
+      "当制度奖励“报表达标”而非“执行真实”，应如何设计可核验机制？"
+    ].join("\n");
+
+    const fallback = `你完成三轮调度后，执行率${score.exec}、阻力${score.resistance}、合法性${score.legitimacy}。改革仍受结构惯性牵制。`;
+    const prompt = `张居正三轮调度：${decisionSummary}。结果：执行${score.exec} 阻力${score.resistance} 合法性${score.legitimacy} 太仓银${silver} 支持度${support}。请给结构后果与1条建议。`;
+
+    ai(prompt, fallback).then((report) => {
+      const finalReport = `${report}\n\n${stageDigest}`;
+      saveStage({ done: true, rounds: records.length, records, score: { ...score, silver, support }, report: finalReport, finishedAt: new Date().toISOString() });
+      modal("第三幕结算", finalReport, [
+        {
+          label: "查看调度清单",
+          onClick: () => {
+            modal("第三幕·调度清单", decisionSummary, [
+              { label: "进入下一幕", onClick: () => { window.location.href = NEXT_HREF; } }
+            ]);
+          }
+        },
+        { label: "进入下一幕", onClick: () => { window.location.href = NEXT_HREF; } }
+      ]);
+    });
+  }
+
+  sliders.forEach((slider) => {
+    slider.addEventListener("input", () => {
+      updateLevelUI();
+    });
+  });
+
+  if (holdBtn) {
+    holdBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      applyEmergency("hold");
+    });
+  }
+
+  if (hardBtn) {
+    hardBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      applyEmergency("hard");
+    });
+  }
+
+  if (archiveBtn) {
+    archiveBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      const mission = missions[roundIndex];
+      modal("《实录》档案摘录", `嘉靖后期以来，朝廷屡言“申明法度”，但县乡执行常受宗族与胥吏掣肘。\n\n本轮注记：${mission ? mission.reading : ""}\n\n你可选择“以档案为依据”获得额外合法性加成。`, [
+        { label: "以档案为依据", onClick: () => applyEmergency("archive") }
+      ]);
+    });
+  }
+
+  executeBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    if (roundIndex >= missions.length) return;
+    applyRound();
+  });
+
+  modal("背景导入", "你是张居正，时在万历初年。\n\n当下局面：\n- 可做：整饬税政、压实地方执行、补足法理依据。\n- 慎做：只看报表数字、忽略地方阻力、把改革变成单人硬推。\n\n本幕共 3 轮决断，每轮都要点击“结束本月政令”才推进。", [
+    {
+      label: "先读当轮任务",
+      onClick: () => renderRound()
+    },
+    { label: "直接开始", onClick: () => renderRound() }
+  ]);
+})();
+</script>
+
+
+
+<script>
+(() => {
+  
+  localStorage.setItem("reado_book_last_wanli-fifteen", "tax-reform-dilemma-3");
+  if ("tax-reform-dilemma-3" === "tax-reform-dilemma-5") {
+    try {
+      const completedRaw = localStorage.getItem("reado_completed_books_v1") || "[]";
+      const completedSet = new Set(JSON.parse(completedRaw));
+      completedSet.add("wanli-fifteen");
+      localStorage.setItem("reado_completed_books_v1", JSON.stringify([...completedSet]));
+    } catch {}
+  }
+  
+  const readoNextHref = "/experiences/tax-reform-dilemma-4.html";
+  (() => {
+    let isNavigating = false;
+    const keywordList = ["开始", "继续", "下一", "进入", "模拟", "抉择", "选择", "确认", "提交", "挑战", "完成", "start", "next", "continue"];
+    const blacklist = ["EN", "ZH", "返回", "back", "帮助", "求助", "笔记", "术语", "设置", "菜单", "关闭", "取消"];
+    const normalize = (value) => String(value || "").replace(/\s+/g, " ").trim();
+    const hasKeyword = (text) => keywordList.some((keyword) => text.toLowerCase().includes(keyword.toLowerCase()));
+    const isBlocked = (text) => blacklist.some((word) => text === word || text.toLowerCase().includes(word.toLowerCase()));
+    const isOptionGroupButton = (node) => {
+      const parent = node.parentElement;
+      if (!parent) return false;
+      const peers = Array.from(parent.children).filter(
+        (child) => child instanceof HTMLElement && child.matches("button,[role='button'],.concept-card,.item-card,[data-choice],[data-option]")
+      );
+      return peers.length >= 2;
+    };
+    const goNext = (delay = 180) => {
+      if (isNavigating) return;
+      isNavigating = true;
+      window.setTimeout(() => {
+        window.location.href = readoNextHref;
+      }, delay);
+    };
+    document.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+      if (target.closest(".reado-shell-wrap")) return;
+      const candidate = target.closest("[data-next-scene],button,a[href],.concept-card,.item-card,[data-choice],[data-option]");
+      if (!(candidate instanceof HTMLElement)) return;
+      if (!candidate.closest("main")) return;
+      if (candidate.hasAttribute("data-no-next")) return;
+      if (candidate.matches("a[href]")) {
+        const href = candidate.getAttribute("href") || "";
+        if (href && href !== "#" && !href.startsWith("javascript:")) return;
+      }
+      const text = normalize(candidate.textContent);
+      if (candidate.matches("[data-next-scene]")) {
+        event.preventDefault();
+        goNext(90);
+        return;
+      }
+      if (isBlocked(text)) return;
+      if (candidate.matches(".concept-card,.item-card,[data-choice],[data-option]")) {
+        goNext(180);
+        return;
+      }
+      if (candidate.matches("button")) {
+        if (hasKeyword(text) || (text.length >= 4 && isOptionGroupButton(candidate))) {
+          goNext(220);
+        }
+      }
+    });
+  })();
+  
+})();
+</script>
+</body></html>

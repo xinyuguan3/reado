@@ -1,0 +1,11 @@
+{
+  "name": "reado-local-app",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build-app.mjs",
+    "start": "node scripts/serve.mjs",
+    "dev": "node scripts/build-app.mjs && node scripts/serve.mjs"
+  }
+}

@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html class="dark" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>0到1: 进化路径全屏模拟</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "obsidian": "#050505",
+                        "obsidian-light": "#1a1f2e",
+                        "neon-blue": "#00f3ff",
+                        "digital-green": "#0aff0a",
+                        "primary": "#0d59f2",
+                        "glass-dark": "rgba(5, 5, 5, 0.85)",
+                        "glass-border": "rgba(0, 243, 255, 0.15)",
+                    },
+                    fontFamily: {
+                        "sans": ["Noto Sans SC", "Source Han Sans CN", "Source Han Sans", "PingFang SC", "Microsoft YaHei", "sans-serif"],
+                        "mono": ["JetBrains Mono", "Courier New", "monospace"],
+                    },
+                    backgroundImage: {
+                        'grid-pattern': "linear-gradient(to right, rgba(0, 243, 255, 0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(0, 243, 255, 0.05) 1px, transparent 1px)",
+                    }
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        body {
+            font-family: 'Noto Sans SC', 'Source Han Sans CN', sans-serif;
+            @apply bg-obsidian text-gray-200;
+        }
+        .bg-tech-grid {
+            background-size: 40px 40px;
+        }
+        .neon-glow {
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.3), 0 0 30px rgba(0, 243, 255, 0.1);
+        }
+        .neon-text {
+            text-shadow: 0 0 8px rgba(0, 243, 255, 0.6);
+        }
+        .terminal-border {
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            box-shadow: inset 0 0 30px rgba(0, 243, 255, 0.05);
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0a0a; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333; 
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-obsidian min-h-screen flex flex-col overflow-hidden relative selection:bg-neon-blue selection:text-obsidian">
+<script src="/shared/book-catalog.js?v=1771240921862"></script>
+<script type="module" src="/shared/shell.js?v=1771240921862"></script>
+<reado-app-shell data-page="knowledge-map"></reado-app-shell>
+<div class="fixed inset-0 bg-grid-pattern bg-tech-grid pointer-events-none z-0 opacity-40"></div>
+<div class="fixed inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(5,5,5,0.9)_100%)] pointer-events-none z-0"></div>
+<div class="flex-1 flex flex-col overflow-hidden h-screen z-10">
+<header class="h-20 border-b border-glass-border bg-obsidian/90 backdrop-blur-md flex items-center justify-center px-12 shrink-0 relative">
+<div class="flex flex-col w-full max-w-2xl gap-2">
+<div class="flex justify-between text-xs font-mono tracking-[0.3em] font-medium">
+<span class="text-neon-blue neon-text">构想</span>
+<span class="text-gray-600">战略</span>
+<span class="text-gray-600">增长</span>
+<span class="text-gray-600">规模化</span>
+</div>
+<div class="h-1 w-full bg-gray-900/50 rounded-full relative overflow-hidden">
+<div class="absolute top-0 left-0 h-full w-[25%] bg-neon-blue neon-glow rounded-full"></div>
+<div class="absolute top-0 left-1/4 w-px h-full bg-black/50"></div>
+<div class="absolute top-0 left-2/4 w-px h-full bg-black/50"></div>
+<div class="absolute top-0 left-3/4 w-px h-full bg-black/50"></div>
+</div>
+</div>
+<div class="absolute right-12 flex items-center gap-4">
+<div class="flex items-center gap-2 font-mono text-xs border border-digital-green/30 px-4 py-2 bg-digital-green/5 text-digital-green rounded-sm">
+<span class="material-symbols-outlined text-sm">database</span>
+<span class="font-bold">能量值: 1,000 / 0-&gt;1</span>
+</div>
+</div>
+</header>
+<main class="flex-1 overflow-hidden flex flex-col relative p-8">
+<div class="flex-1 relative flex flex-col items-center justify-center">
+<div class="mb-12 text-center">
+<h1 class="text-3xl font-black text-white tracking-widest mb-4">0 → 1 的跃迁模拟</h1>
+<p class="text-gray-400 font-light tracking-wide max-w-2xl mx-auto">
+                        在“全球化复制”带来的水平进步与“科技创新”带来的垂直进步之间做出抉择。只有打破现状的新技术，才能带领文明跨越奇点。
+                    </p>
+</div>
+<div class="w-full max-w-6xl aspect-[21/9] terminal-border bg-obsidian/60 backdrop-blur-xl rounded-lg relative overflow-hidden flex flex-col">
+<div class="h-10 border-b border-glass-border flex items-center px-6 justify-between bg-obsidian-light/40">
+<div class="flex items-center gap-3">
+<span class="w-2 h-2 rounded-full bg-red-500/50"></span>
+<span class="w-2 h-2 rounded-full bg-yellow-500/50"></span>
+<span class="w-2 h-2 rounded-full bg-green-500/50"></span>
+<span class="text-[10px] font-mono text-neon-blue ml-4 tracking-widest uppercase">Simulation_Core_Active // Evolution_Path_Visualizer</span>
+</div>
+<div class="text-[10px] font-mono text-gray-500">SYSTEM_TIME: 2024.0.1_BETA</div>
+</div>
+<div class="flex-1 flex items-center justify-between px-24 relative">
+<div class="flex flex-col items-center gap-8 group">
+<div class="relative">
+<div class="w-48 h-48 border-2 border-dashed border-gray-700 rounded-full flex items-center justify-center transition-all duration-700 group-hover:border-gray-500">
+<span class="material-symbols-outlined text-7xl text-gray-600 transition-colors group-hover:text-gray-400">agriculture</span>
+</div>
+<div class="absolute -bottom-10 left-1/2 -translate-x-1/2 text-center whitespace-nowrap">
+<div class="font-bold text-gray-500 tracking-widest">马车 (1 → N)</div>
+<div class="text-[10px] font-mono text-gray-600 mt-1 uppercase">Horizontal Progress</div>
+</div>
+</div>
+</div>
+<div class="flex-1 flex flex-col items-center justify-center px-12">
+<div class="w-full h-[2px] bg-gradient-to-r from-gray-800 via-neon-blue to-gray-800 relative">
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 px-6 py-2 bg-obsidian border border-neon-blue/40 rounded-full">
+<span class="text-xs font-mono text-neon-blue neon-text tracking-widest uppercase font-bold">跃迁点</span>
+</div>
+</div>
+<div class="mt-12 flex gap-12 text-[10px] font-mono">
+<div class="flex flex-col items-center">
+<span class="text-gray-500 uppercase">复杂性</span>
+<span class="text-neon-blue font-bold">指数级上升</span>
+</div>
+<div class="flex flex-col items-center">
+<span class="text-gray-500 uppercase">确定性</span>
+<span class="text-red-500 font-bold">高度稀缺</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col items-center gap-8 group">
+<div class="relative">
+<div class="absolute inset-0 bg-neon-blue/20 blur-3xl rounded-full scale-110 opacity-30 group-hover:opacity-60 transition-opacity"></div>
+<div class="w-48 h-48 border-2 border-neon-blue rounded-full flex items-center justify-center bg-obsidian-light/20 shadow-[0_0_50px_rgba(0,243,255,0.15)] relative z-10 group-hover:scale-105 transition-transform duration-500">
+<span class="material-symbols-outlined text-7xl text-white neon-text">flight_takeoff</span>
+</div>
+<div class="absolute -bottom-10 left-1/2 -translate-x-1/2 text-center whitespace-nowrap">
+<div class="font-bold text-white tracking-widest neon-text">超音速客机 (0 → 1)</div>
+<div class="text-[10px] font-mono text-neon-blue mt-1 uppercase font-bold">Vertical Progress</div>
+</div>
+</div>
+</div>
+</div>
+<div class="absolute bottom-6 left-6 right-6 flex justify-between items-end pointer-events-none">
+<div class="bg-black/80 border border-gray-800 p-4 rounded-sm backdrop-blur-md">
+<div class="text-[10px] font-mono text-gray-500 mb-2 uppercase tracking-tighter">环境分析器 // ENV_SCAN</div>
+<div class="space-y-1">
+<div class="flex justify-between gap-8">
+<span class="text-[10px] text-gray-400">市场饱和度</span>
+<span class="text-[10px] text-red-500 font-mono">98.2%</span>
+</div>
+<div class="flex justify-between gap-8">
+<span class="text-[10px] text-gray-400">创新边际收益</span>
+<span class="text-[10px] text-digital-green font-mono">∞ MAX</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col items-end gap-2 font-mono">
+<div class="text-[10px] text-neon-blue animate-pulse">AWAITING_CRITICAL_DECISION...</div>
+<div class="text-[8px] text-gray-600">INPUT_REQUIRED: ALPHA_LEVEL_01</div>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-8 flex flex-col items-center">
+<div class="flex gap-8 w-full max-w-6xl">
+<button class="flex-1 group relative overflow-hidden border border-gray-800 bg-obsidian-light/20 hover:bg-gray-900 transition-all p-8 text-left rounded-lg hover:border-red-500/40">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-30 transition-opacity">
+<span class="material-symbols-outlined text-6xl">public</span>
+</div>
+<div class="relative z-10 flex flex-col h-full">
+<div class="flex items-center gap-4 mb-4">
+<div class="w-1.5 h-10 bg-gray-700 group-hover:bg-red-500 transition-colors"></div>
+<div>
+<h3 class="text-2xl font-black text-gray-300 group-hover:text-white transition-colors">全球化复制</h3>
+<span class="text-[10px] font-mono text-gray-500 tracking-widest uppercase">Horizontal Copying</span>
+</div>
+</div>
+<p class="text-sm text-gray-500 group-hover:text-gray-300 leading-relaxed mb-6">
+                                将已有的成功模式扩展到更多地区 (1 → N)。属于水平进步，执行门槛低，但会迅速陷入红海竞争。
+                            </p>
+<div class="mt-auto flex items-center text-[10px] font-mono text-red-500/70 group-hover:text-red-500">
+<span class="material-symbols-outlined text-sm mr-1">warning</span> 风险提示: 利润趋零
+                            </div>
+</div>
+</button>
+<button class="flex-1 group relative overflow-hidden border border-neon-blue/30 bg-neon-blue/5 hover:bg-neon-blue/10 transition-all p-8 text-left rounded-lg hover:shadow-[0_0_30px_rgba(0,243,255,0.15)] hover:border-neon-blue">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-30 transition-opacity">
+<span class="material-symbols-outlined text-6xl text-neon-blue">rocket_launch</span>
+</div>
+<div class="relative z-10 flex flex-col h-full">
+<div class="flex items-center gap-4 mb-4">
+<div class="w-1.5 h-10 bg-neon-blue shadow-[0_0_10px_rgba(0,243,255,0.5)]"></div>
+<div>
+<h3 class="text-2xl font-black text-white group-hover:text-neon-blue transition-colors">科技创新</h3>
+<span class="text-[10px] font-mono text-neon-blue/60 tracking-widest uppercase">Vertical Invention</span>
+</div>
+</div>
+<p class="text-sm text-gray-400 group-hover:text-gray-200 leading-relaxed mb-6">
+                                创造前所未有的新事物 (0 → 1)。属于垂直进步，极难执行，但能够建立稳固的垄断壁垒，改变未来。
+                            </p>
+<div class="mt-auto flex items-center text-[10px] font-mono text-neon-blue">
+<span class="material-symbols-outlined text-sm mr-1">verified</span> 核心收益: 建立垄断
+                            </div>
+</div>
+</button>
+</div>
+</div>
+</main>
+</div>
+<div class="fixed top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-neon-blue/20 to-transparent z-50"></div>
+<div class="fixed bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-neon-blue/20 to-transparent z-50"></div>
+
+
+<script src="/shared/experience-runtime.js?v=1771240921862"></script>
+<script>
+(() => {
+  
+  localStorage.setItem("reado_book_last_zero-to-one", "zero-to-one-the-monopolist-s-choice-6");
+  if ("zero-to-one-the-monopolist-s-choice-6" === "zero-to-one-the-monopolist-s-choice-7") {
+    try {
+      const completedRaw = localStorage.getItem("reado_completed_books_v1") || "[]";
+      const completedSet = new Set(JSON.parse(completedRaw));
+      completedSet.add("zero-to-one");
+      localStorage.setItem("reado_completed_books_v1", JSON.stringify([...completedSet]));
+    } catch {}
+  }
+  
+  const readoNextHref = "/experiences/zero-to-one-the-monopolist-s-choice-7.html";
+  (() => {
+    let isNavigating = false;
+    const keywordList = ["开始", "继续", "下一", "进入", "模拟", "抉择", "选择", "确认", "提交", "挑战", "完成", "start", "next", "continue"];
+    const blacklist = ["EN", "ZH", "返回", "back", "帮助", "求助", "笔记", "术语", "设置", "菜单", "关闭", "取消"];
+    const normalize = (value) => String(value || "").replace(/\s+/g, " ").trim();
+    const hasKeyword = (text) => keywordList.some((keyword) => text.toLowerCase().includes(keyword.toLowerCase()));
+    const isBlocked = (text) => blacklist.some((word) => text === word || text.toLowerCase().includes(word.toLowerCase()));
+    const isOptionGroupButton = (node) => {
+      const parent = node.parentElement;
+      if (!parent) return false;
+      const peers = Array.from(parent.children).filter(
+        (child) => child instanceof HTMLElement && child.matches("button,[role='button'],.concept-card,.item-card,[data-choice],[data-option]")
+      );
+      return peers.length >= 2;
+    };
+    const goNext = (delay = 180) => {
+      if (isNavigating) return;
+      isNavigating = true;
+      window.setTimeout(() => {
+        window.location.href = readoNextHref;
+      }, delay);
+    };
+    document.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+      if (target.closest(".reado-shell-wrap")) return;
+      const candidate = target.closest("[data-next-scene],button,a[href],.concept-card,.item-card,[data-choice],[data-option]");
+      if (!(candidate instanceof HTMLElement)) return;
+      if (!candidate.closest("main")) return;
+      if (candidate.hasAttribute("data-no-next")) return;
+      if (candidate.matches("a[href]")) {
+        const href = candidate.getAttribute("href") || "";
+        if (href && href !== "#" && !href.startsWith("javascript:")) return;
+      }
+      const text = normalize(candidate.textContent);
+      if (candidate.matches("[data-next-scene]")) {
+        event.preventDefault();
+        goNext(90);
+        return;
+      }
+      if (isBlocked(text)) return;
+      if (candidate.matches(".concept-card,.item-card,[data-choice],[data-option]")) {
+        goNext(180);
+        return;
+      }
+      if (candidate.matches("button")) {
+        if (hasKeyword(text) || (text.length >= 4 && isOptionGroupButton(candidate))) {
+          goNext(220);
+        }
+      }
+    });
+  })();
+  
+  if (window.ReadoExperienceRuntime && typeof window.ReadoExperienceRuntime.init === "function") {
+    window.ReadoExperienceRuntime.init({
+      bookId: "zero-to-one",
+      moduleSlug: "zero-to-one-the-monopolist-s-choice-6",
+      moduleSlugs: ["zero-to-one-the-monopolist-s-choice","zero-to-one-the-monopolist-s-choice-1","zero-to-one-the-monopolist-s-choice-2","zero-to-one-the-monopolist-s-choice-3","zero-to-one-the-monopolist-s-choice-4","zero-to-one-the-monopolist-s-choice-5","zero-to-one-the-monopolist-s-choice-6","zero-to-one-the-monopolist-s-choice-7"]
+    });
+  }
+})();
+</script>
+</body></html>

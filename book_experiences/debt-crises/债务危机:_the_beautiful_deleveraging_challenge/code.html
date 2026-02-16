@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html class="dark" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>reado: 绝妙的去杠杆挑战</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.symbols.outlined/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec131e",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#1a0d0e",
+                        "surface-dark": "#2a1819",
+                        "gold": "#D4AF37",
+                        "charcoal": "#121212",
+                    },
+                    fontFamily: {
+                        "display": ["Noto Sans SC", "Source Han Sans CN", "sans-serif"],
+                        "mono": ["ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "Liberation Mono", "Courier New", "monospace"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                    backgroundImage: {
+                        'grid-pattern': "linear-gradient(to right, #333 1px, transparent 1px), linear-gradient(to bottom, #333 1px, transparent 1px)",
+                    }
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 24px;
+            width: 24px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 2px solid #ec131e;
+            cursor: pointer;
+            margin-top: -10px;
+            box-shadow: 0 0 10px rgba(236, 19, 30, 0.5);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #4a4a4a;
+            border-radius: 2px;
+        }
+        .glass-panel {
+            background: rgba(30, 20, 20, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .grid-bg {
+            background-size: 40px 40px;
+            mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+        }
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .animate-marquee {
+            animation: marquee 25s linear infinite;
+        }
+    </style>
+</head>
+<body class="bg-background-dark text-slate-200 font-display min-h-screen flex flex-col overflow-hidden relative selection:bg-primary selection:text-white">
+<div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+<div class="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&amp;w=2072&amp;auto=format&amp;fit=crop')] bg-cover bg-center mix-blend-overlay"></div>
+<div class="absolute inset-0 bg-background-dark/95"></div>
+<div class="absolute inset-0 grid-bg bg-grid-pattern opacity-[0.07]"></div>
+</div>
+<header class="relative z-20 w-full border-b border-white/10 glass-panel">
+<div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2">
+<span class="text-2xl font-black text-white tracking-tighter italic">reado</span>
+<div class="w-px h-6 bg-white/20 mx-2"></div>
+<div>
+<h1 class="text-sm font-bold tracking-widest text-white leading-tight">经济危机决策系统</h1>
+<p class="text-[10px] text-slate-400 uppercase tracking-tighter font-medium">原则：应对大债务危机</p>
+</div>
+</div>
+</div>
+<div class="hidden md:flex items-center gap-6 px-6 py-1.5 rounded-full bg-black/40 border border-white/5">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span class="text-xs font-bold text-primary">危机等级：极高</span>
+</div>
+<div class="h-4 w-px bg-white/10"></div>
+<div class="text-xs font-medium text-slate-300">
+                    债务/GDP比率: <span class="text-white font-bold">345%</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-rose-900 border border-white/20 flex items-center justify-center">
+<span class="text-[10px] font-bold text-white">智库</span>
+</div>
+</div>
+</div>
+</header>
+<main class="relative z-10 flex-1 flex flex-col p-4 md:p-6 lg:p-8 max-w-[1600px] mx-auto w-full gap-6">
+<div class="text-center mb-2">
+<h2 class="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight">绝妙的去杠杆挑战</h2>
+<p class="text-slate-400 max-w-2xl mx-auto text-sm md:text-base font-medium">
+                在减少债务规模的同时，通过政策组合避免经济出现剧烈收缩，实现债务/收入比率的良性下降。
+            </p>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full">
+<div class="lg:col-span-3 flex flex-col gap-6">
+<div class="glass-panel p-6 rounded-xl border-l-4 border-l-blue-500 hover:bg-white/5 transition duration-300">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="text-blue-400 font-bold text-xl flex items-center gap-2">
+<span class="material-icons text-base">trending_down</span> 紧缩
+                            </h3>
+<p class="text-[10px] text-slate-500 mt-1 font-bold">AUSTERITY</p>
+</div>
+<span class="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 text-[10px] font-bold border border-blue-500/20">通货紧缩型</span>
+</div>
+<p class="text-xs text-slate-400 mb-6 h-10 leading-relaxed">通过削减政府和私人支出减少债务负担，但通常会引发经济衰退和社会痛苦。</p>
+<div class="relative pt-2">
+<input class="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer" max="100" min="0" type="range" value="75"/>
+<div class="flex justify-between mt-2 text-[10px] font-bold text-slate-500">
+<span>最低</span>
+<span class="text-blue-400">极高强度</span>
+</div>
+</div>
+</div>
+<div class="glass-panel p-6 rounded-xl border-l-4 border-l-purple-500 hover:bg-white/5 transition duration-300">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="text-purple-400 font-bold text-xl flex items-center gap-2">
+<span class="material-icons text-base">gavel</span> 债务违约与重组
+                            </h3>
+<p class="text-[10px] text-slate-500 mt-1 font-bold">DEBT RESTRUCTURING</p>
+</div>
+<span class="px-2 py-0.5 rounded bg-purple-500/10 text-purple-400 text-[10px] font-bold border border-purple-500/20">通货紧缩型</span>
+</div>
+<p class="text-xs text-slate-400 mb-6 h-10 leading-relaxed">减记资产账面价值。虽能消灭债务，但会直接冲击金融系统与银行资本充足率。</p>
+<div class="relative pt-2">
+<input class="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer" max="100" min="0" type="range" value="40"/>
+<div class="flex justify-between mt-2 text-[10px] font-bold text-slate-500">
+<span>可控范围</span>
+<span class="text-purple-400">全面危机</span>
+</div>
+</div>
+</div>
+</div>
+<div class="lg:col-span-6 flex flex-col gap-6">
+<div class="grid grid-cols-2 gap-4">
+<div class="glass-panel p-4 rounded-xl flex flex-col items-center justify-center relative overflow-hidden">
+<div class="absolute top-2 right-2 w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_#ec131e]"></div>
+<div class="relative w-32 h-16 overflow-hidden mb-2">
+<div class="absolute top-0 left-0 w-full h-full bg-slate-800 rounded-t-full"></div>
+<div class="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-primary via-yellow-500 to-green-500 rounded-t-full origin-bottom" style="clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%); transform: rotate(-30deg);"></div>
+<div class="absolute bottom-0 left-1/2 w-24 h-24 bg-surface-dark rounded-full transform -translate-x-1/2 translate-y-1/2 border-4 border-surface-dark"></div>
+</div>
+<div class="text-center z-10">
+<div class="text-2xl font-black text-white tracking-tighter">42%</div>
+<div class="text-[12px] text-slate-300 font-bold mt-1">社会稳定</div>
+</div>
+</div>
+<div class="glass-panel p-4 rounded-xl flex flex-col items-center justify-center relative overflow-hidden">
+<div class="relative w-32 h-16 overflow-hidden mb-2">
+<div class="absolute top-0 left-0 w-full h-full bg-slate-800 rounded-t-full"></div>
+<div class="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-green-500 via-yellow-500 to-primary rounded-t-full origin-bottom" style="clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%); transform: rotate(45deg);"></div>
+<div class="absolute bottom-0 left-1/2 w-24 h-24 bg-surface-dark rounded-full transform -translate-x-1/2 translate-y-1/2 border-4 border-surface-dark"></div>
+</div>
+<div class="text-center z-10">
+<div class="text-2xl font-black text-primary tracking-tighter">8.4%</div>
+<div class="text-[12px] text-slate-300 font-bold mt-1">通货膨胀率</div>
+</div>
+</div>
+</div>
+<div class="glass-panel flex-1 rounded-xl p-6 relative flex flex-col min-h-[300px]">
+<h3 class="text-slate-300 text-sm font-bold uppercase tracking-widest mb-4 flex justify-between">
+<span>经济发展轨迹评估</span>
+<span class="text-gold text-xs">目标：名义增长率 &gt; 债务利率</span>
+</h3>
+<div class="flex-1 relative border-l border-b border-slate-700 w-full">
+<div class="absolute inset-0 flex flex-col justify-between pointer-events-none opacity-20">
+<div class="w-full h-px bg-slate-500 border-t border-dashed"></div>
+<div class="w-full h-px bg-slate-500 border-t border-dashed"></div>
+<div class="w-full h-px bg-slate-500"></div>
+</div>
+<svg class="absolute inset-0 w-full h-full overflow-visible" preserveAspectRatio="none">
+<path class="drop-shadow-[0_0_5px_rgba(236,19,30,0.8)]" d="M0,200 C100,180 200,190 300,150 S500,100 600,80" fill="none" stroke="#ec131e" stroke-width="3"></path>
+<path d="M0,220 C100,210 200,200 300,180 S500,120 600,50" fill="none" stroke="#D4AF37" stroke-dasharray="5,5" stroke-width="3"></path>
+</svg>
+<div class="absolute top-[20%] right-0 translate-x-2 bg-primary text-white text-[10px] px-2 py-0.5 rounded font-bold">总债务</div>
+<div class="absolute top-[10%] right-0 translate-x-2 bg-gold text-black text-[10px] px-2 py-0.5 rounded font-bold">总收入</div>
+</div>
+<div class="mt-4 flex justify-between items-center bg-black/30 p-3 rounded-lg border border-white/5">
+<div class="flex items-center gap-2">
+<span class="material-icons text-yellow-500 text-sm">warning</span>
+<span class="text-xs text-yellow-500 font-bold">警告：通缩螺旋风险加剧</span>
+</div>
+<div class="text-[10px] text-slate-500 font-bold">
+                            当前时间：危机第3年，第2季度
+                        </div>
+</div>
+</div>
+</div>
+<div class="lg:col-span-3 flex flex-col gap-6">
+<div class="glass-panel p-6 rounded-xl border-r-4 border-r-yellow-500 hover:bg-white/5 transition duration-300">
+<div class="flex justify-between items-start mb-4">
+<span class="px-2 py-0.5 rounded bg-yellow-500/10 text-yellow-400 text-[10px] font-bold border border-yellow-500/20">刺激型政策</span>
+<div class="text-right">
+<h3 class="text-yellow-400 font-bold text-xl flex items-center justify-end gap-2">
+                                财富再分配 <span class="material-icons text-base">groups</span>
+</h3>
+<p class="text-[10px] text-slate-500 mt-1 font-bold">REDISTRIBUTION</p>
+</div>
+</div>
+<p class="text-xs text-slate-400 mb-6 h-10 leading-relaxed text-right">通过税收等手段将财富从持有者转向非持有者。若过度会引发资本外逃。</p>
+<div class="relative pt-2" dir="rtl">
+<input class="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer" max="100" min="0" type="range" value="30"/>
+<div class="flex justify-between mt-2 text-[10px] font-bold text-slate-500" dir="ltr">
+<span class="text-yellow-400">高强度</span>
+<span>保守</span>
+</div>
+</div>
+</div>
+<div class="glass-panel p-6 rounded-xl border-r-4 border-r-primary hover:bg-white/5 transition duration-300 relative overflow-hidden group">
+<div class="absolute inset-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/diagmonds-light.png')] pointer-events-none"></div>
+<div class="flex justify-between items-start mb-4 relative z-10">
+<span class="px-2 py-0.5 rounded bg-primary/20 text-primary text-[10px] font-bold border border-primary/30">强力刺激型</span>
+<div class="text-right">
+<h3 class="text-primary font-bold text-xl flex items-center justify-end gap-2">
+                                印钱 <span class="material-icons text-base">local_atm</span>
+</h3>
+<p class="text-[10px] text-slate-500 mt-1 font-bold">MONEY PRINTING</p>
+</div>
+</div>
+<p class="text-xs text-slate-400 mb-6 h-10 leading-relaxed text-right relative z-10">中央银行通过购买政府债券提供流动性，以抵消通缩压力并刺激名义增长。</p>
+<div class="relative pt-2 z-10" dir="rtl">
+<input class="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-primary" max="100" min="0" type="range" value="65"/>
+<div class="flex justify-between mt-2 text-[10px] font-bold text-slate-500" dir="ltr">
+<span class="text-primary">高通胀风险</span>
+<span>审慎</span>
+</div>
+</div>
+</div>
+<button class="mt-auto w-full py-4 bg-primary hover:bg-red-600 active:bg-red-700 text-white font-black rounded-xl shadow-[0_0_20px_rgba(236,19,30,0.3)] transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2 group">
+<span class="tracking-widest">执行政策组合</span>
+<span class="material-icons text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</div>
+</div>
+</main>
+<footer class="relative z-20 glass-panel border-t border-white/10 h-10 flex items-center overflow-hidden">
+<div class="bg-primary px-4 h-full flex items-center z-10">
+<span class="text-[10px] font-black text-white tracking-widest whitespace-nowrap">实时动态</span>
+</div>
+<div class="flex-1 overflow-hidden relative h-full">
+<div class="absolute top-0 left-0 h-full flex items-center whitespace-nowrap animate-marquee">
+<span class="text-xs font-bold text-slate-300 mx-8">市场简讯：随着紧缩措施持续收紧，国债收益率出现剧烈波动。</span>
+<span class="text-xs font-bold text-primary mx-8">警报：由于公共预算大幅削减，首都爆发局部社会动荡。</span>
+<span class="text-xs font-bold text-green-400 mx-8">政策分析：适度的货币贬值正在逐步提升本国出口竞争力。</span>
+<span class="text-xs font-bold text-slate-300 mx-8">最新进展：中央银行正在闭门会议中紧急评估进一步降息的可能性。</span>
+</div>
+</div>
+</footer>
+
+</body></html>

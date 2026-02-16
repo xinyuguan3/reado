@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html class="dark" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>基因战争的胜利：小麦的全球征服</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#fbbf24",
+                        "primary-dark": "#b45309",
+                        "secondary": "#fcd34d",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#1a120b",
+                        "surface-dark": "#2a221a",
+                        "surface-lighter": "#3d3226",
+                    },
+                    fontFamily: {
+                        "display": ["'Noto Sans SC'", "sans-serif"],
+                        "sans": ["'Noto Sans SC'", "sans-serif"]
+                    },
+                    backgroundImage: {
+                        'golden-gradient': 'linear-gradient(to right, #f59e0b, #fbbf24, #f59e0b)',
+                    }
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        @layer base {
+            body {
+                @apply font-sans;
+            }
+        }
+        .glass-panel {
+            background: rgba(26, 18, 11, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(251, 191, 36, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        .glass-panel-highlight {
+            background: linear-gradient(135deg, rgba(45, 36, 27, 0.9) 0%, rgba(66, 48, 29, 0.8) 100%);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            box-shadow: 0 0 40px rgba(251, 191, 36, 0.1);
+        }
+        .text-glow {
+            text-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
+        }
+        .golden-border {
+            border: 1px solid rgba(251, 191, 36, 0.4);
+        }
+    </style>
+</head>
+<body class="bg-background-dark text-gray-100 min-h-screen flex flex-col overflow-x-hidden relative">
+<div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+<img alt="雄伟的金色麦田在日出地平线下延伸" class="absolute inset-0 w-full h-full object-cover opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZksFKOEtkId5n2nx9b3y8gVsKHp7UyeXHKuWICWdKYZqjrsOVup2DgL1yEv2mP3y3r4NpAIjJbqJjrolx8ioID53ep8dqE8dM0zkJ4ytF2UewkOOBnLjJWisYmgT0Z0MJ6CRuBAu4aTKFpbur68uSobhneFvhWIlZTkWps8GDfknY8SxXSCtk39L8B-TkNcjIB7Ib8z6UvXHua8-LiTWiU4R-LKYUmI8HqhbR9c-he1RHA9Kt8-5ZjfLO2xWJQUocffEExp7delI"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/60 to-transparent"></div>
+<div class="absolute inset-0 bg-gradient-to-b from-background-dark/90 via-transparent to-background-dark"></div>
+<div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] mix-blend-overlay"></div>
+</div>
+<nav class="relative z-20 w-full px-6 py-5 flex items-center justify-between border-b border-white/5 bg-background-dark/50 backdrop-blur-md">
+<div class="flex items-center gap-4">
+<div class="h-10 w-10 rounded-lg bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center text-white font-bold shadow-[0_0_15px_rgba(251,191,36,0.4)]">
+            S
+        </div>
+<div>
+<h1 class="text-sm font-bold tracking-widest text-primary">小麦模拟器</h1>
+<p class="text-xs text-gray-400">人类简史：从动物到上帝</p>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="hidden md:flex items-center gap-2 text-primary">
+<span class="material-icons-outlined text-sm">emoji_events</span>
+<span class="text-xs font-bold tracking-widest">最终结算</span>
+</div>
+</div>
+</nav>
+<main class="relative z-10 flex-grow container mx-auto px-4 py-8 lg:py-12 flex flex-col items-center justify-center min-h-[calc(100vh-90px)]">
+<div class="mb-8">
+<div class="h-24 w-24 rounded-full bg-gradient-to-br from-primary to-primary-dark p-[2px] shadow-[0_0_50px_rgba(251,191,36,0.6)]">
+<div class="h-full w-full rounded-full bg-background-dark flex items-center justify-center border-4 border-primary/20">
+<span class="material-symbols-outlined text-6xl text-transparent bg-clip-text bg-gradient-to-br from-primary via-white to-primary">
+                    trophy
+                </span>
+</div>
+</div>
+</div>
+<div class="text-center mb-12 space-y-4">
+<h2 class="text-sm font-bold tracking-[0.4em] text-primary/80">进化目标已达成</h2>
+<h1 class="text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-primary via-white to-primary text-glow leading-tight tracking-tight">
+            基因战争的胜利
+        </h1>
+</div>
+<div class="w-full max-w-5xl grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+<div class="glass-panel p-6 rounded-xl flex flex-col items-center text-center transition-transform hover:scale-105 duration-300">
+<div class="mb-4 h-12 w-12 rounded-full bg-surface-lighter flex items-center justify-center border border-primary/30">
+<span class="material-symbols-outlined text-primary text-2xl">local_fire_department</span>
+</div>
+<div class="space-y-1">
+<p class="text-xs text-gray-400 font-bold tracking-widest">总热量</p>
+<p class="text-4xl font-black text-white">10</p>
+<p class="text-sm text-primary font-bold">万亿</p>
+</div>
+</div>
+<div class="glass-panel-highlight p-8 rounded-xl flex flex-col items-center text-center transform scale-105 z-10 border-primary/50 relative overflow-hidden group">
+<div class="absolute inset-0 bg-gradient-to-b from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+<div class="mb-4 h-16 w-16 rounded-full bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center shadow-lg">
+<span class="material-symbols-outlined text-background-dark text-4xl">groups</span>
+</div>
+<div class="space-y-1 relative z-10">
+<p class="text-xs text-primary-dark font-black tracking-widest">人类仆从</p>
+<p class="text-5xl font-black text-white text-glow">80</p>
+<p class="text-lg text-primary font-bold">亿</p>
+</div>
+<div class="mt-4 px-4 py-1 rounded-full bg-primary/20 border border-primary/30 text-[10px] text-primary font-bold tracking-widest">
+                生态承载上限
+            </div>
+</div>
+<div class="glass-panel p-6 rounded-xl flex flex-col items-center text-center transition-transform hover:scale-105 duration-300">
+<div class="mb-4 h-12 w-12 rounded-full bg-surface-lighter flex items-center justify-center border border-primary/30">
+<span class="material-symbols-outlined text-primary text-2xl">public</span>
+</div>
+<div class="space-y-1">
+<p class="text-xs text-gray-400 font-bold tracking-widest">领地</p>
+<p class="text-4xl font-black text-white">6</p>
+<p class="text-sm text-primary font-bold">大洲</p>
+</div>
+</div>
+</div>
+<div class="w-full max-w-3xl glass-panel p-1 rounded-2xl mb-10">
+<div class="bg-surface-dark/40 rounded-xl p-6 md:p-8 flex flex-col md:flex-row items-center gap-6 md:gap-8">
+<div class="shrink-0 relative">
+<div class="absolute inset-0 bg-primary/20 blur-xl rounded-full"></div>
+<div class="h-20 w-20 rounded-full border-2 border-primary/50 bg-surface-lighter flex items-center justify-center relative z-10">
+<span class="material-symbols-outlined text-4xl text-primary">psychology_alt</span>
+</div>
+</div>
+<div class="flex-grow text-center md:text-left">
+<div class="flex items-center gap-2 mb-2 justify-center md:justify-start">
+<h3 class="text-sm font-bold text-primary tracking-widest">你的天赋</h3>
+</div>
+<h2 class="text-2xl font-bold text-white mb-2">生物战略家</h2>
+<p class="text-gray-400 text-sm leading-relaxed">
+                    你成功地将基因传播置于个体痛苦之上。你不再通过人类幸福的视角来看待世界，而是透过演化成功的冷酷逻辑与精密数学。
+                </p>
+</div>
+<div class="shrink-0">
+<button class="text-xs text-primary border-b border-primary/50 pb-0.5 hover:text-white hover:border-white transition-colors">
+                    查看详细分析 &gt;
+                </button>
+</div>
+</div>
+</div>
+<div class="flex flex-col md:flex-row items-center gap-4 w-full max-w-md mx-auto">
+<button data-no-next="" onclick="window.location.href='/experiences/bilingual-human-domestication-dilemma.html'" class="w-full group relative px-8 py-4 bg-transparent overflow-hidden rounded-lg border border-primary/30 text-white shadow-lg transition-all hover:border-primary/80">
+<div class="absolute inset-0 w-full h-full bg-surface-lighter/50 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<span class="relative flex items-center justify-center gap-2 font-bold">
+<span class="material-symbols-outlined text-primary">visibility</span>
+<span>查看洞察</span>
+</span>
+</button>
+<button data-no-next="" onclick="window.location.href='/experiences/sapiens-the-wheat-conquest-simulator-1.html'" class="w-full group relative px-8 py-4 bg-gradient-to-r from-primary to-primary-dark overflow-hidden rounded-lg shadow-[0_0_20px_rgba(251,191,36,0.4)] transition-all hover:shadow-[0_0_30px_rgba(251,191,36,0.6)] hover:scale-[1.02]">
+<div class="absolute inset-0 w-full h-full bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<span class="relative flex items-center justify-center gap-2 font-bold text-background-dark">
+<span>进入下一时代</span>
+<span class="material-symbols-outlined">arrow_forward</span>
+</span>
+</button>
+</div>
+</main>
+<footer class="relative z-10 w-full py-6 text-center text-gray-500 text-[10px] tracking-[0.2em]">
+    © 小麦模拟器 · 智人演化历程
+</footer>
+
+</body></html>

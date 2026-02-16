@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>reado: 土地炼金术 - 荒地变现界面</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Noto+Sans+SC:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f0c442",
+                        "primary-hover": "#d9b038",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#221d10",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#2a2416",
+                        "text-main": "#1f2937",
+                        "text-secondary": "#6b7280",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "Noto Sans SC", "sans-serif"],
+                        "sans": ["Inter", "Noto Sans SC", "sans-serif"],
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'glow': '0 0 15px rgba(240, 196, 66, 0.3)',
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar for data tables */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #e5e7eb;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #d1d5db;
+        }
+        
+        .stage-card {
+            transition: all 0.3s ease;
+        }
+        .stage-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+        }
+        
+        /* Custom Range Slider */
+        input[type=range] {
+            -webkit-appearance: none; 
+            background: transparent; 
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #f0c442;
+            cursor: pointer;
+            margin-top: -8px; 
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #e5e7eb;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body class="bg-background-light text-text-main font-display antialiased min-h-screen flex flex-col">
+<script src="/shared/book-catalog.js?v=1771240921862"></script>
+<script type="module" src="/shared/shell.js?v=1771240921862"></script>
+<reado-app-shell data-page="knowledge-map"></reado-app-shell>
+<!-- Navbar -->
+<nav class="bg-surface-light border-b border-gray-100 sticky top-0 z-50 h-16 flex items-center justify-between px-6 lg:px-12 shadow-sm">
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2">
+<span class="material-icons-round text-primary text-2xl">architecture</span>
+<span class="font-bold text-xl tracking-tight">reado</span>
+</div>
+<div class="h-6 w-px bg-gray-200 mx-2"></div>
+<div class="text-sm font-medium text-gray-500 flex items-center gap-2">
+<span class="bg-primary/10 text-yellow-700 px-2 py-0.5 rounded text-xs font-semibold">LEVEL 2</span>
+<span class="text-gray-900 font-bold">炼金术：土地财政</span>
+</div>
+</div>
+<div class="flex items-center gap-8">
+<!-- Progress Stepper -->
+<div class="flex items-center gap-2 text-sm">
+<div class="flex items-center text-primary font-bold">
+<span class="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-xs mr-2">1</span>
+                    征收
+                </div>
+<div class="w-8 h-0.5 bg-gray-200"></div>
+<div class="flex items-center text-gray-400">
+<span class="w-6 h-6 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center text-xs mr-2">2</span>
+                    开发
+                </div>
+<div class="w-8 h-0.5 bg-gray-200"></div>
+<div class="flex items-center text-gray-400">
+<span class="w-6 h-6 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center text-xs mr-2">3</span>
+                    拍卖
+                </div>
+</div>
+<button class="text-gray-400 hover:text-gray-600">
+<span class="material-icons-round">help_outline</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-yellow-700 font-bold text-xs">
+                US
+            </div>
+</div>
+</nav>
+<!-- Main Content Grid -->
+<main class="flex-1 max-w-7xl mx-auto w-full p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Left: Interactive Simulation Area (8 cols) -->
+<div class="lg:col-span-8 flex flex-col gap-6">
+<!-- Header Section -->
+<div class="flex justify-between items-end">
+<div>
+<h1 class="text-2xl font-bold text-gray-900 mb-1">第一阶段：土地征收</h1>
+<p class="text-gray-500 text-sm">点击地图上的荒地地块进行征收。注意观察右侧财政成本变化。</p>
+</div>
+<div class="flex gap-2">
+<button class="px-3 py-1.5 bg-white border border-gray-200 rounded text-sm text-gray-600 hover:bg-gray-50 flex items-center gap-1 shadow-sm">
+<span class="material-icons-round text-base">restart_alt</span> 重置
+                    </button>
+</div>
+</div>
+<!-- Interactive Map/Visualizer -->
+<div class="bg-surface-light rounded-xl shadow-soft border border-gray-100 p-6 relative overflow-hidden h-[500px] group">
+<!-- Map Controls Overlay -->
+<div class="absolute top-6 right-6 z-10 flex flex-col gap-2">
+<button class="w-10 h-10 bg-white rounded shadow-sm flex items-center justify-center text-gray-600 hover:text-primary transition-colors border border-gray-100">
+<span class="material-icons-round">add</span>
+</button>
+<button class="w-10 h-10 bg-white rounded shadow-sm flex items-center justify-center text-gray-600 hover:text-primary transition-colors border border-gray-100">
+<span class="material-icons-round">remove</span>
+</button>
+<button class="w-10 h-10 bg-white rounded shadow-sm flex items-center justify-center text-gray-600 hover:text-primary transition-colors border border-gray-100 mt-2" title="图层">
+<span class="material-icons-round">layers</span>
+</button>
+</div>
+<!-- Simulation Viewport -->
+<div class="w-full h-full bg-blue-50/30 rounded-lg relative overflow-hidden flex items-center justify-center">
+<!-- Background Map Image -->
+<img alt="Satellite view of suburban landscape with green fields and dirt patches" class="absolute inset-0 w-full h-full object-cover opacity-40 mix-blend-multiply pointer-events-none grayscale" data-alt="Satellite view of suburban landscape with green fields and dirt patches" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2zjgj08xMmphIQ_CGjWWbdavx7Ori_xBHibMg5w5xdsLYgq4_KeuFGqRmxoDYEooD2o1bjmo2kIEexvnsgay3cKj3aPRRTrWRkBi32TCNZTz4rFhg2yJDj_HxDXGpAZnVI98jT1S1N8ULOhCDCP3IGRMJZT7PVtKwyo21-wazgBZ_TBfsfy029EClCpe6kpYdoP1fWuw6kcswuGaLqWYnc4DCrGFOaF_NsY9eWqxuKSt9jphH9OYYgDVLxodd1lJsOIL-MoEoHIs"/>
+<!-- Isometric Grid Overlay (Simulated with CSS) -->
+<div class="absolute inset-0 grid grid-cols-4 grid-rows-3 gap-4 p-12 perspective-1000 transform scale-90">
+<!-- Plot 1: Requisitioned -->
+<div class="relative bg-primary/10 border-2 border-primary rounded-lg shadow-lg hover:shadow-glow transition-all duration-300 cursor-pointer group/plot flex flex-col items-center justify-center backdrop-blur-sm">
+<span class="material-icons-round text-primary text-4xl mb-2 drop-shadow-sm">check_circle</span>
+<span class="font-bold text-gray-800 text-sm">地块 A-01</span>
+<div class="absolute -top-3 right-3 bg-primary text-white text-xs font-bold px-2 py-0.5 rounded shadow-sm">已征收</div>
+<!-- Tooltip on Hover -->
+<div class="absolute opacity-0 group-hover/plot:opacity-100 bottom-full mb-2 bg-gray-900 text-white text-xs rounded p-2 pointer-events-none transition-opacity w-32 z-20">
+<div class="flex justify-between"><span>面积:</span> <span>50亩</span></div>
+<div class="flex justify-between text-primary"><span>补偿:</span> <span>¥2,500万</span></div>
+</div>
+</div>
+<!-- Plot 2: Available -->
+<div class="relative bg-white/60 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary hover:bg-white/80 transition-all duration-300 cursor-pointer flex flex-col items-center justify-center group/plot">
+<span class="material-icons-round text-gray-400 text-4xl mb-2 group-hover/plot:text-primary transition-colors">add_location_alt</span>
+<span class="font-medium text-gray-500 text-sm group-hover/plot:text-gray-800">荒地 B-02</span>
+<span class="text-xs text-gray-400 mt-1">点击征收</span>
+</div>
+<!-- Plot 3: Available -->
+<div class="relative bg-white/60 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary hover:bg-white/80 transition-all duration-300 cursor-pointer flex flex-col items-center justify-center group/plot">
+<span class="material-icons-round text-gray-400 text-4xl mb-2 group-hover/plot:text-primary transition-colors">add_location_alt</span>
+<span class="font-medium text-gray-500 text-sm group-hover/plot:text-gray-800">荒地 B-03</span>
+<span class="text-xs text-gray-400 mt-1">点击征收</span>
+</div>
+<!-- Plot 4: Requisitioned -->
+<div class="relative bg-primary/10 border-2 border-primary rounded-lg shadow-lg hover:shadow-glow transition-all duration-300 cursor-pointer group/plot flex flex-col items-center justify-center backdrop-blur-sm">
+<span class="material-icons-round text-primary text-4xl mb-2 drop-shadow-sm">check_circle</span>
+<span class="font-bold text-gray-800 text-sm">地块 A-04</span>
+<div class="absolute -top-3 right-3 bg-primary text-white text-xs font-bold px-2 py-0.5 rounded shadow-sm">已征收</div>
+</div>
+<!-- More plots for visual density... -->
+<div class="relative bg-white/40 border-2 border-dotted border-gray-200 rounded-lg opacity-60"></div>
+<div class="relative bg-white/40 border-2 border-dotted border-gray-200 rounded-lg opacity-60"></div>
+<div class="relative bg-white/40 border-2 border-dotted border-gray-200 rounded-lg opacity-60"></div>
+<div class="relative bg-white/40 border-2 border-dotted border-gray-200 rounded-lg opacity-60"></div>
+</div>
+<!-- Overlay Legend -->
+<div class="absolute bottom-6 left-6 bg-white/90 backdrop-blur rounded p-3 text-xs shadow-sm border border-gray-100">
+<div class="flex items-center gap-2 mb-1">
+<div class="w-3 h-3 rounded bg-primary"></div>
+<span class="text-gray-600">已征收 (国有储备用地)</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded border border-gray-400 border-dashed bg-white"></div>
+<span class="text-gray-600">待征收 (集体所有荒地)</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Stage 2 Preview: Infrastructure Controls (Disabled/Preview state for context) -->
+<div aria-hidden="true" class="grid grid-cols-1 md:grid-cols-3 gap-4 opacity-50 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-not-allowed pointer-events-none">
+<div class="bg-surface-light p-4 rounded-lg border border-gray-100 shadow-sm">
+<div class="flex justify-between mb-2">
+<span class="text-xs font-bold text-gray-500">七通一平: 道路</span>
+<span class="text-xs font-mono text-gray-400">¥0</span>
+</div>
+<div class="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+<div class="w-0 h-full bg-primary"></div>
+</div>
+</div>
+<div class="bg-surface-light p-4 rounded-lg border border-gray-100 shadow-sm">
+<div class="flex justify-between mb-2">
+<span class="text-xs font-bold text-gray-500">七通一平: 水电</span>
+<span class="text-xs font-mono text-gray-400">¥0</span>
+</div>
+<div class="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+<div class="w-0 h-full bg-primary"></div>
+</div>
+</div>
+<div class="bg-surface-light p-4 rounded-lg border border-gray-100 shadow-sm flex items-center justify-between">
+<div class="text-xs font-bold text-gray-500">预计地价增幅</div>
+<span class="text-lg font-bold text-gray-300">+0%</span>
+</div>
+</div>
+</div>
+<!-- Right: Financial Sidebar (4 cols) -->
+<div class="lg:col-span-4 flex flex-col gap-6 sticky top-24 h-fit">
+<!-- Main Ledger Card -->
+<div class="bg-surface-light rounded-xl shadow-soft border border-gray-100 overflow-hidden">
+<div class="p-6 bg-gradient-to-br from-gray-50 to-white border-b border-gray-100">
+<h2 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Treasury</h2>
+<div class="text-3xl font-display font-bold text-gray-900 flex items-baseline gap-1">
+<span class="text-lg text-gray-400">¥</span>
+<span id="treasury-display">0.00</span>
+<span class="text-sm text-gray-500 font-medium">亿</span>
+</div>
+<div class="mt-2 text-xs font-medium text-green-600 flex items-center gap-1 bg-green-50 w-fit px-2 py-1 rounded">
+<span class="material-icons-round text-xs">trending_up</span>
+                        土地出让金入库
+                    </div>
+</div>
+<div class="p-6 space-y-6">
+<!-- Cost Breakdown -->
+<div>
+<h3 class="text-xs font-bold text-gray-400 uppercase mb-3">支出明细 (Costs)</h3>
+<div class="space-y-3">
+<div class="flex justify-between items-center text-sm">
+<span class="text-gray-600 flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-orange-400"></span>
+                                    征收补偿
+                                </span>
+<span class="font-mono font-medium text-gray-900">-¥ 5,000万</span>
+</div>
+<div class="flex justify-between items-center text-sm opacity-50">
+<span class="text-gray-600 flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-blue-400"></span>
+                                    基础设施投入
+                                </span>
+<span class="font-mono font-medium text-gray-900">¥ 0</span>
+</div>
+<div class="w-full h-px bg-gray-100 my-2"></div>
+<div class="flex justify-between items-center text-sm font-bold">
+<span class="text-gray-800">总投入成本</span>
+<span class="font-mono text-orange-600">-¥ 5,000万</span>
+</div>
+</div>
+</div>
+<!-- Revenue Projection -->
+<div>
+<h3 class="text-xs font-bold text-gray-400 uppercase mb-3">收益预测 (Projection)</h3>
+<div class="relative pt-2">
+<div class="flex justify-between items-end mb-1">
+<span class="text-xs text-gray-500">当前地块估值</span>
+<span class="text-sm font-bold text-primary">¥ 8,000万</span>
+</div>
+<div class="w-full bg-gray-100 rounded-full h-1.5 mb-4">
+<div class="bg-primary h-1.5 rounded-full" style="width: 45%"></div>
+</div>
+<p class="text-xs text-gray-400 leading-relaxed">
+                                提示：通过“七通一平”完善基建可大幅提升地块估值，从而在拍卖阶段获得更高溢价。
+                            </p>
+</div>
+</div>
+</div>
+<!-- Action Footer -->
+<div class="p-4 bg-gray-50 border-t border-gray-100">
+<button class="w-full bg-gray-900 hover:bg-black text-white py-3 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 group">
+                        下一步：开始开发
+                        <span class="material-icons-round text-primary group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+<div class="text-center mt-2">
+<span class="text-[10px] text-gray-400">完成当前阶段所有必要操作后继续</span>
+</div>
+</div>
+</div>
+<!-- Tip Card -->
+<div class="bg-primary/10 border border-primary/20 rounded-xl p-4 flex gap-3">
+<span class="material-icons-round text-primary mt-0.5">lightbulb</span>
+<div>
+<h4 class="text-sm font-bold text-gray-900 mb-1">知识点：土地储备</h4>
+<p class="text-xs text-gray-600 leading-relaxed">
+                        地方政府并不直接拥有郊区土地。第一步必须通过“征收”将集体土地转为国有建设用地，这是土地财政的起点。
+                    </p>
+</div>
+</div>
+</div>
+</main>
+
+
+<script>
+(() => {
+  
+  localStorage.setItem("reado_book_last_principles-for-navigating-big-debt-crises", "experience-28");
+  if ("experience-28" === "experience-30") {
+    try {
+      const completedRaw = localStorage.getItem("reado_completed_books_v1") || "[]";
+      const completedSet = new Set(JSON.parse(completedRaw));
+      completedSet.add("principles-for-navigating-big-debt-crises");
+      localStorage.setItem("reado_completed_books_v1", JSON.stringify([...completedSet]));
+    } catch {}
+  }
+  
+  const readoNextHref = "/experiences/experience-29.html";
+  (() => {
+    let isNavigating = false;
+    const keywordList = ["开始", "继续", "下一", "进入", "模拟", "抉择", "选择", "确认", "提交", "挑战", "完成", "start", "next", "continue"];
+    const blacklist = ["EN", "ZH", "返回", "back", "帮助", "求助", "笔记", "术语", "设置", "菜单", "关闭", "取消"];
+    const normalize = (value) => String(value || "").replace(/\s+/g, " ").trim();
+    const hasKeyword = (text) => keywordList.some((keyword) => text.toLowerCase().includes(keyword.toLowerCase()));
+    const isBlocked = (text) => blacklist.some((word) => text === word || text.toLowerCase().includes(word.toLowerCase()));
+    const isOptionGroupButton = (node) => {
+      const parent = node.parentElement;
+      if (!parent) return false;
+      const peers = Array.from(parent.children).filter(
+        (child) => child instanceof HTMLElement && child.matches("button,[role='button'],.concept-card,.item-card,[data-choice],[data-option]")
+      );
+      return peers.length >= 2;
+    };
+    const goNext = (delay = 180) => {
+      if (isNavigating) return;
+      isNavigating = true;
+      window.setTimeout(() => {
+        window.location.href = readoNextHref;
+      }, delay);
+    };
+    document.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+      if (target.closest(".reado-shell-wrap")) return;
+      const candidate = target.closest("[data-next-scene],button,a[href],.concept-card,.item-card,[data-choice],[data-option]");
+      if (!(candidate instanceof HTMLElement)) return;
+      if (!candidate.closest("main")) return;
+      if (candidate.hasAttribute("data-no-next")) return;
+      if (candidate.matches("a[href]")) {
+        const href = candidate.getAttribute("href") || "";
+        if (href && href !== "#" && !href.startsWith("javascript:")) return;
+      }
+      const text = normalize(candidate.textContent);
+      if (candidate.matches("[data-next-scene]")) {
+        event.preventDefault();
+        goNext(90);
+        return;
+      }
+      if (isBlocked(text)) return;
+      if (candidate.matches(".concept-card,.item-card,[data-choice],[data-option]")) {
+        goNext(180);
+        return;
+      }
+      if (candidate.matches("button")) {
+        if (hasKeyword(text) || (text.length >= 4 && isOptionGroupButton(candidate))) {
+          goNext(220);
+        }
+      }
+    });
+  })();
+  
+})();
+</script>
+</body></html>

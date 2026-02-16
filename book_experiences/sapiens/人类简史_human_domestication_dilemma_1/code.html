@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html class="dark" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>reado: 人类简史模拟 (全中文版)</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#cf7317",
+                        "primary-dark": "#a65c12",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#1a1612",
+                        "surface-dark": "#2d241b",
+                        "surface-lighter": "#3d3226",
+                        "sidebar-dark": "#14110e"
+                    },
+                    fontFamily: {
+                        "sans": ["Noto Sans SC", "Source Han Sans SC", "PingFang SC", "Microsoft YaHei", "sans-serif"],
+                        "display": ["Noto Sans SC", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1a1612; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cf7317; 
+            border-radius: 3px;
+        }
+        .glass-panel {
+            background: rgba(45, 36, 27, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .sidebar-item-active {
+            background: rgba(207, 115, 23, 0.1);
+            border-right: 3px solid #cf7317;
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-background-dark text-gray-100 min-h-screen flex font-display overflow-hidden relative">
+<div class="fixed inset-0 z-0 opacity-15 pointer-events-none overflow-hidden">
+<img class="absolute inset-0 w-full h-full object-cover mix-blend-overlay grayscale contrast-125 brightness-50" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZksFKOEtkId5n2nx9b3y8gVsKHp7UyeXHKuWICWdKYZqjrsOVup2DgL1yEv2mP3y3r4NpAIjJbqJjrolx8ioID53ep8dqE8dM0zkJ4ytF2UewkOOBnLjJWisYmgT0Z0MJ6CRuBAu4aTKFpbur68uSobhneFvhWIlZTkWps8GDfknY8SxXSCtk39L8B-TkNcjIB7Ib8z6UvXHua8-LiTWiU4R-LKYUmI8HqhbR9c-he1RHA9Kt8-5ZjfLO2xWJQUocffEExp7delI"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/80 to-transparent"></div>
+</div>
+<aside class="relative z-30 w-20 lg:w-64 bg-sidebar-dark border-r border-white/5 flex flex-col shrink-0">
+<div class="p-6 flex items-center gap-3">
+<div class="h-10 w-10 rounded-xl bg-primary flex items-center justify-center text-white font-black text-xl shadow-lg">
+            r
+        </div>
+<span class="text-2xl font-black tracking-tighter hidden lg:block text-white">reado</span>
+</div>
+<nav class="flex-grow mt-4 px-3 space-y-2">
+<div class="flex items-center gap-4 p-3 rounded-lg text-gray-400 hover:bg-white/5 cursor-pointer transition-all">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="hidden lg:block font-medium">学习概览</span>
+</div>
+<div class="flex items-center gap-4 p-3 rounded-lg sidebar-item-active cursor-pointer">
+<span class="material-symbols-outlined text-primary">auto_stories</span>
+<span class="hidden lg:block font-bold text-white">当前阅读</span>
+</div>
+<div class="flex items-center gap-4 p-3 rounded-lg text-gray-400 hover:bg-white/5 cursor-pointer">
+<span class="material-symbols-outlined">military_tech</span>
+<span class="hidden lg:block font-medium">演化成就</span>
+</div>
+<div class="flex items-center gap-4 p-3 rounded-lg text-gray-400 hover:bg-white/5 cursor-pointer">
+<span class="material-symbols-outlined">forum</span>
+<span class="hidden lg:block font-medium">思想社区</span>
+</div>
+</nav>
+<div class="p-6 border-t border-white/5">
+<div class="flex items-center gap-3">
+<div class="h-8 w-8 rounded-full bg-surface-lighter flex items-center justify-center">
+<span class="material-symbols-outlined text-sm">person</span>
+</div>
+<div class="hidden lg:block overflow-hidden">
+<p class="text-xs font-bold text-white truncate">探索者</p>
+<p class="text-[10px] text-gray-500">智人等级 12</p>
+</div>
+</div>
+</div>
+</aside>
+<div class="flex-grow flex flex-col relative z-10 overflow-y-auto">
+<header class="w-full px-8 py-6 flex items-center justify-between border-b border-white/5 bg-background-dark/40 backdrop-blur-sm">
+<div class="flex items-center gap-4">
+<div>
+<h1 class="text-sm font-black tracking-[0.2em] text-primary uppercase">人类简史：模拟</h1>
+<p class="text-xs text-gray-500 font-medium mt-1">第三章：农业革命中的驯化两难</p>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="hidden md:block text-right">
+<span class="block text-[10px] text-primary font-black tracking-[0.2em] uppercase">当前进度</span>
+<span class="block text-sm text-gray-300 font-bold italic">“奢侈生活的陷阱”</span>
+</div>
+<div class="h-10 w-10 rounded-full border border-primary/20 flex items-center justify-center bg-primary/5">
+<span class="material-symbols-outlined text-primary">history_edu</span>
+</div>
+</div>
+</header>
+<main class="flex-grow container mx-auto px-6 py-8 flex flex-col lg:flex-row gap-8">
+<aside class="w-full lg:w-1/4 flex flex-col gap-6">
+<div class="glass-panel rounded-xl p-6 flex flex-col gap-5">
+<div class="h-8 w-8 rounded-lg bg-primary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-xl">priority_high</span>
+</div>
+<div>
+<h2 class="text-xl font-black text-white tracking-tight">奢侈的陷阱</h2>
+<p class="text-xs font-medium text-primary/80 mt-1 uppercase tracking-widest">农业革命的真相</p>
+</div>
+<div class="space-y-4 text-sm text-gray-400 leading-relaxed font-light">
+<p>
+<span class="text-white font-bold">这是历史上最大的骗局。</span> 我们以为通过耕种节省了时间，实际上却加速了生活的跑步机。
+                    </p>
+<blockquote class="text-xs text-gray-500 border-l-2 border-primary/40 pl-3 py-1 italic">
+                        “人类以为自己驯化了植物，但其实是植物驯化了智人。”
+                    </blockquote>
+</div>
+<button class="w-full py-3 px-4 bg-white/5 hover:bg-white/10 rounded-lg text-xs font-bold text-primary transition-all flex items-center justify-between group">
+<span>阅读原文节选</span>
+<span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_right_alt</span>
+</button>
+</div>
+<div class="glass-panel rounded-xl p-6 flex flex-col gap-5">
+<h3 class="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">生存指标监测</h3>
+<div class="space-y-5">
+<div>
+<div class="flex justify-between items-end mb-2">
+<label class="text-xs font-bold text-gray-400">平均日劳动时长</label>
+<span class="text-sm font-black text-primary">9.5 小时</span>
+</div>
+<div class="w-full bg-white/5 rounded-full h-1">
+<div class="bg-primary h-1 rounded-full shadow-[0_0_8px_rgba(207,115,23,0.5)]" style="width: 85%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between items-end mb-2">
+<label class="text-xs font-bold text-gray-400">食物多样性指数</label>
+<span class="text-sm font-black text-red-400">极低</span>
+</div>
+<div class="w-full bg-white/5 rounded-full h-1">
+<div class="bg-red-500/60 h-1 rounded-full" style="width: 15%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between items-end mb-2">
+<label class="text-xs font-bold text-gray-400">人口增长速率</label>
+<span class="text-sm font-black text-green-400">爆发式</span>
+</div>
+<div class="w-full bg-white/5 rounded-full h-1">
+<div class="bg-green-500/60 h-1 rounded-full" style="width: 90%"></div>
+</div>
+</div>
+</div>
+</div>
+</aside>
+<section class="w-full lg:w-2/4 flex flex-col gap-6">
+<div class="flex-grow glass-panel rounded-2xl flex flex-col p-8 relative overflow-hidden">
+<div class="flex justify-between mb-8">
+<div class="text-left">
+<h4 class="text-sm font-black text-gray-400 mb-1">指标 A</h4>
+<p class="text-xl font-black text-white">人类苦难</p>
+</div>
+<div class="text-right">
+<h4 class="text-sm font-black text-primary mb-1">指标 B</h4>
+<p class="text-xl font-black text-white">热量盈余</p>
+</div>
+</div>
+<div class="flex-grow flex items-end justify-around gap-12 px-4 pb-12">
+<div class="flex flex-col items-center gap-4 w-1/3 group relative">
+<div class="relative w-full h-64 bg-black/40 rounded-xl overflow-hidden flex flex-col justify-end border border-white/5">
+<div class="w-full bg-gradient-to-t from-stone-800 to-stone-500 transition-all duration-1000 ease-out" style="height: 75%">
+<div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
+</div>
+<div class="absolute inset-x-0 bottom-4 text-center">
+<span class="text-3xl font-black text-white drop-shadow-lg">极高</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-stone-500 text-sm">fitness_center</span>
+<span class="text-xs font-bold text-gray-500 tracking-widest">脊椎与关节劳损</span>
+</div>
+</div>
+<div class="mb-24">
+<div class="h-14 w-14 rounded-full bg-primary/10 border-2 border-primary/30 flex items-center justify-center shadow-[0_0_20px_rgba(207,115,23,0.1)]">
+<span class="text-xs font-black text-primary italic">对决</span>
+</div>
+</div>
+<div class="flex flex-col items-center gap-4 w-1/3 group relative">
+<div class="relative w-full h-64 bg-black/40 rounded-xl overflow-hidden flex flex-col justify-end border border-white/5">
+<div class="w-full bg-gradient-to-t from-primary-dark to-primary transition-all duration-1000 ease-out shadow-[0_0_40px_rgba(207,115,23,0.3)]" style="height: 92%">
+<div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/diagmonds-light.png')]"></div>
+</div>
+<div class="absolute inset-x-0 bottom-4 text-center">
+<span class="text-3xl font-black text-white drop-shadow-lg">充足</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm">article</span>
+<span class="text-xs font-bold text-primary tracking-widest">单位面积产量</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-auto">
+<button class="group relative overflow-hidden rounded-xl p-6 text-left border border-white/10 hover:border-white/30 transition-all bg-white/5">
+<div class="relative z-10">
+<div class="flex items-center gap-2 mb-2 text-gray-500 group-hover:text-green-400 transition-colors">
+<span class="material-symbols-outlined text-lg">forest</span>
+<span class="text-[10px] font-black tracking-widest uppercase">旧有模式</span>
+</div>
+<h3 class="text-lg font-black text-white mb-2">保持采集狩猎</h3>
+<div class="flex gap-2">
+<span class="text-[10px] px-2 py-0.5 rounded bg-white/5 text-gray-400">自由度高</span>
+<span class="text-[10px] px-2 py-0.5 rounded bg-white/5 text-gray-400">身体健康</span>
+</div>
+</div>
+</button>
+<button class="group relative overflow-hidden rounded-xl p-6 text-left border-2 border-primary bg-primary/10 transition-all shadow-xl shadow-primary/10">
+<div class="relative z-10">
+<div class="flex items-center gap-2 mb-2 text-primary group-hover:text-white transition-colors">
+<span class="material-symbols-outlined text-lg">agriculture</span>
+<span class="text-[10px] font-black tracking-widest uppercase">演化必然</span>
+</div>
+<h3 class="text-lg font-black text-white mb-2">定居一处</h3>
+<div class="flex gap-2">
+<span class="text-[10px] px-2 py-0.5 rounded bg-primary/20 text-primary-dark font-bold">人口爆炸</span>
+<span class="text-[10px] px-2 py-0.5 rounded bg-primary/20 text-primary-dark font-bold">文明雏形</span>
+</div>
+</div>
+<span class="absolute top-4 right-4 h-2 w-2 rounded-full bg-primary animate-pulse shadow-[0_0_8px_#cf7317]"></span>
+</button>
+</div>
+</div>
+<div class="flex items-center justify-center gap-2 text-[10px] text-gray-500 font-medium">
+<span class="material-symbols-outlined text-xs">tips_and_updates</span>
+<span>核心论点：人类本以为找到了更轻松的生存方式，却被固定在了麦田之中。</span>
+</div>
+</section>
+<aside class="w-full lg:w-1/4 flex flex-col gap-6">
+<div class="glass-panel rounded-xl p-6 h-full flex flex-col">
+<div class="flex items-center justify-between mb-8">
+<h3 class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">演化清单</h3>
+<span class="text-[10px] text-primary font-bold">1 / 3 已解锁</span>
+</div>
+<div class="space-y-4">
+<div class="flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/5 opacity-40 grayscale transition-all cursor-not-allowed">
+<div class="h-10 w-10 rounded-lg bg-stone-800 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-stone-600">home</span>
+</div>
+<div>
+<h4 class="text-sm font-black text-gray-300">永久住所</h4>
+<p class="text-[10px] text-gray-600 mt-0.5">尚未解锁</p>
+</div>
+</div>
+<div class="flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/5 opacity-40 grayscale transition-all cursor-not-allowed">
+<div class="h-10 w-10 rounded-lg bg-stone-800 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-stone-600">edit_note</span>
+</div>
+<div>
+<h4 class="text-sm font-black text-gray-300">文字系统</h4>
+<p class="text-[10px] text-gray-600 mt-0.5">尚未解锁</p>
+</div>
+</div>
+<div class="flex items-center gap-4 p-4 rounded-xl bg-primary/10 border border-primary/30 shadow-lg transform scale-[1.02]">
+<div class="h-10 w-10 rounded-lg bg-primary flex items-center justify-center shrink-0 text-white shadow-md">
+<span class="material-symbols-outlined">grass</span>
+</div>
+<div class="flex-grow">
+<h4 class="text-sm font-black text-white">驯化的小麦</h4>
+<p class="text-[10px] text-primary/80 mt-0.5">关键里程碑</p>
+</div>
+<span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+</div>
+</div>
+<div class="mt-auto pt-8 border-t border-white/5">
+<div class="flex justify-between items-center text-[10px] font-black mb-3">
+<span class="text-gray-500 uppercase tracking-widest">DNA 演化点数</span>
+<span class="text-white">1,240 / 5,000</span>
+</div>
+<div class="w-full bg-white/5 rounded-full h-1.5 overflow-hidden">
+<div class="bg-gradient-to-r from-primary to-orange-400 h-full rounded-full w-1/4 shadow-[0_0_10px_rgba(207,115,23,0.4)]"></div>
+</div>
+<p class="text-[10px] text-gray-600 mt-3 text-center italic">距离下一次智力跃迁还需 3,760 点</p>
+</div>
+</div>
+</aside>
+</main>
+</div>
+
+</body></html>

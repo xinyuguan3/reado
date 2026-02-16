@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html class="dark" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>reado: 任务中心 (蓝青色系版)</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1978e5", // reado neon blue
+                        "accent-cyan": "#00f2ff", // reado cyan accent
+                        "reado-bg": "#0a0f16", 
+                        "reado-sidebar": "#0d141d",
+                        "reado-surface": "#161f2b",
+                        "background-dark": "#0a0f16",
+                        "background-light": "#f6f7f8",
+                    },
+                    fontFamily: {
+                        "display": ["Noto Sans SC", "Source Han Sans SC", "Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        @layer base {
+            body {
+                @apply font-display bg-reado-bg text-slate-100;
+            }
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .task-card:hover .progress-glow {
+            box-shadow: 0 0 15px rgba(25, 120, 229, 0.5);
+        }
+        .neon-border {
+            box-shadow: 0 0 10px rgba(25, 120, 229, 0.2);
+        }
+        .active-glow {
+            box-shadow: 0 0 20px rgba(25, 120, 229, 0.4);
+        }
+    </style>
+</head>
+<body class="antialiased h-screen w-full overflow-hidden flex selection:bg-primary selection:text-white">
+<script src="/shared/book-catalog.js?v=1771240921862"></script>
+<script type="module" src="/shared/shell.js?v=1771240921862"></script>
+<reado-app-shell data-page="mission"></reado-app-shell>
+<div class="fixed inset-0 z-0 pointer-events-none">
+<div class="absolute inset-0 bg-cover bg-center opacity-5 blur-3xl scale-110" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDcv6N48woaPUOGqfz6zdHVwoZkkI25kS4N5J747eofzsfCg5F1_QPnvaAZ46i1jkRIa7j7Pj9SPw6g4v9eEHOmU8rvQocHsUzq51EETqXJ1sPUSuGXExg_oifTN28rV092nGmYcwvMUEmHJV95plu07s7AKQejOTPiT7Pn1eMZB-NK11lOay8RjaovBIfQ9zMr8W8oPXyeLgv4m6__cTpwAK0wRzD_z4-FXPVKJZaN9CGexmR7nlq8LilYJDpY4wK-M2mjWsknrLk');"></div>
+<div class="absolute inset-0 bg-gradient-to-b from-reado-bg/95 via-reado-bg to-reado-bg"></div>
+</div>
+<aside class="relative z-20 w-72 h-full flex flex-col border-r border-white/5 bg-reado-sidebar">
+<div class="p-6 pb-2">
+<div class="flex items-center gap-3 mb-8">
+<div class="w-8 h-8 rounded bg-primary flex items-center justify-center text-white active-glow">
+<span class="material-icons text-lg">auto_stories</span>
+</div>
+<h1 class="text-xl font-bold tracking-tight text-white uppercase italic">reado</h1>
+</div>
+<div class="flex flex-col gap-4 mb-6">
+<div class="flex items-center gap-3">
+<div class="relative">
+<img alt="User Avatar" class="w-12 h-12 rounded-full border-2 border-primary/50 object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB18wrv0a3KPJVWjDkloH13OrW7VDRPEJja-UKZ148dQEuNSsR63Qe7zW7cG4kFxp3hDkRMHiCajfO1fF4_qXvvPCYFWjBZgvqv2zKzlsg__qFblrefTEkAqxMu4IMcAYMjY91KWsEffjZmP2bnAAw3pwSRK8uMIQDIQ81Yd6cSpY2hfNNNRRRynS1s5UjqNwQ2IzS7Aa2PUxh4N0StHwdQ4vnGBGX5zOzlUXFVfRirW7BwBIvsBtaj1lVLgpJvEdk8SWFJ6XlYgrI"/>
+<div class="absolute -bottom-1 -right-1 w-5 h-5 bg-reado-surface rounded-full flex items-center justify-center border border-white/10">
+<span class="text-[10px] font-bold text-primary">5</span>
+</div>
+</div>
+<div>
+<div class="font-bold text-white text-sm">陈晓东</div>
+<div class="text-xs text-slate-400 font-medium">学者 等级 5</div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-2">
+<div class="bg-white/5 rounded-lg p-2 flex items-center gap-2 border border-white/5">
+<span class="material-icons text-primary text-sm">bolt</span>
+<div>
+<div class="text-[10px] text-slate-500 uppercase font-bold">经验值</div>
+<div class="text-xs font-bold text-white">42,850</div>
+</div>
+</div>
+<div class="bg-white/5 rounded-lg p-2 flex items-center gap-2 border border-white/5">
+<span class="material-icons text-accent-cyan text-sm">diamond</span>
+<div>
+<div class="text-[10px] text-slate-500 uppercase font-bold">宝石</div>
+<div class="text-xs font-bold text-white">1,240</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<nav class="flex-1 px-3 overflow-y-auto space-y-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 text-slate-400 hover:text-white transition-all group" href="/pages/gamified-learning-hub-dashboard-1.html">
+<span class="material-symbols-outlined text-[20px]">map</span>
+<span class="text-sm font-medium">知识版图</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary border border-primary/20 font-bold transition-all group" href="/pages/simulator-library-level-selection-2.html">
+<span class="material-symbols-outlined text-[20px]">assignment</span>
+<span class="text-sm">任务中心</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 text-slate-400 hover:text-white transition-all group" href="/pages/global-scholar-leaderboard.html">
+<span class="material-symbols-outlined text-[20px]">leaderboard</span>
+<span class="text-sm font-medium">排行榜</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 text-slate-400 hover:text-white transition-all group" href="/pages/gamified-learning-hub-dashboard-3.html">
+<span class="material-symbols-outlined text-[20px]">storefront</span>
+<span class="text-sm font-medium">交易中心</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 text-slate-400 hover:text-white transition-all group" href="/pages/gamified-learning-hub-dashboard-2.html">
+<span class="material-symbols-outlined text-[20px]">person</span>
+<span class="text-sm font-medium">个人资料</span>
+</a>
+</nav>
+<div class="p-4 border-t border-white/5 text-center">
+<p class="text-[10px] text-slate-600 font-bold tracking-widest uppercase">v2.4.0 © reado</p>
+</div>
+</aside>
+<main class="relative z-10 flex-1 flex flex-col h-full overflow-hidden">
+<header class="p-8 pb-4">
+<div class="flex justify-between items-end mb-8">
+<div>
+<h2 class="text-3xl font-black text-white mb-1 tracking-tight">任务中心</h2>
+<p class="text-slate-400 text-sm font-medium">完成挑战，获取丰厚奖励并提升你的等级</p>
+</div>
+<div class="flex items-center gap-2 bg-reado-sidebar p-1.5 rounded-xl border border-white/10">
+<button class="px-6 py-2 rounded-lg bg-primary text-white font-bold text-sm shadow-lg active-glow transition-all">每日任务</button>
+<button class="px-6 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 font-bold text-sm transition-all">每周任务</button>
+<button class="px-6 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 font-bold text-sm transition-all">总成就</button>
+</div>
+</div>
+</header>
+<div class="flex-1 overflow-y-auto px-8 pb-12 hide-scrollbar">
+<div class="max-w-5xl mx-auto space-y-6">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-2">
+<span class="material-icons text-primary">calendar_today</span>
+<span class="text-lg font-bold">今日目标</span>
+<span class="ml-2 px-2 py-0.5 rounded bg-white/5 text-[10px] font-bold text-slate-500 border border-white/5 uppercase tracking-tighter">重置于 04:00</span>
+</div>
+<div class="text-sm font-bold text-slate-400">已完成 2/4</div>
+</div>
+<div class="grid grid-cols-1 gap-4">
+<div class="task-card group relative bg-reado-surface/50 border border-white/5 rounded-2xl p-6 transition-all hover:border-primary/30">
+<div class="flex items-center justify-between gap-6">
+<div class="flex items-center gap-5 flex-1">
+<div class="w-12 h-12 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center justify-center">
+<span class="material-icons text-green-500">check_circle</span>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-3 mb-1">
+<h4 class="text-white font-bold">完成一个阅读关卡</h4>
+<span class="px-2 py-0.5 rounded-full bg-green-500/20 text-green-400 text-[10px] font-bold">已完成</span>
+</div>
+<p class="text-sm text-slate-400">在任意模拟器中完成并退出一次阅读流程</p>
+</div>
+</div>
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-4">
+<div class="flex flex-col items-center">
+<div class="flex items-center gap-1 text-accent-cyan font-bold">
+<span class="material-icons text-sm">paid</span>
+<span>+100</span>
+</div>
+<span class="text-[10px] text-slate-500 font-bold uppercase">金币</span>
+</div>
+<div class="flex flex-col items-center">
+<div class="flex items-center gap-1 text-primary font-bold">
+<span class="material-icons text-sm">bolt</span>
+<span>+50</span>
+</div>
+<span class="text-[10px] text-slate-500 font-bold uppercase">经验</span>
+</div>
+</div>
+<button class="px-6 py-2 bg-white/5 text-slate-500 font-bold text-sm rounded-lg cursor-not-allowed border border-white/5">已领取</button>
+</div>
+</div>
+</div>
+<div class="task-card group relative bg-reado-surface border border-white/10 rounded-2xl p-6 transition-all hover:border-primary/50">
+<div class="flex items-center justify-between gap-6">
+<div class="flex items-center gap-5 flex-1">
+<div class="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+<span class="material-icons text-primary">star</span>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-3 mb-1">
+<h4 class="text-white font-bold">获得一次完美评分</h4>
+<span class="px-2 py-0.5 rounded-full bg-white/5 text-slate-500 text-[10px] font-bold">每日限领 1 次</span>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex-1 max-w-xs bg-black/40 h-2 rounded-full overflow-hidden mt-1">
+<div class="progress-glow h-full bg-primary/20 transition-all duration-1000" style="width: 0%"></div>
+</div>
+<span class="text-xs font-bold text-slate-500 italic">0/1</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-4">
+<div class="flex flex-col items-center">
+<div class="flex items-center gap-1 text-accent-cyan font-bold">
+<span class="material-icons text-sm">paid</span>
+<span>+300</span>
+</div>
+<span class="text-[10px] text-slate-500 font-bold uppercase">金币</span>
+</div>
+<div class="flex flex-col items-center">
+<div class="flex items-center gap-1 text-primary font-bold">
+<span class="material-icons text-sm">bolt</span>
+<span>+150</span>
+</div>
+<span class="text-[10px] text-slate-500 font-bold uppercase">经验</span>
+</div>
+</div>
+<button class="px-6 py-2 bg-primary/10 hover:bg-primary text-primary hover:text-white font-bold text-sm rounded-lg transition-all border border-primary/30">去完成</button>
+</div>
+</div>
+</div>
+<div class="task-card group relative bg-reado-surface border border-white/10 rounded-2xl p-6 transition-all hover:border-primary/50">
+<div class="flex items-center justify-between gap-6">
+<div class="flex items-center gap-5 flex-1">
+<div class="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+<span class="material-icons text-primary">menu_book</span>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-3 mb-1">
+<h4 class="text-white font-bold">专注阅读 30 分钟</h4>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex-1 max-w-xs bg-black/40 h-2 rounded-full overflow-hidden mt-1">
+<div class="progress-glow h-full bg-primary transition-all duration-1000" style="width: 80%"></div>
+</div>
+<span class="text-xs font-bold text-primary italic">24/30m</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-4">
+<div class="flex flex-col items-center">
+<div class="flex items-center gap-1 text-accent-cyan font-bold">
+<span class="material-icons text-sm">paid</span>
+<span>+200</span>
+</div>
+<span class="text-[10px] text-slate-500 font-bold uppercase">金币</span>
+</div>
+<div class="flex flex-col items-center">
+<div class="flex items-center gap-1 text-primary font-bold">
+<span class="material-icons text-sm">bolt</span>
+<span>+100</span>
+</div>
+<span class="text-[10px] text-slate-500 font-bold uppercase">经验</span>
+</div>
+</div>
+<button class="px-6 py-2 bg-primary/10 hover:bg-primary text-primary hover:text-white font-bold text-sm rounded-lg transition-all border border-primary/30">继续阅读</button>
+</div>
+</div>
+</div>
+<div class="task-card group relative bg-reado-surface border border-primary/30 rounded-2xl p-6 transition-all hover:border-primary/60 bg-gradient-to-r from-primary/5 to-transparent">
+<div class="flex items-center justify-between gap-6">
+<div class="flex items-center gap-5 flex-1">
+<div class="w-12 h-12 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center relative">
+<span class="material-icons text-primary">share</span>
+<div class="absolute -top-1 -right-1 w-3 h-3 bg-accent-cyan rounded-full animate-pulse shadow-[0_0_8px_#00f2ff]"></div>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-3 mb-1">
+<h4 class="text-white font-bold">分享今日成就卡</h4>
+<span class="px-2 py-0.5 rounded-full bg-primary text-white text-[10px] font-bold">待领取</span>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex-1 max-w-xs bg-black/40 h-2 rounded-full overflow-hidden mt-1">
+<div class="progress-glow h-full bg-accent-cyan shadow-[0_0_10px_rgba(0,242,255,0.5)]" style="width: 100%"></div>
+</div>
+<span class="text-xs font-bold text-accent-cyan italic">1/1</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-4">
+<div class="flex flex-col items-center">
+<div class="flex items-center gap-1 text-accent-cyan font-bold">
+<span class="material-icons text-sm">paid</span>
+<span>+50</span>
+</div>
+<span class="text-[10px] text-slate-500 font-bold uppercase">金币</span>
+</div>
+<div class="flex flex-col items-center">
+<div class="flex items-center gap-1 text-primary font-bold">
+<span class="material-icons text-sm">bolt</span>
+<span>+30</span>
+</div>
+<span class="text-[10px] text-slate-500 font-bold uppercase">经验</span>
+</div>
+</div>
+<button class="px-6 py-2 bg-primary text-white font-bold text-sm rounded-lg shadow-[0_4px_15px_rgba(25,120,229,0.4)] hover:scale-105 active:scale-95 transition-all">领取奖励</button>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-12 pt-12 border-t border-white/5 grid grid-cols-2 gap-8">
+<div class="p-6 rounded-2xl bg-reado-sidebar border border-white/5 group cursor-pointer hover:border-primary/30 transition-all">
+<div class="flex justify-between items-start mb-6">
+<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+<span class="material-icons text-primary">workspace_premium</span>
+</div>
+<span class="material-icons text-slate-600 group-hover:text-primary transition-colors">arrow_forward</span>
+</div>
+<h5 class="text-white font-bold mb-2">每周挑战正在进行</h5>
+<p class="text-slate-400 text-xs leading-relaxed mb-4 font-medium">累计通关5个不同领域的关卡，解锁本周“博学者”勋章与 2,000 经验值奖励。</p>
+<div class="w-full bg-black/40 h-1.5 rounded-full overflow-hidden">
+<div class="h-full bg-primary" style="width: 40%"></div>
+</div>
+</div>
+<div class="p-6 rounded-2xl bg-reado-sidebar border border-white/5 group cursor-pointer hover:border-primary/30 transition-all">
+<div class="flex justify-between items-start mb-6">
+<div class="w-10 h-10 rounded-lg bg-accent-cyan/10 flex items-center justify-center">
+<span class="material-icons text-accent-cyan">emoji_events</span>
+</div>
+<span class="material-icons text-slate-600 group-hover:text-accent-cyan transition-colors">arrow_forward</span>
+</div>
+<h5 class="text-white font-bold mb-2">里程碑成就</h5>
+<p class="text-slate-400 text-xs leading-relaxed mb-4 font-medium">解锁10个天赋节点。当前进度 7/10。完成后可获得“先驱者”永久头像框。</p>
+<div class="w-full bg-black/40 h-1.5 rounded-full overflow-hidden">
+<div class="h-full bg-accent-cyan" style="width: 70%"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<div class="fixed bottom-6 left-1/2 ml-36 -translate-x-1/2 z-20 flex gap-2">
+<div class="w-8 h-1.5 rounded-full bg-primary shadow-[0_0_10px_rgba(25,120,229,0.8)]"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-white/20"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-white/20"></div>
+</div>
+
+
+<script id="reado-mission-center-script">
+(() => {
+  const catalog = window.__READO_BOOK_CATALOG__;
+  const books = Array.isArray(catalog?.books) ? catalog.books : [];
+  const unlockKey = catalog?.storage?.unlockKey || "reado_unlocked_books_v1";
+  const completedKey = catalog?.storage?.completedKey || "reado_completed_books_v1";
+  const claimKey = "reado_mission_claims_v1";
+  const activeTabKey = "reado_mission_active_tab_v1";
+
+  const contentHost = document.querySelector("main .flex-1.overflow-y-auto.px-8.pb-12.hide-scrollbar .max-w-5xl");
+  const tabWrap = document.querySelector("main header .flex.items-center.gap-2.bg-reado-sidebar");
+  const tabButtons = Array.from(tabWrap?.querySelectorAll("button") || []);
+  if (!contentHost || tabButtons.length < 3) return;
+
+  const tabOrder = ["daily", "weekly", "achievement"];
+  const tabLabels = {
+    daily: "每日任务",
+    weekly: "每周任务",
+    achievement: "总成就"
+  };
+  const tabMeta = {
+    daily: { icon: "calendar_today", title: "今日目标", reset: "重置于 04:00" },
+    weekly: { icon: "date_range", title: "本周挑战", reset: "每周一 04:00 重置" },
+    achievement: { icon: "emoji_events", title: "长期里程碑", reset: "永久累计，不重置" }
+  };
+
+  const readSet = (key) => {
+    try {
+      const raw = JSON.parse(localStorage.getItem(key) || "[]");
+      return new Set(Array.isArray(raw) ? raw : []);
+    } catch {
+      return new Set();
+    }
+  };
+
+  const readClaims = () => {
+    try {
+      const raw = JSON.parse(localStorage.getItem(claimKey) || "{}");
+      return raw && typeof raw === "object" ? raw : {};
+    } catch {
+      return {};
+    }
+  };
+
+  const writeClaims = (claims) => {
+    localStorage.setItem(claimKey, JSON.stringify(claims));
+  };
+
+  const getDayKey = () => {
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, "0");
+    const d = String(now.getDate()).padStart(2, "0");
+    return y + "-" + m + "-" + d;
+  };
+
+  const getWeekKey = () => {
+    const now = new Date();
+    const start = new Date(now.getFullYear(), 0, 1);
+    const day = Math.floor((now - start) / 86400000) + 1;
+    const week = Math.ceil((day + start.getDay()) / 7);
+    return now.getFullYear() + "-W" + String(week).padStart(2, "0");
+  };
+
+  const getSnapshot = () => {
+    const unlocked = readSet(unlockKey);
+    const completed = readSet(completedKey);
+    const started = new Set(
+      books
+        .filter((book) => Boolean(localStorage.getItem("reado_book_last_" + book.id)))
+        .map((book) => book.id)
+    );
+    const categoriesUnlocked = new Set(
+      books.filter((book) => unlocked.has(book.id)).map((book) => book.category)
+    );
+    const categoriesCompleted = new Set(
+      books.filter((book) => completed.has(book.id)).map((book) => book.category)
+    );
+    const completedCareerBooks = books.filter((book) => completed.has(book.id) && book.category === "career-wealth").length;
+    const totalCompletedModules = books
+      .filter((book) => completed.has(book.id))
+      .reduce((sum, book) => sum + (book.moduleCount || 0), 0);
+    return {
+      unlocked,
+      completed,
+      started,
+      categoriesUnlocked,
+      categoriesCompleted,
+      completedCareerBooks,
+      totalCompletedModules
+    };
+  };
+
+  const buildTasks = () => {
+    const s = getSnapshot();
+    const openBook = books.find((book) => s.unlocked.has(book.id) && !s.completed.has(book.id));
+    const firstBook = books[0];
+    const knowledgeHref = "/pages/gamified-learning-hub-dashboard-1.html";
+    const marketHref = "/pages/gamified-learning-hub-dashboard-3.html";
+    const profileHref = "/pages/gamified-learning-hub-dashboard-2.html";
+
+    return {
+      daily: [
+        {
+          id: "daily-start-learning",
+          icon: "auto_stories",
+          title: "开启一次学习流程",
+          desc: "进入任意书籍模块并开始体验。",
+          goal: 1,
+          progress: Math.min(s.started.size, 1),
+          rewardCoins: 120,
+          rewardExp: 60,
+          actionLabel: "去学习",
+          actionHref: openBook ? openBook.hubHref : knowledgeHref
+        },
+        {
+          id: "daily-unlock-book",
+          icon: "shopping_bag",
+          title: "解锁 1 本书",
+          desc: "前往交易中心购买任意一本书籍模块。",
+          goal: 1,
+          progress: Math.min(s.unlocked.size, 1),
+          rewardCoins: 180,
+          rewardExp: 90,
+          actionLabel: "去交易中心",
+          actionHref: marketHref
+        },
+        {
+          id: "daily-finish-book",
+          icon: "task_alt",
+          title: "完成 1 本书",
+          desc: "完整通关一本书的全部模块并激活徽章。",
+          goal: 1,
+          progress: Math.min(s.completed.size, 1),
+          rewardCoins: 260,
+          rewardExp: 140,
+          actionLabel: "去完成",
+          actionHref: openBook ? openBook.hubHref : profileHref
+        }
+      ],
+      weekly: [
+        {
+          id: "weekly-complete-two-books",
+          icon: "menu_book",
+          title: "本周通关 2 本书",
+          desc: "完成跨主题学习，积累稳定输出能力。",
+          goal: 2,
+          progress: Math.min(s.completed.size, 2),
+          rewardCoins: 900,
+          rewardExp: 420,
+          actionLabel: "继续推进",
+          actionHref: openBook ? openBook.hubHref : knowledgeHref
+        },
+        {
+          id: "weekly-unlock-three-books",
+          icon: "inventory_2",
+          title: "本周解锁 3 本书",
+          desc: "扩充你的学习库，准备更高强度挑战。",
+          goal: 3,
+          progress: Math.min(s.unlocked.size, 3),
+          rewardCoins: 780,
+          rewardExp: 360,
+          actionLabel: "去交易中心",
+          actionHref: marketHref
+        },
+        {
+          id: "weekly-two-categories",
+          icon: "hub",
+          title: "本周覆盖 2 个领域",
+          desc: "跨领域学习可显著提升迁移能力。",
+          goal: 2,
+          progress: Math.min(s.categoriesCompleted.size, 2),
+          rewardCoins: 820,
+          rewardExp: 380,
+          actionLabel: "去知识版图",
+          actionHref: knowledgeHref
+        },
+        {
+          id: "weekly-career-book",
+          icon: "trending_up",
+          title: "本周完成 1 本事业/财富书",
+          desc: "优先提升可直接转化的实战能力。",
+          goal: 1,
+          progress: Math.min(s.completedCareerBooks, 1),
+          rewardCoins: 560,
+          rewardExp: 260,
+          actionLabel: "去挑战",
+          actionHref: openBook ? openBook.hubHref : knowledgeHref
+        }
+      ],
+      achievement: [
+        {
+          id: "achievement-unlock-all-books",
+          icon: "library_books",
+          title: "全书库解锁",
+          desc: "解锁当前版本所有书籍模块。",
+          goal: Math.max(books.length, 1),
+          progress: s.unlocked.size,
+          rewardCoins: 2000,
+          rewardExp: 1000,
+          actionLabel: "去解锁",
+          actionHref: marketHref
+        },
+        {
+          id: "achievement-complete-all-books",
+          icon: "workspace_premium",
+          title: "全书库通关",
+          desc: "完成当前版本所有书籍并点亮全部徽章。",
+          goal: Math.max(books.length, 1),
+          progress: s.completed.size,
+          rewardCoins: 3000,
+          rewardExp: 1500,
+          actionLabel: "去完成",
+          actionHref: openBook ? openBook.hubHref : profileHref
+        },
+        {
+          id: "achievement-four-categories",
+          icon: "public",
+          title: "四大领域探索者",
+          desc: "在四个生活战场中都完成至少一本书。",
+          goal: 4,
+          progress: Math.min(s.categoriesCompleted.size, 4),
+          rewardCoins: 2400,
+          rewardExp: 1200,
+          actionLabel: "去探索",
+          actionHref: knowledgeHref
+        },
+        {
+          id: "achievement-20-modules",
+          icon: "insights",
+          title: "20 模块深度学习者",
+          desc: "累计完成 20 个模块，建立系统知识网络。",
+          goal: 20,
+          progress: Math.min(s.totalCompletedModules, 20),
+          rewardCoins: 1600,
+          rewardExp: 900,
+          actionLabel: "继续学习",
+          actionHref: firstBook ? firstBook.hubHref : knowledgeHref
+        }
+      ]
+    };
+  };
+
+  const getClaimId = (task, tab) => {
+    if (tab === "daily") return task.id + "::" + getDayKey();
+    if (tab === "weekly") return task.id + "::" + getWeekKey();
+    return task.id;
+  };
+
+  const isTaskClaimed = (claims, task, tab) => Boolean(claims[getClaimId(task, tab)]);
+  const isTaskComplete = (task) => task.progress >= task.goal;
+  const getProgressPercent = (task) => Math.max(0, Math.min(100, Math.round((task.progress / Math.max(task.goal, 1)) * 100)));
+
+  const renderTaskCard = (task, tab, claims) => {
+    const complete = isTaskComplete(task);
+    const claimed = isTaskClaimed(claims, task, tab);
+    const percent = getProgressPercent(task);
+    const buttonState = claimed
+      ? { type: "disabled", label: "已领取", className: "bg-white/5 text-slate-500 cursor-not-allowed border border-white/5" }
+      : complete
+        ? { type: "claim", label: "领取奖励", className: "bg-primary text-white shadow-[0_4px_15px_rgba(25,120,229,0.4)] hover:scale-105 active:scale-95" }
+        : { type: "action", label: task.actionLabel || "去完成", className: "bg-primary/10 hover:bg-primary text-primary hover:text-white border border-primary/30" };
+    const statusBadge = claimed
+      ? '<span class="px-2 py-0.5 rounded-full bg-white/5 text-slate-500 text-[10px] font-bold">已领取</span>'
+      : complete
+        ? '<span class="px-2 py-0.5 rounded-full bg-primary text-white text-[10px] font-bold">待领取</span>'
+        : '<span class="px-2 py-0.5 rounded-full bg-white/5 text-slate-500 text-[10px] font-bold">进行中</span>';
+
+    return `
+      <div class="task-card group relative bg-reado-surface border border-white/10 rounded-2xl p-6 transition-all hover:border-primary/50">
+        <div class="flex items-center justify-between gap-6">
+          <div class="flex items-center gap-5 flex-1">
+            <div class="w-12 h-12 rounded-xl ${complete ? "bg-primary/20 border-primary/30" : "bg-primary/10 border-primary/20"} border flex items-center justify-center">
+              <span class="material-icons text-primary">${task.icon || "assignment"}</span>
+            </div>
+            <div class="flex-1">
+              <div class="flex items-center gap-3 mb-1">
+                <h4 class="text-white font-bold">${task.title}</h4>
+                ${statusBadge}
+              </div>
+              <p class="text-sm text-slate-400 mb-2">${task.desc}</p>
+              <div class="flex items-center gap-4">
+                <div class="flex-1 max-w-xs bg-black/40 h-2 rounded-full overflow-hidden mt-1">
+                  <div class="progress-glow h-full ${complete ? "bg-accent-cyan shadow-[0_0_10px_rgba(0,242,255,0.5)]" : "bg-primary"} transition-all duration-700" style="width:${percent}%"></div>
+                </div>
+                <span class="text-xs font-bold ${complete ? "text-accent-cyan" : "text-primary"} italic">${task.progress}/${task.goal}</span>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center gap-8">
+            <div class="flex items-center gap-4">
+              <div class="flex flex-col items-center">
+                <div class="flex items-center gap-1 text-accent-cyan font-bold">
+                  <span class="material-icons text-sm">diamond</span>
+                  <span>+${task.rewardCoins || 0}</span>
+                </div>
+                <span class="text-[10px] text-slate-500 font-bold uppercase">宝石</span>
+              </div>
+              <div class="flex flex-col items-center">
+                <div class="flex items-center gap-1 text-primary font-bold">
+                  <span class="material-icons text-sm">bolt</span>
+                  <span>+${task.rewardExp || 0}</span>
+                </div>
+                <span class="text-[10px] text-slate-500 font-bold uppercase">经验</span>
+              </div>
+            </div>
+            <button data-task-id="${task.id}" data-tab="${tab}" data-state="${buttonState.type}" data-action="${task.actionHref || ""}" class="px-6 py-2 font-bold text-sm rounded-lg transition-all ${buttonState.className}">${buttonState.label}</button>
+          </div>
+        </div>
+      </div>`;
+  };
+
+  const chooseRecommended = (tasksByTab, claims) => {
+    const candidates = [];
+    for (const tab of ["daily", "weekly"]) {
+      for (const task of tasksByTab[tab]) {
+        const complete = isTaskComplete(task);
+        const claimed = isTaskClaimed(claims, task, tab);
+        if (claimed) continue;
+        const ratio = task.progress / Math.max(task.goal, 1);
+        let score = tab === "weekly" ? 85 : 60;
+        score += Math.round(ratio * 100);
+        if (complete) score += 400;
+        if (!complete && tab === "weekly" && ratio >= 0.4) score += 80;
+        candidates.push({ task, tab, score, ratio });
+      }
+    }
+    candidates.sort((a, b) => b.score - a.score);
+    return candidates[0] || null;
+  };
+
+  const chooseMilestone = (tasksByTab, claims) => {
+    const list = tasksByTab.achievement
+      .filter((task) => !isTaskClaimed(claims, task, "achievement"))
+      .sort((a, b) => (b.progress / Math.max(b.goal, 1)) - (a.progress / Math.max(a.goal, 1)));
+    return list[0] || tasksByTab.achievement[0] || null;
+  };
+
+  const getActiveTab = () => {
+    const raw = localStorage.getItem(activeTabKey);
+    return tabOrder.includes(raw) ? raw : "daily";
+  };
+
+  const setActiveButtonStyles = (activeTab) => {
+    tabButtons.forEach((button) => {
+      const tab = button.dataset.tab;
+      const isActive = tab === activeTab;
+      button.className = isActive
+        ? "px-6 py-2 rounded-lg bg-primary text-white font-bold text-sm shadow-lg active-glow transition-all"
+        : "px-6 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 font-bold text-sm transition-all";
+    });
+  };
+
+  tabButtons.forEach((button) => {
+    const label = (button.textContent || "").trim();
+    const matched = Object.entries(tabLabels).find(([, value]) => value === label);
+    button.dataset.tab = matched ? matched[0] : "daily";
+  });
+
+  contentHost.innerHTML = `
+    <div id="reado-mission-summary" class="flex items-center justify-between mb-4"></div>
+    <div id="reado-mission-list" class="grid grid-cols-1 gap-4"></div>
+    <div class="mt-12 pt-12 border-t border-white/5 grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div id="reado-mission-recommend"></div>
+      <div id="reado-mission-milestone"></div>
+    </div>`;
+
+  const summaryEl = document.getElementById("reado-mission-summary");
+  const listEl = document.getElementById("reado-mission-list");
+  const recommendEl = document.getElementById("reado-mission-recommend");
+  const milestoneEl = document.getElementById("reado-mission-milestone");
+  if (!summaryEl || !listEl || !recommendEl || !milestoneEl) return;
+
+  let activeTab = getActiveTab();
+
+  const render = () => {
+    const tasksByTab = buildTasks();
+    const claims = readClaims();
+    const currentTasks = tasksByTab[activeTab] || [];
+    const completeCount = currentTasks.filter((task) => isTaskComplete(task)).length;
+    const claimedCount = currentTasks.filter((task) => isTaskClaimed(claims, task, activeTab)).length;
+    const meta = tabMeta[activeTab];
+
+    setActiveButtonStyles(activeTab);
+    summaryEl.innerHTML = `
+      <div class="flex items-center gap-2">
+        <span class="material-icons text-primary">${meta.icon}</span>
+        <span class="text-lg font-bold">${meta.title}</span>
+        <span class="ml-2 px-2 py-0.5 rounded bg-white/5 text-[10px] font-bold text-slate-500 border border-white/5 uppercase tracking-tighter">${meta.reset}</span>
+      </div>
+      <div class="text-sm font-bold text-slate-400">已完成 ${completeCount}/${currentTasks.length} · 已领取 ${claimedCount}</div>`;
+
+    listEl.innerHTML = currentTasks.map((task) => renderTaskCard(task, activeTab, claims)).join("");
+
+    const recommended = chooseRecommended(tasksByTab, claims);
+    if (!recommended) {
+      recommendEl.innerHTML = `
+        <div class="p-6 rounded-2xl bg-reado-sidebar border border-white/5">
+          <h5 class="text-white font-bold mb-2">推荐任务</h5>
+          <p class="text-slate-400 text-xs leading-relaxed font-medium">当前推荐任务已全部完成，恭喜你！</p>
+        </div>`;
+    } else {
+      const task = recommended.task;
+      const ratio = getProgressPercent(task);
+      const themeIcon = recommended.tab === "weekly" ? "workspace_premium" : "whatshot";
+      const themeColor = recommended.tab === "weekly" ? "text-primary" : "text-accent-cyan";
+      recommendEl.innerHTML = `
+        <div class="p-6 rounded-2xl bg-reado-sidebar border border-white/5 group transition-all hover:border-primary/30">
+          <div class="flex justify-between items-start mb-6">
+            <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+              <span class="material-icons ${themeColor}">${themeIcon}</span>
+            </div>
+            <span class="px-2 py-0.5 rounded-full bg-primary/20 text-primary text-[10px] font-bold">${tabLabels[recommended.tab]}</span>
+          </div>
+          <h5 class="text-white font-bold mb-2">${task.title}</h5>
+          <p class="text-slate-400 text-xs leading-relaxed mb-4 font-medium">${task.desc}</p>
+          <div class="w-full bg-black/40 h-1.5 rounded-full overflow-hidden mb-3">
+            <div class="h-full bg-primary" style="width:${ratio}%"></div>
+          </div>
+          <div class="flex items-center justify-between">
+            <p class="text-[11px] text-slate-400">${task.progress}/${task.goal}</p>
+            <button data-task-id="${task.id}" data-tab="${recommended.tab}" data-state="${isTaskComplete(task) ? "claim" : "action"}" data-action="${task.actionHref || ""}" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-primary/10 text-primary hover:bg-primary hover:text-white border border-primary/30 transition-all">
+              ${isTaskComplete(task) ? "领取奖励" : (task.actionLabel || "去完成")}
+            </button>
+          </div>
+        </div>`;
+    }
+
+    const milestone = chooseMilestone(tasksByTab, claims);
+    if (!milestone) {
+      milestoneEl.innerHTML = "";
+    } else {
+      const milestoneRatio = getProgressPercent(milestone);
+      milestoneEl.innerHTML = `
+        <div class="p-6 rounded-2xl bg-reado-sidebar border border-white/5 group transition-all hover:border-primary/30">
+          <div class="flex justify-between items-start mb-6">
+            <div class="w-10 h-10 rounded-lg bg-accent-cyan/10 flex items-center justify-center">
+              <span class="material-icons text-accent-cyan">${milestone.icon || "emoji_events"}</span>
+            </div>
+            <span class="material-icons text-slate-600 group-hover:text-accent-cyan transition-colors">flag</span>
+          </div>
+          <h5 class="text-white font-bold mb-2">${milestone.title}</h5>
+          <p class="text-slate-400 text-xs leading-relaxed mb-4 font-medium">${milestone.desc}</p>
+          <div class="w-full bg-black/40 h-1.5 rounded-full overflow-hidden mb-3">
+            <div class="h-full bg-accent-cyan" style="width:${milestoneRatio}%"></div>
+          </div>
+          <div class="flex items-center justify-between">
+            <p class="text-[11px] text-slate-400">${milestone.progress}/${milestone.goal}</p>
+            <button data-task-id="${milestone.id}" data-tab="achievement" data-state="${isTaskComplete(milestone) ? "claim" : "action"}" data-action="${milestone.actionHref || ""}" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-accent-cyan/10 text-accent-cyan hover:bg-accent-cyan hover:text-background-dark border border-accent-cyan/40 transition-all">
+              ${isTaskComplete(milestone) ? "领取奖励" : (milestone.actionLabel || "去完成")}
+            </button>
+          </div>
+        </div>`;
+    }
+  };
+
+  tabButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const tab = button.dataset.tab;
+      if (!tabOrder.includes(tab)) return;
+      activeTab = tab;
+      localStorage.setItem(activeTabKey, activeTab);
+      render();
+    });
+  });
+
+  const handleAction = (target) => {
+    if (!(target instanceof HTMLElement)) return false;
+    const button = target.closest("button[data-task-id][data-tab]");
+    if (!button) return false;
+    const taskId = button.getAttribute("data-task-id");
+    const tab = button.getAttribute("data-tab");
+    const state = button.getAttribute("data-state");
+    const action = button.getAttribute("data-action");
+    if (!taskId || !tab || !state) return true;
+    if (state === "action") {
+      if (action) window.location.href = action;
+      return true;
+    }
+    if (state === "claim") {
+      const tasksByTab = buildTasks();
+      const task = (tasksByTab[tab] || []).find((item) => item.id === taskId);
+      if (!task || !isTaskComplete(task)) return true;
+      if (window.ReadoUser?.grantRewards) {
+        window.ReadoUser.grantRewards({
+          gems: task.rewardCoins || 0,
+          xp: task.rewardExp || 0,
+          reason: "mission-claim:" + task.id
+        });
+      }
+      const claims = readClaims();
+      claims[getClaimId(task, tab)] = Date.now();
+      writeClaims(claims);
+      render();
+      return true;
+    }
+    return true;
+  };
+
+  listEl.addEventListener("click", (event) => {
+    handleAction(event.target);
+  });
+  recommendEl.addEventListener("click", (event) => {
+    handleAction(event.target);
+  });
+  milestoneEl.addEventListener("click", (event) => {
+    handleAction(event.target);
+  });
+
+  render();
+})();
+</script>
+</body></html>

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html class="dark" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>reado: 债务周期影响分析</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                        "chart-debt": "#ef4444", 
+                        "chart-income": "#10b981", 
+                    },
+                    fontFamily: {
+                        "display": ["Noto Sans SC", "Source Han Sans SC", "PingFang SC", "Microsoft YaHei", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        .glass-panel {
+            background: rgba(19, 25, 36, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #101922; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2d3748; 
+            border-radius: 4px;
+        }
+        .grid-bg {
+            background-size: 40px 40px;
+            background-image:
+                linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+        }
+        .chart-line {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 0;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-100 font-display min-h-screen flex flex-col overflow-hidden relative selection:bg-primary/30">
+<div class="absolute inset-0 z-0 pointer-events-none">
+<div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-primary/10 rounded-full blur-[100px]"></div>
+<div class="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-primary/5 rounded-full blur-[100px]"></div>
+</div>
+<nav class="relative z-20 w-full px-6 py-4 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md">
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 text-primary font-black text-2xl tracking-tighter">
+<span class="material-icons-round text-3xl">auto_stories</span>
+<span>reado</span>
+</div>
+<div class="h-6 w-px bg-slate-300 dark:bg-slate-700 mx-2"></div>
+<div class="flex flex-col">
+<span class="text-xs text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wider">当前章节</span>
+<span class="text-sm font-bold">《应对变化中的世界秩序：债务危机原则》</span>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="hidden md:flex flex-col items-end gap-1">
+<div class="flex justify-between w-48 text-xs font-medium text-slate-500 dark:text-slate-400">
+<span>第三章：泡沫阶段</span>
+<span>75%</span>
+</div>
+<div class="w-48 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 75%"></div>
+</div>
+</div>
+<button class="flex items-center justify-center w-8 h-8 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+<span class="material-icons-round text-slate-500">settings</span>
+</button>
+</div>
+</nav>
+<main class="relative z-10 flex-1 flex flex-col md:flex-row overflow-hidden">
+<section class="flex-1 flex flex-col relative border-r border-slate-200 dark:border-slate-800">
+<div class="px-8 pt-8 pb-4 flex justify-between items-end">
+<div>
+<h2 class="text-2xl font-bold flex items-center gap-3">
+                    债务周期可视化
+                    <span class="px-2 py-0.5 rounded text-xs bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-medium">实时模拟</span>
+</h2>
+<p class="text-slate-500 dark:text-slate-400 mt-1 text-sm">反映地铁扩建融资决策的实时经济影响</p>
+</div>
+<div class="flex items-center gap-4 text-xs font-bold">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-chart-debt"></div>
+<span class="text-chart-debt uppercase">债务 (红色)</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-chart-income"></div>
+<span class="text-chart-income uppercase">收入 (绿色)</span>
+</div>
+</div>
+</div>
+<div class="flex-1 relative w-full h-full p-8 pt-0 overflow-hidden">
+<div class="w-full h-full glass-panel rounded-xl relative overflow-hidden grid-bg flex items-end pb-12 pl-12 pr-6">
+<div class="absolute left-4 top-8 bottom-12 flex flex-col justify-between text-xs font-mono text-slate-500 dark:text-slate-600 h-auto">
+<span>150%</span>
+<span>100%</span>
+<span>50%</span>
+<span>0%</span>
+</div>
+<div class="absolute bottom-4 left-12 right-6 flex justify-between text-xs font-medium text-slate-500 dark:text-slate-600">
+<span>第 1 年</span>
+<span>第 3 年</span>
+<span>第 5 年 (当前)</span>
+<span>第 7 年 (预测)</span>
+<span>第 10 年</span>
+</div>
+<svg class="w-full h-full overflow-visible" preserveAspectRatio="none" viewBox="0 0 800 400">
+<line class="text-slate-200 dark:text-slate-800" stroke="currentColor" stroke-dasharray="4 4" stroke-width="1" x1="0" x2="800" y1="100" y2="100"></line>
+<line class="text-slate-200 dark:text-slate-800" stroke="currentColor" stroke-dasharray="4 4" stroke-width="1" x1="0" x2="800" y1="200" y2="200"></line>
+<line class="text-slate-200 dark:text-slate-800" stroke="currentColor" stroke-dasharray="4 4" stroke-width="1" x1="0" x2="800" y1="300" y2="300"></line>
+<path class="chart-line drop-shadow-lg" d="M0,350 C100,340 200,320 300,280 C400,220 500,100 800,50" fill="none" stroke="#ef4444" stroke-width="3"></path>
+<path class="chart-line drop-shadow-lg" d="M0,350 C150,340 300,310 450,280 C600,250 800,220" fill="none" stroke="#10b981" stroke-width="3"></path>
+<g transform="translate(450, 160)">
+<line stroke="#137fec" stroke-dasharray="4 2" stroke-width="1" x1="0" x2="0" y1="-120" y2="220"></line>
+<circle class="animate-pulse" cx="0" cy="0" fill="#137fec" r="6"></circle>
+<rect fill="#137fec" height="26" rx="4" width="100" x="-50" y="-150"></rect>
+<text fill="white" font-family="Noto Sans SC" font-size="12" font-weight="bold" text-anchor="middle" x="0" y="-133">决策点</text>
+</g>
+</svg>
+<div class="absolute top-[20%] right-[15%] bg-chart-debt/10 border border-chart-debt/30 backdrop-blur-sm px-3 py-2 rounded text-chart-debt text-xs font-bold">
+<span class="material-icons-round text-sm align-middle mr-1">warning</span>
+                    泡沫阶段
+                </div>
+</div>
+</div>
+<div class="px-8 py-6 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 grid grid-cols-3 gap-8">
+<div class="flex flex-col gap-1">
+<span class="text-xs text-slate-500 uppercase font-bold tracking-wider">债务占 GDP 比重</span>
+<div class="flex items-baseline gap-2">
+<span class="text-2xl font-black font-mono">145%</span>
+<span class="text-xs text-chart-debt font-bold flex items-center">
+<span class="material-icons-round text-sm">trending_up</span> +12%
+                    </span>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-xs text-slate-500 uppercase font-bold tracking-wider">生产率增长</span>
+<div class="flex items-baseline gap-2">
+<span class="text-2xl font-black font-mono">2.1%</span>
+<span class="text-xs text-chart-income font-bold flex items-center">
+<span class="material-icons-round text-sm">trending_up</span> +0.4%
+                    </span>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-xs text-slate-500 uppercase font-bold tracking-wider">偿债负担</span>
+<div class="flex items-baseline gap-2">
+<span class="text-2xl font-black">极高</span>
+<span class="text-xs text-orange-400 font-bold flex items-center">
+                        风险警示
+                    </span>
+</div>
+</div>
+</div>
+</section>
+<aside class="w-full md:w-[420px] bg-white dark:bg-[#151f2b] p-8 flex flex-col gap-8 overflow-y-auto">
+<div class="relative">
+<h3 class="text-lg font-bold text-primary mb-4 flex items-center gap-2">
+<span class="material-icons-round">analytics</span>
+                决策分析
+            </h3>
+<div class="bg-slate-50 dark:bg-[#1a2634] border border-slate-200 dark:border-slate-700 rounded-xl p-6 shadow-sm relative overflow-hidden group">
+<div class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-primary/20 to-transparent rounded-bl-3xl"></div>
+<div class="space-y-4 relative z-10">
+<div>
+<p class="text-base font-bold text-slate-800 dark:text-white leading-relaxed">
+                            这是一个创造生产力的“良性债务”，还是会导致泡沫的“恶性债务”？
+                        </p>
+</div>
+<div class="h-px w-full bg-slate-200 dark:bg-slate-700"></div>
+<div>
+<h4 class="text-xs font-bold uppercase tracking-wider text-primary mb-2">结论分析</h4>
+<p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                            地铁扩张导致债务增长显著快于收入增长。虽然基础设施得到了实质性改善，但当前的<span class="text-chart-debt font-bold">偿债成本</span>正在严重挤压其他领域的公共投资。
+                        </p>
+</div>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-6">
+<h3 class="text-sm font-bold uppercase text-slate-500 dark:text-slate-400 tracking-wider">社会影响</h3>
+<div class="bg-background-light dark:bg-background-dark p-4 rounded-xl border border-slate-200 dark:border-slate-800">
+<div class="flex justify-between items-center mb-2">
+<span class="font-bold text-slate-700 dark:text-slate-200">贫富差距</span>
+<span class="text-xs font-bold px-2 py-0.5 rounded bg-chart-debt/20 text-chart-debt border border-chart-debt/30">持续扩大</span>
+</div>
+<div class="flex items-end gap-3 mb-2">
+<span class="text-3xl font-black text-slate-900 dark:text-white">高危</span>
+<span class="text-sm font-bold text-chart-debt mb-1 flex items-center">
+<span class="material-icons-round text-sm">north_east</span> 加速上升
+                    </span>
+</div>
+<p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                    资产持有者从建设刺激带来的资产溢价中受益，而普通薪资阶层正面临通货膨胀和生活成本增加。
+                </p>
+</div>
+<div class="bg-background-light dark:bg-background-dark p-4 rounded-xl border border-slate-200 dark:border-slate-800">
+<div class="flex justify-between items-center mb-3">
+<span class="font-bold text-slate-700 dark:text-slate-200">社会和谐</span>
+<span class="text-xs font-mono text-slate-500 font-bold">指数: 42/100</span>
+</div>
+<div class="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mb-3">
+<div class="h-full bg-orange-400 w-[42%] rounded-full relative">
+<div class="absolute right-0 top-0 bottom-0 w-1 bg-white/30"></div>
+</div>
+</div>
+<div class="flex items-start gap-2">
+<span class="material-icons-round text-orange-400 text-lg mt-0.5">sentiment_dissatisfied</span>
+<p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                        地铁站周边的生活成本急剧上升，正在迫使该地区的长期居民和低收入群体搬离原有社区。
+                    </p>
+</div>
+</div>
+</div>
+<div class="mt-auto pt-6">
+<button class="w-full bg-primary hover:bg-blue-600 text-white font-black py-4 px-6 rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all flex items-center justify-center gap-2 group">
+<span>进入去杠杆化阶段分析</span>
+<span class="material-icons-round group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+<div class="text-center mt-3">
+<span class="text-xs text-slate-400 dark:text-slate-500">点击继续模拟后续周期</span>
+</div>
+</div>
+</aside>
+</main>
+<img class="hidden" data-alt="Abstract subway map network connecting city districts with glowing lines" data-location="Metropolis Subway System" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCVqDPJjya3YXMlognbDBCO8OLS1zA7G78IJ0insrWryoE4BHx9jPmhsTfbRM2JqmvuyICfcGlSZPfX3KJc3ZKCzkv3QwuVoeahvee0A2ETI76AWxp-6IUe8Gjz8Z0RmyPA5xBzAFl43gQcB_vG_foFBbjE1ZfWvYXISKx8n2Moy0o04dX8YrpIsJxHl2_1pCgdVCfjS7C6u0GiMQLSSvcO7basRtykXuS_im1E4-8q0QAQQXg89Z8jCcibbQyzk79_bug4SNKFcuk"/>
+
+</body></html>

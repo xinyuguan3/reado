@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>reado: 《置身事外》 模块中心</title>
+  <style>
+    :root {
+      color-scheme: dark;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: "Noto Sans SC", sans-serif;
+      color: #e6eef9;
+      background:
+        radial-gradient(circle at top right, #1e3258 0%, transparent 38%),
+        radial-gradient(circle at bottom left, #1a2845 0%, transparent 35%),
+        #0a1019;
+      min-height: 100vh;
+    }
+    .container {
+      width: min(980px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 40px;
+    }
+    .head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .title {
+      margin: 0;
+      font-size: clamp(24px, 4.8vw, 42px);
+      line-height: 1.1;
+    }
+    .sub {
+      margin: 8px 0 0;
+      color: #95aecd;
+      font-size: 14px;
+    }
+    .back-links {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .back-links a {
+      text-decoration: none;
+      color: #d4e7ff;
+      border: 1px solid rgba(144, 190, 240, 0.55);
+      background: rgba(26, 39, 61, 0.55);
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 12px;
+    }
+    .lock {
+      margin-top: 18px;
+      border: 1px solid rgba(90, 170, 255, 0.4);
+      background: rgba(17, 27, 42, 0.82);
+      border-radius: 14px;
+      padding: 16px;
+    }
+    .lock p {
+      margin: 0 0 10px;
+      color: #b6cae2;
+    }
+    .lock button {
+      border: 1px solid rgba(98, 203, 255, 0.55);
+      background: rgba(26, 139, 236, 0.3);
+      color: #d8f2ff;
+      border-radius: 8px;
+      font-size: 13px;
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+    .grid {
+      margin-top: 18px;
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+    .module-card {
+      display: grid;
+      grid-template-columns: 92px 1fr;
+      gap: 10px;
+      align-items: center;
+      text-decoration: none;
+      color: inherit;
+      border: 1px solid rgba(181, 205, 236, 0.24);
+      border-radius: 12px;
+      overflow: hidden;
+      background: rgba(16, 24, 37, 0.9);
+      padding: 10px;
+      transition: transform .15s ease, border-color .15s ease;
+    }
+    .module-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(128, 196, 255, 0.8);
+    }
+    .module-card img {
+      width: 92px;
+      height: 66px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    .module-card h3 {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+    .module-card p {
+      margin: 6px 0 0;
+      font-size: 11px;
+      color: #94aed0;
+    }
+  </style>
+</head>
+<body>
+<script src="/shared/book-catalog.js?v=1771240921862"></script>
+<script type="module" src="/shared/shell.js?v=1771240921862"></script>
+<reado-app-shell data-page="knowledge-map"></reado-app-shell>
+  <main class="container">
+    <header class="head">
+      <div>
+        <h1 class="title">《置身事外》</h1>
+        <p class="sub">共 7 个模块，完成购买后可进入模块体验。</p>
+      </div>
+      <div class="back-links">
+        <a href="/pages/gamified-learning-hub-dashboard-1.html">知识版图</a>
+        <a href="/pages/gamified-learning-hub-dashboard-3.html">交易中心</a>
+      </div>
+    </header>
+    <section id="book-lock" class="lock" hidden>
+      <p>该书尚未购买，请先前往交易中心完成购买。</p>
+      <button id="book-unlock-cta">去交易中心购买</button>
+    </section>
+    <section id="book-grid" class="grid">
+      <a class="module-card" data-module="the-beautiful-deleveraging-challenge" href="/experiences/the-beautiful-deleveraging-challenge.html">
+        <img src="/assets/experiences/the-beautiful-deleveraging-challenge.png" alt="reado: 绝妙的去杠杆挑战" loading="lazy" />
+        <div>
+          <h3>模块 1: reado: 绝妙的去杠杆挑战</h3>
+          <p>进入该模块体验</p>
+        </div>
+      </a>
+      <a class="module-card" data-module="the-subway-dilemma" href="/experiences/the-subway-dilemma.html">
+        <img src="/assets/experiences/the-subway-dilemma.png" alt="reado: 债务危机模拟 (全中文版)" loading="lazy" />
+        <div>
+          <h3>模块 2: reado: 债务危机模拟 (全中文版)</h3>
+          <p>进入该模块体验</p>
+        </div>
+      </a>
+      <a class="module-card" data-module="debt-cycle-impact-analysis" href="/experiences/debt-cycle-impact-analysis.html">
+        <img src="/assets/experiences/debt-cycle-impact-analysis.png" alt="reado: 债务周期影响分析" loading="lazy" />
+        <div>
+          <h3>模块 3: reado: 债务周期影响分析</h3>
+          <p>进入该模块体验</p>
+        </div>
+      </a>
+      <a class="module-card" data-module="1994" href="/experiences/1994.html">
+        <img src="/assets/experiences/1994.png" alt="reado: 1994分税制 - 钱包保卫战" loading="lazy" />
+        <div>
+          <h3>模块 4: reado: 1994分税制 - 钱包保卫战</h3>
+          <p>进入该模块体验</p>
+        </div>
+      </a>
+      <a class="module-card" data-module="experience-28" href="/experiences/experience-28.html">
+        <img src="/assets/experiences/experience-28.png" alt="reado: 土地炼金术 - 荒地变现界面" loading="lazy" />
+        <div>
+          <h3>模块 5: reado: 土地炼金术 - 荒地变现界面</h3>
+          <p>进入该模块体验</p>
+        </div>
+      </a>
+      <a class="module-card" data-module="experience-29" href="/experiences/experience-29.html">
+        <img src="/assets/experiences/experience-29.png" alt="reado: 城投债杠杆 - 融资平台平衡界面" loading="lazy" />
+        <div>
+          <h3>模块 6: reado: 城投债杠杆 - 融资平台平衡界面</h3>
+          <p>进入该模块体验</p>
+        </div>
+      </a>
+      <a class="module-card" data-module="experience-30" href="/experiences/experience-30.html">
+        <img src="/assets/experiences/experience-30.png" alt="reado: 招商引资 - 工业与住宅交叉补贴界面" loading="lazy" />
+        <div>
+          <h3>模块 7: reado: 招商引资 - 工业与住宅交叉补贴界面</h3>
+          <p>进入该模块体验</p>
+        </div>
+      </a>
+    </section>
+  </main>
+  <script>
+    (() => {
+      const bookId = "principles-for-navigating-big-debt-crises";
+      const storageKey = "reado_unlocked_books_v1";
+      const lockEl = document.getElementById("book-lock");
+      const gridEl = document.getElementById("book-grid");
+      const cta = document.getElementById("book-unlock-cta");
+      const unlocked = new Set(JSON.parse(localStorage.getItem(storageKey) || "[]"));
+      const isUnlocked = unlocked.has(bookId);
+      lockEl.hidden = isUnlocked;
+      gridEl.hidden = !isUnlocked;
+      if (cta) {
+        cta.addEventListener("click", () => {
+          window.location.href = "/pages/gamified-learning-hub-dashboard-3.html";
+        });
+      }
+      if (!isUnlocked) return;
+      gridEl.addEventListener("click", (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) return;
+        const card = target.closest("a[data-module]");
+        if (!card) return;
+        const moduleSlug = card.getAttribute("data-module");
+        if (!moduleSlug) return;
+        localStorage.setItem("reado_book_last_" + bookId, moduleSlug);
+      });
+    })();
+  </script>
+</body>
+</html>

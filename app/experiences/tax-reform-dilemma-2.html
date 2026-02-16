@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html class="dark" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>reado: 万历皇帝 - 奏折阅览界面</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&amp;family=Noto+Serif+SC:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#b91c1c","background-light": "#f8f6f6",
+                        "background-dark": "#0f0505","imperial-gold": "#d4af37",
+                        "imperial-jade": "#4a7c59",
+                        "ink-black": "#1a1a1a",
+                        "paper": "#f0e6d2",
+                    },
+                    fontFamily: {
+                        "sans": ["Noto Sans SC", "Source Han Sans CN", "Source Han Sans", "sans-serif"],
+                        "serif": ["Noto Serif SC", "Songti SC", "serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                    backgroundImage: {
+                        'parchment': "url('https://www.transparenttextures.com/patterns/aged-paper.png')",
+                    }
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">::-webkit-scrollbar {
+    width: 8px
+    }
+::-webkit-scrollbar-track {
+    background: #1a0b0b
+    }
+::-webkit-scrollbar-thumb {
+    background: #4a2020;
+    border-radius: 4px
+    }
+.seal-button {
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    position: relative
+    }
+.seal-button:active {
+    transform: scale(0.98)
+    }
+.seal-button::after {
+    content: "";
+    position: absolute;
+    inset: -4px;
+    border: 2px solid #c5a059;
+    border-radius: 0.5rem;
+    opacity: 0;
+    transition: opacity 0.3s ease
+    }
+.seal-button:hover::after {
+    opacity: 1
+    }
+.glass-panel {
+    background: rgba(15, 5, 5, 0.9);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(197, 160, 89, 0.15)
+    }
+.mask-image-gradient {
+    -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 80%, transparent 100%)
+    }.ink-bar {
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuBgYZil9TQoRELiiDfBhXHxSH43f1iXsViLu3RRRoUKeIUB6T15CDeK6iR9bEsArgu98h5AOnmzhMzIhrgOK2BZLPDGzF9CJ2FLq11uatzA_ZUuRNDRhtuJj1Lvh24ZD3mK_8Xr_nEQqPqClhXAmR1APT2usSJY9CVilY91k5zG_mOQQhH6AuJytLte6WnmTK0RWwIXXTTfaBrbmDVZtSe17iNuAySwmM8ccejaPbpfXB_WT7yHzfD9kiI4LlJ-kpwb2wHXG9AzkwQ);
+    background-size: cover
+    }</style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-gray-100 font-sans min-h-screen flex flex-col relative overflow-hidden">
+<script src="/shared/book-catalog.js?v=1771240921862"></script>
+<script type="module" src="/shared/shell.js?v=1771240921862"></script>
+<reado-app-shell data-page="knowledge-map"></reado-app-shell>
+<header class="absolute top-6 left-8 z-30">
+<div class="flex items-center gap-2">
+<span class="text-2xl font-black tracking-tighter text-white">reado</span>
+<div class="h-4 w-px bg-white/20 mx-2"></div>
+<span class="text-sm text-imperial-gold font-medium tracking-widest">万历十五年 · 深度模拟</span>
+</div>
+</header>
+<div class="absolute inset-0 z-0">
+<img alt="背景：庄严阴暗的紫禁城太和殿内景" class="w-full h-full object-cover filter blur-[2px] opacity-40" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDX8SBd_bwcsga-D8oyHP11Ls12LgxJHu0VAJewYjOc_KmdsFvgkJBdrm3l59kLoW51uTMzSxHdAnVN6RurzvhTsEeHxWRSEkHXq2ZB8uWYb2ta_BP4L4_DEB4WmB7MRZay_ndWQIuP_qHHPQLTHooWXkyh2Gg9IBb10flqGIfZd7ddoidDqfE0A0qD3o-GfJYBn66WprWCmQNz2PHkCGS39LTpn9b1IYFFg37kawBHVXGHHddhmxdDBFlT1MAvTq4KKX1arcaE5hE"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/90 to-background-dark/30"></div>
+<div class="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#0f0505_100%)] opacity-80"></div>
+</div>
+<main class="relative z-10 flex-grow grid grid-cols-1 lg:grid-cols-12 gap-6 p-6 lg:p-10 h-screen max-h-screen">
+<aside class="col-span-1 lg:col-span-3 flex flex-col gap-6 pt-16 order-2 lg:order-1">
+<div class="glass-panel rounded-xl p-6 flex flex-col gap-8 h-full shadow-2xl border-t-4 border-t-imperial-gold/60">
+<div class="border-b border-white/10 pb-4 mb-2">
+<h3 class="text-imperial-gold tracking-[0.2em] text-sm font-bold flex items-center gap-2">
+<span class="material-icons text-lg">balance</span> 局势总览
+                    </h3>
+</div>
+<div class="group">
+<div class="flex justify-between items-end mb-2">
+<span class="text-gray-300 text-sm font-medium tracking-wide">文官集团愤怒值</span>
+<span class="text-primary font-bold">85%</span>
+</div>
+<div class="h-3 w-full bg-black/60 rounded-sm overflow-hidden border border-white/5 p-[1px]">
+<div class="h-full bg-gradient-to-r from-red-950 via-red-800 to-primary w-[85%] rounded-sm shadow-[0_0_15px_rgba(185,28,28,0.5)] ink-bar relative">
+<div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/shattered-island.png')] opacity-30 mix-blend-multiply"></div>
+</div>
+</div>
+<p class="text-xs text-gray-500 mt-2 group-hover:text-primary transition-colors">群臣激愤，奏折如雪片般飞来。</p>
+</div>
+<div class="group">
+<div class="flex justify-between items-end mb-2">
+<span class="text-gray-300 text-sm font-medium tracking-wide">皇帝自由度</span>
+<span class="text-gray-400 font-bold">15%</span>
+</div>
+<div class="h-3 w-full bg-black/60 rounded-sm overflow-hidden border border-white/5 p-[1px]">
+<div class="h-full bg-gradient-to-r from-gray-800 to-gray-400 w-[15%] rounded-sm shadow-[0_0_10px_rgba(255,255,255,0.2)] ink-bar"></div>
+</div>
+<p class="text-xs text-gray-500 mt-2 group-hover:text-gray-300 transition-colors">困于紫禁城，寸步难行。</p>
+</div>
+<div class="group">
+<div class="flex justify-between items-end mb-2">
+<span class="text-gray-300 text-sm font-medium tracking-wide">国库储备</span>
+<span class="text-imperial-gold font-bold">稳定</span>
+</div>
+<div class="h-1 w-full bg-white/10 rounded-full mt-1">
+<div class="h-full bg-imperial-gold w-[60%] rounded-full opacity-50"></div>
+</div>
+</div>
+<div class="mt-auto pt-6 border-t border-white/10 flex flex-col gap-2">
+<div class="flex items-center gap-2 text-xs text-gray-400">
+<span class="material-icons text-imperial-gold text-sm">hourglass_empty</span>
+<span>万历十四年 · 丙戌年</span>
+</div>
+<div class="text-[10px] text-gray-600 leading-relaxed">
+                        所谓“天子”，不过是制度的囚徒。一举一动，皆受祖制牵制。
+                    </div>
+</div>
+</div>
+</aside>
+<section class="col-span-1 lg:col-span-9 flex flex-col h-full relative pt-10 order-1 lg:order-2">
+<div class="absolute top-6 right-0 z-20 hidden lg:block">
+<div class="glass-panel px-6 py-2 rounded-full border border-imperial-gold/20 flex items-center gap-4 shadow-lg">
+<div class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse"></span>
+<span class="text-xs tracking-widest text-gray-400 uppercase">当前章节</span>
+</div>
+<span class="text-sm tracking-widest text-gray-200 font-bold">关卡一：紫禁城的囚徒 <span class="text-imperial-gold/50 mx-2">|</span> 国本之争</span>
+</div>
+</div>
+<div class="flex-grow flex items-center justify-center relative -mt-6 lg:-mt-12 mb-4">
+<div class="relative w-[240px] h-[240px] lg:w-[320px] lg:h-[320px] z-10 transition-transform duration-700">
+<div class="absolute inset-0 bg-black/40 blur-[60px] rounded-full"></div>
+<img alt="礼部尚书画像" class="w-full h-full object-cover mask-image-gradient rounded-full border border-imperial-gold/20 shadow-2xl opacity-90 grayscale-[0.3]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDN17QOn4h2AmxwMc7THA3FCFAMexL66VqS8WsiyPnrOMol9TKEytoN_SYnHbKKLy5cMAbunbhMO9I_RDPp37ziDJDd2ILQem3U8-Cnl2qc7TB0Whc6KoMn_F9nXwF_6i_aFF2NFthc9j4-NwLyf0zYqu5Rt1xsxUEQFhXIdmWmRyKdcLupDkBUDe6E0V0FZPlHazBC50NBOYa4F7o_s5t-3wzUwmS2pEcG4lEHQBATM0lJ1vFDqiqpn3AMt-ojPYNPZCwQbX_FQGk"/>
+<div class="absolute -bottom-4 left-1/2 transform -translate-x-1/2 glass-panel px-6 py-1.5 rounded-sm border-t border-imperial-gold shadow-lg min-w-[180px] text-center">
+<span class="text-imperial-gold/90 font-bold tracking-[0.3em] text-sm block">礼部尚书 · 申时行</span>
+</div>
+</div>
+</div>
+<div class="relative z-20 -mt-10 lg:-mt-20 max-w-3xl mx-auto w-full flex flex-col items-center">
+<div class="bg-[#380c0c] p-1 rounded-sm shadow-[0_30px_60px_rgba(0,0,0,0.8)] w-full transform rotate-1">
+<div class="bg-paper text-ink-black p-8 lg:p-10 rounded-sm w-full relative">
+<div class="absolute inset-0 opacity-20 pointer-events-none rounded bg-[url('https://www.transparenttextures.com/patterns/aged-paper.png')]"></div>
+<div class="absolute -top-3 left-8 w-8 h-12 bg-gradient-to-b from-[#2c2c2c] to-[#1a1a1a] rounded-sm shadow-md border-t border-white/10 opacity-90"></div>
+<div class="absolute -bottom-3 right-8 w-12 h-8 bg-gradient-to-b from-[#b91c1c] to-[#7f1d1d] rounded-full shadow-md border-t border-white/10 opacity-80"></div>
+<div class="relative z-10">
+<div class="flex items-center justify-center gap-4 mb-5 opacity-70">
+<span class="h-[1px] w-12 bg-red-900/40"></span>
+<span class="text-red-900/80 text-xs font-bold tracking-[0.4em]">礼部急奏</span>
+<span class="h-[1px] w-12 bg-red-900/40"></span>
+</div>
+<h2 class="text-2xl lg:text-3xl font-black text-black mb-6 text-center tracking-wide">
+                                请册立皇长子为太子疏
+                            </h2>
+<div class="text-lg leading-relaxed text-gray-800 font-serif text-justify px-4 lg:px-8 border-l-2 border-red-900/20 ml-2 lg:ml-0">
+<p class="mb-4">
+                                    “臣闻国之本在储副。皇长子常洛年已长，睿智天成，宜早定大计，以安天下之心。”
+                                </p>
+<p class="mb-4">
+                                    “陛下迟迟不决，外廷流言四起，谓陛下有意于皇三子常洵。此乃取乱之道，<span class="font-bold text-red-900 border-b border-red-900/30 pb-0.5">有违祖制立长之义</span>。伏乞陛下，俯顺舆情，早赐册立。”
+                                </p>
+</div>
+<div class="mt-8 flex justify-end px-8">
+<div class="text-right">
+<p class="text-xs text-red-900/60 font-serif tracking-widest mb-1">万历十四年 二月</p>
+<div class="w-16 h-16 border-2 border-red-700 rounded-sm flex items-center justify-center rotate-[-12deg] opacity-60 mask-image-gradient">
+<span class="text-red-700 text-xs font-bold writing-vertical-rl">礼部之印</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-5 w-full px-2 mt-8 pb-12">
+<button class="seal-button group relative bg-[#2a0e0e] hover:bg-[#451616] border border-red-900/30 p-5 rounded-sm text-left overflow-hidden shadow-xl">
+<div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-icons text-5xl text-primary">psychology</span>
+</div>
+<div class="relative z-10">
+<h3 class="text-lg font-bold text-red-100 mb-1 group-hover:text-white transition-colors tracking-widest flex items-center gap-2">
+<span class="w-2 h-2 bg-red-500 rounded-full"></span>
+                                坚持立储意愿
+                            </h3>
+<p class="text-xs text-red-200/60 mb-3 leading-relaxed">
+                                属意郑贵妃之子朱常洵，驳回礼部奏请。
+                            </p>
+<div class="flex gap-2 text-[10px]">
+<span class="px-1.5 py-0.5 rounded-sm bg-red-950 text-red-400 border border-red-900/30">文官愤怒 +20</span>
+<span class="px-1.5 py-0.5 rounded-sm bg-gray-800 text-gray-300 border border-gray-700">自由度 +5</span>
+</div>
+</div>
+</button>
+<button class="seal-button group relative bg-[#1c1c1c] hover:bg-[#2a2a2a] border border-white/5 p-5 rounded-sm text-left overflow-hidden shadow-xl">
+<div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-icons text-5xl text-gray-400">history_edu</span>
+</div>
+<div class="relative z-10">
+<h3 class="text-lg font-bold text-gray-200 mb-1 group-hover:text-white transition-colors tracking-widest flex items-center gap-2">
+<span class="w-2 h-2 bg-gray-500 rounded-full"></span>
+                                遵循祖制
+                            </h3>
+<p class="text-xs text-gray-500 mb-3 leading-relaxed">
+                                虽心有不甘，但仍顺应群臣意见，暂缓争议。
+                            </p>
+<div class="flex gap-2 text-[10px]">
+<span class="px-1.5 py-0.5 rounded-sm bg-green-900/30 text-green-400 border border-green-900/30">文官愤怒 -10</span>
+<span class="px-1.5 py-0.5 rounded-sm bg-gray-800 text-gray-500 border border-gray-700">自由度 -10</span>
+</div>
+</div>
+</button>
+</div>
+</div>
+</section>
+</main>
+<div class="fixed inset-0 pointer-events-none opacity-[0.03] z-50 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]"></div>
+<div class="fixed top-0 left-0 w-full h-32 bg-gradient-to-b from-black/60 to-transparent pointer-events-none z-40"></div>
+
+<script id="reado-wanli-stage2">
+(() => {
+  const STORAGE_KEY = "reado_wanli_campaign_v1";
+  const NEXT_HREF = "/experiences/tax-reform-dilemma-3.html";
+  const RESTART_HREF = "/experiences/tax-reform-dilemma-1.html";
+  const buttons = Array.from(document.querySelectorAll("button.seal-button"));
+  if (buttons.length < 2) return;
+
+  const titleEl = document.querySelector("h2.text-2xl, h2.text-3xl");
+  const paraEls = Array.from(document.querySelectorAll(".text-lg.leading-relaxed p"));
+  const metricEls = Array.from(document.querySelectorAll("aside .group .flex.justify-between span.font-bold"));
+  const titleWrap = titleEl ? titleEl.parentElement : null;
+
+  const progressHint = document.createElement("p");
+  progressHint.className = "text-xs text-cyan-200 mt-2 tracking-wide";
+  const feedbackHint = document.createElement("p");
+  feedbackHint.className = "text-xs text-slate-300 mt-1 leading-relaxed";
+  if (titleWrap) titleWrap.append(progressHint, feedbackHint);
+
+  const rounds = [
+    {
+      title: "请册立皇长子为太子疏",
+      p1: "群臣认为国本不定，朝局将长期失焦。若“立长”迟迟不决，礼法秩序会被不断政治化。",
+      p2: "你需在“秩序稳定”与“皇权裁量”之间做第一次取舍，这将决定后续博弈基调。",
+      a: { label: "顺从立长", sub: "册立皇长子，先稳朝局。", impact: { anger: -15, freedom: -8 } },
+      b: { label: "坚持拖延", sub: "保留裁量，继续观望。", impact: { anger: 18, freedom: 9 } }
+    },
+    {
+      title: "廷议是否公开化",
+      p1: "群臣要求公开廷议，透明化国本讨论。公开机制可提升程序合法性，却可能把议题变成舆情战场。",
+      p2: "公开可缓和流言，但会削弱皇帝议程掌控；密议可保留机动，却会放大“黑箱”质疑。",
+      a: { label: "召开廷议", sub: "公开议程，缓和舆情。", impact: { anger: -8, freedom: -5 } },
+      b: { label: "维持密议", sub: "坚持内廷封闭处理。", impact: { anger: 10, freedom: 4 } }
+    },
+    {
+      title: "是否处置激进言官",
+      p1: "言官联名上疏，要求追责司礼监并彻查内廷。此时争议已从储位问题外溢到制度信任危机。",
+      p2: "若强压言官，短期噤声但撕裂加深；若放任争论，威望受损却可能换来更长期合法性。",
+      a: { label: "惩戒言官", sub: "暂压舆论，维护威权。", impact: { anger: 12, freedom: 7 } },
+      b: { label: "准其辩论", sub: "释放争论，换取合法性。", impact: { anger: -10, freedom: -6 } }
+    }
+  ];
+
+  let i = 0;
+  let score = { anger: 82, freedom: 22 };
+  const decisions = [];
+  let stageFailed = false;
+
+  function clamp(v) {
+    return Math.max(0, Math.min(100, v));
+  }
+
+  function formatDelta(v) {
+    return `${v >= 0 ? "+" : ""}${v}`;
+  }
+
+  function load() {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+    } catch {
+      return {};
+    }
+  }
+
+  function saveStage(payload) {
+    const base = load();
+    base.court = payload;
+    base.lastUpdatedAt = new Date().toISOString();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(base));
+  }
+
+  function clearCampaignAndRestart() {
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.setItem("reado_book_last_wanli-fifteen", "tax-reform-dilemma-1");
+    } catch {}
+    window.location.href = RESTART_HREF;
+  }
+
+  function setMetrics() {
+    if (metricEls[0]) metricEls[0].textContent = `${score.anger}%`;
+    if (metricEls[1]) metricEls[1].textContent = `${score.freedom}%`;
+    progressHint.textContent = `廷议进度：${i}/${rounds.length}`;
+  }
+
+  function setBtn(btn, opt) {
+    const h3 = btn.querySelector("h3");
+    const p = btn.querySelector("p");
+    if (h3) h3.textContent = opt.label;
+    if (p) p.textContent = opt.sub;
+  }
+
+  function render() {
+    const r = rounds[i];
+    if (!r) return finish();
+    if (titleEl) titleEl.textContent = r.title;
+    if (paraEls[0]) paraEls[0].textContent = r.p1;
+    if (paraEls[1]) paraEls[1].textContent = r.p2;
+    setBtn(buttons[0], r.a);
+    setBtn(buttons[1], r.b);
+    if (!decisions.length) feedbackHint.textContent = "廷议提示：愤怒值越高，后续执行摩擦越强。";
+    setMetrics();
+  }
+
+  function modal(t, b, actions) {
+    const w = document.createElement("div");
+    w.style.cssText = "position:fixed;inset:0;z-index:99999;background:rgba(2,6,23,.78);display:flex;align-items:center;justify-content:center;padding:16px;";
+    w.innerHTML = `<div style="max-width:720px;width:100%;background:#0f172a;border:1px solid rgba(148,163,184,.35);border-radius:14px;padding:18px;color:#e2e8f0"><h3 style="font-size:22px;font-weight:800;margin:0 0 10px">${t}</h3><div style="font-size:14px;line-height:1.75;color:#cbd5e1;white-space:pre-wrap">${b}</div><div id="m-actions" style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap"></div></div>`;
+    document.body.appendChild(w);
+    const host = w.querySelector("#m-actions");
+    (actions || []).forEach((a) => {
+      const bt = document.createElement("button");
+      bt.textContent = a.label;
+      bt.style.cssText = "padding:8px 12px;border-radius:8px;border:1px solid rgba(148,163,184,.35);background:#1e293b;color:#fff;font-weight:700;cursor:pointer";
+      bt.onclick = () => {
+        a.onClick?.();
+        w.remove();
+      };
+      host.appendChild(bt);
+    });
+  }
+
+  function disableChoices() {
+    buttons.forEach((b) => {
+      b.disabled = true;
+      b.style.opacity = "0.72";
+    });
+  }
+
+  function failStage(reason, detail) {
+    if (stageFailed) return;
+    stageFailed = true;
+    disableChoices();
+    modal("第二幕失败", `${reason}\n\n${detail}\n\n结局：廷议失控，你需要从第一幕重新开始。`, [
+      { label: "从第一幕重开", onClick: () => clearCampaignAndRestart() }
+    ]);
+  }
+
+  function showToast(text, tone) {
+    const node = document.createElement("div");
+    const color = tone === "warn" ? "#fca5a5" : "#7dd3fc";
+    node.textContent = text;
+    node.style.cssText = `position:fixed;right:18px;top:94px;z-index:99999;padding:8px 12px;border-radius:10px;border:1px solid rgba(148,163,184,.35);background:rgba(15,23,42,.92);color:${color};font-size:12px;font-weight:700;opacity:0;transform:translateY(-6px);transition:all .22s ease;`;
+    document.body.appendChild(node);
+    requestAnimationFrame(() => {
+      node.style.opacity = "1";
+      node.style.transform = "translateY(0)";
+    });
+    setTimeout(() => {
+      node.style.opacity = "0";
+      node.style.transform = "translateY(-8px)";
+    }, 900);
+    setTimeout(() => node.remove(), 1200);
+  }
+
+  function ai(prompt, fallback) {
+    const key = localStorage.getItem("reado_deepseek_api_key") || "";
+    const ep = localStorage.getItem("reado_deepseek_endpoint") || "https://api.deepseek.com/chat/completions";
+    if (!key) return Promise.resolve(`【本地推演】${fallback}`);
+    return fetch(ep, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
+      body: JSON.stringify({
+        model: "deepseek-chat",
+        temperature: 0.7,
+        max_tokens: 260,
+        messages: [
+          { role: "system", content: "你是明代宫廷政治叙事引擎，120-180字，总结结构后果并补1条建议。" },
+          { role: "user", content: prompt }
+        ]
+      })
+    })
+      .then(async (res) => {
+        const d = await res.json();
+        const t = d?.choices?.[0]?.message?.content?.trim();
+        if (!res.ok || !t) throw new Error("bad");
+        return `【DeepSeek推演】${t}`;
+      })
+      .catch(() => `【本地推演】${fallback}`);
+  }
+
+  function apply(opt, label) {
+    const currentRound = rounds[i];
+    score.anger = clamp(score.anger + opt.impact.anger);
+    score.freedom = clamp(score.freedom + opt.impact.freedom);
+    decisions.push({
+      round: currentRound.title,
+      label,
+      impact: { ...opt.impact },
+      snapshot: { ...score }
+    });
+    feedbackHint.textContent = `廷议反馈：群臣愤怒 ${formatDelta(opt.impact.anger)} / 皇权裁量 ${formatDelta(opt.impact.freedom)}`;
+    showToast(`已裁定：${label}`, opt.impact.anger > 0 ? "warn" : "ok");
+    i += 1;
+    render();
+  }
+
+  function finish() {
+    disableChoices();
+
+    const tension = clamp(score.anger - score.freedom + 40);
+    const decisionSummary = decisions
+      .map((item, idx) => `${idx + 1}. ${item.round} -> ${item.label}`)
+      .join("\n");
+
+    const stageDigest = [
+      "【宫廷博弈画像】",
+      `- 群臣愤怒值：${score.anger}`,
+      `- 皇权裁量度：${score.freedom}`,
+      `- 结构张力指数：${tension}`,
+      "",
+      "【结构性后果】",
+      tension >= 75
+        ? "政治冲突已从政策分歧升级为制度互不信任，后续任何改革都会先被政治化。"
+        : "你暂时把冲突维持在可谈判区间，但国本争议仍会周期性回潮。",
+      "",
+      "【带着问题进入下一幕】",
+      "当权威需要合法性背书时，谁在为“沉默成本”买单？"
+    ].join("\n");
+
+    const success = score.anger < 100 && score.freedom >= 10 && (score.anger - score.freedom) <= 75;
+    if (!success) {
+      const failDetail = [
+        `当前状态：愤怒值 ${score.anger} / 裁量度 ${score.freedom} / 张力 ${tension}`,
+        score.anger >= 100 ? "- 群臣愤怒值爆表，议程已失控。" : "",
+        score.freedom < 10 ? "- 皇权裁量空间被挤压到危险区。" : "",
+        (score.anger - score.freedom) > 75 ? "- 对抗强度过高，宫廷进入不可调和状态。" : ""
+      ].filter(Boolean).join("\n");
+      failStage("你未能把‘国本之争’维持在可治理区间。", failDetail);
+      return;
+    }
+
+    const fallback = `宫廷博弈后，群臣愤怒值${score.anger}、皇权裁量度${score.freedom}。国本争议暂时收束，但政治裂缝仍在。`;
+    ai(`宫廷三轮决策：${decisionSummary}。结果：愤怒${score.anger} 自由${score.freedom} 张力${tension}。推演后果并给1条建议。`, fallback).then((report) => {
+      const finalReport = `${report}\n\n${stageDigest}`;
+      saveStage({ done: true, decisions, score: { ...score, tension }, report: finalReport, finishedAt: new Date().toISOString() });
+      modal("第二幕结算", finalReport, [
+        {
+          label: "查看廷议清单",
+          onClick: () => {
+            modal("第二幕·廷议清单", decisionSummary, [
+              { label: "进入下一幕", onClick: () => { window.location.href = NEXT_HREF; } }
+            ]);
+          }
+        },
+        { label: "进入下一幕", onClick: () => { window.location.href = NEXT_HREF; } }
+      ]);
+    });
+  }
+
+  buttons[0].addEventListener("click", (e) => {
+    e.preventDefault();
+    const r = rounds[i];
+    if (!r) return;
+    apply(r.a, r.a.label);
+  });
+
+  buttons[1].addEventListener("click", (e) => {
+    e.preventDefault();
+    const r = rounds[i];
+    if (!r) return;
+    apply(r.b, r.b.label);
+  });
+
+  modal("背景导入", "你进入‘国本之争’。\n\n这一幕不只是“立不立太子”，而是皇权与文官秩序如何彼此约束。请完成三次廷议决策。", [
+    {
+      label: "先读廷议提要",
+      onClick: () => {
+        modal("第二幕背景提要", "国本之争进入白热化时，皇帝每天面对的是“短期权威”与“长期合法性”交换。\n\n当时的可做与慎做：\n- 可做：给出可解释的程序，降低群臣“被排除感”。\n- 慎做：反复拖延但不给理由，任由流言扩散。\n\n你接下来三次廷议不是选对错，而是决定冲突如何结算：\n- 立刻压制，还是分段释放；\n- 保住裁量，还是换取秩序；\n- 争当期控制，还是争长期稳定。", [
+          { label: "开始廷议", onClick: () => render() }
+        ]);
+      }
+    },
+    { label: "直接开始廷议", onClick: () => render() }
+  ]);
+})();
+</script>
+
+
+
+<script>
+(() => {
+  
+  localStorage.setItem("reado_book_last_wanli-fifteen", "tax-reform-dilemma-2");
+  if ("tax-reform-dilemma-2" === "tax-reform-dilemma-5") {
+    try {
+      const completedRaw = localStorage.getItem("reado_completed_books_v1") || "[]";
+      const completedSet = new Set(JSON.parse(completedRaw));
+      completedSet.add("wanli-fifteen");
+      localStorage.setItem("reado_completed_books_v1", JSON.stringify([...completedSet]));
+    } catch {}
+  }
+  
+  const readoNextHref = "/experiences/tax-reform-dilemma-3.html";
+  (() => {
+    let isNavigating = false;
+    const keywordList = ["开始", "继续", "下一", "进入", "模拟", "抉择", "选择", "确认", "提交", "挑战", "完成", "start", "next", "continue"];
+    const blacklist = ["EN", "ZH", "返回", "back", "帮助", "求助", "笔记", "术语", "设置", "菜单", "关闭", "取消"];
+    const normalize = (value) => String(value || "").replace(/\s+/g, " ").trim();
+    const hasKeyword = (text) => keywordList.some((keyword) => text.toLowerCase().includes(keyword.toLowerCase()));
+    const isBlocked = (text) => blacklist.some((word) => text === word || text.toLowerCase().includes(word.toLowerCase()));
+    const isOptionGroupButton = (node) => {
+      const parent = node.parentElement;
+      if (!parent) return false;
+      const peers = Array.from(parent.children).filter(
+        (child) => child instanceof HTMLElement && child.matches("button,[role='button'],.concept-card,.item-card,[data-choice],[data-option]")
+      );
+      return peers.length >= 2;
+    };
+    const goNext = (delay = 180) => {
+      if (isNavigating) return;
+      isNavigating = true;
+      window.setTimeout(() => {
+        window.location.href = readoNextHref;
+      }, delay);
+    };
+    document.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+      if (target.closest(".reado-shell-wrap")) return;
+      const candidate = target.closest("[data-next-scene],button,a[href],.concept-card,.item-card,[data-choice],[data-option]");
+      if (!(candidate instanceof HTMLElement)) return;
+      if (!candidate.closest("main")) return;
+      if (candidate.hasAttribute("data-no-next")) return;
+      if (candidate.matches("a[href]")) {
+        const href = candidate.getAttribute("href") || "";
+        if (href && href !== "#" && !href.startsWith("javascript:")) return;
+      }
+      const text = normalize(candidate.textContent);
+      if (candidate.matches("[data-next-scene]")) {
+        event.preventDefault();
+        goNext(90);
+        return;
+      }
+      if (isBlocked(text)) return;
+      if (candidate.matches(".concept-card,.item-card,[data-choice],[data-option]")) {
+        goNext(180);
+        return;
+      }
+      if (candidate.matches("button")) {
+        if (hasKeyword(text) || (text.length >= 4 && isOptionGroupButton(candidate))) {
+          goNext(220);
+        }
+      }
+    });
+  })();
+  
+})();
+</script>
+</body></html>

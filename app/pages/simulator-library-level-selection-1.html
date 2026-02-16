@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html class="dark" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>reado: 模拟器图书馆 (蓝青色系版)</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#00f2ff", // Vibrant Neon Cyan
+                        "primary-hover": "#00d1db",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#0a0a0c", // Deep Obsidian
+                        "reado-sidebar": "#0d1117",
+                        "reado-surface": "#161b22",
+                    },
+                    fontFamily: {
+                        "display": ["Noto Sans SC", "Inter", "Source Han Sans SC", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .particle {
+            position: absolute;
+            background: rgba(0, 242, 255, 0.2);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 20s infinite linear;
+        }
+        @keyframes float {
+            0% { transform: translateY(0) translateX(0); opacity: 0; }
+            10% { opacity: 0.4; }
+            90% { opacity: 0.4; }
+            100% { transform: translateY(-100vh) translateX(50px); opacity: 0; }
+        }
+    </style>
+</head>
+<body class="bg-background-dark text-slate-100 font-display antialiased h-screen w-full overflow-hidden flex selection:bg-primary selection:text-black">
+<script src="/shared/book-catalog.js?v=1771240921862"></script>
+<script type="module" src="/shared/shell.js?v=1771240921862"></script>
+<reado-app-shell data-page="knowledge-map"></reado-app-shell>
+<div class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+<div class="absolute inset-0 bg-cover bg-center opacity-5 blur-2xl scale-110" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDcv6N48woaPUOGqfz6zdHVwoZkkI25kS4N5J747eofzsfCg5F1_QPnvaAZ46i1jkRIa7j7Pj9SPw6g4v9eEHOmU8rvQocHsUzq51EETqXJ1sPUSuGXExg_oifTN28rV092nGmYcwvMUEmHJV95plu07s7AKQejOTPiT7Pn1eMZB-NK11lOay8RjaovBIfQ9zMr8W8oPXyeLgv4m6__cTpwAK0wRzD_z4-FXPVKJZaN9CGexmR7nlq8LilYJDpY4wK-M2mjWsknrLk');"></div>
+<div class="absolute inset-0 bg-gradient-to-b from-background-dark/80 via-background-dark/95 to-background-dark"></div>
+<div class="particle w-1 h-1 top-[100%] left-[15%]"></div>
+<div class="particle w-2 h-2 top-[100%] left-[35%]" style="animation-duration: 25s"></div>
+<div class="particle w-1 h-1 top-[100%] left-[65%]" style="animation-duration: 18s"></div>
+<div class="particle w-1.5 h-1.5 top-[100%] left-[85%]" style="animation-duration: 30s"></div>
+</div>
+<aside class="relative z-20 w-72 h-full flex flex-col border-r border-white/5 bg-reado-sidebar">
+<div class="p-6 pb-2">
+<div class="flex items-center gap-3 mb-8">
+<div class="w-8 h-8 rounded bg-primary flex items-center justify-center text-black shadow-[0_0_15px_rgba(0,242,255,0.4)]">
+<span class="material-icons text-lg font-bold">auto_stories</span>
+</div>
+<h1 class="text-xl font-bold tracking-tight text-white">reado</h1>
+</div>
+<div class="flex flex-col gap-4 mb-6">
+<div class="flex items-center gap-3">
+<div class="relative">
+<img alt="用户头像" class="w-12 h-12 rounded-full border-2 border-primary/50 object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB18wrv0a3KPJVWjDkloH13OrW7VDRPEJja-UKZ148dQEuNSsR63Qe7zW7cG4kFxp3hDkRMHiCajfO1fF4_qXvvPCYFWjBZgvqv2zKzlsg__qFblrefTEkAqxMu4IMcAYMjY91KWsEffjZmP2bnAAw3pwSRK8uMIQDIQ81Yd6cSpY2hfNNNRRRynS1s5UjqNwQ2IzS7Aa2PUxh4N0StHwdQ4vnGBGX5zOzlUXFVfRirW7BwBIvsBtaj1lVLgpJvEdk8SWFJ6XlYgrI"/>
+<div class="absolute -bottom-1 -right-1 w-5 h-5 bg-reado-surface rounded-full flex items-center justify-center border border-white/10">
+<span class="text-[10px] font-bold text-primary">5</span>
+</div>
+</div>
+<div>
+<div class="font-bold text-white text-sm">陈晓东</div>
+<div class="text-xs text-gray-400">学者 等级 5</div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-2">
+<div class="bg-white/5 rounded-lg p-2 flex items-center gap-2 border border-white/5">
+<span class="material-icons text-primary text-sm">bolt</span>
+<div>
+<div class="text-[10px] text-gray-500 uppercase">经验值</div>
+<div class="text-xs font-bold text-white">42,850</div>
+</div>
+</div>
+<div class="bg-white/5 rounded-lg p-2 flex items-center gap-2 border border-white/5">
+<span class="material-icons text-cyan-400 text-sm">diamond</span>
+<div>
+<div class="text-[10px] text-gray-500 uppercase">宝石</div>
+<div class="text-xs font-bold text-white">1,240</div>
+</div>
+</div>
+</div>
+<div class="bg-primary/10 rounded-lg p-2 flex items-center justify-between border border-primary/20">
+<div class="flex items-center gap-2">
+<span class="material-icons text-primary text-sm">local_fire_department</span>
+<span class="text-xs font-bold text-primary/90">已连续学习 15 天</span>
+</div>
+</div>
+</div>
+</div>
+<nav class="flex-1 px-3 overflow-y-auto space-y-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary border border-primary/20 font-medium transition-all group" href="/pages/gamified-learning-hub-dashboard-1.html">
+<span class="material-symbols-outlined text-[20px]">map</span>
+<span class="text-sm">知识版图</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 text-gray-400 hover:text-white transition-all group" href="/pages/simulator-library-level-selection-2.html">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary/70">task_alt</span>
+<span class="text-sm">任务中心</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 text-gray-400 hover:text-white transition-all group" href="/pages/global-scholar-leaderboard.html">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary/70">leaderboard</span>
+<span class="text-sm">排行榜</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 text-gray-400 hover:text-white transition-all group" href="/pages/gamified-learning-hub-dashboard-3.html">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary/70">storefront</span>
+<span class="text-sm">交易中心</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 text-gray-400 hover:text-white transition-all group" href="/pages/gamified-learning-hub-dashboard-2.html">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary/70">person</span>
+<span class="text-sm">个人资料</span>
+</a>
+</nav>
+<div class="p-4 border-t border-white/5 text-center">
+<p class="text-[10px] text-gray-600">v2.4.0 © 2023 reado</p>
+</div>
+</aside>
+<main class="relative z-10 flex-1 flex flex-col h-full overflow-hidden bg-background-dark/50">
+<header class="flex justify-between items-center p-8 pb-4">
+<div>
+<h2 class="text-3xl font-bold text-white mb-1">无尽世界</h2>
+<p class="text-gray-400 text-sm">选择一个模拟场景开始你的阅读之旅</p>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative group">
+<span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-primary transition-colors text-lg">search</span>
+<input class="bg-reado-surface border border-white/10 rounded-full py-2 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 w-64 transition-all placeholder-gray-600" placeholder="搜索模拟器..." type="text"/>
+</div>
+<div class="flex items-center bg-black/40 rounded-full p-1 border border-white/10">
+<button class="px-3 py-1 rounded-full text-xs font-bold text-gray-400 hover:text-white transition-all">EN</button>
+<button class="px-3 py-1 rounded-full text-xs font-bold bg-primary text-black shadow-sm transition-all">中文</button>
+</div>
+</div>
+</header>
+<div class="flex-1 flex items-center overflow-x-auto hide-scrollbar px-12 gap-8 pb-8 snap-x snap-mandatory">
+<div class="snap-center shrink-0 w-[360px] h-[580px] group relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-500 hover:scale-[1.02] hover:shadow-[0_0_40px_rgba(0,242,255,0.15)] border border-white/10 hover:border-primary/50 bg-reado-surface">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB5cV6zRSH6hSxC9j4aXKjHtSAVsArAslJ2xRXg0jaNQtv71Kox0Cu4UMlWpq46cx8bPoWqJH0K9gOVA4WcHleaJ-nysF8bR1CisZ0fCFJboNWpt7gYry5ZH3RFA0BLzTlKyJterTua9zYEIo-8RB6a1CYgRgqOMUSHwhlttuKp__bWrtkrtI07YOEXxiXi09WJYVL5yvOAZrLNWLQTWTBk2e2ddznKMqoK6Uy9WSjax1zzdCCqZ0bT4tCVK98jWy7X9QOPdn4_jCk');">
+<div class="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/60 to-transparent opacity-90"></div>
+</div>
+<div class="absolute inset-0 p-8 flex flex-col justify-end items-start z-10">
+<div class="mb-auto mt-4 w-full flex justify-between items-start">
+<span class="px-2.5 py-1 rounded bg-primary/20 text-primary text-[10px] font-bold tracking-wider border border-primary/30 backdrop-blur-sm">历史</span>
+<div class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+<span class="material-icons text-white text-sm">lock_open</span>
+</div>
+</div>
+<h3 class="text-2xl font-black text-white leading-tight mb-4 drop-shadow-lg">万历十五年</h3>
+<div class="w-full space-y-5">
+<div class="flex items-center justify-between text-xs font-medium">
+<span class="text-gray-500 tracking-wide">难度等级</span>
+<div class="flex text-primary">
+<span class="material-icons text-sm">star</span>
+<span class="material-icons text-sm">star</span>
+<span class="material-icons text-sm">star</span>
+<span class="material-icons text-sm">star</span>
+<span class="material-icons text-sm text-gray-700">star</span>
+</div>
+</div>
+<div class="space-y-2">
+<span class="text-[10px] text-gray-600 uppercase tracking-widest font-bold">已解锁天赋</span>
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-1 rounded bg-white/5 text-[10px] text-gray-300 border border-white/5 flex items-center gap-1 hover:bg-primary/10 hover:text-primary transition-colors">
+<span class="material-icons text-[10px]">history_edu</span> 大历史观
+                            </span>
+<span class="px-2 py-1 rounded bg-white/5 text-[10px] text-gray-300 border border-white/5 flex items-center gap-1 hover:bg-primary/10 hover:text-primary transition-colors">
+<span class="material-icons text-[10px]">gavel</span> 官僚体系
+                            </span>
+</div>
+</div>
+<button class="w-full py-3.5 bg-primary hover:bg-primary-hover text-black font-bold text-sm rounded-lg transition-all shadow-[0_4px_20px_rgba(0,242,255,0.3)] flex items-center justify-center gap-2 group-hover:translate-y-0 translate-y-2 opacity-90 group-hover:opacity-100">
+<span>进入模拟器</span>
+<span class="material-icons text-sm transition-transform group-hover:translate-x-1">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<div class="snap-center shrink-0 w-[360px] h-[580px] group relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-500 hover:scale-[1.02] hover:shadow-[0_0_40px_rgba(0,242,255,0.15)] border border-white/10 hover:border-primary/50 bg-reado-surface">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDzs4Wa4iv6-6fjfzrxtULOPkaLbtdmcmb89gVfDnCHzkMtKDuxvONzr4HvW0MY9SxMS9fXg_vNzbCd1Em3KRSRy6mzWj1rW5qD6R2UI8DzhHD7lkEC8n7gfyIzsjYl8JUtoTFqKN1XR0fCmASMnAhxrkowAI1JA79Y5U6RNeLlGhQroCoijBJdetGgZ7UWPpftrVpuD66cE8c1YKfR4TGDrqy3aq896goPKPGoWW7vzs2uYixNQ4IixREkQ0UrGRdq9l1AyJxeThc');">
+<div class="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/60 to-transparent opacity-90"></div>
+</div>
+<div class="absolute inset-0 p-8 flex flex-col justify-end items-start z-10">
+<div class="mb-auto mt-4 w-full flex justify-between items-start">
+<span class="px-2.5 py-1 rounded bg-cyan-900/40 text-cyan-200 text-[10px] font-bold tracking-wider border border-cyan-500/20 backdrop-blur-sm">科学</span>
+<div class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+<span class="material-icons text-white text-sm">lock_open</span>
+</div>
+</div>
+<h3 class="text-2xl font-black text-white leading-tight mb-4 drop-shadow-lg">人类简史</h3>
+<div class="w-full space-y-5">
+<div class="flex items-center justify-between text-xs font-medium">
+<span class="text-gray-500 tracking-wide">难度等级</span>
+<div class="flex text-primary">
+<span class="material-icons text-sm">star</span>
+<span class="material-icons text-sm">star</span>
+<span class="material-icons text-sm">star</span>
+<span class="material-icons text-sm text-gray-700">star</span>
+<span class="material-icons text-sm text-gray-700">star</span>
+</div>
+</div>
+<div class="space-y-2">
+<span class="text-[10px] text-gray-600 uppercase tracking-widest font-bold">已解锁天赋</span>
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-1 rounded bg-white/5 text-[10px] text-gray-300 border border-white/5 flex items-center gap-1 hover:bg-primary/10 hover:text-primary transition-colors">
+<span class="material-icons text-[10px]">biotech</span> 演化逻辑
+                            </span>
+<span class="px-2 py-1 rounded bg-white/5 text-[10px] text-gray-300 border border-white/5 flex items-center gap-1 hover:bg-primary/10 hover:text-primary transition-colors">
+<span class="material-icons text-[10px]">groups</span> 社会协作
+                            </span>
+</div>
+</div>
+<button class="w-full py-3.5 bg-white/5 hover:bg-primary text-white hover:text-black font-bold text-sm rounded-lg transition-all border border-white/10 hover:border-primary flex items-center justify-center gap-2 group-hover:translate-y-0 translate-y-2 opacity-90 group-hover:opacity-100 backdrop-blur-sm">
+<span>进入模拟器</span>
+<span class="material-icons text-sm transition-transform group-hover:translate-x-1">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<div class="snap-center shrink-0 w-[360px] h-[580px] group relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-500 hover:scale-[1.02] hover:shadow-[0_0_40px_rgba(0,242,255,0.05)] border border-white/10 bg-reado-surface">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB8f7kN729ZaGW--C_MsO04LXZCAienPX7eLMu6X0WfAYodqzHt58VMM6LSi9IyYLZhppmHWx5nS6TFQ3AKahKwZ4mzoQmphS8aw3OInLLkY4xitaDDmypL3ragn2-xP2zMuFLZrlgz0_TAdvWydNk_zW2aKcEZW6hGOV_cTOU_7VQxiG-CfyCR6YMToI6ItgHTx_dXGs6IC1N4BPP5dKbEb7vhrW2eafJKXK-KHg1aZwtkVcHE9ZFkRMlC9iFhpmdgvZymGgZbYbo');">
+<div class="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/60 to-transparent opacity-90"></div>
+</div>
+<div class="absolute inset-0 p-8 flex flex-col justify-end items-start z-10">
+<div class="mb-auto mt-4 w-full flex justify-between items-start">
+<span class="px-2.5 py-1 rounded bg-blue-900/40 text-blue-200 text-[10px] font-bold tracking-wider border border-blue-500/20 backdrop-blur-sm">商业</span>
+<div class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+<span class="material-icons text-white/50 text-sm">lock</span>
+</div>
+</div>
+<h3 class="text-2xl font-black text-white leading-tight mb-4 drop-shadow-lg">从0到1</h3>
+<div class="w-full space-y-5">
+<div class="flex items-center justify-between text-xs font-medium">
+<span class="text-gray-500 tracking-wide">难度等级</span>
+<div class="flex text-primary">
+<span class="material-icons text-sm">star</span>
+<span class="material-icons text-sm">star</span>
+<span class="material-icons text-sm">star</span>
+<span class="material-icons text-sm">star</span>
+<span class="material-icons text-sm">star</span>
+</div>
+</div>
+<div class="space-y-2">
+<span class="text-[10px] text-gray-600 uppercase tracking-widest font-bold">潜在天赋</span>
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-1 rounded bg-white/5 text-[10px] text-gray-500 border border-white/5 flex items-center gap-1">
+<span class="material-icons text-[10px]">lightbulb</span> 创新思维
+                            </span>
+<span class="px-2 py-1 rounded bg-white/5 text-[10px] text-gray-500 border border-white/5 flex items-center gap-1">
+<span class="material-icons text-[10px]">trending_up</span> 垄断能力
+                            </span>
+</div>
+</div>
+<button class="w-full py-3.5 bg-white/5 hover:bg-white/10 text-gray-500 font-bold text-sm rounded-lg transition-all border border-white/10 flex items-center justify-center gap-2 cursor-not-allowed">
+<span class="material-icons text-sm">lock</span>
+<span>已锁定 (需要等级 5)</span>
+</button>
+</div>
+</div>
+</div>
+<div class="snap-center shrink-0 w-[360px] h-[580px] group relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-500 hover:scale-[1.02] hover:shadow-[0_0_40px_rgba(0,242,255,0.05)] border border-white/10 bg-reado-surface">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDL7gKVqkbOcNXNdqhiZlhUWaGaUSA3j2b0LHZ1Xva7uEB3R3V-WTyx8MX8G6jG1RE9x6hx7rDv5_1U4Cn5thqpnTL5XhH4v9fkghJIEiSt74tRbt5ut1UWwp20MahvU7McCvXAHzOsSE4Kgcq2_QChRMC8cwwrj6sKQEYizAUrAktFx-p16HfY9jsNY4Lr1Hx-RLpDy-4gCLULmRKrGE6XFKAOQepAeJkjKHDiLXdE3kr3XdcT29kjTt4Sa1Itg3S_fdIeSjiZCnk');">
+<div class="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/60 to-transparent opacity-90"></div>
+</div>
+<div class="absolute inset-0 p-8 flex flex-col justify-end items-start z-10">
+<div class="mb-auto mt-4 w-full flex justify-between items-start">
+<span class="px-2.5 py-1 rounded bg-purple-900/40 text-purple-200 text-[10px] font-bold tracking-wider border border-purple-500/20 backdrop-blur-sm">文学</span>
+<div class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+<span class="material-icons text-white/50 text-sm">lock</span>
+</div>
+</div>
+<h3 class="text-2xl font-black text-white leading-tight mb-4 drop-shadow-lg">了不起的盖茨比</h3>
+<div class="w-full space-y-5">
+<div class="flex items-center justify-between text-xs font-medium">
+<span class="text-gray-500 tracking-wide">难度等级</span>
+<div class="flex text-primary">
+<span class="material-icons text-sm">star</span>
+<span class="material-icons text-sm">star</span>
+<span class="material-icons text-sm text-gray-700">star</span>
+<span class="material-icons text-sm text-gray-700">star</span>
+<span class="material-icons text-sm text-gray-700">star</span>
+</div>
+</div>
+<div class="space-y-2">
+<span class="text-[10px] text-gray-600 uppercase tracking-widest font-bold">潜在天赋</span>
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-1 rounded bg-white/5 text-[10px] text-gray-500 border border-white/5 flex items-center gap-1">
+<span class="material-icons text-[10px]">wine_bar</span> 社交动态
+                            </span>
+</div>
+</div>
+<button class="w-full py-3.5 bg-white/5 hover:bg-white/10 text-gray-500 font-bold text-sm rounded-lg transition-all border border-white/10 flex items-center justify-center gap-2 cursor-not-allowed">
+<span class="material-icons text-sm">lock</span>
+<span>已锁定</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<div class="fixed bottom-8 left-1/2 ml-36 -translate-x-1/2 z-20 flex gap-2">
+<div class="w-8 h-1.5 rounded-full bg-primary shadow-[0_0_15px_rgba(0,242,255,0.8)]"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-white/20 hover:bg-white/50 cursor-pointer transition-colors"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-white/20 hover:bg-white/50 cursor-pointer transition-colors"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-white/20 hover:bg-white/50 cursor-pointer transition-colors"></div>
+</div>
+
+
+<script id="reado-simulator-category-script">
+(() => {
+  const catalog = window.__READO_BOOK_CATALOG__;
+  const books = Array.isArray(catalog?.books) ? catalog.books : [];
+  const categorySource = catalog?.categoryMeta || {};
+  const categoryMeta = Object.fromEntries(
+    Object.entries(categorySource).map(([key, value]) => [
+      key,
+      {
+        title: value?.label || key,
+        subtitle: value?.hint || "",
+        axis: value?.axis || ""
+      }
+    ])
+  );
+  const storageKey = catalog?.storage?.unlockKey || "reado_unlocked_books_v1";
+  const marketUrl = "/pages/gamified-learning-hub-dashboard-3.html";
+  const params = new URLSearchParams(window.location.search);
+  const allCategories = Object.keys(categoryMeta);
+  const fallbackCategory = allCategories.includes("science-knowledge") ? "science-knowledge" : (allCategories[0] || "science-knowledge");
+  const selectedCategory = params.get("category") || fallbackCategory;
+  const category = categoryMeta[selectedCategory] ? selectedCategory : fallbackCategory;
+
+  const titleEl = document.querySelector("main header h2");
+  const subEl = document.querySelector("main header p");
+  if (titleEl) titleEl.textContent = categoryMeta[category].title;
+  if (subEl) subEl.textContent = categoryMeta[category].subtitle;
+
+  const headerBlock = titleEl ? titleEl.parentElement : null;
+  if (headerBlock && !headerBlock.querySelector("[data-axis]")) {
+    const axis = document.createElement("p");
+    axis.setAttribute("data-axis", "1");
+    axis.className = "text-xs text-cyan-300 mt-2 font-bold tracking-wide";
+    axis.textContent = categoryMeta[category].axis;
+    headerBlock.append(axis);
+  }
+
+  const strip = document.querySelector("main .flex-1.flex.items-center.overflow-x-auto.hide-scrollbar");
+  if (!strip) return;
+  const pager = Array.from(document.querySelectorAll("body > div"))
+    .find((node) => {
+      if (!(node instanceof HTMLElement)) return false;
+      return node.classList.contains("fixed")
+        && node.classList.contains("bottom-8")
+        && node.classList.contains("left-1/2")
+        && node.classList.contains("z-20");
+    });
+  strip.classList.remove("items-center");
+  strip.classList.add("items-start", "pt-4", "md:pt-6");
+  strip.innerHTML = "";
+
+  const getUnlocked = () => {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(storageKey) || "[]");
+      return new Set(Array.isArray(parsed) ? parsed : []);
+    } catch {
+      return new Set();
+    }
+  };
+
+  const scoped = books.filter((book) => book.category === category);
+  const unlocked = getUnlocked();
+
+  const createCard = (book, index) => {
+    const isUnlocked = unlocked.has(book.id);
+    const tagsHtml = (book.tags || []).map((tag) => `
+      <span class="px-2 py-1 rounded bg-white/5 text-[10px] text-gray-300 border border-white/5">${tag}</span>`
+    ).join("");
+
+    return `
+    <div data-book-card data-book-index="${index}" class="snap-center shrink-0 w-[360px] h-[540px] group relative rounded-2xl overflow-hidden transition-all duration-500 border border-white/10 bg-reado-surface">
+      <div class="absolute inset-0 bg-gradient-to-b from-slate-900/70 via-background-dark/50 to-background-dark"></div>
+      <div class="absolute top-12 left-8 right-8 h-[220px] rounded-xl border border-white/10 bg-black/35 overflow-hidden flex items-center justify-center">
+        <img src="${book.cover}" alt="${book.title}" loading="lazy" class="h-full w-auto object-contain transition-transform duration-500 group-hover:scale-105" />
+      </div>
+      <div class="absolute inset-0 p-8 flex flex-col items-start z-10">
+        <div class="w-full flex justify-between items-start">
+          <span class="px-2.5 py-1 rounded bg-primary/20 text-primary text-[10px] font-bold tracking-wider border border-primary/30 backdrop-blur-sm">${book.tier}</span>
+          <div class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+            <span class="material-icons text-white text-sm">${isUnlocked ? "lock_open" : "lock"}</span>
+          </div>
+        </div>
+        <div class="mt-[244px] w-full">
+          <h3 class="text-2xl font-black text-white leading-tight mb-3 drop-shadow-lg">${book.title}</h3>
+          <p class="text-[11px] text-gray-400 mb-3">${book.moduleCount} 个模块</p>
+          <div class="flex flex-wrap gap-2 mb-4">${tagsHtml || '<span class="px-2 py-1 rounded bg-white/5 text-[10px] text-gray-300 border border-white/5">谈资盲盒</span>'}</div>
+        </div>
+        <button data-book-id="${book.id}" data-first="${book.firstModuleHref}" class="mt-auto w-full py-3.5 ${isUnlocked ? "bg-primary hover:bg-primary-hover text-black" : "bg-white/10 hover:bg-white/20 text-white border border-white/10"} font-bold text-sm rounded-lg transition-all flex items-center justify-center gap-2">
+          <span>${isUnlocked ? "继续学习" : "去交易中心购买"}</span>
+          <span class="material-icons text-sm">arrow_forward</span>
+        </button>
+      </div>
+    </div>`;
+  };
+
+  if (scoped.length === 0) {
+    strip.innerHTML = `
+      <div class="snap-center shrink-0 w-[520px] h-[360px] rounded-2xl border border-white/10 bg-reado-surface p-10 flex flex-col justify-center">
+        <h3 class="text-3xl font-black text-white mb-3">该领域书库建设中</h3>
+        <p class="text-gray-400">你可以先前往其他生活战场开启试玩，或到交易中心查看可购买模块。</p>
+        <a href="${marketUrl}" class="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-black font-bold text-sm">前往交易中心 <span class="material-icons text-sm">arrow_forward</span></a>
+      </div>`;
+  } else {
+    strip.innerHTML = scoped.map((book, index) => createCard(book, index)).join("");
+  }
+
+  const setPager = () => {
+    if (!pager) return;
+    const cards = Array.from(strip.querySelectorAll("[data-book-card]"));
+    if (cards.length <= 1) {
+      pager.style.display = "none";
+      pager.innerHTML = "";
+      return;
+    }
+
+    pager.style.display = "flex";
+    pager.innerHTML = cards.map((_, index) => `
+      <button
+        type="button"
+        data-pager-index="${index}"
+        class="${index === 0
+          ? "w-8 h-1.5 rounded-full bg-primary shadow-[0_0_15px_rgba(0,242,255,0.8)]"
+          : "w-1.5 h-1.5 rounded-full bg-white/20 hover:bg-white/50 transition-colors"}"
+        aria-label="跳转到第 ${index + 1} 本书"
+      ></button>`
+    ).join("");
+
+    const pagerButtons = Array.from(pager.querySelectorAll("button[data-pager-index]"));
+    const setActive = (activeIndex) => {
+      pagerButtons.forEach((button, index) => {
+        const isActive = index === activeIndex;
+        button.className = isActive
+          ? "w-8 h-1.5 rounded-full bg-primary shadow-[0_0_15px_rgba(0,242,255,0.8)]"
+          : "w-1.5 h-1.5 rounded-full bg-white/20 hover:bg-white/50 transition-colors";
+      });
+    };
+
+    const resolveActiveIndex = () => {
+      const viewportCenter = strip.scrollLeft + (strip.clientWidth / 2);
+      let nearestIndex = 0;
+      let nearestDistance = Number.POSITIVE_INFINITY;
+      cards.forEach((card, index) => {
+        const cardCenter = card.offsetLeft + (card.clientWidth / 2);
+        const distance = Math.abs(cardCenter - viewportCenter);
+        if (distance < nearestDistance) {
+          nearestDistance = distance;
+          nearestIndex = index;
+        }
+      });
+      return nearestIndex;
+    };
+
+    let frameId = 0;
+    const onScroll = () => {
+      if (frameId) return;
+      frameId = requestAnimationFrame(() => {
+        frameId = 0;
+        setActive(resolveActiveIndex());
+      });
+    };
+
+    strip.addEventListener("scroll", onScroll, { passive: true });
+    pager.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+      const button = target.closest("button[data-pager-index]");
+      if (!(button instanceof HTMLButtonElement)) return;
+      const index = Number(button.getAttribute("data-pager-index"));
+      if (!Number.isFinite(index) || index < 0 || index >= cards.length) return;
+      const card = cards[index];
+      if (!(card instanceof HTMLElement)) return;
+      const left = Math.max(card.offsetLeft - Math.max((strip.clientWidth - card.clientWidth) / 2, 0), 0);
+      strip.scrollTo({ left, behavior: "smooth" });
+      setActive(index);
+    });
+  }
+  setPager();
+
+  strip.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+    const button = target.closest("button[data-book-id]");
+    if (!button) return;
+    const bookId = button.getAttribute("data-book-id");
+    const first = button.getAttribute("data-first");
+    if (!bookId || !first) return;
+    const nowUnlocked = getUnlocked();
+    if (nowUnlocked.has(bookId)) {
+      const book = books.find((item) => item.id === bookId);
+      const last = localStorage.getItem("reado_book_last_" + bookId);
+      const canResume = Boolean(last && Array.isArray(book?.moduleSlugs) && book.moduleSlugs.includes(last));
+      window.location.href = canResume ? "/experiences/" + last + ".html" : first;
+      return;
+    }
+    window.location.href = marketUrl;
+  });
+})();
+</script>
+</body></html>

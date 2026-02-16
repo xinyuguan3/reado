@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>reado: 1994分税制 - 钱包保卫战</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700;900&amp;family=Noto+Sans+SC:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec1313",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#221010", // Keeping the reddish dark base from config
+                        "terminal-dark": "#1a0b0b", // Slightly darker for panels
+                        "finance-green": "#10b981",
+                    },
+                    fontFamily: {
+                        "display": ["Work Sans", "Noto Sans SC", "sans-serif"],
+                        "mono": ["ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "monospace"],
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                    backgroundImage: {
+                        'grid-pattern': "linear-gradient(to right, rgba(236, 19, 19, 0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(236, 19, 19, 0.05) 1px, transparent 1px)",
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom animations for the terminal feel */
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+        .scanline-effect {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent, rgba(236, 19, 19, 0.02), transparent);
+            pointer-events: none;
+            z-index: 50;
+            animation: scanline 8s linear infinite;
+        }
+        
+        @keyframes pulse-danger {
+            0%, 100% { box-shadow: 0 0 10px rgba(236, 19, 19, 0.2); }
+            50% { box-shadow: 0 0 25px rgba(236, 19, 19, 0.6); }
+        }
+        .danger-pulse {
+            animation: pulse-danger 2s infinite;
+        }
+
+        @keyframes glitch-text {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+        .glitch-hover:hover {
+            animation: glitch-text 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
+        }
+
+        .crt-overlay {
+            background: radial-gradient(circle, rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 100%);
+            background-size: 100% 2px;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-white font-display h-screen overflow-hidden flex flex-col relative selection:bg-primary selection:text-white">
+<!-- Background Elements -->
+<div class="absolute inset-0 z-0 opacity-20 pointer-events-none">
+<!-- Abstract City Blueprint Map Background -->
+<img class="w-full h-full object-cover filter grayscale contrast-125 brightness-50 mix-blend-overlay" data-alt="Dark abstract city blueprint background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDENIDJQb0G9Pfn7sOEFczE7B5HZMjRnDzuvLrtoCx505byg7QnJm5SiXxC78RDkPBGpV0mJv4QvCpwW5mky5SZfK2HiivfWabvohtlBKajOTV6YNyY5mv_UJjYUB3hivbt6g4Gt9b5zp1_HBfXhRwQaZ3MgZ3-TYQR3TyhJg7U5oFFQstcyeZxaFYKXF1PEihlhCzsMAi3oivl-snRUTGs7WiOa3OF2Ypf2sdl0BZLX8UuCFB1q5IIK3jKUNV7WvaL4GN1uarojyQ"/>
+<div class="absolute inset-0 bg-grid-pattern bg-[length:40px_40px]"></div>
+</div>
+<!-- Scanline Overlay -->
+<div class="scanline-effect"></div>
+<div class="absolute inset-0 z-40 pointer-events-none crt-overlay"></div>
+<!-- Main Content Wrapper -->
+<div class="relative z-10 flex flex-col h-full p-6">
+<!-- Header: Terminal Status Bar -->
+<header class="flex justify-between items-center bg-terminal-dark/80 backdrop-blur-md border-b border-primary/30 p-4 rounded-xl shadow-lg mb-6">
+<div class="flex items-center space-x-4">
+<div class="flex items-center gap-2">
+<span class="material-icons text-primary text-3xl">token</span>
+<h1 class="text-2xl font-bold tracking-tighter uppercase">READO <span class="text-primary font-black">OS</span></h1>
+</div>
+<div class="h-8 w-px bg-primary/30 mx-2"></div>
+<div class="flex flex-col">
+<span class="text-xs text-primary/70 uppercase tracking-widest font-mono">Current Simulation</span>
+<span class="text-sm font-semibold">Level 1: 1994 分税制改革 (Tax Sharing Reform)</span>
+</div>
+</div>
+<div class="flex items-center gap-6 font-mono text-xs">
+<div class="flex items-center gap-2 text-primary/80">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                    SYSTEM CRITICAL
+                </div>
+<div class="px-3 py-1 bg-primary/10 border border-primary/30 rounded text-primary">
+                    YEAR: 1994
+                </div>
+<button class="material-icons text-gray-400 hover:text-white transition-colors">settings</button>
+</div>
+</header>
+<!-- Main Dashboard Area -->
+<main class="flex-1 grid grid-cols-12 gap-6 min-h-0">
+<!-- Left Column: Expenditure (Rigid) -->
+<div class="col-span-3 flex flex-col h-full bg-terminal-dark/60 backdrop-blur-sm border border-primary/20 rounded-xl p-1 relative overflow-hidden group hover:border-primary/40 transition-all">
+<div class="absolute top-0 left-0 w-full h-1 bg-primary/20"></div>
+<div class="p-4 flex justify-between items-start border-b border-white/5">
+<div>
+<h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest">事权 (Responsibility)</h3>
+<h2 class="text-xl font-bold text-white mt-1">刚性支出</h2>
+</div>
+<span class="material-icons text-primary text-3xl">trending_up</span>
+</div>
+<div class="flex-1 flex flex-col justify-end px-8 py-8 relative">
+<!-- Progress Bar Background -->
+<div class="w-full bg-gray-800 rounded-lg h-full relative overflow-hidden flex flex-col justify-end">
+<!-- Red Bar Rising -->
+<div class="w-full bg-gradient-to-t from-primary/60 via-primary to-red-400 animate-pulse transition-all duration-1000 ease-out relative" style="height: 85%;">
+<div class="absolute top-0 w-full h-px bg-white/50 shadow-[0_0_10px_rgba(255,255,255,0.8)]"></div>
+<!-- Values inside bar -->
+<div class="absolute top-2 left-0 w-full text-center text-white font-mono font-bold text-lg drop-shadow-md">
+                                ¥ 125 亿
+                            </div>
+</div>
+</div>
+<!-- Label below bar -->
+<div class="text-center mt-4 text-primary font-mono text-sm">
+                        WARNING: OVERLOAD
+                    </div>
+</div>
+<div class="bg-primary/10 p-3 text-xs text-primary/80 font-mono">
+                    &gt; 公共服务支出 +15%<br/>
+                    &gt; 基建维护 +8%<br/>
+                    &gt; 人员薪资刚性增长
+                </div>
+</div>
+<!-- Center Column: Crisis Monitor -->
+<div class="col-span-6 flex flex-col justify-center items-center relative">
+<!-- Central HUD Circle -->
+<div class="relative w-full max-w-lg aspect-square flex flex-col justify-center items-center">
+<!-- Spinning Rings -->
+<div class="absolute inset-0 border border-primary/10 rounded-full animate-[spin_10s_linear_infinite]"></div>
+<div class="absolute inset-12 border border-dashed border-primary/20 rounded-full animate-[spin_15s_linear_infinite_reverse]"></div>
+<!-- Main Alert Text -->
+<div class="relative z-10 text-center space-y-2 danger-pulse bg-background-dark/80 p-12 rounded-full border border-primary/30 backdrop-blur-xl">
+<div class="text-primary font-black text-6xl tracking-tighter leading-none" style="text-shadow: 0 0 20px rgba(236,19,19,0.5);">
+                            50 亿
+                        </div>
+<div class="text-white text-xl font-medium tracking-widest uppercase opacity-90">
+                            财政缺口 (Fiscal Gap)
+                        </div>
+<div class="w-full h-px bg-gradient-to-r from-transparent via-primary to-transparent my-4"></div>
+<div class="inline-flex items-center gap-2 bg-primary text-white px-4 py-1 rounded text-sm font-bold uppercase tracking-wide animate-pulse">
+<span class="material-icons text-base">warning</span>
+                            城市信用预警 (Credit Warning)
+                        </div>
+</div>
+</div>
+<!-- Action Panel -->
+<div class="mt-8 w-full max-w-md">
+<button class="group relative w-full overflow-hidden rounded-lg bg-primary p-1 focus:outline-none focus:ring-4 focus:ring-primary/50 danger-pulse transition-transform hover:scale-[1.02] active:scale-[0.98]">
+<div class="absolute inset-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/diagmonds-light.png')] opacity-20"></div>
+<div class="relative flex items-center justify-between bg-black/20 px-6 py-4 rounded hover:bg-black/10 transition-colors">
+<div class="flex flex-col items-start">
+<span class="text-xs uppercase tracking-widest text-white/70 font-mono mb-1">Available Solution</span>
+<span class="text-2xl font-black text-white glitch-hover">激活：土地出让权</span>
+</div>
+<span class="material-icons text-white text-4xl group-hover:rotate-90 transition-transform">fingerprint</span>
+</div>
+<!-- Progress Overlay for "Unlocking" feel -->
+<div class="absolute bottom-0 left-0 h-1 bg-white/50 w-full animate-pulse"></div>
+</button>
+<div class="flex justify-between mt-2 px-1">
+<span class="text-xs text-gray-400 font-mono">COST: 制度成本 HIGH</span>
+<span class="text-xs text-primary font-mono animate-pulse">RECOMMENDED ACTION</span>
+</div>
+</div>
+</div>
+<!-- Right Column: Revenue (Budget) -->
+<div class="col-span-3 flex flex-col h-full bg-terminal-dark/60 backdrop-blur-sm border border-gray-700 rounded-xl p-1 relative overflow-hidden group hover:border-gray-500 transition-all">
+<div class="absolute top-0 left-0 w-full h-1 bg-finance-green/20"></div>
+<div class="p-4 flex justify-between items-start border-b border-white/5">
+<div class="text-right w-full">
+<h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest">财权 (Fiscal Power)</h3>
+<h2 class="text-xl font-bold text-white mt-1">预算内收入</h2>
+</div>
+<span class="material-icons text-finance-green text-3xl ml-2">trending_down</span>
+</div>
+<div class="flex-1 flex flex-col justify-end px-8 py-8 relative">
+<!-- Progress Bar Background -->
+<div class="w-full bg-gray-800 rounded-lg h-full relative overflow-hidden flex flex-col justify-end">
+<!-- Green Bar Dropping -->
+<div class="w-full bg-gradient-to-t from-finance-green/40 via-finance-green to-emerald-300 transition-all duration-1000 ease-out relative opacity-60" style="height: 35%;">
+<div class="absolute top-0 w-full h-px bg-white/50 shadow-[0_0_10px_rgba(255,255,255,0.8)]"></div>
+<!-- Values inside bar -->
+<div class="absolute -top-8 left-0 w-full text-center text-finance-green font-mono font-bold text-lg">
+                                ¥ 75 亿
+                            </div>
+</div>
+</div>
+<!-- Label below bar -->
+<div class="text-center mt-4 text-gray-500 font-mono text-sm">
+                        STATUS: CRITICAL DROP
+                    </div>
+</div>
+<div class="bg-gray-800/50 p-3 text-xs text-gray-400 font-mono border-t border-white/5">
+                    &gt; 中央上收财权<br/>
+                    &gt; 增值税比例调整 (75:25)<br/>
+                    &gt; 地方税源枯竭
+                </div>
+</div>
+</main>
+<!-- Footer: Data Ticker -->
+<footer class="mt-6 bg-black border-t border-primary/20 p-2 overflow-hidden relative rounded-lg">
+<div class="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-black to-transparent z-10"></div>
+<div class="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-black to-transparent z-10"></div>
+<div class="flex whitespace-nowrap overflow-hidden">
+<div class="animate-[marquee_20s_linear_infinite] flex items-center gap-12 text-sm font-mono text-gray-400">
+<span class="flex items-center gap-2"><span class="text-primary material-icons text-sm">arrow_downward</span> 地方财政自主率: 骤降至 30%</span>
+<span class="flex items-center gap-2 text-white"><span class="bg-primary text-white text-[10px] px-1 rounded">NEWS</span> 中央政府宣布实施分税制改革</span>
+<span class="flex items-center gap-2"><span class="text-primary material-icons text-sm">warning</span> 某市教师工资拖欠达 3 个月</span>
+<span class="flex items-center gap-2"><span class="text-finance-green material-icons text-sm">trending_up</span> 中央宏观调控能力: 显著增强</span>
+<span class="flex items-center gap-2"><span class="text-primary material-icons text-sm">error_outline</span> 基层政府面临运转危机</span>
+<span class="flex items-center gap-2"><span class="text-primary material-icons text-sm">arrow_downward</span> 地方财政自主率: 骤降至 30%</span>
+<span class="flex items-center gap-2 text-white"><span class="bg-primary text-white text-[10px] px-1 rounded">NEWS</span> 中央政府宣布实施分税制改革</span>
+</div>
+</div>
+</footer>
+</div>
+<script>
+        tailwind.config.theme.extend.keyframes = {
+            ...tailwind.config.theme.extend.keyframes,
+            marquee: {
+                '0%': { transform: 'translateX(0%)' },
+                '100%': { transform: 'translateX(-50%)' },
+            }
+        }
+    </script>
+</body></html>

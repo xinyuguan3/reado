@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html class="dark" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>reado: 快乐悖论 - 全屏沉浸模拟界面</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Source+Han+Sans+SC:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0ea5e9",
+                        "primary-dark": "#0284c7",
+                        "accent-green": "#22c55e",
+                        "accent-yellow": "#eab308",
+                        "background-dark": "#020617",
+                        "surface-dark": "#0f172a",
+                        "surface-lighter": "#1e293b"
+                    },
+                    fontFamily: {
+                        "sans": ["Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", "sans-serif"],
+                    },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        body {
+            font-family: 'Source Han Sans SC', sans-serif;
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #020617; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b; 
+            border-radius: 10px;
+        }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .split-divider {
+            background: linear-gradient(to bottom, transparent, rgba(14, 165, 233, 0.5), transparent);
+        }
+        .energy-node {
+            box-shadow: 0 0 15px rgba(14, 165, 233, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-background-dark text-slate-200 min-h-screen flex flex-col font-sans overflow-hidden selection:bg-primary selection:text-white">
+<script src="/shared/book-catalog.js?v=1771240921862"></script>
+<script type="module" src="/shared/shell.js?v=1771240921862"></script>
+<reado-app-shell data-page="knowledge-map"></reado-app-shell>
+<div class="fixed inset-0 z-0 opacity-10 pointer-events-none">
+<img alt="background" class="absolute inset-0 w-full h-full object-cover mix-blend-overlay grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZksFKOEtkId5n2nx9b3y8gVsKHp7UyeXHKuWICWdKYZqjrsOVup2DgL1yEv2mP3y3r4NpAIjJbqJjrolx8ioID53ep8dqE8dM0zkJ4ytF2UewkOOBnLjJWisYmgT0Z0MJ6CRuBAu4aTKFpbur68uSobhneFvhWIlZTkWps8GDfknY8SxXSCtk39L8B-TkNcjIB7Ib8z6UvXHua8-LiTWiU4R-LKYUmI8HqhbR9c-he1RHA9Kt8-5ZjfLO2xWJQUocffEExp7delI"/>
+<div class="absolute inset-0 bg-gradient-to-b from-background-dark via-transparent to-background-dark"></div>
+</div>
+<header class="relative z-50 h-16 px-8 flex items-center justify-between border-b border-white/5 bg-background-dark/80 backdrop-blur-xl">
+<div class="flex items-center gap-4">
+<div class="h-8 w-8 rounded bg-primary flex items-center justify-center text-white font-black text-lg">r</div>
+<div class="h-4 w-px bg-white/10 mx-2"></div>
+<h1 class="text-sm font-bold tracking-[0.3em] text-primary uppercase">快乐的悖论</h1>
+</div>
+<div class="absolute left-1/2 -translate-x-1/2 flex items-center gap-3 px-6 py-1.5 rounded-full bg-white/5 border border-white/10">
+<span class="text-[10px] font-black text-primary uppercase tracking-widest">当前挑战</span>
+<span class="text-xs font-medium text-slate-300">基因延续 vs 个体幸福</span>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2">
+<span class="text-[10px] text-slate-500 uppercase font-bold">资源</span>
+<div class="flex gap-1">
+<div class="h-1.5 w-4 rounded-full bg-primary"></div>
+<div class="h-1.5 w-4 rounded-full bg-primary"></div>
+<div class="h-1.5 w-4 rounded-full bg-primary/20"></div>
+</div>
+</div>
+<button class="material-symbols-outlined text-slate-400 hover:text-white transition-colors">help_outline</button>
+</div>
+</header>
+<main class="flex-grow flex relative z-10 overflow-hidden">
+<section class="flex-grow flex flex-col p-6 overflow-hidden">
+<div class="flex-grow glass-panel rounded-3xl overflow-hidden flex relative border border-white/10">
+<div class="absolute left-1/2 top-0 bottom-0 w-px split-divider z-20"></div>
+<div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-30">
+<div class="w-12 h-12 rounded-full bg-background-dark border border-primary/50 flex items-center justify-center energy-node text-primary">
+<span class="material-symbols-outlined text-xl">balance</span>
+</div>
+</div>
+<div class="w-1/2 h-full flex flex-col p-12 relative group cursor-pointer hover:bg-accent-green/5 transition-colors">
+<div class="mb-12">
+<span class="inline-flex items-center gap-2 px-3 py-1 rounded bg-accent-green/10 text-accent-green text-xs font-black uppercase tracking-widest border border-accent-green/20">
+<span class="material-symbols-outlined text-base">forest</span>
+                        采集者时代
+                    </span>
+</div>
+<div class="space-y-8 flex-grow">
+<div class="flex items-start gap-4">
+<div class="mt-1 h-8 w-8 rounded-lg bg-accent-green/10 flex items-center justify-center text-accent-green">
+<span class="material-symbols-outlined">schedule</span>
+</div>
+<div>
+<h3 class="text-lg font-bold text-white">闲暇时光</h3>
+<p class="text-sm text-slate-400 mt-1">每日工作仅 3-5 小时，大量时间用于社交与休憩。</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="mt-1 h-8 w-8 rounded-lg bg-accent-green/10 flex items-center justify-center text-accent-green">
+<span class="material-symbols-outlined">restaurant</span>
+</div>
+<div>
+<h3 class="text-lg font-bold text-white">营养均衡</h3>
+<p class="text-sm text-slate-400 mt-1">采集数十种动植物，食物结构极其多样化。</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="mt-1 h-8 w-8 rounded-lg bg-accent-green/10 flex items-center justify-center text-accent-green">
+<span class="material-symbols-outlined">sentiment_very_satisfied</span>
+</div>
+<div>
+<h3 class="text-lg font-bold text-white">心理健康</h3>
+<p class="text-sm text-slate-400 mt-1">较低的焦虑水平，没有“未来”的沉重负担。</p>
+</div>
+</div>
+</div>
+<div class="mt-auto bg-black/20 p-6 rounded-2xl border border-white/5">
+<div class="flex justify-between items-end mb-4">
+<div>
+<span class="text-[10px] text-accent-green font-black uppercase tracking-widest">个体幸福指数</span>
+<div class="text-2xl font-black text-white mt-1">85%</div>
+</div>
+<button class="px-6 py-2 bg-accent-green text-black font-bold text-xs rounded-lg hover:brightness-110 transition-all">
+                            分配能量：追求快乐
+                        </button>
+</div>
+<div class="w-full bg-white/5 h-2 rounded-full overflow-hidden">
+<div class="bg-accent-green h-full w-[85%] shadow-[0_0_15px_rgba(34,197,94,0.4)]"></div>
+</div>
+</div>
+</div>
+<div class="w-1/2 h-full flex flex-col p-12 relative group cursor-pointer hover:bg-accent-yellow/5 transition-colors text-right items-end">
+<div class="mb-12">
+<span class="inline-flex items-center gap-2 px-3 py-1 rounded bg-accent-yellow/10 text-accent-yellow text-xs font-black uppercase tracking-widest border border-accent-yellow/20">
+                        农业时代
+                        <span class="material-symbols-outlined text-base">agriculture</span>
+</span>
+</div>
+<div class="space-y-8 flex-grow">
+<div class="flex items-start gap-4 justify-end">
+<div class="text-right">
+<h3 class="text-lg font-bold text-white">基因爆发</h3>
+<p class="text-sm text-slate-400 mt-1">人口呈几何倍数增长，DNA拷贝数达到巅峰。</p>
+</div>
+<div class="mt-1 h-8 w-8 rounded-lg bg-accent-yellow/10 flex items-center justify-center text-accent-yellow">
+<span class="material-symbols-outlined">group_add</span>
+</div>
+</div>
+<div class="flex items-start gap-4 justify-end">
+<div class="text-right">
+<h3 class="text-lg font-bold text-white">过度劳作</h3>
+<p class="text-sm text-slate-400 mt-1">“日出而作，日入而息”，身体因长期劳作而变形。</p>
+</div>
+<div class="mt-1 h-8 w-8 rounded-lg bg-accent-yellow/10 flex items-center justify-center text-accent-yellow">
+<span class="material-symbols-outlined">history_toggle_off</span>
+</div>
+</div>
+<div class="flex items-start gap-4 justify-end">
+<div class="text-right">
+<h3 class="text-lg font-bold text-white">疾病与饥荒</h3>
+<p class="text-sm text-slate-400 mt-1">单一作物依赖，高密度聚居导致流行病频发。</p>
+</div>
+<div class="mt-1 h-8 w-8 rounded-lg bg-accent-yellow/10 flex items-center justify-center text-accent-yellow">
+<span class="material-symbols-outlined">sick</span>
+</div>
+</div>
+</div>
+<div class="mt-auto bg-black/20 p-6 rounded-2xl border border-white/5 w-full">
+<div class="flex justify-between items-end mb-4">
+<button class="px-6 py-2 bg-accent-yellow text-black font-bold text-xs rounded-lg hover:brightness-110 transition-all">
+                            分配能量：繁衍扩张
+                        </button>
+<div class="text-right">
+<span class="text-[10px] text-accent-yellow font-black uppercase tracking-widest">基因延续效率</span>
+<div class="text-2xl font-black text-white mt-1">98%</div>
+</div>
+</div>
+<div class="w-full bg-white/5 h-2 rounded-full overflow-hidden flex justify-end">
+<div class="bg-accent-yellow h-full w-[98%] shadow-[0_0_15px_rgba(234,179,8,0.4)]"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-6 flex items-center justify-between px-6 py-4 glass-panel rounded-2xl border border-white/5">
+<div class="flex items-center gap-4 text-sm text-slate-300">
+<span class="material-symbols-outlined text-primary">tips_and_updates</span>
+<p>核心洞察：<span class="text-white font-bold italic">农业革命不仅是人口的胜利，也是个体生活质量的灾难。</span> 我们在追求种群成功的路上，丢掉了幸福。</p>
+</div>
+<div class="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
+<span>博弈状态:</span>
+<span class="text-accent-yellow">正在倾斜</span>
+</div>
+</div>
+</section>
+<aside class="w-80 border-l border-white/5 bg-background-dark/40 backdrop-blur-md p-6 flex flex-col shrink-0">
+<div class="mb-8">
+<h2 class="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mb-4">演化里程碑</h2>
+<div class="space-y-4">
+<div class="p-4 rounded-xl bg-accent-green/5 border border-accent-green/20 flex gap-4 items-center group opacity-80">
+<div class="h-10 w-10 rounded bg-accent-green/20 flex items-center justify-center text-accent-green">
+<span class="material-symbols-outlined text-xl">psychology</span>
+</div>
+<div>
+<h4 class="text-xs font-bold text-slate-200">认知革命</h4>
+<p class="text-[10px] text-accent-green mt-0.5">已解锁</p>
+</div>
+</div>
+<div class="p-4 rounded-xl bg-accent-yellow/10 border border-accent-yellow/40 flex gap-4 items-center relative overflow-hidden">
+<div class="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-accent-yellow animate-pulse"></div>
+<div class="h-10 w-10 rounded bg-accent-yellow flex items-center justify-center text-black shadow-lg shadow-accent-yellow/20">
+<span class="material-symbols-outlined text-xl">agriculture</span>
+</div>
+<div>
+<h4 class="text-xs font-bold text-white">农业革命</h4>
+<p class="text-[10px] text-accent-yellow mt-0.5 font-bold">进行中</p>
+</div>
+</div>
+<div class="p-4 rounded-xl bg-white/5 border border-white/5 flex gap-4 items-center opacity-40 grayscale">
+<div class="h-10 w-10 rounded bg-surface-lighter flex items-center justify-center text-slate-400">
+<span class="material-symbols-outlined text-xl">science</span>
+</div>
+<div>
+<h4 class="text-xs font-bold text-slate-400">科学革命</h4>
+<p class="text-[10px] text-slate-500 mt-0.5">尚未达成</p>
+</div>
+</div>
+<div class="p-4 rounded-xl bg-white/5 border border-white/5 flex gap-4 items-center opacity-40 grayscale">
+<div class="h-10 w-10 rounded bg-surface-lighter flex items-center justify-center text-slate-400">
+<span class="material-symbols-outlined text-xl">rocket_launch</span>
+</div>
+<div>
+<h4 class="text-xs font-bold text-slate-400">星际移民</h4>
+<p class="text-[10px] text-slate-500 mt-0.5">尚未达成</p>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-auto pt-6 border-t border-white/5">
+<div class="flex justify-between items-center text-[10px] font-black uppercase mb-3">
+<span class="text-slate-500 tracking-widest">文明复杂性</span>
+<span class="text-primary">LV. 04</span>
+</div>
+<div class="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+<div class="bg-gradient-to-r from-primary to-accent-yellow h-full w-[65%]"></div>
+</div>
+<div class="mt-6 space-y-3">
+<button id="sapiens-finish-trigger" data-no-next="" class="w-full py-3 rounded-lg bg-surface-lighter hover:bg-white/10 text-[10px] font-black text-slate-300 uppercase tracking-widest border border-white/5 transition-all">
+                    存盘并退出模拟
+                </button>
+<p class="text-[10px] text-slate-600 italic text-center leading-relaxed">
+                    “演化总是不计代价地追求数量。”
+                </p>
+</div>
+</div>
+</aside>
+</main>
+<div id="sapiens-outro-modal" class="fixed inset-0 z-[140] bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+<div class="w-full max-w-3xl rounded-2xl border border-primary/35 bg-background-dark/95 shadow-[0_20px_60px_rgba(0,0,0,0.55)] overflow-hidden">
+<div class="px-6 md:px-8 py-5 border-b border-primary/20 bg-gradient-to-r from-primary/15 to-transparent">
+<p class="text-xs font-bold tracking-[0.22em] text-primary uppercase">终局复盘 · 人类简史</p>
+<h2 class="text-xl md:text-2xl font-black text-white mt-2">你已完成本书体验链路</h2>
+</div>
+<div class="px-6 md:px-8 py-6 space-y-4">
+<p class="text-sm text-gray-300 leading-relaxed">从农业到工业再到信息时代，你体验了“系统效率”与“个体幸福”之间持续拉扯。下面是本次小麦模拟器的通关记录。</p>
+<div id="sapiens-review-list" class="space-y-2"></div>
+<div class="rounded-xl border border-white/10 bg-white/5 p-3">
+<p id="sapiens-review-summary" class="text-xs text-gray-300"></p>
+</div>
+</div>
+<div class="px-6 md:px-8 py-4 border-t border-white/10 flex flex-wrap justify-end gap-2">
+<button id="sapiens-review-close" class="px-4 py-2 rounded-lg text-xs font-bold text-gray-300 border border-white/10 hover:bg-white/5 transition-colors">继续停留本页</button>
+<button id="sapiens-review-exit-book" class="px-4 py-2 rounded-lg text-xs font-bold text-background-dark bg-primary hover:bg-primary-dark transition-colors">返回《人类简史》主页</button>
+<button id="sapiens-review-exit-map" class="px-4 py-2 rounded-lg text-xs font-bold text-white bg-primary/20 border border-primary/30 hover:bg-primary/30 transition-colors">返回学习地图</button>
+</div>
+</div>
+</div>
+<script>
+(() => {
+  const modal = document.getElementById("sapiens-outro-modal");
+  const trigger = document.getElementById("sapiens-finish-trigger");
+  const closeBtn = document.getElementById("sapiens-review-close");
+  const exitBookBtn = document.getElementById("sapiens-review-exit-book");
+  const exitMapBtn = document.getElementById("sapiens-review-exit-map");
+  const reviewList = document.getElementById("sapiens-review-list");
+  const reviewSummary = document.getElementById("sapiens-review-summary");
+  if (!modal || !trigger || !reviewList || !reviewSummary) return;
+
+  const STORAGE_KEY = "reado_sapiens_era_challenge_v1";
+  const eraMeta = [
+    { key: "agriculture", label: "农业时代" },
+    { key: "industrial", label: "工业时代" },
+    { key: "information", label: "信息时代" }
+  ];
+
+  const readState = () => {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+      return parsed && typeof parsed === "object" ? parsed : {};
+    } catch {
+      return {};
+    }
+  };
+
+  const renderReview = () => {
+    const state = readState();
+    let passedCount = 0;
+    reviewList.innerHTML = eraMeta.map((era) => {
+      const entry = state[era.key] || {};
+      const passed = entry.passed === true;
+      if (passed) passedCount += 1;
+      const attempts = Number(entry.attempts || 0);
+      const failures = Number(entry.failures || 0);
+      return `
+        <div class="rounded-lg border border-white/10 bg-black/20 px-3 py-2 flex items-center justify-between">
+          <span class="text-sm font-bold text-white">${era.label}</span>
+          <span class="text-xs ${passed ? "text-emerald-400" : "text-amber-300"}">
+            ${passed ? "已通关" : "未通关"} · 尝试 ${attempts} 次 · 失败 ${failures} 次
+          </span>
+        </div>`;
+    }).join("");
+    reviewSummary.textContent = `总进度：${passedCount}/3 个时代挑战通过。建议复盘关键失误，再进行下一轮策略优化。`;
+  };
+
+  const openModal = () => {
+    renderReview();
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+  };
+
+  const hideModal = () => {
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+  };
+
+  const markCompleted = () => {
+    try {
+      const key = "reado_completed_books_v1";
+      const parsed = JSON.parse(localStorage.getItem(key) || "[]");
+      const set = new Set(Array.isArray(parsed) ? parsed : []);
+      set.add("sapiens");
+      localStorage.setItem(key, JSON.stringify([...set]));
+    } catch {}
+  };
+
+  trigger.addEventListener("click", (event) => {
+    event.preventDefault();
+    openModal();
+  });
+
+  if (closeBtn) {
+    closeBtn.addEventListener("click", hideModal);
+  }
+  if (exitBookBtn) {
+    exitBookBtn.addEventListener("click", () => {
+      markCompleted();
+      window.location.href = "/books/sapiens.html";
+    });
+  }
+  if (exitMapBtn) {
+    exitMapBtn.addEventListener("click", () => {
+      markCompleted();
+      window.location.href = "/pages/gamified-learning-hub-dashboard-1.html";
+    });
+  }
+})();
+</script>
+
+
+<script src="/shared/experience-runtime.js?v=1771240921862"></script>
+<script>
+(() => {
+  
+  localStorage.setItem("reado_book_last_sapiens", "bilingual-human-domestication-dilemma-3");
+  if ("bilingual-human-domestication-dilemma-3" === "bilingual-human-domestication-dilemma-3") {
+    try {
+      const completedRaw = localStorage.getItem("reado_completed_books_v1") || "[]";
+      const completedSet = new Set(JSON.parse(completedRaw));
+      completedSet.add("sapiens");
+      localStorage.setItem("reado_completed_books_v1", JSON.stringify([...completedSet]));
+    } catch {}
+  }
+  
+  
+  if (window.ReadoExperienceRuntime && typeof window.ReadoExperienceRuntime.init === "function") {
+    window.ReadoExperienceRuntime.init({
+      bookId: "sapiens",
+      moduleSlug: "bilingual-human-domestication-dilemma-3",
+      moduleSlugs: ["the-wheat-conquest-simulator","human-domestication-dilemma-1","human-domestication-dilemma-2","bilingual-human-domestication-dilemma","sapiens-the-wheat-conquest-simulator-1","sapiens-the-wheat-conquest-simulator-2","bilingual-human-domestication-dilemma-4","bilingual-human-domestication-dilemma-1","bilingual-human-domestication-dilemma-2","bilingual-human-domestication-dilemma-3"]
+    });
+  }
+})();
+</script>
+</body></html>

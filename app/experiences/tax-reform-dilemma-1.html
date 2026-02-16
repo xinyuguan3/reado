@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html class="dark" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>reado: 万历十五年决策 (全中文版)</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&amp;family=Noto+Serif+SC:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec1313",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#1a0b0b",
+                        "imperial-gold": "#c5a059",
+                        "imperial-jade": "#4a7c59",
+                        "paper": "#f0e6d2",
+                    },
+                    fontFamily: {
+                        "sans": ["Noto Sans SC", "Source Han Sans", "sans-serif"],
+                        "serif": ["Noto Serif SC", "serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                    backgroundImage: {
+                        'parchment': "url('https://www.transparenttextures.com/patterns/aged-paper.png')",
+                    }
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1a0b0b; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4a2020; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ec1313; 
+        }.seal-button {
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+        }
+        .seal-button:active {
+            transform: scale(0.95);
+        }
+        .seal-button::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border: 2px solid #c5a059;
+            border-radius: 0.5rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .seal-button:hover::after {
+            opacity: 1;
+        }.glass-panel {
+            background: rgba(26, 11, 11, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(197, 160, 89, 0.2);
+        }
+        .mask-image-gradient {
+            -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+            mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-white font-sans min-h-screen flex flex-col relative overflow-hidden">
+<script src="/shared/book-catalog.js?v=1771240921862"></script>
+<script type="module" src="/shared/shell.js?v=1771240921862"></script>
+<reado-app-shell data-page="knowledge-map"></reado-app-shell>
+<header class="absolute top-6 left-8 z-30">
+<div class="flex items-center gap-2">
+<span class="text-2xl font-black tracking-tighter text-white">reado</span>
+<div class="h-4 w-px bg-white/20 mx-2"></div>
+<span class="text-sm text-imperial-gold font-medium tracking-widest">万历十五年</span>
+</div>
+</header>
+<div class="absolute inset-0 z-0">
+<img alt="背景：庄严的紫禁城大殿内景" class="w-full h-full object-cover filter blur-sm opacity-60" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDX8SBd_bwcsga-D8oyHP11Ls12LgxJHu0VAJewYjOc_KmdsFvgkJBdrm3l59kLoW51uTMzSxHdAnVN6RurzvhTsEeHxWRSEkHXq2ZB8uWYb2ta_BP4L4_DEB4WmB7MRZay_ndWQIuP_qHHPQLTHooWXkyh2Gg9IBb10flqGIfZd7ddoidDqfE0A0qD3o-GfJYBn66WprWCmQNz2PHkCGS39LTpn9b1IYFFg37kawBHVXGHHddhmxdDBFlT1MAvTq4KKX1arcaE5hE"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/80 to-transparent"></div>
+</div>
+<main class="relative z-10 flex-grow grid grid-cols-1 lg:grid-cols-12 gap-6 p-6 lg:p-10 h-screen max-h-screen">
+<aside class="col-span-1 lg:col-span-3 flex flex-col gap-6 pt-16">
+<div class="glass-panel rounded-xl p-6 flex flex-col gap-8 h-full shadow-2xl border-t-4 border-t-imperial-gold">
+<div class="border-b border-white/10 pb-4 mb-2">
+<h3 class="text-imperial-gold tracking-widest text-sm font-bold flex items-center gap-2">
+<span class="material-icons text-lg">assessment</span> 帝国现状
+                </h3>
+</div>
+<div class="group">
+<div class="flex justify-between items-end mb-2">
+<span class="text-gray-300 text-sm font-medium">国库财富</span>
+<span class="text-imperial-gold font-bold">65%</span>
+</div>
+<div class="h-2.5 w-full bg-black/40 rounded-full overflow-hidden border border-white/5 p-[1px]">
+<div class="h-full bg-gradient-to-r from-yellow-800 to-imperial-gold w-[65%] rounded-full shadow-[0_0_10px_rgba(197,160,89,0.4)]"></div>
+</div>
+<p class="text-xs text-gray-500 mt-2 group-hover:text-imperial-gold transition-colors">白银储备尚算充足，但增长乏力。</p>
+</div>
+<div class="group">
+<div class="flex justify-between items-end mb-2">
+<span class="text-gray-300 text-sm font-medium">礼教和谐</span>
+<span class="text-imperial-jade font-bold">80%</span>
+</div>
+<div class="h-2.5 w-full bg-black/40 rounded-full overflow-hidden border border-white/5 p-[1px]">
+<div class="h-full bg-gradient-to-r from-green-900 to-imperial-jade w-[80%] rounded-full shadow-[0_0_10px_rgba(74,124,89,0.4)]"></div>
+</div>
+<p class="text-xs text-gray-500 mt-2 group-hover:text-imperial-jade transition-colors">文官集团对目前的礼法秩序感到满意。</p>
+</div>
+<div class="group">
+<div class="flex justify-between items-end mb-2">
+<span class="text-gray-300 text-sm font-medium">皇权</span>
+<span class="text-primary font-bold">45%</span>
+</div>
+<div class="h-2.5 w-full bg-black/40 rounded-full overflow-hidden border border-white/5 p-[1px]">
+<div class="h-full bg-gradient-to-r from-red-900 to-primary w-[45%] rounded-full shadow-[0_0_10px_rgba(236,19,19,0.4)]"></div>
+</div>
+<p class="text-xs text-gray-500 mt-2 group-hover:text-primary transition-colors">陛下，您的敕令在内阁正面临重重阻力。</p>
+</div>
+<div class="mt-auto pt-6 border-t border-white/10 flex items-center gap-3 text-xs text-gray-400">
+<span class="material-icons text-imperial-gold text-sm">history_edu</span>
+<span>万历十五年 · 丁亥年</span>
+</div>
+</div>
+</aside>
+<section class="col-span-1 lg:col-span-9 flex flex-col h-full relative pt-10">
+<div class="absolute top-6 right-0 z-20 hidden lg:block">
+<div class="glass-panel px-6 py-2 rounded-full border border-imperial-gold/30 flex items-center gap-3">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span class="text-sm tracking-widest text-gray-200">《万历十五年》仿真模拟 <span class="text-gray-600 mx-2">|</span> <span class="text-imperial-gold font-bold">第一章：税制改革</span></span>
+</div>
+</div>
+<div class="flex-grow flex items-center justify-center relative -mt-10 lg:-mt-16">
+<div class="relative w-[280px] h-[280px] lg:w-[420px] lg:h-[420px] z-10 transition-transform duration-700 hover:scale-105">
+<div class="absolute inset-0 bg-primary/20 blur-[80px] rounded-full"></div>
+<img alt="明代官员画像" class="w-full h-full object-cover mask-image-gradient rounded-full border-2 border-imperial-gold/30 shadow-2xl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDN17QOn4h2AmxwMc7THA3FCFAMexL66VqS8WsiyPnrOMol9TKEytoN_SYnHbKKLy5cMAbunbhMO9I_RDPp37ziDJDd2ILQem3U8-Cnl2qc7TB0Whc6KoMn_F9nXwF_6i_aFF2NFthc9j4-NwLyf0zYqu5Rt1xsxUEQFhXIdmWmRyKdcLupDkBUDe6E0V0FZPlHazBC50NBOYa4F7o_s5t-3wzUwmS2pEcG4lEHQBATM0lJ1vFDqiqpn3AMt-ojPYNPZCwQbX_FQGk"/>
+<div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 glass-panel px-8 py-2 rounded-md border border-imperial-gold shadow-lg">
+<span class="text-imperial-gold font-bold tracking-[0.25em] text-base whitespace-nowrap">内阁首辅 · 张居正</span>
+</div>
+</div>
+</div>
+<div class="relative z-20 -mt-20 lg:-mt-28 max-w-4xl mx-auto w-full flex flex-col items-center">
+<div class="bg-paper text-background-dark p-8 lg:p-12 rounded shadow-[0_20px_50px_rgba(0,0,0,0.5)] w-full relative mb-10 transform hover:rotate-0 transition-all duration-700 origin-top">
+<div class="absolute inset-0 opacity-15 pointer-events-none rounded bg-[url('https://www.transparenttextures.com/patterns/aged-paper.png')]"></div>
+<div class="absolute -top-4 left-12 w-5 h-20 bg-[#5c1a1a] rounded-b shadow-lg border-x border-b border-[#3d0f0f]"></div>
+<div class="absolute -top-4 right-12 w-5 h-20 bg-[#5c1a1a] rounded-b shadow-lg border-x border-b border-[#3d0f0f]"></div>
+<div class="relative z-10">
+<div class="flex items-center justify-center gap-6 mb-6 opacity-60">
+<span class="h-px w-16 bg-red-900"></span>
+<span class="text-red-900 text-sm font-bold tracking-[0.5em]">内阁奏折</span>
+<span class="h-px w-16 bg-red-900"></span>
+</div>
+<h2 class="text-3xl lg:text-4xl font-bold text-red-900 mb-6 text-center font-serif tracking-tight">论一条鞭法之推行</h2>
+<p class="text-xl lg:text-2xl leading-relaxed text-slate-900 font-medium max-w-3xl mx-auto text-justify">
+                        “臣启陛下：现行税制弊端丛生，豪强巧取豪夺。臣斗胆请旨，将各省赋役一律并为一条，<span class="font-bold text-red-800 border-b-2 border-red-800/30">折办银两纳贡</span>。此举虽可充盈国库、精简吏治，然乡绅豪门因利益受损，必将借口祖制、百般阻挠。”
+                    </p>
+<div class="mt-8 flex justify-center">
+<p class="text-sm text-red-800/70 italic font-serif tracking-widest">— 圣裁未定，朝野屏息 —</p>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 w-full max-w-3xl px-4 pb-12">
+<button class="seal-button group relative bg-[#2a0e0e] hover:bg-[#3d1313] border border-primary/40 p-6 rounded-lg text-left overflow-hidden shadow-2xl">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-30 transition-opacity">
+<span class="material-icons text-6xl text-primary">check_circle</span>
+</div>
+<div class="relative z-10">
+<h3 class="text-xl font-bold text-primary mb-2 group-hover:text-red-400 transition-colors tracking-widest">批准改革</h3>
+<p class="text-sm text-gray-400 mb-4 leading-relaxed">即刻颁布谕旨，推行一条鞭法。</p>
+<div class="flex gap-4 text-xs">
+<span class="px-2 py-1 rounded-sm bg-imperial-gold/20 text-imperial-gold font-bold">国库财富 +10</span>
+<span class="px-2 py-1 rounded-sm bg-red-950/40 text-gray-400">礼教和谐 -15</span>
+</div>
+</div>
+</button>
+<button class="seal-button group relative bg-[#1f1f1f] hover:bg-[#2a2a2a] border border-white/10 p-6 rounded-lg text-left overflow-hidden shadow-2xl">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-30 transition-opacity">
+<span class="material-icons text-6xl text-gray-500">gavel</span>
+</div>
+<div class="relative z-10">
+<h3 class="text-xl font-bold text-gray-200 mb-2 group-hover:text-white transition-colors tracking-widest">维持传统</h3>
+<p class="text-sm text-gray-400 mb-4 leading-relaxed">守祖宗之法，暂缓推行新税制。</p>
+<div class="flex gap-4 text-xs">
+<span class="px-2 py-1 rounded-sm bg-red-950/40 text-red-400 font-bold">国库财富 -5</span>
+<span class="px-2 py-1 rounded-sm bg-imperial-jade/20 text-imperial-jade font-bold">礼教和谐 +5</span>
+</div>
+</div>
+</button>
+</div>
+</div>
+</section>
+</main>
+<div class="fixed inset-0 pointer-events-none opacity-[0.04] z-50 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]"></div>
+
+<script id="reado-wanli-stage1">
+(() => {
+  const STORAGE_KEY = "reado_wanli_campaign_v1";
+  const NEXT_HREF = "/experiences/tax-reform-dilemma-2.html";
+  const RESTART_HREF = "/experiences/tax-reform-dilemma-1.html";
+  const buttons = Array.from(document.querySelectorAll("button.seal-button"));
+  if (buttons.length < 2) return;
+
+  const titleEl = document.querySelector("h2.text-3xl, h2.text-2xl");
+  const descEl = titleEl ? titleEl.parentElement.querySelector("p.text-xl, p.text-lg") : null;
+  const metricEls = Array.from(document.querySelectorAll("aside .group .flex.justify-between span.font-bold"));
+  const titleWrap = titleEl ? titleEl.parentElement : null;
+
+  const progressHint = document.createElement("p");
+  progressHint.className = "text-xs text-cyan-200 mt-2 tracking-wide";
+  const feedbackHint = document.createElement("p");
+  feedbackHint.className = "text-xs text-slate-300 mt-1 leading-relaxed";
+  if (titleWrap) {
+    titleWrap.append(progressHint, feedbackHint);
+  }
+
+  const rounds = [
+    {
+      title: "论一条鞭法之推行",
+      desc: "张居正请求折银并役，换取财政与征收效率。表面上这是税制技术升级，实则是在重排“谁交税、谁获利、谁承担改革成本”。豪强利益受损后，地方执行很可能出现隐性抵抗。",
+      a: { label: "批准改革", sub: "即刻颁布谕旨，推行一条鞭法。", impact: { treasury: 10, order: -8, reform: 13 } },
+      b: { label: "维持传统", sub: "守祖宗之法，暂缓推行新税制。", impact: { treasury: -6, order: 6, reform: -7 } }
+    },
+    {
+      title: "考成法是否严查到底",
+      desc: "内阁建议严考百官，按月复核政绩。考成法能提高短期行政效率，但也会把官僚系统推向“只保指标、不保治理质量”的防御状态，形成上报与实情的裂缝。",
+      a: { label: "严行考成", sub: "按月核绩，不达者立刻追责。", impact: { treasury: 7, order: -6, reform: 10 } },
+      b: { label: "温和考核", sub: "保留弹性，防止官场整体反噬。", impact: { treasury: 3, order: 4, reform: 4 } }
+    },
+    {
+      title: "国本之争：是否尽快册立太子",
+      desc: "群臣要求“立长”，你若继续拖延，可保留裁量却会放大政治撕裂。国本之争的实质并非家事，而是皇权与文官体系对“合法性解释权”的争夺。",
+      a: { label: "顺从立长", sub: "尽快册立皇长子，先稳朝局。", impact: { treasury: 0, order: 11, reform: -2 } },
+      b: { label: "继续拖延", sub: "保留皇帝裁量，暂不册立。", impact: { treasury: 0, order: -12, reform: 3 } }
+    }
+  ];
+
+  let i = 0;
+  let score = { treasury: 65, order: 80, reform: 45 };
+  const decisions = [];
+  let stageFailed = false;
+
+  function load() {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+    } catch {
+      return {};
+    }
+  }
+
+  function saveStage(payload) {
+    const base = load();
+    base.emperor = payload;
+    base.lastUpdatedAt = new Date().toISOString();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(base));
+  }
+
+  function clearCampaignAndRestart() {
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.setItem("reado_book_last_wanli-fifteen", "tax-reform-dilemma-1");
+    } catch {}
+    window.location.href = RESTART_HREF;
+  }
+
+  function clamp(v) {
+    return Math.max(0, Math.min(100, v));
+  }
+
+  function formatDelta(v) {
+    return `${v >= 0 ? "+" : ""}${v}`;
+  }
+
+  function statLabel(value, type) {
+    if (type === "treasury") return value >= 75 ? "充盈" : value >= 55 ? "可控" : "吃紧";
+    if (type === "order") return value >= 75 ? "稳定" : value >= 55 ? "摇摆" : "撕裂";
+    return value >= 70 ? "强推进" : value >= 50 ? "缓推进" : "停滞";
+  }
+
+  function setMetrics() {
+    if (metricEls[0]) metricEls[0].textContent = `${score.treasury}%`;
+    if (metricEls[1]) metricEls[1].textContent = `${score.order}%`;
+    if (metricEls[2]) metricEls[2].textContent = `${score.reform}%`;
+    progressHint.textContent = `批红进度：${i}/${rounds.length}`;
+  }
+
+  function setButton(btn, opt) {
+    const h3 = btn.querySelector("h3");
+    const p = btn.querySelector("p");
+    const chips = btn.querySelectorAll("span.px-2");
+    if (h3) h3.textContent = opt.label;
+    if (p) p.textContent = opt.sub;
+    if (chips[0]) chips[0].textContent = `国库 ${formatDelta(opt.impact.treasury)}`;
+    if (chips[1]) chips[1].textContent = `秩序 ${formatDelta(opt.impact.order)}`;
+  }
+
+  function render() {
+    const r = rounds[i];
+    if (!r) return finish();
+    if (titleEl) titleEl.textContent = r.title;
+    if (descEl) descEl.textContent = r.desc;
+    setButton(buttons[0], r.a);
+    setButton(buttons[1], r.b);
+    if (!decisions.length) {
+      feedbackHint.textContent = "御案提示：优先观察“秩序”与“改革”的此消彼长。";
+    }
+    setMetrics();
+  }
+
+  function showToast(text, tone) {
+    const node = document.createElement("div");
+    const color = tone === "warn" ? "#fbbf24" : "#67e8f9";
+    node.textContent = text;
+    node.style.cssText = `position:fixed;right:18px;top:94px;z-index:99999;padding:8px 12px;border-radius:10px;border:1px solid rgba(148,163,184,.35);background:rgba(15,23,42,.92);color:${color};font-size:12px;font-weight:700;opacity:0;transform:translateY(-6px);transition:all .22s ease;`;
+    document.body.appendChild(node);
+    requestAnimationFrame(() => {
+      node.style.opacity = "1";
+      node.style.transform = "translateY(0)";
+    });
+    setTimeout(() => {
+      node.style.opacity = "0";
+      node.style.transform = "translateY(-8px)";
+    }, 900);
+    setTimeout(() => node.remove(), 1200);
+  }
+
+  function askDeepSeek(prompt, fallback) {
+    const key = localStorage.getItem("reado_deepseek_api_key") || "";
+    const endpoint = localStorage.getItem("reado_deepseek_endpoint") || "https://api.deepseek.com/chat/completions";
+    if (!key) return Promise.resolve(`【本地推演】${fallback}`);
+    return fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
+      body: JSON.stringify({
+        model: "deepseek-chat",
+        temperature: 0.7,
+        max_tokens: 260,
+        messages: [
+          { role: "system", content: "你是明史策略游戏叙事引擎，用120-180字总结结构后果，并补1条策略建议。" },
+          { role: "user", content: prompt }
+        ]
+      })
+    })
+      .then(async (res) => {
+        const data = await res.json();
+        const text = data?.choices?.[0]?.message?.content?.trim();
+        if (!res.ok || !text) throw new Error("bad");
+        return `【DeepSeek推演】${text}`;
+      })
+      .catch(() => `【本地推演】${fallback}`);
+  }
+
+  function modal(title, body, actions) {
+    const wrap = document.createElement("div");
+    wrap.style.cssText = "position:fixed;inset:0;z-index:99999;background:rgba(2,6,23,.78);display:flex;align-items:center;justify-content:center;padding:16px;";
+    wrap.innerHTML = `<div style="max-width:720px;width:100%;background:#0f172a;border:1px solid rgba(148,163,184,.35);border-radius:14px;padding:18px;color:#e2e8f0"><h3 style="font-size:22px;font-weight:800;margin:0 0 10px">${title}</h3><div style="font-size:14px;line-height:1.75;color:#cbd5e1;white-space:pre-wrap">${body}</div><div id="m-actions" style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap"></div></div>`;
+    document.body.append(wrap);
+    const host = wrap.querySelector("#m-actions");
+    (actions || []).forEach((a) => {
+      const b = document.createElement("button");
+      b.textContent = a.label;
+      b.style.cssText = "padding:8px 12px;border-radius:8px;border:1px solid rgba(148,163,184,.35);background:#1e293b;color:#fff;font-weight:700;cursor:pointer";
+      b.onclick = () => {
+        a.onClick?.();
+        wrap.remove();
+      };
+      host.appendChild(b);
+    });
+  }
+
+  function disableChoices() {
+    buttons.forEach((b) => {
+      b.disabled = true;
+      b.style.opacity = "0.72";
+    });
+  }
+
+  function failStage(reason, detail) {
+    if (stageFailed) return;
+    stageFailed = true;
+    disableChoices();
+    modal("第一幕失败", `${reason}\n\n${detail}\n\n结局：本幕判定失败，你需要从第一幕重新开始。`, [
+      { label: "从第一幕重开", onClick: () => clearCampaignAndRestart() }
+    ]);
+  }
+
+  function apply(opt, label) {
+    const currentRound = rounds[i];
+    score.treasury = clamp(score.treasury + opt.impact.treasury);
+    score.order = clamp(score.order + opt.impact.order);
+    score.reform = clamp(score.reform + opt.impact.reform);
+    decisions.push({
+      round: currentRound.title,
+      label,
+      impact: { ...opt.impact },
+      snapshot: { ...score }
+    });
+    feedbackHint.textContent = `御批“${label}”已下：国库 ${formatDelta(opt.impact.treasury)} / 秩序 ${formatDelta(opt.impact.order)} / 改革 ${formatDelta(opt.impact.reform)}`;
+    showToast(`已批红：${label}`, opt.impact.order < 0 ? "warn" : "ok");
+    i += 1;
+    render();
+  }
+
+  function finish() {
+    disableChoices();
+
+    const decisionSummary = decisions
+      .map((item, idx) => `${idx + 1}. ${item.round} -> ${item.label}`)
+      .join("\n");
+    const outcome = [
+      `【你的执政画像】`,
+      `- 财政：${score.treasury} (${statLabel(score.treasury, "treasury")})`,
+      `- 朝局秩序：${score.order} (${statLabel(score.order, "order")})`,
+      `- 改革推进：${score.reform} (${statLabel(score.reform, "reform")})`,
+      "",
+      "【结构性后果】",
+      score.order < 50
+        ? "你以政策速度换取了短期效率，但官僚与礼法联盟的反弹已进入显性阶段。"
+        : "你暂时维持了秩序，但改革深水区仍将遭遇利益集团的延迟反扑。",
+      "",
+      "【带着问题进入下一幕】",
+      "当皇权、官僚与财政目标互相冲突时，谁来承担改革成本？"
+    ].join("\n");
+
+    const fallback = `三轮批红后，国库${score.treasury}、秩序${score.order}、改革${score.reform}。你获得了阶段性推进窗口，但朝局分歧并未消失。`;
+    const prompt = `万历皇帝三轮批红：${decisionSummary}。结果：国库${score.treasury}、秩序${score.order}、改革${score.reform}。请推演后果并给1条策略建议。`;
+
+    const success = score.treasury >= 72 && score.order >= 58 && score.reform >= 55;
+    if (!success) {
+      const failDetail = [
+        `当前状态：财政 ${score.treasury} / 秩序 ${score.order} / 改革 ${score.reform}`,
+        score.order < 58 ? "- 朝局秩序跌破安全线，政令执行链条出现断裂。" : "",
+        score.treasury < 72 ? "- 国库缓冲不足，后续改革成本无法覆盖。" : "",
+        score.reform < 55 ? "- 改革推进不足，窗口期被消耗殆尽。" : ""
+      ].filter(Boolean).join("\n");
+      failStage("你的御批组合未能维持改革三角平衡。", failDetail);
+      return;
+    }
+
+    askDeepSeek(prompt, fallback).then((report) => {
+      const finalReport = `${report}\n\n${outcome}`;
+      saveStage({
+        done: true,
+        decisions,
+        score,
+        report: finalReport,
+        finishedAt: new Date().toISOString()
+      });
+      modal("第一幕结算", finalReport, [
+        {
+          label: "查看本幕决策清单",
+          onClick: () => {
+            modal("第一幕·批红清单", decisionSummary, [
+              { label: "进入下一幕", onClick: () => { window.location.href = NEXT_HREF; } }
+            ]);
+          }
+        },
+        { label: "进入下一幕", onClick: () => { window.location.href = NEXT_HREF; } }
+      ]);
+    });
+  }
+
+  buttons[0].addEventListener("click", (e) => {
+    e.preventDefault();
+    const r = rounds[i];
+    if (!r) return;
+    apply(r.a, r.a.label);
+  });
+
+  buttons[1].addEventListener("click", (e) => {
+    e.preventDefault();
+    const r = rounds[i];
+    if (!r) return;
+    apply(r.b, r.b.label);
+  });
+
+  const aiBtn = document.createElement("button");
+  aiBtn.textContent = "AI设置";
+  aiBtn.style.cssText = "position:fixed;right:14px;bottom:14px;z-index:9999;padding:7px 10px;border-radius:999px;border:1px solid rgba(56,189,248,.5);background:rgba(14,116,144,.25);color:#cffafe;font-size:12px;font-weight:700";
+  aiBtn.onclick = () => {
+    const key = prompt("输入 DeepSeek API Key", localStorage.getItem("reado_deepseek_api_key") || "");
+    if (key === null) return;
+    const ep = prompt("输入 DeepSeek endpoint", localStorage.getItem("reado_deepseek_endpoint") || "https://api.deepseek.com/chat/completions");
+    if (ep === null) return;
+    localStorage.setItem("reado_deepseek_api_key", key.trim());
+    localStorage.setItem("reado_deepseek_endpoint", ep.trim());
+    alert("已保存");
+  };
+  document.body.appendChild(aiBtn);
+
+  modal("背景导入", "你是万历皇帝（约1587年）。天下表面承平，内里财政吃紧、官僚掣肘。\n\n你将连续批阅三折：每次御批都会在财政、秩序、改革之间制造新的结构张力。", [
+    {
+      label: "先读背景提要",
+      onClick: () => {
+        modal("第一幕背景提要", "万历朝这三件事，分别对应三类风险：\n\n1) 一条鞭法：动的是地方利益分配，不只是税制技术。\n可做：先稳征收秩序与执行路径。\n慎做：只在诏书层面强推，不管地方承接。\n\n2) 考成法：能拉高短期效率，也会催生“报表达标”。\n可做：把考核与真实治理结果绑定。\n慎做：只看数字，不看民间反应。\n\n3) 国本之争：表面是立储，实质是合法性解释权。\n可做：控制撕裂节奏，避免朝局失控。\n慎做：把政治冲突拖成长期对抗。", [
+          { label: "开始批红", onClick: () => render() }
+        ]);
+      }
+    },
+    { label: "直接开始批红", onClick: () => render() }
+  ]);
+})();
+</script>
+
+
+
+<script>
+(() => {
+  
+  localStorage.setItem("reado_book_last_wanli-fifteen", "tax-reform-dilemma-1");
+  if ("tax-reform-dilemma-1" === "tax-reform-dilemma-5") {
+    try {
+      const completedRaw = localStorage.getItem("reado_completed_books_v1") || "[]";
+      const completedSet = new Set(JSON.parse(completedRaw));
+      completedSet.add("wanli-fifteen");
+      localStorage.setItem("reado_completed_books_v1", JSON.stringify([...completedSet]));
+    } catch {}
+  }
+  
+  const readoNextHref = "/experiences/tax-reform-dilemma-2.html";
+  (() => {
+    let isNavigating = false;
+    const keywordList = ["开始", "继续", "下一", "进入", "模拟", "抉择", "选择", "确认", "提交", "挑战", "完成", "start", "next", "continue"];
+    const blacklist = ["EN", "ZH", "返回", "back", "帮助", "求助", "笔记", "术语", "设置", "菜单", "关闭", "取消"];
+    const normalize = (value) => String(value || "").replace(/\s+/g, " ").trim();
+    const hasKeyword = (text) => keywordList.some((keyword) => text.toLowerCase().includes(keyword.toLowerCase()));
+    const isBlocked = (text) => blacklist.some((word) => text === word || text.toLowerCase().includes(word.toLowerCase()));
+    const isOptionGroupButton = (node) => {
+      const parent = node.parentElement;
+      if (!parent) return false;
+      const peers = Array.from(parent.children).filter(
+        (child) => child instanceof HTMLElement && child.matches("button,[role='button'],.concept-card,.item-card,[data-choice],[data-option]")
+      );
+      return peers.length >= 2;
+    };
+    const goNext = (delay = 180) => {
+      if (isNavigating) return;
+      isNavigating = true;
+      window.setTimeout(() => {
+        window.location.href = readoNextHref;
+      }, delay);
+    };
+    document.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+      if (target.closest(".reado-shell-wrap")) return;
+      const candidate = target.closest("[data-next-scene],button,a[href],.concept-card,.item-card,[data-choice],[data-option]");
+      if (!(candidate instanceof HTMLElement)) return;
+      if (!candidate.closest("main")) return;
+      if (candidate.hasAttribute("data-no-next")) return;
+      if (candidate.matches("a[href]")) {
+        const href = candidate.getAttribute("href") || "";
+        if (href && href !== "#" && !href.startsWith("javascript:")) return;
+      }
+      const text = normalize(candidate.textContent);
+      if (candidate.matches("[data-next-scene]")) {
+        event.preventDefault();
+        goNext(90);
+        return;
+      }
+      if (isBlocked(text)) return;
+      if (candidate.matches(".concept-card,.item-card,[data-choice],[data-option]")) {
+        goNext(180);
+        return;
+      }
+      if (candidate.matches("button")) {
+        if (hasKeyword(text) || (text.length >= 4 && isOptionGroupButton(candidate))) {
+          goNext(220);
+        }
+      }
+    });
+  })();
+  
+})();
+</script>
+</body></html>

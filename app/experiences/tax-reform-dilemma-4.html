@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html class="dark" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>reado: 海瑞 - 刚直不阿模拟界面</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#b91c1c","ink-black": "#1a1a1a",
+                        "paper-aged": "#d4c5a3",
+                        "paper-light": "#e8dfcc",
+                        "wood-dark": "#3e2723",
+                        "wood-light": "#5d4037",
+                        "jade-dim": "#556b2f",
+                        "seal-red": "#c62828",
+                        "highlight": "#ffd700",
+                    },
+                    fontFamily: {
+                        "sans": ["Noto Sans SC", "Source Han Sans", "sans-serif"],
+                        "serif": ["Noto Serif SC", "serif"],
+                        "handwriting": ["Kaiti SC", "STKaiti", "KaiTi", "serif"]},
+                    boxShadow: {
+                        'paper': '0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.1)',
+                        'deep': '0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3)',
+                    },
+                    backgroundImage: {
+                        'wood-texture': "url('https://www.transparenttextures.com/patterns/wood-pattern.png')",
+                        'paper-texture': "url('https://www.transparenttextures.com/patterns/aged-paper.png')",
+                    }
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+        }
+        .handwritten {
+            font-family: 'Kaiti SC', 'STKaiti', 'KaiTi', serif;
+        }
+        .stamp-seal {
+            border: 3px solid #c62828;
+            color: #c62828;
+            mask-image: url('https://www.transparenttextures.com/patterns/grunge-wall.png');
+            -webkit-mask-image: url('https://www.transparenttextures.com/patterns/grunge-wall.png');
+            transform: rotate(-12deg);
+            opacity: 0.8;
+        }
+        .vertical-text {
+            writing-mode: vertical-rl;
+            text-orientation: upright;
+        }::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #2c1e1e; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #5d4037; 
+            border: 1px solid #2c1e1e;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #795548; 
+        }
+    </style>
+</head>
+<body class="bg-wood-dark bg-wood-texture text-gray-200 min-h-screen flex flex-col relative overflow-hidden selection:bg-red-900 selection:text-white">
+<script src="/shared/book-catalog.js?v=1771240921862"></script>
+<script type="module" src="/shared/shell.js?v=1771240921862"></script>
+<reado-app-shell data-page="knowledge-map"></reado-app-shell>
+<header class="bg-[#271a1a] border-b-4 border-[#1a1212] py-3 px-6 shadow-md z-50 flex justify-between items-center relative">
+<div class="flex items-center gap-4">
+<span class="text-3xl font-black tracking-tighter text-white">reado</span>
+<div class="h-6 w-px bg-white/20"></div>
+<div class="flex flex-col">
+<span class="text-xs text-gray-400 uppercase tracking-widest">当前关卡</span>
+<span class="text-lg text-white font-bold tracking-wide">孤独的模范生：海瑞办案</span>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex flex-col items-end">
+<span class="text-xs text-gray-400">当前时间</span>
+<span class="font-mono text-highlight">万历十五年 二月二十</span>
+</div>
+<div class="bg-red-900/20 px-3 py-1 border border-red-900/50 rounded text-red-400 text-xs font-bold tracking-widest uppercase">
+                审批中
+            </div>
+</div>
+</header>
+<main class="flex-grow relative w-full h-full p-6 grid grid-cols-12 gap-8 overflow-hidden">
+<div class="absolute inset-0 z-0 pointer-events-none opacity-30">
+<img alt="Yamen Background" class="w-full h-full object-cover filter grayscale contrast-125 brightness-50" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDX8SBd_bwcsga-D8oyHP11Ls12LgxJHu0VAJewYjOc_KmdsFvgkJBdrm3l59kLoW51uTMzSxHdAnVN6RurzvhTsEeHxWRSEkHXq2ZB8uWYb2ta_BP4L4_DEB4WmB7MRZay_ndWQIuP_qHHPQLTHooWXkyh2Gg9IBb10flqGIfZd7ddoidDqfE0A0qD3o-GfJYBn66WprWCmQNz2PHkCGS39LTpn9b1IYFFg37kawBHVXGHHddhmxdDBFlT1MAvTq4KKX1arcaE5hE"/>
+<div class="absolute inset-0 bg-wood-dark/80 mix-blend-multiply"></div>
+</div>
+<section class="col-span-12 lg:col-span-5 relative z-10 flex flex-col gap-4 perspective-1000 h-full max-h-[calc(100vh-160px)]">
+<h2 class="text-gray-400 text-sm font-bold tracking-widest uppercase mb-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">mail</span> 案卷附件
+            </h2>
+<div class="relative w-full h-full overflow-y-auto pr-2 pb-10 space-y-6">
+<div class="bg-[#f2eecb] text-ink-black p-6 shadow-paper transform rotate-1 rounded-sm relative max-w-md mx-auto">
+<div class="absolute top-0 right-0 w-16 h-16 bg-red-800/10 rounded-bl-3xl"></div>
+<div class="handwritten text-lg leading-relaxed mb-4">
+<p class="mb-2">海大人亲启：</p>
+<p class="indent-8">听闻大人近日操劳，小人特备薄礼一份，聊表心意。徐公子年少无知，误伤人命，实乃无心之失。家父乃前任尚书，望大人高抬贵手，日后必有重谢。</p>
+</div>
+<div class="border-t border-gray-400 pt-3 flex justify-between items-center">
+<span class="text-sm text-gray-600 font-serif">徐府管家 拜上</span>
+<div class="w-12 h-12 border-2 border-red-800 rounded-sm opacity-60 flex items-center justify-center rotate-12">
+<span class="text-red-800 text-xs font-bold">私函</span>
+</div>
+</div>
+</div>
+<div class="bg-[#ffecb3] text-ink-black p-5 shadow-deep transform -rotate-2 rounded-sm max-w-sm mx-auto border-4 border-double border-red-900/20">
+<h3 class="text-center font-serif font-bold text-xl mb-4 border-b border-gray-800 pb-2">礼单</h3>
+<ul class="space-y-2 text-sm font-serif">
+<li class="flex justify-between border-b border-gray-800/10 pb-1">
+<span>纹银</span>
+<span class="font-bold">五百两</span>
+</li>
+<li class="flex justify-between border-b border-gray-800/10 pb-1">
+<span>湖丝</span>
+<span class="font-bold">二十匹</span>
+</li>
+<li class="flex justify-between border-b border-gray-800/10 pb-1">
+<span>古玩玉器</span>
+<span class="font-bold">一箱</span>
+</li>
+</ul>
+<div class="mt-4 text-center text-xs text-red-700 font-bold">
+                        * 若大人允诺，即刻送至府上 *
+                    </div>
+</div>
+<div class="bg-[#e0e0e0] text-ink-black p-6 shadow-paper transform rotate-0 rounded-sm max-w-md mx-auto border-l-8 border-gray-600">
+<div class="flex justify-between items-start mb-4">
+<div class="bg-gray-800 text-white px-2 py-1 text-xs font-bold">淳安县衙</div>
+<div class="text-xs text-gray-500">卷宗号：天字七号</div>
+</div>
+<h3 class="text-2xl font-bold mb-2">徐公子纵奴行凶案</h3>
+<div class="grid grid-cols-2 gap-4 text-sm mb-4">
+<div>
+<span class="text-gray-500 block text-xs">被告</span>
+<span class="font-bold">徐阶之侄 徐蟠</span>
+</div>
+<div>
+<span class="text-gray-500 block text-xs">原告</span>
+<span class="font-bold">佃户 赵二</span>
+</div>
+</div>
+<p class="text-sm text-gray-800 leading-snug border-t border-gray-300 pt-2">
+                        案情：徐蟠强占民田，指使家奴殴打赵二致残。赵二状告至县衙。
+                    </p>
+</div>
+</div>
+</section>
+<section class="col-span-12 lg:col-span-7 relative z-10 flex flex-col h-full">
+<div class="flex-grow bg-[#3e2723] rounded-t-lg border-x-8 border-t-8 border-[#2d1b18] shadow-2xl relative overflow-hidden flex flex-col">
+<div class="bg-[#5d4037] p-3 shadow-inner border-b border-[#2d1b18] flex justify-between items-center">
+<h2 class="text-[#d4c5a3] font-serif font-bold text-lg tracking-[0.2em] flex items-center gap-2">
+<span class="material-symbols-outlined">gavel</span> 大明律 · 刑律
+                    </h2>
+<span class="text-[#a1887f] text-xs">卷二十一</span>
+</div>
+<div class="flex-grow p-8 bg-paper-texture bg-[#e8dfcc] text-ink-black relative overflow-y-auto custom-scrollbar">
+<div class="absolute top-0 bottom-0 left-12 w-px bg-red-900/20"></div>
+<div class="max-w-2xl mx-auto">
+<div class="mb-8 pl-8 relative">
+<span class="absolute -left-5 top-1 text-red-800 font-bold text-lg">§</span>
+<h3 class="font-bold text-lg mb-2 text-red-900 border-b border-red-900/30 inline-block pb-1">豪强兼并与纵奴行凶</h3>
+<p class="text-base leading-relaxed font-serif mb-4 text-justify">
+                                “凡豪势之人，强占良民田宅者，杖八十，追还田宅。若因而致死人命者，处绞监候。”
+                            </p>
+<p class="text-base leading-relaxed font-serif text-justify">
+                                “奴婢殴良人至折伤者，杖一百，徒三年；致笃疾者，流三千里。<strong>主使者，与同罪。</strong>”
+                            </p>
+</div>
+<div class="bg-red-50 border border-red-200 p-4 rounded-sm pl-8 text-sm text-red-900 italic">
+<strong>海瑞注：</strong> 
+                            法者，天下之公器。徐阶虽曾为首辅，有恩于国，然其家人在乡横行不法，若因私情而废公法，何以面对圣上，何以面对百姓？
+                        </div>
+</div>
+</div>
+</div>
+<div class="h-auto bg-[#271a1a] border-t-4 border-[#1a1212] p-6 flex flex-col md:flex-row gap-6 items-center justify-center shadow-[0_-10px_40px_rgba(0,0,0,0.5)] z-20">
+<button class="group relative w-full md:w-64 h-24 bg-[#3e2723] rounded shadow-lg overflow-hidden border-2 border-red-900 hover:bg-[#4e342e] transition-all active:scale-95 active:shadow-inner flex items-center justify-center">
+<div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')] opacity-50"></div>
+<div class="flex flex-col items-center z-10">
+<span class="material-symbols-outlined text-red-500 text-3xl mb-1 group-hover:scale-110 transition-transform">gavel</span>
+<span class="text-red-100 font-bold text-xl tracking-[0.2em] group-hover:text-white">按律严惩</span>
+<span class="text-red-400 text-xs mt-1">拒收贿赂，依律定罪</span>
+</div>
+<div class="absolute top-0 right-0 p-1">
+<div class="w-3 h-3 rounded-full bg-red-600 shadow-[0_0_5px_#ef4444] animate-pulse"></div>
+</div>
+</button>
+<button class="group relative w-full md:w-64 h-24 bg-[#3e2723] rounded shadow-lg overflow-hidden border-2 border-green-800/30 hover:bg-[#4e342e] transition-all active:scale-95 active:shadow-inner flex items-center justify-center grayscale hover:grayscale-0 opacity-80 hover:opacity-100">
+<div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/wood-pattern.png')] opacity-50"></div>
+<div class="flex flex-col items-center z-10">
+<span class="material-symbols-outlined text-green-700 text-3xl mb-1 group-hover:scale-110 transition-transform">handshake</span>
+<span class="text-green-100/50 font-bold text-xl tracking-[0.2em] group-hover:text-green-100">法外开恩</span>
+<span class="text-green-800/50 text-xs mt-1 group-hover:text-green-400">通融世家，收受薄礼</span>
+</div>
+</button>
+</div>
+</section>
+</main>
+<footer class="bg-[#1a1212] text-gray-400 border-t border-gray-800 p-2 px-6 flex flex-wrap justify-between items-center z-50 text-sm">
+<div class="flex items-center gap-4 bg-[#2c1e1e] px-4 py-2 rounded border border-gray-800">
+<span class="material-symbols-outlined text-yellow-600">savings</span>
+<div class="flex flex-col leading-none">
+<span class="text-[10px] uppercase tracking-wider text-gray-500">本月俸禄</span>
+<span class="font-bold text-gray-200">12 两 (极低)</span>
+</div>
+</div>
+<div class="flex-grow max-w-xl mx-4 lg:mx-10 flex items-center gap-3">
+<span class="text-xs font-bold whitespace-nowrap text-red-400">全系统排挤度</span>
+<div class="w-full h-4 bg-gray-900 rounded-full overflow-hidden border border-gray-700 relative group cursor-help">
+<div class="h-full bg-gradient-to-r from-orange-900 via-red-700 to-red-600 w-[85%] relative">
+<div class="absolute inset-0 w-full h-full" style="background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent); background-size: 1rem 1rem;"></div>
+</div>
+<div class="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs p-2 rounded hidden group-hover:block whitespace-nowrap z-50 border border-red-900">
+                    警告：同僚正在孤立你，弹劾即将到来
+                </div>
+</div>
+<span class="text-xs font-mono text-red-500 font-bold">85%</span>
+</div>
+<div class="flex items-center gap-4 opacity-50 hover:opacity-100 transition-opacity">
+<div class="flex flex-col items-end leading-none">
+<span class="text-[10px] uppercase tracking-wider text-gray-500">家庭状况</span>
+<span class="text-xs">温饱尚难维持</span>
+</div>
+<span class="material-symbols-outlined text-gray-500">rice_bowl</span>
+</div>
+</footer>
+
+<script id="reado-wanli-stage4">
+(() => {
+  const STORAGE_KEY = "reado_wanli_campaign_v1";
+  const NEXT_HREF = "/experiences/tax-reform-dilemma-5.html";
+  const RESTART_HREF = "/experiences/tax-reform-dilemma-1.html";
+  const buttons = Array.from(document.querySelectorAll("section button")).filter((b) => {
+    const t = (b.textContent || "").replace(/\s+/g, " ");
+    return t.includes("按律") || t.includes("法外");
+  });
+  if (buttons.length < 2) return;
+
+  const caseTitle = document.querySelector("h3.text-2xl");
+  const caseDesc = document.querySelector("p.text-sm.text-gray-800");
+  const lawTitle = document.querySelector("h3.font-bold.text-lg");
+
+  const lawPanel = lawTitle ? lawTitle.closest("div.mb-8") : null;
+  const lawHint = document.createElement("div");
+  lawHint.className = "mt-3 text-xs text-red-900/80 leading-relaxed bg-red-50/70 border border-red-200 p-3 rounded-sm";
+  if (lawPanel) lawPanel.appendChild(lawHint);
+
+  const footerInfo = document.querySelector("footer .flex-grow");
+  const progressInfo = document.createElement("div");
+  progressInfo.className = "text-xs text-yellow-300 font-bold whitespace-nowrap";
+  if (footerInfo) {
+    progressInfo.textContent = "断案进度 0/3";
+    footerInfo.prepend(progressInfo);
+  }
+
+  const statusPanel = document.createElement("div");
+  statusPanel.className = "fixed right-5 top-24 z-[9998] bg-[#2b1d1a]/95 border border-[#7f5f44] rounded-lg px-3 py-2 text-[11px] text-amber-100 leading-5 shadow-xl";
+  document.body.appendChild(statusPanel);
+
+  const cases = [
+    {
+      title: "徐公子纵奴行凶案",
+      desc: "豪强侵田、指使家奴伤人，是否同罪同罚。",
+      law: "豪强兼并与纵奴行凶",
+      reading: "这是《万历十五年》中最典型的结构冲突：在乡绅网络主导的基层社会里，法律条文与实际权力并不重合。海瑞若严格执法，会触发官场连锁排挤；若网开一面，则法治公信迅速坍塌。",
+      a: { l: "按律严惩", dl: "拒收贿赂，依律定罪", v: { law: 11, trust: 9, backlash: 12 }, note: "你压住了豪强试探，民间公信上升。" },
+      b: { l: "法外开恩", dl: "通融世家，收受薄礼", v: { law: -8, trust: -7, backlash: -2 }, note: "你换来短期和气，但法威受损。" }
+    },
+    {
+      title: "仓粮亏空案",
+      desc: "灾年赈粮流失，牵涉胥吏与仓官。",
+      law: "仓储亏空与赈灾责任",
+      reading: "仓粮亏空案揭示了另一层结构问题：基层治理中的信息链条断裂。中央只看到报表，地方掌握真实库存。若不追责，腐败固化；若强追责，行政系统会以“消极执行”反制。",
+      a: { l: "追责到底", dl: "先拘后审，倒查账册", v: { law: 9, trust: 7, backlash: 8 }, note: "你切断了中层寻租链，但树敌增多。" },
+      b: { l: "地方自纠", dl: "限期补仓，不追旧责", v: { law: -5, trust: -4, backlash: -1 }, note: "你降低了阻力，却纵容了旧有规则。" }
+    },
+    {
+      title: "权贵斗殴致死案",
+      desc: "涉京官亲族，说情压力极大。",
+      law: "命案与权贵保护伞",
+      reading: "终局案件考验的是“法律是否真能约束权力”。黄仁宇强调：在高度人治化秩序中，清官常常只能以个人道德硬顶结构惰性，结果往往是“案件赢了，体系没变”。",
+      a: { l: "同罪同罚", dl: "依法重判，公开判词", v: { law: 13, trust: 10, backlash: 14 }, note: "你树立了法之公器，但政治反扑不可避免。" },
+      b: { l: "从轻处置", dl: "降格论罪，换取官场和气", v: { law: -10, trust: -9, backlash: -3 }, note: "你保住仕途缓冲，却让百姓彻底失望。" }
+    }
+  ];
+
+  let i = 0;
+  const score = { law: 55, trust: 50, backlash: 35 };
+  const records = [];
+  let stageFailed = false;
+
+  function load() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); } catch { return {}; }
+  }
+
+  function saveStage(payload) {
+    const base = load();
+    base.hairui = payload;
+    base.lastUpdatedAt = new Date().toISOString();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(base));
+  }
+
+  function clearCampaignAndRestart() {
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.setItem("reado_book_last_wanli-fifteen", "tax-reform-dilemma-1");
+    } catch {}
+    window.location.href = RESTART_HREF;
+  }
+
+  function clamp(v) { return Math.max(0, Math.min(100, v)); }
+
+  function setBtn(btn, data) {
+    const spans = Array.from(btn.querySelectorAll("div.flex.flex-col.items-center span"));
+    const title = spans[1] || null;
+    const sub = spans[2] || null;
+    if (title) title.textContent = data.l;
+    if (sub) sub.textContent = data.dl;
+  }
+
+  function renderStatus() {
+    statusPanel.innerHTML = [
+      '<div class="font-bold text-yellow-100 mb-1">海瑞断案面板</div>',
+      `<div>法治强度：<span class="font-bold text-white">${score.law}</span></div>`,
+      `<div>民间公信：<span class="font-bold text-emerald-200">${score.trust}</span></div>`,
+      `<div>官场反扑：<span class="font-bold text-red-200">${score.backlash}</span></div>`,
+      `<div class="mt-1 text-amber-200">进度 ${i}/${cases.length}</div>`
+    ].join("");
+    progressInfo.textContent = `断案进度 ${i}/${cases.length}`;
+  }
+
+  function modal(t, b, actions) {
+    const w = document.createElement("div");
+    w.style.cssText = "position:fixed;inset:0;z-index:99999;background:rgba(2,6,23,.78);display:flex;align-items:center;justify-content:center;padding:16px;";
+    w.innerHTML = `<div style=\"max-width:820px;width:100%;background:#0f172a;border:1px solid rgba(148,163,184,.35);border-radius:14px;padding:18px;color:#e2e8f0\"><h3 style=\"font-size:22px;font-weight:800;margin:0 0 10px\">${t}</h3><div style=\"font-size:14px;line-height:1.75;color:#cbd5e1;white-space:pre-wrap\">${b}</div><div id=\"m-actions\" style=\"margin-top:14px;display:flex;gap:8px;flex-wrap:wrap\"></div></div>`;
+    document.body.appendChild(w);
+    const host = w.querySelector("#m-actions");
+    (actions || []).forEach((a) => {
+      const bt = document.createElement("button");
+      bt.textContent = a.label;
+      bt.style.cssText = "padding:8px 12px;border-radius:8px;border:1px solid rgba(148,163,184,.35);background:#1e293b;color:#fff;font-weight:700;cursor:pointer";
+      bt.onclick = () => { a.onClick?.(); w.remove(); };
+      host.appendChild(bt);
+    });
+  }
+
+  function disableChoices() {
+    buttons.forEach((b) => { b.disabled = true; b.style.opacity = "0.7"; });
+  }
+
+  function failStage(reason, detail) {
+    if (stageFailed) return;
+    stageFailed = true;
+    disableChoices();
+    modal("第四幕失败", `${reason}\n\n${detail}\n\n结局：司法体系失去公信，你需要从第一幕重新开始。`, [
+      { label: "从第一幕重开", onClick: () => clearCampaignAndRestart() }
+    ]);
+  }
+
+  function ai(prompt, fallback) {
+    const key = localStorage.getItem("reado_deepseek_api_key") || "";
+    const ep = localStorage.getItem("reado_deepseek_endpoint") || "https://api.deepseek.com/chat/completions";
+    if (!key) return Promise.resolve(`【本地推演】${fallback}`);
+    return fetch(ep, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
+      body: JSON.stringify({
+        model: "deepseek-chat",
+        temperature: 0.7,
+        max_tokens: 280,
+        messages: [
+          { role: "system", content: "你是司法叙事引擎，总结结构后果并给1条建议。" },
+          { role: "user", content: prompt }
+        ]
+      })
+    })
+      .then(async (res) => {
+        const d = await res.json();
+        const t = d?.choices?.[0]?.message?.content?.trim();
+        if (!res.ok || !t) throw new Error("bad");
+        return `【DeepSeek推演】${t}`;
+      })
+      .catch(() => `【本地推演】${fallback}`);
+  }
+
+  function render() {
+    const c = cases[i];
+    if (!c) return finish();
+    if (caseTitle) caseTitle.textContent = c.title;
+    if (caseDesc) caseDesc.textContent = c.desc;
+    if (lawTitle) lawTitle.textContent = c.law;
+    if (lawHint) lawHint.textContent = c.reading;
+    setBtn(buttons[0], c.a);
+    setBtn(buttons[1], c.b);
+    renderStatus();
+
+    modal(`第 ${i + 1} 案 · 案情导读`, `${c.reading}\n\n案情焦点：${c.desc}\n\n请先阅读卷宗与法条，再做判决。`, [
+      { label: "开始判案" }
+    ]);
+  }
+
+  function apply(opt, label) {
+    if (stageFailed) return;
+    const current = cases[i];
+    score.law = clamp(score.law + opt.v.law);
+    score.trust = clamp(score.trust + opt.v.trust);
+    score.backlash = clamp(score.backlash + opt.v.backlash);
+    records.push({ case: current.title, label, note: opt.note, snapshot: { ...score } });
+    i += 1;
+    renderStatus();
+
+    if (score.law <= 35 || score.trust <= 32) {
+      const failDetail = [
+        `当前状态：法治 ${score.law} / 公信 ${score.trust} / 反扑 ${score.backlash}`,
+        score.law <= 35 ? "- 法治强度跌穿底线，案件已无法形成示范约束。" : "",
+        score.trust <= 32 ? "- 民间公信崩塌，判决失去社会认受。": ""
+      ].filter(Boolean).join("\n");
+      failStage("连续裁判导致法理与民意双重失守。", failDetail);
+      return;
+    }
+
+    if (i < cases.length) {
+      modal("本案反馈", `${opt.note}\n\n法治 ${opt.v.law >= 0 ? "+" : ""}${opt.v.law} / 公信 ${opt.v.trust >= 0 ? "+" : ""}${opt.v.trust} / 反扑 ${opt.v.backlash >= 0 ? "+" : ""}${opt.v.backlash}`, [
+        { label: "进入下一案", onClick: () => render() }
+      ]);
+      return;
+    }
+
+    finish();
+  }
+
+  function finish() {
+    if (stageFailed) return;
+    disableChoices();
+
+    const decisionSummary = records.map((item, idx) => `${idx + 1}. ${item.case} -> ${item.label}`).join("\n");
+    const net = score.law + score.trust - score.backlash;
+    const success = score.law >= 50 && score.trust >= 45 && net >= 55;
+    if (!success) {
+      const failDetail = [
+        `当前状态：法治 ${score.law} / 公信 ${score.trust} / 反扑 ${score.backlash} / 净效能 ${net}`,
+        score.law < 50 ? "- 法治强度不足，无法压住权势惯性。" : "",
+        score.trust < 45 ? "- 公信不足，判决难以服众。" : "",
+        net < 55 ? "- 反扑成本过高，法治收益被抵消。" : ""
+      ].filter(Boolean).join("\n");
+      failStage("三案收官后，法治收益未能覆盖结构反扑。", failDetail);
+      return;
+    }
+
+    const stageDigest = [
+      "【断案画像】",
+      `- 法治强度：${score.law}`,
+      `- 民间公信：${score.trust}`,
+      `- 官场反扑：${score.backlash}`,
+      "",
+      "【结构性后果】",
+      score.law >= 70 && score.backlash >= 70
+        ? "你以个人操守维持了法威，但体系并未形成对法治的自动保护。"
+        : "你降低了对抗成本，却让“法不及权贵”的惯性继续存活。",
+      "",
+      "【带着问题进入下一幕】",
+      "如果制度必须依赖清官个人品格，法治还能否稳定复制？"
+    ].join("\n");
+
+    const fallback = `海瑞连断三案后，法治${score.law}、公信${score.trust}、反扑${score.backlash}。清官可立法威，却难改结构。`;
+    ai(`海瑞三案判词：${decisionSummary}。结果 法治${score.law} 公信${score.trust} 反扑${score.backlash}。推演后果并给1条建议。`, fallback).then((report) => {
+      const finalReport = `${report}\n\n${stageDigest}`;
+      saveStage({ done: true, records, score, report: finalReport, finishedAt: new Date().toISOString() });
+      modal("第四幕结算", finalReport, [
+        {
+          label: "查看判案清单",
+          onClick: () => {
+            modal("第四幕·判案清单", decisionSummary, [
+              { label: "进入下一幕", onClick: () => { window.location.href = NEXT_HREF; } }
+            ]);
+          }
+        },
+        { label: "进入下一幕", onClick: () => { window.location.href = NEXT_HREF; } }
+      ]);
+    });
+  }
+
+  buttons[0].addEventListener("click", (e) => {
+    e.preventDefault();
+    const c = cases[i];
+    if (!c) return;
+    apply(c.a, c.a.l);
+  });
+
+  buttons[1].addEventListener("click", (e) => {
+    e.preventDefault();
+    const c = cases[i];
+    if (!c) return;
+    apply(c.b, c.b.l);
+  });
+
+  renderStatus();
+  modal("背景导入", "你是海瑞，任地方要职，时值豪强与官场关系盘根错节。\n\n断案时的现实约束：\n- 可做：按律立判、公开理据、形成可复核标准。\n- 慎做：因权贵说情而开口子，导致后案无法执法。\n\n你将连续断三案，不是比“谁更刚”，而是看法治能否穿透关系网络。", [
+    {
+      label: "先读断案提示",
+      onClick: () => {
+        modal("断案提示", "按案流程建议：\n1) 先看案卷附件，再看法条与注解。\n2) 每次判决都会同步改变法治、公信和官场反扑。\n3) 第 1 案立尺度，第 2 案定惯例，第 3 案看体系是否买账。", [
+          { label: "开始断案", onClick: () => render() }
+        ]);
+      }
+    },
+    { label: "开始断案", onClick: () => render() }
+  ]);
+})();
+</script>
+
+
+
+<script>
+(() => {
+  
+  localStorage.setItem("reado_book_last_wanli-fifteen", "tax-reform-dilemma-4");
+  if ("tax-reform-dilemma-4" === "tax-reform-dilemma-5") {
+    try {
+      const completedRaw = localStorage.getItem("reado_completed_books_v1") || "[]";
+      const completedSet = new Set(JSON.parse(completedRaw));
+      completedSet.add("wanli-fifteen");
+      localStorage.setItem("reado_completed_books_v1", JSON.stringify([...completedSet]));
+    } catch {}
+  }
+  
+  const readoNextHref = "/experiences/tax-reform-dilemma-5.html";
+  (() => {
+    let isNavigating = false;
+    const keywordList = ["开始", "继续", "下一", "进入", "模拟", "抉择", "选择", "确认", "提交", "挑战", "完成", "start", "next", "continue"];
+    const blacklist = ["EN", "ZH", "返回", "back", "帮助", "求助", "笔记", "术语", "设置", "菜单", "关闭", "取消"];
+    const normalize = (value) => String(value || "").replace(/\s+/g, " ").trim();
+    const hasKeyword = (text) => keywordList.some((keyword) => text.toLowerCase().includes(keyword.toLowerCase()));
+    const isBlocked = (text) => blacklist.some((word) => text === word || text.toLowerCase().includes(word.toLowerCase()));
+    const isOptionGroupButton = (node) => {
+      const parent = node.parentElement;
+      if (!parent) return false;
+      const peers = Array.from(parent.children).filter(
+        (child) => child instanceof HTMLElement && child.matches("button,[role='button'],.concept-card,.item-card,[data-choice],[data-option]")
+      );
+      return peers.length >= 2;
+    };
+    const goNext = (delay = 180) => {
+      if (isNavigating) return;
+      isNavigating = true;
+      window.setTimeout(() => {
+        window.location.href = readoNextHref;
+      }, delay);
+    };
+    document.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+      if (target.closest(".reado-shell-wrap")) return;
+      const candidate = target.closest("[data-next-scene],button,a[href],.concept-card,.item-card,[data-choice],[data-option]");
+      if (!(candidate instanceof HTMLElement)) return;
+      if (!candidate.closest("main")) return;
+      if (candidate.hasAttribute("data-no-next")) return;
+      if (candidate.matches("a[href]")) {
+        const href = candidate.getAttribute("href") || "";
+        if (href && href !== "#" && !href.startsWith("javascript:")) return;
+      }
+      const text = normalize(candidate.textContent);
+      if (candidate.matches("[data-next-scene]")) {
+        event.preventDefault();
+        goNext(90);
+        return;
+      }
+      if (isBlocked(text)) return;
+      if (candidate.matches(".concept-card,.item-card,[data-choice],[data-option]")) {
+        goNext(180);
+        return;
+      }
+      if (candidate.matches("button")) {
+        if (hasKeyword(text) || (text.length >= 4 && isOptionGroupButton(candidate))) {
+          goNext(220);
+        }
+      }
+    });
+  })();
+  
+})();
+</script>
+</body></html>

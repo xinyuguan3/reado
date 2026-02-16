@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html class="dark" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>reado: 戚继光 - 孤独的创新者界面</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&amp;family=Noto+Serif+SC:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#b93c3c","background-light": "#f0f0f0",
+                        "background-dark": "#121212",
+                        "imperial-gold": "#d4af37",
+                        "iron-gray": "#3a3f44","gunpowder": "#2c2c2c",
+                        "parchment": "#e6dec8",
+                        "tech-blue": "#4a6fa5",},
+                    fontFamily: {
+                        "sans": ["Noto Sans SC", "Source Han Sans", "sans-serif"],
+                        "serif": ["Noto Serif SC", "serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "1rem", "full": "9999px"},
+                    backgroundImage: {
+                        'war-pattern': "url('https://www.transparenttextures.com/patterns/black-scales.png')",
+                    }
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #121212; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3a3f44; 
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #b93c3c; 
+        }
+        .tech-node {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        .tech-node:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+        }
+        .tech-node::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border: 1px solid rgba(255,255,255,0.1);
+            pointer-events: none;
+        }
+        .glass-panel {
+            background: rgba(18, 18, 18, 0.9);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(58, 63, 68, 0.5);
+        }
+        .map-grid {
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        .connector-line {
+            position: absolute;
+            background: #3a3f44;
+            z-index: 0;
+        }
+        .connector-line.active {
+            background: #d4af37;
+            box-shadow: 0 0 8px rgba(212, 175, 55, 0.4);
+        }
+    </style>
+</head>
+<body class="bg-background-dark text-gray-200 font-sans min-h-screen flex flex-col relative overflow-hidden selection:bg-primary selection:text-white">
+<header data-stage-header class="absolute top-0 left-0 w-full z-40 bg-gradient-to-b from-black/90 to-transparent p-6 border-b border-white/5">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="text-2xl font-black tracking-tighter text-white">reado</span>
+<div class="h-5 w-px bg-white/20 mx-2"></div>
+<div class="flex flex-col">
+<span class="text-xs text-gray-400 tracking-wider uppercase">关卡 4</span>
+<span class="text-sm text-imperial-gold font-bold tracking-widest">影子将军的科技树</span>
+</div>
+</div>
+<div class="flex items-center gap-6 text-sm">
+<div class="flex items-center gap-2 px-4 py-1.5 bg-black/40 border border-imperial-gold/30 rounded">
+<span class="material-symbols-outlined text-imperial-gold text-lg">payments</span>
+<span class="text-gray-400 text-xs">当前军费</span>
+<span class="text-white font-bold font-mono text-lg">3,200</span>
+<span class="text-xs text-imperial-gold">两</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-gray-500 text-lg">calendar_month</span>
+<span class="text-gray-400">嘉靖三十八年</span>
+</div>
+</div>
+</div>
+</header>
+<div class="absolute inset-0 z-0 bg-gunpowder">
+<div class="absolute inset-0 map-grid opacity-30"></div>
+<img alt="背景：戚家军练兵图" class="absolute w-full h-full object-cover opacity-10 mix-blend-overlay grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDX8SBd_bwcsga-D8oyHP11Ls12LgxJHu0VAJewYjOc_KmdsFvgkJBdrm3l59kLoW51uTMzSxHdAnVN6RurzvhTsEeHxWRSEkHXq2ZB8uWYb2ta_BP4L4_DEB4WmB7MRZay_ndWQIuP_qHHPQLTHooWXkyh2Gg9IBb10flqGIfZd7ddoidDqfE0A0qD3o-GfJYBn66WprWCmQNz2PHkCGS39LTpn9b1IYFFg37kawBHVXGHHddhmxdDBFlT1MAvTq4KKX1arcaE5hE"/>
+<div class="absolute inset-0 bg-gradient-to-r from-background-dark via-background-dark/90 to-background-dark/80"></div>
+<div class="absolute right-20 top-1/2 -translate-y-1/2 w-[600px] h-[600px] border border-white/5 rounded-full opacity-5 pointer-events-none flex items-center justify-center">
+<div class="w-[400px] h-[400px] border border-white/5 rounded-full"></div>
+<div class="absolute h-full w-px bg-white/5"></div>
+<div class="absolute w-full h-px bg-white/5"></div>
+</div>
+</div>
+<main data-stage-main class="relative z-10 flex-grow grid grid-cols-1 lg:grid-cols-12 gap-6 p-6 lg:p-8 pt-24 h-screen max-h-screen overflow-hidden">
+<aside class="col-span-1 lg:col-span-3 flex flex-col gap-4 h-full">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-primary">gavel</span>
+<h2 class="text-lg font-bold tracking-widest text-gray-100">政治周旋</h2>
+</div>
+<div class="glass-panel flex-grow rounded-lg p-1 overflow-y-auto flex flex-col gap-3 relative">
+<div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent"></div>
+<button class="group w-full text-left p-4 bg-[#1e1e1e] hover:bg-[#252525] border border-white/5 hover:border-imperial-gold/30 rounded transition-all duration-300 relative overflow-hidden">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-bold text-gray-200 group-hover:text-imperial-gold transition-colors">给首辅写信</h3>
+<span class="text-xs px-1.5 py-0.5 bg-red-900/30 text-red-400 border border-red-900/50 rounded">-5 自尊</span>
+</div>
+<p class="text-xs text-gray-500 mb-3 line-clamp-2">向张居正汇报边防困境，言辞需极其谦卑，甚至近乎谄媚，以求拨付新式火器研发款项。</p>
+<div class="flex items-center justify-between border-t border-white/5 pt-2 mt-1">
+<span class="text-[10px] text-gray-600 uppercase tracking-wider">耗时: 3天</span>
+<span class="text-xs font-medium text-green-500">+800 两军费</span>
+</div>
+<div class="absolute left-0 bottom-0 h-full w-1 bg-primary/0 group-hover:bg-primary/50 transition-all"></div>
+</button>
+<button class="group w-full text-left p-4 bg-[#1e1e1e] hover:bg-[#252525] border border-white/5 hover:border-imperial-gold/30 rounded transition-all duration-300 relative overflow-hidden">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-bold text-gray-200 group-hover:text-imperial-gold transition-colors">宴请监军</h3>
+<span class="text-xs px-1.5 py-0.5 bg-red-900/30 text-red-400 border border-red-900/50 rounded">-200 两</span>
+</div>
+<p class="text-xs text-gray-500 mb-3 line-clamp-2">京城派来的太监监军不仅不懂军事，还需好生伺候。设宴款待可减少其对新阵法的干扰。</p>
+<div class="flex items-center justify-between border-t border-white/5 pt-2 mt-1">
+<span class="text-[10px] text-gray-600 uppercase tracking-wider">耗时: 1晚</span>
+<span class="text-xs font-medium text-blue-400">解锁：鸟铳改良</span>
+</div>
+<div class="absolute left-0 bottom-0 h-full w-1 bg-primary/0 group-hover:bg-primary/50 transition-all"></div>
+</button>
+<button class="group w-full text-left p-4 bg-[#1e1e1e] hover:bg-[#252525] border border-white/5 hover:border-imperial-gold/30 rounded transition-all duration-300 relative overflow-hidden opacity-75">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-bold text-gray-200 group-hover:text-imperial-gold transition-colors">整顿卫所</h3>
+<span class="text-xs px-1.5 py-0.5 bg-yellow-900/30 text-yellow-500 border border-yellow-900/50 rounded">风险极高</span>
+</div>
+<p class="text-xs text-gray-500 mb-3 line-clamp-2">清查虚报兵额的空饷。此举将得罪地方豪强与同僚。</p>
+<div class="flex items-center justify-between border-t border-white/5 pt-2 mt-1">
+<span class="text-[10px] text-gray-600 uppercase tracking-wider">耗时: 1月</span>
+<span class="text-xs font-medium text-green-500">+2000 两/月</span>
+</div>
+<div class="absolute left-0 bottom-0 h-full w-1 bg-primary/0 group-hover:bg-primary/50 transition-all"></div>
+</button>
+</div>
+<div class="p-4 bg-gradient-to-r from-gray-900 to-black border border-white/10 rounded-lg">
+<div class="flex items-center gap-3">
+<img alt="Avatar" class="w-10 h-10 rounded border border-gray-600 object-cover grayscale opacity-70" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDN17QOn4h2AmxwMc7THA3FCFAMexL66VqS8WsiyPnrOMol9TKEytoN_SYnHbKKLy5cMAbunbhMO9I_RDPp37ziDJDd2ILQem3U8-Cnl2qc7TB0Whc6KoMn_F9nXwF_6i_aFF2NFthc9j4-NwLyf0zYqu5Rt1xsxUEQFhXIdmWmRyKdcLupDkBUDe6E0V0FZPlHazBC50NBOYa4F7o_s5t-3wzUwmS2pEcG4lEHQBATM0lJ1vFDqiqpn3AMt-ojPYNPZCwQbX_FQGk"/>
+<div>
+<div class="text-xs text-gray-500 uppercase">当前状态</div>
+<div class="text-sm font-bold text-white">如履薄冰</div>
+</div>
+</div>
+<div class="mt-3 h-1.5 w-full bg-gray-800 rounded-full overflow-hidden">
+<div class="h-full bg-red-700 w-[30%]"></div>
+</div>
+<div class="flex justify-between mt-1">
+<span class="text-[10px] text-gray-500">朝廷信任度</span>
+<span class="text-[10px] text-red-500 font-bold">危急</span>
+</div>
+</div>
+</aside>
+<section class="col-span-1 lg:col-span-9 flex flex-col h-full relative">
+<div class="absolute top-0 right-0 z-20 flex gap-4">
+<div class="flex items-center gap-2 bg-black/60 backdrop-blur px-3 py-1.5 rounded border border-white/10">
+<span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+<span class="text-xs text-gray-300">倭寇动向：<span class="text-white font-bold">集结中 (剩余12天)</span></span>
+</div>
+</div>
+<div class="flex-grow bg-[#1a1a1a] rounded-lg border border-white/10 relative overflow-hidden shadow-inner group">
+<div class="absolute inset-0 map-grid opacity-20 pointer-events-none"></div>
+<div class="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none select-none">
+<div class="border-2 border-white w-96 h-96 rounded-full flex items-center justify-center relative">
+<div class="absolute top-0 bottom-0 w-px bg-white"></div>
+<div class="absolute left-0 right-0 h-px bg-white"></div>
+<div class="w-64 h-64 border border-dashed border-white rounded-full"></div>
+<span class="absolute top-4 bg-[#1a1a1a] px-2 font-serif text-2xl tracking-widest text-white">鸳鸯阵</span>
+</div>
+</div>
+<svg class="absolute inset-0 w-full h-full pointer-events-none z-0">
+<path class="animate-[dash_20s_linear_infinite]" d="M100,250 C150,250 150,150 250,150" fill="none" stroke="#d4af37" stroke-dasharray="5,5" stroke-width="2"></path>
+<path d="M100,250 C150,250 150,350 250,350" fill="none" stroke="#3a3f44" stroke-width="2"></path>
+<path d="M450,150 C500,150 500,100 600,100" fill="none" stroke="#3a3f44" stroke-width="2"></path>
+<path d="M450,150 C500,150 500,200 600,200" fill="none" stroke="#d4af37" stroke-width="2"></path>
+</svg>
+<div class="absolute inset-0 p-10 overflow-auto">
+<div class="absolute left-10 top-1/2 -translate-y-1/2 z-10">
+<div class="tech-node bg-imperial-gold text-black w-32 h-32 rounded-full flex flex-col items-center justify-center border-4 border-[#8e7323] shadow-[0_0_30px_rgba(212,175,55,0.2)] cursor-pointer">
+<span class="material-symbols-outlined text-4xl mb-1">groups</span>
+<span class="font-bold text-sm tracking-widest">募兵制</span>
+<span class="text-[10px] opacity-70 mt-1">义乌矿工</span>
+</div>
+</div>
+<div class="absolute left-[250px] top-[150px] -translate-y-1/2 z-10">
+<div class="tech-node bg-[#252525] w-52 p-4 rounded-lg border border-imperial-gold shadow-lg cursor-pointer hover:bg-[#2a2a2a]">
+<div class="flex justify-between items-start mb-2">
+<h4 class="font-bold text-imperial-gold flex items-center gap-2">
+<span class="material-symbols-outlined text-base">forest</span>
+                                    狼筅 (Langxian)
+                                </h4>
+<span class="text-[10px] bg-imperial-gold/20 text-imperial-gold px-1 rounded">已研发</span>
+</div>
+<p class="text-[10px] text-gray-400 mb-3 leading-relaxed">取自南方多枝竹木，附以铁刺。专克倭寇长刀，令其不得近身。</p>
+<div class="w-full bg-gray-800 h-1 rounded-full overflow-hidden">
+<div class="bg-imperial-gold h-full w-full"></div>
+</div>
+</div>
+</div>
+<div data-tech-node-wrap="niachong" class="absolute left-[250px] top-[350px] -translate-y-1/2 z-10 opacity-60 grayscale transition-all duration-300">
+<div data-tech-card="niachong" class="tech-node bg-[#1a1a1a] w-52 p-4 rounded-lg border border-gray-700 border-dashed cursor-not-allowed">
+<div class="flex justify-between items-start mb-2">
+<h4 class="font-bold text-gray-400 flex items-center gap-2">
+<span class="material-symbols-outlined text-base">my_location</span>
+                                    鸟铳改良
+                                </h4>
+<span class="material-symbols-outlined text-xs text-gray-600">lock</span>
+</div>
+<p class="text-[10px] text-gray-500 mb-3 leading-relaxed">仿制西洋火绳枪，需提升精度与射速。目前工部拨款不足。</p>
+<div class="flex items-center gap-2 text-[10px] text-red-500">
+<span class="material-symbols-outlined text-xs">close</span>
+                                需政治周旋：宴请监军
+                            </div>
+</div>
+</div>
+<div data-tech-node-wrap="tengdun" class="absolute left-[600px] top-[100px] -translate-y-1/2 z-10 transition-all duration-300">
+<div data-tech-card="tengdun" class="tech-node bg-[#1c1c1c] w-48 p-3 rounded-lg border border-white/15 cursor-pointer hover:border-imperial-gold/45">
+<h4 class="font-bold text-slate-100 text-sm mb-1">藤牌盾</h4>
+<p class="text-[10px] text-gray-400">轻便坚韧，防箭矢。</p>
+<button data-tech-btn="tengdun" class="mt-2 w-full py-1 bg-[#222] hover:bg-[#2b2b2b] text-slate-100 text-xs font-bold rounded border border-white/10 transition-colors">
+                                研发 (-300两)
+                            </button>
+</div>
+</div>
+<div class="absolute left-[600px] top-[200px] -translate-y-1/2 z-10">
+<div class="tech-node bg-[#1e1e1e] w-52 p-4 rounded-lg border-2 border-primary/50 shadow-[0_0_15px_rgba(185,60,60,0.2)] cursor-pointer hover:border-primary transition-colors">
+<div class="flex justify-between items-start mb-2">
+<h4 class="font-bold text-white flex items-center gap-2">
+<span class="material-symbols-outlined text-base text-primary">colorize</span>
+                                    长枪方阵
+                                </h4>
+<span class="text-[10px] bg-primary/20 text-primary px-1 rounded animate-pulse">可研发</span>
+</div>
+<p class="text-[10px] text-gray-400 mb-3">狼筅困敌，长枪杀敌。配合使用，无往不利。</p>
+<button class="w-full py-1 bg-primary hover:bg-red-600 text-white text-xs font-bold rounded flex items-center justify-center gap-1 transition-colors">
+<span class="material-symbols-outlined text-[10px]">upgrade</span>
+                                研发 (-500两)
+                            </button>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-4 grid grid-cols-4 gap-4 h-24">
+<div class="col-span-1 bg-[#151515] border border-white/10 rounded p-3 flex flex-col justify-between">
+<span class="text-xs text-gray-500 uppercase tracking-wider">当前阵法</span>
+<div class="flex items-center gap-2">
+<span class="text-2xl font-serif text-imperial-gold font-bold">鸳鸯阵</span>
+<span class="text-xs text-green-500 bg-green-900/20 px-1 rounded border border-green-900/30">Lv. 2</span>
+</div>
+<div class="w-full bg-gray-800 h-1 rounded-full overflow-hidden mt-1">
+<div class="bg-imperial-gold h-full w-[45%]"></div>
+</div>
+</div>
+<div class="col-span-3 bg-[#151515] border border-white/10 rounded p-3 flex items-center justify-between gap-6 relative overflow-hidden">
+<div class="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-[#151515] to-transparent z-10"></div>
+<div class="flex flex-col z-0 max-w-[70%]">
+<span class="text-xs text-gray-500 uppercase tracking-wider mb-1">历史注脚</span>
+<p class="text-sm text-gray-300 italic font-serif leading-snug">"戚继光之所以能战无不胜，非仅因其勇，更因其能在腐朽的体制缝隙中，寻得一线生机以练强兵。" —— 《万历十五年》</p>
+</div>
+<div class="flex-shrink-0 z-20">
+<button class="bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white px-4 py-2 rounded border border-white/10 text-xs font-bold tracking-widest transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">menu_book</span>
+                            查阅兵书
+                        </button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<div class="fixed inset-0 pointer-events-none opacity-[0.03] z-50 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]"></div>
+
+<script id="reado-wanli-stage5">
+(() => {
+  const STORAGE_KEY = "reado_wanli_campaign_v1";
+  const RESTART_HREF = "/experiences/tax-reform-dilemma-1.html";
+
+  const allButtons = Array.from(document.querySelectorAll("button"));
+  const findActionButton = (title) =>
+    allButtons.find((btn) => (btn.querySelector("h3")?.textContent || "").includes(title));
+
+  const writeLetterBtn = findActionButton("给首辅写信");
+  const banquetBtn = findActionButton("宴请监军");
+  const rectifyBtn = findActionButton("整顿卫所");
+  const historyBtn = allButtons.find((btn) => (btn.textContent || "").includes("查阅兵书"));
+  const changqiangBtn = allButtons.find((btn) => (btn.textContent || "").includes("研发 (-500两)"));
+
+  const birdTitleEl = Array.from(document.querySelectorAll("h4")).find((el) => (el.textContent || "").includes("鸟铳改良"));
+  const birdCard = birdTitleEl ? birdTitleEl.closest(".tech-node") : null;
+
+  const tengdunTitleEl = Array.from(document.querySelectorAll("h4")).find((el) => (el.textContent || "").includes("藤牌盾"));
+  const tengdunCard = tengdunTitleEl ? tengdunTitleEl.closest(".tech-node") : null;
+
+  const formationNameEl = Array.from(document.querySelectorAll("span")).find((el) => (el.textContent || "").trim() === "鸳鸯阵");
+  const formationPanel = formationNameEl ? formationNameEl.closest("div.col-span-1") : null;
+  const formationLvEl = formationPanel
+    ? Array.from(formationPanel.querySelectorAll("span")).find((el) => (el.textContent || "").includes("Lv."))
+    : null;
+  const formationBarEl = formationPanel ? formationPanel.querySelector("div.bg-imperial-gold.h-full") : null;
+
+  const fundsEl = Array.from(document.querySelectorAll("header span")).find((el) => {
+    const text = (el.textContent || "").trim();
+    return /^\d[\d,]*$/.test(text) && (el.closest("div")?.textContent || "").includes("当前军费");
+  });
+
+  const threatLabelEl = Array.from(document.querySelectorAll("span")).find((el) => (el.textContent || "").includes("倭寇动向"));
+  const techSection = Array.from(document.querySelectorAll("section")).find(
+    (section) => (section.textContent || "").includes("鸳鸯阵") && (section.textContent || "").includes("倭寇动向")
+  );
+  const techBoard = techSection ? techSection.querySelector("div.flex-grow") : null;
+  const stageHeader = document.querySelector("[data-stage-header]");
+  const stageMain = document.querySelector("[data-stage-main]");
+  const stageAside = stageMain ? stageMain.querySelector("aside") : null;
+  const shellApplied = document.body.classList.contains("reado-shell-applied");
+  const birdWrap = birdCard ? birdCard.closest("[data-tech-node-wrap='niachong']") : null;
+  const tengdunWrap = tengdunCard ? tengdunCard.closest("[data-tech-node-wrap='tengdun']") : null;
+  const tengdunBtn = document.querySelector("[data-tech-btn='tengdun']");
+
+  if (!writeLetterBtn || !banquetBtn || !rectifyBtn || !historyBtn || !techBoard) return;
+  if (shellApplied) {
+    if (stageHeader) stageHeader.style.display = "none";
+    if (stageMain) {
+      stageMain.classList.remove("pt-24");
+      stageMain.classList.add("pt-6", "lg:pt-8");
+      stageMain.style.height = "calc(100vh - 86px)";
+      stageMain.style.maxHeight = "calc(100vh - 86px)";
+    }
+  }
+
+  function load() {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+    } catch {
+      return {};
+    }
+  }
+
+  function saveStage(payload) {
+    const base = load();
+    base.qijiguang = payload;
+    base.lastUpdatedAt = new Date().toISOString();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(base));
+  }
+
+  function modal(title, body, actions) {
+    const w = document.createElement("div");
+    w.style.cssText = "position:fixed;inset:0;z-index:99999;background:rgba(2,6,23,.78);display:flex;align-items:center;justify-content:center;padding:16px;";
+    w.innerHTML = `<div style=\"max-width:900px;width:100%;max-height:88vh;background:#0f172a;border:1px solid rgba(148,163,184,.35);border-radius:14px;padding:18px;color:#e2e8f0;display:flex;flex-direction:column;\"><h3 style=\"font-size:22px;font-weight:800;margin:0 0 10px\">${title}</h3><div id=\"m-body\" style=\"font-size:14px;line-height:1.75;color:#cbd5e1;white-space:pre-wrap;overflow:auto;min-height:0;flex:1;padding-right:4px;\">${body}</div><div id=\"m-actions\" style=\"margin-top:14px;display:flex;gap:8px;flex-wrap:wrap\"></div></div>`;
+    document.body.appendChild(w);
+    const host = w.querySelector("#m-actions");
+    (actions || []).forEach((a) => {
+      const bt = document.createElement("button");
+      bt.textContent = a.label;
+      bt.style.cssText = "padding:8px 12px;border-radius:8px;border:1px solid rgba(148,163,184,.35);background:#1e293b;color:#fff;font-weight:700;cursor:pointer";
+      bt.onclick = () => {
+        a.onClick?.();
+        w.remove();
+      };
+      host.appendChild(bt);
+    });
+  }
+
+  function showToast(text, tone = "info") {
+    const node = document.createElement("div");
+    const color = tone === "warn" ? "#fca5a5" : tone === "ok" ? "#67e8f9" : "#fde68a";
+    const topOffset = shellApplied ? 96 : 18;
+    node.textContent = text;
+    node.style.cssText = `position:fixed;right:18px;top:${topOffset}px;z-index:99999;padding:8px 12px;border-radius:10px;border:1px solid rgba(148,163,184,.35);background:rgba(15,23,42,.92);color:${color};font-size:12px;font-weight:700;opacity:0;transform:translateY(-6px);transition:all .22s ease;`;
+    document.body.appendChild(node);
+    requestAnimationFrame(() => {
+      node.style.opacity = "1";
+      node.style.transform = "translateY(0)";
+    });
+    setTimeout(() => {
+      node.style.opacity = "0";
+      node.style.transform = "translateY(-8px)";
+    }, 900);
+    setTimeout(() => node.remove(), 1200);
+  }
+
+  const state = {
+    funds: parseInt(String(fundsEl?.textContent || "3200").replace(/[^\d]/g, ""), 10) || 3200,
+    military: 52,
+    discipline: 48,
+    firepower: 34,
+    morale: 46,
+    intel: 22,
+    politics: 38,
+    formationLv: 2,
+    actionsDone: new Set(),
+    techDone: new Set(["langxian"]),
+    birdUnlocked: false,
+    picked: new Set(),
+    battle: null
+  };
+  let stageFailed = false;
+
+  function clearCampaignAndRestart() {
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.setItem("reado_book_last_wanli-fifteen", "tax-reform-dilemma-1");
+    } catch {}
+    window.location.href = RESTART_HREF;
+  }
+
+  const techMeta = {
+    changqiang: {
+      label: "长枪方阵",
+      cost: 500,
+      requires: [],
+      gain: { military: 5, discipline: 7 },
+      info: "长枪线在狼筅之后补位，是戚家军近战主杀伤层。"
+    },
+    niachong: {
+      label: "鸟铳改良",
+      cost: 600,
+      requires: ["bird_unlock"],
+      gain: { firepower: 12, military: 4 },
+      info: "改良火绳与轮放节奏，形成接敌前火力压制。"
+    },
+    tengdun: {
+      label: "藤牌盾",
+      cost: 300,
+      requires: [],
+      gain: { discipline: 4, morale: 4 },
+      info: "藤牌手在前列吸收冲击，为长枪争取出手窗口。"
+    },
+    scout: {
+      label: "海防夜巡哨探",
+      cost: 450,
+      requires: [],
+      gain: { intel: 12, military: 3 },
+      info: "沿海烽堠与夜巡可提前发现倭寇登陆点。"
+    },
+    ship: {
+      label: "福船火力改装",
+      cost: 900,
+      requires: ["niachong"],
+      gain: { firepower: 8, morale: 5 },
+      info: "强化船载火器，争取海上先手。"
+    },
+    training: {
+      label: "鸳鸯阵协同操练",
+      cost: 700,
+      requires: ["changqiang", "tengdun"],
+      gain: { discipline: 10, military: 6, morale: 4 },
+      info: "把藤牌、狼筅、长枪、刀手训练成协同体系。"
+    },
+    yuanyang3: {
+      label: "鸳鸯阵 Lv.3",
+      cost: 800,
+      requires: ["training", "scout", "niachong"],
+      gain: { military: 10, discipline: 8, firepower: 6 },
+      info: "阵法升级为“侦察-火器-近战”三段联动。"
+    }
+  };
+
+  const techKnowledgePanel = document.createElement("div");
+  techKnowledgePanel.className = "glass-panel w-full rounded-lg p-3 border border-white/10";
+  techKnowledgePanel.innerHTML = `
+    <div class="text-xs text-imperial-gold font-bold tracking-widest mb-1">军务纪要</div>
+    <div data-tech-log class="space-y-1 max-h-24 overflow-auto text-[11px]"></div>
+  `;
+  if (stageAside) {
+    stageAside.appendChild(techKnowledgePanel);
+  } else {
+    techKnowledgePanel.classList.add("fixed", "left-6", "bottom-6", "z-[9997]", "w-[360px]");
+    document.body.appendChild(techKnowledgePanel);
+  }
+
+  function addBattleLog(text, tone = "info") {
+    const host = techKnowledgePanel.querySelector("[data-tech-log]");
+    if (!host) return;
+    const p = document.createElement("p");
+    p.className = tone === "warn" ? "text-[11px] text-amber-200" : "text-[11px] text-slate-300";
+    p.textContent = `- ${text}`;
+    host.prepend(p);
+    const children = Array.from(host.children);
+    children.slice(10).forEach((node) => node.remove());
+  }
+
+  const hud = document.createElement("div");
+  hud.className = "fixed right-5 top-24 z-[9998] bg-[#171717]/92 border border-imperial-gold/35 rounded-lg px-3 py-2 text-[11px] text-gray-200 leading-5 shadow-xl";
+  document.body.appendChild(hud);
+
+  const doneBtn = document.createElement("button");
+  doneBtn.style.cssText = "position:fixed;right:16px;bottom:16px;z-index:9999;padding:10px 14px;border-radius:10px;background:#38bdf8;color:#082f49;font-weight:800;border:0;box-shadow:0 8px 24px rgba(56,189,248,.35)";
+  document.body.appendChild(doneBtn);
+
+  function disableAllActions() {
+    Array.from(document.querySelectorAll("button")).forEach((btn) => {
+      if (btn.closest("[id='m-actions']")) return;
+      btn.disabled = true;
+      btn.style.opacity = "0.6";
+      btn.style.cursor = "not-allowed";
+    });
+    doneBtn.disabled = true;
+  }
+
+  function failStage(reason, detail) {
+    if (stageFailed) return;
+    stageFailed = true;
+    disableAllActions();
+    modal("第五幕失败", `${reason}\n\n${detail}\n\n结局：抗倭链路断裂，你需要从第一幕重新开始。`, [
+      { label: "从第一幕重开", onClick: () => clearCampaignAndRestart() }
+    ]);
+  }
+
+  function updateBattleButton() {
+    if (stageFailed) {
+      doneBtn.textContent = "战局已失利";
+      return;
+    }
+    if (state.battle?.success) {
+      doneBtn.textContent = "完成戚继光篇并总复盘";
+      return;
+    }
+    doneBtn.textContent = "发起台州抗倭战（验证）";
+  }
+
+  function updateFundsUI() {
+    if (fundsEl) fundsEl.textContent = state.funds.toLocaleString("zh-CN");
+  }
+
+  function updateThreatLabel() {
+    if (!threatLabelEl) return;
+    if (state.battle?.success) {
+      threatLabelEl.textContent = "倭寇动向：已击退（海防重整中）";
+      return;
+    }
+    if (state.battle?.attempted) {
+      threatLabelEl.textContent = "倭寇动向：再度集结（可继续演练）";
+      return;
+    }
+    threatLabelEl.textContent = "倭寇动向：集结中（剩余12天）";
+  }
+
+  function updateFormationUI() {
+    if (formationLvEl) formationLvEl.textContent = `Lv. ${state.formationLv}`;
+    if (formationBarEl) {
+      const width = Math.min(100, 35 + state.formationLv * 18);
+      formationBarEl.style.width = `${width}%`;
+    }
+  }
+
+  function refreshHud() {
+    const researchedCount = [...state.techDone].filter((id) => id !== "langxian").length;
+    hud.innerHTML = [
+      '<div class="font-bold text-imperial-gold mb-1">戚家军总览</div>',
+      `<div>军费：<span class="font-bold text-white">${state.funds.toLocaleString("zh-CN")}</span> 两</div>`,
+      `<div>军事指数：<span class="font-bold text-sky-200">${state.military}</span></div>`,
+      `<div>纪律/火力：<span class="font-bold text-emerald-200">${state.discipline}</span> / <span class="font-bold text-orange-200">${state.firepower}</span></div>`,
+      `<div>政治动作：<span class="font-bold text-white">${state.actionsDone.size}</span>/3</div>`,
+      `<div>新增科技：<span class="font-bold text-white">${researchedCount}</span></div>`,
+      `<div class="mt-1 text-slate-400">鸳鸯阵等级：Lv.${state.formationLv}</div>`
+    ].join("");
+    updateFundsUI();
+    updateThreatLabel();
+    updateFormationUI();
+    updateBattleButton();
+  }
+
+  function canAfford(cost) {
+    return state.funds >= cost;
+  }
+
+  function spend(cost) {
+    if (!canAfford(cost)) {
+      showToast(`军费不足：需要 ${cost} 两`, "warn");
+      return false;
+    }
+    state.funds -= cost;
+    return true;
+  }
+
+  function gainFunds(value) {
+    state.funds = Math.max(0, state.funds + value);
+  }
+
+  function markActionDone(btn, key) {
+    state.actionsDone.add(key);
+    state.picked.add(key);
+    btn.style.boxShadow = "0 0 0 2px rgba(212,175,55,.65) inset";
+    btn.disabled = true;
+    btn.style.opacity = "0.78";
+  }
+
+  function hasRequirement(req) {
+    if (req === "bird_unlock") return state.birdUnlocked;
+    return state.techDone.has(req);
+  }
+
+  function isTechDone(id) {
+    return state.techDone.has(id);
+  }
+
+  function applyAction(key) {
+    if (state.actionsDone.has(key)) return;
+
+    if (key === "write_letter") {
+      gainFunds(800);
+      state.politics += 8;
+      state.morale = Math.max(0, state.morale - 2);
+      markActionDone(writeLetterBtn, key);
+      addBattleLog("上疏首辅后，军费暂时到位，但个人声望受损。", "ok");
+      showToast("军费 +800（户部拨款到位）", "ok");
+    }
+
+    if (key === "banquet_eunuch") {
+      if (!spend(200)) return;
+      state.politics += 6;
+      state.birdUnlocked = true;
+      markActionDone(banquetBtn, key);
+      unlockBirdTech();
+      addBattleLog("监军态度缓和，鸟铳改良申请获批。", "ok");
+      showToast("鸟铳改良已解锁", "ok");
+    }
+
+    if (key === "rectify_guard") {
+      gainFunds(1200);
+      state.discipline += 12;
+      state.politics = Math.max(0, state.politics - 8);
+      markActionDone(rectifyBtn, key);
+      addBattleLog("卫所空额清查完成，战兵纪律明显提升。", "warn");
+      showToast("纪律 +12，后续军费 +1200", "ok");
+    }
+
+    refreshHud();
+  }
+
+  function researchTech(id) {
+    const meta = techMeta[id];
+    if (!meta) return;
+    if (isTechDone(id)) {
+      showToast(`${meta.label} 已研发`, "info");
+      return;
+    }
+
+    for (const req of meta.requires) {
+      if (!hasRequirement(req)) {
+        showToast(`未满足前置：${meta.label}`, "warn");
+        return;
+      }
+    }
+
+    if (!spend(meta.cost)) return;
+
+    state.techDone.add(id);
+    state.picked.add(id);
+    Object.entries(meta.gain).forEach(([k, v]) => {
+      state[k] = (state[k] || 0) + v;
+    });
+    if (id === "yuanyang3") {
+      state.formationLv = 3;
+    }
+
+    addBattleLog(`科技完成：${meta.label}。${meta.info}`, "ok");
+    showToast(`研发完成：${meta.label}`, "ok");
+    refreshHud();
+    renderTechState();
+  }
+
+  function unlockBirdTech() {
+    if (!birdCard) return;
+    if (birdWrap) {
+      birdWrap.classList.remove("opacity-60", "grayscale");
+      birdWrap.style.opacity = "1";
+      birdWrap.style.filter = "none";
+    }
+    birdCard.classList.remove("cursor-not-allowed", "border-dashed");
+    birdCard.classList.add("border-primary/50", "hover:border-primary", "cursor-pointer");
+    birdCard.style.background = "#20242d";
+
+    const lockIcon = birdCard.querySelector(".material-symbols-outlined.text-xs.text-gray-600");
+    if (lockIcon) lockIcon.remove();
+
+    const title = birdCard.querySelector("h4");
+    if (title) {
+      title.classList.remove("text-gray-400");
+      title.classList.add("text-cyan-100");
+    }
+    const desc = birdCard.querySelector("p");
+    if (desc) {
+      desc.classList.remove("text-gray-500");
+      desc.classList.add("text-gray-300");
+    }
+    const note = Array.from(birdCard.querySelectorAll("div,span,p")).find((el) => (el.textContent || "").includes("需政治周旋"));
+    if (note) {
+      note.textContent = "已解锁：可研发（-600两）";
+      note.classList.remove("text-red-500");
+      note.classList.add("text-cyan-300");
+    }
+
+    if (!birdCard.querySelector("[data-tech-btn='niachong']")) {
+      const btn = document.createElement("button");
+      btn.setAttribute("data-tech-btn", "niachong");
+      btn.className = "mt-3 w-full py-1 bg-primary hover:bg-red-600 text-white text-xs font-bold rounded flex items-center justify-center gap-1 transition-colors";
+      btn.innerHTML = '<span class="material-symbols-outlined text-[10px]">upgrade</span> 研发 (-600两)';
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        researchTech("niachong");
+      });
+      birdCard.appendChild(btn);
+    }
+  }
+
+  const extraTechPanel = document.createElement("div");
+  extraTechPanel.className = "absolute right-4 bottom-4 z-20 w-[330px] bg-black/70 border border-white/10 rounded-lg p-3 backdrop-blur";
+  extraTechPanel.innerHTML = `
+    <div class="text-xs text-imperial-gold font-bold tracking-widest mb-2">扩展科技研发</div>
+    <div class="space-y-2">
+      <button data-tech-id="scout" class="w-full text-left text-xs px-2 py-1.5 rounded bg-white/5 hover:bg-white/10 border border-white/10">海防夜巡哨探（-450两）</button>
+      <button data-tech-id="ship" class="w-full text-left text-xs px-2 py-1.5 rounded bg-white/5 hover:bg-white/10 border border-white/10">福船火力改装（-900两）</button>
+      <button data-tech-id="training" class="w-full text-left text-xs px-2 py-1.5 rounded bg-white/5 hover:bg-white/10 border border-white/10">鸳鸯阵协同操练（-700两）</button>
+      <button data-tech-id="yuanyang3" class="w-full text-left text-xs px-2 py-1.5 rounded bg-white/5 hover:bg-white/10 border border-white/10">鸳鸯阵 Lv.3（-800两）</button>
+    </div>
+  `;
+  techBoard.appendChild(extraTechPanel);
+
+  extraTechPanel.querySelectorAll("button[data-tech-id]").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      const id = btn.getAttribute("data-tech-id");
+      researchTech(id);
+    });
+  });
+
+  function renderTechState() {
+    const changqiangDone = isTechDone("changqiang");
+    if (changqiangBtn) {
+      changqiangBtn.disabled = changqiangDone;
+      changqiangBtn.textContent = changqiangDone ? "已研发" : "研发 (-500两)";
+      changqiangBtn.style.opacity = changqiangDone ? "0.7" : "1";
+    }
+
+    if (tengdunCard) {
+      const done = isTechDone("tengdun");
+      if (tengdunWrap) tengdunWrap.style.opacity = "1";
+      tengdunCard.style.opacity = "1";
+      tengdunCard.style.cursor = done ? "default" : "pointer";
+      tengdunCard.style.background = done ? "#223127" : "#1c1c1c";
+      tengdunCard.style.borderColor = done ? "rgba(52,211,153,.45)" : "rgba(255,255,255,.15)";
+      const title = tengdunCard.querySelector("h4");
+      const desc = tengdunCard.querySelector("p");
+      if (title) {
+        title.classList.remove("text-gray-400");
+        title.classList.add(done ? "text-emerald-200" : "text-slate-100");
+      }
+      if (desc) {
+        desc.classList.remove("text-gray-600");
+        desc.classList.add(done ? "text-emerald-100/80" : "text-gray-400");
+      }
+    }
+    if (tengdunBtn) {
+      const done = isTechDone("tengdun");
+      tengdunBtn.disabled = done;
+      tengdunBtn.textContent = done ? "已研发" : "研发 (-300两)";
+      tengdunBtn.style.opacity = done ? "0.72" : "1";
+    }
+
+    if (birdCard) {
+      const done = isTechDone("niachong");
+      const btn = birdCard.querySelector("[data-tech-btn='niachong']");
+      if (birdWrap && state.birdUnlocked) {
+        birdWrap.style.opacity = "1";
+        birdWrap.style.filter = "none";
+      }
+      if (done) {
+        birdCard.style.background = "#20313d";
+        birdCard.style.borderColor = "rgba(34,211,238,.45)";
+      }
+      if (btn) {
+        btn.disabled = done;
+        btn.textContent = done ? "已研发" : "研发 (-600两)";
+        btn.style.opacity = done ? "0.7" : "1";
+      }
+    }
+
+    extraTechPanel.querySelectorAll("button[data-tech-id]").forEach((btn) => {
+      const id = btn.getAttribute("data-tech-id");
+      const meta = techMeta[id];
+      const done = isTechDone(id);
+      const ready = meta.requires.every((req) => hasRequirement(req));
+      btn.disabled = done || !ready;
+      btn.style.opacity = done ? "0.65" : ready ? "1" : "0.5";
+      const label = done
+        ? `${meta.label}（已研发）`
+        : !ready
+        ? `${meta.label}（前置未满足）`
+        : `${meta.label}（-${meta.cost}两）`;
+      btn.textContent = label;
+    });
+  }
+
+  function battleScore() {
+    const p1 = state.intel + state.firepower + (isTechDone("ship") ? 12 : 0) + (isTechDone("scout") ? 10 : 0);
+    const p2 =
+      state.discipline +
+      state.formationLv * 12 +
+      (isTechDone("changqiang") ? 10 : 0) +
+      (isTechDone("langxian") ? 8 : 0) +
+      (isTechDone("tengdun") ? 6 : 0);
+    const p3 = state.morale + state.politics + Math.floor(state.military / 4) + (isTechDone("niachong") ? 8 : 0);
+    return { p1, p2, p3 };
+  }
+
+  function runBattle() {
+    if (stageFailed) return;
+    if (state.actionsDone.size < 3) {
+      showToast("请先完成左侧 3 项政治动作", "warn");
+      return;
+    }
+    if ([...state.techDone].length < 4) {
+      showToast("科技准备不足，建议至少再完成 3 项研发", "warn");
+      return;
+    }
+
+    const score = battleScore();
+    const target = { p1: 55, p2: 72, p3: 58 };
+    const ok1 = score.p1 >= target.p1;
+    const ok2 = score.p2 >= target.p2;
+    const ok3 = score.p3 >= target.p3;
+    const passed = [ok1, ok2, ok3].filter(Boolean).length;
+    const total = score.p1 + score.p2 + score.p3;
+    const success = passed >= 2 && total >= 205;
+
+    const report = [
+      "【台州抗倭战 · 三阶段验证】",
+      `1) 侦察与接敌：${score.p1} / ${target.p1} ${ok1 ? "✅" : "❌"}`,
+      `2) 阵列对撞：${score.p2} / ${target.p2} ${ok2 ? "✅" : "❌"}`,
+      `3) 追击收束：${score.p3} / ${target.p3} ${ok3 ? "✅" : "❌"}`,
+      "",
+      success
+        ? "战果：戚家军成功击退倭寇，沿海防线稳住。"
+        : "战果：首轮交战未能完全压制倭寇，需要继续补齐科技协同。",
+      "",
+      "战术复盘：",
+      !ok1 ? "- 侦察/海上火力不足，建议补“哨探”或“福船改装”。" : "- 前期侦察与火力压制有效，成功减缓敌军冲击。",
+      !ok2 ? "- 阵列协同不足，建议补“协同操练”或“鸳鸯阵Lv3”。" : "- 中段阵列稳定，近战协同发挥出优势。",
+      !ok3 ? "- 士气与组织收束不足，建议提高纪律/政治协调。" : "- 收尾追击效率较高，战场控制力达标。"
+    ].join("\n");
+
+    state.battle = { attempted: true, success, score, target, total, report };
+    state.picked.add(success ? "battle_win" : "battle_retry");
+    addBattleLog(success ? "台州抗倭战验证成功。" : "台州抗倭战验证失败，战役链路中断。", success ? "ok" : "warn");
+
+    refreshHud();
+    if (!success) {
+      failStage("台州抗倭战未能达成阶段目标。", report);
+      return;
+    }
+    modal(success ? "抗倭战验证成功" : "抗倭战验证未达标", report, [
+      { label: success ? "进入总复盘" : "继续补强后再战" }
+    ]);
+  }
+
+  function extractBrief(text) {
+    const raw = String(text || "").replace(/\s+/g, " ").trim();
+    if (!raw) return "未完成";
+    return raw.length > 80 ? `${raw.slice(0, 80)}...` : raw;
+  }
+
+  function finalizeReview() {
+    if (stageFailed) return;
+    if (!state.battle?.success) {
+      showToast("请先完成抗倭战验证（需打赢）", "warn");
+      return;
+    }
+
+    const base = load();
+    const summary = {
+      emperor: base?.emperor?.report || "第一幕未完成",
+      court: base?.court?.report || "第二幕未完成",
+      zhang: base?.zhang?.report || "第三幕未完成",
+      hairui: base?.hairui?.report || "第四幕未完成"
+    };
+
+    const stageBrief = [
+      `- 第一幕（皇帝）：${extractBrief(summary.emperor)}`,
+      `- 第二幕（宫廷）：${extractBrief(summary.court)}`,
+      `- 第三幕（张居正）：${extractBrief(summary.zhang)}`,
+      `- 第四幕（海瑞）：${extractBrief(summary.hairui)}`
+    ].join("\n");
+
+    const picks = [...state.picked];
+    const finalReport = [
+      "【戚继光篇总复盘】",
+      "你完成了政治周旋、科技研发与抗倭战验证三段闭环。",
+      "",
+      "【你的战役结果】",
+      state.battle.report,
+      "",
+      "【四幕联动摘要】",
+      stageBrief,
+      "",
+      "【本幕决策清单】",
+      picks.map((p, i) => `${i + 1}. ${p}`).join("\n"),
+      "",
+      "【知识迁移】",
+      "1) 技术本身不是胜利，协同与执行链才是。",
+      "2) 政治协调不是妥协，而是为技术争取实施窗口。",
+      "3) 若没有可复用训练体系，名将能力无法复制。"
+    ].join("\n");
+
+    saveStage({
+      done: true,
+      picks,
+      military: state.military,
+      funds: state.funds,
+      techDone: [...state.techDone],
+      actionsDone: [...state.actionsDone],
+      battle: state.battle,
+      report: finalReport,
+      finishedAt: new Date().toISOString()
+    });
+
+    modal("万历十五年·总复盘", finalReport, [
+      { label: "返回知识版图", onClick: () => { window.location.href = "/pages/gamified-learning-hub-dashboard-1.html"; } }
+    ]);
+  }
+
+  doneBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    if (state.battle?.success) {
+      finalizeReview();
+      return;
+    }
+    runBattle();
+  });
+
+  if (writeLetterBtn) writeLetterBtn.addEventListener("click", (e) => { e.preventDefault(); applyAction("write_letter"); });
+  if (banquetBtn) banquetBtn.addEventListener("click", (e) => { e.preventDefault(); applyAction("banquet_eunuch"); });
+  if (rectifyBtn) rectifyBtn.addEventListener("click", (e) => { e.preventDefault(); applyAction("rectify_guard"); });
+
+  if (changqiangBtn) {
+    changqiangBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      researchTech("changqiang");
+    });
+  }
+
+  if (tengdunCard) {
+    tengdunCard.style.cursor = "pointer";
+    tengdunCard.addEventListener("click", (e) => {
+      e.preventDefault();
+      researchTech("tengdun");
+    });
+  }
+  if (tengdunBtn) {
+    tengdunBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      researchTech("tengdun");
+    });
+  }
+
+  historyBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    modal("兵书与操练提示", "戚家军抗倭要诀：\n\n1) 鸳鸯阵是什么：\n由藤牌、狼筅、长枪、刀手、火器分层协同，目标是“先破冲锋，再夺节奏”。\n\n2) 当前 Lv.2 的效果：\n- 阵型稳定性提升\n- 近战协同效率提升\n\n3) 升到 Lv.3 后：\n- 与鸟铳轮放形成连携\n- 对倭寇第一波冲击伤害明显增加\n\n4) 该做与不该做：\n- 该做：先侦察、再布阵、后接敌。\n- 不该做：只堆单点科技，不做协同训练。", [{ label: "继续部署" }]);
+  });
+
+  if (formationPanel) {
+    const tip = document.createElement("div");
+    tip.className = "absolute left-2 top-2 text-[10px] px-2 py-1 rounded bg-black/70 border border-imperial-gold/30 text-imperial-gold cursor-help";
+    tip.textContent = "? 鸳鸯阵说明";
+    formationPanel.style.position = "relative";
+    formationPanel.appendChild(tip);
+    tip.addEventListener("mouseenter", () => {
+      modal("鸳鸯阵 Hover 提示", "鸳鸯阵不是单一武器，而是协同战术系统。\n\nLv.2：可稳定接敌，减少阵型崩溃。\nLv.3：加入鸟铳轮放与哨探情报，形成“火器压制 + 近战收割”的完整闭环。", [{ label: "了解" }]);
+    });
+  }
+
+  function renderTechHints() {
+    if (birdWrap && !state.birdUnlocked) {
+      birdWrap.style.opacity = "0.6";
+      birdWrap.style.filter = "grayscale(1)";
+    }
+    if (!state.techDone.has("langxian")) state.techDone.add("langxian");
+  }
+
+  renderTechHints();
+  renderTechState();
+  refreshHud();
+
+  modal("背景导入", "你是戚继光，时在嘉靖末年倭患高峰。\n\n当下边防要务：\n- 可做：整训战兵、改良火器、建立侦察与协同。\n- 慎做：只拼个人勇武、忽视后勤和政治掣肘。\n\n本幕流程：\n1) 完成左侧 3 项政治动作\n2) 推进科技树（含鸟铳改良）\n3) 发起台州抗倭战，验证是否能赢。", [
+    { label: "先看兵书提示", onClick: () => historyBtn.click() },
+    { label: "开始部署" }
+  ]);
+})();
+</script>
+
+</body></html>

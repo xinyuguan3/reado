@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html class="dark" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>reado: 科学革命 - 承认无知 (全屏沉浸版)</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Source+Han+Sans+SC:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0891b2",
+                        "primary-dark": "#155e75",
+                        "accent": "#22d3ee",
+                        "background-dark": "#020617",
+                        "surface-dark": "#1e293b",
+                        "map-bg": "#1e293b",
+                        "map-fog": "#0f172a"
+                    },
+                    fontFamily: {
+                        "sans": ["Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", "sans-serif"],
+                        "display": ["Source Han Sans SC", "sans-serif"]
+                    }
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        body {
+            font-family: 'Source Han Sans SC', sans-serif;
+            background-color: #020617;
+        }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(34, 211, 238, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        .map-texture {
+            background-color: #1e293b;
+            background-image: 
+                radial-gradient(rgba(34, 211, 238, 0.15) 1px, transparent 1px),
+                linear-gradient(rgba(34, 211, 238, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(34, 211, 238, 0.05) 1px, transparent 1px);
+            background-size: 32px 32px, 128px 128px, 128px 128px;
+        }
+        .fog-overlay {
+            background: radial-gradient(circle at center, transparent 20%, rgba(2, 6, 23, 0.85) 75%, #020617 100%);
+        }
+        .ancient-effect::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%2322d3ee' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+            opacity: 0.4;
+            pointer-events: none;
+        }
+        .nav-link:hover {
+            text-shadow: 0 0 10px rgba(34, 211, 238, 0.8);
+        }
+    </style>
+</head>
+<body class="text-slate-200 h-screen w-screen flex flex-col font-display overflow-hidden relative selection:bg-accent selection:text-background-dark">
+<header class="relative z-50 w-full px-8 py-4 flex items-center justify-between border-b border-white/5 bg-background-dark/40 backdrop-blur-xl">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-3">
+<div class="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center text-white font-black text-lg shadow-lg shadow-primary/20">r</div>
+<span class="text-xl font-black tracking-tighter text-white">reado</span>
+</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-xs font-bold tracking-widest text-accent uppercase nav-link" href="#">承认无知</a>
+<a class="text-xs font-bold tracking-widest text-slate-500 hover:text-slate-300 uppercase transition-colors" href="#">帝国扩张</a>
+<a class="text-xs font-bold tracking-widest text-slate-500 hover:text-slate-300 uppercase transition-colors" href="#">科学革命</a>
+</nav>
+</div>
+<div class="flex items-center gap-6">
+<div class="text-right hidden sm:block">
+<span class="block text-[10px] text-primary font-black tracking-[0.2em] uppercase">坐标</span>
+<span class="block text-xs font-mono text-slate-400">0.0000° N, 0.0000° E</span>
+</div>
+<div class="h-10 w-10 rounded-full border border-primary/30 flex items-center justify-center bg-primary/10 text-accent">
+<span class="material-symbols-outlined text-xl">account_circle</span>
+</div>
+</div>
+</header>
+<main class="flex-grow flex relative overflow-hidden h-full">
+<div class="absolute inset-0 z-0 map-texture ancient-effect flex items-center justify-center">
+<div class="absolute inset-0 bg-[linear-gradient(rgba(34,211,238,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(34,211,238,0.05)_1px,transparent_1px)] bg-[size:60px_60px] pointer-events-none"></div>
+<div class="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-64 opacity-20 pointer-events-none">
+<svg class="w-full h-full stroke-primary/30 fill-primary/5" viewBox="0 0 200 150">
+<path d="M10,80 Q40,40 90,80 T170,60 T190,120 L160,140 L20,130 Z"></path>
+<text class="text-[6px] fill-primary/40 font-serif tracking-[0.5em]" x="50" y="100">TERRA VETERIS</text>
+</svg>
+</div>
+<div class="absolute inset-0 fog-overlay pointer-events-none z-10"></div>
+<div class="absolute top-1/3 right-1/4 animate-pulse z-0 pointer-events-none">
+<span class="text-sm text-slate-700 font-serif tracking-[0.5em] opacity-40 select-none uppercase">Terra Incognita</span>
+</div>
+<div class="absolute bottom-1/4 left-1/2 animate-pulse delay-1000 z-0 pointer-events-none">
+<span class="text-sm text-slate-700 font-serif tracking-[0.5em] opacity-20 select-none uppercase">Mare Ignotum</span>
+</div>
+<div class="relative z-20 flex flex-col items-center gap-10 text-center max-w-lg mx-auto p-12 rounded-full">
+<div class="space-y-4">
+<div class="flex justify-center">
+<div class="relative">
+<span class="material-symbols-outlined text-7xl text-accent/20">explore</span>
+<span class="material-symbols-outlined text-4xl text-accent absolute inset-0 flex items-center justify-center drop-shadow-[0_0_15px_rgba(34,211,238,0.6)]">visibility_off</span>
+</div>
+</div>
+<h2 class="text-3xl font-black text-white tracking-widest uppercase">面对空白</h2>
+<p class="text-sm text-slate-400 leading-relaxed max-w-xs mx-auto">
+                        中世纪地图填满了虚构的怪物。
+                        <br/>现代科学承认：<span class="text-accent italic">这里什么都没有，直到我们亲眼所见。</span>
+</p>
+</div>
+<button data-no-next="" onclick="window.location.href='/experiences/bilingual-human-domestication-dilemma-2.html'" class="group relative px-12 py-5 bg-background-dark/40 backdrop-blur-md overflow-hidden rounded-full border border-accent/40 text-white font-bold tracking-[0.3em] uppercase transition-all hover:border-accent hover:shadow-[0_0_40px_rgba(34,211,238,0.3)]">
+<span class="relative z-10 flex items-center gap-4">
+<span class="material-symbols-outlined group-hover:rotate-180 transition-transform duration-700">sailing</span>
+                        我不知道
+                    </span>
+<div class="absolute inset-0 -translate-x-full group-hover:translate-x-0 bg-gradient-to-r from-transparent via-accent/10 to-transparent transition-transform duration-1000 ease-in-out"></div>
+</button>
+<div class="space-y-1">
+<p class="text-[10px] text-primary font-mono tracking-widest uppercase opacity-70">点击驱动探索船队向未知进发</p>
+<div class="w-16 h-[1px] bg-primary/30 mx-auto"></div>
+</div>
+</div>
+</div>
+<aside class="absolute right-8 top-1/2 -translate-y-1/2 z-30 w-80 flex flex-col gap-6">
+<div class="glass-panel rounded-2xl p-8 relative overflow-hidden group">
+<div class="absolute -right-4 -top-4 w-24 h-24 bg-accent/10 rounded-full blur-2xl group-hover:bg-accent/20 transition-colors"></div>
+<div class="flex items-center justify-between mb-8">
+<h3 class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">无知的好奇心</h3>
+<span class="material-symbols-outlined text-accent text-xl">psychology</span>
+</div>
+<div class="flex flex-col items-center justify-center mb-8">
+<div class="relative w-36 h-36 flex items-center justify-center">
+<svg class="w-full h-full -rotate-90">
+<circle class="text-slate-800" cx="72" cy="72" fill="transparent" r="64" stroke="currentColor" stroke-width="4"></circle>
+<circle class="text-accent drop-shadow-[0_0_12px_rgba(34,211,238,0.4)] transition-all duration-1000" cx="72" cy="72" fill="transparent" r="64" stroke="currentColor" stroke-dasharray="402" stroke-dashoffset="321" stroke-linecap="round" stroke-width="6"></circle>
+</svg>
+<div class="absolute flex flex-col items-center">
+<span class="text-4xl font-black text-white">20%</span>
+<span class="text-[10px] text-primary uppercase font-bold tracking-widest">探索指数</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-white/5 p-4 rounded-xl border border-white/5 text-center">
+<div class="text-[10px] text-slate-500 mb-1 uppercase tracking-tighter">地理留白</div>
+<div class="text-xl font-mono font-bold text-slate-200">80%</div>
+</div>
+<div class="bg-white/5 p-4 rounded-xl border border-white/5 text-center">
+<div class="text-[10px] text-slate-500 mb-1 uppercase tracking-tighter">探险船队</div>
+<div class="text-xl font-mono font-bold text-slate-200">01</div>
+</div>
+</div>
+</div>
+<div class="glass-panel rounded-2xl p-8 flex flex-col gap-6">
+<div class="flex items-center justify-between">
+<h3 class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">帝国扩张进程</h3>
+<span class="material-symbols-outlined text-primary text-xl">account_balance</span>
+</div>
+<div class="space-y-6">
+<div class="space-y-3">
+<div class="flex justify-between items-end">
+<label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">制图学等级</label>
+<span class="text-xs font-black text-accent uppercase">Early Modern</span>
+</div>
+<div class="w-full bg-slate-800/50 rounded-full h-1">
+<div class="bg-accent h-1 rounded-full shadow-[0_0_10px_rgba(34,211,238,0.4)]" style="width: 15%"></div>
+</div>
+</div>
+<div class="space-y-3">
+<div class="flex justify-between items-end">
+<label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">帝国资本投入</label>
+<span class="text-xs font-black text-primary">LV. 1</span>
+</div>
+<div class="w-full bg-slate-800/50 rounded-full h-1">
+<div class="bg-primary h-1 rounded-full" style="width: 5%"></div>
+</div>
+</div>
+</div>
+<div class="mt-4 pt-6 border-t border-white/5">
+<div class="flex gap-4">
+<div class="shrink-0 h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-lg">history_edu</span>
+</div>
+<p class="text-[11px] text-slate-400 leading-relaxed italic">
+                            “既然承认了不知道，就要投入金钱去弄清楚。这就是科学与帝国的共生。”
+                        </p>
+</div>
+</div>
+</div>
+</aside>
+<div class="absolute bottom-8 left-8 z-30">
+<div class="glass-panel px-4 py-2 rounded-full border border-white/5 flex items-center gap-3">
+<span class="w-2 h-2 rounded-full bg-accent animate-pulse"></span>
+<span class="text-[10px] font-bold text-slate-400 tracking-widest uppercase">System Status: Awaiting Input</span>
+</div>
+</div>
+<div id="section-intro-unknown" class="fixed inset-0 z-[120] bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+<div class="w-full max-w-3xl rounded-2xl border border-accent/35 bg-background-dark/95 shadow-[0_20px_60px_rgba(0,0,0,0.55)] overflow-hidden">
+<div class="px-6 md:px-8 py-5 border-b border-accent/20 bg-gradient-to-r from-accent/15 to-transparent">
+<p class="text-xs font-bold tracking-[0.22em] text-accent uppercase">章节导览 · 面对空白</p>
+<h2 class="text-xl md:text-2xl font-black text-white mt-2">下一幕前情提要：承认无知，才会探索未知</h2>
+</div>
+<div class="px-6 md:px-8 py-6 space-y-4 text-sm text-gray-300 leading-relaxed">
+<p>科学革命的重要起点不是“已经知道很多”，而是“承认还有大量未知”。当社会接受无知，就会投入资源做地图、做实验、做远航。</p>
+<div class="grid md:grid-cols-3 gap-3">
+<div class="rounded-xl border border-white/10 bg-white/5 p-3">
+<p class="text-xs uppercase tracking-widest text-accent font-bold mb-1">知识点 1</p>
+<p class="text-xs text-gray-300">未知区域不是失败，而是研究与探索的入口。</p>
+</div>
+<div class="rounded-xl border border-white/10 bg-white/5 p-3">
+<p class="text-xs uppercase tracking-widest text-accent font-bold mb-1">知识点 2</p>
+<p class="text-xs text-gray-300">“我不知道”会催生探险、资本投入与新知识体系。</p>
+</div>
+<div class="rounded-xl border border-white/10 bg-white/5 p-3">
+<p class="text-xs uppercase tracking-widest text-accent font-bold mb-1">知识点 3</p>
+<p class="text-xs text-gray-300">本幕重点体验：从神话解释转向实证探索。</p>
+</div>
+</div>
+</div>
+<div class="px-6 md:px-8 py-4 border-t border-white/10 flex justify-end">
+<button id="section-intro-unknown-enter" class="px-5 py-2.5 rounded-lg bg-accent text-background-dark text-sm font-black tracking-wide hover:bg-cyan-300 transition-colors">我已了解，进入探索</button>
+</div>
+</div>
+</div>
+<script>
+(() => {
+  const panel = document.getElementById("section-intro-unknown");
+  const enter = document.getElementById("section-intro-unknown-enter");
+  if (!panel || !enter) return;
+  enter.addEventListener("click", () => {
+    panel.classList.add("opacity-0", "pointer-events-none", "transition-opacity", "duration-200");
+    window.setTimeout(() => panel.remove(), 220);
+  });
+})();
+</script>
+</main>
+
+</body></html>

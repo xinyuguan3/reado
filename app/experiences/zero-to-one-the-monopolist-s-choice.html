@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html class="dark" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>reado: 从0到1模拟 (全中文版)</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0d59f2",
+                        "background-light": "#f5f6f8",
+                        "background-dark": "#101622",
+                        "glass-dark": "rgba(16, 22, 34, 0.7)",
+                        "glass-border": "rgba(255, 255, 255, 0.1)",
+                        "accent-purple": "#8b5cf6",
+                    },
+                    fontFamily: {
+                        "sans": ["Noto Sans SC", "Source Han Sans CN", "Source Han Sans", "PingFang SC", "Microsoft YaHei", "sans-serif"],
+                        "display": ["Noto Sans SC", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(13, 89, 242, 0.08) 0%, transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.08) 0%, transparent 25%);
+        }
+        .glass-panel {
+            background: rgba(16, 22, 34, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+        .grid-bg {
+            background-size: 50px 50px;
+            background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
+        }
+        .neon-text {
+            text-shadow: 0 0 10px rgba(13, 89, 242, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen text-gray-800 dark:text-gray-100 flex flex-col overflow-hidden relative">
+<script src="/shared/book-catalog.js?v=1771240921862"></script>
+<script type="module" src="/shared/shell.js?v=1771240921862"></script>
+<reado-app-shell data-page="knowledge-map"></reado-app-shell>
+<div class="fixed inset-0 grid-bg pointer-events-none z-0"></div>
+<div class="flex flex-1 overflow-hidden h-screen">
+<div class="flex-1 flex flex-col overflow-hidden">
+<header class="glass-panel border-b border-glass-border">
+<div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded bg-primary/20 flex items-center justify-center border border-primary/40">
+<span class="material-icons-outlined text-primary">rocket_launch</span>
+</div>
+<div>
+<h1 class="text-xs uppercase tracking-[0.2em] text-gray-400 font-bold">reado: 从0到1模拟器</h1>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+<span class="font-bold text-lg leading-none">第四关：垄断者的抉择</span>
+</div>
+</div>
+</div>
+<div class="hidden md:flex flex-1 mx-12 flex-col gap-2">
+<div class="flex justify-between text-[10px] text-gray-400 uppercase tracking-widest font-black mb-1">
+<span>构想</span>
+<span class="text-primary neon-text">战略</span>
+<span>增长</span>
+<span>规模化</span>
+</div>
+<div class="h-1.5 w-full bg-gray-800 rounded-full relative overflow-hidden">
+<div class="absolute top-0 left-0 h-full w-[45%] bg-gradient-to-r from-primary to-accent-purple rounded-full shadow-[0_0_10px_rgba(13,89,242,0.5)]"></div>
+<div class="absolute top-0 left-0 w-full h-full flex justify-between px-[12%]">
+<div class="w-0.5 h-full bg-background-dark z-10"></div>
+<div class="w-0.5 h-full bg-background-dark z-10"></div>
+<div class="w-0.5 h-full bg-background-dark z-10"></div>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 text-xs font-mono text-primary bg-primary/10 px-3 py-1.5 rounded border border-primary/20">
+<span class="material-icons-outlined text-sm">account_balance_wallet</span>
+<span>1000万 创投资金</span>
+</div>
+<div class="px-3 py-1 bg-gray-800 rounded-full text-[10px] font-bold text-gray-400 border border-gray-700">
+                        中文简体
+                    </div>
+</div>
+</div>
+</header>
+<main class="flex-1 overflow-y-auto z-10 p-6 flex flex-col md:flex-row gap-6 max-w-7xl mx-auto w-full">
+<aside class="w-full md:w-80 flex-shrink-0 flex flex-col gap-6">
+<div class="glass-panel p-5 rounded-xl border-l-4 border-l-accent-purple relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-20 group-hover:opacity-40 transition-opacity">
+<span class="material-icons-outlined text-6xl text-accent-purple">analytics</span>
+</div>
+<h2 class="text-xs uppercase tracking-widest text-gray-400 mb-4 flex items-center gap-2 font-bold">
+<span class="material-icons-outlined text-sm">person</span> 创始人数据
+                    </h2>
+<div class="space-y-6">
+<div>
+<div class="flex justify-between text-sm mb-1">
+<span class="text-gray-300">防御力</span>
+<span class="text-accent-purple font-bold">较低</span>
+</div>
+<div class="h-2 bg-gray-800 rounded-full overflow-hidden">
+<div class="h-full w-[25%] bg-accent-purple/80 rounded-full"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-sm mb-1">
+<span class="text-gray-300">市场规模</span>
+<span class="text-primary font-bold">巨大</span>
+</div>
+<div class="h-2 bg-gray-800 rounded-full overflow-hidden">
+<div class="h-full w-[90%] bg-primary rounded-full animate-pulse"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-sm mb-1">
+<span class="text-gray-300">创始人远见</span>
+<span class="text-green-400 font-bold">独特逆向</span>
+</div>
+<div class="h-2 bg-gray-800 rounded-full overflow-hidden">
+<div class="h-full w-[75%] bg-green-500/80 rounded-full"></div>
+</div>
+</div>
+</div>
+<div class="mt-6 pt-4 border-t border-white/10">
+<div class="flex justify-between items-center">
+<span class="text-xs text-gray-400 uppercase font-bold">预估估值</span>
+<span class="text-xl font-mono text-white">￥2800万</span>
+</div>
+</div>
+</div>
+<div class="glass-panel p-5 rounded-xl border border-dashed border-gray-700 bg-black/20">
+<div class="flex items-start gap-3">
+<span class="material-icons-outlined text-yellow-500">lightbulb</span>
+<div class="text-sm text-gray-300 leading-relaxed">
+<strong class="text-white block mb-1">彼得·蒂尔的洞见：</strong>
+                            “竞争是给失败者准备的。如果你想创造持久的价值，那就建立垄断。”
+                        </div>
+</div>
+</div>
+<div class="relative h-32 rounded-xl overflow-hidden glass-panel border border-gray-700">
+<img alt="硅谷航拍夜景" class="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-overlay" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDBZtq4pYRHqedKep-5zfvQFbhCVJ3gPIN_aBROOaUTNPFcJIjhrvjRNXZvvSZRLrMxbu24xJT2eF0a9uogkQJ7j6tsWHzN160bWkpiBOAGcKEqcPKWnXJ2iiPeoFkfX-UEuUi9RsXVrg2P-WD98DImTSegDhi2sGSnyZtnuus6oJgXgTKvk-fWyxrlP83PR5m7aoWn8OkuJ28ziDQKk-gxxM6riUkGL-shgN4BIfjyUHUSDlkF1bnQuKleTAaxg4YBzr3CfLUEhZw"/>
+<div class="absolute bottom-2 left-3 z-10">
+<div class="flex items-center gap-1 text-xs font-bold text-white bg-black/50 px-2 py-1 rounded backdrop-blur-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                            帕罗奥图, 加州
+                        </div>
+</div>
+</div>
+</aside>
+<section class="flex-1 flex flex-col gap-6 relative">
+<div class="glass-panel rounded-2xl flex-1 flex flex-col relative overflow-hidden shadow-2xl min-h-[400px]">
+<div class="h-1 w-full bg-gradient-to-r from-transparent via-primary to-transparent opacity-80"></div>
+<div class="p-8 flex-1 flex flex-col justify-center items-center text-center relative z-10">
+<div class="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none">
+<svg class="w-96 h-96" viewBox="0 0 100 100">
+<circle class="text-white" cx="50" cy="50" fill="none" r="40" stroke="currentColor" stroke-width="1"></circle>
+<circle class="text-white" cx="50" cy="50" fill="none" r="30" stroke="currentColor" stroke-width="1"></circle>
+<path class="text-white" d="M50 10 L50 90 M10 50 L90 50" stroke="currentColor" stroke-width="0.5"></path>
+</svg>
+</div>
+<span class="inline-block px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-black tracking-widest uppercase mb-6 border border-blue-500/20">
+                            初创项目计划书 #8291
+                        </span>
+<h1 class="text-4xl md:text-5xl font-black text-white mb-2 tracking-tight">
+                            垂直搜索引擎
+                        </h1>
+<h2 class="text-2xl md:text-3xl font-light text-primary mb-8">
+                            专为 AI 模型打造
+                        </h2>
+<p class="max-w-xl text-lg text-gray-300 leading-relaxed mb-8">
+                            一个索引研究论文和模型权重的专业平台，为机器学习工程师提供比通用搜索好10倍的相关性。
+                            <br/><br/>
+<span class="text-sm text-gray-500 italic">“通用搜索太宽泛了。我们需要深度。”</span>
+</p>
+<div class="grid grid-cols-3 gap-4 w-full max-w-lg mb-8">
+<div class="bg-white/5 border border-white/10 rounded-lg p-3 flex flex-col items-center gap-2">
+<span class="material-icons-outlined text-gray-400">group</span>
+<span class="text-[10px] text-gray-400 uppercase font-bold">目标人群</span>
+<span class="text-sm font-bold text-white">算法工程师</span>
+</div>
+<div class="bg-white/5 border border-white/10 rounded-lg p-3 flex flex-col items-center gap-2">
+<span class="material-icons-outlined text-gray-400">attach_money</span>
+<span class="text-[10px] text-gray-400 uppercase font-bold">定价</span>
+<span class="text-sm font-bold text-white">￥350/月</span>
+</div>
+<div class="bg-white/5 border border-white/10 rounded-lg p-3 flex flex-col items-center gap-2">
+<span class="material-icons-outlined text-gray-400">speed</span>
+<span class="text-[10px] text-gray-400 uppercase font-bold">核心技术</span>
+<span class="text-sm font-bold text-white">专有算法</span>
+</div>
+</div>
+</div>
+<div class="h-32 w-full bg-gradient-to-t from-background-dark/80 to-transparent absolute bottom-0 z-0"></div>
+</div>
+<div class="grid md:grid-cols-2 gap-4 md:gap-6 h-auto md:h-48">
+<button id="zero-one-start-option" class="relative group overflow-hidden rounded-xl border border-primary/30 bg-background-dark/40 hover:bg-primary/10 transition-all duration-300 text-left p-6 flex flex-col justify-between hover:border-primary hover:shadow-[0_0_20px_rgba(13,89,242,0.3)]">
+<div class="absolute top-0 left-0 w-1 h-full bg-primary group-hover:w-1.5 transition-all"></div>
+<div>
+<div class="flex justify-between items-start mb-2">
+<span class="bg-primary text-white text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wider">“蒂尔”路径</span>
+<span class="material-icons-outlined text-primary opacity-50 group-hover:opacity-100 transition-opacity transform group-hover:scale-110">stars</span>
+</div>
+<h3 class="text-xl font-black text-white mb-1 group-hover:text-primary transition-colors">垄断细分市场</h3>
+</div>
+<p class="text-sm text-gray-400 mt-4 group-hover:text-gray-300 transition-colors">
+                            首先统治细小的机器学习研究市场。在向外扩张前占领 90% 的份额。
+                        </p>
+</button>
+<button class="relative group overflow-hidden rounded-xl border border-gray-700 bg-background-dark/40 hover:bg-red-500/5 transition-all duration-300 text-left p-6 flex flex-col justify-between hover:border-red-500/50 hover:shadow-[0_0_20px_rgba(239,68,68,0.15)]">
+<div class="absolute top-0 left-0 w-1 h-full bg-gray-700 group-hover:bg-red-500 transition-all"></div>
+<div>
+<div class="flex justify-between items-start mb-2">
+<span class="bg-gray-700 text-gray-300 text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wider group-hover:bg-red-900 group-hover:text-red-100">传统思维</span>
+<span class="material-icons-outlined text-gray-500 opacity-50 group-hover:opacity-100 group-hover:text-red-400 transition-opacity">trending_down</span>
+</div>
+<h3 class="text-xl font-black text-white mb-1 group-hover:text-red-400 transition-colors">价格竞争</h3>
+</div>
+<p class="text-sm text-gray-400 mt-4 group-hover:text-gray-300 transition-colors">
+                            向所有人大规模发布。通过降低价格来挑战现有的搜索巨头。
+                        </p>
+</button>
+</div>
+</section>
+<aside class="hidden xl:flex w-20 flex-col gap-4 items-center pt-10 border-l border-glass-border glass-panel rounded-l-xl my-4 -mr-6">
+<div class="flex flex-col gap-6">
+<button class="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-gray-400 hover:text-primary hover:bg-primary/20 transition-all group relative">
+<span class="material-icons-outlined">edit_note</span>
+<span class="absolute left-[-80px] bg-gray-900 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none">笔记</span>
+</button>
+<button class="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-gray-400 hover:text-primary hover:bg-primary/20 transition-all group relative">
+<span class="material-icons-outlined">menu_book</span>
+<span class="absolute left-[-80px] bg-gray-900 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none">术语表</span>
+</button>
+<button class="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-gray-400 hover:text-primary hover:bg-primary/20 transition-all group relative">
+<span class="material-icons-outlined">help_outline</span>
+<span class="absolute left-[-80px] bg-gray-900 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none">求助</span>
+</button>
+</div>
+<div class="mt-auto mb-8 w-px h-24 bg-gradient-to-b from-transparent via-gray-700 to-transparent"></div>
+</aside>
+</main>
+</div>
+</div>
+<div id="zero-one-intro-panel" class="fixed inset-0 z-[120] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+<div class="w-full max-w-3xl rounded-2xl border border-primary/40 bg-background-dark/95 shadow-[0_20px_60px_rgba(2,6,23,0.65)] overflow-hidden">
+<div class="px-6 md:px-8 py-5 border-b border-primary/20 bg-gradient-to-r from-primary/20 to-transparent">
+<p class="text-xs font-bold tracking-[0.22em] text-primary uppercase">开场导览 · 从0到1</p>
+<h2 class="text-xl md:text-2xl font-black text-white mt-2">先读这一页，再开始你的创业推演</h2>
+</div>
+<div class="px-6 md:px-8 py-6 space-y-4 text-sm text-gray-300 leading-relaxed">
+<p>这本书讨论的不是“如何在已有赛道里跑得更快”，而是“如何创造一个以前不存在的新价值”。</p>
+<div class="grid md:grid-cols-3 gap-3">
+<div class="rounded-xl border border-white/10 bg-white/5 p-3">
+<p class="text-xs uppercase tracking-widest text-primary font-bold mb-1">总论 1</p>
+<p class="text-xs text-gray-300">1 到 n 是复制；0 到 1 是创新。真正高价值来自后者。</p>
+</div>
+<div class="rounded-xl border border-white/10 bg-white/5 p-3">
+<p class="text-xs uppercase tracking-widest text-primary font-bold mb-1">总论 2</p>
+<p class="text-xs text-gray-300">竞争会压缩利润，好的创业目标是建立“创造性垄断”。</p>
+</div>
+<div class="rounded-xl border border-white/10 bg-white/5 p-3">
+<p class="text-xs uppercase tracking-widest text-primary font-bold mb-1">总论 3</p>
+<p class="text-xs text-gray-300">关键提问：你是否掌握了一个“非共识但正确”的秘密？</p>
+</div>
+</div>
+<div class="rounded-xl border border-primary/25 bg-primary/10 p-3">
+<p class="text-xs text-gray-100"><span class="font-bold text-primary">建议玩法：</span>先选“垄断细分市场”路径体验主线，再回看“价格竞争”对照线，理解两种战略的结果差异。</p>
+</div>
+</div>
+<div class="px-6 md:px-8 py-4 border-t border-white/10 flex justify-end">
+<button id="zero-one-intro-enter" class="px-5 py-2.5 rounded-lg bg-primary text-white text-sm font-black tracking-wide hover:bg-blue-500 transition-colors">开始推演</button>
+</div>
+</div>
+</div>
+<script>
+(() => {
+  const panel = document.getElementById("zero-one-intro-panel");
+  const enter = document.getElementById("zero-one-intro-enter");
+  if (!panel || !enter) return;
+  enter.addEventListener("click", () => {
+    panel.classList.add("opacity-0", "pointer-events-none", "transition-opacity", "duration-200");
+    window.setTimeout(() => {
+      panel.remove();
+      const starter = document.getElementById("zero-one-start-option");
+      if (starter instanceof HTMLElement) starter.focus();
+    }, 220);
+  });
+})();
+</script>
+
+<script src="/shared/experience-runtime.js?v=1771240921862"></script>
+<script>
+(() => {
+  
+  localStorage.setItem("reado_book_last_zero-to-one", "zero-to-one-the-monopolist-s-choice");
+  if ("zero-to-one-the-monopolist-s-choice" === "zero-to-one-the-monopolist-s-choice-7") {
+    try {
+      const completedRaw = localStorage.getItem("reado_completed_books_v1") || "[]";
+      const completedSet = new Set(JSON.parse(completedRaw));
+      completedSet.add("zero-to-one");
+      localStorage.setItem("reado_completed_books_v1", JSON.stringify([...completedSet]));
+    } catch {}
+  }
+  
+  const readoNextHref = "/experiences/zero-to-one-the-monopolist-s-choice-1.html";
+  (() => {
+    let isNavigating = false;
+    const keywordList = ["开始", "继续", "下一", "进入", "模拟", "抉择", "选择", "确认", "提交", "挑战", "完成", "start", "next", "continue"];
+    const blacklist = ["EN", "ZH", "返回", "back", "帮助", "求助", "笔记", "术语", "设置", "菜单", "关闭", "取消"];
+    const normalize = (value) => String(value || "").replace(/\s+/g, " ").trim();
+    const hasKeyword = (text) => keywordList.some((keyword) => text.toLowerCase().includes(keyword.toLowerCase()));
+    const isBlocked = (text) => blacklist.some((word) => text === word || text.toLowerCase().includes(word.toLowerCase()));
+    const isOptionGroupButton = (node) => {
+      const parent = node.parentElement;
+      if (!parent) return false;
+      const peers = Array.from(parent.children).filter(
+        (child) => child instanceof HTMLElement && child.matches("button,[role='button'],.concept-card,.item-card,[data-choice],[data-option]")
+      );
+      return peers.length >= 2;
+    };
+    const goNext = (delay = 180) => {
+      if (isNavigating) return;
+      isNavigating = true;
+      window.setTimeout(() => {
+        window.location.href = readoNextHref;
+      }, delay);
+    };
+    document.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+      if (target.closest(".reado-shell-wrap")) return;
+      const candidate = target.closest("[data-next-scene],button,a[href],.concept-card,.item-card,[data-choice],[data-option]");
+      if (!(candidate instanceof HTMLElement)) return;
+      if (!candidate.closest("main")) return;
+      if (candidate.hasAttribute("data-no-next")) return;
+      if (candidate.matches("a[href]")) {
+        const href = candidate.getAttribute("href") || "";
+        if (href && href !== "#" && !href.startsWith("javascript:")) return;
+      }
+      const text = normalize(candidate.textContent);
+      if (candidate.matches("[data-next-scene]")) {
+        event.preventDefault();
+        goNext(90);
+        return;
+      }
+      if (isBlocked(text)) return;
+      if (candidate.matches(".concept-card,.item-card,[data-choice],[data-option]")) {
+        goNext(180);
+        return;
+      }
+      if (candidate.matches("button")) {
+        if (hasKeyword(text) || (text.length >= 4 && isOptionGroupButton(candidate))) {
+          goNext(220);
+        }
+      }
+    });
+  })();
+  
+  if (window.ReadoExperienceRuntime && typeof window.ReadoExperienceRuntime.init === "function") {
+    window.ReadoExperienceRuntime.init({
+      bookId: "zero-to-one",
+      moduleSlug: "zero-to-one-the-monopolist-s-choice",
+      moduleSlugs: ["zero-to-one-the-monopolist-s-choice","zero-to-one-the-monopolist-s-choice-1","zero-to-one-the-monopolist-s-choice-2","zero-to-one-the-monopolist-s-choice-3","zero-to-one-the-monopolist-s-choice-4","zero-to-one-the-monopolist-s-choice-5","zero-to-one-the-monopolist-s-choice-6","zero-to-one-the-monopolist-s-choice-7"]
+    });
+  }
+})();
+</script>
+</body></html>

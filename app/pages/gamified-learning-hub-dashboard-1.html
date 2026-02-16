@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html class="dark" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>reado: 学习中心控制台</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["'Source Han Sans SC'", "'Noto Sans CJK SC'", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+                    boxShadow: {
+                        'glow': '0 0 20px rgba(19, 91, 236, 0.5)',
+                        'card-dark': '0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3)',
+                    },
+                    backgroundImage: {
+                        'map-pattern': "url('data:image/svg+xml,%3Csvg width=\\'60\\' height=\\'60\\' viewBox=\\'0 0 60 60\\' xmlns=\\'http://www.w3.org/2000/svg\\'%3E%3Cg fill=\\'none\\' fill-rule=\\'evenodd\\'%3E%3Cg fill=\\'%231a2333\\' fill-opacity=\\'0.4\\'%3E%3Cpath d=\\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')",
+                    }
+                },
+            },
+        }
+    </script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style type="text/tailwindcss">
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+        body {
+            font-family: 'Noto Sans SC', 'Source Han Sans SC', sans-serif;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .glass-panel {
+            background: rgba(16, 22, 34, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .map-node-pulse {
+            animation: pulse-blue 2s infinite;
+        }
+        @keyframes pulse-blue {
+            0% { box-shadow: 0 0 0 0 rgba(19, 91, 236, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(19, 91, 236, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(19, 91, 236, 0); }
+        }
+        .logo-font {
+            font-family: 'Lexend', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-white h-screen overflow-hidden flex flex-col selection:bg-primary selection:text-white">
+<script src="/shared/book-catalog.js?v=1771240921862"></script>
+<script type="module" src="/shared/shell.js?v=1771240921862"></script>
+<reado-app-shell data-page="knowledge-map"></reado-app-shell>
+<header class="h-20 flex-none z-50 px-6 py-4 flex items-center justify-between glass-panel sticky top-0">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white shadow-glow">
+<span class="material-icons text-2xl">auto_stories</span>
+</div>
+<h1 class="text-2xl font-bold tracking-tight hidden md:block logo-font">reado</h1>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2 bg-background-dark/50 px-4 py-2 rounded-full border border-white/5">
+<span class="material-icons text-orange-500 text-xl">local_fire_department</span>
+<span class="font-bold text-orange-400">连续 15 天</span>
+</div>
+<div class="hidden md:flex items-center gap-2 bg-background-dark/50 px-4 py-2 rounded-full border border-white/5">
+<span class="material-icons text-primary text-xl">diamond</span>
+<span class="font-bold text-primary-300">2,450 宝石</span>
+</div>
+<div class="flex items-center gap-3 pl-4 border-l border-white/10">
+<div class="text-right hidden sm:block">
+<div class="text-sm font-bold">亚历克斯·陈</div>
+<div class="text-xs text-slate-400">42 级 资深学者</div>
+</div>
+<div class="relative">
+<div class="w-12 h-12 rounded-full p-0.5 bg-gradient-to-tr from-primary to-purple-500">
+<img alt="用户头像" class="w-full h-full rounded-full object-cover border-2 border-background-dark" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTCkPJeZKnZiMBWRNBvlC4hj4fuKNI6gb3njqhKFHIdlwmY3juARMMHwwtJg1wv4mUfWu8RlkcrYlKa11Qdo68yG3EqQnQ9E8riXBtvOkdYOqDVbS1s2JSXODzNG2MlyJ4nBha372qjxomU_OS5gCP-XjccsEU8E_n8AogkO8Tv5xwjCp9JWKX2MXi49x2TiT1FCtgXk6e_FJ0rxOLFrn_3jnLdHaeWn4B2tDBS8-pQzmmIatinOFwi81-9HkHWrKUxHd0IhwOI2E"/>
+</div>
+<div class="absolute -bottom-1 -right-1 bg-primary text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border border-background-dark">
+                    42
+                </div>
+</div>
+</div>
+</div>
+</header>
+<div class="flex-1 flex overflow-hidden relative">
+<nav class="w-20 md:w-64 flex-none flex flex-col gap-2 p-4 glass-panel z-40 hidden md:flex">
+<div class="flex flex-col gap-2">
+<a class="flex items-center gap-3 px-4 py-3 bg-primary/10 text-primary rounded-xl font-medium transition-colors border border-primary/20" href="/pages/gamified-learning-hub-dashboard-1.html">
+<span class="material-icons">map</span>
+<span class="hidden md:inline">知识版图</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-colors font-medium" href="/pages/simulator-library-level-selection-1.html">
+<span class="material-icons">backpack</span>
+<span class="hidden md:inline">道具仓库</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-colors font-medium" href="/pages/global-scholar-leaderboard.html">
+<span class="material-icons">leaderboard</span>
+<span class="hidden md:inline">排行榜</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-colors font-medium" href="/pages/gamified-learning-hub-dashboard-3.html">
+<span class="material-icons">storefront</span>
+<span class="hidden md:inline">交易中心</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-colors font-medium" href="/pages/gamified-learning-hub-dashboard-2.html">
+<span class="material-icons">person</span>
+<span class="hidden md:inline">个人资料</span>
+</a>
+</div>
+<div class="mt-auto">
+<div class="bg-gradient-to-br from-indigo-900/50 to-primary/20 p-5 rounded-2xl border border-white/5 relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-2 opacity-20 group-hover:opacity-40 transition-opacity">
+<span class="material-icons text-6xl">emoji_events</span>
+</div>
+<div class="relative z-10">
+<h3 class="text-sm font-bold text-white mb-1">每周挑战</h3>
+<p class="text-xs text-slate-300 mb-3">阅读 3 章节历史书</p>
+<div class="w-full bg-background-dark h-1.5 rounded-full overflow-hidden mb-2">
+<div class="bg-primary h-full w-2/3 rounded-full"></div>
+</div>
+<span class="text-xs text-primary-300 font-medium">已完成 2/3</span>
+</div>
+</div>
+</div>
+</nav>
+<main class="flex-1 relative bg-background-dark overflow-hidden cursor-move select-none">
+<div class="absolute inset-0 bg-map-pattern opacity-30"></div>
+<div class="absolute inset-0 bg-gradient-to-b from-background-dark/20 via-transparent to-background-dark/80 pointer-events-none z-10"></div>
+<div class="w-[140%] h-[140%] absolute -top-[20%] -left-[20%] flex items-center justify-center">
+<svg class="absolute inset-0 w-full h-full pointer-events-none opacity-40" xmlns="http://www.w3.org/2000/svg">
+<path d="M30% 35% L20% 50%" stroke="#334155" stroke-width="2"></path>
+</svg>
+
+</div>
+<div class="absolute left-[70%] top-[30%] flex flex-col items-center group cursor-pointer z-20">
+<div class="relative">
+<div class="w-16 h-16 rounded-xl rotate-45 bg-gradient-to-br from-cyan-600 to-blue-800 flex items-center justify-center shadow-lg hover:shadow-cyan-500/50 transition-all duration-300 map-node-pulse">
+<span class="material-icons text-3xl text-white -rotate-45">memory</span>
+</div>
+<div class="absolute -top-3 -right-3 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center border-2 border-background-dark text-xs font-bold text-white">
+                        !
+                    </div>
+</div>
+<div class="mt-6 bg-background-dark/80 px-3 py-1.5 rounded-lg border border-cyan-500/30 backdrop-blur text-center group-hover:bg-cyan-900/40 transition-colors">
+<div class="text-cyan-100 font-bold">认知/硬核</div>
+<div class="text-[10px] text-cyan-400 uppercase tracking-wider">科学普及 · 历史 · 哲学 · 社会学</div>
+</div>
+</div>
+<div class="absolute left-[30%] top-[35%] flex flex-col items-center group cursor-pointer z-20">
+<div class="w-16 h-16 rounded-full bg-slate-800 border-2 border-green-500 flex items-center justify-center opacity-90 hover:opacity-100 hover:scale-105 transition-all">
+<span class="material-icons text-3xl text-green-500">psychology</span>
+</div>
+<div class="mt-3 bg-background-dark/80 px-3 py-1.5 rounded-lg border border-white/10 backdrop-blur text-center">
+<div class="text-slate-300 font-bold group-hover:text-white">个人修炼</div>
+<div class="text-[10px] text-green-400 uppercase tracking-wider">心理学 · 自我提升 · 时间管理 · 思维模型</div>
+</div>
+</div>
+<div class="absolute left-[60%] top-[70%] flex flex-col items-center group opacity-60 z-10">
+<div class="w-14 h-14 rounded-lg bg-slate-900 border border-slate-700 flex items-center justify-center grayscale">
+<span class="material-icons text-2xl text-slate-500">account_balance</span>
+</div>
+<div class="mt-3">
+<div class="text-slate-500 font-bold text-sm">灵感/生活</div>
+<div class="flex items-center justify-center gap-1 text-[10px] text-slate-600">
+<span class="material-icons text-[10px]">lock</span> 艺术设计 · 传记 · 文学虚构 · 生活美学
+                    </div>
+</div>
+</div>
+<div class="absolute left-[20%] top-[50%] flex flex-col items-center group cursor-pointer z-20">
+<div class="w-14 h-14 rounded-full bg-indigo-900/50 border border-indigo-500/50 flex items-center justify-center hover:bg-indigo-900 hover:shadow-[0_0_15px_rgba(99,102,241,0.5)] transition-all">
+<span class="material-icons text-2xl text-indigo-300">rocket_launch</span>
+</div>
+<div class="mt-3 bg-background-dark/80 px-3 py-1.5 rounded-lg border border-white/10 backdrop-blur text-center">
+<div class="text-slate-300 font-bold text-sm group-hover:text-white">事业/财富</div>
+<div class="text-[10px] text-indigo-400 uppercase tracking-wider">经济金融 · 商业管理 · 职场技能 · 创业</div>
+</div>
+</div>
+</div>
+<button class="md:hidden absolute bottom-6 right-6 w-14 h-14 rounded-full bg-primary text-white shadow-glow flex items-center justify-center z-50">
+<span class="material-icons">play_arrow</span>
+</button>
+</main>
+<aside class="w-80 flex-none bg-background-dark border-l border-white/5 flex flex-col h-full z-40 hidden lg:flex">
+<div class="p-6 border-b border-white/5">
+<div class="flex items-center justify-between mb-4">
+<h2 class="font-bold text-lg text-white">全球排名</h2>
+<span class="text-xs text-primary bg-primary/10 px-2 py-1 rounded-lg">第 4 赛季</span>
+</div>
+<div class="bg-gradient-to-r from-slate-800 to-slate-900 rounded-xl p-4 border border-white/5 relative overflow-hidden">
+<div class="absolute -right-4 -top-4 w-20 h-20 bg-primary/20 rounded-full blur-2xl"></div>
+<div class="flex items-center justify-between relative z-10">
+<div class="flex flex-col">
+<span class="text-xs text-slate-400 uppercase tracking-wider font-medium">当前排名</span>
+<span class="text-2xl font-bold text-white">#1,248</span>
+</div>
+<div class="flex items-center gap-1 text-green-400 text-sm font-medium bg-green-500/10 px-2 py-1 rounded-lg">
+<span class="material-icons text-sm">arrow_upward</span>
+                        12
+                    </div>
+</div>
+<div class="mt-3 w-full bg-slate-700/50 h-1.5 rounded-full overflow-hidden">
+<div class="bg-green-500 h-full w-[65%] rounded-full shadow-[0_0_10px_rgba(34,197,94,0.5)]"></div>
+</div>
+<p class="text-[10px] text-slate-400 mt-2 text-right">全球前 5%</p>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-6 scrollbar-hide">
+<div class="flex items-center justify-between mb-4">
+<h2 class="font-bold text-lg text-white">进行中的任务</h2>
+<span class="bg-white/10 text-white text-xs px-2 py-1 rounded-full">3</span>
+</div>
+<div class="space-y-4">
+<div class="bg-slate-800/40 p-4 rounded-2xl border border-primary/30 hover:bg-slate-800/60 transition-colors group cursor-pointer relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
+<div class="flex gap-3 mb-3">
+<div class="w-12 h-16 bg-slate-700 rounded-lg flex-none overflow-hidden shadow-lg">
+<img alt="人类简史封面" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBhnpSmevHEvI79iUT0XqOoO_LhVj6S6LqyDef-4S8K9IE_qizRZnCp1ggKJyYA83boDXGmbDxLyBlOmLLzFwj0OHtC3otLNcNmvWFHKwQP6WbEDpsqBnOC0yQWvsW26rgLuFeAkVLdGcmBM5BXl2wEmshGxoLSMFCb9nzcKlW_VcbbZT47UVQTbNB7wqK6RVVK5sYjzEkoWJkkB1g_mWB7aoq1HJenIWyGFMAAsVbWFx0ofKEBbAvlRG3EdGraADfYX7UD9o9hBV0"/>
+</div>
+<div class="flex-1">
+<h3 class="font-bold text-white text-sm leading-tight mb-1">人类简史：从动物到上帝</h3>
+<p class="text-xs text-slate-400">尤瓦尔·赫拉利</p>
+</div>
+</div>
+<div class="flex items-center justify-between text-xs mb-2">
+<span class="text-primary font-bold">等级 3 / 10</span>
+<span class="text-slate-400">30%</span>
+</div>
+<div class="w-full bg-background-dark h-2 rounded-full overflow-hidden mb-3">
+<div class="bg-primary h-full w-[30%] rounded-full shadow-glow"></div>
+</div>
+<button class="w-full py-2 bg-primary hover:bg-primary/90 text-white text-xs font-bold rounded-lg transition-colors flex items-center justify-center gap-2">
+<span>继续学习</span>
+<span class="material-icons text-sm">play_circle</span>
+</button>
+</div>
+<div class="bg-slate-800/20 p-4 rounded-2xl border border-white/5 hover:bg-slate-800/40 transition-colors group cursor-pointer">
+<div class="flex gap-3 mb-3">
+<div class="w-12 h-16 bg-slate-700 rounded-lg flex-none overflow-hidden shadow-lg">
+<img alt="原子习惯封面" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3f23tTb_q26te18vxq0IUAy9JLyLzG7UMV205GnoFYoE7RHI2bNJsbklZFztFHxAubc_9HFd7NeFVgAMRTz0s_52VbUTV6pj4WX6-sC0k4Um06mSYrRJ-e5mb7KPHO59XRLhv5exKdMJ_olG8DmQm5wrwiWX5azqvNFREsuSOwaE4-RnhtVffqdmj59nJxWuAdlgxLo36stAM3qPbios5sx-jAODAkKYD0GNhcQFvMHc-zi1spdaPDhdJmBG9dX6sbZIBK5trC00"/>
+</div>
+<div class="flex-1">
+<h3 class="font-bold text-slate-200 text-sm leading-tight mb-1">原子习惯</h3>
+<p class="text-xs text-slate-500">詹姆斯·克利尔</p>
+</div>
+</div>
+<div class="flex items-center justify-between text-xs mb-2">
+<span class="text-slate-400 font-bold">等级 7 / 12</span>
+<span class="text-slate-500">58%</span>
+</div>
+<div class="w-full bg-background-dark h-2 rounded-full overflow-hidden">
+<div class="bg-slate-500 h-full w-[58%] rounded-full"></div>
+</div>
+</div>
+<div class="bg-slate-800/20 p-4 rounded-2xl border border-white/5 hover:bg-slate-800/40 transition-colors group cursor-pointer">
+<div class="flex gap-3 mb-3">
+<div class="w-12 h-16 bg-slate-700 rounded-lg flex-none overflow-hidden shadow-lg">
+<img alt="思考，快与慢封面" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBu8g3s8X1-2jLxlYq-rmOO7UpTy_Z2IZv2l0qBbN10iYfzyASlI-pr2h4ZZjvM_ZuTSIB1TNVdg3Ihac_9nXQNFZ9-13ohFJaoyvNa6gogkl5FOPsnpBtgqSaIrrDARL88NrkTYX3GkPB7DJBrA3dlkZFxalbvZTz8qGx0fqDWQ8faGHQ_nfQ8CZmQSg8h0NC_JYGGYoy-LqH0IsCdoYdvI2PEsy429Us-hApGswVfGc-JAFMMAMz8bjmQHi_Zx-OpHeyCwbeCet4"/>
+</div>
+<div class="flex-1">
+<h3 class="font-bold text-slate-200 text-sm leading-tight mb-1">思考，快与慢</h3>
+<p class="text-xs text-slate-500">丹尼尔·卡尼曼</p>
+</div>
+</div>
+<div class="flex items-center justify-between text-xs mb-2">
+<span class="text-slate-400 font-bold">等级 1 / 15</span>
+<span class="text-slate-500">5%</span>
+</div>
+<div class="w-full bg-background-dark h-2 rounded-full overflow-hidden">
+<div class="bg-slate-500 h-full w-[5%] rounded-full"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="p-4 border-t border-white/5 bg-slate-900/50">
+<button class="w-full py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white text-sm font-medium rounded-xl transition-all flex items-center justify-center gap-2">
+<span class="material-icons text-sm">add_circle_outline</span>
+                探索新领域
+            </button>
+</div>
+</aside>
+</div>
+
+
+<script id="reado-map-category-script">
+(() => {
+  const fallbackBooks = [{"id":"wanli-fifteen","title":"《万历十五年》","cover":"/assets/book-covers/wanli-fifteen.jpg","category":"science-knowledge","categoryLabel":"认知/硬核","categoryHint":"开拓世界地图，解锁迷雾","moduleCount":5,"hubHref":"/books/wanli-fifteen.html","firstModuleHref":"/experiences/tax-reform-dilemma-1.html","moduleSlugs":["tax-reform-dilemma-1","tax-reform-dilemma-2","tax-reform-dilemma-3","tax-reform-dilemma-4","tax-reform-dilemma-5"]},{"id":"sapiens","title":"《人类简史》","cover":"/assets/book-covers/sapiens.jpg","category":"science-knowledge","categoryLabel":"认知/硬核","categoryHint":"开拓世界地图，解锁迷雾","moduleCount":10,"hubHref":"/books/sapiens.html","firstModuleHref":"/experiences/the-wheat-conquest-simulator.html","moduleSlugs":["the-wheat-conquest-simulator","human-domestication-dilemma-1","human-domestication-dilemma-2","bilingual-human-domestication-dilemma","sapiens-the-wheat-conquest-simulator-1","sapiens-the-wheat-conquest-simulator-2","bilingual-human-domestication-dilemma-4","bilingual-human-domestication-dilemma-1","bilingual-human-domestication-dilemma-2","bilingual-human-domestication-dilemma-3"]},{"id":"principles-for-navigating-big-debt-crises","title":"《置身事外》","cover":"/assets/book-covers/principles-for-navigating-big-debt-crises.jpg","category":"career-wealth","categoryLabel":"事业/财富","categoryHint":"获取金币和装备，通关职场副本","moduleCount":7,"hubHref":"/books/principles-for-navigating-big-debt-crises.html","firstModuleHref":"/experiences/the-beautiful-deleveraging-challenge.html","moduleSlugs":["the-beautiful-deleveraging-challenge","the-subway-dilemma","debt-cycle-impact-analysis","1994","experience-28","experience-29","experience-30"]},{"id":"zero-to-one","title":"《从零到一》","cover":"/assets/book-covers/zero-to-one.jpg","category":"career-wealth","categoryLabel":"事业/财富","categoryHint":"获取金币和装备，通关职场副本","moduleCount":8,"hubHref":"/books/zero-to-one.html","firstModuleHref":"/experiences/zero-to-one-the-monopolist-s-choice.html","moduleSlugs":["zero-to-one-the-monopolist-s-choice","zero-to-one-the-monopolist-s-choice-1","zero-to-one-the-monopolist-s-choice-2","zero-to-one-the-monopolist-s-choice-3","zero-to-one-the-monopolist-s-choice-4","zero-to-one-the-monopolist-s-choice-5","zero-to-one-the-monopolist-s-choice-6","zero-to-one-the-monopolist-s-choice-7"]}];
+  const catalog = window.__READO_BOOK_CATALOG__;
+  const books = Array.isArray(catalog?.books) && catalog.books.length > 0 ? catalog.books : fallbackBooks;
+  const storageKey = catalog?.storage?.unlockKey || "reado_unlocked_books_v1";
+  const viewStorageKey = "reado_knowledge_map_view_v1";
+
+  const main = document.querySelector("main");
+  if (!(main instanceof HTMLElement)) return;
+
+  const mapScene = document.createElement("div");
+  mapScene.id = "reado-map-scene";
+  mapScene.className = "absolute inset-0 overflow-hidden";
+  while (main.firstChild) {
+    mapScene.append(main.firstChild);
+  }
+  main.append(mapScene);
+
+  const ensureStyle = () => {
+    if (document.getElementById("reado-knowledge-view-style")) return;
+    const style = document.createElement("style");
+    style.id = "reado-knowledge-view-style";
+    style.textContent = [
+      "#reado-map-view-toggle { position: absolute; top: 14px; left: 14px; right: 14px; z-index: 90; display: flex; justify-content: space-between; align-items: center; gap: 10px; pointer-events: none; }",
+      "#reado-map-view-toggle .reado-view-chip { pointer-events: auto; background: rgba(15, 23, 42, 0.82); border: 1px solid rgba(148, 163, 184, 0.3); color: #cbd5e1; border-radius: 9999px; padding: 6px 12px; font-size: 11px; letter-spacing: 0.14em; font-weight: 700; text-transform: uppercase; backdrop-filter: blur(8px); }",
+      "#reado-map-view-toggle .reado-view-switch { pointer-events: auto; display: inline-flex; background: rgba(15, 23, 42, 0.82); border: 1px solid rgba(148, 163, 184, 0.3); border-radius: 9999px; padding: 4px; backdrop-filter: blur(8px); }",
+      "#reado-map-view-toggle .reado-view-btn { border: 0; background: transparent; color: #94a3b8; font-size: 12px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; border-radius: 9999px; padding: 7px 12px; cursor: pointer; transition: all .18s ease; }",
+      "#reado-map-view-toggle .reado-view-btn.active { background: linear-gradient(135deg, #1d4ed8, #2563eb); color: #fff; box-shadow: 0 0 18px rgba(37, 99, 235, 0.35); }",
+      "#reado-shelf-view { position: absolute; inset: 0; z-index: 70; overflow-y: auto; overflow-x: hidden; display: none; background: radial-gradient(1100px 420px at 15% -10%, rgba(37, 99, 235, 0.18), transparent), radial-gradient(900px 380px at 85% 0%, rgba(99, 102, 241, 0.2), transparent), linear-gradient(180deg, rgba(2, 6, 23, 0.8), rgba(2, 6, 23, 0.95)); }",
+      "#reado-shelf-view .reado-shelf-wrap { max-width: 1200px; margin: 0 auto; padding: 78px 18px 28px; }",
+      "#reado-shelf-view .reado-shelf-header { margin-bottom: 14px; }",
+      "#reado-shelf-view .reado-shelf-title { font-size: 28px; line-height: 1.2; font-weight: 900; color: #fff; letter-spacing: -0.02em; }",
+      "#reado-shelf-view .reado-shelf-sub { margin-top: 6px; color: #93c5fd; font-size: 12px; letter-spacing: 0.14em; font-weight: 700; text-transform: uppercase; }",
+      "#reado-shelf-view .reado-shelf-count { margin-top: 10px; color: #94a3b8; font-size: 12px; }",
+      "#reado-shelf-view .reado-shelf-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }",
+      "#reado-shelf-view .reado-shelf-card { border: 1px solid rgba(148, 163, 184, 0.22); background: rgba(15, 23, 42, 0.78); border-radius: 18px; overflow: hidden; box-shadow: 0 12px 30px rgba(2, 6, 23, 0.35); transition: border-color .18s ease, transform .18s ease; display: flex; flex-direction: column; }",
+      "#reado-shelf-view .reado-shelf-card:hover { border-color: rgba(59, 130, 246, 0.7); transform: translateY(-2px); }",
+      "#reado-shelf-view .reado-shelf-cover { height: 190px; border-bottom: 1px solid rgba(148, 163, 184, 0.16); background: rgba(2, 6, 23, 0.6); display: flex; align-items: center; justify-content: center; padding: 10px; }",
+      "#reado-shelf-view .reado-shelf-cover img { max-height: 100%; max-width: 100%; object-fit: contain; }",
+      "#reado-shelf-view .reado-shelf-body { padding: 12px; display: flex; flex-direction: column; gap: 8px; flex: 1; }",
+      "#reado-shelf-view .reado-shelf-cat { font-size: 10px; color: #7dd3fc; letter-spacing: .1em; font-weight: 800; text-transform: uppercase; }",
+      "#reado-shelf-view .reado-shelf-name { font-size: 15px; line-height: 1.35; color: #fff; font-weight: 800; min-height: 40px; }",
+      "#reado-shelf-view .reado-shelf-meta { font-size: 11px; color: #94a3b8; }",
+      "#reado-shelf-view .reado-shelf-hint { font-size: 11px; color: #cbd5e1; min-height: 32px; }",
+      "#reado-shelf-view .reado-shelf-cta { margin-top: auto; border: 1px solid rgba(59, 130, 246, 0.45); background: linear-gradient(135deg, rgba(37, 99, 235, 0.3), rgba(30, 64, 175, 0.4)); color: #fff; border-radius: 10px; font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; padding: 10px; cursor: pointer; transition: all .18s ease; }",
+      "#reado-shelf-view .reado-shelf-cta:hover { border-color: rgba(96, 165, 250, 0.8); background: linear-gradient(135deg, rgba(59, 130, 246, 0.45), rgba(37, 99, 235, 0.5)); }",
+      "#reado-shelf-view .reado-shelf-empty { border: 1px solid rgba(148, 163, 184, 0.2); border-radius: 12px; background: rgba(15, 23, 42, 0.68); padding: 18px; color: #cbd5e1; font-size: 13px; text-align: center; }",
+      "@media (max-width: 900px) { #reado-map-view-toggle { top: 10px; left: 10px; right: 10px; } #reado-map-view-toggle .reado-view-chip { display: none; } #reado-shelf-view .reado-shelf-wrap { padding-top: 64px; } #reado-shelf-view .reado-shelf-title { font-size: 22px; } }"
+    ].join("\n");
+    document.head.append(style);
+  };
+  ensureStyle();
+
+  const removeCenterHub = () => {
+    const bySchoolIcon = Array.from(mapScene.querySelectorAll("span.material-icons"))
+      .find((el) => (el.textContent || "").trim() === "school");
+    const centerNode = bySchoolIcon?.closest(".absolute");
+    if (centerNode instanceof HTMLElement) {
+      centerNode.remove();
+      return;
+    }
+    const fallbackNode = Array.from(mapScene.querySelectorAll(".absolute"))
+      .find((node) => {
+        const text = (node.textContent || "").replace(/\s+/g, " ").trim();
+        return text.includes("中央档案馆") || text.includes("中央档案部") || text.includes("基地总部");
+      });
+    if (fallbackNode instanceof HTMLElement) {
+      fallbackNode.remove();
+    }
+    mapScene.querySelectorAll("svg path").forEach((pathEl) => {
+      const d = (pathEl.getAttribute("d") || "").replace(/\s+/g, " ").trim();
+      if (d.startsWith("M50% 50%")) {
+        pathEl.remove();
+      }
+    });
+  };
+  removeCenterHub();
+
+  const categories = [
+    {
+      id: "science-knowledge",
+      icon: "memory",
+      title: "🧩 认知/硬核",
+      subtitle: "科学普及 · 历史 · 哲学 · 社会学",
+      titleClass: "text-cyan-100 font-bold text-sm",
+      subtitleClass: "text-[10px] text-cyan-300 tracking-wider"
+    },
+    {
+      id: "personal-growth",
+      icon: "psychology",
+      title: "个人修炼",
+      subtitle: "心理学 · 自我提升 · 时间管理 · 思维模型",
+      titleClass: "text-emerald-100 font-bold text-sm",
+      subtitleClass: "text-[10px] text-emerald-300 tracking-wider"
+    },
+    {
+      id: "career-wealth",
+      icon: "rocket_launch",
+      title: "事业/财富",
+      subtitle: "经济金融 · 商业管理 · 职场技能 · 创业",
+      titleClass: "text-indigo-100 font-bold text-sm",
+      subtitleClass: "text-[10px] text-indigo-300 tracking-wider"
+    },
+    {
+      id: "lifestyle-creativity",
+      icon: "account_balance",
+      title: "灵感/生活",
+      subtitle: "艺术设计 · 传记 · 文学虚构 · 生活美学",
+      titleClass: "text-amber-100 font-bold text-sm",
+      subtitleClass: "text-[10px] text-amber-300 tracking-wider"
+    }
+  ];
+
+  const findNodeByIcon = (iconName) => {
+    const icon = Array.from(mapScene.querySelectorAll("span.material-icons"))
+      .find((el) => (el.textContent || "").trim() === iconName);
+    if (!icon) return null;
+    const node = icon.closest(".absolute");
+    return node instanceof HTMLElement ? node : null;
+  };
+
+  categories.forEach((category) => {
+    const node = findNodeByIcon(category.icon);
+    if (!node) return;
+    const childDivs = Array.from(node.children).filter((child) => child.tagName === "DIV");
+    const iconBox = childDivs[0];
+    const metaBox = childDivs[childDivs.length - 1];
+
+    if (metaBox) {
+      metaBox.classList.add("bg-background-dark/80", "px-3", "py-1.5", "rounded-lg", "border", "border-white/10", "backdrop-blur", "text-center");
+      metaBox.innerHTML = `
+        <div class="${category.titleClass}">${category.title}</div>
+        <div class="${category.subtitleClass}">${category.subtitle}</div>`;
+    }
+
+    node.classList.remove("opacity-60", "z-10");
+    node.classList.add("cursor-pointer", "z-20");
+    if (iconBox) {
+      iconBox.classList.remove("grayscale", "opacity-90");
+      iconBox.classList.add("hover:scale-105");
+      iconBox.style.opacity = "1";
+    }
+
+    const goToCategory = () => {
+      window.location.href = "/pages/simulator-library-level-selection-1.html?category=" + category.id;
+    };
+
+    node.addEventListener("click", goToCategory);
+    node.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        goToCategory();
+      }
+    });
+    node.setAttribute("role", "button");
+    node.setAttribute("tabindex", "0");
+  });
+
+  const toolbar = document.createElement("div");
+  toolbar.id = "reado-map-view-toggle";
+  toolbar.innerHTML = `
+    <span class="reado-view-chip">学习入口</span>
+    <div class="reado-view-switch" role="tablist" aria-label="知识页视图切换">
+      <button type="button" class="reado-view-btn" data-view="shelf" role="tab" aria-selected="true">书架视图</button>
+      <button type="button" class="reado-view-btn" data-view="map" role="tab" aria-selected="false">知识版图</button>
+    </div>`;
+
+  const shelfPanel = document.createElement("section");
+  shelfPanel.id = "reado-shelf-view";
+  shelfPanel.innerHTML = `
+    <div class="reado-shelf-wrap">
+      <div class="reado-shelf-header">
+        <h2 class="reado-shelf-title">可体验书架</h2>
+        <p class="reado-shelf-sub">默认视图 · 直接进入书籍体验</p>
+        <p class="reado-shelf-count" data-shelf-count></p>
+      </div>
+      <div class="reado-shelf-grid" data-shelf-grid></div>
+    </div>`;
+
+  main.append(toolbar, shelfPanel);
+
+  const shelfGrid = shelfPanel.querySelector("[data-shelf-grid]");
+  const shelfCount = shelfPanel.querySelector("[data-shelf-count]");
+  const viewButtons = Array.from(toolbar.querySelectorAll("[data-view]"));
+
+  const getUnlocked = () => {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(storageKey) || "[]");
+      return new Set(Array.isArray(parsed) ? parsed : []);
+    } catch {
+      return new Set();
+    }
+  };
+
+  const saveUnlocked = (set) => {
+    localStorage.setItem(storageKey, JSON.stringify([...set]));
+  };
+
+  const createCard = (book, unlocked) => {
+    const isUnlocked = unlocked.has(book.id);
+    return `
+      <article class="reado-shelf-card">
+        <div class="reado-shelf-cover">
+          <img src="${book.cover}" alt="${book.title}" loading="lazy" />
+        </div>
+        <div class="reado-shelf-body">
+          <div class="reado-shelf-cat">${book.categoryLabel || "书籍模块"}</div>
+          <div class="reado-shelf-name">${book.title}</div>
+          <div class="reado-shelf-meta">${book.moduleCount || 0} 个体验模块</div>
+          <div class="reado-shelf-hint">${book.categoryHint || "点击进入，开始互动体验。"}</div>
+          <button type="button" class="reado-shelf-cta" data-book-id="${book.id}">
+            ${isUnlocked ? "继续体验" : "开始体验"}
+          </button>
+        </div>
+      </article>`;
+  };
+
+  const renderShelf = () => {
+    if (!(shelfGrid instanceof HTMLElement)) return;
+    const available = books.filter((book) => book && book.id && (book.firstModuleHref || book.hubHref));
+    const unlocked = getUnlocked();
+    if (shelfCount instanceof HTMLElement) {
+      shelfCount.textContent = `当前可体验 ${available.length} 本书`;
+    }
+    if (available.length === 0) {
+      shelfGrid.innerHTML = '<div class="reado-shelf-empty">暂无可用书籍，请先配置 book_experiences 模块。</div>';
+      return;
+    }
+    shelfGrid.innerHTML = available.map((book) => createCard(book, unlocked)).join("");
+  };
+
+  if (shelfGrid instanceof HTMLElement) {
+    shelfGrid.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+      const button = target.closest("button[data-book-id]");
+      if (!(button instanceof HTMLElement)) return;
+      const bookId = button.getAttribute("data-book-id");
+      if (!bookId) return;
+      const book = books.find((item) => item.id === bookId);
+      if (!book) return;
+
+      const unlocked = getUnlocked();
+      if (!unlocked.has(bookId)) {
+        unlocked.add(bookId);
+        saveUnlocked(unlocked);
+      }
+
+      const last = localStorage.getItem("reado_book_last_" + bookId);
+      const canResume = Boolean(last && Array.isArray(book.moduleSlugs) && book.moduleSlugs.includes(last));
+      const entryHref = canResume
+        ? "/experiences/" + last + ".html"
+        : (book.firstModuleHref || book.hubHref || "");
+      if (entryHref) {
+        window.location.href = entryHref;
+      }
+    });
+  }
+
+  const setView = (view) => {
+    const nextView = view === "map" ? "map" : "shelf";
+    localStorage.setItem(viewStorageKey, nextView);
+    const mapOn = nextView === "map";
+    mapScene.style.display = mapOn ? "" : "none";
+    shelfPanel.style.display = mapOn ? "none" : "block";
+    main.classList.toggle("cursor-move", mapOn);
+    main.classList.toggle("select-none", mapOn);
+    viewButtons.forEach((button) => {
+      const isActive = button.getAttribute("data-view") === nextView;
+      button.classList.toggle("active", isActive);
+      button.setAttribute("aria-selected", isActive ? "true" : "false");
+    });
+  };
+
+  viewButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const view = button.getAttribute("data-view") || "shelf";
+      setView(view);
+    });
+  });
+
+  renderShelf();
+  const savedView = localStorage.getItem(viewStorageKey);
+  setView(savedView === "map" || savedView === "shelf" ? savedView : "shelf");
+})();
+</script>
+</body></html>

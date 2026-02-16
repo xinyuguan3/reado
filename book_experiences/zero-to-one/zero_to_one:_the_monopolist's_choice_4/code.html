@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html class="dark" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>reado: 创业成功七问诊断台</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Source+Han+Sans+CN:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "tech-black": "#050505",
+                        "tech-green": "#00ff41",
+                        "tech-green-dim": "#008f24",
+                        "tech-gray": "#1a1a1a",
+                        "tech-border": "#333333",
+                        "glass-dark": "rgba(5, 5, 5, 0.8)",
+                    },
+                    fontFamily: {
+                        "sans": ["Source Han Sans CN", "Source Han Sans", "Noto Sans SC", "sans-serif"],
+                        "mono": ["Source Code Pro", "monospace"],
+                    },
+                    boxShadow: {
+                        'neon': '0 0 5px rgba(0, 255, 65, 0.2), 0 0 10px rgba(0, 255, 65, 0.1)',
+                        'neon-strong': '0 0 10px rgba(0, 255, 65, 0.6), 0 0 20px rgba(0, 255, 65, 0.4)',
+                    }
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        body {
+            font-family: 'Source Han Sans CN', sans-serif;
+            background-color: #050505;
+            color: #e5e5e5;
+        }
+        .scan-line {
+            width: 100%;
+            height: 2px;
+            background: rgba(0, 255, 65, 0.1);
+            position: absolute;
+            z-index: 10;
+            animation: scan 3s linear infinite;
+        }
+        @keyframes scan {
+            0% { top: 0%; opacity: 0; }
+            5% { opacity: 1; }
+            95% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+        .grid-bg {
+            background-size: 40px 40px;
+            background-image: 
+                linear-gradient(to right, rgba(0, 255, 65, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 255, 65, 0.03) 1px, transparent 1px);
+        }
+        .crt-overlay {
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+        .glitch-text:hover {
+            animation: glitch 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
+            color: #00ff41;
+        }
+        @keyframes glitch {
+            0% { transform: translate(0) }
+            20% { transform: translate(-2px, 2px) }
+            40% { transform: translate(-2px, -2px) }
+            60% { transform: translate(2px, 2px) }
+            80% { transform: translate(2px, -2px) }
+            100% { transform: translate(0) }
+        }
+        .slot-active {
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.3);
+            border-color: #00ff41;
+            background: rgba(0, 255, 65, 0.05);
+        }
+        .slot-inactive {
+            border-color: #333;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body class="bg-tech-black h-screen w-screen overflow-hidden flex items-center justify-center relative">
+<div class="fixed inset-0 grid-bg pointer-events-none z-0"></div>
+<div class="fixed inset-0 crt-overlay z-50 pointer-events-none opacity-20"></div>
+<div class="scan-line pointer-events-none"></div>
+<main class="relative z-10 w-full max-w-7xl h-[90vh] flex flex-col gap-6 p-6">
+<header class="flex justify-between items-end border-b border-tech-green/30 pb-4">
+<div>
+<div class="text-xs font-mono text-tech-green/60 mb-1 tracking-widest">SYSTEM: ZERO_TO_ONE_DIAGNOSTIC</div>
+<h1 class="text-4xl font-black tracking-tight text-white uppercase glitch-text cursor-default">
+                    商业成功<span class="text-tech-green">七问</span>诊断台
+                </h1>
+</div>
+<div class="flex flex-col items-end gap-1">
+<div class="text-tech-green font-mono text-xl font-bold">SUCCESS_PROBABILITY</div>
+<div class="flex items-center gap-2">
+<span class="block w-2 h-2 bg-tech-green animate-pulse rounded-full"></span>
+<span class="text-sm text-gray-400 font-mono">LIVE EVALUATION</span>
+</div>
+</div>
+</header>
+<div class="flex-1 grid grid-cols-12 gap-6 min-h-0">
+<div class="col-span-12 lg:col-span-4 flex flex-col gap-3 overflow-y-auto pr-2 custom-scrollbar">
+<button class="group w-full text-left p-4 border slot-active border-tech-green bg-tech-green/5 rounded transition-all hover:bg-tech-green/10 relative overflow-hidden">
+<div class="absolute right-0 top-0 p-2 opacity-10 group-hover:opacity-20">
+<span class="material-symbols-outlined text-4xl">precision_manufacturing</span>
+</div>
+<div class="flex justify-between items-center mb-1">
+<span class="font-mono text-xs text-tech-green font-bold">01 // ENGINEERING</span>
+<span class="material-symbols-outlined text-tech-green text-sm">check_circle</span>
+</div>
+<h3 class="text-xl font-bold text-white tracking-wide group-hover:text-tech-green transition-colors">工程问题</h3>
+<div class="h-0.5 w-full bg-gray-800 mt-3 relative overflow-hidden">
+<div class="absolute left-0 top-0 h-full w-full bg-tech-green"></div>
+</div>
+</button>
+<button class="group w-full text-left p-4 border border-tech-border bg-tech-gray/30 rounded transition-all hover:border-tech-green/50 hover:bg-tech-gray/50 relative overflow-hidden">
+<div class="absolute right-0 top-0 p-2 opacity-0 group-hover:opacity-10">
+<span class="material-symbols-outlined text-4xl">schedule</span>
+</div>
+<div class="flex justify-between items-center mb-1">
+<span class="font-mono text-xs text-gray-500 group-hover:text-tech-green/70 font-bold">02 // TIMING</span>
+<span class="material-symbols-outlined text-gray-600 text-sm">radio_button_unchecked</span>
+</div>
+<h3 class="text-xl font-bold text-gray-300 tracking-wide group-hover:text-white transition-colors">时机问题</h3>
+<div class="h-0.5 w-full bg-gray-800 mt-3 relative overflow-hidden">
+<div class="absolute left-0 top-0 h-full w-0 bg-tech-green transition-all group-hover:w-10"></div>
+</div>
+</button>
+<button class="group w-full text-left p-4 border border-tech-border bg-tech-gray/30 rounded transition-all hover:border-tech-green/50 hover:bg-tech-gray/50 relative overflow-hidden">
+<div class="absolute right-0 top-0 p-2 opacity-0 group-hover:opacity-10">
+<span class="material-symbols-outlined text-4xl">diamond</span>
+</div>
+<div class="flex justify-between items-center mb-1">
+<span class="font-mono text-xs text-gray-500 group-hover:text-tech-green/70 font-bold">03 // MONOPOLY</span>
+<span class="material-symbols-outlined text-gray-600 text-sm">radio_button_unchecked</span>
+</div>
+<h3 class="text-xl font-bold text-gray-300 tracking-wide group-hover:text-white transition-colors">垄断问题</h3>
+<div class="h-0.5 w-full bg-gray-800 mt-3"></div>
+</button>
+<button class="group w-full text-left p-4 border border-tech-border bg-tech-gray/30 rounded transition-all hover:border-tech-green/50 hover:bg-tech-gray/50 relative overflow-hidden">
+<div class="absolute right-0 top-0 p-2 opacity-0 group-hover:opacity-10">
+<span class="material-symbols-outlined text-4xl">groups</span>
+</div>
+<div class="flex justify-between items-center mb-1">
+<span class="font-mono text-xs text-gray-500 group-hover:text-tech-green/70 font-bold">04 // PEOPLE</span>
+<span class="material-symbols-outlined text-gray-600 text-sm">radio_button_unchecked</span>
+</div>
+<h3 class="text-xl font-bold text-gray-300 tracking-wide group-hover:text-white transition-colors">人员问题</h3>
+<div class="h-0.5 w-full bg-gray-800 mt-3"></div>
+</button>
+<button class="group w-full text-left p-4 border border-tech-border bg-tech-gray/30 rounded transition-all hover:border-tech-green/50 hover:bg-tech-gray/50 relative overflow-hidden">
+<div class="absolute right-0 top-0 p-2 opacity-0 group-hover:opacity-10">
+<span class="material-symbols-outlined text-4xl">campaign</span>
+</div>
+<div class="flex justify-between items-center mb-1">
+<span class="font-mono text-xs text-gray-500 group-hover:text-tech-green/70 font-bold">05 // DISTRIBUTION</span>
+<span class="material-symbols-outlined text-gray-600 text-sm">radio_button_unchecked</span>
+</div>
+<h3 class="text-xl font-bold text-gray-300 tracking-wide group-hover:text-white transition-colors">销售问题</h3>
+<div class="h-0.5 w-full bg-gray-800 mt-3"></div>
+</button>
+<button class="group w-full text-left p-4 border border-tech-border bg-tech-gray/30 rounded transition-all hover:border-tech-green/50 hover:bg-tech-gray/50 relative overflow-hidden">
+<div class="absolute right-0 top-0 p-2 opacity-0 group-hover:opacity-10">
+<span class="material-symbols-outlined text-4xl">hourglass_top</span>
+</div>
+<div class="flex justify-between items-center mb-1">
+<span class="font-mono text-xs text-gray-500 group-hover:text-tech-green/70 font-bold">06 // DURABILITY</span>
+<span class="material-symbols-outlined text-gray-600 text-sm">radio_button_unchecked</span>
+</div>
+<h3 class="text-xl font-bold text-gray-300 tracking-wide group-hover:text-white transition-colors">持久问题</h3>
+<div class="h-0.5 w-full bg-gray-800 mt-3"></div>
+</button>
+<button class="group w-full text-left p-4 border border-tech-border bg-tech-gray/30 rounded transition-all hover:border-tech-green/50 hover:bg-tech-gray/50 relative overflow-hidden">
+<div class="absolute right-0 top-0 p-2 opacity-0 group-hover:opacity-10">
+<span class="material-symbols-outlined text-4xl">key</span>
+</div>
+<div class="flex justify-between items-center mb-1">
+<span class="font-mono text-xs text-gray-500 group-hover:text-tech-green/70 font-bold">07 // SECRET</span>
+<span class="material-symbols-outlined text-gray-600 text-sm">radio_button_unchecked</span>
+</div>
+<h3 class="text-xl font-bold text-gray-300 tracking-wide group-hover:text-white transition-colors">秘密问题</h3>
+<div class="h-0.5 w-full bg-gray-800 mt-3"></div>
+</button>
+</div>
+<div class="col-span-12 lg:col-span-8 flex flex-col gap-6">
+<div class="flex-1 bg-tech-gray/20 border border-tech-green/30 rounded-lg p-8 relative flex flex-col justify-center items-center shadow-neon backdrop-blur-sm">
+<div class="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-tech-green"></div>
+<div class="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-tech-green"></div>
+<div class="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-tech-green"></div>
+<div class="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-tech-green"></div>
+<div class="text-center w-full max-w-2xl z-10">
+<span class="inline-block px-3 py-1 bg-tech-green/10 border border-tech-green text-tech-green text-xs font-mono mb-6">QUESTION_01_ENGINEERING</span>
+<h2 class="text-3xl md:text-5xl font-black text-white leading-tight mb-8">
+                            你的技术比同行好 <br/>
+<span class="text-tech-green text-6xl md:text-7xl">10倍</span> 吗？
+                        </h2>
+<p class="text-gray-400 text-lg mb-10 font-light">
+                            增量式的改进会导致竞争，而革命性的技术才能带来垄断。不要只是稍微好一点，必须有质的飞跃。
+                        </p>
+<div class="grid grid-cols-2 gap-4 w-full">
+<button class="py-4 px-6 border border-tech-border rounded hover:border-tech-green hover:bg-tech-green/10 hover:text-white text-gray-400 transition-all font-bold text-lg flex items-center justify-center gap-2 group">
+<span class="w-4 h-4 rounded-full border border-gray-500 group-hover:border-tech-green"></span>
+                                仅仅是更好一点
+                            </button>
+<button class="py-4 px-6 bg-tech-green text-black font-black text-lg rounded shadow-neon hover:bg-white transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-xl">check</span>
+                                是的，拥有10倍优势
+                            </button>
+</div>
+</div>
+<div class="absolute inset-0 z-0 opacity-20 pointer-events-none overflow-hidden">
+<svg class="w-full h-full" preserveAspectRatio="none">
+<path d="M0,100 Q400,50 800,80 T1600,20" fill="none" stroke="#00ff41" stroke-width="1" vector-effect="non-scaling-stroke"></path>
+<path d="M0,120 Q300,80 600,90 T1200,60" fill="none" stroke="#00ff41" stroke-dasharray="5,5" stroke-width="1" vector-effect="non-scaling-stroke"></path>
+</svg>
+</div>
+</div>
+<div class="h-48 grid grid-cols-3 gap-6">
+<div class="col-span-3 md:col-span-2 bg-tech-black border border-tech-border rounded-lg p-6 relative flex items-center gap-8">
+<div class="relative w-32 h-32 flex-shrink-0 flex items-center justify-center">
+<svg class="w-full h-full -rotate-90 transform" viewBox="0 0 100 100">
+<circle cx="50" cy="50" fill="none" r="45" stroke="#333" stroke-width="8"></circle>
+<circle class="transition-all duration-1000" cx="50" cy="50" fill="none" r="45" stroke="#00ff41" stroke-dasharray="283" stroke-dashoffset="240" stroke-width="8"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-3xl font-black text-white">14<span class="text-sm text-gray-500">%</span></span>
+</div>
+</div>
+<div class="flex-1">
+<h4 class="text-gray-400 text-sm font-mono uppercase tracking-wider mb-2">Total Success Probability</h4>
+<div class="text-2xl font-bold text-white mb-4">极低概率 - 需谨慎</div>
+<div class="w-full h-1 bg-gray-800 rounded-full overflow-hidden">
+<div class="h-full bg-tech-green w-[14%] shadow-[0_0_10px_#00ff41]"></div>
+</div>
+<p class="text-xs text-gray-500 mt-2 font-mono">CALCULATING METRICS BASED ON PETER THIEL'S FRAMEWORK...</p>
+</div>
+</div>
+<div class="col-span-3 md:col-span-1 bg-tech-black border border-tech-border rounded-lg p-6 flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-4">
+<span class="text-gray-500 text-xs font-mono">STATUS</span>
+<span class="w-2 h-2 bg-red-500 rounded-full animate-pulse shadow-[0_0_8px_red]"></span>
+</div>
+<div class="text-xl font-bold text-gray-300">尚未完成评估</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-xs text-gray-500 font-mono">
+<span>COMPLETED</span>
+<span class="text-white">1/7</span>
+</div>
+<div class="flex gap-1">
+<div class="h-1 flex-1 bg-tech-green"></div>
+<div class="h-1 flex-1 bg-gray-800"></div>
+<div class="h-1 flex-1 bg-gray-800"></div>
+<div class="h-1 flex-1 bg-gray-800"></div>
+<div class="h-1 flex-1 bg-gray-800"></div>
+<div class="h-1 flex-1 bg-gray-800"></div>
+<div class="h-1 flex-1 bg-gray-800"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+
+</body></html>

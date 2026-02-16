@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html class="dark" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>reado: 0到1的跃迁模拟</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Source+Han+Sans+CN:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "neon-blue": "#00f3ff",
+                        "neon-purple": "#bc13fe",
+                        "deep-black": "#050505",
+                        "terminal-bg": "#0a0b10",
+                        "glass-border": "rgba(0, 243, 255, 0.2)",
+                        "dim-text": "#4a5568",
+                    },
+                    fontFamily: {
+                        "sans": ["Source Han Sans CN", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", "sans-serif"],
+                        "mono": ["Menlo", "Monaco", "Courier New", "monospace"],
+                    },
+                    boxShadow: {
+                        "neon": "0 0 10px rgba(0, 243, 255, 0.5), 0 0 20px rgba(0, 243, 255, 0.3)",
+                        "neon-inner": "inset 0 0 10px rgba(0, 243, 255, 0.2)",
+                    }
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        body {
+            background-color: #050505;
+            background-image: 
+                linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+        .scanline {
+            width: 100%;
+            height: 100px;
+            z-index: 10;
+            background: linear-gradient(0deg, rgba(0,0,0,0) 0%, rgba(0, 243, 255, 0.05) 50%, rgba(0,0,0,0) 100%);
+            opacity: 0.1;
+            position: absolute;
+            bottom: 100%;
+            animation: scanline 10s linear infinite;
+            pointer-events: none;
+        }
+        @keyframes scanline {
+            0% { bottom: 100%; }
+            100% { bottom: -100px; }
+        }
+        .term-container {
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.05);
+            background: rgba(10, 11, 16, 0.9);
+        }
+        .glitch-text {
+            position: relative;
+        }
+        .glitch-text::before,
+        .glitch-text::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0b10;
+        }
+        .glitch-text::before {
+            left: 2px;
+            text-shadow: -1px 0 #ff00c1;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim 5s infinite linear alternate-reverse;
+        }
+        .glitch-text::after {
+            left: -2px;
+            text-shadow: -1px 0 #00fff9;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim2 5s infinite linear alternate-reverse;
+        }
+        @keyframes glitch-anim {
+            0% { clip: rect(38px, 9999px, 81px, 0); }
+            20% { clip: rect(6px, 9999px, 16px, 0); }
+            40% { clip: rect(63px, 9999px, 6px, 0); }
+            60% { clip: rect(32px, 9999px, 73px, 0); }
+            80% { clip: rect(78px, 9999px, 20px, 0); }
+            100% { clip: rect(45px, 9999px, 12px, 0); }
+        }
+        @keyframes glitch-anim2 {
+            0% { clip: rect(18px, 9999px, 91px, 0); }
+            20% { clip: rect(66px, 9999px, 12px, 0); }
+            40% { clip: rect(3px, 9999px, 66px, 0); }
+            60% { clip: rect(12px, 9999px, 33px, 0); }
+            80% { clip: rect(58px, 9999px, 2px, 0); }
+            100% { clip: rect(25px, 9999px, 82px, 0); }
+        }
+    </style>
+</head>
+<body class="bg-deep-black min-h-screen text-gray-100 flex flex-col items-center justify-center p-4 md:p-8 relative overflow-hidden font-sans">
+<script src="/shared/book-catalog.js?v=1771240921862"></script>
+<script type="module" src="/shared/shell.js?v=1771240921862"></script>
+<reado-app-shell data-page="knowledge-map"></reado-app-shell>
+<div class="scanline"></div>
+<div class="fixed top-0 left-0 w-full h-full pointer-events-none z-0">
+<div class="absolute top-[10%] left-[20%] w-64 h-64 bg-neon-blue rounded-full opacity-[0.03] blur-[100px]"></div>
+<div class="absolute bottom-[10%] right-[20%] w-96 h-96 bg-neon-purple rounded-full opacity-[0.03] blur-[100px]"></div>
+</div>
+<main class="w-full max-w-6xl z-10 flex flex-col gap-8">
+<header class="flex justify-between items-center border-b border-glass-border pb-4">
+<div class="flex items-center gap-4">
+<div class="w-3 h-3 bg-red-500 rounded-full"></div>
+<div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
+<div class="w-3 h-3 bg-green-500 rounded-full"></div>
+<span class="ml-4 font-mono text-neon-blue text-sm tracking-widest uppercase">sim_0_to_1.exe</span>
+</div>
+<div class="font-mono text-xs text-dim-text">
+                SESSION_ID: 0x1A4F // SYSTEM: READY
+            </div>
+</header>
+<section class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center min-h-[500px]">
+<div class="term-container rounded-lg p-8 h-full flex flex-col relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-2 font-mono text-[10px] text-neon-blue border-b border-l border-glass-border opacity-50">
+                    VISUALIZATION_MODE: COMPARATIVE
+                </div>
+<h1 class="text-4xl md:text-5xl font-black text-white mb-2 tracking-tight glitch-text" data-text="从 0 到 1: 垂直进步">
+                    从 0 到 1: 垂直进步
+                </h1>
+<p class="text-gray-400 mb-12 text-sm font-light tracking-wide">
+                    技术不仅是改进，而是创造全新的事物。
+                </p>
+<div class="flex-1 flex flex-col justify-center gap-12 relative">
+<div class="flex items-center gap-6 opacity-30 transition-opacity duration-500 hover:opacity-60">
+<div class="w-16 h-16 border border-gray-600 rounded flex items-center justify-center">
+<span class="material-icons-outlined text-4xl text-gray-500">agriculture</span>
+</div>
+<div class="h-0.5 flex-1 bg-gradient-to-r from-gray-700 to-transparent flex items-center relative">
+<div class="absolute right-0 -top-2 text-xs text-gray-500 font-mono">GLOBALIZATION</div>
+</div>
+<div class="text-right">
+<div class="text-2xl font-bold text-gray-500">1 <span class="text-sm align-middle">➔</span> n</div>
+<div class="text-xs text-gray-600 uppercase tracking-widest">水平进步</div>
+<div class="text-[10px] text-gray-700 mt-1">复制</div>
+</div>
+</div>
+<div class="flex items-center gap-6 relative z-10">
+<div class="w-20 h-20 border-2 border-neon-blue rounded-lg flex items-center justify-center shadow-neon bg-black/50">
+<span class="material-icons-outlined text-5xl text-neon-blue animate-pulse">flight_takeoff</span>
+</div>
+<div class="h-0.5 flex-1 bg-gradient-to-r from-neon-blue to-transparent flex items-center relative">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-neon-blue/10 text-neon-blue text-[10px] border border-neon-blue/30 rounded">
+                                TECHNOLOGY SHIFT
+                            </div>
+<div class="w-full h-full bg-neon-blue opacity-20 animate-pulse"></div>
+</div>
+<div class="text-right">
+<div class="text-4xl font-black text-white drop-shadow-[0_0_8px_rgba(0,243,255,0.8)]">0 <span class="text-xl align-middle text-neon-blue">➔</span> 1</div>
+<div class="text-sm text-neon-blue font-bold uppercase tracking-widest mt-1">垂直进步</div>
+<div class="text-xs text-gray-400 mt-1">创造</div>
+</div>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-6 h-full">
+<div class="term-container rounded-lg p-6 flex-1 flex flex-col">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-sm font-bold text-gray-300 flex items-center gap-2">
+<span class="material-icons-outlined text-neon-blue text-sm">bar_chart</span>
+                            利润潜力分析
+                        </h3>
+<span class="text-[10px] text-dim-text font-mono">DATA_SOURCE: THIEL_CAPITAL</span>
+</div>
+<div class="flex-1 flex items-end gap-8 px-4 pb-2">
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full bg-gray-800 rounded-t relative h-24 overflow-hidden transition-all duration-500 group-hover:bg-gray-700">
+<div class="absolute bottom-0 w-full bg-gray-600 h-[20%]"></div>
+<div class="absolute top-2 w-full text-center text-[10px] text-gray-500">Low Margin</div>
+</div>
+<div class="text-center">
+<div class="text-xs font-bold text-gray-500">完全竞争</div>
+<div class="text-[10px] text-gray-600">全球化 (1-&gt;n)</div>
+</div>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full bg-neon-blue/10 rounded-t relative h-48 border-t border-x border-neon-blue/30 overflow-hidden shadow-neon-inner transition-all duration-500 group-hover:bg-neon-blue/20">
+<div class="absolute bottom-0 w-full bg-neon-blue h-[85%] shadow-[0_0_15px_rgba(0,243,255,0.4)]"></div>
+<div class="absolute top-2 w-full text-center text-xs font-bold text-white drop-shadow-md">High Margin</div>
+</div>
+<div class="text-center">
+<div class="text-xs font-bold text-white">创造性垄断</div>
+<div class="text-[10px] text-neon-blue">技术创新 (0-&gt;1)</div>
+</div>
+</div>
+</div>
+</div>
+<div class="term-container rounded-lg p-5">
+<div class="grid grid-cols-2 gap-4">
+<div class="border-l-2 border-neon-blue pl-3">
+<div class="text-[10px] text-gray-500 uppercase mb-1">关键特质</div>
+<div class="text-sm text-gray-200">
+                                专有技术 <span class="text-neon-blue font-bold">10x</span> 优势
+                            </div>
+</div>
+<div class="border-l-2 border-gray-700 pl-3">
+<div class="text-[10px] text-gray-500 uppercase mb-1">网络效应</div>
+<div class="text-sm text-gray-200">
+                                从小市场开始垄断
+                            </div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<footer class="grid md:grid-cols-2 gap-6 mt-4">
+<button class="group relative overflow-hidden rounded bg-transparent border border-neon-blue/50 p-6 text-left transition-all hover:bg-neon-blue/10 hover:shadow-neon hover:border-neon-blue">
+<div class="absolute top-0 right-0 p-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-icons-outlined text-neon-blue">arrow_forward</span>
+</div>
+<div class="flex items-center gap-3 mb-2">
+<span class="material-icons-outlined text-neon-blue group-hover:animate-spin">auto_awesome</span>
+<span class="text-lg font-bold text-white group-hover:text-neon-blue">创造前所未有</span>
+</div>
+<p class="text-xs text-gray-400 group-hover:text-gray-300">
+                    质疑现有假设，寻找秘密，建立垂直垄断。这是 0 到 1 的路径。
+                </p>
+</button>
+<button class="group relative overflow-hidden rounded bg-transparent border border-gray-800 p-6 text-left transition-all hover:bg-white/5 hover:border-gray-600">
+<div class="absolute top-0 right-0 p-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-icons-outlined text-gray-400">close</span>
+</div>
+<div class="flex items-center gap-3 mb-2">
+<span class="material-icons-outlined text-gray-600 group-hover:text-gray-400">content_copy</span>
+<span class="text-lg font-bold text-gray-500 group-hover:text-gray-300">复制成功模式</span>
+</div>
+<p class="text-xs text-gray-600 group-hover:text-gray-500">
+                    在现有市场中竞争，改进现有产品。这是 1 到 n 的陷阱。
+                </p>
+</button>
+</footer>
+</main>
+<div class="fixed bottom-8 right-8 text-right hidden lg:block pointer-events-none">
+<div class="text-[10px] text-dim-text font-mono mb-1">SYSTEM_STATUS</div>
+<div class="flex gap-1 justify-end">
+<div class="w-1 h-4 bg-neon-blue animate-pulse"></div>
+<div class="w-1 h-4 bg-neon-blue opacity-50"></div>
+<div class="w-1 h-4 bg-neon-blue opacity-25"></div>
+</div>
+</div>
+
+
+<script src="/shared/experience-runtime.js?v=1771240921862"></script>
+<script>
+(() => {
+  
+  localStorage.setItem("reado_book_last_zero-to-one", "zero-to-one-the-monopolist-s-choice-3");
+  if ("zero-to-one-the-monopolist-s-choice-3" === "zero-to-one-the-monopolist-s-choice-7") {
+    try {
+      const completedRaw = localStorage.getItem("reado_completed_books_v1") || "[]";
+      const completedSet = new Set(JSON.parse(completedRaw));
+      completedSet.add("zero-to-one");
+      localStorage.setItem("reado_completed_books_v1", JSON.stringify([...completedSet]));
+    } catch {}
+  }
+  
+  const readoNextHref = "/experiences/zero-to-one-the-monopolist-s-choice-4.html";
+  (() => {
+    let isNavigating = false;
+    const keywordList = ["开始", "继续", "下一", "进入", "模拟", "抉择", "选择", "确认", "提交", "挑战", "完成", "start", "next", "continue"];
+    const blacklist = ["EN", "ZH", "返回", "back", "帮助", "求助", "笔记", "术语", "设置", "菜单", "关闭", "取消"];
+    const normalize = (value) => String(value || "").replace(/\s+/g, " ").trim();
+    const hasKeyword = (text) => keywordList.some((keyword) => text.toLowerCase().includes(keyword.toLowerCase()));
+    const isBlocked = (text) => blacklist.some((word) => text === word || text.toLowerCase().includes(word.toLowerCase()));
+    const isOptionGroupButton = (node) => {
+      const parent = node.parentElement;
+      if (!parent) return false;
+      const peers = Array.from(parent.children).filter(
+        (child) => child instanceof HTMLElement && child.matches("button,[role='button'],.concept-card,.item-card,[data-choice],[data-option]")
+      );
+      return peers.length >= 2;
+    };
+    const goNext = (delay = 180) => {
+      if (isNavigating) return;
+      isNavigating = true;
+      window.setTimeout(() => {
+        window.location.href = readoNextHref;
+      }, delay);
+    };
+    document.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+      if (target.closest(".reado-shell-wrap")) return;
+      const candidate = target.closest("[data-next-scene],button,a[href],.concept-card,.item-card,[data-choice],[data-option]");
+      if (!(candidate instanceof HTMLElement)) return;
+      if (!candidate.closest("main")) return;
+      if (candidate.hasAttribute("data-no-next")) return;
+      if (candidate.matches("a[href]")) {
+        const href = candidate.getAttribute("href") || "";
+        if (href && href !== "#" && !href.startsWith("javascript:")) return;
+      }
+      const text = normalize(candidate.textContent);
+      if (candidate.matches("[data-next-scene]")) {
+        event.preventDefault();
+        goNext(90);
+        return;
+      }
+      if (isBlocked(text)) return;
+      if (candidate.matches(".concept-card,.item-card,[data-choice],[data-option]")) {
+        goNext(180);
+        return;
+      }
+      if (candidate.matches("button")) {
+        if (hasKeyword(text) || (text.length >= 4 && isOptionGroupButton(candidate))) {
+          goNext(220);
+        }
+      }
+    });
+  })();
+  
+  if (window.ReadoExperienceRuntime && typeof window.ReadoExperienceRuntime.init === "function") {
+    window.ReadoExperienceRuntime.init({
+      bookId: "zero-to-one",
+      moduleSlug: "zero-to-one-the-monopolist-s-choice-3",
+      moduleSlugs: ["zero-to-one-the-monopolist-s-choice","zero-to-one-the-monopolist-s-choice-1","zero-to-one-the-monopolist-s-choice-2","zero-to-one-the-monopolist-s-choice-3","zero-to-one-the-monopolist-s-choice-4","zero-to-one-the-monopolist-s-choice-5","zero-to-one-the-monopolist-s-choice-6","zero-to-one-the-monopolist-s-choice-7"]
+    });
+  }
+})();
+</script>
+</body></html>

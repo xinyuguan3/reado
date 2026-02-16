@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html class="dark" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>人类简史：工业时代基因狂潮模拟器</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "industrial-dark": "#1e2124",
+                        "industrial-metal": "#4a4e53",
+                        "neon-blue": "#00f0ff",
+                        "rust-copper": "#b85c38",
+                        "rust-light": "#d48c70",
+                        "steam-grey": "#c7c9cb",
+                        "warning-red": "#ff2a2a",
+                    },
+                    fontFamily: {
+                        "sans": ["Noto Sans SC", "Source Han Sans SC", "sans-serif"],
+                        "display": ["Noto Sans SC", "Source Han Sans SC", "sans-serif"]
+                    },
+                    boxShadow: {
+                        "neon": "0 0 10px rgba(0, 240, 255, 0.5), 0 0 20px rgba(0, 240, 255, 0.3)",
+                        "rust": "0 0 10px rgba(184, 92, 56, 0.4)",
+                    },
+                    animation: {
+                        'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'spin-slow': 'spin 20s linear infinite',
+                    }
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        body {
+            font-family: 'Noto Sans SC', 'Source Han Sans SC', sans-serif;
+            @apply bg-industrial-dark text-steam-grey;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e2124; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #b85c38; 
+            border-radius: 3px;
+        }
+        .tech-panel {
+            background: rgba(30, 33, 36, 0.85);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(184, 92, 56, 0.3);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+        }
+        .map-bg {
+            background-color: #1a1c1f;
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(184, 92, 56, 0.05) 0%, transparent 60%),
+                linear-gradient(0deg, rgba(0,0,0,0.4) 0%, transparent 100%);
+        }
+        .trade-route {
+            stroke-dasharray: 10;
+            animation: dash 30s linear infinite;
+        }
+        @keyframes dash {
+            to {
+                stroke-dashoffset: -1000;
+            }
+        }
+        .hex-grid {
+            background-size: 50px 50px;
+            background-image: 
+                linear-gradient(30deg, #2a2d33 12%, transparent 12.5%, transparent 87%, #2a2d33 87.5%, #2a2d33),
+                linear-gradient(150deg, #2a2d33 12%, transparent 12.5%, transparent 87%, #2a2d33 87.5%, #2a2d33),
+                linear-gradient(30deg, #2a2d33 12%, transparent 12.5%, transparent 87%, #2a2d33 87.5%, #2a2d33),
+                linear-gradient(150deg, #2a2d33 12%, transparent 12.5%, transparent 87%, #2a2d33 87.5%, #2a2d33),
+                linear-gradient(60deg, #2a2d3377 25%, transparent 25.5%, transparent 75%, #2a2d3377 75%, #2a2d3377),
+                linear-gradient(60deg, #2a2d3377 25%, transparent 25.5%, transparent 75%, #2a2d3377 75%, #2a2d3377);
+            background-position: 0 0, 0 0, 25px 43px, 25px 43px, 0 0, 25px 43px;
+        }
+        .tech-node-active {
+            @apply border-neon-blue bg-neon-blue/10 text-neon-blue shadow-neon;
+        }
+        .tech-node-locked {
+            @apply border-gray-700 bg-gray-800/50 text-gray-500 cursor-not-allowed;
+        }
+        .tech-node-available {
+            @apply border-rust-copper bg-rust-copper/10 text-rust-light hover:bg-rust-copper/20 cursor-pointer;
+        }
+    </style>
+</head>
+<body class="overflow-hidden relative h-screen w-screen selection:bg-neon-blue selection:text-black">
+<script src="/shared/book-catalog.js?v=1771240921862"></script>
+<script type="module" src="/shared/shell.js?v=1771240921862"></script>
+<reado-app-shell data-page="knowledge-map"></reado-app-shell>
+<div class="absolute inset-0 z-0 pointer-events-none map-bg overflow-hidden">
+<div class="absolute inset-0 hex-grid opacity-10"></div>
+<img alt="World Map Background" class="absolute inset-0 w-full h-full object-cover opacity-20 grayscale mix-blend-overlay" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVYMR0AOtJ3GtDhGz_o4QAzRD-f_3wOk056dH_Z0EEwi3qhCa9MpUaFM8Fu1WBaZRnfwYbmC2MHCMMWaeJGt_lJFbGAHs1oCa5MMl_4BuU7hP_oooj5bmOjn6dZhzVv_gBa5HhmcTaXWEhAHpO8VL1fg7GUDgweRNHAN9Ys8dDeaPByfdWthlAgIB4ozF3PWzVa4EWsDwdk1WFFIFewZiAoAOAikfZpGLnA_joV6mMP5SKXXI0DH1Tw48mXf6JpAU22kGWCj0lgdo"/>
+<svg class="absolute inset-0 w-full h-full opacity-40">
+<path class="trade-route" d="M 55% 30% Q 40% 35% 25% 35%" fill="none" stroke="#b85c38" stroke-width="2"></path>
+<path class="trade-route" d="M 55% 30% L 60% 40% L 80% 50%" fill="none" stroke="#b85c38" stroke-width="2" style="animation-duration: 20s"></path>
+<path class="trade-route" d="M 20% 40% Q 10% 45% 0% 40%" fill="none" stroke="#00f0ff" stroke-width="1" style="animation-duration: 25s"></path>
+<path class="trade-route" d="M 100% 40% Q 90% 45% 85% 50%" fill="none" stroke="#00f0ff" stroke-width="1" style="animation-duration: 25s"></path>
+</svg>
+<div class="absolute inset-0 bg-[radial-gradient(transparent_40%,#1e2124_100%)]"></div>
+</div>
+<header class="absolute top-0 left-0 w-full z-50 px-8 py-5 flex justify-between items-end border-b border-white/5 bg-gradient-to-b from-industrial-dark to-transparent">
+<div class="flex flex-col">
+<div class="flex items-center gap-3">
+<span class="material-icons text-rust-copper text-3xl animate-spin-slow">settings</span>
+<h1 class="text-2xl font-bold tracking-wider text-white uppercase" style="text-shadow: 0 2px 10px rgba(0,0,0,0.8);">
+                工业时代：<span class="text-neon-blue">机器狂潮中的基因</span>
+</h1>
+</div>
+<div class="text-xs text-rust-light font-mono mt-1 tracking-widest pl-11">
+            模拟进程：第 1850 年 - 蒸汽与钢铁的黎明
+        </div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex flex-col items-end">
+<span class="text-[10px] text-gray-500 font-mono uppercase">全球总人口</span>
+<span class="text-xl font-mono text-white">12.6 亿</span>
+</div>
+<div class="w-px h-8 bg-white/10"></div>
+<div class="flex flex-col items-end">
+<span class="text-[10px] text-gray-500 font-mono uppercase">碳排放指数</span>
+<span class="text-xl font-mono text-rust-copper animate-pulse">Lv. 3</span>
+</div>
+</div>
+</header>
+<main class="relative z-10 w-full h-full pt-28 pb-10 px-8 grid grid-cols-12 gap-8">
+<div class="col-span-3 flex flex-col h-full gap-4">
+<div class="tech-panel p-1 flex-1 rounded-sm relative overflow-hidden flex flex-col">
+<div class="bg-black/40 p-3 border-b border-white/5 flex justify-between items-center">
+<h2 class="text-sm font-bold text-rust-light flex items-center gap-2">
+<span class="material-icons text-xs">account_tree</span> 进化路径
+                </h2>
+<span class="text-[10px] bg-rust-copper/20 text-rust-copper px-2 py-0.5 rounded border border-rust-copper/30">可用点数: 15</span>
+</div>
+<div class="p-4 overflow-y-auto space-y-6 custom-scrollbar relative">
+<div class="absolute left-8 top-8 bottom-8 w-0.5 bg-gray-700 -z-10"></div>
+<div class="relative pl-10">
+<div class="absolute left-[29px] top-6 w-3 h-3 bg-neon-blue rounded-full shadow-neon"></div>
+<div class="tech-node-active p-3 rounded border transition-all">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-bold text-sm">机械化育种</h3>
+<span class="material-icons text-[16px]">agriculture</span>
+</div>
+<p class="text-[10px] opacity-80">利用早期选种机器筛选高产种子，变异率 +15%。</p>
+</div>
+</div>
+<div class="relative pl-10">
+<div class="absolute left-[30px] top-6 w-2 h-2 bg-rust-copper rounded-full"></div>
+<div class="tech-node-available p-3 rounded border transition-all group">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-bold text-sm group-hover:text-white">化学肥料</h3>
+<span class="material-icons text-[16px]">science</span>
+</div>
+<p class="text-[10px] opacity-70 group-hover:opacity-100">合成氨技术的早期实验，突破土地肥力上限。</p>
+<div class="mt-2 text-[10px] text-rust-copper font-mono text-right">消耗: 10 点</div>
+</div>
+</div>
+<div class="relative pl-10">
+<div class="absolute left-[31px] top-6 w-1.5 h-1.5 bg-gray-600 rounded-full"></div>
+<div class="tech-node-locked p-3 rounded border transition-all">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-bold text-sm">全球物流</h3>
+<span class="material-icons text-[16px]">directions_boat</span>
+</div>
+<p class="text-[10px] opacity-60">蒸汽轮船与铁路网将小麦运往世界每一个角落。</p>
+</div>
+</div>
+<div class="relative pl-10">
+<div class="absolute left-[31px] top-6 w-1.5 h-1.5 bg-gray-600 rounded-full"></div>
+<div class="tech-node-locked p-3 rounded border transition-all">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-bold text-sm">大规模灌溉</h3>
+<span class="material-icons text-[16px]">water_drop</span>
+</div>
+<p class="text-[10px] opacity-60">改变河流走向，建立庞大的单一作物种植区。</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="col-span-6 relative flex flex-col justify-between items-center h-full py-4">
+<div class="relative w-full h-[55vh] flex items-center justify-center">
+<div class="absolute w-[500px] h-[500px] border border-white/5 rounded-full animate-spin-slow"></div>
+<div class="absolute w-[400px] h-[400px] border border-dashed border-rust-copper/20 rounded-full animate-[spin_30s_linear_infinite_reverse]"></div>
+<div class="absolute w-[300px] h-[300px] bg-neon-blue/5 blur-3xl rounded-full"></div>
+<div class="relative z-10 group cursor-crosshair">
+<img alt="Industrial Wheat" class="h-[450px] w-auto object-cover drop-shadow-[0_0_15px_rgba(184,92,56,0.5)] grayscale-[0.3] contrast-125 sepia-[0.2]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3I5uTPKRNVhx5J6o5nTT0UOglQlUAu6L5M6G5CvsIu4OurzI-sD_ZP0mS5twyXGpBfkN1AWCrfQzUFtXWfc5WtHMnKr338zotafonz3JZtr4w0sO4O84KaxpMTbvLzkRh5iRmiBcebyak01LByrjiqXThrwI6-c_TZs9SHMAr0yX5CktEaXzxxyKGRjlejXSpuJrEUmEePl88zEeHbaX1qFT5AQzkiUINvN-85Legcvcmz8nNiaMeFfKA0NvpqYkOkTB19gLuKlA" style="mask-image: radial-gradient(circle, black 60%, transparent 100%); -webkit-mask-image: radial-gradient(circle, black 60%, transparent 100%);"/>
+<div class="absolute top-[20%] left-[10%] flex items-center gap-2">
+<div class="w-2 h-2 bg-neon-blue rounded-full animate-ping"></div>
+<div class="bg-black/70 border border-neon-blue/30 px-2 py-1 text-[10px] text-neon-blue backdrop-blur-sm">
+                        基因序列：修正中
+                    </div>
+</div>
+<div class="absolute bottom-[30%] right-[15%] flex items-center gap-2 flex-row-reverse">
+<div class="w-2 h-2 bg-rust-copper rounded-full animate-pulse"></div>
+<div class="bg-black/70 border border-rust-copper/30 px-2 py-1 text-[10px] text-rust-light backdrop-blur-sm">
+                        茎秆强度：强化
+                    </div>
+</div>
+<svg class="absolute inset-0 w-full h-full pointer-events-none overflow-visible">
+<line stroke="rgba(0, 240, 255, 0.2)" stroke-width="1" x1="20%" x2="40%" y1="22%" y2="40%"></line>
+<line stroke="rgba(184, 92, 56, 0.2)" stroke-width="1" x1="80%" x2="60%" y1="68%" y2="50%"></line>
+<circle cx="50%" cy="50%" fill="none" r="150" stroke="rgba(255,255,255,0.05)" stroke-dasharray="4 4" stroke-width="1"></circle>
+</svg>
+</div>
+</div>
+<div class="flex flex-col items-center w-full max-w-md relative z-20 mt-auto">
+<div class="flex justify-between w-full text-[10px] text-gray-500 font-mono mb-2 px-4 uppercase">
+<span>系统负载: 84%</span>
+<span>预计结果: 产量指数级增长</span>
+</div>
+<button id="industrial-era-start-btn" data-no-next="" class="group relative w-full overflow-hidden rounded bg-rust-copper p-[1px] focus:outline-none focus:ring-2 focus:ring-rust-copper focus:ring-offset-2 focus:ring-offset-gray-900">
+<div class="relative flex items-center justify-center gap-3 bg-[#2a1e18] px-8 py-4 transition-all duration-300 group-hover:bg-[#3d251a]">
+<span class="material-icons text-2xl text-rust-light group-hover:text-white group-hover:animate-spin">settings_suggest</span>
+<span class="text-xl font-bold tracking-widest text-white group-hover:text-neon-blue transition-colors">驱动工业引擎</span>
+<div class="absolute bottom-0 left-0 h-[2px] w-full bg-gradient-to-r from-transparent via-rust-copper to-transparent opacity-50"></div>
+</div>
+</button>
+<p class="mt-4 text-xs text-center text-gray-500 max-w-sm">
+                "在这场游戏中，并非只有我们在进化。工厂的轰鸣声也是生物圈的一部分。"
+            </p>
+</div>
+</div>
+<div class="col-span-3 flex flex-col h-full gap-4">
+<div class="tech-panel p-1 flex-1 rounded-sm flex flex-col">
+<div class="bg-black/40 p-3 border-b border-white/5 mb-2">
+<h2 class="text-sm font-bold text-neon-blue flex items-center gap-2">
+<span class="material-icons text-xs">analytics</span> 基因传播指标
+                </h2>
+</div>
+<div class="p-4 space-y-8 overflow-y-auto">
+<div>
+<div class="flex justify-between items-end mb-2">
+<span class="text-xs text-gray-400">产量爆发</span>
+<span class="text-lg font-mono text-neon-blue font-bold">340%</span>
+</div>
+<div class="h-2 w-full bg-gray-800 rounded-full overflow-hidden">
+<div class="h-full bg-gradient-to-r from-blue-900 to-neon-blue w-[75%] shadow-[0_0_10px_rgba(0,240,255,0.5)]"></div>
+</div>
+<div class="mt-1 flex justify-between text-[9px] text-gray-600 font-mono">
+<span>前工业时代基准</span>
+<span>当前</span>
+</div>
+</div>
+<div>
+<div class="flex justify-between items-end mb-2">
+<span class="text-xs text-gray-400">抗药性</span>
+<span class="text-lg font-mono text-warning-red font-bold">低</span>
+</div>
+<div class="h-2 w-full bg-gray-800 rounded-full overflow-hidden">
+<div class="h-full bg-gradient-to-r from-red-900 to-warning-red w-[15%]"></div>
+</div>
+<p class="text-[10px] text-warning-red mt-1 flex items-center gap-1">
+<span class="material-icons text-[10px]">warning</span> 
+                        警告：单一作物极易受病害侵袭
+                    </p>
+</div>
+<div>
+<div class="flex justify-between items-end mb-2">
+<span class="text-xs text-gray-400">环境适应力</span>
+<span class="text-lg font-mono text-rust-light font-bold">人工干预</span>
+</div>
+<div class="h-2 w-full bg-gray-800 rounded-full overflow-hidden">
+<div class="h-full bg-rust-copper w-[90%] relative">
+<div class="absolute inset-0 w-full h-full" style="background-image: linear-gradient(45deg,rgba(0,0,0,.3) 25%,transparent 25%,transparent 50%,rgba(0,0,0,.3) 50%,rgba(0,0,0,.3) 75%,transparent 75%,transparent); background-size: 8px 8px;"></div>
+</div>
+</div>
+<p class="text-[10px] text-gray-500 mt-1">
+                        依赖化肥与灌溉维持生存
+                    </p>
+</div>
+<div class="mt-6 border border-white/10 bg-white/5 p-3 rounded">
+<h4 class="text-xs font-bold text-white mb-2 border-b border-white/10 pb-1">全球交易所快讯</h4>
+<div class="space-y-2">
+<div class="flex justify-between text-xs">
+<span class="text-gray-400">芝加哥期货</span>
+<span class="text-green-400 font-mono">▲ +2.4%</span>
+</div>
+<div class="flex justify-between text-xs">
+<span class="text-gray-400">利物浦港口</span>
+<span class="text-rust-light font-mono">▼ 库存积压</span>
+</div>
+</div>
+</div>
+<div class="mt-4 p-3 bg-neon-blue/5 border-l-2 border-neon-blue">
+<p class="text-[10px] text-gray-300 leading-relaxed">
+<strong class="text-neon-blue">历史洞察：</strong> 
+                        工业化农业虽然解决了饥荒，但也创造了脆弱的生态单一性。这是一种高风险的赌博。
+                    </p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<div class="fixed bottom-6 left-6 z-40 hidden lg:block pointer-events-none">
+<div class="w-16 h-16 border-l-2 border-b-2 border-rust-copper/50"></div>
+</div>
+<div class="fixed top-28 right-6 z-40 hidden lg:block pointer-events-none">
+<div class="w-16 h-16 border-r-2 border-t-2 border-neon-blue/50"></div>
+</div>
+<div id="era-intro-industrial" class="fixed inset-0 z-[120] bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+<div class="w-full max-w-3xl rounded-2xl border border-rust-copper/40 bg-[#16181b]/95 shadow-[0_20px_60px_rgba(0,0,0,0.55)] overflow-hidden">
+<div class="px-6 md:px-8 py-5 border-b border-rust-copper/30 bg-gradient-to-r from-rust-copper/20 to-transparent">
+<p class="text-xs font-bold tracking-[0.22em] text-rust-light uppercase">章节导览 · 工业时代</p>
+<h2 class="text-xl md:text-2xl font-black text-white mt-2">第二时代前情提要：机器如何放大小麦统治</h2>
+</div>
+<div class="px-6 md:px-8 py-6 space-y-4 text-sm text-gray-300 leading-relaxed">
+<p>工业革命让粮食产量高速增长，但也把农业推进到高能耗、高依赖的轨道。化肥、铁路、蒸汽和金融市场，把“局部作物”变成了“全球系统”。</p>
+<div class="grid md:grid-cols-3 gap-3">
+<div class="rounded-xl border border-white/10 bg-black/30 p-3">
+<p class="text-xs uppercase tracking-widest text-rust-light font-bold mb-1">知识点 1</p>
+<p class="text-xs text-gray-300">产量提升伴随生态单一化，系统抗风险能力下降。</p>
+</div>
+<div class="rounded-xl border border-white/10 bg-black/30 p-3">
+<p class="text-xs uppercase tracking-widest text-rust-light font-bold mb-1">知识点 2</p>
+<p class="text-xs text-gray-300">农业开始依赖能源、化工与长链物流，不再是本地循环。</p>
+</div>
+<div class="rounded-xl border border-white/10 bg-black/30 p-3">
+<p class="text-xs uppercase tracking-widest text-rust-light font-bold mb-1">知识点 3</p>
+<p class="text-xs text-gray-300">关注“效率提升”背后的新脆弱性与外部代价。</p>
+</div>
+</div>
+</div>
+<div class="px-6 md:px-8 py-4 border-t border-white/10 flex justify-end">
+<button id="era-intro-industrial-enter" class="px-5 py-2.5 rounded-lg bg-rust-copper text-white text-sm font-black tracking-wide hover:bg-rust-light transition-colors">我已了解，进入工业时代</button>
+</div>
+</div>
+</div>
+<script>
+(() => {
+  const panel = document.getElementById("era-intro-industrial");
+  const enter = document.getElementById("era-intro-industrial-enter");
+  if (!panel || !enter) return;
+  enter.addEventListener("click", () => {
+    panel.classList.add("opacity-0", "pointer-events-none", "transition-opacity", "duration-200");
+    window.setTimeout(() => panel.remove(), 220);
+  });
+})();
+
+(() => {
+  const startButton = document.getElementById("industrial-era-start-btn");
+  if (!startButton) return;
+
+  const STORAGE_KEY = "reado_sapiens_era_challenge_v1";
+  const eraKey = "industrial";
+  const nextHref = "/experiences/sapiens-the-wheat-conquest-simulator-2.html";
+  const incidents = [
+    {
+      title: "突发事件 1：化肥供应中断",
+      description: "主要化肥厂停产，库存仅能维持 7 天。",
+      options: [
+        { label: "优先保障主粮区并立即替代采购", correct: true, feedback: "你保住了关键产区的生长窗口。" },
+        { label: "继续按原配方平均分配", correct: false, feedback: "所有地块都吃不饱，产量集体下滑。" }
+      ]
+    },
+    {
+      title: "突发事件 2：港口铁路罢工",
+      description: "跨洲运输停摆，仓储与城市供给出现剪刀差。",
+      options: [
+        { label: "启用区域配给并缩短供应链", correct: true, feedback: "你争取到了系统缓冲时间。" },
+        { label: "等待全国物流恢复再处理", correct: false, feedback: "城市先断粮，市场恐慌升级。" }
+      ]
+    },
+    {
+      title: "突发事件 3：单一品种病害",
+      description: "高产主力品种遭遇真菌侵袭，感染率快速上升。",
+      options: [
+        { label: "立刻隔离并启用多品种替代", correct: true, feedback: "病害扩散被遏制在核心区外。" },
+        { label: "加倍投肥硬撑到收获", correct: false, feedback: "病害失控，整季减产。" }
+      ]
+    }
+  ];
+
+  const challengeLayer = document.createElement("div");
+  challengeLayer.className = "fixed inset-0 z-[140] hidden items-center justify-center p-4 bg-black/80 backdrop-blur-sm";
+  challengeLayer.innerHTML = `
+    <div class="w-full max-w-2xl rounded-2xl border border-rust-copper/40 bg-[#16181b]/95 shadow-[0_20px_60px_rgba(0,0,0,0.55)] overflow-hidden">
+      <div class="px-6 py-4 border-b border-rust-copper/30 bg-gradient-to-r from-rust-copper/20 to-transparent flex items-center justify-between">
+        <p class="text-xs font-bold tracking-[0.22em] text-rust-light uppercase">工业时代突发事件</p>
+        <span id="era-incident-progress" class="text-xs text-gray-400 font-bold">事件 1/3</span>
+      </div>
+      <div id="era-incident-body" class="px-6 py-6 space-y-4">
+        <h3 id="era-incident-title" class="text-xl font-black text-white"></h3>
+        <p id="era-incident-desc" class="text-sm text-gray-300 leading-relaxed"></p>
+        <div id="era-incident-options" class="space-y-3"></div>
+        <p id="era-incident-feedback" class="text-xs text-rust-light font-bold min-h-[1.2rem]"></p>
+      </div>
+      <div class="px-6 py-4 border-t border-white/10 flex justify-end">
+        <button id="era-incident-cancel" class="px-4 py-2 rounded-lg text-xs font-bold text-gray-300 border border-white/10 hover:bg-white/5 transition-colors">稍后再试</button>
+      </div>
+    </div>`;
+  document.body.append(challengeLayer);
+
+  const progressEl = challengeLayer.querySelector("#era-incident-progress");
+  const titleEl = challengeLayer.querySelector("#era-incident-title");
+  const descEl = challengeLayer.querySelector("#era-incident-desc");
+  const optionsEl = challengeLayer.querySelector("#era-incident-options");
+  const feedbackEl = challengeLayer.querySelector("#era-incident-feedback");
+  const bodyEl = challengeLayer.querySelector("#era-incident-body");
+  const cancelBtn = challengeLayer.querySelector("#era-incident-cancel");
+
+  let incidentIndex = 0;
+  let running = false;
+
+  const readState = () => {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+      return parsed && typeof parsed === "object" ? parsed : {};
+    } catch {
+      return {};
+    }
+  };
+
+  const writeState = (next) => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+  };
+
+  const touchEntry = (state) => {
+    const entry = state[eraKey] || { attempts: 0, failures: 0, passed: false };
+    state[eraKey] = entry;
+    return entry;
+  };
+
+  const closeLayer = () => {
+    challengeLayer.classList.add("hidden");
+    challengeLayer.classList.remove("flex");
+  };
+
+  const openLayer = () => {
+    challengeLayer.classList.remove("hidden");
+    challengeLayer.classList.add("flex");
+  };
+
+  const failRun = (reason) => {
+    const state = readState();
+    const entry = touchEntry(state);
+    entry.failures += 1;
+    entry.passed = false;
+    writeState(state);
+    bodyEl.innerHTML = `
+      <h3 class="text-xl font-black text-red-400">工业时代失败</h3>
+      <p class="text-sm text-gray-300 leading-relaxed">${reason}</p>
+      <p class="text-xs text-gray-500">本时代挑战判定失败，请从头重玩。</p>
+      <div class="pt-2">
+        <button id="era-incident-restart" class="px-5 py-2.5 rounded-lg bg-red-500 text-white text-sm font-black hover:bg-red-400 transition-colors">从头重开</button>
+      </div>`;
+    const restartBtn = bodyEl.querySelector("#era-incident-restart");
+    if (restartBtn) {
+      restartBtn.addEventListener("click", () => window.location.reload());
+    }
+  };
+
+  const passRun = () => {
+    const state = readState();
+    const entry = touchEntry(state);
+    entry.passed = true;
+    entry.updatedAt = Date.now();
+    writeState(state);
+    bodyEl.innerHTML = `
+      <h3 class="text-xl font-black text-emerald-400">工业时代通关</h3>
+      <p class="text-sm text-gray-300 leading-relaxed">你已处理完 3 个工业化风险事件，系统可进入信息时代。</p>
+      <div class="pt-2">
+        <button id="era-incident-next" class="px-5 py-2.5 rounded-lg bg-rust-copper text-white text-sm font-black hover:bg-rust-light transition-colors">进入下一时代</button>
+      </div>`;
+    const nextBtn = bodyEl.querySelector("#era-incident-next");
+    if (nextBtn) {
+      nextBtn.addEventListener("click", () => {
+        window.location.href = nextHref;
+      });
+      nextBtn.focus();
+    }
+  };
+
+  const renderIncident = () => {
+    const current = incidents[incidentIndex];
+    if (!current) {
+      passRun();
+      return;
+    }
+    progressEl.textContent = `事件 ${incidentIndex + 1}/${incidents.length}`;
+    titleEl.textContent = current.title;
+    descEl.textContent = current.description;
+    feedbackEl.textContent = "";
+    optionsEl.innerHTML = current.options.map((option, idx) => `
+      <button data-incident-option="${idx}" class="w-full text-left px-4 py-3 rounded-lg border border-rust-copper/30 bg-black/30 text-sm font-bold text-gray-100 hover:border-rust-copper/70 hover:bg-black/40 transition-colors">
+        ${option.label}
+      </button>`).join("");
+  };
+
+  optionsEl.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+    const button = target.closest("[data-incident-option]");
+    if (!(button instanceof HTMLElement)) return;
+    const current = incidents[incidentIndex];
+    if (!current) return;
+    const selectedIndex = Number(button.getAttribute("data-incident-option"));
+    const selected = current.options[selectedIndex];
+    if (!selected) return;
+    if (!selected.correct) {
+      failRun(selected.feedback || "决策失误。");
+      return;
+    }
+    feedbackEl.textContent = selected.feedback || "决策正确，进入下一事件。";
+    incidentIndex += 1;
+    window.setTimeout(renderIncident, 450);
+  });
+
+  if (cancelBtn) {
+    cancelBtn.addEventListener("click", () => {
+      closeLayer();
+      running = false;
+      incidentIndex = 0;
+    });
+  }
+
+  startButton.addEventListener("click", (event) => {
+    event.preventDefault();
+    if (running) return;
+    running = true;
+    incidentIndex = 0;
+    const state = readState();
+    const entry = touchEntry(state);
+    entry.attempts += 1;
+    entry.passed = false;
+    writeState(state);
+    renderIncident();
+    openLayer();
+  });
+})();
+</script>
+
+
+
+<script src="/shared/experience-runtime.js?v=1771240921862"></script>
+<script>
+(() => {
+  
+  localStorage.setItem("reado_book_last_sapiens", "sapiens-the-wheat-conquest-simulator-1");
+  if ("sapiens-the-wheat-conquest-simulator-1" === "bilingual-human-domestication-dilemma-3") {
+    try {
+      const completedRaw = localStorage.getItem("reado_completed_books_v1") || "[]";
+      const completedSet = new Set(JSON.parse(completedRaw));
+      completedSet.add("sapiens");
+      localStorage.setItem("reado_completed_books_v1", JSON.stringify([...completedSet]));
+    } catch {}
+  }
+  
+  const readoNextHref = "/experiences/sapiens-the-wheat-conquest-simulator-2.html";
+  (() => {
+    let isNavigating = false;
+    const keywordList = ["开始", "继续", "下一", "进入", "模拟", "抉择", "选择", "确认", "提交", "挑战", "完成", "start", "next", "continue"];
+    const blacklist = ["EN", "ZH", "返回", "back", "帮助", "求助", "笔记", "术语", "设置", "菜单", "关闭", "取消"];
+    const normalize = (value) => String(value || "").replace(/\s+/g, " ").trim();
+    const hasKeyword = (text) => keywordList.some((keyword) => text.toLowerCase().includes(keyword.toLowerCase()));
+    const isBlocked = (text) => blacklist.some((word) => text === word || text.toLowerCase().includes(word.toLowerCase()));
+    const isOptionGroupButton = (node) => {
+      const parent = node.parentElement;
+      if (!parent) return false;
+      const peers = Array.from(parent.children).filter(
+        (child) => child instanceof HTMLElement && child.matches("button,[role='button'],.concept-card,.item-card,[data-choice],[data-option]")
+      );
+      return peers.length >= 2;
+    };
+    const goNext = (delay = 180) => {
+      if (isNavigating) return;
+      isNavigating = true;
+      window.setTimeout(() => {
+        window.location.href = readoNextHref;
+      }, delay);
+    };
+    document.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+      if (target.closest(".reado-shell-wrap")) return;
+      const candidate = target.closest("[data-next-scene],button,a[href],.concept-card,.item-card,[data-choice],[data-option]");
+      if (!(candidate instanceof HTMLElement)) return;
+      if (!candidate.closest("main")) return;
+      if (candidate.hasAttribute("data-no-next")) return;
+      if (candidate.matches("a[href]")) {
+        const href = candidate.getAttribute("href") || "";
+        if (href && href !== "#" && !href.startsWith("javascript:")) return;
+      }
+      const text = normalize(candidate.textContent);
+      if (candidate.matches("[data-next-scene]")) {
+        event.preventDefault();
+        goNext(90);
+        return;
+      }
+      if (isBlocked(text)) return;
+      if (candidate.matches(".concept-card,.item-card,[data-choice],[data-option]")) {
+        goNext(180);
+        return;
+      }
+      if (candidate.matches("button")) {
+        if (hasKeyword(text) || (text.length >= 4 && isOptionGroupButton(candidate))) {
+          goNext(220);
+        }
+      }
+    });
+  })();
+  
+  if (window.ReadoExperienceRuntime && typeof window.ReadoExperienceRuntime.init === "function") {
+    window.ReadoExperienceRuntime.init({
+      bookId: "sapiens",
+      moduleSlug: "sapiens-the-wheat-conquest-simulator-1",
+      moduleSlugs: ["the-wheat-conquest-simulator","human-domestication-dilemma-1","human-domestication-dilemma-2","bilingual-human-domestication-dilemma","sapiens-the-wheat-conquest-simulator-1","sapiens-the-wheat-conquest-simulator-2","bilingual-human-domestication-dilemma-4","bilingual-human-domestication-dilemma-1","bilingual-human-domestication-dilemma-2","bilingual-human-domestication-dilemma-3"]
+    });
+  }
+})();
+</script>
+</body></html>

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html class="dark" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>reado: 创始人悖论性格分析</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0d59f2",
+                        "background-light": "#f5f6f8",
+                        "background-dark": "#05070a",
+                        "glass-dark": "rgba(16, 22, 34, 0.7)",
+                        "glass-border": "rgba(255, 255, 255, 0.1)",
+                        "accent-purple": "#8b5cf6",
+                        "neon-blue": "#00f3ff",
+                        "neon-purple": "#bc13fe",
+                    },
+                    fontFamily: {
+                        "sans": ["Source Han Sans CN", "Source Han Sans", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", "sans-serif"],
+                        "display": ["Source Han Sans CN", "sans-serif"]
+                    },
+                    boxShadow: {
+                        "neon-blue": "0 0 20px rgba(0, 243, 255, 0.5)",
+                        "neon-purple": "0 0 20px rgba(188, 19, 254, 0.5)",
+                    }
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        body {
+            font-family: 'Source Han Sans CN', 'Noto Sans SC', sans-serif;
+            background-color: #05070a;
+            overflow: hidden;
+        }
+        .radial-bg {
+            background: radial-gradient(circle at 50% 50%, rgba(20, 30, 50, 1) 0%, rgba(5, 7, 10, 1) 100%);
+        }
+        .trait-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        .trait-float-delayed {
+            animation: float 6s ease-in-out infinite 3s;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+        .silhouette-mask {
+            mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+        }
+        .slider-thumb::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #fff;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+            border: 2px solid rgba(0,0,0,0.1);
+        }
+        .slider-thumb::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #fff;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+            border: 2px solid rgba(0,0,0,0.1);
+        }
+        .neon-text-blue {
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.8), 0 0 20px rgba(0, 243, 255, 0.4);
+        }
+        .neon-text-purple {
+            text-shadow: 0 0 10px rgba(188, 19, 254, 0.8), 0 0 20px rgba(188, 19, 254, 0.4);
+        }
+        .glow-line {
+            box-shadow: 0 0 10px rgba(13, 89, 242, 0.5);
+        }
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            animation: scan 8s linear infinite;
+            z-index: 10;
+            pointer-events: none;
+        }
+        @keyframes scan {
+            0% { top: 0%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+    </style>
+</head>
+<body class="bg-background-dark text-white min-h-screen flex items-center justify-center relative radial-bg">
+<script src="/shared/book-catalog.js?v=1771240921862"></script>
+<script type="module" src="/shared/shell.js?v=1771240921862"></script>
+<reado-app-shell data-page="knowledge-map"></reado-app-shell>
+<div class="absolute inset-0 z-0 opacity-20 pointer-events-none" style="background-image: linear-gradient(rgba(13, 89, 242, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(13, 89, 242, 0.1) 1px, transparent 1px); background-size: 50px 50px; mask-image: radial-gradient(circle, black 30%, transparent 80%);">
+</div>
+<div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+<div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-neon-purple opacity-20 blur-[120px] rounded-full"></div>
+<div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-neon-blue opacity-20 blur-[120px] rounded-full"></div>
+</div>
+<div class="scan-line"></div>
+<main class="relative z-10 w-full max-w-6xl h-screen flex flex-col items-center justify-center p-8">
+<header class="absolute top-10 w-full flex justify-between items-center px-8">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-gray-500">psychology_alt</span>
+<div class="h-4 w-[1px] bg-gray-700"></div>
+<h2 class="text-sm font-bold tracking-widest text-gray-400 uppercase">创始人悖论模拟器</h2>
+</div>
+<div class="text-xs text-gray-600 font-mono">MODULE: ZERO TO ONE // CH.14</div>
+</header>
+<div class="relative w-full flex-1 flex items-center justify-center">
+<div class="absolute left-10 md:left-20 top-1/2 -translate-y-1/2 flex flex-col gap-16 text-right pointer-events-none">
+<div class="trait-float">
+<h3 class="text-3xl font-black text-gray-200 neon-text-purple">愤世嫉俗</h3>
+<p class="text-xs text-neon-purple mt-1 uppercase tracking-wider opacity-80">Cynicism</p>
+</div>
+<div class="trait-float-delayed">
+<h3 class="text-3xl font-black text-gray-200 neon-text-purple">局外人</h3>
+<p class="text-xs text-neon-purple mt-1 uppercase tracking-wider opacity-80">Outsider</p>
+</div>
+<div class="trait-float">
+<h3 class="text-3xl font-black text-gray-200 neon-text-purple">一无所有</h3>
+<p class="text-xs text-neon-purple mt-1 uppercase tracking-wider opacity-80">Penniless</p>
+</div>
+</div>
+<div class="relative z-20 h-[60vh] w-[30vh] md:w-[40vh] flex items-end justify-center">
+<div class="absolute inset-0 bg-gradient-to-t from-black via-gray-900 to-gray-800 opacity-90 rounded-t-full blur-sm scale-90"></div>
+<div class="absolute inset-0 flex">
+<div class="w-1/2 h-full bg-gradient-to-br from-neon-purple/20 to-transparent rounded-tl-full blur-md opacity-60"></div>
+<div class="w-1/2 h-full bg-gradient-to-bl from-neon-blue/20 to-transparent rounded-tr-full blur-md opacity-60"></div>
+</div>
+<div class="w-48 h-64 bg-black rounded-t-[100px] relative overflow-hidden border-t border-white/10 shadow-[0_0_50px_rgba(255,255,255,0.05)]">
+<div class="absolute top-10 left-10 w-20 h-20 bg-neon-purple/20 rounded-full blur-xl mix-blend-screen"></div>
+<div class="absolute top-10 right-10 w-20 h-20 bg-neon-blue/20 rounded-full blur-xl mix-blend-screen"></div>
+<div class="absolute bottom-0 w-full h-1/2 bg-gradient-to-t from-black to-transparent z-10"></div>
+</div>
+<svg class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-full pointer-events-none opacity-30" viewBox="0 0 400 600">
+<path d="M 50 200 Q 150 300 200 300" fill="none" stroke="#bc13fe" stroke-dasharray="4 4" stroke-width="1"></path>
+<path d="M 350 200 Q 250 300 200 300" fill="none" stroke="#00f3ff" stroke-dasharray="4 4" stroke-width="1"></path>
+<circle cx="200" cy="300" fill="white" r="5"></circle>
+</svg>
+<div class="absolute bottom-[-40px] text-center">
+<div class="text-xs text-gray-500 uppercase tracking-[0.3em] mb-2">Archetype</div>
+<div class="text-2xl font-black text-white tracking-widest">独裁者</div>
+</div>
+</div>
+<div class="absolute right-10 md:right-20 top-1/2 -translate-y-1/2 flex flex-col gap-16 text-left pointer-events-none">
+<div class="trait-float-delayed">
+<h3 class="text-3xl font-black text-gray-200 neon-text-blue">极度乐观</h3>
+<p class="text-xs text-neon-blue mt-1 uppercase tracking-wider opacity-80">Optimism</p>
+</div>
+<div class="trait-float">
+<h3 class="text-3xl font-black text-gray-200 neon-text-blue">领袖</h3>
+<p class="text-xs text-neon-blue mt-1 uppercase tracking-wider opacity-80">Leader</p>
+</div>
+<div class="trait-float-delayed">
+<h3 class="text-3xl font-black text-gray-200 neon-text-blue">亿万富翁</h3>
+<p class="text-xs text-neon-blue mt-1 uppercase tracking-wider opacity-80">Billionaire</p>
+</div>
+</div>
+</div>
+<div class="w-full max-w-2xl mx-auto mt-8 relative z-30">
+<div class="text-center mb-8 opacity-90">
+<p class="text-lg md:text-xl font-light text-gray-300 italic">
+                    "初创公司需要一个有<span class="text-white font-bold not-italic mx-1 shadow-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]">灵魂</span>的人物，而非委员会"
+                </p>
+</div>
+<div class="bg-glass-dark border border-glass-border p-6 rounded-2xl backdrop-blur-xl shadow-2xl relative overflow-hidden group">
+<div class="absolute inset-0 bg-gradient-to-r from-neon-purple/5 via-transparent to-neon-blue/5 opacity-50"></div>
+<div class="flex justify-between items-center mb-4 text-xs font-bold uppercase tracking-wider text-gray-400">
+<span class="flex items-center gap-1 text-neon-purple"><span class="material-icons-outlined text-sm">all_inclusive</span> 怪诞特质</span>
+<span class="text-white">性格平衡度</span>
+<span class="flex items-center gap-1 text-neon-blue">神化特质 <span class="material-icons-outlined text-sm">stars</span></span>
+</div>
+<div class="relative h-12 flex items-center">
+<div class="absolute w-full h-1 bg-gray-700 rounded-full overflow-hidden">
+<div class="w-full h-full bg-gradient-to-r from-neon-purple via-white to-neon-blue opacity-50"></div>
+</div>
+<input class="slider-thumb w-full absolute z-20 opacity-0 cursor-pointer h-full" id="paradoxSlider" max="100" min="0" type="range" value="50"/>
+<div class="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-6 h-6 bg-white rounded-full shadow-[0_0_20px_rgba(255,255,255,1)] border-2 border-gray-900 pointer-events-none z-10 flex items-center justify-center">
+<div class="w-1.5 h-1.5 bg-black rounded-full"></div>
+</div>
+</div>
+<div class="flex justify-center mt-4 flex-col items-center gap-3">
+<button id="generate-vision-btn" data-next-scene="vision-generated" class="bg-white text-black font-bold px-8 py-3 rounded-lg hover:bg-gray-200 transition-colors shadow-[0_0_20px_rgba(255,255,255,0.3)] flex items-center gap-2">
+<span class="material-symbols-outlined">fingerprint</span>
+                        生成独裁式愿景
+                    </button>
+<p id="vision-feedback" class="text-xs text-neon-blue/80 opacity-0 transition-opacity duration-200">愿景已生成，正在进入下一幕...</p>
+</div>
+</div>
+</div>
+</main>
+<script>
+        // Simple visual feedback for the slider (purely aesthetic for this static demo)
+        const slider = document.getElementById('paradoxSlider');
+        const visualThumb = document.querySelector('.slider-thumb + div');
+        slider.addEventListener('input', (e) => {
+            const val = e.target.value;
+            visualThumb.style.left = `${val}%`;
+            // Subtle color shift on body based on slider
+            if(val < 40) {
+                document.body.style.backgroundColor = '#0a0510'; // purple tint
+            } else if (val > 60) {
+                document.body.style.backgroundColor = '#050a10'; // blue tint
+            } else {
+                document.body.style.backgroundColor = '#05070a'; // neutral
+            }
+        });
+
+        const generateBtn = document.getElementById('generate-vision-btn');
+        const feedback = document.getElementById('vision-feedback');
+        if (generateBtn && feedback) {
+            generateBtn.addEventListener('click', () => {
+                feedback.classList.remove('opacity-0');
+                feedback.classList.add('opacity-100');
+            });
+        }
+    </script>
+
+
+<script src="/shared/experience-runtime.js?v=1771240921862"></script>
+<script>
+(() => {
+  
+  localStorage.setItem("reado_book_last_zero-to-one", "zero-to-one-the-monopolist-s-choice-1");
+  if ("zero-to-one-the-monopolist-s-choice-1" === "zero-to-one-the-monopolist-s-choice-7") {
+    try {
+      const completedRaw = localStorage.getItem("reado_completed_books_v1") || "[]";
+      const completedSet = new Set(JSON.parse(completedRaw));
+      completedSet.add("zero-to-one");
+      localStorage.setItem("reado_completed_books_v1", JSON.stringify([...completedSet]));
+    } catch {}
+  }
+  
+  const readoNextHref = "/experiences/zero-to-one-the-monopolist-s-choice-2.html";
+  (() => {
+    let isNavigating = false;
+    const keywordList = ["开始", "继续", "下一", "进入", "模拟", "抉择", "选择", "确认", "提交", "挑战", "完成", "start", "next", "continue"];
+    const blacklist = ["EN", "ZH", "返回", "back", "帮助", "求助", "笔记", "术语", "设置", "菜单", "关闭", "取消"];
+    const normalize = (value) => String(value || "").replace(/\s+/g, " ").trim();
+    const hasKeyword = (text) => keywordList.some((keyword) => text.toLowerCase().includes(keyword.toLowerCase()));
+    const isBlocked = (text) => blacklist.some((word) => text === word || text.toLowerCase().includes(word.toLowerCase()));
+    const isOptionGroupButton = (node) => {
+      const parent = node.parentElement;
+      if (!parent) return false;
+      const peers = Array.from(parent.children).filter(
+        (child) => child instanceof HTMLElement && child.matches("button,[role='button'],.concept-card,.item-card,[data-choice],[data-option]")
+      );
+      return peers.length >= 2;
+    };
+    const goNext = (delay = 180) => {
+      if (isNavigating) return;
+      isNavigating = true;
+      window.setTimeout(() => {
+        window.location.href = readoNextHref;
+      }, delay);
+    };
+    document.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+      if (target.closest(".reado-shell-wrap")) return;
+      const candidate = target.closest("[data-next-scene],button,a[href],.concept-card,.item-card,[data-choice],[data-option]");
+      if (!(candidate instanceof HTMLElement)) return;
+      if (!candidate.closest("main")) return;
+      if (candidate.hasAttribute("data-no-next")) return;
+      if (candidate.matches("a[href]")) {
+        const href = candidate.getAttribute("href") || "";
+        if (href && href !== "#" && !href.startsWith("javascript:")) return;
+      }
+      const text = normalize(candidate.textContent);
+      if (candidate.matches("[data-next-scene]")) {
+        event.preventDefault();
+        goNext(90);
+        return;
+      }
+      if (isBlocked(text)) return;
+      if (candidate.matches(".concept-card,.item-card,[data-choice],[data-option]")) {
+        goNext(180);
+        return;
+      }
+      if (candidate.matches("button")) {
+        if (hasKeyword(text) || (text.length >= 4 && isOptionGroupButton(candidate))) {
+          goNext(220);
+        }
+      }
+    });
+  })();
+  
+  if (window.ReadoExperienceRuntime && typeof window.ReadoExperienceRuntime.init === "function") {
+    window.ReadoExperienceRuntime.init({
+      bookId: "zero-to-one",
+      moduleSlug: "zero-to-one-the-monopolist-s-choice-1",
+      moduleSlugs: ["zero-to-one-the-monopolist-s-choice","zero-to-one-the-monopolist-s-choice-1","zero-to-one-the-monopolist-s-choice-2","zero-to-one-the-monopolist-s-choice-3","zero-to-one-the-monopolist-s-choice-4","zero-to-one-the-monopolist-s-choice-5","zero-to-one-the-monopolist-s-choice-6","zero-to-one-the-monopolist-s-choice-7"]
+    });
+  }
+})();
+</script>
+</body></html>

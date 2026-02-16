@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html class="dark" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>reado: 全球学者排行榜</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&amp;family=Noto+Sans+SC:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "Noto Sans SC", "sans-serif"],
+                        "sans": ["Noto Sans SC", "Lexend", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        @layer base {
+            body {
+                @apply font-sans;
+            }
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: rgba(19, 91, 236, 0.2);
+            border-radius: 20px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(19, 91, 236, 0.4);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .gold-gradient {
+            background: linear-gradient(135deg, #FFD700 0%, #FDB931 100%);
+        }
+        .silver-gradient {
+            background: linear-gradient(135deg, #E0E0E0 0%, #BDBDBD 100%);
+        }
+        .bronze-gradient {
+            background: linear-gradient(135deg, #CD7F32 0%, #A0522D 100%);
+        }
+        .crown-glow {
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 h-screen overflow-hidden flex selection:bg-primary selection:text-white">
+<script src="/shared/book-catalog.js?v=1771240921862"></script>
+<script type="module" src="/shared/shell.js?v=1771240921862"></script>
+<reado-app-shell data-page="ranking"></reado-app-shell>
+<nav class="hidden md:flex flex-col w-20 lg:w-64 h-full border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark/50 flex-shrink-0 z-20 relative">
+<div class="p-6 flex items-center justify-center lg:justify-start gap-3">
+<div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white shadow-lg shadow-primary/30">
+<span class="material-icons">school</span>
+</div>
+<span class="hidden lg:block text-2xl font-bold tracking-tight text-slate-900 dark:text-white font-display">reado</span>
+</div>
+<div class="flex-1 px-4 py-8 space-y-2">
+<a class="flex items-center gap-4 p-3 rounded text-slate-500 hover:text-primary hover:bg-primary/5 transition-colors group" href="/pages/gamified-learning-hub-dashboard-1.html">
+<span class="material-icons group-hover:scale-110 transition-transform">public</span>
+<span class="hidden lg:block font-medium">世界地图</span>
+</a>
+<a class="flex items-center gap-4 p-3 rounded text-slate-500 hover:text-primary hover:bg-primary/5 transition-colors group" href="/pages/simulator-library-level-selection-1.html">
+<span class="material-icons group-hover:scale-110 transition-transform">inventory_2</span>
+<span class="hidden lg:block font-medium">我的库存</span>
+</a>
+<a class="flex items-center gap-4 p-3 rounded bg-primary/10 text-primary font-semibold shadow-sm ring-1 ring-primary/20" href="/pages/global-scholar-leaderboard.html">
+<span class="material-icons">emoji_events</span>
+<span class="hidden lg:block">排行榜</span>
+</a>
+<a class="flex items-center gap-4 p-3 rounded text-slate-500 hover:text-primary hover:bg-primary/5 transition-colors group" href="/pages/gamified-learning-hub-dashboard-3.html">
+<span class="material-icons group-hover:scale-110 transition-transform">storefront</span>
+<span class="hidden lg:block font-medium">交易市场</span>
+</a>
+<a class="flex items-center gap-4 p-3 rounded text-slate-500 hover:text-primary hover:bg-primary/5 transition-colors group" href="/pages/gamified-learning-hub-dashboard-2.html">
+<span class="material-icons group-hover:scale-110 transition-transform">person</span>
+<span class="hidden lg:block font-medium">个人主页</span>
+</a>
+</div>
+<div class="p-4 border-t border-slate-200 dark:border-slate-800">
+<button class="flex items-center gap-3 p-2 w-full rounded hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+<span class="material-icons text-slate-400">logout</span>
+<span class="hidden lg:block text-sm font-medium text-slate-500">退出登录</span>
+</button>
+</div>
+</nav>
+<main class="flex-1 h-full overflow-hidden flex flex-col md:flex-row relative">
+<div class="flex-1 h-full overflow-y-auto relative scroll-smooth p-6 pb-32">
+<header class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+<div>
+<h1 class="text-3xl font-bold text-slate-900 dark:text-white">全球学者排行榜</h1>
+<p class="text-slate-500 text-sm mt-1">与全球最顶尖的智慧大脑同台竞技。</p>
+</div>
+<div class="bg-slate-200 dark:bg-slate-800/80 p-1 rounded-lg flex">
+<button class="px-6 py-1.5 rounded-md text-sm font-medium bg-white dark:bg-primary text-slate-900 dark:text-white shadow-sm transition-all">本周</button>
+<button class="px-6 py-1.5 rounded-md text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all">总榜</button>
+</div>
+</header>
+<div class="flex justify-center items-end gap-4 sm:gap-8 mb-12 min-h-[300px]">
+<div class="flex flex-col items-center group cursor-pointer">
+<div class="relative mb-3 transform group-hover:-translate-y-2 transition-transform duration-300">
+<div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full border-4 border-slate-300 dark:border-slate-600 p-1 bg-background-light dark:bg-background-dark relative z-10 overflow-hidden">
+<img alt="排名 2 头像" class="w-full h-full object-cover rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCEXTctgjq4qTUGxx2JMGfwbsWSEFSdH1jip0f2tCjs7jIi8IEqPI6m4Rs-j7e7s8_5sjkmMKPcKSuS5WC-YaJaGl5oAzTEdFqnXgqsNmbNqXkpsB0gJD1qGJOmIfYkLCJhey0UzIPr7nkcDFU1qNOXeG1o4QW7k5NBJV6HrSBkTxA69_n3N60bh1TWlLVkNqDQSfUWj4mGo1zNtqglFZ0agi04GJxrxYaSWpyFhSTEm5BZSEqxSvq1hkyQX9KDXjLGhZ_zlJxi_Vg"/>
+</div>
+<div class="absolute -bottom-4 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full silver-gradient flex items-center justify-center text-slate-900 font-bold text-sm shadow-lg z-20">2</div>
+</div>
+<h3 class="font-semibold text-slate-900 dark:text-white text-sm sm:text-base">艾琳娜·R</h3>
+<span class="text-xs text-slate-500 bg-slate-200 dark:bg-slate-800 px-2 py-0.5 rounded mt-1">斯坦福大学</span>
+<p class="text-primary font-bold mt-1 text-sm">18,450 经验值</p>
+<div class="w-20 sm:w-24 h-24 bg-slate-300/20 dark:bg-slate-700/30 rounded-t-lg mt-2 mx-auto"></div>
+</div>
+<div class="flex flex-col items-center z-10 group cursor-pointer">
+<div class="relative mb-3 transform group-hover:-translate-y-2 transition-transform duration-300">
+<div class="absolute -top-10 left-1/2 -translate-x-1/2 text-4xl animate-bounce">👑</div>
+<div class="w-28 h-28 sm:w-32 sm:h-32 rounded-full border-4 border-yellow-500 p-1 bg-background-light dark:bg-background-dark relative z-10 overflow-hidden crown-glow">
+<img alt="排名 1 头像" class="w-full h-full object-cover rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCUR5SVNRLGQj7wIbrZizGWwoCm65hGUPc617Qsilcdy-4_9fwmURLvynwVrXlFAHbYJvljM_KBNTq-SrtroSc0ovqPzCgDVsyoh1gY4rtzToHM4zwPEligTsJWtJd6IYHTjwLa0l3AwHI5-pYpkcCf5PKYdUbk570u1DYBxwpGzbkf5Id4sbliv9A5_EQqJK0pvvyMz10thGoYMzGfC9gQBWLmPAsK6IN2lUvH6IKUdZvGipbtiJ-bTq2FTEkNyo87py8W69zxGFE"/>
+</div>
+<div class="absolute -bottom-4 left-1/2 -translate-x-1/2 w-10 h-10 rounded-full gold-gradient flex items-center justify-center text-slate-900 font-bold text-lg shadow-lg z-20">1</div>
+</div>
+<h3 class="font-bold text-slate-900 dark:text-white text-base sm:text-lg">戴维·金</h3>
+<span class="text-xs text-slate-500 bg-slate-200 dark:bg-slate-800 px-2 py-0.5 rounded mt-1">麻省理工学院</span>
+<p class="text-primary font-bold mt-1 text-base">21,050 经验值</p>
+<div class="w-28 sm:w-32 h-36 bg-yellow-500/10 rounded-t-lg mt-2 mx-auto border-t border-yellow-500/20"></div>
+</div>
+<div class="flex flex-col items-center group cursor-pointer">
+<div class="relative mb-3 transform group-hover:-translate-y-2 transition-transform duration-300">
+<div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full border-4 border-orange-800 dark:border-orange-900/50 p-1 bg-background-light dark:bg-background-dark relative z-10 overflow-hidden">
+<img alt="排名 3 头像" class="w-full h-full object-cover rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA7b6vaiqv8zH58hSxny_hJKWEym9crKVZC3CyKJiw1ajoujcAmZsUH3XowwKeYSj64nqN7LHfYCLRRLe-9tADcuA-Tyk8TTEQDuo8EjTnRL9AacdQyBkk68q4ouuAgbGqZzcNw6_JInn3E87Yrkr-Pl2Nzzs10nfIRpBUntvtM7XJbnXpurd9Xy-Pd7iBy25RFX2pyl4q-3Ifqyest_x16RJJi1M-d9Ba4mLaHHIIm81BqUSw5OLtv67fK4yeoryUIEMfLADnD8r4"/>
+</div>
+<div class="absolute -bottom-4 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bronze-gradient flex items-center justify-center text-white font-bold text-sm shadow-lg z-20">3</div>
+</div>
+<h3 class="font-semibold text-slate-900 dark:text-white text-sm sm:text-base">莎拉·J</h3>
+<span class="text-xs text-slate-500 bg-slate-200 dark:bg-slate-800 px-2 py-0.5 rounded mt-1">牛津大学</span>
+<p class="text-primary font-bold mt-1 text-sm">16,200 经验值</p>
+<div class="w-20 sm:w-24 h-16 bg-orange-900/10 rounded-t-lg mt-2 mx-auto"></div>
+</div>
+</div>
+<div class="hidden sm:grid grid-cols-12 gap-4 px-6 py-4 text-sm font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200 dark:border-slate-800 sticky top-0 bg-background-light dark:bg-background-dark z-10">
+<div class="col-span-1 text-center">排名</div>
+<div class="col-span-5">学者</div>
+<div class="col-span-4">大学</div>
+<div class="col-span-2 text-right">经验值</div>
+</div>
+<div class="space-y-2 mt-2">
+<div class="glass-card hover:bg-white/5 p-4 rounded-xl flex sm:grid grid-cols-12 gap-4 items-center transition-all group">
+<div class="col-span-1 flex justify-center w-8 sm:w-auto font-bold text-slate-400">4</div>
+<div class="col-span-5 flex items-center gap-4 flex-1">
+<img alt="学者头像" class="w-10 h-10 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCM8K6ojELJXUUVdYgnKN0R98z46qQmj1isDqevKiX0LV1Ks42vPw5tm1klGCy7VdDVfwOJTItEKjfWyNXntGyPE18K869gN0bSq3Ab-SEw2P-u0KAua6fvQFFRdPgMiFuzbkvtx9m26dNQXIpjBlus_1pzQHVxIZr_Ck3RMMcuaGqYTjRrWbCxiVEbx3TEZvQVbvuJWCIEKjBH3D3fo_Rzb-HbsDDmBDtQoU7zXnHixqaWely9xuqBre_Goyv7IbkJC2yYnWQ7-6A"/>
+<div>
+<p class="font-bold text-slate-900 dark:text-white text-base">马库斯·陈</p>
+<span class="sm:hidden text-xs text-slate-500">耶鲁大学 • 15,800 经验值</span>
+</div>
+</div>
+<div class="col-span-4 hidden sm:block text-slate-500 text-sm">耶鲁大学</div>
+<div class="col-span-2 text-right font-bold text-primary hidden sm:block text-base">15,800</div>
+</div>
+<div class="glass-card hover:bg-white/5 p-4 rounded-xl flex sm:grid grid-cols-12 gap-4 items-center transition-all group">
+<div class="col-span-1 flex justify-center w-8 sm:w-auto font-bold text-slate-400">5</div>
+<div class="col-span-5 flex items-center gap-4 flex-1">
+<img alt="学者头像" class="w-10 h-10 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfpeBrq-9-M_bFOcQ1noczz8LTr7KL14edTrhXbXvK70TCFpohDeWum1QwDENLWf6LDXDbR3yN8Q5cVDZQFN11W8tO_hirozDneYstY2KdYGzm8Pcx3oiuw9GxdPd3ufFGqaE2OYuBEMcbk_y7g-6k0EGf9zv8-SpuD6ez16wDs_sesHOf1g1FGJ3EfNOalWsmhHjuQYw0slNUKZPpfglr-Bpo7wUmxnW7u22nH7kDUYXGdfLC0UCPxWrLjwRs1YzDytHFS2B1Iwg"/>
+<div>
+<p class="font-bold text-slate-900 dark:text-white text-base">亚历克斯·摩根</p>
+<span class="sm:hidden text-xs text-slate-500">加州大学洛杉矶分校 • 15,120 经验值</span>
+</div>
+</div>
+<div class="col-span-4 hidden sm:block text-slate-500 text-sm">加州大学洛杉矶分校</div>
+<div class="col-span-2 text-right font-bold text-primary hidden sm:block text-base">15,120</div>
+</div>
+<div class="glass-card hover:bg-white/5 p-4 rounded-xl flex sm:grid grid-cols-12 gap-4 items-center transition-all group">
+<div class="col-span-1 flex justify-center w-8 sm:w-auto font-bold text-slate-400 flex-col items-center">
+<span>6</span>
+<span class="text-[10px] text-green-500 font-bold flex items-center"><span class="material-icons text-[10px]">arrow_drop_up</span>2</span>
+</div>
+<div class="col-span-5 flex items-center gap-4 flex-1">
+<img alt="学者头像" class="w-10 h-10 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCz7e6RBi5OQ1yIKoRI_YewIkbhx1so0dFEoMwGWJ5fBR1k0nFcDEIIOmU7lGR2U3j9dDe-V5pHli33KrajITRiXzCsKT86ayXz9fZ6fNfXKZjOLGn4sK252kJC3dAoKJY8bDu0ljvV0agSo-33dQ9f4UQrdfWNiC8vcy29eAH_0WET62zsCBUggSvF_XjxJEdp0DZDKb5VUvUC3uf6J5oWYnfpqyWKzbcpQru5qN03uK07Ua_P6V7JtzeDTB_ljzT-XvcQd8rTUoI"/>
+<div>
+<p class="font-bold text-slate-900 dark:text-white text-base">普里雅·帕特尔</p>
+<span class="sm:hidden text-xs text-slate-500">剑桥大学 • 14,900 经验值</span>
+</div>
+</div>
+<div class="col-span-4 hidden sm:block text-slate-500 text-sm">剑桥大学</div>
+<div class="col-span-2 text-right font-bold text-primary hidden sm:block text-base">14,900</div>
+</div>
+<div class="glass-card hover:bg-white/5 p-4 rounded-xl flex sm:grid grid-cols-12 gap-4 items-center transition-all group">
+<div class="col-span-1 flex justify-center w-8 sm:w-auto font-bold text-slate-400">7</div>
+<div class="col-span-5 flex items-center gap-4 flex-1">
+<img alt="学者头像" class="w-10 h-10 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBMzPSiCp3hlELWSpfXs-nG2oda8K_L5bKWG9zLO0ByoXPuacKr0vcZLdNBchKuTpg05L-_eadcT7qUgJz5WRdzYZZB3oUO7QBb7QQnMM9lelAm8VxiVkELxd-CX7oU3aPMuzDjICm2OEG-m6NKdjj205pTXyap-tL0-3zl-_UKNkN93rcnBrrBv_EZC5fot_5rQHUslGxIsAJayLgkdx8J9Q-8vEj4icNdkvtMoGLciAQ_Ill_-kLuq75FLG0J7YCtfNFz6XNybnU"/>
+<div>
+<p class="font-bold text-slate-900 dark:text-white text-base">詹姆斯·威尔逊</p>
+<span class="sm:hidden text-xs text-slate-500">哈佛大学 • 14,250 经验值</span>
+</div>
+</div>
+<div class="col-span-4 hidden sm:block text-slate-500 text-sm">哈佛大学</div>
+<div class="col-span-2 text-right font-bold text-primary hidden sm:block text-base">14,250</div>
+</div>
+<div class="glass-card hover:bg-white/5 p-4 rounded-xl flex sm:grid grid-cols-12 gap-4 items-center transition-all group">
+<div class="col-span-1 flex justify-center w-8 sm:w-auto font-bold text-slate-400">8</div>
+<div class="col-span-5 flex items-center gap-4 flex-1">
+<img alt="学者头像" class="w-10 h-10 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD55qL4YGFdVA5ocOQlDI9YEjtu2gdN0SqlIUmxZjE9-ZgyTTIrAJfeOHViMVHEXZCjT8I_2GR2X_fZpDqd-81JqNY0yR8SOIikM75F9BFCOK-T_1kA7JftWsSYTWMNzxKxHGuc9VIYed4tdL3QYMrjpDsdxcuZp_h3Ilz3hwybGrHAfLEiuLZAvUSrlzArgLcnrPfHPSLcng8Uy791JQomObTondJSnHUuRDBu4yyJvkvw2F9Rh7yRii9BMN6s-0yEPV2_evzr4l8"/>
+<div>
+<p class="font-bold text-slate-900 dark:text-white text-base">法蒂玛·赛义德</p>
+<span class="sm:hidden text-xs text-slate-500">苏黎世联邦理工学院 • 13,800 经验值</span>
+</div>
+</div>
+<div class="col-span-4 hidden sm:block text-slate-500 text-sm">苏黎世联邦理工学院</div>
+<div class="col-span-2 text-right font-bold text-primary hidden sm:block text-base">13,800</div>
+</div>
+</div>
+<div class="absolute bottom-6 left-6 right-6 z-30">
+<div class="bg-primary shadow-xl shadow-primary/30 p-4 rounded-2xl flex sm:grid grid-cols-12 gap-4 items-center border border-primary/50 text-white">
+<div class="col-span-1 flex justify-center w-8 sm:w-auto font-bold text-white/90">24</div>
+<div class="col-span-5 flex items-center gap-4 flex-1">
+<img alt="我的头像" class="w-10 h-10 rounded-full object-cover border-2 border-white/20" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLGiqAMV4TBMN64N_VxzEpBtpS0ZOx19PWSetGviRnrliI7O6FbSJfXuXgommOJGnlxO6SrZFV9yssPoSX5-p0G4JGDBo3Ph4slG-sYDBMBeYzAgpfuc2aWWYBjO4Foz2sCyovBOA0rsxV-K1z5So9WqSG7fpZ4Rna9mYv1sHhz4G7wHwXcYyr5UeN8X8-yQKmXNgNHZ57PxCzk5FwvDksywNBF3rI-CkwM4WX0KrduxwnGbT0RQ_BQd8R9mLqNCgErYR9qP3ZRkk"/>
+<div>
+<p class="font-bold text-base">你</p>
+<span class="sm:hidden text-xs text-white/70">10,400 经验值</span>
+</div>
+</div>
+<div class="col-span-4 hidden sm:block text-white/80 text-sm">多伦多大学</div>
+<div class="col-span-2 text-right font-bold text-white hidden sm:block text-base">10,400</div>
+</div>
+</div>
+</div>
+<aside class="w-full md:w-80 lg:w-96 bg-white dark:bg-background-dark/50 border-l border-slate-200 dark:border-slate-800 p-6 flex flex-col gap-6 z-20 overflow-y-auto">
+<div class="flex items-center justify-between mb-2">
+<div class="flex items-center gap-3">
+<div class="relative">
+<img alt="个人资料" class="w-12 h-12 rounded-full object-cover ring-2 ring-primary ring-offset-2 dark:ring-offset-background-dark" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLGiqAMV4TBMN64N_VxzEpBtpS0ZOx19PWSetGviRnrliI7O6FbSJfXuXgommOJGnlxO6SrZFV9yssPoSX5-p0G4JGDBo3Ph4slG-sYDBMBeYzAgpfuc2aWWYBjO4Foz2sCyovBOA0rsxV-K1z5So9WqSG7fpZ4Rna9mYv1sHhz4G7wHwXcYyr5UeN8X8-yQKmXNgNHZ57PxCzk5FwvDksywNBF3rI-CkwM4WX0KrduxwnGbT0RQ_BQd8R9mLqNCgErYR9qP3ZRkk"/>
+<div class="absolute -bottom-1 -right-1 w-5 h-5 bg-primary text-white text-[10px] flex items-center justify-center rounded-full border border-white dark:border-background-dark font-bold">5</div>
+</div>
+<div>
+<h2 class="text-sm font-bold text-slate-900 dark:text-white">艾利克斯</h2>
+<span class="text-xs text-slate-500">三级学者</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<div class="flex items-center gap-1 bg-red-50 dark:bg-red-900/20 px-2 py-1 rounded-full border border-red-100 dark:border-red-900/30">
+<span class="material-icons text-orange-500 text-sm">local_fire_department</span>
+<span class="text-xs font-bold text-slate-700 dark:text-slate-200">12</span>
+</div>
+<div class="flex items-center gap-1 bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded-full border border-blue-100 dark:border-blue-900/30">
+<span class="material-icons text-blue-500 text-sm">diamond</span>
+<span class="text-xs font-bold text-slate-700 dark:text-slate-200">2,450</span>
+</div>
+</div>
+</div>
+<div class="bg-slate-100 dark:bg-slate-800 p-5 rounded-2xl">
+<div class="flex justify-between text-xs mb-2">
+<span class="text-slate-500">当前经验值</span>
+<span class="text-slate-900 dark:text-white font-bold">10,400 / 12,000</span>
+</div>
+<div class="h-2 w-full bg-slate-300 dark:bg-slate-700 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[86%] rounded-full relative">
+<div class="absolute inset-0 bg-white/20 w-full"></div>
+</div>
+</div>
+<p class="text-xs text-slate-500 mt-2">距离“博士候选人”还需 1,600 经验值</p>
+</div>
+<div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-5 relative overflow-hidden group border border-slate-700 shadow-xl">
+<div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-primary/20 rounded-full blur-xl"></div>
+<div class="flex justify-between items-center mb-4">
+<div class="inline-flex items-center gap-1 bg-primary/20 text-primary text-xs font-bold px-2 py-1 rounded-full border border-primary/20">
+<span class="material-icons text-xs">timer</span>
+<span>剩余 14时 32分</span>
+</div>
+<span class="text-xs text-slate-400">每日挑战</span>
+</div>
+<div class="flex gap-4 mb-4">
+<div class="w-16 h-24 flex-shrink-0 rounded-lg overflow-hidden shadow-lg transform rotate-[-3deg] border border-white/10">
+<img alt="书籍封面" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOBfE3qOH2og2EOumyPnfqNVVmrA5wVjY85KpybQiAm4OsjNu7nWRnVC7CHq0RRgZmkhf9DWkjyUGEM9nKEkXuK-MCe7v8GJVhCkoB1hUI66qNK8WSTtQchAB9WPIxo02OmnxZ4Wupa2R9xtRoN7Yoz4SvcVEaLRwZ9TCUhDgulC018pP6cpPCaHQt6a0zpcJ2qAL5urxDMZZfOYlUERKVjHFiV-SlBaVoRZhgBPUNjLfMSpFpMjofmaQUaLGC1wY7fXX8Vx4yzqU"/>
+</div>
+<div>
+<h4 class="text-white font-bold text-lg leading-tight mb-1">行为经济学 101</h4>
+<p class="text-slate-400 text-xs mb-2">作者：理查德·塞勒 博士</p>
+<div class="flex items-center gap-2 text-xs text-yellow-500 font-medium">
+<span class="material-icons text-sm">bolt</span>
+<span>+500 经验值奖励</span>
+</div>
+</div>
+</div>
+<button class="w-full py-3 bg-primary hover:bg-blue-600 text-white font-bold rounded-full shadow-lg shadow-primary/25 transition-all flex items-center justify-center gap-2 group-hover:scale-[1.02]">
+                    开始挑战
+                    <span class="material-icons text-sm">arrow_forward</span>
+</button>
+</div>
+<div>
+<div class="flex items-center justify-between mb-4">
+<h3 class="font-bold text-slate-900 dark:text-white">荣誉奖杯</h3>
+<a class="text-xs text-primary font-bold hover:underline" href="#">查看全部</a>
+</div>
+<div class="grid grid-cols-4 gap-3">
+<div class="aspect-square bg-slate-100 dark:bg-slate-800 rounded-xl flex flex-col items-center justify-center p-2 cursor-help group relative hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+<span class="material-icons text-yellow-500 text-3xl mb-1 drop-shadow-sm">local_library</span>
+<div class="absolute bottom-full mb-2 hidden group-hover:block w-32 bg-black text-white text-[10px] p-2 rounded-lg z-50 text-center pointer-events-none">
+                            学者：阅读 50 篇论文
+                        </div>
+</div>
+<div class="aspect-square bg-slate-100 dark:bg-slate-800 rounded-xl flex flex-col items-center justify-center p-2 cursor-help group relative hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+<span class="material-icons text-blue-400 text-3xl mb-1 drop-shadow-sm">speed</span>
+<div class="absolute bottom-full mb-2 hidden group-hover:block w-32 bg-black text-white text-[10px] p-2 rounded-lg z-50 text-center pointer-events-none">
+                            速读者：用时排名前 10%
+                        </div>
+</div>
+<div class="aspect-square bg-slate-100 dark:bg-slate-800 rounded-xl flex flex-col items-center justify-center p-2 cursor-help group relative hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+<span class="material-icons text-purple-400 text-3xl mb-1 drop-shadow-sm">auto_stories</span>
+<div class="absolute bottom-full mb-2 hidden group-hover:block w-32 bg-black text-white text-[10px] p-2 rounded-lg z-50 text-center pointer-events-none">
+                            书虫：连续 7 天阅读
+                        </div>
+</div>
+<div class="aspect-square bg-slate-100 dark:bg-slate-800 rounded-xl flex flex-col items-center justify-center p-2 opacity-50 relative border border-dashed border-slate-300 dark:border-slate-600">
+<span class="material-icons text-slate-400 text-3xl mb-1">lock</span>
+</div>
+</div>
+</div>
+<div class="mt-auto pt-6 border-t border-slate-200 dark:border-slate-800">
+<h3 class="font-bold text-slate-900 dark:text-white text-sm mb-3">在线学友</h3>
+<div class="flex -space-x-2 overflow-hidden">
+<img alt="学友头像" class="inline-block h-8 w-8 rounded-full ring-2 ring-white dark:ring-background-dark object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3_9zztMGocCxbi72icPoDf3QwolnkPjgB5s7BqIxKUmUkAtKG3_QSwaVfFNNlm2GD6BL2f037ZwjUXwO3oOI9rxKyCgVEXRoZq6mE7cqa2a_u7yO98jKcO3REpxRNE0EdrE1Qobtw9wSiKFmjhfEDK3n7lnHfKDqM4GaFMMG1WdA0GZPLCZA2aH1twcOL98T6Lnhcpf0dc8PcF4H9uc3JLEnj8l1_jutWg7ayQpYuRJOYgKcANf4e9zbY5AZ25NJHY-_YX2xmG9E"/>
+<img alt="学友头像" class="inline-block h-8 w-8 rounded-full ring-2 ring-white dark:ring-background-dark object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKCEayWbaVY0hwpXZP81QCzs-q29P3Ipzi0yEb-_2cyfqAs72xIlDGRhBL_Z08YJ4YT5wIjI3E0L00hwHnqZeupg4R1J91wnNY941j4sJR_7x4KLz201lbiMvn9cBxCS7g-OZyba_hUC6uD9lGPk_ZOanvcz0AeKM-utQUuxLLdBCbyAwFEKOB_Rqv1SjviBTI1ve9s7Z6bcA-qakzB5gBAKdMmLeFcXSmDJNeyNj3fqHATDlEDiU-AqDznFkRsfWcbOt3nOfblAA"/>
+<img alt="学友头像" class="inline-block h-8 w-8 rounded-full ring-2 ring-white dark:ring-background-dark object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0khKnqb9LQ9KJdVDOyguwBmpXoHZoKJV8Setb2OUvQ2fy7F82NvmP-pMuCYLvhfDY76_MXrRv9brJVeW3-d7__INrH04T80yzE8dsHsT27LZWkhfDS-adilLbi3_4wFc-11rFXrfOTiSMJINzjmpNQ0wRz7inWqJ5tbG8QBRDwnT9HOV4f9fwrUpjvBFSfd1CS3LKlHTUjEuclTdWZynetNyQtuQLjSxBusYp8Bu6f8c00b6ibpPzeTCNZjcJn2EmcntfsOZ2DF8"/>
+<div class="h-8 w-8 rounded-full ring-2 ring-white dark:ring-background-dark bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs text-slate-500 font-bold">
+                        +4
+                    </div>
+</div>
+</div>
+</aside>
+</main>
+
+</body></html>

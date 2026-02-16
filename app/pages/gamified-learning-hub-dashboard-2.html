@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html class="dark" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>reado: 个人资料与天赋树 (蓝青色系版)</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1978e5", // reado neon blue/cyan base
+                        "accent-cyan": "#00f2ff",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#111821",
+                        "surface-dark": "#1a232e",
+                    },
+                    fontFamily: {
+                        "display": ["'Source Han Sans SC'", "'Noto Sans CJK SC'", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    boxShadow: {
+                        'glow-cyan': '0 0 20px rgba(25, 120, 229, 0.4)',
+                        'node-active': '0 0 15px rgba(0, 242, 255, 0.8), 0 0 30px rgba(25, 120, 229, 0.4)',
+                    },
+                },
+            },
+        }
+    </script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style type="text/tailwindcss">
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+        body {
+            font-family: 'Source Han Sans SC', 'Noto Sans SC', sans-serif;
+        }
+        .glass-panel {
+            background: rgba(17, 24, 33, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(25, 120, 229, 0.1);
+        }
+        .evolution-tree-bg {
+            background-image: radial-gradient(circle at center, #1e293b 0%, #111821 100%);
+        }
+        .constellation-line {
+            stroke: rgba(0, 242, 255, 0.2);
+            stroke-width: 1.5;
+            stroke-dasharray: 4;
+        }
+        .logo-font {
+            font-family: 'Lexend', sans-serif;
+        }.scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-background-dark text-slate-200 h-screen overflow-hidden flex flex-col font-display">
+<script src="/shared/book-catalog.js?v=1771240921862"></script>
+<script type="module" src="/shared/shell.js?v=1771240921862"></script>
+<reado-app-shell data-page="profile"></reado-app-shell>
+<header class="h-20 flex-none z-50 px-6 py-4 flex items-center justify-between glass-panel sticky top-0 border-b border-primary/20">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-white shadow-glow-cyan">
+<span class="material-icons text-2xl">auto_stories</span>
+</div>
+<h1 class="text-2xl font-bold tracking-tight hidden md:block logo-font text-white">reado</h1>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-lg border border-white/5">
+<span class="material-icons text-orange-500 text-xl">local_fire_department</span>
+<span class="font-bold text-orange-400">连续 15 天</span>
+</div>
+<div class="hidden md:flex items-center gap-2 bg-white/5 px-4 py-2 rounded-lg border border-white/5">
+<span class="material-icons text-primary text-xl">auto_awesome</span>
+<span class="font-bold text-primary">2,450 智慧值</span>
+</div>
+<div class="flex items-center gap-3 pl-4 border-l border-white/10">
+<div class="text-right hidden sm:block">
+<div class="text-sm font-bold text-white">亚历克斯·陈</div>
+<div class="text-xs text-slate-400">Lv.42 全域架构师</div>
+</div>
+<div class="relative">
+<div class="w-12 h-12 rounded-full p-0.5 bg-gradient-to-tr from-primary to-accent-cyan">
+<img alt="用户头像" class="w-full h-full rounded-full object-cover border-2 border-background-dark" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTCkPJeZKnZiMBWRNBvlC4hj4fuKNI6gb3njqhKFHIdlwmY3juARMMHwwtJg1wv4mUfWu8RlkcrYlKa11Qdo68yG3EqQnQ9E8riXBtvOkdYOqDVbS1s2JSXODzNG2MlyJ4nBha372qjxomU_OS5gCP-XjccsEU8E_n8AogkO8Tv5xwjCp9JWKX2MXi49x2TiT1FCtgXk6e_FJ0rxOLFrn_3jnLdHaeWn4B2tDBS8-pQzmmIatinOFwi81-9HkHWrKUxHd0IhwOI2E"/>
+</div>
+</div>
+</div>
+</div>
+</header>
+<div class="flex-1 flex overflow-hidden">
+<nav class="w-20 md:w-64 flex-none flex flex-col gap-2 p-4 glass-panel z-40 border-r border-primary/10">
+<div class="flex flex-col gap-2">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors font-medium" href="/pages/gamified-learning-hub-dashboard-1.html">
+<span class="material-icons">map</span>
+<span class="hidden md:inline">知识版图</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors font-medium" href="/pages/simulator-library-level-selection-2.html">
+<span class="material-icons">assignment</span>
+<span class="hidden md:inline">任务中心</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors font-medium" href="/pages/global-scholar-leaderboard.html">
+<span class="material-icons">leaderboard</span>
+<span class="hidden md:inline">排行榜</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors font-medium" href="/pages/gamified-learning-hub-dashboard-3.html">
+<span class="material-icons">storefront</span>
+<span class="hidden md:inline">交易中心</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-primary/20 text-accent-cyan rounded-lg font-medium transition-colors border border-primary/20" href="/pages/gamified-learning-hub-dashboard-2.html">
+<span class="material-icons">person</span>
+<span class="hidden md:inline">个人资料</span>
+</a>
+</div>
+</nav>
+<main class="flex-1 relative evolution-tree-bg overflow-hidden">
+<div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(#1978e5 1px, transparent 1px); background-size: 40px 40px;"></div>
+<svg class="absolute inset-0 w-full h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg">
+<line class="constellation-line" style="stroke: #00f2ff; stroke-opacity: 0.6;" x1="50%" x2="35%" y1="50%" y2="35%"></line>
+<line class="constellation-line" style="stroke: #00f2ff; stroke-opacity: 0.6;" x1="50%" x2="65%" y1="50%" y2="40%"></line>
+<line class="constellation-line" style="stroke: #475569;" x1="35%" x2="25%" y1="35%" y2="45%"></line>
+<line class="constellation-line" style="stroke: #475569;" x1="65%" x2="75%" y1="40%" y2="25%"></line>
+<line class="constellation-line" style="stroke: #475569;" x1="50%" x2="50%" y1="50%" y2="75%"></line>
+</svg>
+<div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 flex flex-col items-center">
+<div class="w-20 h-20 rounded-full bg-primary/20 border-2 border-accent-cyan shadow-node-active flex items-center justify-center text-accent-cyan group cursor-pointer hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-4xl">hub</span>
+</div>
+<div class="mt-4 text-center">
+<div class="text-white font-bold text-lg">全域架构师</div>
+<div class="text-accent-cyan text-xs font-medium">终极天赋已觉醒</div>
+</div>
+</div>
+<div class="absolute left-[35%] top-[35%] -translate-x-1/2 -translate-y-1/2 z-20 flex flex-col items-center">
+<div class="w-14 h-14 rounded-full bg-primary/20 border border-primary shadow-glow-cyan flex items-center justify-center text-accent-cyan cursor-pointer hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-2xl">biotech</span>
+</div>
+<div class="mt-2 text-center">
+<div class="text-slate-200 font-bold text-sm">生物战略家</div>
+<div class="text-primary text-[10px]">已解锁</div>
+</div>
+</div>
+<div class="absolute left-[65%] top-[40%] -translate-x-1/2 -translate-y-1/2 z-20 flex flex-col items-center">
+<div class="w-14 h-14 rounded-full bg-primary/20 border border-primary shadow-glow-cyan flex items-center justify-center text-accent-cyan cursor-pointer hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-2xl">account_balance</span>
+</div>
+<div class="mt-2 text-center">
+<div class="text-slate-200 font-bold text-sm">文明史官</div>
+<div class="text-primary text-[10px]">已解锁</div>
+</div>
+</div>
+<div class="absolute left-[25%] top-[45%] -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center opacity-40">
+<div class="w-12 h-12 rounded-full bg-slate-800 border border-slate-600 flex items-center justify-center text-slate-500">
+<span class="material-symbols-outlined text-xl">lock</span>
+</div>
+<div class="mt-2 text-center">
+<div class="text-slate-500 font-medium text-xs">量子逻辑学家</div>
+</div>
+</div>
+<div class="absolute left-[75%] top-[25%] -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center opacity-40">
+<div class="w-12 h-12 rounded-full bg-slate-800 border border-slate-600 flex items-center justify-center text-slate-500">
+<span class="material-symbols-outlined text-xl">lock</span>
+</div>
+<div class="mt-2 text-center">
+<div class="text-slate-500 font-medium text-xs">星系经济师</div>
+</div>
+</div>
+<div class="absolute left-[50%] top-[75%] -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center opacity-40">
+<div class="w-12 h-12 rounded-full bg-slate-800 border border-slate-600 flex items-center justify-center text-slate-500">
+<span class="material-symbols-outlined text-xl">lock</span>
+</div>
+<div class="mt-2 text-center">
+<div class="text-slate-500 font-medium text-xs">元伦理专家</div>
+</div>
+</div>
+<div class="absolute bottom-8 left-1/2 -translate-x-1/2 px-6 py-3 glass-panel rounded-lg border border-primary/30 flex items-center gap-4">
+<div class="text-xs font-bold text-accent-cyan tracking-widest uppercase">天赋进化进度</div>
+<div class="w-48 bg-white/10 h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[45%] rounded-full shadow-glow-cyan"></div>
+</div>
+<div class="text-xs text-white font-bold">45%</div>
+</div>
+</main>
+<aside class="w-80 flex-none bg-background-dark border-l border-primary/10 flex flex-col h-full z-40 hidden xl:flex">
+<div class="p-6 border-b border-white/5">
+<h2 class="font-bold text-lg text-white mb-6">成就统计</h2>
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-surface-dark p-4 rounded-xl border border-white/5 text-center">
+<div class="text-primary text-2xl font-bold mb-1">2,450</div>
+<div class="text-[10px] text-slate-400 uppercase tracking-tighter">总智慧值</div>
+</div>
+<div class="bg-surface-dark p-4 rounded-xl border border-white/5 text-center">
+<div class="text-orange-400 text-2xl font-bold mb-1">128</div>
+<div class="text-[10px] text-slate-400 uppercase tracking-tighter">阅读天数</div>
+</div>
+<div class="bg-surface-dark p-4 rounded-xl border border-white/5 text-center">
+<div class="text-cyan-400 text-2xl font-bold mb-1">12</div>
+<div class="text-[10px] text-slate-400 uppercase tracking-tighter">已通关模拟器</div>
+</div>
+<div class="bg-surface-dark p-4 rounded-xl border border-white/5 text-center">
+<div class="text-accent-cyan text-2xl font-bold mb-1">8</div>
+<div class="text-[10px] text-slate-400 uppercase tracking-tighter">稀有勋章</div>
+</div>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-6 scrollbar-hide">
+<h2 class="font-bold text-lg text-white mb-4">稀有勋章</h2>
+<div class="space-y-4">
+<div class="bg-primary/10 p-4 rounded-xl border border-primary/30 flex items-center gap-4 group cursor-pointer hover:bg-primary/20 transition-colors">
+<div class="w-12 h-12 rounded-lg bg-gradient-to-br from-primary to-accent-cyan flex items-center justify-center shadow-lg">
+<span class="material-symbols-outlined text-white">auto_awesome_motion</span>
+</div>
+<div>
+<h3 class="font-bold text-white text-sm">古怪的榜样</h3>
+<p class="text-[10px] text-slate-400">在非高峰时段完成 50 次深度阅读</p>
+</div>
+</div>
+<div class="bg-surface-dark/40 p-4 rounded-xl border border-white/5 flex items-center gap-4 opacity-80">
+<div class="w-12 h-12 rounded-lg bg-slate-700/50 flex items-center justify-center">
+<span class="material-symbols-outlined text-slate-400">history_edu</span>
+</div>
+<div>
+<h3 class="font-bold text-slate-200 text-sm">知识考古学家</h3>
+<p class="text-[10px] text-slate-500">阅读完 5 本 50 年以上的经典著作</p>
+</div>
+</div>
+<div class="bg-surface-dark/40 p-4 rounded-xl border border-white/5 flex items-center gap-4 opacity-80">
+<div class="w-12 h-12 rounded-lg bg-slate-700/50 flex items-center justify-center">
+<span class="material-symbols-outlined text-slate-400">psychology_alt</span>
+</div>
+<div>
+<h3 class="font-bold text-slate-200 text-sm">逻辑之源</h3>
+<p class="text-[10px] text-slate-500">连续 7 天在哲学领域保持高专注</p>
+</div>
+</div>
+</div>
+</div>
+<div class="p-6 border-t border-white/5">
+<button class="w-full py-4 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl transition-all shadow-glow-cyan flex items-center justify-center gap-2">
+<span class="material-icons text-sm">upgrade</span>
+<span>天赋突破</span>
+</button>
+</div>
+</aside>
+</div>
+
+
+<script id="reado-profile-talent-script">
+(() => {
+  const catalog = window.__READO_BOOK_CATALOG__;
+  const books = Array.isArray(catalog?.books) ? catalog.books : [];
+  const unlockKey = catalog?.storage?.unlockKey || "reado_unlocked_books_v1";
+  const completedKey = catalog?.storage?.completedKey || "reado_completed_books_v1";
+  const main = document.querySelector("body > .flex-1.flex.overflow-hidden > main");
+  if (!main) return;
+
+  const parseSet = (key) => {
+    try {
+      const raw = JSON.parse(localStorage.getItem(key) || "[]");
+      return new Set(Array.isArray(raw) ? raw : []);
+    } catch {
+      return new Set();
+    }
+  };
+
+  const unlocked = parseSet(unlockKey);
+  const completed = parseSet(completedKey);
+  const completedBooks = books.filter((book) => completed.has(book.id));
+  const pendingBooks = books.filter((book) => unlocked.has(book.id) && !completed.has(book.id));
+  const totalModules = completedBooks.reduce((sum, book) => sum + (book.moduleCount || 0), 0);
+
+  main.className = "flex-1 overflow-y-auto bg-background-dark p-6 md:p-8";
+  main.innerHTML = `
+    <div class="max-w-7xl mx-auto space-y-6">
+      <section class="rounded-2xl border border-primary/20 bg-slate-900/50 p-5 md:p-6">
+        <h2 class="text-2xl md:text-3xl font-black text-white">天赋展示</h2>
+        <p class="text-slate-300 mt-2">每本通关书籍将永久点亮一枚收益徽章，点击即可回顾核心知识点。</p>
+        <div class="mt-5 grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div class="rounded-xl border border-white/10 bg-slate-900/70 p-3">
+            <p class="text-[11px] text-slate-400">已解锁书籍</p>
+            <p class="text-2xl font-black text-cyan-300">${unlocked.size}</p>
+          </div>
+          <div class="rounded-xl border border-white/10 bg-slate-900/70 p-3">
+            <p class="text-[11px] text-slate-400">已激活徽章</p>
+            <p class="text-2xl font-black text-emerald-300">${completedBooks.length}</p>
+          </div>
+          <div class="rounded-xl border border-white/10 bg-slate-900/70 p-3">
+            <p class="text-[11px] text-slate-400">累计通关模块</p>
+            <p class="text-2xl font-black text-indigo-300">${totalModules}</p>
+          </div>
+          <div class="rounded-xl border border-white/10 bg-slate-900/70 p-3">
+            <p class="text-[11px] text-slate-400">待通关书籍</p>
+            <p class="text-2xl font-black text-amber-300">${pendingBooks.length}</p>
+          </div>
+        </div>
+      </section>
+      <div class="grid xl:grid-cols-[2fr_1fr] gap-6 items-start">
+        <section class="rounded-2xl border border-white/10 bg-slate-900/45 p-5">
+          <h3 class="text-xl font-black text-white">已激活徽章</h3>
+          <p class="text-sm text-slate-400 mt-1">徽章永久保留，代表你已经读完并掌握该书核心框架。</p>
+          <div id="reado-profile-badge-grid" class="mt-4 grid sm:grid-cols-2 gap-3"></div>
+        </section>
+        <section class="rounded-2xl border border-primary/25 bg-slate-900/70 p-5 sticky top-6">
+          <h3 class="text-xl font-black text-white">知识回顾</h3>
+          <div id="reado-profile-review" class="mt-4 text-sm text-slate-300"></div>
+        </section>
+      </div>
+      <section class="rounded-2xl border border-white/10 bg-slate-900/35 p-5">
+        <h3 class="text-lg font-black text-white">已解锁待通关</h3>
+        <div id="reado-profile-pending" class="mt-3 flex flex-wrap gap-2"></div>
+      </section>
+    </div>`;
+
+  const grid = document.getElementById("reado-profile-badge-grid");
+  const review = document.getElementById("reado-profile-review");
+  const pending = document.getElementById("reado-profile-pending");
+  if (!grid || !review || !pending) return;
+
+  const renderReview = (book) => {
+    if (!book) {
+      review.innerHTML = `
+        <div class="rounded-xl border border-white/10 bg-slate-950/70 p-4">
+          <p class="text-slate-400">当前没有可回顾的徽章。完成一本书后会在这里永久点亮。</p>
+        </div>`;
+      return;
+    }
+    const points = (book.highlights || []).map((item) => `<li class="leading-relaxed">${item}</li>`).join("");
+    const last = localStorage.getItem("reado_book_last_" + book.id);
+    const canResume = Boolean(last && Array.isArray(book.moduleSlugs) && book.moduleSlugs.includes(last));
+    const continueHref = canResume ? "/experiences/" + last + ".html" : book.firstModuleHref;
+    review.innerHTML = `
+      <div class="rounded-xl border border-white/10 bg-slate-950/70 p-4">
+        <div class="text-cyan-300 text-xs font-bold mb-2">${book.badgeTitle}</div>
+        <h4 class="text-white font-black text-lg mb-3">${book.title}</h4>
+        <ul class="list-disc pl-5 space-y-2 text-slate-300">${points || "<li>核心知识点待补充</li>"}</ul>
+        <div class="mt-4 flex gap-2">
+          <a href="${continueHref}" class="inline-flex items-center gap-1 px-3 py-2 rounded-lg bg-primary text-black font-bold text-xs">继续体验</a>
+          <a href="${book.hubHref}" class="inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-white/15 text-slate-200 font-bold text-xs">查看模块</a>
+        </div>
+      </div>`;
+  };
+
+  if (completedBooks.length === 0) {
+    grid.innerHTML = `
+      <div class="sm:col-span-2 rounded-xl border border-white/10 bg-slate-950/60 p-5 text-center">
+        <p class="text-slate-300 font-bold">暂无已激活徽章</p>
+        <p class="text-slate-400 text-sm mt-2">先去交易中心解锁书籍，并完成全部模块后回来查看。</p>
+      </div>`;
+    renderReview(null);
+  } else {
+    grid.innerHTML = completedBooks.map((book, index) => `
+      <button type="button" data-book-id="${book.id}" class="reado-profile-badge text-left rounded-xl border border-white/10 bg-slate-950/65 p-4 hover:border-cyan-400/50 hover:bg-slate-900/90 transition-all ${index === 0 ? "ring-1 ring-cyan-400/40" : ""}">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-lg bg-primary/20 border border-primary/30 flex items-center justify-center">
+            <span class="material-icons text-cyan-300">${book.badgeIcon || "workspace_premium"}</span>
+          </div>
+          <div>
+            <div class="text-white font-bold text-sm">${book.badgeTitle || "知识徽章"}</div>
+            <div class="text-[11px] text-slate-400">${book.title}</div>
+          </div>
+        </div>
+      </button>`).join("");
+    renderReview(completedBooks[0]);
+
+    grid.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+      const button = target.closest("button[data-book-id]");
+      if (!button) return;
+      const bookId = button.getAttribute("data-book-id");
+      const selected = completedBooks.find((book) => book.id === bookId);
+      if (!selected) return;
+      Array.from(grid.querySelectorAll(".reado-profile-badge")).forEach((node) => {
+        node.classList.remove("ring-1", "ring-cyan-400/40");
+      });
+      button.classList.add("ring-1", "ring-cyan-400/40");
+      renderReview(selected);
+    });
+  }
+
+  if (pendingBooks.length === 0) {
+    pending.innerHTML = '<span class="text-slate-400 text-sm">目前没有待通关书籍。</span>';
+  } else {
+    pending.innerHTML = pendingBooks.map((book) => `
+      <a href="${book.hubHref}" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-amber-400/30 bg-amber-400/10 text-amber-200 text-xs font-bold">
+        <span class="material-icons text-sm">schedule</span>${book.title}
+      </a>`).join("");
+  }
+})();
+</script>
+</body></html>

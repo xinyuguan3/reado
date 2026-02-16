@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html class="dark" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>人类简史：信息时代数字种子模拟器</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "cyber-black": "#050505",
+                        "cyber-dark": "#0a0c10",
+                        "matrix-green": "#00ff41",
+                        "matrix-dark-green": "#008F11",
+                        "cyan-blue": "#00d2ff",
+                        "data-blue": "#005577",
+                        "alert-red": "#ff003c",
+                    },
+                    fontFamily: {
+                        "sans": ["Noto Sans SC", "Source Han Sans SC", "sans-serif"],
+                        "mono": ["Space Mono", "Courier New", "monospace"],
+                        "display": ["Noto Sans SC", "Source Han Sans SC", "sans-serif"]
+                    },
+                    boxShadow: {
+                        "neon-green": "0 0 10px rgba(0, 255, 65, 0.5), 0 0 20px rgba(0, 255, 65, 0.2)",
+                        "neon-cyan": "0 0 10px rgba(0, 210, 255, 0.5), 0 0 20px rgba(0, 210, 255, 0.2)",
+                    },
+                    animation: {
+                        'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'spin-slow': 'spin 15s linear infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        body {
+            font-family: 'Noto Sans SC', 'Source Han Sans SC', sans-serif;
+            @apply bg-cyber-black text-gray-300;
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0c10; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #00ff41; 
+            border-radius: 2px;
+        }
+        .tech-panel {
+            background: rgba(10, 12, 16, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 255, 65, 0.2);
+            box-shadow: inset 0 0 30px rgba(0, 255, 65, 0.05);
+        }
+        .map-bg {
+            background-color: #050505;
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(0, 210, 255, 0.05) 0%, transparent 70%),
+                linear-gradient(0deg, rgba(0,0,0,0.8) 0%, transparent 100%);
+        }
+        .data-stream {
+            stroke-dasharray: 5;
+            animation: flow 2s linear infinite;
+        }
+        @keyframes flow {
+            to {
+                stroke-dashoffset: -100;
+            }
+        }
+        .grid-overlay {
+            background-size: 40px 40px;
+            background-image:
+                linear-gradient(to right, rgba(0, 255, 65, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 255, 65, 0.05) 1px, transparent 1px);
+        }
+        .tech-node-active {
+            @apply border-matrix-green bg-matrix-green/10 text-matrix-green shadow-neon-green;
+        }
+        .tech-node-locked {
+            @apply border-gray-800 bg-gray-900/50 text-gray-600 cursor-not-allowed;
+        }
+        .tech-node-available {
+            @apply border-cyan-blue bg-cyan-blue/10 text-cyan-blue hover:bg-cyan-blue/20 cursor-pointer shadow-neon-cyan;
+        }
+        .scan-line {
+            background: linear-gradient(to bottom, transparent, rgba(0, 255, 65, 0.2), transparent);
+            animation: scan 4s linear infinite;
+        }
+        @keyframes scan {
+            0% { top: -20%; opacity: 0; }
+            5% { opacity: 1; }
+            95% { opacity: 1; }
+            100% { top: 120%; opacity: 0; }
+        }
+    </style>
+</head>
+<body class="overflow-hidden relative h-screen w-screen selection:bg-matrix-green selection:text-black">
+<script src="/shared/book-catalog.js?v=1771240921862"></script>
+<script type="module" src="/shared/shell.js?v=1771240921862"></script>
+<reado-app-shell data-page="knowledge-map"></reado-app-shell>
+<div class="absolute inset-0 z-0 pointer-events-none map-bg overflow-hidden">
+<div class="absolute inset-0 grid-overlay"></div>
+<img alt="Digital World Map" class="absolute inset-0 w-full h-full object-cover opacity-30 mix-blend-screen grayscale contrast-150 brightness-50" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVYMR0AOtJ3GtDhGz_o4QAzRD-f_3wOk056dH_Z0EEwi3qhCa9MpUaFM8Fu1WBaZRnfwYbmC2MHCMMWaeJGt_lJFbGAHs1oCa5MMl_4BuU7hP_oooj5bmOjn6dZhzVv_gBa5HhmcTaXWEhAHpO8VL1fg7GUDgweRNHAN9Ys8dDeaPByfdWthlAgIB4ozF3PWzVa4EWsDwdk1WFFIFewZiAoAOAikfZpGLnA_joV6mMP5SKXXI0DH1Tw48mXf6JpAU22kGWCj0lgdo"/>
+<svg class="absolute inset-0 w-full h-full opacity-60">
+<path class="data-stream" d="M 20% 80% Q 50% 20% 80% 30%" fill="none" stroke="#00ff41" stroke-width="1"></path>
+<path class="data-stream" d="M 10% 40% Q 30% 60% 60% 50%" fill="none" stroke="#00d2ff" stroke-width="1" style="animation-duration: 3s; stroke-dasharray: 2 4;"></path>
+<path class="data-stream" d="M 70% 80% L 75% 40% L 90% 20%" fill="none" stroke="#00ff41" stroke-width="0.5" style="animation-duration: 1.5s"></path>
+<circle cx="50%" cy="50%" fill="none" r="30%" stroke="rgba(0, 210, 255, 0.1)" stroke-width="1"></circle>
+</svg>
+<div class="absolute inset-0 bg-[radial-gradient(transparent_20%,#050505_90%)]"></div>
+<div class="absolute w-full h-[20%] scan-line opacity-10 pointer-events-none z-0"></div>
+</div>
+<header class="absolute top-0 left-0 w-full z-50 px-8 py-5 flex justify-between items-end border-b border-matrix-green/20 bg-gradient-to-b from-cyber-dark to-transparent backdrop-blur-sm">
+<div class="flex flex-col">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-matrix-green text-3xl animate-pulse">code</span>
+<h1 class="text-2xl font-bold tracking-widest text-white uppercase shadow-black drop-shadow-lg">
+                    数字时代：<span class="text-matrix-green font-mono">代码化的生命</span>
+</h1>
+</div>
+<div class="text-xs text-cyan-blue font-mono mt-1 tracking-[0.2em] pl-11 uppercase flex gap-2">
+<span>System: Online</span>
+<span class="text-gray-500">|</span>
+<span>Year: 2025+</span>
+</div>
+</div>
+<div class="flex items-center gap-6 font-mono">
+<div class="flex flex-col items-end">
+<span class="text-[10px] text-gray-500 uppercase">全球数据节点</span>
+<span class="text-xl text-cyan-blue">89.4 亿</span>
+</div>
+<div class="w-px h-8 bg-matrix-green/20"></div>
+<div class="flex flex-col items-end">
+<span class="text-[10px] text-gray-500 uppercase">算力消耗</span>
+<span class="text-xl text-matrix-green animate-pulse">98.2%</span>
+</div>
+</div>
+</header>
+<main class="relative z-10 w-full h-full pt-28 pb-10 px-8 grid grid-cols-12 gap-6 lg:gap-8">
+<div class="col-span-3 flex flex-col h-full gap-4">
+<div class="tech-panel p-0.5 flex-1 rounded-sm relative overflow-hidden flex flex-col">
+<div class="bg-matrix-green/5 p-3 border-b border-matrix-green/20 flex justify-between items-center">
+<h2 class="text-sm font-bold text-matrix-green flex items-center gap-2 tracking-wide">
+<span class="material-symbols-outlined text-sm">schema</span> 演化算法
+                    </h2>
+<span class="text-[10px] bg-matrix-green/10 text-matrix-green px-2 py-0.5 rounded border border-matrix-green/30 font-mono">HASH: #8A4F</span>
+</div>
+<div class="p-4 overflow-y-auto space-y-6 custom-scrollbar relative flex-1">
+<div class="absolute left-[34px] top-8 bottom-8 w-px bg-gray-800 -z-10"></div>
+<div class="relative pl-12">
+<div class="absolute left-[30px] top-6 w-2.5 h-2.5 bg-matrix-green rounded-sm shadow-[0_0_10px_#00ff41]"></div>
+<div class="tech-node-active p-3 rounded-sm border transition-all">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-bold text-sm">转基因技术 (GMO)</h3>
+<span class="material-symbols-outlined text-[16px]">biotech</span>
+</div>
+<p class="text-[10px] opacity-80 font-mono">直接编辑碱基对，跳过自然选择。抗虫性 +200%。</p>
+</div>
+</div>
+<div class="relative pl-12">
+<div class="absolute left-[31px] top-6 w-2 h-2 bg-cyan-blue rounded-full"></div>
+<div class="tech-node-available p-3 rounded-sm border transition-all group">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-bold text-sm group-hover:text-white">数字孪生农场</h3>
+<span class="material-symbols-outlined text-[16px]">memory</span>
+</div>
+<p class="text-[10px] opacity-70 group-hover:opacity-100 font-mono">在云端模拟万次生长周期，寻找最优解。</p>
+<div class="mt-2 text-[10px] text-cyan-blue font-mono text-right">&gt; EXECUTE_INIT</div>
+</div>
+</div>
+<div class="relative pl-12">
+<div class="absolute left-[32px] top-6 w-1.5 h-1.5 bg-gray-700 rounded-full"></div>
+<div class="tech-node-locked p-3 rounded-sm border transition-all">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-bold text-sm">AI 精准灌溉</h3>
+<span class="material-symbols-outlined text-[16px]">water_drop</span>
+</div>
+<p class="text-[10px] opacity-60 font-mono">每株植物拥有独立传感器，水资源利用率 99.9%。</p>
+</div>
+</div>
+<div class="relative pl-12">
+<div class="absolute left-[32px] top-6 w-1.5 h-1.5 bg-gray-700 rounded-full"></div>
+<div class="tech-node-locked p-3 rounded-sm border transition-all">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-bold text-sm">基因专利壁垒</h3>
+<span class="material-symbols-outlined text-[16px]">gavel</span>
+</div>
+<p class="text-[10px] opacity-60 font-mono">生命被注册为知识产权，私自留种违法。</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="col-span-6 relative flex flex-col justify-between items-center h-full py-2">
+<div class="relative w-full h-[60vh] flex items-center justify-center perspective-1000">
+<div class="absolute w-[500px] h-[500px] border border-cyan-blue/20 rounded-full animate-spin-slow" style="border-style: dashed;"></div>
+<div class="absolute w-[420px] h-[420px] border border-matrix-green/10 rounded-full animate-[spin_20s_linear_infinite_reverse]"></div>
+<div class="absolute w-[300px] h-[300px] bg-matrix-green/5 blur-[50px] rounded-full"></div>
+<div class="relative z-10 animate-float cursor-pointer group">
+<img alt="Digital DNA Wheat" class="h-[480px] w-auto object-cover mix-blend-lighten opacity-90 drop-shadow-[0_0_20px_rgba(0,255,65,0.6)] filter hue-rotate-90 brightness-125 contrast-125" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3I5uTPKRNVhx5J6o5nTT0UOglQlUAu6L5M6G5CvsIu4OurzI-sD_ZP0mS5twyXGpBfkN1AWCrfQzUFtXWfc5WtHMnKr338zotafonz3JZtr4w0sO4O84KaxpMTbvLzkRh5iRmiBcebyak01LByrjiqXThrwI6-c_TZs9SHMAr0yX5CktEaXzxxyKGRjlejXSpuJrEUmEePl88zEeHbaX1qFT5AQzkiUINvN-85Legcvcmz8nNiaMeFfKA0NvpqYkOkTB19gLuKlA" style="mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent); -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);"/>
+<div class="absolute inset-0 bg-[linear-gradient(90deg,transparent_50%,rgba(0,255,65,0.1)_50%)] bg-[length:4px_100%] opacity-50 mix-blend-overlay pointer-events-none"></div>
+<div class="absolute top-[20%] left-[-20px] text-[10px] text-matrix-green font-mono bg-black/80 px-2 border-l-2 border-matrix-green animate-pulse">
+                        SEQ_ID: WHT-9000
+                    </div>
+<div class="absolute bottom-[30%] right-[-20px] text-[10px] text-cyan-blue font-mono bg-black/80 px-2 border-r-2 border-cyan-blue">
+                        YIELD: OPTIMIZED
+                    </div>
+</div>
+<svg class="absolute inset-0 w-full h-full pointer-events-none overflow-visible">
+<line stroke="rgba(0, 255, 65, 0.4)" stroke-width="1" x1="30%" x2="42%" y1="20%" y2="35%"></line>
+<circle cx="30%" cy="20%" fill="#00ff41" r="3"></circle>
+<text fill="#00ff41" font-family="monospace" font-size="10" x="25%" y="18%">GENOME_EDIT</text>
+<line stroke="rgba(0, 210, 255, 0.4)" stroke-width="1" x1="70%" x2="58%" y1="70%" y2="60%"></line>
+<circle cx="70%" cy="70%" fill="#00d2ff" r="3"></circle>
+<text fill="#00d2ff" font-family="monospace" font-size="10" x="71%" y="72%">DATA_LINK</text>
+</svg>
+<div class="absolute bottom-10 text-center">
+<h3 class="text-sm font-bold text-white tracking-widest uppercase mb-1">对抗：传统基因 <span class="text-xs text-gray-500">vs</span> 合成基因</h3>
+<div class="w-64 h-1 bg-gray-800 rounded mx-auto mt-2 overflow-hidden">
+<div class="h-full bg-gradient-to-r from-matrix-green to-cyan-blue w-[80%] animate-pulse"></div>
+</div>
+</div>
+</div>
+<div class="flex flex-col items-center w-full max-w-md relative z-20 mt-auto">
+<div class="flex justify-between w-full text-[10px] text-cyan-blue font-mono mb-2 px-4 uppercase tracking-wider">
+<span>Process: 99%</span>
+<span>Target: Global Optimization</span>
+</div>
+<button id="information-era-start-btn" data-no-next="" class="group relative w-full overflow-hidden rounded-sm bg-transparent p-[1px] focus:outline-none">
+<div class="absolute inset-0 bg-gradient-to-r from-matrix-green via-cyan-blue to-matrix-green opacity-50 group-hover:opacity-100 transition-opacity duration-300 animate-pulse"></div>
+<div class="relative flex items-center justify-center gap-3 bg-black px-8 py-4 transition-all duration-300 group-hover:bg-gray-900 border border-transparent group-hover:border-matrix-green/30">
+<span class="material-symbols-outlined text-2xl text-matrix-green group-hover:animate-spin">terminal</span>
+<span class="text-lg font-bold tracking-widest text-white group-hover:text-matrix-green transition-colors font-mono">执行全局优化指令</span>
+</div>
+</button>
+<p class="mt-4 text-[10px] text-center text-gray-500 font-mono max-w-sm">
+                    "在 0 和 1 的世界里，饥饿只是一个等待修复的 Bug。"
+                </p>
+</div>
+</div>
+<div class="col-span-3 flex flex-col h-full gap-4">
+<div class="tech-panel p-0.5 flex-1 rounded-sm flex flex-col">
+<div class="bg-matrix-green/5 p-3 border-b border-matrix-green/20 mb-2">
+<h2 class="text-sm font-bold text-cyan-blue flex items-center gap-2 tracking-wide">
+<span class="material-symbols-outlined text-sm">hub</span> 全球网络覆盖
+                    </h2>
+</div>
+<div class="p-4 space-y-8 overflow-y-auto font-mono">
+<div>
+<div class="flex justify-between items-end mb-2">
+<span class="text-xs text-gray-400">算力需求</span>
+<span class="text-lg text-matrix-green font-bold">128 TFLOPS</span>
+</div>
+<div class="h-1.5 w-full bg-gray-900 rounded-full overflow-hidden border border-gray-800">
+<div class="h-full bg-matrix-green w-[85%] shadow-[0_0_8px_rgba(0,255,65,0.6)]"></div>
+</div>
+<div class="mt-1 flex justify-between text-[9px] text-gray-600">
+<span>SERVER_01</span>
+<span class="text-matrix-green">OVERLOAD</span>
+</div>
+</div>
+<div>
+<div class="flex justify-between items-end mb-2">
+<span class="text-xs text-gray-400">生物多样性预警</span>
+<span class="text-lg text-alert-red font-bold">CRITICAL LOW</span>
+</div>
+<div class="h-1.5 w-full bg-gray-900 rounded-full overflow-hidden border border-gray-800">
+<div class="h-full bg-alert-red w-[12%] animate-pulse"></div>
+</div>
+<p class="text-[9px] text-alert-red mt-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-[10px]">warning</span> 
+                            原始基因库已濒临崩溃
+                        </p>
+</div>
+<div>
+<div class="flex justify-between items-end mb-2">
+<span class="text-xs text-gray-400">全球垄断率</span>
+<span class="text-lg text-cyan-blue font-bold">High</span>
+</div>
+<div class="h-1.5 w-full bg-gray-900 rounded-full overflow-hidden border border-gray-800">
+<div class="h-full bg-cyan-blue w-[94%]"></div>
+</div>
+<p class="text-[9px] text-gray-500 mt-1">
+                            3 家巨头控制 90% 种子市场
+                        </p>
+</div>
+<div class="mt-6 border border-matrix-green/20 bg-black p-3 rounded-sm font-mono text-[10px] leading-relaxed relative overflow-hidden">
+<div class="absolute top-0 left-0 w-full h-[2px] bg-matrix-green/30 animate-[scan_2s_linear_infinite]"></div>
+<h4 class="text-matrix-green mb-2 opacity-80">&gt; SYSTEM_LOG</h4>
+<div class="space-y-1 text-gray-400">
+<div class="flex gap-2"><span class="text-gray-600">14:02:21</span> <span class="text-cyan-blue">UPLOAD</span> <span>专利数据包发送完成</span></div>
+<div class="flex gap-2"><span class="text-gray-600">14:02:23</span> <span class="text-alert-red">ERROR</span> <span>非法留种检测：区域 A7</span></div>
+<div class="flex gap-2"><span class="text-gray-600">14:02:25</span> <span class="text-matrix-green">SUCCESS</span> <span>远程锁死 A7 种子活性</span></div>
+</div>
+</div>
+<div class="mt-4 p-3 bg-cyan-blue/5 border-l-2 border-cyan-blue">
+<p class="text-[10px] text-gray-300 leading-relaxed font-sans">
+<strong class="text-cyan-blue">信息时代洞察：</strong> 
+                            种子不再只是自然产物，它们变成了携带版权的代码。谁控制了代码，谁就控制了粮食安全。
+                        </p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<div class="fixed bottom-8 left-8 z-40 hidden lg:block pointer-events-none opacity-50">
+<div class="w-8 h-8 border-l border-b border-matrix-green"></div>
+<div class="w-2 h-2 bg-matrix-green absolute bottom-0 left-0"></div>
+</div>
+<div class="fixed top-28 right-8 z-40 hidden lg:block pointer-events-none opacity-50">
+<div class="w-8 h-8 border-r border-t border-cyan-blue"></div>
+<div class="w-2 h-2 bg-cyan-blue absolute top-0 right-0"></div>
+</div>
+<div id="era-intro-information" class="fixed inset-0 z-[120] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+<div class="w-full max-w-3xl rounded-2xl border border-matrix-green/35 bg-cyber-dark/95 shadow-[0_20px_60px_rgba(0,0,0,0.6)] overflow-hidden">
+<div class="px-6 md:px-8 py-5 border-b border-matrix-green/30 bg-gradient-to-r from-matrix-green/15 to-transparent">
+<p class="text-xs font-bold tracking-[0.22em] text-matrix-green uppercase">章节导览 · 信息时代</p>
+<h2 class="text-xl md:text-2xl font-black text-white mt-2">第三时代前情提要：粮食被写成代码</h2>
+</div>
+<div class="px-6 md:px-8 py-6 space-y-4 text-sm text-gray-300 leading-relaxed">
+<p>信息时代的农业核心不再只是土地，而是数据、算法与知识产权。谁掌握基因编辑与专利网络，谁就拥有全球粮食分配的话语权。</p>
+<div class="grid md:grid-cols-3 gap-3">
+<div class="rounded-xl border border-white/10 bg-black/35 p-3">
+<p class="text-xs uppercase tracking-widest text-matrix-green font-bold mb-1">知识点 1</p>
+<p class="text-xs text-gray-300">种子从自然资源转向“可编程资产”。</p>
+</div>
+<div class="rounded-xl border border-white/10 bg-black/35 p-3">
+<p class="text-xs uppercase tracking-widest text-matrix-green font-bold mb-1">知识点 2</p>
+<p class="text-xs text-gray-300">效率与垄断同时增强，系统公平性成为新问题。</p>
+</div>
+<div class="rounded-xl border border-white/10 bg-black/35 p-3">
+<p class="text-xs uppercase tracking-widest text-matrix-green font-bold mb-1">知识点 3</p>
+<p class="text-xs text-gray-300">本幕请观察“技术进步”与“控制权集中”的博弈。</p>
+</div>
+</div>
+</div>
+<div class="px-6 md:px-8 py-4 border-t border-white/10 flex justify-end">
+<button id="era-intro-information-enter" class="px-5 py-2.5 rounded-lg bg-matrix-green text-cyber-black text-sm font-black tracking-wide hover:bg-[#78ff9e] transition-colors">我已了解，进入信息时代</button>
+</div>
+</div>
+</div>
+<script>
+(() => {
+  const panel = document.getElementById("era-intro-information");
+  const enter = document.getElementById("era-intro-information-enter");
+  if (!panel || !enter) return;
+  enter.addEventListener("click", () => {
+    panel.classList.add("opacity-0", "pointer-events-none", "transition-opacity", "duration-200");
+    window.setTimeout(() => panel.remove(), 220);
+  });
+})();
+
+(() => {
+  const startButton = document.getElementById("information-era-start-btn");
+  if (!startButton) return;
+
+  const STORAGE_KEY = "reado_sapiens_era_challenge_v1";
+  const eraKey = "information";
+  const nextHref = "/experiences/bilingual-human-domestication-dilemma-4.html";
+  const incidents = [
+    {
+      title: "突发事件 1：核心模型偏见",
+      description: "AI 农业模型在弱网地区误判灌溉需求，作物濒死。",
+      options: [
+        { label: "先降级自动化并人工接管高风险区", correct: true, feedback: "你阻断了模型误伤扩散。" },
+        { label: "继续全自动，等待更多数据自我纠正", correct: false, feedback: "错误继续放大，大片减产。" }
+      ]
+    },
+    {
+      title: "突发事件 2：专利锁种争议",
+      description: "多个地区爆发“留种违法”抗议，供应链出现对抗。",
+      options: [
+        { label: "开放应急许可并设立过渡期", correct: true, feedback: "供应与秩序暂时稳定。" },
+        { label: "立即全面执法并封锁区域", correct: false, feedback: "冲突升级，物流中断。" }
+      ]
+    },
+    {
+      title: "突发事件 3：基因库被勒索攻击",
+      description: "关键种质数据库被加密，无法下发播种参数。",
+      options: [
+        { label: "切换离线备份并隔离受感染节点", correct: true, feedback: "你保住了核心种质与部署链。" },
+        { label: "支付赎金快速恢复", correct: false, feedback: "恢复不完整且再次遭受攻击。" }
+      ]
+    }
+  ];
+
+  const challengeLayer = document.createElement("div");
+  challengeLayer.className = "fixed inset-0 z-[140] hidden items-center justify-center p-4 bg-black/80 backdrop-blur-sm";
+  challengeLayer.innerHTML = `
+    <div class="w-full max-w-2xl rounded-2xl border border-matrix-green/35 bg-cyber-dark/95 shadow-[0_20px_60px_rgba(0,0,0,0.6)] overflow-hidden">
+      <div class="px-6 py-4 border-b border-matrix-green/30 bg-gradient-to-r from-matrix-green/20 to-transparent flex items-center justify-between">
+        <p class="text-xs font-bold tracking-[0.22em] text-matrix-green uppercase">信息时代突发事件</p>
+        <span id="era-incident-progress" class="text-xs text-gray-400 font-bold">事件 1/3</span>
+      </div>
+      <div id="era-incident-body" class="px-6 py-6 space-y-4">
+        <h3 id="era-incident-title" class="text-xl font-black text-white"></h3>
+        <p id="era-incident-desc" class="text-sm text-gray-300 leading-relaxed"></p>
+        <div id="era-incident-options" class="space-y-3"></div>
+        <p id="era-incident-feedback" class="text-xs text-matrix-green font-bold min-h-[1.2rem]"></p>
+      </div>
+      <div class="px-6 py-4 border-t border-white/10 flex justify-end">
+        <button id="era-incident-cancel" class="px-4 py-2 rounded-lg text-xs font-bold text-gray-300 border border-white/10 hover:bg-white/5 transition-colors">稍后再试</button>
+      </div>
+    </div>`;
+  document.body.append(challengeLayer);
+
+  const progressEl = challengeLayer.querySelector("#era-incident-progress");
+  const titleEl = challengeLayer.querySelector("#era-incident-title");
+  const descEl = challengeLayer.querySelector("#era-incident-desc");
+  const optionsEl = challengeLayer.querySelector("#era-incident-options");
+  const feedbackEl = challengeLayer.querySelector("#era-incident-feedback");
+  const bodyEl = challengeLayer.querySelector("#era-incident-body");
+  const cancelBtn = challengeLayer.querySelector("#era-incident-cancel");
+
+  let incidentIndex = 0;
+  let running = false;
+
+  const readState = () => {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+      return parsed && typeof parsed === "object" ? parsed : {};
+    } catch {
+      return {};
+    }
+  };
+
+  const writeState = (next) => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+  };
+
+  const touchEntry = (state) => {
+    const entry = state[eraKey] || { attempts: 0, failures: 0, passed: false };
+    state[eraKey] = entry;
+    return entry;
+  };
+
+  const closeLayer = () => {
+    challengeLayer.classList.add("hidden");
+    challengeLayer.classList.remove("flex");
+  };
+
+  const openLayer = () => {
+    challengeLayer.classList.remove("hidden");
+    challengeLayer.classList.add("flex");
+  };
+
+  const failRun = (reason) => {
+    const state = readState();
+    const entry = touchEntry(state);
+    entry.failures += 1;
+    entry.passed = false;
+    writeState(state);
+    bodyEl.innerHTML = `
+      <h3 class="text-xl font-black text-red-400">信息时代失败</h3>
+      <p class="text-sm text-gray-300 leading-relaxed">${reason}</p>
+      <p class="text-xs text-gray-500">本时代挑战判定失败，请从头重玩。</p>
+      <div class="pt-2">
+        <button id="era-incident-restart" class="px-5 py-2.5 rounded-lg bg-red-500 text-white text-sm font-black hover:bg-red-400 transition-colors">从头重开</button>
+      </div>`;
+    const restartBtn = bodyEl.querySelector("#era-incident-restart");
+    if (restartBtn) {
+      restartBtn.addEventListener("click", () => window.location.reload());
+    }
+  };
+
+  const passRun = () => {
+    const state = readState();
+    const entry = touchEntry(state);
+    entry.passed = true;
+    entry.updatedAt = Date.now();
+    writeState(state);
+    bodyEl.innerHTML = `
+      <h3 class="text-xl font-black text-emerald-400">信息时代通关</h3>
+      <p class="text-sm text-gray-300 leading-relaxed">你已处理完 3 个信息化风险事件，准备进入后续文明章节。</p>
+      <div class="pt-2">
+        <button id="era-incident-next" class="px-5 py-2.5 rounded-lg bg-matrix-green text-cyber-black text-sm font-black hover:bg-[#78ff9e] transition-colors">进入下一幕</button>
+      </div>`;
+    const nextBtn = bodyEl.querySelector("#era-incident-next");
+    if (nextBtn) {
+      nextBtn.addEventListener("click", () => {
+        window.location.href = nextHref;
+      });
+      nextBtn.focus();
+    }
+  };
+
+  const renderIncident = () => {
+    const current = incidents[incidentIndex];
+    if (!current) {
+      passRun();
+      return;
+    }
+    progressEl.textContent = `事件 ${incidentIndex + 1}/${incidents.length}`;
+    titleEl.textContent = current.title;
+    descEl.textContent = current.description;
+    feedbackEl.textContent = "";
+    optionsEl.innerHTML = current.options.map((option, idx) => `
+      <button data-incident-option="${idx}" class="w-full text-left px-4 py-3 rounded-lg border border-matrix-green/30 bg-black/35 text-sm font-bold text-gray-100 hover:border-matrix-green/70 hover:bg-black/45 transition-colors">
+        ${option.label}
+      </button>`).join("");
+  };
+
+  optionsEl.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+    const button = target.closest("[data-incident-option]");
+    if (!(button instanceof HTMLElement)) return;
+    const current = incidents[incidentIndex];
+    if (!current) return;
+    const selectedIndex = Number(button.getAttribute("data-incident-option"));
+    const selected = current.options[selectedIndex];
+    if (!selected) return;
+    if (!selected.correct) {
+      failRun(selected.feedback || "决策失误。");
+      return;
+    }
+    feedbackEl.textContent = selected.feedback || "决策正确，进入下一事件。";
+    incidentIndex += 1;
+    window.setTimeout(renderIncident, 450);
+  });
+
+  if (cancelBtn) {
+    cancelBtn.addEventListener("click", () => {
+      closeLayer();
+      running = false;
+      incidentIndex = 0;
+    });
+  }
+
+  startButton.addEventListener("click", (event) => {
+    event.preventDefault();
+    if (running) return;
+    running = true;
+    incidentIndex = 0;
+    const state = readState();
+    const entry = touchEntry(state);
+    entry.attempts += 1;
+    entry.passed = false;
+    writeState(state);
+    renderIncident();
+    openLayer();
+  });
+})();
+</script>
+
+
+<script src="/shared/experience-runtime.js?v=1771240921862"></script>
+<script>
+(() => {
+  
+  localStorage.setItem("reado_book_last_sapiens", "sapiens-the-wheat-conquest-simulator-2");
+  if ("sapiens-the-wheat-conquest-simulator-2" === "bilingual-human-domestication-dilemma-3") {
+    try {
+      const completedRaw = localStorage.getItem("reado_completed_books_v1") || "[]";
+      const completedSet = new Set(JSON.parse(completedRaw));
+      completedSet.add("sapiens");
+      localStorage.setItem("reado_completed_books_v1", JSON.stringify([...completedSet]));
+    } catch {}
+  }
+  
+  const readoNextHref = "/experiences/bilingual-human-domestication-dilemma-4.html";
+  (() => {
+    let isNavigating = false;
+    const keywordList = ["开始", "继续", "下一", "进入", "模拟", "抉择", "选择", "确认", "提交", "挑战", "完成", "start", "next", "continue"];
+    const blacklist = ["EN", "ZH", "返回", "back", "帮助", "求助", "笔记", "术语", "设置", "菜单", "关闭", "取消"];
+    const normalize = (value) => String(value || "").replace(/\s+/g, " ").trim();
+    const hasKeyword = (text) => keywordList.some((keyword) => text.toLowerCase().includes(keyword.toLowerCase()));
+    const isBlocked = (text) => blacklist.some((word) => text === word || text.toLowerCase().includes(word.toLowerCase()));
+    const isOptionGroupButton = (node) => {
+      const parent = node.parentElement;
+      if (!parent) return false;
+      const peers = Array.from(parent.children).filter(
+        (child) => child instanceof HTMLElement && child.matches("button,[role='button'],.concept-card,.item-card,[data-choice],[data-option]")
+      );
+      return peers.length >= 2;
+    };
+    const goNext = (delay = 180) => {
+      if (isNavigating) return;
+      isNavigating = true;
+      window.setTimeout(() => {
+        window.location.href = readoNextHref;
+      }, delay);
+    };
+    document.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+      if (target.closest(".reado-shell-wrap")) return;
+      const candidate = target.closest("[data-next-scene],button,a[href],.concept-card,.item-card,[data-choice],[data-option]");
+      if (!(candidate instanceof HTMLElement)) return;
+      if (!candidate.closest("main")) return;
+      if (candidate.hasAttribute("data-no-next")) return;
+      if (candidate.matches("a[href]")) {
+        const href = candidate.getAttribute("href") || "";
+        if (href && href !== "#" && !href.startsWith("javascript:")) return;
+      }
+      const text = normalize(candidate.textContent);
+      if (candidate.matches("[data-next-scene]")) {
+        event.preventDefault();
+        goNext(90);
+        return;
+      }
+      if (isBlocked(text)) return;
+      if (candidate.matches(".concept-card,.item-card,[data-choice],[data-option]")) {
+        goNext(180);
+        return;
+      }
+      if (candidate.matches("button")) {
+        if (hasKeyword(text) || (text.length >= 4 && isOptionGroupButton(candidate))) {
+          goNext(220);
+        }
+      }
+    });
+  })();
+  
+  if (window.ReadoExperienceRuntime && typeof window.ReadoExperienceRuntime.init === "function") {
+    window.ReadoExperienceRuntime.init({
+      bookId: "sapiens",
+      moduleSlug: "sapiens-the-wheat-conquest-simulator-2",
+      moduleSlugs: ["the-wheat-conquest-simulator","human-domestication-dilemma-1","human-domestication-dilemma-2","bilingual-human-domestication-dilemma","sapiens-the-wheat-conquest-simulator-1","sapiens-the-wheat-conquest-simulator-2","bilingual-human-domestication-dilemma-4","bilingual-human-domestication-dilemma-1","bilingual-human-domestication-dilemma-2","bilingual-human-domestication-dilemma-3"]
+    });
+  }
+})();
+</script>
+</body></html>

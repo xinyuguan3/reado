@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html class="dark" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>reado: 天赋评估报告</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1313ec",
+                        "primary-light": "#4f4ff5",
+                        "primary-dark": "#0a0a8a",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101022",
+                        "surface-dark": "#16162e",
+                        "surface-darker": "#0a0a16",
+                    },
+                    fontFamily: {
+                        "display": ["Noto Sans SC", "sans-serif"],
+                        "body": ["Noto Sans SC", "sans-serif"],
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px"},
+                    backgroundImage: {
+                        'grid-pattern': "linear-gradient(to right, #1f1f3a 1px, transparent 1px), linear-gradient(to bottom, #1f1f3a 1px, transparent 1px)",
+                    }
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">.radar-chart-bg {
+            clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+        }
+        .radar-chart-overlay {
+            clip-path: polygon(50% 10%, 100% 38%, 75% 90%, 25% 90%, 10% 38%);
+        }
+        .texture-overlay {
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%231313ec' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        .glow-primary {
+            box-shadow: 0 0 20px rgba(19, 19, 236, 0.3);
+        }
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-100 min-h-screen flex flex-col relative overflow-x-hidden selection:bg-primary selection:text-white">
+<div class="fixed inset-0 z-0 pointer-events-none opacity-20 bg-grid-pattern bg-[length:40px_40px]"></div>
+<div class="fixed inset-0 z-0 pointer-events-none texture-overlay"></div>
+<div class="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary/10 blur-[120px] pointer-events-none"></div>
+<div class="fixed bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-primary/5 blur-[100px] pointer-events-none"></div>
+<nav class="relative z-20 w-full px-6 py-6 flex justify-between items-center max-w-7xl mx-auto">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center text-white shadow-lg glow-primary">
+<span class="material-icons text-xl">auto_stories</span>
+</div>
+<div>
+<h1 class="font-black text-2xl tracking-tight leading-none italic">reado</h1>
+<p class="text-[10px] uppercase tracking-[0.2em] text-gray-500 dark:text-gray-400 font-bold">游戏化阅读平台</p>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="bg-surface-dark border border-white/10 rounded-full px-4 py-2 flex items-center h-10">
+<span class="text-xs font-bold text-primary-light">中文版报告</span>
+</div>
+<button class="w-10 h-10 rounded-full bg-surface-dark border border-white/10 items-center justify-center hover:bg-white/5 transition-colors flex">
+<span class="material-icons text-gray-400">person</span>
+</button>
+</div>
+</nav>
+<main class="relative z-10 flex-grow flex items-center justify-center p-4 md:p-8">
+<div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-12 gap-8">
+<div class="lg:col-span-5 flex flex-col gap-6">
+<div class="bg-surface-dark/80 backdrop-blur-md border border-white/10 rounded-2xl overflow-hidden shadow-2xl relative group">
+<div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50"></div>
+<div class="p-8 relative">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary-light text-xs font-bold mb-6">
+<span class="material-icons text-sm">history_edu</span>
+<span>模拟：大汉崛起</span>
+</div>
+<div class="relative w-full aspect-[4/3] rounded-xl overflow-hidden mb-6 shadow-lg border border-white/5 bg-surface-darker">
+<div class="absolute inset-0 bg-gradient-to-t from-background-dark via-transparent to-transparent z-10"></div>
+<img alt="统筹大师抽象视觉" class="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCNhEfBLT3mjx77YcoZ_hHvx_GPm3i2F5WmhJ8-E4cbav7VLbur39sPCBWx8xySNfir7qHYstaeOuUSok4_olhBAmfGg901uOcRG7gT-h-RIpKw0CBhOLMSFpx3MgiyD0wRSEsJ0ZPBssroWOs62W5bZSn2QJvKvmlA0lJTyy3s-XfXMYIyScgsFzRwsEncvCc1uz4ZcTW_cUD3Bsj1etIlPR6UPL_VGCJI6Zw9-OOYIU8YrGNQP2yHYnpUKJwmB0F7Mb6XtUDrss"/>
+<div class="absolute bottom-4 left-4 z-20">
+<p class="text-xs text-primary-light font-bold tracking-widest uppercase mb-1">天赋原型</p>
+<h3 class="text-white font-bold text-xl">统筹大师</h3>
+</div>
+</div>
+<div class="space-y-2 mb-6">
+<h2 class="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400">
+                            统筹大师
+                        </h2>
+</div>
+<p class="text-gray-300 leading-relaxed border-l-4 border-primary/50 pl-4 text-lg">
+                        您拥有调和冲突力量的罕见能力。就像一位编织大师，您能敏锐地洞察出那些常人容易忽视的战略脉络，并将不同的利益诉求转化为前进的动力。
+                    </p>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-surface-dark/50 border border-white/5 rounded-xl p-6 flex flex-col items-center justify-center text-center">
+<span class="text-3xl font-black text-white">94<span class="text-sm text-gray-500 font-medium">/100</span></span>
+<span class="text-xs text-gray-400 mt-2 font-bold tracking-widest">潜力指数</span>
+</div>
+<div class="bg-surface-dark/50 border border-white/5 rounded-xl p-6 flex flex-col items-center justify-center text-center">
+<span class="text-3xl font-black text-white">前 5%</span>
+<span class="text-xs text-gray-400 mt-2 font-bold tracking-widest">全站排名</span>
+</div>
+</div>
+</div>
+<div class="lg:col-span-7 flex flex-col gap-6">
+<div class="bg-surface-dark/80 backdrop-blur-md border border-white/10 rounded-2xl p-6 md:p-10 relative flex flex-col items-center justify-center min-h-[400px]">
+<div class="absolute top-6 right-8 text-right">
+<div class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">分析模型</div>
+<div class="text-xs text-primary-light font-bold">五维战术家模型</div>
+</div>
+<div class="relative w-64 h-64 md:w-80 md:h-80 flex items-center justify-center my-8">
+<div class="absolute inset-0 radar-chart-bg bg-surface-darker border border-white/5 opacity-50 scale-100"></div>
+<div class="absolute inset-0 radar-chart-bg border border-white/10 scale-75"></div>
+<div class="absolute inset-0 radar-chart-bg border border-white/10 scale-50"></div>
+<div class="absolute inset-0 radar-chart-bg border border-white/10 scale-25"></div>
+<div class="absolute inset-0 flex justify-center"><div class="h-full w-[1px] bg-white/5"></div></div>
+<div class="absolute inset-0 flex items-center justify-center transform rotate-[72deg]"><div class="h-full w-[1px] bg-white/5"></div></div>
+<div class="absolute inset-0 flex items-center justify-center transform rotate-[144deg]"><div class="h-full w-[1px] bg-white/5"></div></div>
+<div class="absolute inset-0 flex items-center justify-center transform rotate-[216deg]"><div class="h-full w-[1px] bg-white/5"></div></div>
+<div class="absolute inset-0 flex items-center justify-center transform rotate-[288deg]"><div class="h-full w-[1px] bg-white/5"></div></div>
+<div class="absolute w-full h-full radar-chart-overlay bg-primary/20 border-2 border-primary z-10 glow-primary"></div>
+<div class="absolute -top-10 text-center w-32 left-1/2 -translate-x-1/2">
+<div class="text-base font-black text-white tracking-widest">谋略</div>
+</div>
+<div class="absolute top-[30%] -right-24 text-left w-24">
+<div class="text-base font-black text-white tracking-widest">共情</div>
+</div>
+<div class="absolute bottom-0 -right-16 text-left w-24">
+<div class="text-base font-black text-white tracking-widest">果敢</div>
+</div>
+<div class="absolute bottom-0 -left-16 text-right w-24">
+<div class="text-base font-black text-white tracking-widest">洞察</div>
+</div>
+<div class="absolute top-[30%] -left-24 text-right w-24">
+<div class="text-base font-black text-white tracking-widest">领导力</div>
+</div>
+</div>
+</div>
+<div class="bg-surface-dark/80 backdrop-blur-md border border-white/10 rounded-2xl p-8 flex flex-col gap-8">
+<div>
+<h3 class="flex items-center gap-2 text-xl font-black text-white mb-4">
+<span class="material-icons text-primary">psychology</span>
+                        核心洞察
+                    </h3>
+<div class="space-y-4 text-gray-300">
+<p class="text-lg leading-relaxed">
+                            您在朝廷辩论中的决策显示，相比短期利益，您更倾向于长期的稳定。您始终选择能够团结群臣而非制造分裂的方案，展现了卓越的大局观。
+                        </p>
+</div>
+</div>
+<div>
+<h3 class="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-[0.2em] mb-4">
+                        天赋进阶方案
+                    </h3>
+<div class="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+<div class="flex-shrink-0 w-64 bg-surface-darker rounded-lg p-4 border border-white/5 hover:border-primary/50 transition-all cursor-pointer group">
+<div class="flex gap-4">
+<div class="w-14 h-20 bg-gray-800 rounded shadow-inner flex-shrink-0 overflow-hidden">
+<img alt="孙子兵法封面" class="w-full h-full object-cover opacity-90" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYrAAGKJJmeWzrmSf5ELigqnNUnlcPn5oMyW7mybStqakpOYSigrsfqInQZAer5J8oE8uCvAt23pPj267LY2uU5h13mlPU8SIjRnvBXgJV0Qon33QjE8NBOmqAktL2fvmvEm5zm4P6ghPYzcxo9PHPGhAN88F9xQoJs_svQHrWVXNqMUWLx4kuLFg01WkYHMVP32MPfHJFzUV_GoMjAZwwUN-zhrG1yvY0YC2XoJmuTc3RRV9NRGfuhn9sKC_7d1pbHJ6WnZTgMKk"/>
+</div>
+<div class="flex flex-col justify-center">
+<h4 class="text-sm font-bold text-white group-hover:text-primary-light transition-colors mb-1">孙子兵法</h4>
+<p class="text-[10px] text-gray-500">博弈与战略思维</p>
+</div>
+</div>
+</div>
+<div class="flex-shrink-0 w-64 bg-surface-darker rounded-lg p-4 border border-white/5 hover:border-primary/50 transition-all cursor-pointer group">
+<div class="flex gap-4">
+<div class="w-14 h-20 bg-gray-800 rounded shadow-inner flex-shrink-0 overflow-hidden">
+<img alt="史记封面" class="w-full h-full object-cover opacity-90" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCIYU_RmKNzUTfeXsX0ecm-Zb9i17nhOgVmgm-1x4ROzs0rzNE4pgVuTjoExoOZdoJ7tDvXbLNW-R4wYeNBHCvMBkvbsQ21CmmjzkrAvwxbAAkKeH3Fkf3bXGai9u8tse848syLiRwCY28qKpBfmsBXOkNeVxX_twfZupY6vEGyV8Ja7NgFTuCwbUu8O7JHJd5FYTsgNK1Olo-DP_uVC8oYTP1raOc-gAAb5RPV4TVBgjrjEZmgCv3s-FWAWSyTXJbrnBdBb8pnB30"/>
+</div>
+<div class="flex flex-col justify-center">
+<h4 class="text-sm font-bold text-white group-hover:text-primary-light transition-colors mb-1">史记</h4>
+<p class="text-[10px] text-gray-500">权力的艺术与人性洞察</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<div class="sticky bottom-0 z-30 w-full bg-surface-darker/90 backdrop-blur-xl border-t border-white/10 py-5">
+<div class="max-w-6xl mx-auto px-4 md:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
+<p class="text-[10px] text-gray-500 font-bold tracking-widest hidden md:block">
+            报告编号: #8X92-HAN-DYN • 生成日期: 2023年10月24日
+        </p>
+<div class="flex w-full md:w-auto gap-4">
+<button class="flex-1 md:flex-none px-8 py-3 rounded-lg border border-white/20 text-white font-bold text-sm hover:bg-white/5 transition-colors flex items-center justify-center gap-2 group">
+<span class="material-icons text-base text-gray-400 group-hover:text-white">share</span>
+<span>分享报告</span>
+</button>
+<button class="flex-1 md:flex-none px-10 py-3 rounded-lg bg-primary hover:bg-primary-light text-white font-black text-sm shadow-lg shadow-primary/40 transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
+<span>继续提升</span>
+<span class="material-icons text-base">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+
+</body></html>

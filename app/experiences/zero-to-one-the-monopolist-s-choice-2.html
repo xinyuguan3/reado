@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html class="dark" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>reado: 垄断与竞争博弈界面</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Source+Han+Sans+CN:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "monopoly-blue": "#00f0ff",
+                        "competition-red": "#ff2a2a",
+                        "background-dark": "#05070a",
+                        "glass-dark": "rgba(5, 7, 10, 0.8)",
+                        "glass-border": "rgba(255, 255, 255, 0.1)",
+                    },
+                    fontFamily: {
+                        "sans": ["Source Han Sans CN", "Source Han Sans", "Noto Sans SC", "sans-serif"],
+                    },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        body {
+            font-family: 'Source Han Sans CN', sans-serif;
+            background-color: #05070a;
+            color: #e5e7eb;
+        }
+        .grid-bg {
+            background-size: 40px 40px;
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+        }
+        .scanline {
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
+            background-size: 100% 4px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0.15;
+        }
+        .glow-text-red {
+            text-shadow: 0 0 10px rgba(255, 42, 42, 0.7);
+        }
+        .glow-text-blue {
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.7);
+        }
+        .node-pulse {
+            animation: pulse-glow 2s infinite;
+        }
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0.4); }
+            70% { box-shadow: 0 0 0 20px rgba(0, 240, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0); }
+        }
+        .chaotic-web-node {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #ff2a2a;
+            border-radius: 50%;
+            box-shadow: 0 0 5px #ff2a2a;
+        }
+        .chaotic-web-line {
+            position: absolute;
+            height: 1px;
+            background: rgba(255, 42, 42, 0.3);
+            transform-origin: 0 0;
+        }
+    </style>
+</head>
+<body class="min-h-screen overflow-hidden flex flex-col relative selection:bg-monopoly-blue selection:text-black">
+<script src="/shared/book-catalog.js?v=1771240921862"></script>
+<script type="module" src="/shared/shell.js?v=1771240921862"></script>
+<reado-app-shell data-page="knowledge-map"></reado-app-shell>
+<div class="fixed inset-0 grid-bg pointer-events-none z-0"></div>
+<div class="fixed inset-0 bg-radial-gradient pointer-events-none z-0" style="background: radial-gradient(circle at center, transparent 0%, #05070a 90%);"></div>
+<div class="scanline"></div>
+<header class="relative z-20 pt-8 pb-4 text-center">
+<h1 class="text-4xl md:text-5xl font-black tracking-widest uppercase text-white mb-2" style="text-shadow: 0 0 20px rgba(255,255,255,0.2);">
+            竞争是<span class="text-competition-red glow-text-red mx-2">失败者</span>的游戏
+        </h1>
+<div class="flex items-center justify-center gap-2 text-gray-500 text-xs tracking-[0.3em] uppercase">
+<span class="w-2 h-2 bg-monopoly-blue rounded-full animate-pulse"></span>
+            市场动态模拟 v1.0
+        </div>
+</header>
+<main class="flex-1 relative z-10 flex flex-col container mx-auto px-4 md:px-8 h-full">
+<div class="flex-1 flex flex-col md:flex-row gap-8 md:gap-12 items-stretch py-6 min-h-0">
+<div class="flex-1 flex flex-col relative group border border-red-900/30 bg-red-950/5 rounded-xl overflow-hidden hover:bg-red-950/10 transition-colors duration-500">
+<div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTEgMWgydjJIMUMxeiIgZmlsbD0iI2ZmMiEyYSIgZmlsbC1vcGFjaXR5PSIwLjA1Ii8+PC9zdmc+')] opacity-20"></div>
+<div class="p-6 border-b border-red-900/30 flex justify-between items-center backdrop-blur-sm bg-black/20">
+<div>
+<h2 class="text-xl font-bold text-red-500 tracking-wider flex items-center gap-2">
+<span class="material-icons-outlined text-sm">close</span>
+                            完全竞争市场
+                        </h2>
+<p class="text-xs text-red-400/60 uppercase tracking-widest mt-1">例如：航空公司</p>
+</div>
+<div class="text-right">
+<div class="text-2xl font-mono text-red-500 font-bold glow-text-red">0.2%</div>
+<div class="text-[10px] text-red-400/60 uppercase">净利润率</div>
+</div>
+</div>
+<div class="flex-1 relative overflow-hidden">
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="relative w-64 h-64">
+<div class="chaotic-web-node" style="top: 20%; left: 30%"></div>
+<div class="chaotic-web-node" style="top: 70%; left: 80%"></div>
+<div class="chaotic-web-node" style="top: 50%; left: 50%"></div>
+<div class="chaotic-web-node" style="top: 10%; left: 60%"></div>
+<div class="chaotic-web-node" style="top: 80%; left: 20%"></div>
+<div class="chaotic-web-node" style="top: 40%; left: 10%"></div>
+<div class="chaotic-web-node" style="top: 30%; left: 90%"></div>
+<div class="chaotic-web-line w-full rotate-45 top-1/2 left-0"></div>
+<div class="chaotic-web-line w-full -rotate-12 top-1/3 left-0"></div>
+<div class="chaotic-web-line w-full rotate-90 top-0 left-1/2"></div>
+<div class="chaotic-web-line w-2/3 rotate-12 top-2/3 left-10"></div>
+<div class="chaotic-web-line w-3/4 -rotate-45 top-1/2 left-10"></div>
+<div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-48 border border-red-500/20 rounded-full animate-[spin_10s_linear_infinite]"></div>
+<div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 border border-red-500/10 rounded-full animate-[spin_7s_linear_infinite_reverse]"></div>
+</div>
+</div>
+<div class="absolute bottom-0 left-0 right-0 h-32 flex items-end justify-around px-8 pb-4 gap-1 opacity-60">
+<div class="w-2 bg-red-600/50 h-[10%]"></div>
+<div class="w-2 bg-red-600/50 h-[15%]"></div>
+<div class="w-2 bg-red-600/50 h-[8%]"></div>
+<div class="w-2 bg-red-600/50 h-[12%]"></div>
+<div class="w-2 bg-red-600/50 h-[5%]"></div>
+<div class="w-2 bg-red-600/50 h-[18%]"></div>
+<div class="w-2 bg-red-600/50 h-[9%]"></div>
+<div class="w-2 bg-red-600/50 h-[14%]"></div>
+<div class="w-2 bg-red-600/50 h-[11%]"></div>
+<div class="w-2 bg-red-600/50 h-[7%]"></div>
+</div>
+<div class="absolute top-10 left-10 bg-black/80 text-red-500 text-[10px] px-2 py-1 border border-red-900 rounded font-mono">价格战</div>
+<div class="absolute bottom-20 right-10 bg-black/80 text-red-500 text-[10px] px-2 py-1 border border-red-900 rounded font-mono">生存挣扎</div>
+</div>
+</div>
+<div class="hidden md:flex flex-col justify-center items-center relative">
+<div class="w-px h-full bg-gradient-to-b from-transparent via-gray-700 to-transparent absolute"></div>
+<div class="bg-background-dark border border-gray-700 text-gray-500 rounded-full p-2 z-10 font-black text-xs">VS</div>
+</div>
+<div class="flex-1 flex flex-col relative group border border-monopoly-blue/30 bg-blue-950/5 rounded-xl overflow-hidden hover:bg-blue-950/10 transition-colors duration-500">
+<div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTEgMWgydjJIMUMxeiIgZmlsbD0iIzAwZjBmZiIgZmlsbC1vcGFjaXR5PSIwLjA1Ii8+PC9zdmc+')] opacity-20"></div>
+<div class="p-6 border-b border-monopoly-blue/30 flex justify-between items-center backdrop-blur-sm bg-black/20">
+<div>
+<h2 class="text-xl font-bold text-monopoly-blue tracking-wider flex items-center gap-2">
+<span class="material-icons-outlined text-sm">diamond</span>
+                            垄断市场
+                        </h2>
+<p class="text-xs text-monopoly-blue/60 uppercase tracking-widest mt-1">例如：谷歌</p>
+</div>
+<div class="text-right">
+<div class="text-2xl font-mono text-monopoly-blue font-bold glow-text-blue">25%+</div>
+<div class="text-[10px] text-monopoly-blue/60 uppercase">净利润率</div>
+</div>
+</div>
+<div class="flex-1 relative overflow-hidden flex items-center justify-center">
+<div class="relative">
+<div class="absolute inset-0 flex items-center justify-center opacity-30">
+<div class="w-96 h-px bg-gradient-to-r from-transparent via-monopoly-blue to-transparent absolute rotate-0"></div>
+<div class="w-96 h-px bg-gradient-to-r from-transparent via-monopoly-blue to-transparent absolute rotate-45"></div>
+<div class="w-96 h-px bg-gradient-to-r from-transparent via-monopoly-blue to-transparent absolute rotate-90"></div>
+<div class="w-96 h-px bg-gradient-to-r from-transparent via-monopoly-blue to-transparent absolute rotate-135"></div>
+</div>
+<div class="w-32 h-32 rounded-full bg-monopoly-blue/10 border-2 border-monopoly-blue flex items-center justify-center node-pulse relative z-10 backdrop-blur-md">
+<div class="w-20 h-20 rounded-full bg-monopoly-blue/20 flex items-center justify-center">
+<span class="material-icons-outlined text-4xl text-monopoly-blue drop-shadow-[0_0_10px_rgba(0,240,255,0.8)]">hub</span>
+</div>
+</div>
+<div class="absolute top-1/2 left-1/2 w-48 h-48 -ml-24 -mt-24 border border-monopoly-blue/20 rounded-full animate-[spin_20s_linear_infinite]">
+<div class="w-2 h-2 bg-monopoly-blue rounded-full absolute -top-1 left-1/2 shadow-[0_0_5px_#00f0ff]"></div>
+</div>
+</div>
+<div class="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-monopoly-blue/20 to-transparent flex items-end justify-center pb-6">
+<div class="text-center">
+<div class="text-4xl font-mono text-white font-bold drop-shadow-[0_0_10px_rgba(0,240,255,0.5)] tracking-widest">
+                                $ HUGE
+                            </div>
+<div class="text-xs text-monopoly-blue uppercase tracking-[0.5em] mt-2 border-t border-monopoly-blue/50 pt-2">自由现金流</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="py-8 md:py-12 flex flex-col items-center justify-center relative z-20">
+<h3 class="text-xl md:text-2xl font-light text-center mb-8 text-gray-300">
+                你会选择<span class="text-white font-bold border-b border-red-500 mx-1">加入厮杀</span>，还是<span class="text-white font-bold border-b border-monopoly-blue mx-1">建立垄断</span>？
+            </h3>
+<div class="flex flex-col md:flex-row gap-6 w-full max-w-4xl">
+<button id="price-war-btn" data-no-next="true" class="flex-1 group relative overflow-hidden bg-background-dark border border-gray-800 hover:border-red-600 transition-all duration-300 rounded-lg p-6 text-left">
+<div class="absolute inset-0 bg-gradient-to-r from-red-900/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="relative z-10 flex items-start gap-4">
+<div class="w-12 h-12 rounded bg-gray-900 border border-gray-700 flex items-center justify-center group-hover:border-red-500 group-hover:text-red-500 transition-colors">
+<span class="material-icons-outlined">trending_down</span>
+</div>
+<div>
+<h4 class="text-lg font-bold text-gray-300 group-hover:text-white mb-1">加入价格战</h4>
+<p class="text-sm text-gray-500 group-hover:text-gray-400">
+                                既然别人在做，那我也做。通过更低的价格抢占市场份额，哪怕利润微薄。
+                            </p>
+</div>
+</div>
+</button>
+<button id="monopoly-path-btn" data-next-scene="solve-unique-problem" class="flex-1 group relative overflow-hidden bg-background-dark border border-gray-800 hover:border-monopoly-blue transition-all duration-300 rounded-lg p-6 text-left shadow-[0_0_0_0_rgba(0,240,255,0)] hover:shadow-[0_0_20px_rgba(0,240,255,0.15)]">
+<div class="absolute inset-0 bg-gradient-to-r from-blue-900/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="relative z-10 flex items-start gap-4">
+<div class="w-12 h-12 rounded bg-gray-900 border border-gray-700 flex items-center justify-center group-hover:border-monopoly-blue group-hover:text-monopoly-blue transition-colors">
+<span class="material-icons-outlined">psychology</span>
+</div>
+<div>
+<h4 class="text-lg font-bold text-gray-300 group-hover:text-white mb-1">解决独特问题</h4>
+<p class="text-sm text-gray-500 group-hover:text-gray-400">
+                                逃避竞争。在一个微小的利基市场实现垄断，然后向外扩张。
+                            </p>
+</div>
+</div>
+</button>
+</div>
+</div>
+<div id="price-war-feedback" class="fixed left-1/2 -translate-x-1/2 bottom-10 z-[120] max-w-md w-[92vw] px-4 py-3 rounded-lg border border-red-500/40 bg-red-950/90 text-red-100 text-sm shadow-[0_0_30px_rgba(239,68,68,0.25)] opacity-0 pointer-events-none transition-opacity duration-200">
+<p class="font-bold text-red-300 mb-1">负反馈：价格战陷阱</p>
+<p class="text-xs leading-relaxed">你进入了同质化竞争，利润被持续压缩，无法积累研发与组织优势。请改选“解决独特问题”路径。</p>
+</div>
+</main>
+<footer class="border-t border-gray-800 bg-black/60 backdrop-blur text-[10px] uppercase text-gray-500 py-2 px-6 flex justify-between items-center relative z-20">
+<div class="flex gap-4">
+<span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> 系统正常</span>
+<span class="flex items-center gap-1"><span class="material-icons-outlined text-[10px]">lock</span> 数据加密</span>
+</div>
+<div class="font-mono tracking-widest">READO // ZERO TO ONE</div>
+</footer>
+<script>
+(() => {
+  const badChoiceButton = document.getElementById("price-war-btn");
+  const feedback = document.getElementById("price-war-feedback");
+  if (!badChoiceButton || !feedback) return;
+  let timer = 0;
+  badChoiceButton.addEventListener("click", () => {
+    feedback.classList.remove("opacity-0", "pointer-events-none");
+    feedback.classList.add("opacity-100");
+    window.clearTimeout(timer);
+    timer = window.setTimeout(() => {
+      feedback.classList.remove("opacity-100");
+      feedback.classList.add("opacity-0", "pointer-events-none");
+    }, 2600);
+  });
+})();
+</script>
+
+
+<script src="/shared/experience-runtime.js?v=1771240921862"></script>
+<script>
+(() => {
+  
+  localStorage.setItem("reado_book_last_zero-to-one", "zero-to-one-the-monopolist-s-choice-2");
+  if ("zero-to-one-the-monopolist-s-choice-2" === "zero-to-one-the-monopolist-s-choice-7") {
+    try {
+      const completedRaw = localStorage.getItem("reado_completed_books_v1") || "[]";
+      const completedSet = new Set(JSON.parse(completedRaw));
+      completedSet.add("zero-to-one");
+      localStorage.setItem("reado_completed_books_v1", JSON.stringify([...completedSet]));
+    } catch {}
+  }
+  
+  const readoNextHref = "/experiences/zero-to-one-the-monopolist-s-choice-3.html";
+  (() => {
+    let isNavigating = false;
+    const keywordList = ["开始", "继续", "下一", "进入", "模拟", "抉择", "选择", "确认", "提交", "挑战", "完成", "start", "next", "continue"];
+    const blacklist = ["EN", "ZH", "返回", "back", "帮助", "求助", "笔记", "术语", "设置", "菜单", "关闭", "取消"];
+    const normalize = (value) => String(value || "").replace(/\s+/g, " ").trim();
+    const hasKeyword = (text) => keywordList.some((keyword) => text.toLowerCase().includes(keyword.toLowerCase()));
+    const isBlocked = (text) => blacklist.some((word) => text === word || text.toLowerCase().includes(word.toLowerCase()));
+    const isOptionGroupButton = (node) => {
+      const parent = node.parentElement;
+      if (!parent) return false;
+      const peers = Array.from(parent.children).filter(
+        (child) => child instanceof HTMLElement && child.matches("button,[role='button'],.concept-card,.item-card,[data-choice],[data-option]")
+      );
+      return peers.length >= 2;
+    };
+    const goNext = (delay = 180) => {
+      if (isNavigating) return;
+      isNavigating = true;
+      window.setTimeout(() => {
+        window.location.href = readoNextHref;
+      }, delay);
+    };
+    document.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+      if (target.closest(".reado-shell-wrap")) return;
+      const candidate = target.closest("[data-next-scene],button,a[href],.concept-card,.item-card,[data-choice],[data-option]");
+      if (!(candidate instanceof HTMLElement)) return;
+      if (!candidate.closest("main")) return;
+      if (candidate.hasAttribute("data-no-next")) return;
+      if (candidate.matches("a[href]")) {
+        const href = candidate.getAttribute("href") || "";
+        if (href && href !== "#" && !href.startsWith("javascript:")) return;
+      }
+      const text = normalize(candidate.textContent);
+      if (candidate.matches("[data-next-scene]")) {
+        event.preventDefault();
+        goNext(90);
+        return;
+      }
+      if (isBlocked(text)) return;
+      if (candidate.matches(".concept-card,.item-card,[data-choice],[data-option]")) {
+        goNext(180);
+        return;
+      }
+      if (candidate.matches("button")) {
+        if (hasKeyword(text) || (text.length >= 4 && isOptionGroupButton(candidate))) {
+          goNext(220);
+        }
+      }
+    });
+  })();
+  
+  if (window.ReadoExperienceRuntime && typeof window.ReadoExperienceRuntime.init === "function") {
+    window.ReadoExperienceRuntime.init({
+      bookId: "zero-to-one",
+      moduleSlug: "zero-to-one-the-monopolist-s-choice-2",
+      moduleSlugs: ["zero-to-one-the-monopolist-s-choice","zero-to-one-the-monopolist-s-choice-1","zero-to-one-the-monopolist-s-choice-2","zero-to-one-the-monopolist-s-choice-3","zero-to-one-the-monopolist-s-choice-4","zero-to-one-the-monopolist-s-choice-5","zero-to-one-the-monopolist-s-choice-6","zero-to-one-the-monopolist-s-choice-7"]
+    });
+  }
+})();
+</script>
+</body></html>
