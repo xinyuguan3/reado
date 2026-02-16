@@ -76,8 +76,8 @@
     </style>
 </head>
 <body class="bg-background-light dark:bg-background-dark text-white font-sans min-h-screen flex flex-col relative overflow-hidden">
-<script src="/shared/book-catalog.js?v=1771243282012"></script>
-<script type="module" src="/shared/shell.js?v=1771243282012"></script>
+<script src="/shared/book-catalog.js?v=1771244370007"></script>
+<script type="module" src="/shared/shell.js?v=1771244370007"></script>
 <reado-app-shell data-page="knowledge-map"></reado-app-shell>
 <header class="absolute top-6 left-8 z-30">
 <div class="flex items-center gap-2">
@@ -217,9 +217,9 @@
   const titleWrap = titleEl ? titleEl.parentElement : null;
 
   const progressHint = document.createElement("p");
-  progressHint.className = "text-xs text-cyan-200 mt-2 tracking-wide";
+  progressHint.className = "text-xs text-amber-900 mt-2 tracking-wide font-bold bg-amber-100/80 border border-amber-300/60 rounded px-2 py-1 inline-block";
   const feedbackHint = document.createElement("p");
-  feedbackHint.className = "text-xs text-slate-300 mt-1 leading-relaxed";
+  feedbackHint.className = "text-xs text-slate-800 mt-2 leading-relaxed font-medium bg-slate-100/85 border border-slate-300/60 rounded px-2 py-1.5";
   if (titleWrap) {
     titleWrap.append(progressHint, feedbackHint);
   }

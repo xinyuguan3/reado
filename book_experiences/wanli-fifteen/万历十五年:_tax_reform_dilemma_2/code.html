@@ -249,9 +249,9 @@
   const titleWrap = titleEl ? titleEl.parentElement : null;
 
   const progressHint = document.createElement("p");
-  progressHint.className = "text-xs text-cyan-200 mt-2 tracking-wide";
+  progressHint.className = "text-xs text-amber-900 mt-2 tracking-wide font-bold bg-amber-100/80 border border-amber-300/60 rounded px-2 py-1 inline-block";
   const feedbackHint = document.createElement("p");
-  feedbackHint.className = "text-xs text-slate-300 mt-1 leading-relaxed";
+  feedbackHint.className = "text-xs text-slate-800 mt-2 leading-relaxed font-medium bg-slate-100/85 border border-slate-300/60 rounded px-2 py-1.5";
   if (titleWrap) titleWrap.append(progressHint, feedbackHint);
 
   const rounds = [
