@@ -17,14 +17,16 @@ const DEFAULT_USER_STATE = {
   gems: 1240,
   streak: "连续 15 天",
   avatar:
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuDTCkPJeZKnZiMBWRNBvlC4hj4fuKNI6gb3njqhKFHIdlwmY3juARMMHwwtJg1wv4mUfWu8RlkcrYlKa11Qdo68yG3EqQnQ9E8riXBtvOkdYOqDVbS1s2JSXODzNG2MlyJ4nBha372qjxomU_OS5gCP-XjccsEU8E_n8AogkO8Tv5xwjCp9JWKX2MXi49x2TiT1FCtgXk6e_FJ0rxOLFrn_3jnLdHaeWn4B2tDBS8-pQzmmIatinOFwi81-9HkHWrKUxHd0IhwOI2E"
+    "/assets/remote-images/3ec2fbb52c0ab37789b9f619.png"
 };
 const GEM_CENTER_HREF = "/pages/gem-center.html";
 const LAST_EXPERIENCE_KEY = "reado_last_experience_href";
 const DEEPSEEK_KEY_STORAGE = "reado_deepseek_api_key";
 const DEEPSEEK_ENDPOINT_STORAGE = "reado_deepseek_endpoint";
-const DEFAULT_DEEPSEEK_API_KEY = "";
+const DEFAULT_DEEPSEEK_API_KEY = "sk-8d2c4dd272334149821f77dfda61b8a4";
 const DEFAULT_DEEPSEEK_ENDPOINT = "https://api.deepseek.com/chat/completions";
+const FALLBACK_AVATAR_DATA_URI = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23135bec'/%3E%3Cstop offset='100%25' stop-color='%2300eaff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='96' height='96' rx='48' fill='url(%23g)'/%3E%3Ccircle cx='48' cy='38' r='18' fill='rgba(255,255,255,0.92)'/%3E%3Cpath d='M18 84c4-16 16-24 30-24s26 8 30 24' fill='rgba(255,255,255,0.92)'/%3E%3C/svg%3E";
+const FALLBACK_IMAGE_DATA_URI = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 360'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%230f172a'/%3E%3Cstop offset='100%25' stop-color='%23135bec'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='640' height='360' fill='url(%23bg)'/%3E%3Ccircle cx='220' cy='140' r='50' fill='rgba(255,255,255,0.2)'/%3E%3Cpath d='M112 290c34-56 76-84 126-84s92 28 126 84' fill='rgba(255,255,255,0.22)'/%3E%3Cpath d='M438 128l44 44 78-78' stroke='rgba(255,255,255,0.65)' stroke-width='16' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ctext x='320' y='326' text-anchor='middle' fill='rgba(255,255,255,0.84)' font-family='Arial,sans-serif' font-size='24'%3EImage unavailable%3C/text%3E%3C/svg%3E";
 
 function formatNumber(value) {
   return new Intl.NumberFormat("zh-CN").format(value);
@@ -658,6 +660,103 @@ function ensureGlobalStyle() {
       body.reado-shell-applied.reado-experience-mode {
         overflow-x: hidden !important;
       }
+      body.reado-shell-applied.reado-page-warehouse {
+        overflow-y: auto !important;
+      }
+      body.reado-shell-applied.reado-page-warehouse main {
+        height: auto !important;
+        min-height: calc(100dvh - 80px) !important;
+        overflow-y: auto !important;
+      }
+      body.reado-shell-applied.reado-page-warehouse main > header {
+        padding: 14px 14px 10px !important;
+      }
+      body.reado-shell-applied.reado-page-warehouse main > header > div {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+      }
+      body.reado-shell-applied.reado-page-warehouse main > header .grid.grid-cols-2.gap-2 {
+        width: 100% !important;
+      }
+      body.reado-shell-applied.reado-page-warehouse main > header .grid.grid-cols-2.gap-2 > div {
+        min-width: 0 !important;
+      }
+      body.reado-shell-applied.reado-page-warehouse .hide-scrollbar {
+        padding-left: 14px !important;
+        padding-right: 14px !important;
+        padding-bottom: 18px !important;
+      }
+      body.reado-shell-applied.reado-page-warehouse [data-book-card] {
+        width: min(84vw, 360px) !important;
+        max-width: min(84vw, 360px) !important;
+        height: min(68vh, 560px) !important;
+      }
+      body.reado-shell-applied.reado-page-warehouse [data-book-category-card] {
+        width: min(88vw, 520px) !important;
+        height: auto !important;
+        min-height: 280px !important;
+        padding: 28px 24px !important;
+      }
+      body.reado-shell-applied.reado-page-warehouse .fixed.bottom-8.left-1\/2 {
+        display: none !important;
+      }
+      body.reado-shell-applied.reado-page-mission {
+        overflow-y: auto !important;
+      }
+      body.reado-shell-applied.reado-page-mission main {
+        height: auto !important;
+        min-height: calc(100dvh - 80px) !important;
+        overflow-y: auto !important;
+      }
+      body.reado-shell-applied.reado-page-mission main > header {
+        padding: 16px 16px 10px !important;
+      }
+      body.reado-shell-applied.reado-page-mission main > header > div {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 12px !important;
+        margin-bottom: 10px !important;
+      }
+      body.reado-shell-applied.reado-page-mission main > header .bg-reado-sidebar {
+        width: 100% !important;
+        overflow-x: auto !important;
+        padding: 4px !important;
+      }
+      body.reado-shell-applied.reado-page-mission main > header .bg-reado-sidebar button {
+        white-space: nowrap !important;
+        padding: 8px 14px !important;
+        font-size: 13px !important;
+      }
+      body.reado-shell-applied.reado-page-mission main .hide-scrollbar {
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+        padding-bottom: 18px !important;
+      }
+      body.reado-shell-applied.reado-page-mission .task-card > div {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 12px !important;
+      }
+      body.reado-shell-applied.reado-page-mission .task-card .flex.items-center.gap-8 {
+        width: 100% !important;
+        justify-content: space-between !important;
+        gap: 12px !important;
+        flex-wrap: wrap !important;
+      }
+      body.reado-shell-applied.reado-page-mission .task-card .flex.items-center.gap-4 {
+        gap: 10px !important;
+      }
+      body.reado-shell-applied.reado-page-mission .task-card button {
+        margin-left: auto !important;
+        white-space: nowrap !important;
+      }
+      body.reado-shell-applied.reado-page-mission .grid.grid-cols-2.gap-8 {
+        grid-template-columns: 1fr !important;
+      }
+      body.reado-shell-applied.reado-page-mission .fixed.bottom-6.left-1\/2 {
+        display: none !important;
+      }
       body.reado-shell-applied.reado-experience-mode .reado-shell-top {
         top: 8px;
         right: 8px;
@@ -695,36 +794,47 @@ function ensureGlobalStyle() {
         right: 10px;
         top: 64px;
       }
-      body.reado-shell-applied.reado-experience-mode main {
+      body.reado-shell-applied.reado-experience-mode.reado-mobile-proportional main {
+        transform: scale(var(--reado-mobile-scale, 0.9));
+        transform-origin: top left;
+        width: var(--reado-mobile-main-width, 111.111%);
+        min-height: var(--reado-mobile-main-min-height, 100dvh);
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+      }
+      body.reado-shell-applied.reado-experience-mode.reado-mobile-proportional .bg-paper {
+        overflow: hidden !important;
+      }
+      body.reado-shell-applied.reado-experience-mode.reado-mobile-flow main {
         height: auto !important;
         max-height: none !important;
         min-height: 100dvh !important;
       }
-      body.reado-shell-applied.reado-experience-mode main.flex {
+      body.reado-shell-applied.reado-experience-mode.reado-mobile-flow main.flex {
         flex-direction: column !important;
       }
-      body.reado-shell-applied.reado-experience-mode main[class*="grid-cols-12"] {
+      body.reado-shell-applied.reado-experience-mode.reado-mobile-flow main[class*="grid-cols-12"] {
         grid-template-columns: minmax(0, 1fr) !important;
       }
-      body.reado-shell-applied.reado-experience-mode main > [class*="col-span-"] {
+      body.reado-shell-applied.reado-experience-mode.reado-mobile-flow main > [class*="col-span-"] {
         grid-column: 1 / -1 !important;
       }
-      body.reado-shell-applied.reado-experience-mode main > aside,
-      body.reado-shell-applied.reado-experience-mode main > section {
+      body.reado-shell-applied.reado-experience-mode.reado-mobile-flow main > aside,
+      body.reado-shell-applied.reado-experience-mode.reado-mobile-flow main > section {
         width: 100% !important;
         max-width: 100% !important;
         min-width: 0 !important;
       }
-      body.reado-shell-applied.reado-experience-mode [class*="h-screen"],
-      body.reado-shell-applied.reado-experience-mode [class*="max-h-screen"],
-      body.reado-shell-applied.reado-experience-mode [class*="h-[calc(100vh"] {
+      body.reado-shell-applied.reado-experience-mode.reado-mobile-flow [class*="h-screen"],
+      body.reado-shell-applied.reado-experience-mode.reado-mobile-flow [class*="max-h-screen"],
+      body.reado-shell-applied.reado-experience-mode.reado-mobile-flow [class*="h-[calc(100vh"] {
         height: auto !important;
         max-height: none !important;
       }
-      body.reado-shell-applied.reado-experience-mode [class*="w-["] {
+      body.reado-shell-applied.reado-experience-mode.reado-mobile-flow [class*="w-["] {
         max-width: 100% !important;
       }
-      body.reado-shell-applied.reado-experience-mode [class*="min-w-["] {
+      body.reado-shell-applied.reado-experience-mode.reado-mobile-flow [class*="min-w-["] {
         min-width: 0 !important;
       }
     }
@@ -737,12 +847,129 @@ function ensureGlobalStyle() {
   document.head.append(style);
 }
 
+function enableMobileProportionalMode(isExperiencePage) {
+  if (!isExperiencePage) return;
+  const media = window.matchMedia("(max-width: 900px)");
+  let rafId = 0;
+
+  const apply = () => {
+    if (!media.matches) {
+      document.body.classList.remove("reado-mobile-flow");
+      document.body.classList.remove("reado-mobile-proportional");
+      document.body.style.removeProperty("--reado-mobile-scale");
+      document.body.style.removeProperty("--reado-mobile-main-width");
+      document.body.style.removeProperty("--reado-mobile-main-min-height");
+      return;
+    }
+    const main = document.querySelector("main");
+    if (!(main instanceof HTMLElement)) return;
+
+    const vw = window.innerWidth || 390;
+    let scale = vw <= 360 ? 0.82 : (vw <= 420 ? 0.88 : 0.92);
+    document.body.classList.add("reado-mobile-proportional");
+    document.body.style.setProperty("--reado-mobile-scale", "1");
+    document.body.style.setProperty("--reado-mobile-main-width", "100%");
+    document.body.style.setProperty("--reado-mobile-main-min-height", Math.ceil(window.innerHeight) + "px");
+    main.getBoundingClientRect();
+
+    let minLeft = Infinity;
+    let maxRight = -Infinity;
+    const allNodes = main.querySelectorAll("*");
+    allNodes.forEach((node) => {
+      if (!(node instanceof HTMLElement)) return;
+      const rect = node.getBoundingClientRect();
+      if (rect.width <= 0 || rect.height <= 0) return;
+      minLeft = Math.min(minLeft, rect.left);
+      maxRight = Math.max(maxRight, rect.right);
+    });
+    const mainRect = main.getBoundingClientRect();
+    minLeft = Math.min(minLeft, mainRect.left);
+    maxRight = Math.max(maxRight, mainRect.right);
+    if (Number.isFinite(minLeft) && Number.isFinite(maxRight) && maxRight > minLeft) {
+      const contentWidth = maxRight - minLeft;
+      const fitScale = (vw - 8) / contentWidth;
+      if (Number.isFinite(fitScale)) {
+        scale = Math.min(scale, fitScale);
+      }
+    }
+    if (main.scrollHeight > window.innerHeight * 1.45) {
+      scale = Math.max(0.8, scale - 0.04);
+    }
+    scale = Math.max(0.62, Math.min(1, scale));
+
+    if (scale < 0.72) {
+      document.body.classList.remove("reado-mobile-proportional");
+      document.body.classList.add("reado-mobile-flow");
+      document.body.style.removeProperty("--reado-mobile-scale");
+      document.body.style.removeProperty("--reado-mobile-main-width");
+      document.body.style.removeProperty("--reado-mobile-main-min-height");
+      return;
+    }
+
+    document.body.classList.remove("reado-mobile-flow");
+    document.body.style.setProperty("--reado-mobile-scale", scale.toFixed(3));
+    document.body.style.setProperty("--reado-mobile-main-width", (100 / scale).toFixed(3) + "%");
+    document.body.style.setProperty("--reado-mobile-main-min-height", Math.ceil(window.innerHeight / scale) + "px");
+  };
+
+  const scheduleApply = () => {
+    cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(apply);
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", scheduleApply, { once: true });
+  } else {
+    scheduleApply();
+  }
+  window.addEventListener("resize", scheduleApply, { passive: true });
+  window.addEventListener("orientationchange", scheduleApply, { passive: true });
+  if (typeof media.addEventListener === "function") {
+    media.addEventListener("change", scheduleApply);
+  } else if (typeof media.addListener === "function") {
+    media.addListener(scheduleApply);
+  }
+}
+
+function enableImageFallbacks() {
+  if (window.__readoImageFallbackReady) return;
+  window.__readoImageFallbackReady = true;
+
+  const bindFallback = (img) => {
+    if (!(img instanceof HTMLImageElement)) return;
+    if (img.dataset.readoFallbackBound === "1") return;
+    img.dataset.readoFallbackBound = "1";
+    img.addEventListener("error", () => {
+      if (img.src !== FALLBACK_IMAGE_DATA_URI) {
+        img.src = FALLBACK_IMAGE_DATA_URI;
+      }
+    });
+  };
+
+  document.querySelectorAll("img").forEach(bindFallback);
+
+  const observer = new MutationObserver((records) => {
+    records.forEach((record) => {
+      record.addedNodes.forEach((node) => {
+        if (!(node instanceof Element)) return;
+        if (node instanceof HTMLImageElement) {
+          bindFallback(node);
+        } else {
+          node.querySelectorAll?.("img").forEach(bindFallback);
+        }
+      });
+    });
+  });
+  observer.observe(document.documentElement, { childList: true, subtree: true });
+}
+
 class ReadoAppShell extends HTMLElement {
   connectedCallback() {
     if (this.dataset.ready === "1") return;
     this.dataset.ready = "1";
     ensureIconFont();
     ensureGlobalStyle();
+    enableImageFallbacks();
     document.body.classList.add("reado-shell-applied");
     if (!localStorage.getItem(USER_STATE_KEY)) {
       writeUserState(DEFAULT_USER_STATE);
@@ -756,6 +983,13 @@ class ReadoAppShell extends HTMLElement {
     if (isLearningPage) {
       document.body.classList.add("reado-experience-mode");
     }
+    if (path === "/pages/simulator-library-level-selection-2.html") {
+      document.body.classList.add("reado-page-mission");
+    }
+    if (path === "/pages/simulator-library-level-selection-1.html") {
+      document.body.classList.add("reado-page-warehouse");
+    }
+    enableMobileProportionalMode(isExperiencePage);
     if (isExperiencePage) {
       const fullHref = window.location.pathname + window.location.search + window.location.hash;
       localStorage.setItem(LAST_EXPERIENCE_KEY, fullHref);
@@ -831,6 +1065,14 @@ class ReadoAppShell extends HTMLElement {
         }
       }
     };
+
+    if (avatarEl) {
+      avatarEl.addEventListener("error", () => {
+        if (avatarEl.src !== FALLBACK_AVATAR_DATA_URI) {
+          avatarEl.src = FALLBACK_AVATAR_DATA_URI;
+        }
+      });
+    }
 
     renderUser(readUserState(), false);
 
