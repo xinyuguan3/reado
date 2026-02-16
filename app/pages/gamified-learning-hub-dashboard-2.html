@@ -62,8 +62,8 @@
     </style>
 </head>
 <body class="bg-background-dark text-slate-200 h-screen overflow-hidden flex flex-col font-display">
-<script src="/shared/book-catalog.js?v=1771240921862"></script>
-<script type="module" src="/shared/shell.js?v=1771240921862"></script>
+<script src="/shared/book-catalog.js?v=1771241087232"></script>
+<script type="module" src="/shared/shell.js?v=1771241087232"></script>
 <reado-app-shell data-page="profile"></reado-app-shell>
 <header class="h-20 flex-none z-50 px-6 py-4 flex items-center justify-between glass-panel sticky top-0 border-b border-primary/20">
 <div class="flex items-center gap-4">
@@ -332,7 +332,8 @@
     }
     const points = (book.highlights || []).map((item) => `<li class="leading-relaxed">${item}</li>`).join("");
     const last = localStorage.getItem("reado_book_last_" + book.id);
-    const canResume = Boolean(last && Array.isArray(book.moduleSlugs) && book.moduleSlugs.includes(last));
+    const forceFirst = book.id === "wanli-fifteen";
+    const canResume = !forceFirst && Boolean(last && Array.isArray(book.moduleSlugs) && book.moduleSlugs.includes(last));
     const continueHref = canResume ? "/experiences/" + last + ".html" : book.firstModuleHref;
     review.innerHTML = `
       <div class="rounded-xl border border-white/10 bg-slate-950/70 p-4">

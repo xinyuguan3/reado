@@ -709,6 +709,12 @@ function injectMarketplaceBooks(html, books) {
     const unlocked = getUnlocked();
     if (unlocked.has(id)) {
       const book = books.find((item) => item.id === id);
+      const forceFirst = book?.id === "wanli-fifteen";
+      if (forceFirst) {
+        localStorage.removeItem("reado_book_last_" + id);
+        window.location.href = first;
+        return;
+      }
       const last = localStorage.getItem("reado_book_last_" + id);
       const canResume = Boolean(last && Array.isArray(book?.moduleSlugs) && book.moduleSlugs.includes(last));
       window.location.href = canResume ? "/experiences/" + last + ".html" : first;
@@ -1343,6 +1349,12 @@ function injectSimulatorCategoryBooks(html, books) {
     const nowUnlocked = getUnlocked();
     if (nowUnlocked.has(bookId)) {
       const book = books.find((item) => item.id === bookId);
+      const forceFirst = book?.id === "wanli-fifteen";
+      if (forceFirst) {
+        localStorage.removeItem("reado_book_last_" + bookId);
+        window.location.href = first;
+        return;
+      }
       const last = localStorage.getItem("reado_book_last_" + bookId);
       const canResume = Boolean(last && Array.isArray(book?.moduleSlugs) && book.moduleSlugs.includes(last));
       window.location.href = canResume ? "/experiences/" + last + ".html" : first;
@@ -1439,7 +1451,8 @@ function injectProfileTalents(html) {
     }
     const points = (book.highlights || []).map((item) => \`<li class="leading-relaxed">\${item}</li>\`).join("");
     const last = localStorage.getItem("reado_book_last_" + book.id);
-    const canResume = Boolean(last && Array.isArray(book.moduleSlugs) && book.moduleSlugs.includes(last));
+    const forceFirst = book.id === "wanli-fifteen";
+    const canResume = !forceFirst && Boolean(last && Array.isArray(book.moduleSlugs) && book.moduleSlugs.includes(last));
     const continueHref = canResume ? "/experiences/" + last + ".html" : book.firstModuleHref;
     review.innerHTML = \`
       <div class="rounded-xl border border-white/10 bg-slate-950/70 p-4">

@@ -23,7 +23,7 @@ const GEM_CENTER_HREF = "/pages/gem-center.html";
 const LAST_EXPERIENCE_KEY = "reado_last_experience_href";
 const DEEPSEEK_KEY_STORAGE = "reado_deepseek_api_key";
 const DEEPSEEK_ENDPOINT_STORAGE = "reado_deepseek_endpoint";
-const DEFAULT_DEEPSEEK_API_KEY = "";
+const DEFAULT_DEEPSEEK_API_KEY = "sk-8d2c4dd272334149821f77dfda61b8a4";
 const DEFAULT_DEEPSEEK_ENDPOINT = "https://api.deepseek.com/chat/completions";
 
 function formatNumber(value) {

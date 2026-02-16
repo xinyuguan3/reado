@@ -63,8 +63,8 @@
     </style>
 </head>
 <body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 h-screen overflow-hidden flex flex-col font-display">
-<script src="/shared/book-catalog.js?v=1771240921862"></script>
-<script type="module" src="/shared/shell.js?v=1771240921862"></script>
+<script src="/shared/book-catalog.js?v=1771241087232"></script>
+<script type="module" src="/shared/shell.js?v=1771241087232"></script>
 <reado-app-shell data-page="market"></reado-app-shell>
 <header class="h-16 flex-none z-50 px-6 flex items-center justify-between glass-panel sticky top-0 border-b border-primary/10">
 <div class="flex items-center gap-8">
@@ -464,6 +464,12 @@
     const unlocked = getUnlocked();
     if (unlocked.has(id)) {
       const book = books.find((item) => item.id === id);
+      const forceFirst = book?.id === "wanli-fifteen";
+      if (forceFirst) {
+        localStorage.removeItem("reado_book_last_" + id);
+        window.location.href = first;
+        return;
+      }
       const last = localStorage.getItem("reado_book_last_" + id);
       const canResume = Boolean(last && Array.isArray(book?.moduleSlugs) && book.moduleSlugs.includes(last));
       window.location.href = canResume ? "/experiences/" + last + ".html" : first;
