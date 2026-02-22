@@ -1,0 +1,291 @@
+{
+  "slug": "the-wheat-conquest-simulator",
+  "title": "reado: 人类简史 - 小麦全球征服模拟",
+  "order": 1,
+  "generatedBy": "playable-content-engine",
+  "generatedAt": "2026-02-22T16:28:40.845Z",
+  "bookSummary": "Module 1: reado: 人类简史 - 小麦全球征服模拟 reado: 人类简史 - 小麦全球征服模拟 science api biotech public 人类简史: 全球驯化战争地图 BETA Sapiens Domestication War Map // YEAR -9500 BC 已驯化人数 accessibility_new 14,205 占领土地面积 map 840 km² 可用 DNA 点数 all_inclusive 45 引导 tips_and_updates 玩法说明 世界简报 RANGE 1 美索不达米亚的智人正在为扇出永久性背部问题 NEW AREA 黎凡特部落放弃狩猎，转向全天候除草作业 ALERT 干旱风险上升，需要更多劳动力挖掘灌溉渠",
+  "skillPoints": [
+    {
+      "id": "skill-reado",
+      "name": "Skill · reado",
+      "description": "Use \"reado\" to diagnose tradeoffs before making a decision.",
+      "category": "analysis",
+      "keywords": [
+        "reado",
+        "tradeoff",
+        "mechanism"
+      ],
+      "difficulty": 1,
+      "power": 42,
+      "xpReward": 44,
+      "gemReward": 6,
+      "moduleHint": 1
+    }
+  ],
+  "knowledgeBattle": {
+    "passScore": 4,
+    "reward": {
+      "xp": 230,
+      "gems": 38
+    },
+    "questions": [
+      {
+        "id": "battle-entry-reado",
+        "prompt": "关于「reado」，哪项解释最符合书中机制？",
+        "options": [
+          "Module 1: reado: 人类简史 - 小麦全球征服模拟 reado: 人类简史 - 小麦全球征服模拟 science api biotech public 人类简史: 全球驯化战争地图 BETA Sapiens Domestication War Map // YEAR -9500 BC 已驯化人数 accessibility_new 14,205 占领土地面积 map 840 km² 可用 DNA 点数 all_inclus",
+          "NEW AREA 黎凡特部落放弃狩猎，转向全天候除草作业",
+          "ALERT 干旱风险上升，需要更多劳动力挖掘灌溉渠",
+          "HISTORY 大航海时代尚未开启，小麦正在蓄力"
+        ],
+        "answerIndex": 0,
+        "explanation": "Track how \"reado\" changes outcomes across scenarios instead of judging single events.",
+        "skillId": "",
+        "entryId": "entry-reado",
+        "moduleHint": 1
+      },
+      {
+        "id": "battle-entry",
+        "prompt": "关于「人类简史」，哪项解释最符合书中机制？",
+        "options": [
+          "ALERT 干旱风险上升，需要更多劳动力挖掘灌溉渠",
+          "Module 1: reado: 人类简史 - 小麦全球征服模拟 reado: 人类简史 - 小麦全球征服模拟 science api biotech public 人类简史: 全球驯化战争地图 BETA Sapiens Domestication War Map // YEAR -9500 BC 已驯化人数 accessibility_new 14,205 占领土地面积 map 840 km² 可用 DNA 点数 all_inclus",
+          "NEW AREA 黎凡特部落放弃狩猎，转向全天候除草作业",
+          "HISTORY 大航海时代尚未开启，小麦正在蓄力"
+        ],
+        "answerIndex": 0,
+        "explanation": "Track how \"人类简史\" changes outcomes across scenarios instead of judging single events.",
+        "skillId": "",
+        "entryId": "entry",
+        "moduleHint": 3
+      },
+      {
+        "id": "battle-entry",
+        "prompt": "关于「全屏沉浸模拟界面」，哪项解释最符合书中机制？",
+        "options": [
+          "请先选择一个策略，系统将即时反馈后果",
+          "Module 1: reado: 人类简史 - 小麦全球征服模拟 reado: 人类简史 - 小麦全球征服模拟 science api biotech public 人类简史: 全球驯化战争地图 BETA Sapiens Domestication War Map // YEAR -9500 BC 已驯化人数 accessibility_new 14,205 占领土地面积 map 840 km² 可用 DNA 点数 all_inclus",
+          "NEW AREA 黎凡特部落放弃狩猎，转向全天候除草作业",
+          "HISTORY 大航海时代尚未开启，小麦正在蓄力"
+        ],
+        "answerIndex": 0,
+        "explanation": "Track how \"全屏沉浸模拟界面\" changes outcomes across scenarios instead of judging single events.",
+        "skillId": "",
+        "entryId": "entry",
+        "moduleHint": 9
+      },
+      {
+        "id": "battle-entry",
+        "prompt": "关于「互信权重」，哪项解释最符合书中机制？",
+        "options": [
+          "hourglass_top 进化 hub 传播 dna 能力 science 进化实验室 修改小麦基因以控制人类 已进化 accessibility 折损麦秆 迫使人类弯腰收割，造成其脊柱永久性损伤，增加对土地的依赖",
+          "Module 1: reado: 人类简史 - 小麦全球征服模拟 reado: 人类简史 - 小麦全球征服模拟 science api biotech public 人类简史: 全球驯化战争地图 BETA Sapiens Domestication War Map // YEAR -9500 BC 已驯化人数 accessibility_new 14,205 占领土地面积 map 840 km² 可用 DNA 点数 all_inclus",
+          "NEW AREA 黎凡特部落放弃狩猎，转向全天候除草作业",
+          "HISTORY 大航海时代尚未开启，小麦正在蓄力"
+        ],
+        "answerIndex": 0,
+        "explanation": "Track how \"互信权重\" changes outcomes across scenarios instead of judging single events.",
+        "skillId": "",
+        "entryId": "entry",
+        "moduleHint": 10
+      }
+    ]
+  },
+  "thinkTankEntries": [
+    {
+      "id": "entry-reado",
+      "term": "reado",
+      "title": "reado",
+      "summary": "Module 1: reado: 人类简史 - 小麦全球征服模拟 reado: 人类简史 - 小麦全球征服模拟 science api biotech public 人类简史: 全球驯化战争地图 BETA Sapiens Domestication War Map // YEAR -9500 BC 已驯化人数 accessibility_new 14,205 占领土地面积 map 840 km² 可用 DNA 点数 all_inclusive 45 引导 tips_and_updates 玩法说明 世界简报 RANGE 1 美索不达米亚的智人正在为扇出永久性背部问题",
+      "insight": "Track how \"reado\" changes outcomes across scenarios instead of judging single events.",
+      "sourceCue": "",
+      "tags": [
+        "reado",
+        "knowledge-fragment"
+      ],
+      "relatedTerms": [
+        "dna",
+        "人类简史",
+        "science"
+      ],
+      "moduleHint": 1,
+      "relatedEntryRefs": [
+        {
+          "id": "entry",
+          "title": "推行进度",
+          "term": "推行进度",
+          "books": [
+            "wanli-fifteen",
+            "sapiens",
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 10
+        },
+        {
+          "id": "entry-experiences",
+          "title": "experiences",
+          "term": "experiences",
+          "books": [
+            "wanli-fifteen",
+            "sapiens",
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 8
+        },
+        {
+          "id": "entry-history",
+          "title": "history",
+          "term": "history",
+          "books": [
+            "wanli-fifteen",
+            "sapiens"
+          ],
+          "score": 7
+        },
+        {
+          "id": "entry-arrow",
+          "title": "arrow",
+          "term": "arrow",
+          "books": [
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 6
+        },
+        {
+          "id": "entry-dna",
+          "title": "dna",
+          "term": "dna",
+          "books": [
+            "sapiens"
+          ],
+          "score": 6
+        },
+        {
+          "id": "entry-gavel",
+          "title": "gavel",
+          "term": "gavel",
+          "books": [
+            "wanli-fifteen"
+          ],
+          "score": 6
+        },
+        {
+          "id": "entry-science",
+          "title": "science",
+          "term": "science",
+          "books": [
+            "sapiens"
+          ],
+          "score": 6
+        },
+        {
+          "id": "entry-trending",
+          "title": "trending",
+          "term": "trending",
+          "books": [
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 6
+        }
+      ]
+    },
+    {
+      "id": "entry",
+      "term": "知识点",
+      "title": "知识点",
+      "summary": "15 DNA grain 难以消化的谷粒 人类必须花费数小时研磨，限制其乱跑狩猎，建立定居点",
+      "insight": "Track how \"知识点\" changes outcomes across scenarios instead of judging single events.",
+      "sourceCue": "",
+      "tags": [
+        "知识点",
+        "knowledge-fragment"
+      ],
+      "relatedTerms": [
+        "reado",
+        "dna",
+        "人类简史"
+      ],
+      "moduleHint": 1,
+      "relatedEntryRefs": [
+        {
+          "id": "entry-reado",
+          "title": "reado",
+          "term": "reado",
+          "books": [
+            "wanli-fifteen",
+            "sapiens",
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 10
+        },
+        {
+          "id": "entry-experiences",
+          "title": "experiences",
+          "term": "experiences",
+          "books": [
+            "wanli-fifteen",
+            "sapiens",
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 8
+        },
+        {
+          "id": "entry-history",
+          "title": "history",
+          "term": "history",
+          "books": [
+            "wanli-fifteen",
+            "sapiens"
+          ],
+          "score": 7
+        },
+        {
+          "id": "entry-dna",
+          "title": "dna",
+          "term": "dna",
+          "books": [
+            "sapiens"
+          ],
+          "score": 6
+        },
+        {
+          "id": "entry-gavel",
+          "title": "gavel",
+          "term": "gavel",
+          "books": [
+            "wanli-fifteen"
+          ],
+          "score": 6
+        },
+        {
+          "id": "entry-science",
+          "title": "science",
+          "term": "science",
+          "books": [
+            "sapiens"
+          ],
+          "score": 6
+        },
+        {
+          "id": "entry-accessibility",
+          "title": "accessibility",
+          "term": "accessibility",
+          "books": [
+            "sapiens"
+          ],
+          "score": 5
+        },
+        {
+          "id": "entry-add",
+          "title": "add",
+          "term": "add",
+          "books": [
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 5
+        }
+      ]
+    }
+  ]
+}

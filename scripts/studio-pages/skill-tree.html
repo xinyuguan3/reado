@@ -1,0 +1,1279 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>reado · 技能树</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #060b14;
+      --panel: rgba(10, 20, 36, 0.78);
+      --panel-strong: rgba(9, 18, 31, 0.9);
+      --line: rgba(152, 188, 230, 0.24);
+      --text: #e9f2ff;
+      --muted: #8ea8c8;
+      --accent: #37c8ff;
+      --accent-2: #ff9f43;
+      --ok: #4ade80;
+      --danger: #f97316;
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+      background:
+        radial-gradient(1200px 500px at 8% -8%, rgba(12, 148, 201, 0.28), transparent 55%),
+        radial-gradient(900px 420px at 90% 102%, rgba(255, 159, 67, 0.16), transparent 58%),
+        linear-gradient(120deg, #060b14, #071225 46%, #07152b);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(152, 188, 230, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(152, 188, 230, 0.04) 1px, transparent 1px);
+      background-size: 24px 24px;
+      mask-image: radial-gradient(circle at 50% 40%, rgba(0, 0, 0, 0.82), transparent 80%);
+      z-index: -1;
+    }
+
+    .page {
+      width: min(1460px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 96px 0 26px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 14px 42px rgba(3, 10, 24, 0.42);
+    }
+
+    .hero {
+      padding: 20px;
+      display: grid;
+      gap: 14px;
+      background:
+        radial-gradient(560px 220px at 2% 0%, rgba(55, 200, 255, 0.18), transparent 60%),
+        radial-gradient(520px 200px at 96% 100%, rgba(255, 159, 67, 0.14), transparent 60%),
+        var(--panel);
+    }
+
+    .hero-main {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-family: "Space Grotesk", "Noto Sans SC", sans-serif;
+      font-size: clamp(34px, 5vw, 56px);
+      line-height: 1;
+      letter-spacing: -0.03em;
+      color: #f7fbff;
+    }
+
+    .hero p {
+      margin: 10px 0 0;
+      max-width: 780px;
+      color: #b8cae3;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .book-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .book-tab {
+      border: 1px solid rgba(142, 168, 200, 0.4);
+      border-radius: 999px;
+      background: rgba(6, 16, 29, 0.78);
+      color: #b7d8ff;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
+    }
+
+    .book-tab:hover {
+      transform: translateY(-1px);
+      border-color: rgba(55, 200, 255, 0.65);
+    }
+
+    .book-tab.active {
+      color: #061323;
+      border-color: rgba(55, 200, 255, 0.9);
+      background: linear-gradient(135deg, #37c8ff, #7de7ff);
+    }
+
+    .hero-metrics {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    }
+
+    .metric {
+      border: 1px solid rgba(152, 188, 230, 0.22);
+      border-radius: 14px;
+      padding: 12px;
+      background: rgba(6, 15, 28, 0.68);
+      min-height: 86px;
+      animation: reveal 0.4s ease both;
+    }
+
+    .metric .label {
+      font-size: 11px;
+      color: #89a4c8;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .metric .value {
+      margin-top: 5px;
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 28px;
+      line-height: 1;
+      color: #f6fbff;
+    }
+
+    .metric .hint {
+      margin-top: 5px;
+      font-size: 12px;
+      color: #a3bddb;
+      line-height: 1.45;
+    }
+
+    .control {
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+      grid-template-columns: 1.3fr 1fr 1fr 1fr;
+      align-items: end;
+    }
+
+    .control-field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .control-field label {
+      font-size: 11px;
+      color: #8da7c9;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .control input,
+    .control select {
+      width: 100%;
+      border: 1px solid rgba(152, 188, 230, 0.3);
+      border-radius: 11px;
+      background: rgba(3, 10, 21, 0.68);
+      color: #e4efff;
+      font-size: 13px;
+      padding: 10px 12px;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .control input:focus,
+    .control select:focus {
+      border-color: rgba(55, 200, 255, 0.8);
+      box-shadow: 0 0 0 3px rgba(55, 200, 255, 0.12);
+    }
+
+    .control .range-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .control .range-row input[type="range"] {
+      padding: 0;
+      height: 36px;
+    }
+
+    .control .range-value {
+      min-width: 48px;
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 18px;
+      color: #7de7ff;
+    }
+
+    .layout {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: minmax(0, 1.55fr) minmax(320px, 1fr);
+    }
+
+    .map-card {
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+      min-height: 620px;
+      background:
+        radial-gradient(480px 260px at 84% 12%, rgba(55, 200, 255, 0.14), transparent 70%),
+        radial-gradient(440px 240px at 12% 96%, rgba(255, 159, 67, 0.1), transparent 68%),
+        var(--panel);
+    }
+
+    .card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .card-title {
+      margin: 0;
+      font-size: 14px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #9ac4ee;
+      font-weight: 800;
+    }
+
+    .card-tip {
+      font-size: 12px;
+      color: #89a6c8;
+    }
+
+    .graph-wrap {
+      border: 1px solid rgba(152, 188, 230, 0.22);
+      border-radius: 14px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 44%, rgba(17, 35, 62, 0.7), rgba(5, 12, 24, 0.95));
+      position: relative;
+      min-height: 520px;
+    }
+
+    #skill-graph {
+      width: 100%;
+      height: 100%;
+      min-height: 520px;
+      display: block;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .legend span {
+      border: 1px solid rgba(152, 188, 230, 0.26);
+      border-radius: 999px;
+      background: rgba(7, 17, 32, 0.72);
+      padding: 5px 9px;
+      font-size: 11px;
+      color: #a9c3de;
+    }
+
+    .detail {
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+      align-content: start;
+      min-height: 620px;
+      background:
+        linear-gradient(160deg, rgba(55, 200, 255, 0.06), rgba(255, 159, 67, 0.04)),
+        var(--panel-strong);
+    }
+
+    .empty {
+      border: 1px dashed rgba(152, 188, 230, 0.35);
+      border-radius: 12px;
+      background: rgba(4, 11, 21, 0.56);
+      padding: 14px;
+      color: #9ab3d3;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .detail-title {
+      margin: 0;
+      font-family: "Space Grotesk", "Noto Sans SC", sans-serif;
+      font-size: 30px;
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+      color: #f8fbff;
+    }
+
+    .detail-sub {
+      margin: 0;
+      font-size: 12px;
+      color: #9fc0e5;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .detail-desc {
+      margin: 0;
+      font-size: 13px;
+      color: #c4d7ee;
+      line-height: 1.7;
+    }
+
+    .meter {
+      display: grid;
+      gap: 6px;
+    }
+
+    .meter-head {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #93b4db;
+    }
+
+    .meter-track {
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(18, 37, 61, 0.7);
+      overflow: hidden;
+      border: 1px solid rgba(152, 188, 230, 0.15);
+    }
+
+    .meter-fill {
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #37c8ff, #7de7ff);
+      width: 0;
+      transition: width 0.35s ease;
+    }
+
+    .kv {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .kv span {
+      border: 1px solid rgba(152, 188, 230, 0.28);
+      border-radius: 999px;
+      padding: 4px 9px;
+      font-size: 11px;
+      color: #9fc3e8;
+      background: rgba(5, 13, 24, 0.72);
+    }
+
+    .actions {
+      display: grid;
+      gap: 8px;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .btn {
+      border: 1px solid rgba(152, 188, 230, 0.34);
+      border-radius: 11px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #e5f4ff;
+      background: rgba(6, 15, 27, 0.7);
+      padding: 10px;
+      text-align: center;
+      text-decoration: none;
+      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(55, 200, 255, 0.82);
+      background: rgba(9, 24, 42, 0.9);
+    }
+
+    .btn.primary {
+      color: #061323;
+      border-color: rgba(55, 200, 255, 0.9);
+      background: linear-gradient(135deg, #37c8ff, #7de7ff);
+    }
+
+    .module-panel {
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .module-track {
+      display: grid;
+      gap: 9px;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+
+    .module-card {
+      border: 1px solid rgba(152, 188, 230, 0.24);
+      border-radius: 13px;
+      background: rgba(6, 15, 28, 0.64);
+      padding: 11px;
+      display: grid;
+      gap: 9px;
+      animation: reveal 0.45s ease both;
+    }
+
+    .module-card.active {
+      border-color: rgba(55, 200, 255, 0.74);
+      box-shadow: 0 0 0 2px rgba(55, 200, 255, 0.14);
+      background: rgba(8, 21, 37, 0.86);
+    }
+
+    .module-title {
+      margin: 0;
+      font-size: 14px;
+      color: #e5f4ff;
+      line-height: 1.55;
+    }
+
+    .module-kv {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .module-kv span {
+      border: 1px solid rgba(152, 188, 230, 0.26);
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 11px;
+      color: #9fc0e4;
+      background: rgba(4, 11, 21, 0.6);
+    }
+
+    .module-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .module-actions button,
+    .module-actions a {
+      flex: 1;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 8px;
+      border: 1px solid rgba(152, 188, 230, 0.32);
+      background: rgba(6, 14, 26, 0.7);
+      color: #cde5ff;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .module-actions button:hover,
+    .module-actions a:hover {
+      border-color: rgba(55, 200, 255, 0.8);
+      color: #e8f6ff;
+    }
+
+    .status {
+      font-size: 12px;
+      color: #9dc1e6;
+    }
+
+    .status.error { color: #fca98f; }
+
+    @keyframes reveal {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .g-edge {
+      stroke: rgba(146, 188, 238, 0.26);
+      stroke-width: 1.3;
+      fill: none;
+    }
+
+    .g-backbone {
+      stroke: rgba(255, 159, 67, 0.2);
+      stroke-width: 2;
+      fill: none;
+      stroke-dasharray: 4 5;
+    }
+
+    .g-module {
+      cursor: pointer;
+      transition: opacity 0.2s ease;
+    }
+
+    .g-module circle {
+      fill: rgba(255, 159, 67, 0.2);
+      stroke: rgba(255, 195, 114, 0.75);
+      stroke-width: 1.6;
+    }
+
+    .g-module text {
+      fill: #ffd7ae;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .g-module.inactive { opacity: 0.28; }
+
+    .g-skill {
+      cursor: pointer;
+      transition: transform 0.2s ease;
+      transform-origin: center;
+    }
+
+    .g-skill circle {
+      fill: rgba(55, 200, 255, 0.22);
+      stroke: rgba(136, 220, 255, 0.74);
+      stroke-width: 1.4;
+    }
+
+    .g-skill text {
+      fill: #e8f6ff;
+      font-size: 9.5px;
+      font-weight: 700;
+      pointer-events: none;
+    }
+
+    .g-skill:hover,
+    .g-skill.active {
+      transform: scale(1.08);
+    }
+
+    .g-skill.active circle {
+      fill: rgba(255, 159, 67, 0.28);
+      stroke: rgba(255, 214, 166, 0.96);
+    }
+
+    .g-empty {
+      fill: #92b3d6;
+      font-size: 16px;
+      font-family: "Space Grotesk", "Noto Sans SC", sans-serif;
+    }
+
+    @media (max-width: 1240px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+      .detail {
+        min-height: 0;
+      }
+    }
+
+    @media (max-width: 920px) {
+      .page {
+        width: calc(100% - 16px);
+        padding-top: 88px;
+      }
+      .hero {
+        padding: 14px;
+      }
+      .control {
+        grid-template-columns: 1fr;
+      }
+      .metric .value {
+        font-size: 24px;
+      }
+      .actions {
+        grid-template-columns: 1fr;
+      }
+      .module-track {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+<style id="reado-shell-boot-style">
+body.reado-shell-pending {
+  background: #0b1220;
+}
+body.reado-shell-pending > :not(script):not(reado-app-shell):not(.reado-shell-boot-mask) {
+  visibility: hidden !important;
+}
+body > .reado-shell-boot-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    radial-gradient(1200px 420px at 20% -10%, rgba(47, 123, 255, 0.22), transparent 60%),
+    radial-gradient(900px 360px at 92% 112%, rgba(0, 234, 255, 0.14), transparent 58%),
+    #0b1220;
+  transition: opacity 180ms ease;
+}
+body.reado-shell-pending > .reado-shell-boot-mask {
+  opacity: 1;
+}
+body.reado-shell-ready > .reado-shell-boot-mask {
+  opacity: 0;
+}
+</style>
+<script>
+(function () {
+  var body = document.body;
+  if (!body) return;
+  body.classList.add("reado-shell-pending");
+  var mask = body.querySelector(".reado-shell-boot-mask");
+  if (!mask) {
+    mask = document.createElement("div");
+    mask.className = "reado-shell-boot-mask";
+    mask.setAttribute("aria-hidden", "true");
+    body.appendChild(mask);
+  }
+  window.setTimeout(function () {
+    if (!body.classList.contains("reado-shell-applied")) {
+      body.classList.remove("reado-shell-pending");
+    }
+  }, 4000);
+})();
+</script>
+<script src="/shared/book-catalog.js"></script>
+<script type="module" src="/shared/shell.js"></script>
+<reado-app-shell data-page="skill-tree"></reado-app-shell>
+
+<main class="page">
+  <section class="card hero">
+    <div class="hero-main">
+      <div>
+        <h1>Skill Galaxy</h1>
+        <p>把每本书拆成可操作技能节点。点击星图节点可查看难度、奖励、关联比拼，并直接跳转到对应互动模块。</p>
+      </div>
+      <div id="status" class="status">正在读取书籍数据...</div>
+    </div>
+    <div id="book-tabs" class="book-tabs"></div>
+    <div id="metrics" class="hero-metrics"></div>
+  </section>
+
+  <section class="card control">
+    <div class="control-field">
+      <label for="search-input">搜索技能</label>
+      <input id="search-input" type="search" placeholder="输入技能名、关键词、模块名" />
+    </div>
+    <div class="control-field">
+      <label for="module-filter">模块过滤</label>
+      <select id="module-filter"></select>
+    </div>
+    <div class="control-field">
+      <label for="sort-select">排序策略</label>
+      <select id="sort-select">
+        <option value="power">按强度</option>
+        <option value="difficulty">按难度</option>
+        <option value="reward">按奖励</option>
+      </select>
+    </div>
+    <div class="control-field">
+      <label for="power-range">最低强度阈值</label>
+      <div class="range-row">
+        <input id="power-range" type="range" min="0" max="100" step="1" value="0" />
+        <span id="power-range-value" class="range-value">0</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="layout">
+    <article class="card map-card">
+      <header class="card-head">
+        <h2 class="card-title">技能星图</h2>
+        <span id="graph-tip" class="card-tip">模块锚点连接技能节点，点击节点可查看详情。</span>
+      </header>
+      <div class="graph-wrap">
+        <svg id="skill-graph" viewBox="0 0 1200 700" role="img" aria-label="Skill graph"></svg>
+      </div>
+      <div id="legend" class="legend"></div>
+    </article>
+
+    <aside class="card detail" id="skill-detail"></aside>
+  </section>
+
+  <section class="card module-panel">
+    <header class="card-head">
+      <h2 class="card-title">模块战斗台</h2>
+      <span class="card-tip">胜利即可获得 XP/GEM 奖励。</span>
+    </header>
+    <div id="module-track" class="module-track"></div>
+  </section>
+</main>
+
+<script>
+(() => {
+  const tabsEl = document.getElementById("book-tabs");
+  const metricsEl = document.getElementById("metrics");
+  const statusEl = document.getElementById("status");
+  const moduleFilterEl = document.getElementById("module-filter");
+  const sortEl = document.getElementById("sort-select");
+  const searchEl = document.getElementById("search-input");
+  const rangeEl = document.getElementById("power-range");
+  const rangeValueEl = document.getElementById("power-range-value");
+  const graphEl = document.getElementById("skill-graph");
+  const detailEl = document.getElementById("skill-detail");
+  const legendEl = document.getElementById("legend");
+  const moduleTrackEl = document.getElementById("module-track");
+  const graphTipEl = document.getElementById("graph-tip");
+
+  const state = {
+    books: [],
+    activeBookId: "",
+    view: null,
+    cache: new Map(),
+    filters: {
+      module: "all",
+      sort: "power",
+      search: "",
+      minPower: 0
+    },
+    selectedSkillId: ""
+  };
+
+  const asArray = (v) => Array.isArray(v) ? v : [];
+  const toText = (v, fallback = "") => typeof v === "string" && v.trim() ? v.trim() : fallback;
+  const toNumber = (v, fallback = 0) => Number.isFinite(Number(v)) ? Number(v) : fallback;
+  const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+
+  const fetchJson = async (url) => {
+    const response = await fetch(url, { credentials: "same-origin" });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok || data?.ok === false) {
+      throw new Error(data?.error || ("Request failed: " + response.status));
+    }
+    return data;
+  };
+
+  const setStatus = (text, type = "") => {
+    if (!statusEl) return;
+    statusEl.classList.toggle("error", type === "error");
+    statusEl.textContent = text;
+  };
+
+  const formatNumber = (value) => new Intl.NumberFormat("zh-CN").format(Math.round(toNumber(value, 0)));
+
+  const normalizeSkill = (raw, module, idx) => {
+    const skill = raw && typeof raw === "object" ? raw : {};
+    const moduleRef = module && typeof module === "object" ? module : {};
+    const battle = moduleRef.knowledgeBattle && typeof moduleRef.knowledgeBattle === "object" ? moduleRef.knowledgeBattle : {};
+    const reward = battle.reward && typeof battle.reward === "object" ? battle.reward : {};
+    return {
+      id: toText(skill.id, `${moduleRef.slug || "module"}-skill-${idx + 1}`),
+      name: toText(skill.name, toText(skill.term, `Skill ${idx + 1}`)),
+      description: toText(skill.description, "这个技能节点暂未提供描述。"),
+      category: toText(skill.category, "Core"),
+      keywords: asArray(skill.keywords).map((item) => toText(item)).filter(Boolean).slice(0, 6),
+      power: clamp(toNumber(skill.power, 40), 1, 100),
+      difficulty: clamp(toNumber(skill.difficulty, 1), 1, 10),
+      xpReward: clamp(toNumber(skill.xpReward, toNumber(reward.xp, 80)), 0, 999),
+      gemReward: clamp(toNumber(skill.gemReward, toNumber(reward.gems, 12)), 0, 999),
+      moduleSlug: toText(moduleRef.slug),
+      moduleTitle: toText(moduleRef.title, toText(moduleRef.slug, "未命名模块")),
+      moduleHref: toText(moduleRef.href, "/experiences/" + encodeURIComponent(toText(moduleRef.slug))),
+      moduleOrder: toNumber(moduleRef.order, idx + 1),
+      battlePassScore: clamp(toNumber(battle.passScore, 1), 1, 99),
+      battleQuestionCount: asArray(battle.questions).length
+    };
+  };
+
+  const sortSkills = (rows, sortKey) => {
+    const list = rows.slice();
+    list.sort((a, b) => {
+      if (sortKey === "difficulty") {
+        return b.difficulty - a.difficulty || b.power - a.power || a.name.localeCompare(b.name, "zh-Hans-CN");
+      }
+      if (sortKey === "reward") {
+        const rewardA = a.xpReward + a.gemReward * 8;
+        const rewardB = b.xpReward + b.gemReward * 8;
+        return rewardB - rewardA || b.power - a.power || a.name.localeCompare(b.name, "zh-Hans-CN");
+      }
+      return b.power - a.power || b.difficulty - a.difficulty || a.name.localeCompare(b.name, "zh-Hans-CN");
+    });
+    return list;
+  };
+
+  const renderBookTabs = () => {
+    tabsEl.innerHTML = state.books.map((book) => `
+      <button class="book-tab ${book.id === state.activeBookId ? "active" : ""}" type="button" data-book-id="${book.id}">
+        ${book.title}
+      </button>
+    `).join("");
+  };
+
+  const renderMetrics = (view, filteredSkills) => {
+    const allSkills = asArray(view?.skills);
+    const totalRewardsXp = filteredSkills.reduce((sum, skill) => sum + skill.xpReward, 0);
+    const totalRewardsGem = filteredSkills.reduce((sum, skill) => sum + skill.gemReward, 0);
+    const avgPower = filteredSkills.length
+      ? filteredSkills.reduce((sum, skill) => sum + skill.power, 0) / filteredSkills.length
+      : 0;
+    const highDifficulty = filteredSkills.filter((item) => item.difficulty >= 7).length;
+
+    metricsEl.innerHTML = [
+      {
+        label: "技能节点",
+        value: `${formatNumber(filteredSkills.length)} / ${formatNumber(allSkills.length)}`,
+        hint: "当前过滤结果 / 全书总节点"
+      },
+      {
+        label: "平均强度",
+        value: formatNumber(avgPower),
+        hint: "PWR 反映技能可迁移性"
+      },
+      {
+        label: "高难节点",
+        value: formatNumber(highDifficulty),
+        hint: "难度 >= 7 的深水技能"
+      },
+      {
+        label: "可赢奖励",
+        value: `${formatNumber(totalRewardsXp)} XP + ${formatNumber(totalRewardsGem)} GEM`,
+        hint: "来自节点与比拼奖励"
+      }
+    ].map((item, idx) => `
+      <article class="metric" style="animation-delay:${idx * 50}ms">
+        <div class="label">${item.label}</div>
+        <div class="value">${item.value}</div>
+        <div class="hint">${item.hint}</div>
+      </article>
+    `).join("");
+  };
+
+  const buildFilters = (view) => {
+    const modules = asArray(view?.modules);
+    moduleFilterEl.innerHTML = [
+      `<option value="all">全部模块</option>`,
+      ...modules.map((module) => `<option value="${module.slug}">${module.title}</option>`)
+    ].join("");
+    moduleFilterEl.value = state.filters.module;
+    sortEl.value = state.filters.sort;
+    searchEl.value = state.filters.search;
+    rangeEl.value = String(state.filters.minPower);
+    rangeValueEl.textContent = String(state.filters.minPower);
+  };
+
+  const getFilteredSkills = (view) => {
+    const keyword = state.filters.search.trim().toLowerCase();
+    const moduleValue = state.filters.module;
+    const minPower = toNumber(state.filters.minPower, 0);
+    const all = asArray(view?.skills);
+    const filtered = all.filter((skill) => {
+      if (moduleValue !== "all" && skill.moduleSlug !== moduleValue) return false;
+      if (skill.power < minPower) return false;
+      if (!keyword) return true;
+      const haystack = [
+        skill.name,
+        skill.description,
+        skill.category,
+        skill.moduleTitle,
+        ...asArray(skill.keywords)
+      ].join(" ").toLowerCase();
+      return haystack.includes(keyword);
+    });
+    return sortSkills(filtered, state.filters.sort);
+  };
+
+  const getSelectedSkill = (skills) => {
+    if (!skills.length) return null;
+    const matched = skills.find((item) => item.id === state.selectedSkillId);
+    return matched || skills[0];
+  };
+
+  const renderDetail = (skill, view) => {
+    if (!skill) {
+      detailEl.innerHTML = `<div class="empty">当前筛选条件下没有技能节点。你可以降低强度阈值或切换模块。</div>`;
+      return;
+    }
+    const passScore = Math.max(1, skill.battlePassScore || 1);
+    const questions = Math.max(passScore, skill.battleQuestionCount || passScore);
+    const rewardDensity = clamp((skill.xpReward + skill.gemReward * 10) / 220, 0, 1);
+
+    detailEl.innerHTML = `
+      <p class="detail-sub">${skill.moduleTitle}</p>
+      <h3 class="detail-title">${skill.name}</h3>
+      <p class="detail-desc">${skill.description}</p>
+
+      <div class="meter">
+        <div class="meter-head"><span>技能强度</span><strong>${formatNumber(skill.power)}</strong></div>
+        <div class="meter-track"><div class="meter-fill" style="width:${clamp(skill.power, 0, 100)}%"></div></div>
+      </div>
+      <div class="meter">
+        <div class="meter-head"><span>挑战难度</span><strong>${formatNumber(skill.difficulty)} / 10</strong></div>
+        <div class="meter-track"><div class="meter-fill" style="width:${clamp(skill.difficulty * 10, 0, 100)}%"></div></div>
+      </div>
+      <div class="meter">
+        <div class="meter-head"><span>奖励密度</span><strong>${Math.round(rewardDensity * 100)}%</strong></div>
+        <div class="meter-track"><div class="meter-fill" style="width:${Math.round(rewardDensity * 100)}%"></div></div>
+      </div>
+
+      <div class="kv">
+        <span>分类 ${skill.category}</span>
+        <span>+${formatNumber(skill.xpReward)} XP</span>
+        <span>+${formatNumber(skill.gemReward)} GEM</span>
+        <span>比拼 ${passScore}/${questions}</span>
+      </div>
+
+      <div class="kv">
+        ${asArray(skill.keywords).length
+          ? asArray(skill.keywords).map((item) => `<span>${item}</span>`).join("")
+          : `<span>暂无关键词</span>`}
+      </div>
+
+      <div class="actions">
+        <a class="btn primary" href="${skill.moduleHref}">进入模块</a>
+        <a class="btn" href="${skill.moduleHref}">开始比拼</a>
+      </div>
+
+      <div class="empty">提示：进入模块后，打开右侧 HUD 的 <strong>Battle</strong> 标签页即可参与知识比拼并领取奖励。</div>
+    `;
+  };
+
+  const renderLegend = (filteredSkills) => {
+    if (!filteredSkills.length) {
+      legendEl.innerHTML = "<span>暂无数据</span>";
+      return;
+    }
+    const categoryMap = new Map();
+    for (const skill of filteredSkills) {
+      const key = skill.category || "Core";
+      categoryMap.set(key, (categoryMap.get(key) || 0) + 1);
+    }
+    const rows = Array.from(categoryMap.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 8)
+      .map(([name, count]) => `<span>${name} · ${count}</span>`);
+    legendEl.innerHTML = rows.join("");
+  };
+
+  const renderGraph = (view, filteredSkills, selectedSkill) => {
+    const modules = asArray(view?.modules);
+    if (!modules.length || !filteredSkills.length) {
+      graphEl.innerHTML = `<text class="g-empty" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle">当前条件下没有可视化节点</text>`;
+      return;
+    }
+
+    const byModule = new Map(modules.map((module) => [module.slug, []]));
+    for (const skill of filteredSkills) {
+      if (!byModule.has(skill.moduleSlug)) byModule.set(skill.moduleSlug, []);
+      byModule.get(skill.moduleSlug).push(skill);
+    }
+
+    const centerX = 430;
+    const centerY = 350;
+    const moduleRadius = 250;
+    const moduleNodes = modules.map((module, idx) => {
+      const angle = ((idx / Math.max(1, modules.length)) * Math.PI * 2) - (Math.PI / 2);
+      return {
+        ...module,
+        x: centerX + Math.cos(angle) * moduleRadius,
+        y: centerY + Math.sin(angle) * moduleRadius,
+        angle,
+        skills: byModule.get(module.slug) || []
+      };
+    });
+
+    const skillNodes = [];
+    moduleNodes.forEach((moduleNode, moduleIndex) => {
+      const skills = moduleNode.skills;
+      const localRadius = 66 + Math.min(72, skills.length * 4);
+      skills.forEach((skill, idx) => {
+        const spread = ((idx / Math.max(1, skills.length)) * Math.PI * 2) + moduleIndex * 0.42;
+        const x = moduleNode.x + Math.cos(spread) * localRadius;
+        const y = moduleNode.y + Math.sin(spread) * localRadius;
+        skillNodes.push({
+          ...skill,
+          x,
+          y,
+          moduleX: moduleNode.x,
+          moduleY: moduleNode.y,
+          r: 9 + Math.round(clamp(skill.power, 1, 100) / 22)
+        });
+      });
+    });
+
+    const backbone = moduleNodes
+      .map((node, idx) => {
+        const next = moduleNodes[idx + 1];
+        if (!next) return "";
+        return `<line class="g-backbone" x1="${node.x.toFixed(2)}" y1="${node.y.toFixed(2)}" x2="${next.x.toFixed(2)}" y2="${next.y.toFixed(2)}" />`;
+      })
+      .join("");
+
+    const edges = skillNodes
+      .map((node) => `<line class="g-edge" x1="${node.moduleX.toFixed(2)}" y1="${node.moduleY.toFixed(2)}" x2="${node.x.toFixed(2)}" y2="${node.y.toFixed(2)}" />`)
+      .join("");
+
+    const moduleSvg = moduleNodes
+      .map((node) => {
+        const inactive = !node.skills.length ? "inactive" : "";
+        return `
+          <g class="g-module ${inactive}" data-module-slug="${node.slug}" tabindex="0">
+            <circle cx="${node.x.toFixed(2)}" cy="${node.y.toFixed(2)}" r="15" />
+            <text x="${node.x.toFixed(2)}" y="${(node.y - 24).toFixed(2)}" text-anchor="middle">M${node.order || moduleNodes.indexOf(node) + 1}</text>
+          </g>
+        `;
+      })
+      .join("");
+
+    const skillSvg = skillNodes
+      .map((node) => {
+        const active = selectedSkill && node.id === selectedSkill.id ? "active" : "";
+        const short = toText(node.name).slice(0, 10);
+        return `
+          <g class="g-skill ${active}" data-skill-id="${node.id}" tabindex="0">
+            <circle cx="${node.x.toFixed(2)}" cy="${node.y.toFixed(2)}" r="${node.r}" />
+            <text x="${node.x.toFixed(2)}" y="${(node.y + node.r + 12).toFixed(2)}" text-anchor="middle">${short}</text>
+          </g>
+        `;
+      })
+      .join("");
+
+    graphEl.innerHTML = `<g>${backbone}${edges}${moduleSvg}${skillSvg}</g>`;
+  };
+
+  const renderModules = (view, filteredSkills) => {
+    const modules = asArray(view?.modules);
+    if (!modules.length) {
+      moduleTrackEl.innerHTML = `<article class="empty">没有可用模块。</article>`;
+      return;
+    }
+
+    const grouped = new Map(modules.map((module) => [module.slug, []]));
+    filteredSkills.forEach((skill) => {
+      if (!grouped.has(skill.moduleSlug)) grouped.set(skill.moduleSlug, []);
+      grouped.get(skill.moduleSlug).push(skill);
+    });
+
+    moduleTrackEl.innerHTML = modules.map((module, idx) => {
+      const rows = grouped.get(module.slug) || [];
+      const totalXp = rows.reduce((sum, skill) => sum + skill.xpReward, 0);
+      const totalGem = rows.reduce((sum, skill) => sum + skill.gemReward, 0);
+      const averagePower = rows.length ? rows.reduce((sum, skill) => sum + skill.power, 0) / rows.length : 0;
+      const active = state.filters.module === module.slug ? "active" : "";
+      return `
+        <article class="module-card ${active}" style="animation-delay:${idx * 40}ms">
+          <h3 class="module-title">${module.title}</h3>
+          <div class="module-kv">
+            <span>技能 ${rows.length}</span>
+            <span>均强 ${Math.round(averagePower)}</span>
+            <span>+${formatNumber(totalXp)} XP</span>
+            <span>+${formatNumber(totalGem)} GEM</span>
+          </div>
+          <div class="module-actions">
+            <button type="button" data-module-focus="${module.slug}">聚焦</button>
+            <a href="${module.href || ("/experiences/" + encodeURIComponent(module.slug))}">打开模块</a>
+          </div>
+        </article>
+      `;
+    }).join("");
+  };
+
+  const render = () => {
+    const view = state.view;
+    if (!view) return;
+    const filteredSkills = getFilteredSkills(view);
+    const selected = getSelectedSkill(filteredSkills);
+    state.selectedSkillId = selected ? selected.id : "";
+
+    renderMetrics(view, filteredSkills);
+    renderDetail(selected, view);
+    renderLegend(filteredSkills);
+    renderGraph(view, filteredSkills, selected);
+    renderModules(view, filteredSkills);
+
+    graphTipEl.textContent = filteredSkills.length
+      ? `共 ${filteredSkills.length} 个技能节点，当前聚焦 ${selected ? selected.name : "-"}`
+      : "没有匹配节点，尝试放宽筛选条件。";
+  };
+
+  const buildView = async (bookId) => {
+    if (state.cache.has(bookId)) return state.cache.get(bookId);
+
+    const bookPayload = await fetchJson("/api/content/books/" + encodeURIComponent(bookId));
+    const book = bookPayload?.book || {};
+    const modules = asArray(book.modules);
+
+    const moduleRows = await Promise.all(modules.map(async (module, idx) => {
+      const fallbackHref = "/experiences/" + encodeURIComponent(toText(module.slug));
+      const moduleMeta = await fetchJson("/api/think-tank/modules/" + encodeURIComponent(module.slug))
+        .then((payload) => payload?.module || {})
+        .catch(() => ({}));
+      return {
+        slug: toText(module.slug),
+        title: toText(module.title, `模块 ${idx + 1}`),
+        href: toText(module.href, fallbackHref),
+        order: toNumber(module.order, idx + 1),
+        knowledgeBattle: moduleMeta?.knowledgeBattle || null,
+        skillPoints: asArray(moduleMeta?.skillPoints)
+      };
+    }));
+
+    const skills = [];
+    moduleRows.forEach((module, moduleIndex) => {
+      asArray(module.skillPoints).forEach((skill, idx) => {
+        skills.push(normalizeSkill(skill, module, idx + moduleIndex));
+      });
+    });
+
+    const view = {
+      bookId,
+      title: toText(book.title, bookId),
+      modules: moduleRows,
+      skills,
+      summary: toText(book.knowledgeSummary)
+    };
+    state.cache.set(bookId, view);
+    return view;
+  };
+
+  const selectBook = async (bookId) => {
+    if (!bookId) return;
+    state.activeBookId = bookId;
+    state.filters.module = "all";
+    state.filters.search = "";
+    state.filters.minPower = 0;
+    state.filters.sort = "power";
+    state.selectedSkillId = "";
+    renderBookTabs();
+    setStatus("正在生成技能星图...");
+
+    try {
+      state.view = await buildView(bookId);
+      buildFilters(state.view);
+      render();
+      setStatus(`已加载 ${state.view.title} · ${state.view.skills.length} 个技能节点`);
+    } catch (error) {
+      state.view = null;
+      metricsEl.innerHTML = "";
+      moduleTrackEl.innerHTML = "<article class='empty'>加载失败，请稍后重试。</article>";
+      graphEl.innerHTML = `<text class="g-empty" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle">加载失败</text>`;
+      detailEl.innerHTML = `<article class="empty">${toText(error?.message, "加载失败")}</article>`;
+      setStatus(toText(error?.message, "加载失败"), "error");
+    }
+  };
+
+  tabsEl.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+    const button = target.closest("[data-book-id]");
+    if (!(button instanceof HTMLElement)) return;
+    const nextId = toText(button.getAttribute("data-book-id"));
+    if (!nextId || nextId === state.activeBookId) return;
+    selectBook(nextId);
+  });
+
+  moduleFilterEl.addEventListener("change", () => {
+    state.filters.module = toText(moduleFilterEl.value, "all");
+    render();
+  });
+
+  sortEl.addEventListener("change", () => {
+    state.filters.sort = toText(sortEl.value, "power");
+    render();
+  });
+
+  searchEl.addEventListener("input", () => {
+    state.filters.search = toText(searchEl.value);
+    render();
+  });
+
+  rangeEl.addEventListener("input", () => {
+    state.filters.minPower = clamp(toNumber(rangeEl.value, 0), 0, 100);
+    rangeValueEl.textContent = String(state.filters.minPower);
+    render();
+  });
+
+  graphEl.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+    const skillNode = target.closest("[data-skill-id]");
+    if (skillNode instanceof HTMLElement) {
+      state.selectedSkillId = toText(skillNode.getAttribute("data-skill-id"));
+      render();
+      return;
+    }
+    const moduleNode = target.closest("[data-module-slug]");
+    if (moduleNode instanceof HTMLElement) {
+      const slug = toText(moduleNode.getAttribute("data-module-slug"));
+      state.filters.module = slug || "all";
+      moduleFilterEl.value = state.filters.module;
+      render();
+    }
+  });
+
+  graphEl.addEventListener("keydown", (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+    if (event.key !== "Enter" && event.key !== " ") return;
+    event.preventDefault();
+    const skillId = toText(target.getAttribute("data-skill-id"));
+    const moduleSlug = toText(target.getAttribute("data-module-slug"));
+    if (skillId) {
+      state.selectedSkillId = skillId;
+      render();
+      return;
+    }
+    if (moduleSlug) {
+      state.filters.module = moduleSlug;
+      moduleFilterEl.value = moduleSlug;
+      render();
+    }
+  });
+
+  moduleTrackEl.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+    const focusBtn = target.closest("[data-module-focus]");
+    if (!(focusBtn instanceof HTMLElement)) return;
+    const slug = toText(focusBtn.getAttribute("data-module-focus"));
+    if (!slug) return;
+    state.filters.module = slug;
+    moduleFilterEl.value = slug;
+    render();
+  });
+
+  const init = async () => {
+    setStatus("正在读取书籍数据...");
+    try {
+      const payload = await fetchJson("/api/content/books");
+      state.books = asArray(payload?.books).filter((book) => book && book.id);
+      if (!state.books.length) {
+        setStatus("暂无可用书籍", "error");
+        detailEl.innerHTML = "<article class='empty'>暂无书籍数据。</article>";
+        return;
+      }
+      renderBookTabs();
+      await selectBook(state.books[0].id);
+    } catch (error) {
+      setStatus(toText(error?.message, "加载书籍失败"), "error");
+      detailEl.innerHTML = `<article class="empty">${toText(error?.message, "加载失败")}</article>`;
+    }
+  };
+
+  init();
+})();
+</script>
+</body>
+</html>

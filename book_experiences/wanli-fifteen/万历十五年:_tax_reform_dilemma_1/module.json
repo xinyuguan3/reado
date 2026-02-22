@@ -1,5 +1,375 @@
 {
   "slug": "tax-reform-dilemma-1",
   "title": "第一幕：万历皇帝",
-  "order": 1
+  "order": 1,
+  "generatedBy": "playable-content-engine",
+  "generatedAt": "2026-02-22T16:27:19.403Z",
+  "bookSummary": "Module 1: reado: 万历十五年决策 (全中文版) reado: 万历十五年决策 (全中文版) reado 万历十五年 assessment 帝国现状 国库财富 65% 白银储备尚算充足，但增长乏力 礼教和谐 80% 文官集团对目前的礼法秩序感到满意 皇权 45% 陛下，您的敕令在内阁正面临重重阻力",
+  "skillPoints": [
+    {
+      "id": "skill-reado",
+      "name": "Skill · reado",
+      "description": "Use \"reado\" to diagnose tradeoffs before making a decision.",
+      "category": "analysis",
+      "keywords": [
+        "reado",
+        "tradeoff",
+        "mechanism"
+      ],
+      "difficulty": 1,
+      "power": 42,
+      "xpReward": 44,
+      "gemReward": 6,
+      "moduleHint": 1
+    },
+    {
+      "id": "skill-history",
+      "name": "Skill · history",
+      "description": "Use \"history\" to diagnose tradeoffs before making a decision.",
+      "category": "execution",
+      "keywords": [
+        "history",
+        "tradeoff",
+        "mechanism"
+      ],
+      "difficulty": 1,
+      "power": 42,
+      "xpReward": 44,
+      "gemReward": 6,
+      "moduleHint": 1
+    }
+  ],
+  "knowledgeBattle": {
+    "passScore": 2,
+    "reward": {
+      "xp": 140,
+      "gems": 23
+    },
+    "questions": [
+      {
+        "id": "battle-entry-reado",
+        "prompt": "关于「reado」，哪项解释最符合书中机制？",
+        "options": [
+          "Module 1: reado: 万历十五年决策 (全中文版) reado: 万历十五年决策 (全中文版) reado 万历十五年 assessment 帝国现状 国库财富 65% 白银储备尚算充足，但增长乏力",
+          "礼教和谐 80% 文官集团对目前的礼法秩序感到满意",
+          "皇权 45% 陛下，您的敕令在内阁正面临重重阻力",
+          "history_edu 万历十五年 · 丁亥年 《万历十五年》仿真模拟 | 第一章：税制改革 内阁首辅 · 张居正 内阁奏折 论一条鞭法之推行 “臣启陛下：现行税制弊端丛生，豪强巧取豪夺"
+        ],
+        "answerIndex": 0,
+        "explanation": "Track how \"reado\" changes outcomes across scenarios instead of judging single events.",
+        "skillId": "",
+        "entryId": "entry-reado",
+        "moduleHint": 1
+      },
+      {
+        "id": "battle-entry-history",
+        "prompt": "关于「history」，哪项解释最符合书中机制？",
+        "options": [
+          "此举虽可充盈国库、精简吏治，然乡绅豪门因利益受损，必将借口祖制、百般阻挠",
+          "Module 1: reado: 万历十五年决策 (全中文版) reado: 万历十五年决策 (全中文版) reado 万历十五年 assessment 帝国现状 国库财富 65% 白银储备尚算充足，但增长乏力",
+          "礼教和谐 80% 文官集团对目前的礼法秩序感到满意",
+          "皇权 45% 陛下，您的敕令在内阁正面临重重阻力"
+        ],
+        "answerIndex": 0,
+        "explanation": "Track how \"history\" changes outcomes across scenarios instead of judging single events.",
+        "skillId": "",
+        "entryId": "entry-history",
+        "moduleHint": 1
+      }
+    ]
+  },
+  "thinkTankEntries": [
+    {
+      "id": "entry-reado",
+      "term": "reado",
+      "title": "reado",
+      "summary": "Module 1: reado: 万历十五年决策 (全中文版) reado: 万历十五年决策 (全中文版) reado 万历十五年 assessment 帝国现状 国库财富 65% 白银储备尚算充足，但增长乏力",
+      "insight": "Track how \"reado\" changes outcomes across scenarios instead of judging single events.",
+      "sourceCue": "",
+      "tags": [
+        "reado",
+        "knowledge-fragment"
+      ],
+      "relatedTerms": [
+        "推行进度",
+        "万历十五年",
+        "gavel"
+      ],
+      "moduleHint": 1,
+      "relatedEntryRefs": [
+        {
+          "id": "entry",
+          "title": "推行进度",
+          "term": "推行进度",
+          "books": [
+            "wanli-fifteen",
+            "sapiens",
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 10
+        },
+        {
+          "id": "entry-experiences",
+          "title": "experiences",
+          "term": "experiences",
+          "books": [
+            "wanli-fifteen",
+            "sapiens",
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 8
+        },
+        {
+          "id": "entry-history",
+          "title": "history",
+          "term": "history",
+          "books": [
+            "wanli-fifteen",
+            "sapiens"
+          ],
+          "score": 7
+        },
+        {
+          "id": "entry-arrow",
+          "title": "arrow",
+          "term": "arrow",
+          "books": [
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 6
+        },
+        {
+          "id": "entry-dna",
+          "title": "dna",
+          "term": "dna",
+          "books": [
+            "sapiens"
+          ],
+          "score": 6
+        },
+        {
+          "id": "entry-gavel",
+          "title": "gavel",
+          "term": "gavel",
+          "books": [
+            "wanli-fifteen"
+          ],
+          "score": 6
+        },
+        {
+          "id": "entry-science",
+          "title": "science",
+          "term": "science",
+          "books": [
+            "sapiens"
+          ],
+          "score": 6
+        },
+        {
+          "id": "entry-trending",
+          "title": "trending",
+          "term": "trending",
+          "books": [
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 6
+        }
+      ]
+    },
+    {
+      "id": "entry-history",
+      "term": "history",
+      "title": "history",
+      "summary": "此举虽可充盈国库、精简吏治，然乡绅豪门因利益受损，必将借口祖制、百般阻挠",
+      "insight": "Track how \"history\" changes outcomes across scenarios instead of judging single events.",
+      "sourceCue": "",
+      "tags": [
+        "history",
+        "knowledge-fragment"
+      ],
+      "relatedTerms": [
+        "reado",
+        "推行进度",
+        "万历十五年"
+      ],
+      "moduleHint": 1,
+      "relatedEntryRefs": [
+        {
+          "id": "entry",
+          "title": "推行进度",
+          "term": "推行进度",
+          "books": [
+            "wanli-fifteen",
+            "sapiens",
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 6
+        },
+        {
+          "id": "entry-experiences",
+          "title": "experiences",
+          "term": "experiences",
+          "books": [
+            "wanli-fifteen",
+            "sapiens",
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 6
+        },
+        {
+          "id": "entry-reado",
+          "title": "reado",
+          "term": "reado",
+          "books": [
+            "wanli-fifteen",
+            "sapiens",
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 6
+        },
+        {
+          "id": "entry-accessibility",
+          "title": "accessibility",
+          "term": "accessibility",
+          "books": [
+            "sapiens"
+          ],
+          "score": 5
+        },
+        {
+          "id": "entry-balance",
+          "title": "balance",
+          "term": "balance",
+          "books": [
+            "wanli-fifteen"
+          ],
+          "score": 5
+        },
+        {
+          "id": "entry-dna",
+          "title": "dna",
+          "term": "dna",
+          "books": [
+            "sapiens"
+          ],
+          "score": 5
+        },
+        {
+          "id": "entry-edu",
+          "title": "edu",
+          "term": "edu",
+          "books": [
+            "wanli-fifteen"
+          ],
+          "score": 5
+        },
+        {
+          "id": "entry-gavel",
+          "title": "gavel",
+          "term": "gavel",
+          "books": [
+            "wanli-fifteen"
+          ],
+          "score": 5
+        }
+      ]
+    },
+    {
+      "id": "entry-experiences",
+      "term": "experiences",
+      "title": "experiences",
+      "summary": "国库储备 稳定 hourglass_empty 万历十四年 · 丙戌年 所谓“天子”，不过是制度的囚徒",
+      "insight": "Track how \"experiences\" changes outcomes across scenarios instead of judging single events.",
+      "sourceCue": "",
+      "tags": [
+        "experiences",
+        "knowledge-fragment"
+      ],
+      "relatedTerms": [
+        "reado",
+        "推行进度",
+        "万历十五年"
+      ],
+      "moduleHint": 1,
+      "relatedEntryRefs": [
+        {
+          "id": "entry",
+          "title": "推行进度",
+          "term": "推行进度",
+          "books": [
+            "wanli-fifteen",
+            "sapiens",
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 8
+        },
+        {
+          "id": "entry-reado",
+          "title": "reado",
+          "term": "reado",
+          "books": [
+            "wanli-fifteen",
+            "sapiens",
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 8
+        },
+        {
+          "id": "entry-history",
+          "title": "history",
+          "term": "history",
+          "books": [
+            "wanli-fifteen",
+            "sapiens"
+          ],
+          "score": 7
+        },
+        {
+          "id": "entry-accessibility",
+          "title": "accessibility",
+          "term": "accessibility",
+          "books": [
+            "sapiens"
+          ],
+          "score": 5
+        },
+        {
+          "id": "entry-add",
+          "title": "add",
+          "term": "add",
+          "books": [
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 5
+        },
+        {
+          "id": "entry-arrow",
+          "title": "arrow",
+          "term": "arrow",
+          "books": [
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 5
+        },
+        {
+          "id": "entry-balance",
+          "title": "balance",
+          "term": "balance",
+          "books": [
+            "wanli-fifteen"
+          ],
+          "score": 5
+        },
+        {
+          "id": "entry-circle",
+          "title": "circle",
+          "term": "circle",
+          "books": [
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 5
+        }
+      ]
+    }
+  ]
 }

@@ -1,0 +1,256 @@
+{
+  "slug": "zero-to-one-the-monopolist-s-choice-4",
+  "title": "reado: 创业成功七问诊断台",
+  "order": 5,
+  "generatedBy": "playable-content-engine",
+  "generatedAt": "2026-02-22T16:28:59.834Z",
+  "bookSummary": "Module 1: reado: 从0到1模拟 (全中文版) reado: 从0到1模拟 (全中文版) rocket_launch reado: 从0到1模拟器 第四关：垄断者的抉择 构想 战略 增长 规模化 account_balance_wallet 1000万 创投资金 中文简体 analytics person 创始人数据 防御力 较低 市场规模 巨大 创始人远见 独特逆向 预估估值 ￥2800万 lightbulb 彼得·蒂尔的洞见： “竞争是给失败者准备的 如果你想创造持久的价值，那就建立垄断 ” 帕罗奥图, 加州 初创项目计划书 #8291 垂直搜索引擎 专为 AI 模型打造 一个索引研究论文和模型权重的专业平台，为机器学习工程师提供比通用搜索好10倍的相关性",
+  "skillPoints": [
+    {
+      "id": "skill-psychology",
+      "name": "Skill · psychology",
+      "description": "Use \"psychology\" to diagnose tradeoffs before making a decision.",
+      "category": "analysis",
+      "keywords": [
+        "psychology",
+        "tradeoff",
+        "mechanism"
+      ],
+      "difficulty": 5,
+      "power": 114,
+      "xpReward": 100,
+      "gemReward": 14,
+      "moduleHint": 5
+    }
+  ],
+  "knowledgeBattle": {
+    "passScore": 1,
+    "reward": {
+      "xp": 194,
+      "gems": 32
+    },
+    "questions": [
+      {
+        "id": "battle-entry-psychology",
+        "prompt": "关于「psychology」，哪项解释最符合书中机制？",
+        "options": [
+          "” group 目标人群 算法工程师 attach_money 定价 ￥350/月 speed 核心技术 专有算法 “蒂尔”路径 stars 垄断细分市场 首先统治细小的机器学习研究市场",
+          "Module 1: reado: 从0到1模拟 (全中文版) reado: 从0到1模拟 (全中文版) rocket_launch reado: 从0到1模拟器 第四关：垄断者的抉择 构想 战略 增长 规模化 account_balance_wallet 1000万 创投资金 中文简体 analytics person 创始人数据 防御力 较低 市场规模 巨大 创始人远见 独特逆向 预估估值 ￥2800万 lightbulb 彼得·蒂尔",
+          "如果你想创造持久的价值，那就建立垄断",
+          "” 帕罗奥图, 加州 初创项目计划书 #8291 垂直搜索引擎 专为 AI 模型打造 一个索引研究论文和模型权重的专业平台，为机器学习工程师提供比通用搜索好10倍的相关性"
+        ],
+        "answerIndex": 0,
+        "explanation": "Track how \"psychology\" changes outcomes across scenarios instead of judging single events.",
+        "skillId": "",
+        "entryId": "entry-psychology",
+        "moduleHint": 5
+      }
+    ]
+  },
+  "thinkTankEntries": [
+    {
+      "id": "entry-psychology",
+      "term": "psychology",
+      "title": "psychology",
+      "summary": "” group 目标人群 算法工程师 attach_money 定价 ￥350/月 speed 核心技术 专有算法 “蒂尔”路径 stars 垄断细分市场 首先统治细小的机器学习研究市场",
+      "insight": "Track how \"psychology\" changes outcomes across scenarios instead of judging single events.",
+      "sourceCue": "",
+      "tags": [
+        "psychology",
+        "knowledge-fragment"
+      ],
+      "relatedTerms": [
+        "reado",
+        "radio",
+        "button"
+      ],
+      "moduleHint": 5,
+      "relatedEntryRefs": [
+        {
+          "id": "entry",
+          "title": "推行进度",
+          "term": "推行进度",
+          "books": [
+            "wanli-fifteen",
+            "sapiens",
+            "principles-for-navigating-big-debt-crises",
+            "zero-to-one"
+          ],
+          "score": 6
+        },
+        {
+          "id": "entry-experiences",
+          "title": "experiences",
+          "term": "experiences",
+          "books": [
+            "wanli-fifteen",
+            "sapiens",
+            "principles-for-navigating-big-debt-crises",
+            "zero-to-one"
+          ],
+          "score": 6
+        },
+        {
+          "id": "entry-reado",
+          "title": "reado",
+          "term": "reado",
+          "books": [
+            "wanli-fifteen",
+            "sapiens",
+            "principles-for-navigating-big-debt-crises",
+            "zero-to-one"
+          ],
+          "score": 6
+        },
+        {
+          "id": "entry-accessibility",
+          "title": "accessibility",
+          "term": "accessibility",
+          "books": [
+            "sapiens"
+          ],
+          "score": 5
+        },
+        {
+          "id": "entry-button",
+          "title": "button",
+          "term": "button",
+          "books": [
+            "zero-to-one"
+          ],
+          "score": 5
+        },
+        {
+          "id": "entry-dna",
+          "title": "dna",
+          "term": "dna",
+          "books": [
+            "sapiens"
+          ],
+          "score": 5
+        },
+        {
+          "id": "entry-down",
+          "title": "down",
+          "term": "down",
+          "books": [
+            "zero-to-one"
+          ],
+          "score": 5
+        },
+        {
+          "id": "entry-history",
+          "title": "history",
+          "term": "history",
+          "books": [
+            "wanli-fifteen",
+            "sapiens"
+          ],
+          "score": 5
+        }
+      ]
+    },
+    {
+      "id": "entry-status",
+      "term": "status",
+      "title": "status",
+      "summary": "总论 3 关键提问：你是否掌握了一个“非共识但正确”的秘密",
+      "insight": "Track how \"status\" changes outcomes across scenarios instead of judging single events.",
+      "sourceCue": "",
+      "tags": [
+        "status",
+        "knowledge-fragment"
+      ],
+      "relatedTerms": [
+        "reado",
+        "radio",
+        "button"
+      ],
+      "moduleHint": 5,
+      "relatedEntryRefs": [
+        {
+          "id": "entry",
+          "title": "推行进度",
+          "term": "推行进度",
+          "books": [
+            "wanli-fifteen",
+            "sapiens",
+            "principles-for-navigating-big-debt-crises",
+            "zero-to-one"
+          ],
+          "score": 4
+        },
+        {
+          "id": "entry-button",
+          "title": "button",
+          "term": "button",
+          "books": [
+            "zero-to-one"
+          ],
+          "score": 4
+        },
+        {
+          "id": "entry-down",
+          "title": "down",
+          "term": "down",
+          "books": [
+            "zero-to-one"
+          ],
+          "score": 4
+        },
+        {
+          "id": "entry-experiences",
+          "title": "experiences",
+          "term": "experiences",
+          "books": [
+            "wanli-fifteen",
+            "sapiens",
+            "principles-for-navigating-big-debt-crises",
+            "zero-to-one"
+          ],
+          "score": 4
+        },
+        {
+          "id": "entry-one",
+          "title": "one",
+          "term": "one",
+          "books": [
+            "zero-to-one"
+          ],
+          "score": 4
+        },
+        {
+          "id": "entry-psychology",
+          "title": "psychology",
+          "term": "psychology",
+          "books": [
+            "sapiens",
+            "zero-to-one"
+          ],
+          "score": 4
+        },
+        {
+          "id": "entry-radio",
+          "title": "radio",
+          "term": "radio",
+          "books": [
+            "zero-to-one"
+          ],
+          "score": 4
+        },
+        {
+          "id": "entry-reado",
+          "title": "reado",
+          "term": "reado",
+          "books": [
+            "wanli-fifteen",
+            "sapiens",
+            "principles-for-navigating-big-debt-crises",
+            "zero-to-one"
+          ],
+          "score": 4
+        }
+      ]
+    }
+  ]
+}

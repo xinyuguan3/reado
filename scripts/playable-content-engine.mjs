@@ -7,7 +7,10 @@ import { pathToFileURL } from "node:url";
 import { promisify } from "node:util";
 
 const STATE_FILE = "reado-playable-works.json";
+const THINK_TANK_STATE_FILE = "reado-think-tank.json";
 const MAX_TEXT_LEN = 120_000;
+const MAX_CONTEXT_TEXT_LEN = Math.max(60_000, Number(process.env.READO_MAX_CONTEXT_CHARS || 180_000));
+const MAX_UPLOAD_BYTES = Math.max(1, Number(process.env.READO_UPLOAD_MAX_MB || 25)) * 1024 * 1024;
 const PLACEHOLDER_PNG_BASE64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO8B6xkAAAAASUVORK5CYII=";
 const CODEX_CONFIG_PATH = path.join(process.env.HOME || "", ".codex", "config.toml");
 const CODEX_AUTH_PATH = path.join(process.env.HOME || "", ".codex", "auth.json");
@@ -348,6 +351,99 @@ async function fetchTextWithTimeout(url, options = {}, timeoutMs = 15000) {
   }
 }
 
+function extractTextFromParserPayload(payload, depth = 0) {
+  if (depth > 8 || payload === null || payload === undefined) return "";
+  if (typeof payload === "string") return toText(payload);
+  if (Array.isArray(payload)) {
+    return payload
+      .map((item) => extractTextFromParserPayload(item, depth + 1))
+      .filter(Boolean)
+      .join("\n\n")
+      .trim();
+  }
+  if (typeof payload !== "object") return "";
+
+  const direct = toText(
+    payload?.text,
+    toText(payload?.content, toText(payload?.fulltext, toText(payload?.markdown, toText(payload?.body))))
+  );
+  if (direct) return direct;
+
+  const pageText = toArray(payload?.pages)
+    .map((page) => {
+      const text = toText(page?.text, toText(page?.content, toText(page?.markdown, toText(page?.body))));
+      const imageHints = toArray(page?.images)
+        .map((img) => toText(img?.caption, toText(img?.description, toText(img?.ocrText))))
+        .filter(Boolean)
+        .join("\n");
+      return [text, imageHints].filter(Boolean).join("\n");
+    })
+    .filter(Boolean)
+    .join("\n\n")
+    .trim();
+  if (pageText) return pageText;
+
+  const chunkText = toArray(payload?.chunks)
+    .map((chunk) => toText(chunk?.text, toText(chunk?.content, toText(chunk?.markdown))))
+    .filter(Boolean)
+    .join("\n\n")
+    .trim();
+  if (chunkText) return chunkText;
+
+  const likelyKeys = ["data", "result", "results", "output", "document", "documents", "payload", "items"];
+  for (const key of likelyKeys) {
+    const nested = extractTextFromParserPayload(payload?.[key], depth + 1);
+    if (nested) return nested;
+  }
+  return "";
+}
+
+async function parsePdfViaBridgeEndpoint({
+  endpoint,
+  apiKey,
+  provider,
+  name,
+  mimeType,
+  contentBase64,
+  timeoutMs = 90000
+}) {
+  const normalizedEndpoint = toText(endpoint);
+  if (!normalizedEndpoint) {
+    throw new Error("PDF parser endpoint is missing");
+  }
+  const response = await fetchWithTimeout(
+    normalizedEndpoint,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(toText(apiKey) ? { Authorization: `Bearer ${apiKey}` } : {})
+      },
+      body: JSON.stringify({
+        provider: toText(provider),
+        name: toText(name, "source.pdf"),
+        mimeType: toText(mimeType, "application/pdf"),
+        contentBase64: toText(contentBase64),
+        options: {
+          include_images: true,
+          output: "text"
+        }
+      })
+    },
+    timeoutMs
+  );
+  const payload = await response.json().catch(() => ({}));
+  const text = extractTextFromParserPayload(payload);
+  if (!response.ok || !text) {
+    const error = toText(payload?.error, toText(payload?.message, `PDF parser request failed (${response.status})`));
+    throw new Error(error);
+  }
+  return {
+    text: clamp(text.replace(/\s+/g, " ").trim(), MAX_CONTEXT_TEXT_LEN),
+    provider: toText(payload?.provider, toText(provider, "external_parser"))
+  };
+}
+
 function pickIntroLines(sentences, count = 8) {
   return sentences.slice(0, count).map((item) => item.slice(0, 120));
 }
@@ -661,7 +757,7 @@ async function fetchUrlContext(urlText) {
   const text = contentType.includes("html") ? stripHtml(body) : body.trim();
   return {
     title,
-    contextText: clamp(text, 60_000),
+    contextText: clamp(text, MAX_CONTEXT_TEXT_LEN),
     sources: [{ title, url: normalized, snippet: clamp(text, 1200) }]
   };
 }
@@ -735,7 +831,7 @@ async function fetchBookContext(bookName) {
   const sources = tasks
     .filter((item) => item.status === "fulfilled" && item.value)
     .map((item) => item.value);
-  const contextText = clamp(sources.map((item) => item.snippet).join("\n\n"), 60_000);
+  const contextText = clamp(sources.map((item) => item.snippet).join("\n\n"), MAX_CONTEXT_TEXT_LEN);
   return {
     title: query,
     contextText: contextText || `Topic: ${query}. Summarize key ideas conservatively using public knowledge.`,
@@ -773,7 +869,7 @@ async function extractTextFromEpubBuffer(buffer) {
       }
       if (parts.join("\n\n").length > 120_000) break;
     }
-    const merged = clamp(parts.join("\n\n"), 60_000);
+    const merged = clamp(parts.join("\n\n"), MAX_CONTEXT_TEXT_LEN);
     if (!merged) throw new Error("epub text extraction returned empty content");
     return merged;
   } finally {
@@ -797,7 +893,7 @@ function buildContextFromSourceInputs({ sources, contextText, fallbackTitle }) {
       .map((item) => [item.title, item.content || item.snippet].filter(Boolean).join("\n"))
       .filter(Boolean)
       .join("\n\n"),
-    60_000
+    MAX_CONTEXT_TEXT_LEN
   );
   return {
     title: toText(fallbackTitle, normalizedSources[0]?.title || "Imported Sources"),
@@ -958,7 +1054,7 @@ async function fetchArxivSummaryByUrl(urlText) {
   if (!title && !summary) return null;
   return {
     title: title || `arXiv ${arxivId}`,
-    contextText: clamp(summary || title, 60_000),
+    contextText: clamp(summary || title, MAX_CONTEXT_TEXT_LEN),
     sources: [
       {
         title: title || `arXiv ${arxivId}`,
@@ -1327,8 +1423,8 @@ function compileModuleHtml({ bookId, blueprint, module, moduleIndex, moduleCount
   const escapedSetting = escapeHtml(blueprint.setting || "Complex-system scenario simulation");
   const escapedMission = escapeHtml(blueprint.mission || "Find a better strategy under constraints.");
   const escapedThemeLabel = escapeHtml(theme.label);
-  const nextHref = nextModuleSlug ? `/experiences/${encodeURIComponent(nextModuleSlug)}.html` : "";
-  const prevHref = prevModuleSlug ? `/experiences/${encodeURIComponent(prevModuleSlug)}.html` : "";
+  const nextHref = nextModuleSlug ? `/experiences/${encodeURIComponent(nextModuleSlug)}` : "";
+  const prevHref = prevModuleSlug ? `/experiences/${encodeURIComponent(prevModuleSlug)}` : "";
   const hubBookSlug = encodeURIComponent(bookId);
 
   const intelList = toArray(module.intel).length > 0
@@ -1587,7 +1683,7 @@ function compileModuleHtml({ bookId, blueprint, module, moduleIndex, moduleCount
         <p>${escapedTakeaway}</p>
       </div>
       <div id="end-actions" class="end-actions">
-        ${nextHref ? `<a class="btn primary" href="${nextHref}">Next Scene</a>` : `<a class="btn primary" href="/books/${hubBookSlug}.html">Back to Book Hub</a>`}
+        ${nextHref ? `<a class="btn primary" href="${nextHref}">Next Scene</a>` : `<a class="btn primary" href="/books/${hubBookSlug}">Back to Book Hub</a>`}
         ${prevHref ? `<a class="btn" href="${prevHref}">Previous Scene</a>` : ""}
         <button id="retry-btn" class="btn" type="button">Restart Module</button>
       </div>
@@ -1726,7 +1822,7 @@ function compileModuleHtml({ bookId, blueprint, module, moduleIndex, moduleCount
       paintRound();
 
       try {
-        localStorage.setItem("reado_last_experience_href", "/experiences/${encodeURIComponent(moduleSlug)}.html");
+        localStorage.setItem("reado_last_experience_href", "/experiences/${encodeURIComponent(moduleSlug)}");
       } catch {}
     })();
   </script>
@@ -1959,9 +2055,9 @@ async function generateModuleHtmlWithStitchBridge({
   const moduleTakeaway = toText(module?.takeaway);
   const moduleRounds = toArray(module?.rounds).slice(0, 3);
   const moduleIntel = toArray(module?.intel).slice(0, 6).map((item) => `- ${toText(item)}`).join("\n");
-  const nextHref = nextModuleSlug ? `/experiences/${encodeURIComponent(nextModuleSlug)}.html` : `/books/${encodeURIComponent(bookId)}.html`;
-  const prevHref = prevModuleSlug ? `/experiences/${encodeURIComponent(prevModuleSlug)}.html` : "/pages/gamified-learning-hub-dashboard-1.html";
-  const hubHref = `/books/${encodeURIComponent(bookId)}.html`;
+  const nextHref = nextModuleSlug ? `/experiences/${encodeURIComponent(nextModuleSlug)}` : `/books/${encodeURIComponent(bookId)}`;
+  const prevHref = prevModuleSlug ? `/experiences/${encodeURIComponent(prevModuleSlug)}` : "/pages/gamified-learning-hub-dashboard-1";
+  const hubHref = `/books/${encodeURIComponent(bookId)}`;
   const design = buildDesignDirection(bookTitle, moduleTitle, moduleIndex);
   const focusedContext = makeFocusedContextSnippet({
     contextText,
@@ -2141,9 +2237,9 @@ async function generateModuleHtmlWithLlm({
   const moduleOpening = toText(module?.opening, "");
   const moduleIntel = toArray(module?.intel).slice(0, 6).map((item) => `- ${toText(item)}`).join("\n");
 
-  const nextHref = nextModuleSlug ? `/experiences/${encodeURIComponent(nextModuleSlug)}.html` : `/books/${encodeURIComponent(bookId)}.html`;
-  const prevHref = prevModuleSlug ? `/experiences/${encodeURIComponent(prevModuleSlug)}.html` : "/pages/gamified-learning-hub-dashboard-1.html";
-  const hubHref = `/books/${encodeURIComponent(bookId)}.html`;
+  const nextHref = nextModuleSlug ? `/experiences/${encodeURIComponent(nextModuleSlug)}` : `/books/${encodeURIComponent(bookId)}`;
+  const prevHref = prevModuleSlug ? `/experiences/${encodeURIComponent(prevModuleSlug)}` : "/pages/gamified-learning-hub-dashboard-1";
+  const hubHref = `/books/${encodeURIComponent(bookId)}`;
 
   const design = buildDesignDirection(bookTitle, moduleTitle, moduleIndex);
   const focusedContext = makeFocusedContextSnippet({
@@ -2245,6 +2341,483 @@ async function generateModuleHtmlWithLlm({
   return html;
 }
 
+function clampInt(value, min, max, fallback = 0) {
+  const num = Number(value);
+  if (!Number.isFinite(num)) return fallback;
+  return Math.max(min, Math.min(max, Math.round(num)));
+}
+
+function uniqueStrings(items, max = 24, maxLen = 80) {
+  const seen = new Set();
+  const out = [];
+  for (const item of toArray(items)) {
+    const value = clamp(toText(item), maxLen);
+    if (!value) continue;
+    const key = value.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(value);
+    if (out.length >= max) break;
+  }
+  return out;
+}
+
+function normalizeSkillPointNode(raw, index = 0) {
+  const row = raw && typeof raw === "object" ? raw : {};
+  const name = clamp(
+    toText(row.name, toText(row.title, toText(row.label, `Skill Point ${index + 1}`))),
+    72
+  );
+  const id = clamp(
+    slugify(toText(row.id, name || `skill-point-${index + 1}`)) || `skill-point-${index + 1}`,
+    60
+  );
+  const description = clamp(
+    toText(row.description, toText(row.summary, "Apply this concept to make better decisions in real contexts.")),
+    320
+  );
+  const difficulty = clampInt(row.difficulty, 1, 5, clampInt((index % 5) + 1, 1, 5, 3));
+  const power = clampInt(row.power, 10, 100, difficulty * 18 + 24);
+  const xpReward = clampInt(row.xpReward ?? row.xp, 10, 280, 30 + difficulty * 14);
+  const gemReward = clampInt(row.gemReward ?? row.gems, 1, 88, 4 + difficulty * 2);
+  const moduleHint = clampInt(row.moduleHint, 0, 99, 0);
+  return {
+    id,
+    name,
+    description,
+    category: clamp(toText(row.category, "core"), 40),
+    keywords: uniqueStrings(row.keywords, 8, 28),
+    difficulty,
+    power,
+    xpReward,
+    gemReward,
+    moduleHint
+  };
+}
+
+function normalizeThinkTankEntry(raw, index = 0) {
+  const row = raw && typeof raw === "object" ? raw : {};
+  const term = clamp(toText(row.term, toText(row.keyword, toText(row.title, `Concept ${index + 1}`))), 72);
+  const title = clamp(toText(row.title, term), 88);
+  const id = clamp(slugify(toText(row.id, title || `entry-${index + 1}`)) || `entry-${index + 1}`, 60);
+  return {
+    id,
+    term: clamp(term, 72),
+    title,
+    summary: clamp(toText(row.summary, toText(row.definition, "Core concept distilled from this book.")), 360),
+    insight: clamp(toText(row.insight, toText(row.whyItMatters, "Use this concept to evaluate tradeoffs and mechanisms.")), 320),
+    sourceCue: clamp(toText(row.sourceCue, toText(row.sourceHint, "")), 200),
+    tags: uniqueStrings(row.tags, 10, 28),
+    relatedTerms: uniqueStrings(row.relatedTerms, 10, 40),
+    moduleHint: clampInt(row.moduleHint, 0, 99, 0)
+  };
+}
+
+function normalizeBattleQuestion(raw, index = 0) {
+  const row = raw && typeof raw === "object" ? raw : {};
+  const options = uniqueStrings(row.options, 4, 220);
+  const normalizedOptions = options.length >= 2
+    ? options
+    : ["Focus on mechanisms and constraints", "Rely on intuition without evidence"];
+  const answerIndex = clampInt(row.answerIndex, 0, normalizedOptions.length - 1, 0);
+  const id = clamp(slugify(toText(row.id, `battle-q-${index + 1}`)) || `battle-q-${index + 1}`, 60);
+  return {
+    id,
+    prompt: clamp(toText(row.prompt, toText(row.question, "Which interpretation best aligns with this module's core mechanism?")), 220),
+    options: normalizedOptions,
+    answerIndex,
+    explanation: clamp(toText(row.explanation, "Correct choices should align with causal logic and evidence from the source."), 260),
+    skillId: clamp(toText(row.skillId), 60),
+    entryId: clamp(toText(row.entryId, toText(row.knowledgeEntryId)), 60),
+    moduleHint: clampInt(row.moduleHint, 0, 99, 0)
+  };
+}
+
+function buildFallbackKnowledgePack({ title, contextText, sourceLines, moduleCount = 3 }) {
+  const terms = extractGroundingTerms(`${contextText}\n${sourceLines}`, 32).slice(0, 16);
+  const sentences = splitSentences(contextText).slice(0, 40);
+  const seedTerms = terms.length > 0 ? terms : ["system tradeoff", "causal mechanism", "decision constraint", "long-term feedback"];
+
+  const skillPoints = seedTerms.slice(0, Math.max(4, Math.min(8, moduleCount * 2))).map((term, idx) => normalizeSkillPointNode({
+    id: `skill-${term}`,
+    name: `Skill · ${term}`,
+    description: `Use "${term}" to diagnose tradeoffs before making a decision.`,
+    category: idx % 2 === 0 ? "analysis" : "execution",
+    keywords: [term, "tradeoff", "mechanism"],
+    difficulty: (idx % 5) + 1,
+    moduleHint: (idx % Math.max(1, moduleCount)) + 1
+  }, idx));
+
+  const thinkTankEntries = seedTerms.slice(0, Math.max(6, Math.min(14, moduleCount * 4))).map((term, idx) => {
+    const sentence = sentences[idx] || sentences[0] || `This book frames "${term}" as a key driver in decision quality.`;
+    return normalizeThinkTankEntry({
+      id: `entry-${term}`,
+      term,
+      title: term,
+      summary: sentence,
+      insight: `Track how "${term}" changes outcomes across scenarios instead of judging single events.`,
+      tags: [term, "knowledge-fragment"],
+      relatedTerms: seedTerms.filter((item) => item !== term).slice(0, 3),
+      moduleHint: (idx % Math.max(1, moduleCount)) + 1
+    }, idx);
+  });
+
+  const battleQuestions = thinkTankEntries.slice(0, Math.max(4, Math.min(10, moduleCount * 3))).map((entry, idx) => {
+    const distractors = thinkTankEntries
+      .filter((item) => item.id !== entry.id)
+      .slice(0, 3)
+      .map((item) => item.summary);
+    return normalizeBattleQuestion({
+      id: `battle-${entry.id}`,
+      prompt: `关于「${entry.title}」，哪项解释最符合书中机制？`,
+      options: [entry.summary, ...distractors].slice(0, 4),
+      answerIndex: 0,
+      explanation: entry.insight,
+      entryId: entry.id,
+      moduleHint: entry.moduleHint
+    }, idx);
+  });
+
+  const summarySeed = sentences.slice(0, 3).join(" ");
+  return {
+    bookSummary: clamp(summarySeed || `A playable interpretation of ${title}.`, 420),
+    skillPoints,
+    thinkTankEntries,
+    knowledgeBattle: {
+      passScore: Math.max(2, Math.ceil(Math.max(1, battleQuestions.length) * 0.6)),
+      reward: {
+        xp: clampInt(50 + moduleCount * 18, 30, 280, 96),
+        gems: clampInt(8 + moduleCount * 3, 4, 88, 18)
+      },
+      questions: battleQuestions
+    }
+  };
+}
+
+function normalizeKnowledgePack(raw, { title, contextText, sourceLines, moduleCount = 3 } = {}) {
+  const fallback = buildFallbackKnowledgePack({ title, contextText, sourceLines, moduleCount });
+  const row = raw && typeof raw === "object" ? raw : {};
+
+  const skillPoints = toArray(row.skillPoints || row.skills)
+    .map((item, idx) => normalizeSkillPointNode(item, idx))
+    .slice(0, 16);
+  const entries = toArray(row.thinkTankEntries || row.entries || row.lexicon)
+    .map((item, idx) => normalizeThinkTankEntry(item, idx))
+    .slice(0, 24);
+  const questions = toArray(row.battleQuestions || row.questions || row.knowledgeBattle?.questions)
+    .map((item, idx) => normalizeBattleQuestion(item, idx))
+    .slice(0, 24);
+
+  const normalized = {
+    bookSummary: clamp(toText(row.bookSummary, toText(row.summary, fallback.bookSummary)), 420),
+    skillPoints: skillPoints.length ? skillPoints : fallback.skillPoints,
+    thinkTankEntries: entries.length ? entries : fallback.thinkTankEntries,
+    knowledgeBattle: {
+      passScore: Math.max(
+        1,
+        clampInt(
+          row.knowledgeBattle?.passScore ?? row.passScore,
+          1,
+          99,
+          fallback.knowledgeBattle.passScore
+        )
+      ),
+      reward: {
+        xp: clampInt(
+          row.knowledgeBattle?.reward?.xp ?? row.reward?.xp,
+          10,
+          400,
+          fallback.knowledgeBattle.reward.xp
+        ),
+        gems: clampInt(
+          row.knowledgeBattle?.reward?.gems ?? row.reward?.gems,
+          1,
+          120,
+          fallback.knowledgeBattle.reward.gems
+        )
+      },
+      questions: questions.length ? questions : fallback.knowledgeBattle.questions
+    }
+  };
+
+  return normalized;
+}
+
+async function generateKnowledgePackWithLlm({
+  endpoint,
+  apiKey,
+  model,
+  title,
+  contextText,
+  sourceLines,
+  moduleCount
+}) {
+  const focusedContext = makeFocusedContextSnippet({
+    contextText,
+    sourceLines,
+    focusText: `${title}\n${extractGroundingTerms(contextText, 18).join(" ")}`,
+    maxLen: 8500
+  });
+
+  const prompt = [
+    "You are generating a gamified knowledge graph for one playable book.",
+    "Return strict JSON only.",
+    "Schema:",
+    "{",
+    '  "bookSummary": string,',
+    '  "skillPoints": [',
+    '    {"id": string, "name": string, "description": string, "category": string, "keywords": string[], "difficulty": number, "power": number, "xpReward": number, "gemReward": number, "moduleHint": number}',
+    "  ],",
+    '  "thinkTankEntries": [',
+    '    {"id": string, "term": string, "title": string, "summary": string, "insight": string, "sourceCue": string, "tags": string[], "relatedTerms": string[], "moduleHint": number}',
+    "  ],",
+    '  "knowledgeBattle": {',
+    '    "passScore": number,',
+    '    "reward": {"xp": number, "gems": number},',
+    '    "questions": [',
+    '      {"id": string, "prompt": string, "options": string[], "answerIndex": number, "explanation": string, "skillId": string, "entryId": string, "moduleHint": number}',
+    "    ]",
+    "  }",
+    "}",
+    "",
+    "Constraints:",
+    `- moduleHint in [1, ${Math.max(1, moduleCount)}].`,
+    "- skillPoints: 6-12 nodes, each actionable and non-generic.",
+    "- thinkTankEntries: 8-20 entries, concise but mechanism-focused.",
+    "- questions: 6-14 multiple-choice items with exactly 4 options each.",
+    "- answerIndex must be valid and map to grounded evidence.",
+    "- Keep everything tied to source context; avoid generic learning advice.",
+    "",
+    `Topic: ${title}`,
+    "",
+    "Context summary:",
+    focusedContext || clamp(contextText, 8000),
+    "",
+    "Source references:",
+    clamp(sourceLines, 5000)
+  ].join("\n");
+
+  const content = await requestLlmText({
+    endpoint,
+    apiKey,
+    model,
+    prompt,
+    systemText: "Return strict JSON only. No markdown.",
+    maxTokens: 3200,
+    timeoutMs: 120000,
+    retries: 1,
+    temperature: 0.35
+  });
+  const parsed = extractJsonBlock(content);
+  if (!parsed) throw new Error("LLM knowledge pack returned non-JSON content");
+  return parsed;
+}
+
+function resolveModuleIndexHint(hint, moduleRows, moduleCount) {
+  const count = Math.max(1, Number(moduleCount) || 1);
+  const numeric = clampInt(hint, 0, 99, 0);
+  if (numeric >= 1 && numeric <= count) return numeric - 1;
+  const text = toText(hint).toLowerCase();
+  if (!text) return -1;
+  const fromDigit = text.match(/\d+/);
+  if (fromDigit) {
+    const idx = clampInt(fromDigit[0], 1, count, 1) - 1;
+    return idx;
+  }
+  const rows = toArray(moduleRows);
+  for (let i = 0; i < rows.length; i += 1) {
+    const title = toText(rows[i]?.title).toLowerCase();
+    if (title && text.includes(title.slice(0, Math.min(18, title.length)))) return i;
+  }
+  return -1;
+}
+
+function distributeKnowledgePackToModules({ moduleRows, moduleSlugs, knowledgePack }) {
+  const rows = toArray(moduleRows);
+  const slugs = toArray(moduleSlugs);
+  const count = Math.min(rows.length, slugs.length);
+  if (count < 1) return new Map();
+  const map = new Map();
+  for (let i = 0; i < count; i += 1) {
+    map.set(slugs[i], {
+      skillPoints: [],
+      thinkTankEntries: [],
+      knowledgeBattle: {
+        passScore: clampInt(knowledgePack?.knowledgeBattle?.passScore, 1, 99, 2),
+        reward: {
+          xp: clampInt(knowledgePack?.knowledgeBattle?.reward?.xp, 10, 400, 80),
+          gems: clampInt(knowledgePack?.knowledgeBattle?.reward?.gems, 1, 120, 12)
+        },
+        questions: []
+      }
+    });
+  }
+
+  const resolveTargetSlug = (hint, fallbackIndex) => {
+    const idx = resolveModuleIndexHint(hint, rows, count);
+    if (idx >= 0 && idx < count) return slugs[idx];
+    return slugs[fallbackIndex % count];
+  };
+
+  const skills = toArray(knowledgePack?.skillPoints);
+  skills.forEach((skill, idx) => {
+    const slug = resolveTargetSlug(skill?.moduleHint, idx);
+    map.get(slug)?.skillPoints.push(skill);
+  });
+
+  const entries = toArray(knowledgePack?.thinkTankEntries);
+  entries.forEach((entry, idx) => {
+    const slug = resolveTargetSlug(entry?.moduleHint, idx);
+    map.get(slug)?.thinkTankEntries.push(entry);
+  });
+
+  const questions = toArray(knowledgePack?.knowledgeBattle?.questions);
+  questions.forEach((question, idx) => {
+    let slug = "";
+    if (question?.entryId) {
+      for (const [moduleSlug, bucket] of map.entries()) {
+        if (toArray(bucket?.thinkTankEntries).some((entry) => entry.id === question.entryId)) {
+          slug = moduleSlug;
+          break;
+        }
+      }
+    }
+    if (!slug) {
+      slug = resolveTargetSlug(question?.moduleHint, idx);
+    }
+    map.get(slug)?.knowledgeBattle.questions.push(question);
+  });
+
+  for (const [slug, bucket] of map.entries()) {
+    if (!bucket.knowledgeBattle.questions.length) {
+      const localEntries = toArray(bucket.thinkTankEntries);
+      bucket.knowledgeBattle.questions = localEntries.slice(0, 2).map((entry, idx) => normalizeBattleQuestion({
+        id: `fallback-${slug}-${idx + 1}`,
+        prompt: `在该模块中，「${entry.title}」更强调哪种理解？`,
+        options: [
+          entry.summary,
+          "脱离机制地追求单点最优",
+          "忽略约束，只做理想化推演",
+          "随机选择，不看证据"
+        ],
+        answerIndex: 0,
+        explanation: entry.insight,
+        entryId: entry.id
+      }, idx));
+    }
+    const maxScore = Math.max(1, bucket.knowledgeBattle.questions.length);
+    bucket.knowledgeBattle.passScore = Math.max(1, Math.min(maxScore, bucket.knowledgeBattle.passScore || Math.ceil(maxScore * 0.6)));
+  }
+
+  return map;
+}
+
+function createEmptyThinkTankStore() {
+  return {
+    version: 1,
+    updated_at: "",
+    entries: [],
+    books: {}
+  };
+}
+
+function normalizeThinkTankStoreEntry(raw) {
+  const row = raw && typeof raw === "object" ? raw : {};
+  const id = clamp(slugify(toText(row.id, toText(row.title, toText(row.term, "entry")))) || "entry", 60);
+  return {
+    id,
+    term: clamp(toText(row.term, row.title), 72),
+    title: clamp(toText(row.title, row.term), 88),
+    summary: clamp(toText(row.summary), 420),
+    insight: clamp(toText(row.insight), 360),
+    sourceCue: clamp(toText(row.sourceCue), 220),
+    tags: uniqueStrings(row.tags, 20, 30),
+    relatedTerms: uniqueStrings(row.relatedTerms, 20, 42),
+    books: uniqueStrings(row.books, 64, 80),
+    modules: uniqueStrings(row.modules, 128, 120),
+    related: toArray(row.related)
+      .map((item) => ({
+        id: clamp(toText(item?.id), 60),
+        score: clampInt(item?.score, 1, 999, 1)
+      }))
+      .filter((item) => item.id)
+      .slice(0, 12),
+    created_at: toText(row.created_at),
+    updated_at: toText(row.updated_at)
+  };
+}
+
+function normalizeThinkTankStore(raw) {
+  const row = raw && typeof raw === "object" ? raw : createEmptyThinkTankStore();
+  const booksRaw = row.books && typeof row.books === "object" ? row.books : {};
+  const books = {};
+  for (const [bookId, item] of Object.entries(booksRaw)) {
+    const safeBookId = clamp(toText(bookId), 120);
+    if (!safeBookId) continue;
+    const bookRow = item && typeof item === "object" ? item : {};
+    books[safeBookId] = {
+      bookId: safeBookId,
+      title: clamp(toText(bookRow.title), 140),
+      summary: clamp(toText(bookRow.summary), 480),
+      entryIds: uniqueStrings(bookRow.entryIds, 200, 72),
+      skillPoints: toArray(bookRow.skillPoints)
+        .map((skill, idx) => normalizeSkillPointNode(skill, idx))
+        .slice(0, 40),
+      updated_at: toText(bookRow.updated_at)
+    };
+  }
+  return {
+    version: 1,
+    updated_at: toText(row.updated_at),
+    entries: toArray(row.entries).map((entry) => normalizeThinkTankStoreEntry(entry)),
+    books
+  };
+}
+
+function mergeUniqueStrings(base, append, max = 64, maxLen = 80) {
+  return uniqueStrings([...(toArray(base)), ...(toArray(append))], max, maxLen);
+}
+
+function buildTagSet(entry) {
+  return new Set([
+    ...toArray(entry?.tags),
+    ...toArray(entry?.relatedTerms),
+    ...toArray(splitTokens(`${entry?.term || ""} ${entry?.title || ""}`))
+  ].map((item) => String(item || "").toLowerCase()).filter(Boolean));
+}
+
+function computeThinkTankRelationScore(a, b) {
+  const aSet = buildTagSet(a);
+  const bSet = buildTagSet(b);
+  let overlap = 0;
+  for (const item of aSet) {
+    if (bSet.has(item)) overlap += 1;
+  }
+  const crossBook = toArray(a?.books).some((bookId) => !toArray(b?.books).includes(bookId));
+  return overlap + (crossBook ? 1 : 0);
+}
+
+function computeThinkTankRelations(entries) {
+  const rows = toArray(entries);
+  const relatedMap = new Map();
+  for (let i = 0; i < rows.length; i += 1) {
+    const base = rows[i];
+    if (!base?.id) continue;
+    const related = [];
+    for (let j = 0; j < rows.length; j += 1) {
+      if (i === j) continue;
+      const candidate = rows[j];
+      if (!candidate?.id) continue;
+      const score = computeThinkTankRelationScore(base, candidate);
+      if (score < 2) continue;
+      related.push({ id: candidate.id, score });
+    }
+    related.sort((x, y) => y.score - x.score || x.id.localeCompare(y.id));
+    relatedMap.set(base.id, related.slice(0, 10));
+  }
+  return relatedMap;
+}
+
 export class PlayableContentEngine {
   constructor({ rootDir, dataDir }) {
     this.rootDir = rootDir;
@@ -2252,6 +2825,7 @@ export class PlayableContentEngine {
     this.bookExperiencesDir = path.join(rootDir, "book_experiences");
     this.bookCoversDir = path.join(rootDir, "book_covers");
     this.statePath = path.join(dataDir, STATE_FILE);
+    this.thinkTankPath = path.join(dataDir, THINK_TANK_STATE_FILE);
     this.state = { works: [] };
 
     this.llmEndpoint = "";
@@ -2269,6 +2843,12 @@ export class PlayableContentEngine {
     this.htmlProvider = toText(process.env.READO_HTML_PROVIDER, this.stitchBridgeEndpoint ? "auto" : "llm").toLowerCase();
     this.parserWebhookUrl = toText(process.env.READO_PARSER_WEBHOOK_URL);
     this.parserWebhookToken = toText(process.env.READO_PARSER_WEBHOOK_TOKEN);
+    this.notebooklmBridgeEndpoint = toText(process.env.READO_NOTEBOOKLM_BRIDGE_ENDPOINT);
+    this.notebooklmBridgeApiKey = toText(process.env.READO_NOTEBOOKLM_BRIDGE_API_KEY);
+    this.pdfReaderMcpEndpoint = toText(process.env.READO_PDF_READER_MCP_ENDPOINT);
+    this.pdfReaderMcpApiKey = toText(process.env.READO_PDF_READER_MCP_API_KEY);
+    this.maxContextChars = MAX_CONTEXT_TEXT_LEN;
+    this.maxUploadBytes = MAX_UPLOAD_BYTES;
     this.skills = [];
     this.skillsLoaded = false;
   }
@@ -2289,12 +2869,14 @@ export class PlayableContentEngine {
     const id = toText(row.id);
     const kind = toText(row.kind);
     if (!id || !kind || typeof row.run !== "function") return;
+    const priority = Number.isFinite(Number(row.priority)) ? Number(row.priority) : 100;
     this.skills.push({
       id,
       kind,
       label: toText(row.label, id),
       description: toText(row.description),
       enabled: row.enabled !== false,
+      priority,
       source: toText(row.source, "builtin"),
       supports: typeof row.supports === "function" ? row.supports : null,
       run: row.run
@@ -2305,6 +2887,7 @@ export class PlayableContentEngine {
     return this.skills
       .filter((skill) => skill.kind === kind && skill.enabled)
       .sort((a, b) => {
+        if (a.priority !== b.priority) return a.priority - b.priority;
         const aBuiltin = a.source === "builtin" ? 1 : 0;
         const bBuiltin = b.source === "builtin" ? 1 : 0;
         if (aBuiltin !== bBuiltin) return aBuiltin - bBuiltin;
@@ -2319,6 +2902,7 @@ export class PlayableContentEngine {
       label: skill.label,
       description: skill.description,
       enabled: skill.enabled,
+      priority: skill.priority,
       source: skill.source
     }));
   }
@@ -2396,11 +2980,66 @@ export class PlayableContentEngine {
       run: async ({ buffer }) => ({ text: await extractTextFromEpubBuffer(buffer) })
     });
     this.registerSkill({
+      id: "ingest.pdf.notebooklm-bridge",
+      kind: "ingest",
+      label: "PDF via NotebookLM Bridge",
+      description: "Extract PDF text (and image-grounded descriptions) through a NotebookLM-compatible parser bridge",
+      enabled: Boolean(this.notebooklmBridgeEndpoint),
+      priority: 10,
+      source: "builtin",
+      supports: ({ mimeType, lowerName }) => (
+        String(mimeType || "") === "application/pdf" || String(lowerName || "").endsWith(".pdf")
+      ),
+      run: async ({ name, mimeType, contentBase64 }) => {
+        if (!this.notebooklmBridgeEndpoint) {
+          throw new Error("NotebookLM parser bridge is not configured");
+        }
+        const parsed = await parsePdfViaBridgeEndpoint({
+          endpoint: this.notebooklmBridgeEndpoint,
+          apiKey: this.notebooklmBridgeApiKey,
+          provider: "notebooklm_py",
+          name,
+          mimeType: mimeType || "application/pdf",
+          contentBase64,
+          timeoutMs: 120000
+        });
+        return { text: parsed.text };
+      }
+    });
+    this.registerSkill({
+      id: "ingest.pdf.reader-mcp-bridge",
+      kind: "ingest",
+      label: "PDF via PDF Reader MCP Bridge",
+      description: "Extract PDF text through pdf-reader-mcp HTTP bridge",
+      enabled: Boolean(this.pdfReaderMcpEndpoint),
+      priority: 20,
+      source: "builtin",
+      supports: ({ mimeType, lowerName }) => (
+        String(mimeType || "") === "application/pdf" || String(lowerName || "").endsWith(".pdf")
+      ),
+      run: async ({ name, mimeType, contentBase64 }) => {
+        if (!this.pdfReaderMcpEndpoint) {
+          throw new Error("PDF Reader MCP bridge is not configured");
+        }
+        const parsed = await parsePdfViaBridgeEndpoint({
+          endpoint: this.pdfReaderMcpEndpoint,
+          apiKey: this.pdfReaderMcpApiKey,
+          provider: "pdf_reader_mcp",
+          name,
+          mimeType: mimeType || "application/pdf",
+          contentBase64,
+          timeoutMs: 90000
+        });
+        return { text: parsed.text };
+      }
+    });
+    this.registerSkill({
       id: "ingest.pdf-webhook",
       kind: "ingest",
       label: "PDF Parser Webhook",
       description: "Extract PDF text via parser service",
       enabled: Boolean(this.parserWebhookUrl),
+      priority: 80,
       source: "builtin",
       supports: ({ mimeType, lowerName }) => (
         String(mimeType || "") === "application/pdf" || String(lowerName || "").endsWith(".pdf")
@@ -2418,6 +3057,7 @@ export class PlayableContentEngine {
               ...(this.parserWebhookToken ? { Authorization: `Bearer ${this.parserWebhookToken}` } : {})
             },
             body: JSON.stringify({
+              provider: "generic_webhook",
               name,
               mimeType: mimeType || "application/pdf",
               contentBase64
@@ -2426,11 +3066,11 @@ export class PlayableContentEngine {
           45000
         );
         const parserData = await parserRes.json().catch(() => ({}));
-        const text = toText(parserData?.text);
+        const text = extractTextFromParserPayload(parserData);
         if (!parserRes.ok || !text) {
-          throw new Error(parserData?.error || "PDF parsing failed");
+          throw new Error(toText(parserData?.error, "PDF parsing failed"));
         }
-        return { text };
+        return { text: clamp(text.replace(/\s+/g, " ").trim(), MAX_CONTEXT_TEXT_LEN) };
       }
     });
 
@@ -2556,6 +3196,135 @@ export class PlayableContentEngine {
   async persist() {
     await fs.mkdir(this.dataDir, { recursive: true });
     await fs.writeFile(this.statePath, JSON.stringify(this.state, null, 2), "utf8");
+  }
+
+  async loadThinkTankStore() {
+    try {
+      const raw = await fs.readFile(this.thinkTankPath, "utf8");
+      const parsed = JSON.parse(raw);
+      return normalizeThinkTankStore(parsed);
+    } catch {
+      return createEmptyThinkTankStore();
+    }
+  }
+
+  async persistThinkTankStore(store) {
+    await fs.mkdir(this.dataDir, { recursive: true });
+    await fs.writeFile(this.thinkTankPath, JSON.stringify(normalizeThinkTankStore(store), null, 2), "utf8");
+  }
+
+  async generateKnowledgePackFromSummary({ title, contextText, sourceLines, moduleCount, hooks = null }) {
+    let raw = null;
+    let mode = "fallback";
+    if (this.llmApiKey && this.llmEndpoint) {
+      try {
+        this.emitProgress(hooks, "building_knowledge_pack", 40, "Generating skill tree + think tank from summary");
+        raw = await generateKnowledgePackWithLlm({
+          endpoint: this.llmEndpoint,
+          apiKey: this.llmApiKey,
+          model: this.llmModel,
+          title,
+          contextText,
+          sourceLines,
+          moduleCount
+        });
+        mode = "llm";
+      } catch (error) {
+        console.warn("[studio] knowledge pack generation failed, fallback enabled:", toText(error?.message, "unknown"));
+      }
+    }
+    const normalized = normalizeKnowledgePack(raw, {
+      title,
+      contextText,
+      sourceLines,
+      moduleCount
+    });
+    return { ...normalized, generationMode: mode };
+  }
+
+  async upsertThinkTankForBook({ bookId, bookTitle, bookSummary, moduleKnowledgeMap, skillPoints }) {
+    const store = await this.loadThinkTankStore();
+    const entryById = new Map(toArray(store.entries).map((entry) => [entry.id, normalizeThinkTankStoreEntry(entry)]));
+    const now = nowIso();
+    const nextBookEntryIds = new Set(toArray(store.books?.[bookId]?.entryIds));
+    const moduleMap = moduleKnowledgeMap instanceof Map ? moduleKnowledgeMap : new Map();
+
+    for (const [moduleSlug, bucket] of moduleMap.entries()) {
+      const entries = toArray(bucket?.thinkTankEntries);
+      for (const localEntry of entries) {
+        const normalizedLocal = normalizeThinkTankEntry(localEntry);
+        const existing = entryById.get(normalizedLocal.id);
+        if (!existing) {
+          entryById.set(normalizedLocal.id, normalizeThinkTankStoreEntry({
+            ...normalizedLocal,
+            books: [bookId],
+            modules: [moduleSlug],
+            created_at: now,
+            updated_at: now
+          }));
+        } else {
+          existing.term = clamp(toText(existing.term, normalizedLocal.term), 72);
+          existing.title = clamp(toText(existing.title, normalizedLocal.title), 88);
+          existing.summary = clamp(toText(existing.summary, normalizedLocal.summary), 420);
+          existing.insight = clamp(toText(existing.insight, normalizedLocal.insight), 360);
+          existing.sourceCue = clamp(toText(existing.sourceCue, normalizedLocal.sourceCue), 220);
+          existing.tags = mergeUniqueStrings(existing.tags, normalizedLocal.tags, 20, 30);
+          existing.relatedTerms = mergeUniqueStrings(existing.relatedTerms, normalizedLocal.relatedTerms, 20, 42);
+          existing.books = mergeUniqueStrings(existing.books, [bookId], 64, 80);
+          existing.modules = mergeUniqueStrings(existing.modules, [moduleSlug], 128, 120);
+          existing.updated_at = now;
+          entryById.set(existing.id, normalizeThinkTankStoreEntry(existing));
+        }
+        nextBookEntryIds.add(normalizedLocal.id);
+      }
+    }
+
+    const nextEntries = [...entryById.values()];
+    const relatedMap = computeThinkTankRelations(nextEntries);
+    for (const entry of nextEntries) {
+      entry.related = toArray(relatedMap.get(entry.id));
+      if (!entry.created_at) entry.created_at = now;
+      entry.updated_at = now;
+    }
+
+    store.entries = nextEntries;
+    store.books = store.books && typeof store.books === "object" ? store.books : {};
+    store.books[bookId] = {
+      bookId,
+      title: clamp(toText(bookTitle), 140),
+      summary: clamp(toText(bookSummary), 480),
+      entryIds: [...nextBookEntryIds],
+      skillPoints: toArray(skillPoints).map((item, idx) => normalizeSkillPointNode(item, idx)).slice(0, 40),
+      updated_at: now
+    };
+    store.updated_at = now;
+    await this.persistThinkTankStore(store);
+
+    const entryLookup = new Map(store.entries.map((entry) => [entry.id, entry]));
+    const relatedRefsByEntryId = {};
+    for (const entryId of nextBookEntryIds) {
+      const relRows = toArray(entryLookup.get(entryId)?.related)
+        .map((item) => {
+          const row = entryLookup.get(item?.id);
+          if (!row) return null;
+          return {
+            id: row.id,
+            title: row.title,
+            term: row.term,
+            books: toArray(row.books).slice(0, 8),
+            score: clampInt(item?.score, 1, 999, 1)
+          };
+        })
+        .filter(Boolean)
+        .slice(0, 8);
+      relatedRefsByEntryId[entryId] = relRows;
+    }
+
+    return {
+      storeUpdatedAt: store.updated_at,
+      book: store.books[bookId],
+      relatedRefsByEntryId
+    };
   }
 
   async listWorks(limit = 60) {
@@ -2720,7 +3489,7 @@ export class PlayableContentEngine {
     ).catch(() => null);
     if (!response || !response.ok) return null;
     const data = await response.json().catch(() => ({}));
-    const content = clamp(toText(data?.content || data?.text), 60_000);
+    const content = clamp(toText(data?.content || data?.text), MAX_CONTEXT_TEXT_LEN);
     if (!content) return null;
     return {
       title: toText(data?.title, toText(urlText)),
@@ -2760,7 +3529,7 @@ export class PlayableContentEngine {
           title: toText(payload?.title, toText(row.title, arxiv.title)),
           url: toText(row.url, normalized),
           snippet: clamp(toText(row.snippet, arxiv.contextText), 1200),
-          content: clamp(toText(arxiv.contextText), 60_000),
+          content: clamp(toText(arxiv.contextText), MAX_CONTEXT_TEXT_LEN),
           parsedBy: "url.arxiv"
         };
       }
@@ -2797,7 +3566,7 @@ export class PlayableContentEngine {
       ? body.match(/<title[^>]*>([\s\S]*?)<\/title>/i)
       : null;
     const title = toText(payload?.title, toText(stripHtml(titleMatch?.[1]), normalized));
-    const normalizedText = clamp(text.replace(/\s+/g, " ").trim(), 60_000);
+    const normalizedText = clamp(text.replace(/\s+/g, " ").trim(), MAX_CONTEXT_TEXT_LEN);
     if (!normalizedText) {
       throw new Error("no readable text extracted from url");
     }
@@ -2853,7 +3622,7 @@ export class PlayableContentEngine {
     }
     const buffer = Buffer.from(contentBase64, "base64");
     if (!buffer || buffer.length === 0) throw new Error("file is empty");
-    if (buffer.length > 12 * 1024 * 1024) throw new Error("file too large (>12MB)");
+    if (buffer.length > MAX_UPLOAD_BYTES) throw new Error(`file too large (> ${Math.floor(MAX_UPLOAD_BYTES / (1024 * 1024))}MB)`);
 
     const lowerName = name.toLowerCase();
     if (lowerName.endsWith(".mobi") || lowerName.endsWith(".azw") || lowerName.endsWith(".azw3")) {
@@ -2886,10 +3655,12 @@ export class PlayableContentEngine {
       if (errors.length > 0) {
         throw new Error(errors[errors.length - 1]);
       }
-      throw new Error("unsupported file type. use txt/md/csv/json/html/epub or pdf(with parser webhook)");
+      throw new Error(
+        "unsupported file type. use txt/md/csv/json/html/epub or pdf(with notebooklm bridge / pdf mcp bridge / parser webhook / local pdf skill)"
+      );
     }
 
-    const normalizedText = clamp(text.replace(/\s+/g, " ").trim(), 60_000);
+    const normalizedText = clamp(text.replace(/\s+/g, " ").trim(), MAX_CONTEXT_TEXT_LEN);
     if (!normalizedText) throw new Error("no readable text extracted from file");
     this.emitProgress(hooks, "ingesting_file", 90, `File parsed: ${name}`);
 
@@ -2956,6 +3727,22 @@ export class PlayableContentEngine {
       .join("\n\n");
     const groundingTerms = extractGroundingTerms(`${context.contextText}\n${sourceLines}`, 28);
     this.emitProgress(hooks, "preparing_sources", 28, `Sources prepared (${toArray(context.sources).length} items)`);
+    const knowledgePackPromise = this.generateKnowledgePackFromSummary({
+      title,
+      contextText: context.contextText || input,
+      sourceLines,
+      moduleCount,
+      hooks
+    }).catch((error) => ({
+      ...normalizeKnowledgePack(null, {
+        title,
+        contextText: context.contextText || input,
+        sourceLines,
+        moduleCount
+      }),
+      generationMode: "fallback",
+      error: toText(error?.message, "knowledge pack generation failed")
+    }));
 
     let blueprintRaw = null;
     let llmError = "";
@@ -3153,27 +3940,106 @@ export class PlayableContentEngine {
       }
       await fs.writeFile(path.join(moduleDir, "code.html"), html, "utf8");
       await fs.writeFile(path.join(moduleDir, "screen.png"), Buffer.from(PLACEHOLDER_PNG_BASE64, "base64"));
+      writtenModules.push({
+        slug: moduleSlug,
+        title: module.title,
+        order: i + 1,
+        moduleDir
+      });
+    }
+
+    const knowledgePack = await knowledgePackPromise;
+    const moduleKnowledgeMap = distributeKnowledgePackToModules({
+      moduleRows,
+      moduleSlugs,
+      knowledgePack
+    });
+    let thinkTankSnapshot = {
+      storeUpdatedAt: "",
+      book: null,
+      relatedRefsByEntryId: {}
+    };
+    try {
+      thinkTankSnapshot = await this.upsertThinkTankForBook({
+        bookId,
+        bookTitle: blueprint.title,
+        bookSummary: knowledgePack.bookSummary,
+        moduleKnowledgeMap,
+        skillPoints: knowledgePack.skillPoints
+      });
+    } catch (error) {
+      console.warn("[studio] think tank merge failed:", toText(error?.message, "unknown"));
+    }
+    const metaGeneratedAt = nowIso();
+    const totalSkillPoints = toArray(knowledgePack.skillPoints).length;
+    const totalThinkTankEntries = toArray(knowledgePack.thinkTankEntries).length;
+    const totalBattleQuestions = toArray(knowledgePack.knowledgeBattle?.questions).length;
+
+    for (const moduleRow of writtenModules) {
+      const bucket = moduleKnowledgeMap.get(moduleRow.slug) || {
+        skillPoints: [],
+        thinkTankEntries: [],
+        knowledgeBattle: {
+          passScore: clampInt(knowledgePack?.knowledgeBattle?.passScore, 1, 99, 2),
+          reward: {
+            xp: clampInt(knowledgePack?.knowledgeBattle?.reward?.xp, 10, 400, 80),
+            gems: clampInt(knowledgePack?.knowledgeBattle?.reward?.gems, 1, 120, 12)
+          },
+          questions: []
+        }
+      };
+      const entriesWithLinks = toArray(bucket.thinkTankEntries).map((entry) => ({
+        ...entry,
+        relatedEntryRefs: toArray(thinkTankSnapshot?.relatedRefsByEntryId?.[entry.id]).slice(0, 8)
+      }));
+
       await fs.writeFile(
-        path.join(moduleDir, "module.json"),
+        path.join(moduleRow.moduleDir, "module.json"),
         JSON.stringify(
           {
-            slug: moduleSlug,
-            order: i + 1,
-            title: module.title,
+            slug: moduleRow.slug,
+            order: moduleRow.order,
+            title: moduleRow.title,
             generatedBy: "playable-content-engine",
-            generatedAt: nowIso()
+            generatedAt: metaGeneratedAt,
+            bookSummary: clamp(toText(knowledgePack.bookSummary, blueprint.hook), 420),
+            skillPoints: toArray(bucket.skillPoints).slice(0, 12),
+            knowledgeBattle: {
+              passScore: clampInt(bucket.knowledgeBattle?.passScore, 1, 99, 2),
+              reward: {
+                xp: clampInt(bucket.knowledgeBattle?.reward?.xp, 10, 400, 80),
+                gems: clampInt(bucket.knowledgeBattle?.reward?.gems, 1, 120, 12)
+              },
+              questions: toArray(bucket.knowledgeBattle?.questions).slice(0, 12)
+            },
+            thinkTankEntries: entriesWithLinks.slice(0, 18)
           },
           null,
           2
         ),
         "utf8"
       );
-      writtenModules.push({
-        slug: moduleSlug,
-        title: module.title,
-        order: i + 1
-      });
     }
+
+    await fs.writeFile(
+      path.join(this.bookExperiencesDir, bookId, "knowledge-index.json"),
+      JSON.stringify(
+        {
+          bookId,
+          title: blueprint.title,
+          summary: clamp(toText(knowledgePack.bookSummary, blueprint.hook), 420),
+          generationMode: toText(knowledgePack.generationMode, "fallback"),
+          skillPointCount: totalSkillPoints,
+          thinkTankEntryCount: totalThinkTankEntries,
+          battleQuestionCount: totalBattleQuestions,
+          thinkTankUpdatedAt: toText(thinkTankSnapshot?.storeUpdatedAt),
+          generatedAt: metaGeneratedAt
+        },
+        null,
+        2
+      ),
+      "utf8"
+    );
 
     await fs.writeFile(path.join(this.bookCoversDir, `${bookId}.png`), Buffer.from(PLACEHOLDER_PNG_BASE64, "base64"));
     this.emitProgress(hooks, "publishing_catalog", 96, "Modules compiled, publishing to catalog");
@@ -3201,6 +4067,11 @@ export class PlayableContentEngine {
       is_public: false,
       public_at: "",
       grounding: groundingReport || null,
+      knowledge_pack_mode: toText(knowledgePack?.generationMode, "fallback"),
+      skill_point_count: totalSkillPoints,
+      think_tank_entry_count: totalThinkTankEntries,
+      knowledge_battle_question_count: totalBattleQuestions,
+      think_tank_updated_at: toText(thinkTankSnapshot?.storeUpdatedAt),
       created_at: nowIso(),
       updated_at: nowIso()
     };
@@ -3211,5 +4082,153 @@ export class PlayableContentEngine {
     await this.persist();
     this.emitProgress(hooks, "done", 100, "Playable experience generated");
     return work;
+  }
+
+  async backfillKnowledgeForBook({ bookId, title = "", modules = [] }, hooks = null) {
+    const safeBookId = toText(bookId);
+    const moduleRows = toArray(modules).filter((item) => item && typeof item === "object");
+    if (!safeBookId) throw new Error("bookId is required");
+    if (!moduleRows.length) throw new Error(`book has no modules: ${safeBookId}`);
+
+    const moduleCount = Math.max(1, moduleRows.length);
+    const safeTitle = toText(title, safeBookId);
+    const moduleSources = [];
+    for (const module of moduleRows) {
+      const moduleTitle = toText(module?.title, toText(module?.slug, "Module"));
+      let html = "";
+      if (toText(module?.htmlPath)) {
+        html = await fs.readFile(module.htmlPath, "utf8").catch(() => "");
+      } else if (toText(module?.moduleDirPath)) {
+        html = await fs.readFile(path.join(module.moduleDirPath, "code.html"), "utf8").catch(() => "");
+      }
+      const text = clamp(stripHtml(html), 16_000);
+      moduleSources.push({
+        slug: toText(module?.slug),
+        title: moduleTitle,
+        moduleDirPath: toText(module?.moduleDirPath),
+        text
+      });
+    }
+
+    const contextText = clamp(
+      moduleSources
+        .map((item, idx) => `Module ${idx + 1}: ${item.title}\n${item.text}`)
+        .join("\n\n"),
+      120_000
+    );
+    const sourceLines = moduleSources
+      .map((item, idx) => `${idx + 1}. ${item.title} | /experiences/${encodeURIComponent(item.slug)}\n${clamp(item.text, 900)}`)
+      .join("\n\n");
+
+    const knowledgePack = await this.generateKnowledgePackFromSummary({
+      title: safeTitle,
+      contextText,
+      sourceLines,
+      moduleCount,
+      hooks
+    });
+    const moduleSlugs = moduleSources.map((item) => item.slug);
+    const map = distributeKnowledgePackToModules({
+      moduleRows: moduleSources,
+      moduleSlugs,
+      knowledgePack
+    });
+    let thinkTankSnapshot = {
+      storeUpdatedAt: "",
+      relatedRefsByEntryId: {}
+    };
+    try {
+      thinkTankSnapshot = await this.upsertThinkTankForBook({
+        bookId: safeBookId,
+        bookTitle: safeTitle,
+        bookSummary: knowledgePack.bookSummary,
+        moduleKnowledgeMap: map,
+        skillPoints: knowledgePack.skillPoints
+      });
+    } catch (error) {
+      console.warn("[studio] think tank merge failed during backfill:", toText(error?.message, "unknown"));
+    }
+
+    const now = nowIso();
+    for (const module of moduleSources) {
+      const bucket = map.get(module.slug) || {
+        skillPoints: [],
+        thinkTankEntries: [],
+        knowledgeBattle: {
+          passScore: clampInt(knowledgePack?.knowledgeBattle?.passScore, 1, 99, 2),
+          reward: {
+            xp: clampInt(knowledgePack?.knowledgeBattle?.reward?.xp, 10, 400, 80),
+            gems: clampInt(knowledgePack?.knowledgeBattle?.reward?.gems, 1, 120, 12)
+          },
+          questions: []
+        }
+      };
+      const entryRows = toArray(bucket.thinkTankEntries).map((entry) => ({
+        ...entry,
+        relatedEntryRefs: toArray(thinkTankSnapshot?.relatedRefsByEntryId?.[entry.id]).slice(0, 8)
+      }));
+
+      const metaPath = path.join(module.moduleDirPath, "module.json");
+      let existing = {};
+      try {
+        const raw = await fs.readFile(metaPath, "utf8");
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === "object") existing = parsed;
+      } catch {}
+      const nextMeta = {
+        ...existing,
+        slug: toText(existing.slug, module.slug),
+        title: toText(existing.title, module.title),
+        order: Number.isFinite(Number(existing.order)) ? Number(existing.order) : (moduleSlugs.indexOf(module.slug) + 1),
+        generatedBy: toText(existing.generatedBy, "playable-content-engine"),
+        generatedAt: toText(existing.generatedAt, now),
+        bookSummary: clamp(toText(knowledgePack.bookSummary), 420),
+        skillPoints: toArray(bucket.skillPoints).slice(0, 12),
+        knowledgeBattle: {
+          passScore: clampInt(bucket.knowledgeBattle?.passScore, 1, 99, 2),
+          reward: {
+            xp: clampInt(bucket.knowledgeBattle?.reward?.xp, 10, 400, 80),
+            gems: clampInt(bucket.knowledgeBattle?.reward?.gems, 1, 120, 12)
+          },
+          questions: toArray(bucket.knowledgeBattle?.questions).slice(0, 12)
+        },
+        thinkTankEntries: entryRows.slice(0, 18)
+      };
+      await fs.writeFile(metaPath, JSON.stringify(nextMeta, null, 2), "utf8");
+    }
+
+    const knowledgeDir = path.join(this.bookExperiencesDir, safeBookId);
+    await fs.mkdir(knowledgeDir, { recursive: true });
+    await fs.writeFile(
+      path.join(knowledgeDir, "knowledge-index.json"),
+      JSON.stringify(
+        {
+          bookId: safeBookId,
+          title: safeTitle,
+          summary: clamp(toText(knowledgePack.bookSummary), 420),
+          generationMode: toText(knowledgePack.generationMode, "fallback"),
+          skillPointCount: toArray(knowledgePack.skillPoints).length,
+          thinkTankEntryCount: toArray(knowledgePack.thinkTankEntries).length,
+          battleQuestionCount: toArray(knowledgePack.knowledgeBattle?.questions).length,
+          thinkTankUpdatedAt: toText(thinkTankSnapshot?.storeUpdatedAt),
+          generatedAt: now
+        },
+        null,
+        2
+      ),
+      "utf8"
+    );
+
+    return {
+      ok: true,
+      bookId: safeBookId,
+      title: safeTitle,
+      moduleCount,
+      skillPointCount: toArray(knowledgePack.skillPoints).length,
+      thinkTankEntryCount: toArray(knowledgePack.thinkTankEntries).length,
+      battleQuestionCount: toArray(knowledgePack.knowledgeBattle?.questions).length,
+      generationMode: toText(knowledgePack.generationMode, "fallback"),
+      thinkTankUpdatedAt: toText(thinkTankSnapshot?.storeUpdatedAt)
+    };
   }
 }

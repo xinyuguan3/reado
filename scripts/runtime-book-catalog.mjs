@@ -177,6 +177,140 @@ function toText(value, fallback = "") {
   return text || fallback;
 }
 
+function clampText(value, maxLen = 320) {
+  const text = String(value || "").trim();
+  if (!text) return "";
+  return text.length > maxLen ? text.slice(0, maxLen) : text;
+}
+
+function toArray(value) {
+  return Array.isArray(value) ? value : [];
+}
+
+function clampInt(value, min, max, fallback = 0) {
+  const num = Number(value);
+  if (!Number.isFinite(num)) return fallback;
+  return Math.max(min, Math.min(max, Math.round(num)));
+}
+
+function uniqueStrings(items, max = 24, maxLen = 80) {
+  const seen = new Set();
+  const out = [];
+  for (const item of toArray(items)) {
+    const value = clampText(item, maxLen);
+    if (!value) continue;
+    const key = value.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(value);
+    if (out.length >= max) break;
+  }
+  return out;
+}
+
+function normalizeSkillPoint(raw, index = 0) {
+  const row = raw && typeof raw === "object" ? raw : {};
+  const name = clampText(toText(row.name, toText(row.title, `Skill Point ${index + 1}`)), 72);
+  const id = clampText(slugify(toText(row.id, name || `skill-point-${index + 1}`)) || `skill-point-${index + 1}`, 60);
+  return {
+    id,
+    name,
+    description: clampText(toText(row.description, toText(row.summary, "")), 320),
+    category: clampText(toText(row.category, "core"), 40),
+    keywords: uniqueStrings(row.keywords, 8, 28),
+    difficulty: clampInt(row.difficulty, 1, 5, 3),
+    power: clampInt(row.power, 10, 100, 40),
+    xpReward: clampInt(row.xpReward ?? row.xp, 0, 500, 0),
+    gemReward: clampInt(row.gemReward ?? row.gems, 0, 200, 0),
+    moduleHint: clampInt(row.moduleHint, 0, 99, 0)
+  };
+}
+
+function normalizeThinkTankEntry(raw, index = 0) {
+  const row = raw && typeof raw === "object" ? raw : {};
+  const term = clampText(toText(row.term, toText(row.title, `Concept ${index + 1}`)), 72);
+  const title = clampText(toText(row.title, term), 88);
+  const id = clampText(slugify(toText(row.id, title || `entry-${index + 1}`)) || `entry-${index + 1}`, 60);
+  return {
+    id,
+    term,
+    title,
+    summary: clampText(toText(row.summary), 360),
+    insight: clampText(toText(row.insight), 320),
+    sourceCue: clampText(toText(row.sourceCue), 220),
+    tags: uniqueStrings(row.tags, 10, 28),
+    relatedTerms: uniqueStrings(row.relatedTerms, 10, 40),
+    relatedEntryRefs: toArray(row.relatedEntryRefs)
+      .map((item) => {
+        const ref = item && typeof item === "object" ? item : {};
+        const refId = clampText(toText(ref.id), 60);
+        if (!refId) return null;
+        return {
+          id: refId,
+          title: clampText(toText(ref.title), 88),
+          term: clampText(toText(ref.term), 72),
+          books: uniqueStrings(ref.books, 8, 120),
+          score: clampInt(ref.score, 0, 999, 0)
+        };
+      })
+      .filter(Boolean)
+      .slice(0, 8),
+    moduleHint: clampInt(row.moduleHint, 0, 99, 0)
+  };
+}
+
+function normalizeBattleQuestion(raw, index = 0) {
+  const row = raw && typeof raw === "object" ? raw : {};
+  const options = uniqueStrings(row.options, 4, 220);
+  return {
+    id: clampText(slugify(toText(row.id, `battle-q-${index + 1}`)) || `battle-q-${index + 1}`, 60),
+    prompt: clampText(toText(row.prompt, toText(row.question, "")), 220),
+    options: options.length >= 2 ? options : ["Option A", "Option B"],
+    answerIndex: clampInt(row.answerIndex, 0, Math.max(0, options.length - 1), 0),
+    explanation: clampText(toText(row.explanation), 260),
+    skillId: clampText(toText(row.skillId), 60),
+    entryId: clampText(toText(row.entryId, toText(row.knowledgeEntryId)), 60),
+    moduleHint: clampInt(row.moduleHint, 0, 99, 0)
+  };
+}
+
+function normalizeKnowledgeBattle(raw) {
+  const row = raw && typeof raw === "object" ? raw : {};
+  const questions = toArray(row.questions).map((item, index) => normalizeBattleQuestion(item, index)).slice(0, 12);
+  const maxScore = Math.max(1, questions.length || 1);
+  return {
+    passScore: Math.max(1, Math.min(maxScore, clampInt(row.passScore, 1, 99, Math.ceil(maxScore * 0.6)))),
+    reward: {
+      xp: clampInt(row.reward?.xp, 0, 500, 0),
+      gems: clampInt(row.reward?.gems, 0, 200, 0)
+    },
+    questions
+  };
+}
+
+function normalizeModuleMeta(raw) {
+  const row = raw && typeof raw === "object" ? raw : {};
+  return {
+    slug: clampText(toText(row.slug), 120),
+    order: Number(row.order),
+    title: clampText(toText(row.title), 160),
+    generatedBy: clampText(toText(row.generatedBy), 80),
+    generatedAt: clampText(toText(row.generatedAt), 80),
+    bookSummary: clampText(toText(row.bookSummary), 420),
+    skillPoints: toArray(row.skillPoints || row.skills).map((item, index) => normalizeSkillPoint(item, index)).slice(0, 12),
+    thinkTankEntries: toArray(row.thinkTankEntries || row.entries).map((item, index) => normalizeThinkTankEntry(item, index)).slice(0, 18),
+    knowledgeBattle: normalizeKnowledgeBattle(row.knowledgeBattle)
+  };
+}
+
+function cloneModule(module) {
+  const row = module && typeof module === "object" ? module : {};
+  return {
+    ...row,
+    meta: normalizeModuleMeta(row.meta)
+  };
+}
+
 function resolveBookId(rawName) {
   const normalized = toText(rawName);
   const direct = BOOK_NAME_TO_ID.get(normalized);
@@ -272,9 +406,13 @@ export class RuntimeBookCatalog {
         title: module.title,
         index: index + 1,
         imageHref: `/assets/experiences/${module.slug}.png`,
-        href: `/experiences/${module.slug}.html`,
+        href: `/experiences/${module.slug}`,
         nextSlug: modules[index + 1]?.slug || "",
         prevSlug: modules[index - 1]?.slug || "",
+        meta: module.meta || normalizeModuleMeta(null),
+        skillPointCount: toArray(module.meta?.skillPoints).length,
+        thinkTankEntryCount: toArray(module.meta?.thinkTankEntries).length,
+        battleQuestionCount: toArray(module.meta?.knowledgeBattle?.questions).length,
         htmlPath: module.htmlPath,
         moduleDirPath: module.moduleDirPath,
         screenPath: module.screenPath
@@ -284,6 +422,10 @@ export class RuntimeBookCatalog {
 
       const title = toText(bookMeta.title, titleFromBookId(bookId));
       const cover = coverState.coverByBookId.get(bookId) || richModules[0].imageHref;
+      const skillPointCount = richModules.reduce((sum, item) => sum + toArray(item?.meta?.skillPoints).length, 0);
+      const thinkTankEntryCount = richModules.reduce((sum, item) => sum + toArray(item?.meta?.thinkTankEntries).length, 0);
+      const battleQuestionCount = richModules.reduce((sum, item) => sum + toArray(item?.meta?.knowledgeBattle?.questions).length, 0);
+      const knowledgeSummary = toText(richModules.find((item) => toText(item?.meta?.bookSummary))?.meta?.bookSummary);
 
       const book = {
         id: bookId,
@@ -300,9 +442,13 @@ export class RuntimeBookCatalog {
         badgeTitle: toText(bookMeta.badgeTitle),
         badgeIcon: toText(bookMeta.badgeIcon),
         highlights: Array.isArray(bookMeta.highlights) ? [...bookMeta.highlights] : [],
+        knowledgeSummary,
+        skillPointCount,
+        thinkTankEntryCount,
+        battleQuestionCount,
         cover,
         moduleCount: richModules.length,
-        hubHref: `/books/${bookId}.html`,
+        hubHref: `/books/${bookId}`,
         firstModuleHref: richModules[0].href,
         moduleSlugs: richModules.map((module) => module.slug),
         lastModuleSlug: richModules[richModules.length - 1].slug,
@@ -339,6 +485,10 @@ export class RuntimeBookCatalog {
         badgeTitle: book.badgeTitle,
         badgeIcon: book.badgeIcon,
         highlights: book.highlights,
+        knowledgeSummary: book.knowledgeSummary,
+        skillPointCount: book.skillPointCount,
+        thinkTankEntryCount: book.thinkTankEntryCount,
+        battleQuestionCount: book.battleQuestionCount,
         cover: book.cover,
         moduleCount: book.moduleCount,
         hubHref: book.hubHref,
@@ -439,12 +589,13 @@ export class RuntimeBookCatalog {
         try {
           const rawMeta = await fs.readFile(path.join(moduleDirPath, "module.json"), "utf8");
           const parsedMeta = JSON.parse(rawMeta);
-          if (parsedMeta && typeof parsedMeta === "object") moduleMeta = parsedMeta;
+          if (parsedMeta && typeof parsedMeta === "object") moduleMeta = normalizeModuleMeta(parsedMeta);
         } catch {}
+        if (!moduleMeta) moduleMeta = normalizeModuleMeta(null);
 
-        const metaSlug = toText(moduleMeta?.slug);
-        const titleFromMeta = toText(moduleMeta?.title);
-        const orderFromMeta = Number(moduleMeta?.order);
+        const metaSlug = toText(moduleMeta.slug);
+        const titleFromMeta = toText(moduleMeta.title);
+        const orderFromMeta = Number(moduleMeta.order);
         const localOrder = Number.isFinite(orderFromMeta) ? orderFromMeta : moduleIndex + 1;
         const order = variantIndex * 1000 + localOrder;
         const slug = uniqueSlug(slugify(metaSlug || moduleDirName), usedSlugs, usedSlugs.size);
@@ -454,6 +605,12 @@ export class RuntimeBookCatalog {
           slug,
           title,
           order,
+          meta: {
+            ...moduleMeta,
+            slug,
+            order,
+            title: titleFromMeta || title
+          },
           htmlPath,
           moduleDirPath,
           screenPath
@@ -467,21 +624,21 @@ export class RuntimeBookCatalog {
 
   async getBooks() {
     const snapshot = await this.getSnapshot();
-    return snapshot.books.map((book) => ({ ...book, modules: book.modules.map((module) => ({ ...module })) }));
+    return snapshot.books.map((book) => ({ ...book, modules: book.modules.map((module) => cloneModule(module)) }));
   }
 
   async getBook(bookId) {
     const snapshot = await this.getSnapshot();
     const row = snapshot.bookById.get(String(bookId || "").trim());
     if (!row) return null;
-    return { ...row, modules: row.modules.map((module) => ({ ...module })) };
+    return { ...row, modules: row.modules.map((module) => cloneModule(module)) };
   }
 
   async getModule(moduleSlug) {
     const snapshot = await this.getSnapshot();
     const row = snapshot.moduleBySlug.get(String(moduleSlug || "").trim());
     if (!row) return null;
-    return { ...row };
+    return cloneModule(row);
   }
 
   async readModuleHtml(moduleSlug) {

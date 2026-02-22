@@ -48,6 +48,70 @@ Notes:
   - `mcpFetchConfigured: true` means env is loaded.
   - `mcpFetchConfigured: false` means bridge is not active.
 
+### Optional NotebookLM parser bridge (PDF quality upgrade)
+
+For user-uploaded PDF files, you can route parsing to a NotebookLM-powered service:
+
+```bash
+READO_NOTEBOOKLM_BRIDGE_ENDPOINT=http://127.0.0.1:8792/parse
+READO_NOTEBOOKLM_BRIDGE_API_KEY=...
+```
+
+Bridge contract expected by Reado:
+
+- Request: `POST` JSON `{ "name": "...", "mimeType": "application/pdf", "contentBase64": "..." }`
+- Response: JSON containing extracted text in one of:
+  - `text`
+  - `content`
+  - `fulltext`
+  - `pages[].text` / `chunks[].text`
+
+Priority order for PDF parsing:
+
+1. NotebookLM bridge (`READO_NOTEBOOKLM_BRIDGE_ENDPOINT`)
+2. PDF Reader MCP bridge (`READO_PDF_READER_MCP_ENDPOINT`)
+3. Local anthropic PDF skill (`studio_skills/anthropic-pdf-reader.mjs`)
+4. Generic parser webhook (`READO_PARSER_WEBHOOK_URL`)
+
+### Optional PDF Reader MCP bridge (`pdf-reader-mcp`)
+
+This repo includes a local HTTP bridge that adapts MCP PDF tools to Reado's parser contract:
+
+```bash
+npm run pdf-mcp-bridge
+```
+
+Bridge env:
+
+```bash
+PDF_MCP_BRIDGE_PORT=8791
+PDF_MCP_SERVER_COMMAND=npx
+PDF_MCP_SERVER_ARGS=-y @sylphx/pdf-reader-mcp
+```
+
+Then point Reado to it:
+
+```bash
+READO_PDF_READER_MCP_ENDPOINT=http://127.0.0.1:8791/parse
+```
+
+Health fields in `/api/studio/health`:
+
+- `notebooklmBridgeConfigured`
+- `pdfReaderMcpConfigured`
+- `maxContextChars`
+- `maxUploadBytes`
+
+### Optional filesystem MCP (dev-side tooling)
+
+If you want Codex/MCP tooling to operate on local parser inputs directly, add filesystem MCP in your local Codex config (`~/.codex/config.toml`) and allow only project-scoped paths.
+
+Typical server:
+
+- `@modelcontextprotocol/server-filesystem`
+
+This is optional and not required for runtime parsing in Reado; it is mainly useful for local debugging workflows.
+
 ### Optional Stitch bridge (HTML generation provider)
 
 This repo now supports a pluggable HTML provider bridge:

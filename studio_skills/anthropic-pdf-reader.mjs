@@ -22,6 +22,7 @@ export default async function installPdfSkill({ registerSkill, helpers }) {
     label: "PDF Reader (anthropics/skills)",
     description: "Use anthropics pdf skill guidance with pdftotext and pypdf/pdfplumber fallback",
     source: "anthropics/skills:skills/pdf",
+    priority: 60,
     supports: ({ mimeType, lowerName }) => (
       String(mimeType || "") === "application/pdf" || String(lowerName || "").endsWith(".pdf")
     ),
@@ -49,7 +50,7 @@ export default async function installPdfSkill({ registerSkill, helpers }) {
           }
         }
 
-        const normalized = clamp(text.replace(/\s+/g, " ").trim(), 60000);
+        const normalized = clamp(text.replace(/\s+/g, " ").trim(), 180000);
         if (!normalized) {
           throw new Error(
             "PDF skill extracted empty text. Install poppler(pdftotext) or python deps from ~/.codex/skills/pdf/SKILL.md"

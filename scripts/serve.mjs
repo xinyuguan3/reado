@@ -35,6 +35,7 @@ loadDotEnvFile(path.join(rootDir, ".env.local"));
 const appDir = path.join(rootDir, "app");
 const dataDir = path.join(rootDir, ".data");
 const stateFilePath = path.join(dataDir, "reado-player-state.json");
+const thinkTankFilePath = path.join(dataDir, "reado-think-tank.json");
 const port = Number(process.env.PORT || 4173);
 const sessionCookieName = "reado_sid";
 const MAX_DURATION_MS = 6 * 60 * 60 * 1000;
@@ -45,12 +46,41 @@ const stripeWebhookSecret = String(process.env.STRIPE_WEBHOOK_SECRET || "").trim
 const stripePublishableKey = String(process.env.STRIPE_PUBLISHABLE_KEY || "").trim();
 const stripePricingTableId = String(process.env.STRIPE_PRICING_TABLE_ID || "").trim();
 const stripePriceId = String(process.env.STRIPE_PRICE_ID || "").trim();
-const stripePriceMonthlyStarter = String(process.env.STRIPE_PRICE_MONTHLY_STARTER || "").trim();
-const stripePriceMonthlyTrial = String(process.env.STRIPE_PRICE_MONTHLY_TRIAL || "").trim();
-const stripePriceMonthlyPro = String(process.env.STRIPE_PRICE_MONTHLY_PRO || "").trim();
-const stripePriceAnnualStarter = String(process.env.STRIPE_PRICE_ANNUAL_STARTER || "").trim();
-const stripePriceAnnualTrial = String(process.env.STRIPE_PRICE_ANNUAL_TRIAL || "").trim();
-const stripePriceAnnualPro = String(process.env.STRIPE_PRICE_ANNUAL_PRO || "").trim();
+const stripePriceMonthlyStarterLegacy = String(process.env.STRIPE_PRICE_MONTHLY_STARTER || "").trim();
+const stripePriceMonthlyTrialLegacy = String(process.env.STRIPE_PRICE_MONTHLY_TRIAL || "").trim();
+const stripePriceMonthlyProLegacy = String(process.env.STRIPE_PRICE_MONTHLY_PRO || "").trim();
+const stripePriceAnnualStarterLegacy = String(process.env.STRIPE_PRICE_ANNUAL_STARTER || "").trim();
+const stripePriceAnnualTrialLegacy = String(process.env.STRIPE_PRICE_ANNUAL_TRIAL || "").trim();
+const stripePriceAnnualProLegacy = String(process.env.STRIPE_PRICE_ANNUAL_PRO || "").trim();
+const stripePriceMonthlyExplorer = String(
+  process.env.STRIPE_PRICE_MONTHLY_EXPLORER
+  || stripePriceMonthlyStarterLegacy
+  || stripePriceMonthlyTrialLegacy
+  || stripePriceId
+  || ""
+).trim();
+const stripePriceAnnualExplorer = String(
+  process.env.STRIPE_PRICE_ANNUAL_EXPLORER
+  || stripePriceAnnualStarterLegacy
+  || stripePriceAnnualTrialLegacy
+  || ""
+).trim();
+const stripePriceMonthlyScholar = String(
+  process.env.STRIPE_PRICE_MONTHLY_SCHOLAR
+  || stripePriceMonthlyProLegacy
+  || ""
+).trim();
+const stripePriceAnnualScholar = String(
+  process.env.STRIPE_PRICE_ANNUAL_SCHOLAR
+  || stripePriceAnnualProLegacy
+  || ""
+).trim();
+const stripePriceLifetime = String(process.env.STRIPE_PRICE_LIFETIME || "").trim();
+const stripePriceAddon2000 = String(
+  process.env.STRIPE_PRICE_ADDON_2000
+  || process.env.STRIPE_PRICE_ADDON_CREDITS_2000
+  || ""
+).trim();
 const stripeSuccessUrl = String(process.env.STRIPE_SUCCESS_URL || "").trim();
 const stripeCancelUrl = String(process.env.STRIPE_CANCEL_URL || "").trim();
 const stripePortalReturnUrl = String(process.env.STRIPE_PORTAL_RETURN_URL || stripeSuccessUrl || "").trim();
@@ -58,33 +88,68 @@ const supabasePublicUrl = String(process.env.READO_SUPABASE_URL || process.env.S
 const supabaseAnonKey = String(process.env.READO_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || "").trim();
 const stripeCheckoutPrices = {
   monthly: {
-    starter: stripePriceMonthlyStarter,
-    trial: stripePriceMonthlyTrial || stripePriceId,
-    pro: stripePriceMonthlyPro
+    explorer: stripePriceMonthlyExplorer,
+    scholar: stripePriceMonthlyScholar,
+    lifetime: stripePriceLifetime
   },
   annual: {
-    starter: stripePriceAnnualStarter,
-    trial: stripePriceAnnualTrial,
-    pro: stripePriceAnnualPro
+    explorer: stripePriceAnnualExplorer,
+    scholar: stripePriceAnnualScholar,
+    lifetime: stripePriceLifetime
   }
 };
 const stripeDefaultCheckoutPriceId = stripePriceId
-  || stripePriceMonthlyTrial
-  || stripePriceMonthlyStarter
-  || stripePriceMonthlyPro
-  || stripePriceAnnualTrial
-  || stripePriceAnnualStarter
-  || stripePriceAnnualPro
+  || stripePriceMonthlyExplorer
+  || stripePriceAnnualExplorer
+  || stripePriceMonthlyScholar
+  || stripePriceAnnualScholar
+  || stripePriceLifetime
+  || stripePriceMonthlyTrialLegacy
+  || stripePriceMonthlyStarterLegacy
+  || stripePriceMonthlyProLegacy
+  || stripePriceAnnualTrialLegacy
+  || stripePriceAnnualStarterLegacy
+  || stripePriceAnnualProLegacy
   || "";
+const stripeSubscriptionPriceIds = new Set(
+  [
+    stripePriceMonthlyExplorer,
+    stripePriceAnnualExplorer,
+    stripePriceMonthlyScholar,
+    stripePriceAnnualScholar,
+    stripePriceId,
+    stripePriceMonthlyStarterLegacy,
+    stripePriceMonthlyTrialLegacy,
+    stripePriceMonthlyProLegacy,
+    stripePriceAnnualStarterLegacy,
+    stripePriceAnnualTrialLegacy,
+    stripePriceAnnualProLegacy
+  ].filter(Boolean)
+);
+const stripeLifetimePriceIds = new Set([stripePriceLifetime].filter(Boolean));
+const stripeAddonPriceCredits = new Map();
+if (stripePriceAddon2000) {
+  stripeAddonPriceCredits.set(stripePriceAddon2000, Math.max(1, toInt(process.env.READO_ADDON_CREDITS_2000 || 2000)));
+}
+const stripeOneTimePriceIds = new Set([
+  ...stripeLifetimePriceIds,
+  ...stripeAddonPriceCredits.keys()
+]);
 const stripeCheckoutPriceIds = new Set(
   [
     stripePriceId,
-    stripePriceMonthlyStarter,
-    stripePriceMonthlyTrial,
-    stripePriceMonthlyPro,
-    stripePriceAnnualStarter,
-    stripePriceAnnualTrial,
-    stripePriceAnnualPro
+    stripePriceMonthlyExplorer,
+    stripePriceAnnualExplorer,
+    stripePriceMonthlyScholar,
+    stripePriceAnnualScholar,
+    stripePriceLifetime,
+    stripePriceAddon2000,
+    stripePriceMonthlyStarterLegacy,
+    stripePriceMonthlyTrialLegacy,
+    stripePriceMonthlyProLegacy,
+    stripePriceAnnualStarterLegacy,
+    stripePriceAnnualTrialLegacy,
+    stripePriceAnnualProLegacy
   ].filter(Boolean)
 );
 const stripeCheckoutConfigStatus = {
@@ -93,22 +158,28 @@ const stripeCheckoutConfigStatus = {
   hasCancelUrl: Boolean(stripeCancelUrl),
   hasLegacyPrice: Boolean(stripePriceId),
   monthly: {
-    starter: Boolean(stripePriceMonthlyStarter),
-    trial: Boolean(stripePriceMonthlyTrial || stripePriceId),
-    pro: Boolean(stripePriceMonthlyPro)
+    explorer: Boolean(stripePriceMonthlyExplorer),
+    scholar: Boolean(stripePriceMonthlyScholar),
+    lifetime: Boolean(stripePriceLifetime)
   },
   annual: {
-    starter: Boolean(stripePriceAnnualStarter),
-    trial: Boolean(stripePriceAnnualTrial),
-    pro: Boolean(stripePriceAnnualPro)
+    explorer: Boolean(stripePriceAnnualExplorer),
+    scholar: Boolean(stripePriceAnnualScholar),
+    lifetime: Boolean(stripePriceLifetime)
+  },
+  oneTime: {
+    lifetime: Boolean(stripePriceLifetime),
+    addon2000: Boolean(stripePriceAddon2000)
   }
 };
 const creditsDailyFree = toInt(process.env.READO_CREDITS_DAILY_FREE || 0);
 const creditsMonthlyFree = toInt(process.env.READO_CREDITS_MONTHLY_FREE || 0);
-const creditsDailySmall = toInt(process.env.READO_CREDITS_DAILY_SMALL || 120);
-const creditsMonthlySmall = toInt(process.env.READO_CREDITS_MONTHLY_SMALL || 4800);
-const creditsDailyLarge = toInt(process.env.READO_CREDITS_DAILY_LARGE || 1800);
-const creditsMonthlyLarge = toInt(process.env.READO_CREDITS_MONTHLY_LARGE || 90000);
+const creditsDailySmall = toInt(process.env.READO_CREDITS_DAILY_SMALL || 0);
+const creditsMonthlySmall = toInt(process.env.READO_CREDITS_MONTHLY_SMALL || 4000);
+const creditsDailyLarge = toInt(process.env.READO_CREDITS_DAILY_LARGE || 0);
+const creditsMonthlyLarge = toInt(process.env.READO_CREDITS_MONTHLY_LARGE || 12000);
+const creditsDailyLifetime = toInt(process.env.READO_CREDITS_DAILY_LIFETIME || 0);
+const creditsMonthlyLifetime = toInt(process.env.READO_CREDITS_MONTHLY_LIFETIME || 2000);
 const stripeSmallPriceIds = new Set(
   String(process.env.READO_STRIPE_PRICE_IDS_SMALL || "")
     .split(",")
@@ -121,10 +192,22 @@ const stripeLargePriceIds = new Set(
     .map((item) => item.trim())
     .filter(Boolean)
 );
-for (const id of [stripePriceMonthlyStarter, stripePriceAnnualStarter, stripePriceMonthlyTrial, stripePriceAnnualTrial]) {
+for (const id of [
+  stripePriceMonthlyExplorer,
+  stripePriceAnnualExplorer,
+  stripePriceMonthlyStarterLegacy,
+  stripePriceAnnualStarterLegacy,
+  stripePriceMonthlyTrialLegacy,
+  stripePriceAnnualTrialLegacy
+]) {
   if (id) stripeSmallPriceIds.add(id);
 }
-for (const id of [stripePriceMonthlyPro, stripePriceAnnualPro]) {
+for (const id of [
+  stripePriceMonthlyScholar,
+  stripePriceAnnualScholar,
+  stripePriceMonthlyProLegacy,
+  stripePriceAnnualProLegacy
+]) {
   if (id) stripeLargePriceIds.add(id);
 }
 if (!stripeSmallPriceIds.size && stripePriceId) {
@@ -450,6 +533,9 @@ function normalizeBillingRecord(sessionId, rawRecord) {
     creditsSpentTotal: toInt(row.creditsSpentTotal),
     creditsRefundedTotal: toInt(row.creditsRefundedTotal),
     creditsUpdatedAt: typeof row.creditsUpdatedAt === "string" ? row.creditsUpdatedAt : "",
+    lifetimeAccess: Boolean(row.lifetimeAccess),
+    lifetimePurchasedAt: typeof row.lifetimePurchasedAt === "string" ? row.lifetimePurchasedAt : "",
+    addonCreditsPurchasedTotal: toInt(row.addonCreditsPurchasedTotal),
     updatedAt: typeof row.updatedAt === "string" ? row.updatedAt : ""
   };
 }
@@ -570,12 +656,23 @@ function getNextUtcDayStartMs(dateLike = Date.now()) {
 function resolveCreditPlanForRecord(record) {
   const active = isBillingSubscriptionActiveStatus(record?.status);
   const priceId = sanitizeStripeString(record?.priceId);
+  const lifetimeAccess = Boolean(record?.lifetimeAccess);
   if (!active) {
+    if (lifetimeAccess) {
+      return {
+        id: "lifetime",
+        dailyRefresh: creditsDailyLifetime,
+        monthlyGrant: creditsMonthlyLifetime,
+        active: false,
+        lifetimeAccess: true
+      };
+    }
     return {
       id: "free",
       dailyRefresh: creditsDailyFree,
       monthlyGrant: creditsMonthlyFree,
-      active
+      active,
+      lifetimeAccess: false
     };
   }
   if (priceId && stripeLargePriceIds.has(priceId)) {
@@ -583,7 +680,8 @@ function resolveCreditPlanForRecord(record) {
       id: "large",
       dailyRefresh: creditsDailyLarge,
       monthlyGrant: creditsMonthlyLarge,
-      active
+      active,
+      lifetimeAccess
     };
   }
   if (priceId && stripeSmallPriceIds.has(priceId)) {
@@ -591,14 +689,16 @@ function resolveCreditPlanForRecord(record) {
       id: "small",
       dailyRefresh: creditsDailySmall,
       monthlyGrant: creditsMonthlySmall,
-      active
+      active,
+      lifetimeAccess
     };
   }
   return {
     id: "small",
     dailyRefresh: creditsDailySmall,
     monthlyGrant: creditsMonthlySmall,
-    active
+    active,
+    lifetimeAccess
   };
 }
 
@@ -633,7 +733,7 @@ function reconcileCreditsForRecord(record, nowMs = Date.now()) {
     changed = true;
   }
 
-  if (planChanged && plan.active) {
+  if (planChanged) {
     if (record.creditsDailyRemaining < toInt(plan.dailyRefresh)) {
       record.creditsDailyRemaining = toInt(plan.dailyRefresh);
       record.creditsDailyResetAtMs = nextResetAtMs;
@@ -670,6 +770,7 @@ function toPublicCreditSnapshot(record) {
   return {
     planId: plan.id,
     subscriptionActive: plan.active,
+    lifetimeAccess: Boolean(plan.lifetimeAccess),
     available: getCreditAvailable(record),
     dailyRemaining: toInt(record?.creditsDailyRemaining),
     dailyRefreshAmount: toInt(plan.dailyRefresh),
@@ -733,6 +834,28 @@ function refundCreditsToRecord(record, charge, reason = "refund") {
   reconcileCreditsForRecord(record);
   record.creditsMonthlyBalance = toInt(record.creditsMonthlyBalance) + amount;
   record.creditsRefundedTotal = toInt(record.creditsRefundedTotal) + amount;
+  record.creditsUpdatedAt = nowIso();
+  record.updatedAt = nowIso();
+  return true;
+}
+
+function applyLifetimePurchaseToRecord(record) {
+  if (!record || typeof record !== "object") return false;
+  const already = Boolean(record.lifetimeAccess);
+  record.lifetimeAccess = true;
+  if (!sanitizeStripeString(record.lifetimePurchasedAt)) {
+    record.lifetimePurchasedAt = nowIso();
+  }
+  record.updatedAt = nowIso();
+  return !already;
+}
+
+function applyAddonCreditsPurchaseToRecord(record, amount) {
+  const credits = Math.max(0, toInt(amount));
+  if (!record || typeof record !== "object" || credits <= 0) return false;
+  reconcileCreditsForRecord(record);
+  record.creditsMonthlyBalance = toInt(record.creditsMonthlyBalance) + credits;
+  record.addonCreditsPurchasedTotal = toInt(record.addonCreditsPurchasedTotal) + credits;
   record.creditsUpdatedAt = nowIso();
   record.updatedAt = nowIso();
   return true;
@@ -1200,6 +1323,8 @@ function toPublicBillingSnapshot(record) {
     subscriptionId: typeof record?.subscriptionId === "string" ? record.subscriptionId : "",
     status,
     subscriptionActive,
+    lifetimeAccess: Boolean(record?.lifetimeAccess),
+    lifetimePurchasedAt: typeof record?.lifetimePurchasedAt === "string" ? record.lifetimePurchasedAt : "",
     priceId: typeof record?.priceId === "string" ? record.priceId : "",
     currentPeriodEnd: toInt(record?.currentPeriodEnd),
     cancelAtPeriodEnd: Boolean(record?.cancelAtPeriodEnd),
@@ -1466,7 +1591,7 @@ async function buildStudioWorkSummaries(works, sessionId) {
       created_at: cleanText(work?.created_at),
       updated_at: cleanText(work?.updated_at),
       can_edit: cleanText(work?.owner_session_id) === cleanText(sessionId),
-      book_href: `/books/${encodeURIComponent(bookId)}.html`,
+      book_href: `/books/${encodeURIComponent(bookId)}`,
       first_module_href: cleanText(book?.firstModuleHref),
       cover: cleanText(book?.cover, buildGeneratedCoverDataUri({ title, subtitle, seed: bookId }))
     });
@@ -1494,6 +1619,10 @@ async function handleStudioApi(req, res, url, session) {
         stitchBridgeConfigured: Boolean(playableContentEngine.stitchBridgeEndpoint),
         mcpSearchConfigured: Boolean(playableContentEngine.mcpSearchEndpoint),
         mcpFetchConfigured: Boolean(playableContentEngine.mcpFetchEndpoint),
+        notebooklmBridgeConfigured: Boolean(playableContentEngine.notebooklmBridgeEndpoint),
+        pdfReaderMcpConfigured: Boolean(playableContentEngine.pdfReaderMcpEndpoint),
+        maxContextChars: toInt(playableContentEngine.maxContextChars),
+        maxUploadBytes: toInt(playableContentEngine.maxUploadBytes),
         skillCount: playableContentEngine.listSkills().length
       });
       return true;
@@ -1907,10 +2036,34 @@ function schedulePersist() {
   }, 120);
 }
 
+function normalizeIncomingPath(urlPath) {
+  let safePath = decodeURIComponent(String(urlPath || "/").split("?")[0] || "/");
+  safePath = safePath.replaceAll("\\", "/");
+  if (!safePath.startsWith("/")) safePath = "/" + safePath;
+  safePath = path.posix.normalize(safePath);
+  if (!safePath.startsWith("/")) safePath = "/" + safePath;
+  if (safePath !== "/" && safePath.endsWith("/")) {
+    safePath = safePath.slice(0, -1);
+  }
+  return safePath;
+}
+
+function resolveCleanPath(pathname) {
+  const normalized = normalizeIncomingPath(pathname);
+  if (normalized === "/index" || normalized === "/index.html") return "/";
+  if (/^\/(?:pages|books|experiences)\/[^/]+\.html$/i.test(normalized)) {
+    return normalized.replace(/\.html$/i, "");
+  }
+  return normalized;
+}
+
 function resolveRequestPath(urlPath) {
-  let safePath = decodeURIComponent(urlPath.split("?")[0]);
-  if (safePath === "/") safePath = "/index.html";
-  return path.normalize(safePath).replace(/^(\.\.[/\\])+/, "");
+  const cleanPath = resolveCleanPath(urlPath);
+  if (cleanPath === "/") return "/index.html";
+  if (/^\/(?:pages|books|experiences)\/[^/]+$/i.test(cleanPath)) {
+    return `${cleanPath}.html`;
+  }
+  return cleanPath;
 }
 
 async function readFileForRequest(urlPath) {
@@ -1934,6 +2087,36 @@ async function readFileForRequest(urlPath) {
   }
 }
 
+function getStaticCacheControl(url, payload) {
+  const pathname = String(url?.pathname || "/");
+  const ext = String(payload?.ext || path.extname(pathname)).toLowerCase();
+  if (!ext || ext === ".html") {
+    return "no-cache, no-transform";
+  }
+  if (url?.searchParams?.has("v")) {
+    return "public, max-age=31536000, immutable";
+  }
+  if (pathname.startsWith("/assets/")) {
+    return "public, max-age=604800";
+  }
+  if (pathname.startsWith("/shared/")) {
+    return "public, max-age=86400";
+  }
+  return "public, max-age=600";
+}
+
+function resolveCanonicalRedirectPath(pathname) {
+  const normalized = normalizeIncomingPath(pathname);
+  if (normalized === "/index" || normalized === "/index.html") return "/";
+  if (/^\/(?:pages|books|experiences)\/[^/]+\.html$/i.test(normalized)) {
+    return normalized.replace(/\.html$/i, "");
+  }
+  if (/^\/(?:pages|books|experiences)\/[^/]+\/$/i.test(pathname || "")) {
+    return normalized;
+  }
+  return "";
+}
+
 function escapeHtml(value) {
   return String(value || "")
     .replaceAll("&", "&amp;")
@@ -1941,6 +2124,13 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll("\"", "&quot;")
     .replaceAll("'", "&#39;");
+}
+
+function toInlineJson(value) {
+  return JSON.stringify(value)
+    .replace(/<\//g, "<\\/")
+    .replace(/\u2028/g, "\\u2028")
+    .replace(/\u2029/g, "\\u2029");
 }
 
 function injectBeforeBody(html, snippet) {
@@ -1970,6 +2160,109 @@ function clampText(value, maxLen = 4000) {
   const text = String(value || "");
   if (!text) return "";
   return text.length > maxLen ? text.slice(0, maxLen) : text;
+}
+
+function asArray(value) {
+  return Array.isArray(value) ? value : [];
+}
+
+function clampIntRange(value, min, max, fallback = 0) {
+  const num = Number(value);
+  if (!Number.isFinite(num)) return fallback;
+  return Math.max(min, Math.min(max, Math.round(num)));
+}
+
+function uniqueTexts(value, max = 24, maxLen = 80) {
+  const seen = new Set();
+  const out = [];
+  for (const item of asArray(value)) {
+    const text = clampText(item, maxLen).trim();
+    if (!text) continue;
+    const key = text.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(text);
+    if (out.length >= max) break;
+  }
+  return out;
+}
+
+function normalizeThinkTankEntryRow(raw) {
+  const row = raw && typeof raw === "object" ? raw : {};
+  const id = cleanText(row.id);
+  if (!id) return null;
+  return {
+    id: clampText(id, 80),
+    term: clampText(cleanText(row.term), 120),
+    title: clampText(cleanText(row.title), 160),
+    summary: clampText(cleanText(row.summary), 500),
+    insight: clampText(cleanText(row.insight), 420),
+    sourceCue: clampText(cleanText(row.sourceCue), 220),
+    tags: uniqueTexts(row.tags, 24, 40),
+    relatedTerms: uniqueTexts(row.relatedTerms, 24, 60),
+    books: uniqueTexts(row.books, 24, 120),
+    modules: uniqueTexts(row.modules, 120, 140),
+    related: asArray(row.related)
+      .map((item) => {
+        const rel = item && typeof item === "object" ? item : {};
+        const relId = cleanText(rel.id);
+        if (!relId) return null;
+        return {
+          id: clampText(relId, 80),
+          score: clampIntRange(rel.score, 0, 999, 0)
+        };
+      })
+      .filter(Boolean)
+      .slice(0, 12),
+    updated_at: cleanText(row.updated_at)
+  };
+}
+
+async function readThinkTankStore() {
+  try {
+    const raw = await fs.readFile(thinkTankFilePath, "utf8");
+    const parsed = JSON.parse(raw);
+    const booksRaw = parsed?.books && typeof parsed.books === "object" ? parsed.books : {};
+    const books = {};
+    for (const [bookId, row] of Object.entries(booksRaw)) {
+      const safeBookId = cleanText(bookId);
+      if (!safeBookId) continue;
+      const item = row && typeof row === "object" ? row : {};
+      books[safeBookId] = {
+        bookId: safeBookId,
+        title: clampText(cleanText(item.title), 160),
+        summary: clampText(cleanText(item.summary), 500),
+        entryIds: uniqueTexts(item.entryIds, 300, 90),
+        skillPoints: asArray(item.skillPoints).map((skill) => ({
+          id: clampText(cleanText(skill?.id), 80),
+          name: clampText(cleanText(skill?.name, cleanText(skill?.title)), 120),
+          description: clampText(cleanText(skill?.description, cleanText(skill?.summary)), 360),
+          difficulty: clampIntRange(skill?.difficulty, 1, 5, 1),
+          power: clampIntRange(skill?.power, 0, 100, 0),
+          xpReward: clampIntRange(skill?.xpReward ?? skill?.xp, 0, 500, 0),
+          gemReward: clampIntRange(skill?.gemReward ?? skill?.gems, 0, 200, 0)
+        })).filter((skill) => skill.id || skill.name).slice(0, 60),
+        updatedAt: cleanText(item.updated_at)
+      };
+    }
+    const entries = asArray(parsed?.entries).map(normalizeThinkTankEntryRow).filter(Boolean);
+    const entryById = new Map(entries.map((item) => [item.id, item]));
+    return {
+      ok: true,
+      updatedAt: cleanText(parsed?.updated_at),
+      books,
+      entries,
+      entryById
+    };
+  } catch {
+    return {
+      ok: false,
+      updatedAt: "",
+      books: {},
+      entries: [],
+      entryById: new Map()
+    };
+  }
 }
 
 function stripHtmlToText(html) {
@@ -2235,7 +2528,7 @@ function buildCatalogScript(sessionId) {
 
 function buildDynamicBookPageHtml(book) {
   const modulesHtml = book.modules.map((module) => `
-      <a class="module-card" href="/experiences/${encodeURIComponent(module.slug)}.html">
+      <a class="module-card" href="/experiences/${encodeURIComponent(module.slug)}">
         <img src="${escapeHtml(module.imageHref)}" alt="${escapeHtml(module.title)}" loading="lazy" />
         <div class="meta">
           <p class="idx">第 ${module.index} 关</p>
@@ -2312,6 +2605,26 @@ function buildDynamicBookPageHtml(book) {
       margin: 0;
       color: #a5b4fc;
       font-size: 13px;
+    }
+    .facts {
+      margin-top: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .facts span {
+      border: 1px solid rgba(148,163,184,.28);
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 11px;
+      color: #cfe1ff;
+      background: rgba(8,15,32,.38);
+    }
+    .knowledge-summary {
+      margin: 10px 0 0;
+      color: #dbeafe;
+      font-size: 13px;
+      line-height: 1.7;
     }
     .highlight {
       margin: 12px 0 0;
@@ -2395,12 +2708,18 @@ function buildDynamicBookPageHtml(book) {
         <span class="badge">${escapeHtml(book.categoryLabel || "书籍模块")} · ${escapeHtml(book.tier || "简餐级")}</span>
         <h1>${escapeHtml(book.title)}</h1>
         <p class="sub">${escapeHtml(book.moduleCount)} 个互动关卡</p>
+        <div class="facts">
+          <span>技能点 ${escapeHtml(String(Number(book.skillPointCount) || 0))}</span>
+          <span>智库词条 ${escapeHtml(String(Number(book.thinkTankEntryCount) || 0))}</span>
+          <span>比拼题 ${escapeHtml(String(Number(book.battleQuestionCount) || 0))}</span>
+        </div>
+        ${cleanText(book.knowledgeSummary) ? `<p class="knowledge-summary">${escapeHtml(book.knowledgeSummary)}</p>` : ""}
         <ul class="highlight">
           ${(Array.isArray(book.highlights) ? book.highlights : []).slice(0, 3).map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
         </ul>
         <div class="links">
           <a href="${escapeHtml(book.firstModuleHref)}">从第一关开始</a>
-          <a href="/pages/gamified-learning-hub-dashboard-1.html">返回个人书库</a>
+          <a href="/pages/gamified-learning-hub-dashboard-1">返回个人书库</a>
         </div>
       </article>
     </section>
@@ -2419,9 +2738,9 @@ function buildDynamicExperienceHtml(html, module, book) {
 <script type="module" src="/shared/shell.js"></script>
 <script src="/shared/experience-runtime.js"></script>
 <reado-app-shell data-page="knowledge-map"></reado-app-shell>`;
-  const nextHref = cleanText(module?.nextSlug) ? `/experiences/${encodeURIComponent(module.nextSlug)}.html` : "";
-  const prevHref = cleanText(module?.prevSlug) ? `/experiences/${encodeURIComponent(module.prevSlug)}.html` : "";
-  const hubHref = `/books/${encodeURIComponent(book.id)}.html`;
+  const nextHref = cleanText(module?.nextSlug) ? `/experiences/${encodeURIComponent(module.nextSlug)}` : "";
+  const prevHref = cleanText(module?.prevSlug) ? `/experiences/${encodeURIComponent(module.prevSlug)}` : "";
+  const hubHref = `/books/${encodeURIComponent(book.id)}`;
   const modulePagerSnippet = `
 <style>
   .reado-module-nav {
@@ -2488,22 +2807,30 @@ function buildDynamicExperienceHtml(html, module, book) {
 <script>
 (() => {
   try {
-    localStorage.setItem("reado_book_last_${book.id}", ${JSON.stringify(module.slug)});
-    if (${JSON.stringify(module.slug)} === ${JSON.stringify(book.lastModuleSlug)}) {
+    localStorage.setItem("reado_book_last_${book.id}", ${toInlineJson(module.slug)});
+    if (${toInlineJson(module.slug)} === ${toInlineJson(book.lastModuleSlug)}) {
       const key = "reado_completed_books_v1";
       const raw = localStorage.getItem(key) || "[]";
       const parsed = JSON.parse(raw);
       const next = new Set(Array.isArray(parsed) ? parsed : []);
-      next.add(${JSON.stringify(book.id)});
+      next.add(${toInlineJson(book.id)});
       localStorage.setItem(key, JSON.stringify([...next]));
     }
   } catch {}
 
   if (window.ReadoExperienceRuntime && typeof window.ReadoExperienceRuntime.init === "function") {
     window.ReadoExperienceRuntime.init({
-      bookId: ${JSON.stringify(book.id)},
-      moduleSlug: ${JSON.stringify(module.slug)},
-      moduleSlugs: ${JSON.stringify(book.moduleSlugs)}
+      bookId: ${toInlineJson(book.id)},
+      moduleSlug: ${toInlineJson(module.slug)},
+      moduleSlugs: ${toInlineJson(book.moduleSlugs)},
+      moduleMeta: ${toInlineJson(module?.meta || {})},
+      bookMeta: ${toInlineJson({
+        id: book?.id,
+        title: book?.title,
+        knowledgeSummary: book?.knowledgeSummary || "",
+        skillPointCount: Number(book?.skillPointCount) || 0,
+        thinkTankEntryCount: Number(book?.thinkTankEntryCount) || 0
+      })}
     });
   }
 })();
@@ -2513,7 +2840,7 @@ function buildDynamicExperienceHtml(html, module, book) {
 }
 
 async function readDynamicPayloadForRequest(pathname, sessionId) {
-  const normalized = String(pathname || "");
+  const normalized = resolveCleanPath(pathname);
   if (!normalized) return null;
 
   if (normalized === "/shared/book-catalog.js") {
@@ -2524,7 +2851,7 @@ async function readDynamicPayloadForRequest(pathname, sessionId) {
     };
   }
 
-  const bookMatch = normalized.match(/^\/books\/([^/]+)\.html$/);
+  const bookMatch = normalized.match(/^\/books\/([^/]+?)(?:\.html)?$/);
   if (bookMatch) {
     const bookId = decodeURIComponent(bookMatch[1] || "").trim();
     if (isUserGeneratedBookId(bookId) && !canSessionViewUserBook(sessionId, bookId)) {
@@ -2540,7 +2867,7 @@ async function readDynamicPayloadForRequest(pathname, sessionId) {
     };
   }
 
-  const experienceMatch = normalized.match(/^\/experiences\/([^/]+)\.html$/);
+  const experienceMatch = normalized.match(/^\/experiences\/([^/]+?)(?:\.html)?$/);
   if (experienceMatch) {
     const moduleSlug = decodeURIComponent(experienceMatch[1] || "").trim();
     const loaded = await runtimeBookCatalog.readModuleHtml(moduleSlug);
@@ -2659,6 +2986,12 @@ function getOrCreateModuleProgress(bookProgress, moduleSlug) {
       lastAction: "",
       lastLabel: "",
       lastDurationAt: "",
+      battleAttempts: 0,
+      battleWins: 0,
+      battleBestScore: 0,
+      battleLastAt: "",
+      battleClaimedAt: "",
+      battleReward: { xp: 0, gems: 0 },
       events: []
     };
     modules[moduleSlug] = moduleProgress;
@@ -2667,6 +3000,17 @@ function getOrCreateModuleProgress(bookProgress, moduleSlug) {
   moduleProgress.durationMsTotal = toInt(moduleProgress.durationMsTotal);
   moduleProgress.durationSamples = toInt(moduleProgress.durationSamples);
   moduleProgress.lastDurationAt = typeof moduleProgress.lastDurationAt === "string" ? moduleProgress.lastDurationAt : "";
+  moduleProgress.battleAttempts = toInt(moduleProgress.battleAttempts);
+  moduleProgress.battleWins = toInt(moduleProgress.battleWins);
+  moduleProgress.battleBestScore = toInt(moduleProgress.battleBestScore);
+  moduleProgress.battleLastAt = typeof moduleProgress.battleLastAt === "string" ? moduleProgress.battleLastAt : "";
+  moduleProgress.battleClaimedAt = typeof moduleProgress.battleClaimedAt === "string" ? moduleProgress.battleClaimedAt : "";
+  moduleProgress.battleReward = moduleProgress.battleReward && typeof moduleProgress.battleReward === "object"
+    ? {
+        xp: toInt(moduleProgress.battleReward.xp),
+        gems: toInt(moduleProgress.battleReward.gems)
+      }
+    : { xp: 0, gems: 0 };
   return moduleProgress;
 }
 
@@ -2776,6 +3120,8 @@ async function handleStripeWebhookApi(req, res) {
     const sessionId = sanitizeStripeString(dataObject.client_reference_id)
       || sanitizeStripeString(dataObject.metadata?.sessionId)
       || getSessionIdForCustomer(customerId);
+    const checkoutMode = sanitizeStripeString(dataObject.mode).toLowerCase();
+    const completedPriceId = sanitizeStripeString(dataObject.metadata?.priceId);
     touched = applyBillingUpdateForSession({
       sessionId,
       customerId,
@@ -2783,6 +3129,18 @@ async function handleStripeWebhookApi(req, res) {
       checkoutSessionId: sanitizeStripeString(dataObject.id),
       eventId
     });
+    if (sessionId && checkoutMode === "payment") {
+      const record = getOrCreateBillingRecord(sessionId);
+      if (completedPriceId && stripeLifetimePriceIds.has(completedPriceId)) {
+        const granted = applyLifetimePurchaseToRecord(record);
+        const reconciled = reconcileCreditsForRecord(record);
+        touched = granted || reconciled || touched;
+      }
+      const addonCredits = Math.max(0, toInt(stripeAddonPriceCredits.get(completedPriceId)));
+      if (addonCredits > 0) {
+        touched = applyAddonCreditsPurchaseToRecord(record, addonCredits) || touched;
+      }
+    }
   }
 
   if (
@@ -2836,6 +3194,9 @@ async function handleStripeWebhookApi(req, res) {
 function buildModuleResponse(bookId, moduleProgress) {
   const durationSamples = toInt(moduleProgress.durationSamples);
   const durationMsTotal = toInt(moduleProgress.durationMsTotal);
+  const battleReward = moduleProgress?.battleReward && typeof moduleProgress.battleReward === "object"
+    ? { xp: toInt(moduleProgress.battleReward.xp), gems: toInt(moduleProgress.battleReward.gems) }
+    : { xp: 0, gems: 0 };
   return {
     slug: moduleProgress.slug,
     visitCount: toInt(moduleProgress.visitCount),
@@ -2851,6 +3212,15 @@ function buildModuleResponse(bookId, moduleProgress) {
     lastDurationAt: moduleProgress.lastDurationAt || null,
     lastAction: moduleProgress.lastAction || "",
     lastLabel: moduleProgress.lastLabel || "",
+    battle: {
+      attempts: toInt(moduleProgress.battleAttempts),
+      wins: toInt(moduleProgress.battleWins),
+      bestScore: toInt(moduleProgress.battleBestScore),
+      lastAt: moduleProgress.battleLastAt || null,
+      claimed: Boolean(moduleProgress.battleClaimedAt),
+      claimedAt: moduleProgress.battleClaimedAt || null,
+      reward: battleReward
+    },
     bookId
   };
 }
@@ -2863,7 +3233,10 @@ function toPublicModule(module) {
     href: module.href,
     imageHref: module.imageHref,
     nextSlug: module.nextSlug || null,
-    prevSlug: module.prevSlug || null
+    prevSlug: module.prevSlug || null,
+    skillPointCount: asArray(module?.meta?.skillPoints).length,
+    thinkTankEntryCount: asArray(module?.meta?.thinkTankEntries).length,
+    battleQuestionCount: asArray(module?.meta?.knowledgeBattle?.questions).length
   };
 }
 
@@ -2899,7 +3272,10 @@ async function handleContentApi(req, res, url, session = null) {
           firstModuleHref: book.firstModuleHref,
           hubHref: book.hubHref,
           category: book.category,
-          categoryLabel: book.categoryLabel
+          categoryLabel: book.categoryLabel,
+          skillPointCount: Number(book.skillPointCount) || 0,
+          thinkTankEntryCount: Number(book.thinkTankEntryCount) || 0,
+          battleQuestionCount: Number(book.battleQuestionCount) || 0
         }))
       });
       return true;
@@ -2929,6 +3305,10 @@ async function handleContentApi(req, res, url, session = null) {
           category: book.category,
           categoryLabel: book.categoryLabel,
           categoryHint: book.categoryHint,
+          knowledgeSummary: cleanText(book.knowledgeSummary),
+          skillPointCount: Number(book.skillPointCount) || 0,
+          thinkTankEntryCount: Number(book.thinkTankEntryCount) || 0,
+          battleQuestionCount: Number(book.battleQuestionCount) || 0,
           highlights: book.highlights,
           modules: book.modules.map(toPublicModule)
         }
@@ -3135,6 +3515,11 @@ async function handleApi(req, res, url, providedSession = null) {
         enabled: stripeCheckoutReady(),
         defaultPriceId: stripeDefaultCheckoutPriceId,
         prices: stripeCheckoutPrices,
+        oneTime: {
+          lifetime: stripePriceLifetime,
+          addonCredits2000: stripePriceAddon2000,
+          addonCredits2000Amount: Math.max(0, toInt(stripeAddonPriceCredits.get(stripePriceAddon2000)))
+        },
         configStatus: stripeCheckoutConfigStatus
       },
       pricingTable: {
@@ -3174,13 +3559,22 @@ async function handleApi(req, res, url, providedSession = null) {
       writeJson(res, 503, { ok: false, error: "No Stripe checkout price configured on server" });
       return true;
     }
+    const isSubscriptionPrice = stripeSubscriptionPriceIds.has(selectedPriceId);
+    const isOneTimePrice = stripeOneTimePriceIds.has(selectedPriceId);
+    if (!isSubscriptionPrice && !isOneTimePrice) {
+      writeJson(res, 400, { ok: false, error: "Selected Stripe price is not mapped to any checkout mode" });
+      return true;
+    }
+    const checkoutMode = isOneTimePrice ? "payment" : "subscription";
     const sessionPayload = {
-      mode: "subscription",
+      mode: checkoutMode,
       success_url: stripeSuccessUrl,
       cancel_url: stripeCancelUrl,
       "line_items[0][price]": selectedPriceId,
       "line_items[0][quantity]": 1,
       "metadata[sessionId]": session.id,
+      "metadata[priceId]": selectedPriceId,
+      "metadata[checkoutMode]": checkoutMode,
       client_reference_id: session.id,
       allow_promotion_codes: "true"
     };
@@ -3195,15 +3589,18 @@ async function handleApi(req, res, url, providedSession = null) {
       applyBillingUpdateForSession({
         sessionId: session.id,
         customerId: sanitizeStripeString(stripeSession.customer),
-        subscriptionId: sanitizeStripeString(stripeSession.subscription),
+        subscriptionId: checkoutMode === "subscription"
+          ? sanitizeStripeString(stripeSession.subscription)
+          : "",
         checkoutSessionId: sanitizeStripeString(stripeSession.id),
-        priceId: selectedPriceId
+        priceId: checkoutMode === "subscription" ? selectedPriceId : ""
       });
       schedulePersist();
       writeJson(res, 200, {
         ok: true,
         checkoutUrl: sanitizeStripeString(stripeSession.url),
-        checkoutSessionId: sanitizeStripeString(stripeSession.id)
+        checkoutSessionId: sanitizeStripeString(stripeSession.id),
+        checkoutMode
       });
       return true;
     } catch (error) {
@@ -3288,6 +3685,109 @@ async function handleApi(req, res, url, providedSession = null) {
       },
       metrics: session.metrics || { visits: 0, interactions: 0 },
       books
+    });
+    return true;
+  }
+
+  const thinkTankBookMatch = pathname.match(/^\/api\/think-tank\/books\/([^/]+)$/);
+  if (method === "GET" && thinkTankBookMatch) {
+    const bookId = decodeURIComponent(thinkTankBookMatch[1] || "").trim();
+    if (!bookId) {
+      writeJson(res, 400, { ok: false, error: "bookId is required" });
+      return true;
+    }
+    if (isUserGeneratedBookId(bookId) && !canSessionViewUserBook(session?.id, bookId)) {
+      writeJson(res, 404, { ok: false, error: "Book not found" });
+      return true;
+    }
+    const [book, store] = await Promise.all([
+      runtimeBookCatalog.getBook(bookId),
+      readThinkTankStore()
+    ]);
+    if (!book) {
+      writeJson(res, 404, { ok: false, error: "Book not found" });
+      return true;
+    }
+    const storeBook = store.books?.[bookId] || null;
+    const seenEntries = new Set();
+    const mergedEntries = [];
+
+    const pushEntry = (entry) => {
+      const row = normalizeThinkTankEntryRow(entry);
+      if (!row) return;
+      if (seenEntries.has(row.id)) return;
+      seenEntries.add(row.id);
+      mergedEntries.push(row);
+    };
+
+    for (const entryId of asArray(storeBook?.entryIds)) {
+      pushEntry(store.entryById.get(entryId));
+    }
+    for (const module of asArray(book.modules)) {
+      for (const entry of asArray(module?.meta?.thinkTankEntries)) {
+        pushEntry(entry);
+      }
+    }
+
+    const entryLookup = new Map(mergedEntries.map((item) => [item.id, item]));
+    const entries = mergedEntries.map((entry) => ({
+      ...entry,
+      relatedEntries: asArray(entry.related)
+        .map((item) => {
+          const target = store.entryById.get(item.id) || entryLookup.get(item.id);
+          if (!target) return null;
+          return {
+            id: target.id,
+            title: target.title || target.term || target.id,
+            books: asArray(target.books).slice(0, 8),
+            score: clampIntRange(item.score, 0, 999, 0)
+          };
+        })
+        .filter(Boolean)
+        .slice(0, 8)
+    }));
+
+    writeJson(res, 200, {
+      ok: true,
+      book: {
+        id: book.id,
+        title: book.title,
+        summary: cleanText(storeBook?.summary, cleanText(book?.knowledgeSummary)),
+        skillPoints: asArray(storeBook?.skillPoints).slice(0, 32),
+        entryCount: entries.length,
+        updatedAt: cleanText(storeBook?.updatedAt, cleanText(store?.updatedAt))
+      },
+      entries
+    });
+    return true;
+  }
+
+  const thinkTankModuleMatch = pathname.match(/^\/api\/think-tank\/modules\/([^/]+)$/);
+  if (method === "GET" && thinkTankModuleMatch) {
+    const moduleSlug = decodeURIComponent(thinkTankModuleMatch[1] || "").trim();
+    if (!moduleSlug) {
+      writeJson(res, 400, { ok: false, error: "moduleSlug is required" });
+      return true;
+    }
+    const module = await runtimeBookCatalog.getModule(moduleSlug);
+    if (!module) {
+      writeJson(res, 404, { ok: false, error: "Module not found" });
+      return true;
+    }
+    if (isUserGeneratedBookId(module.bookId) && !canSessionViewUserBook(session?.id, module.bookId)) {
+      writeJson(res, 404, { ok: false, error: "Module not found" });
+      return true;
+    }
+    writeJson(res, 200, {
+      ok: true,
+      module: {
+        slug: module.slug,
+        bookId: module.bookId,
+        title: module.title,
+        skillPoints: asArray(module?.meta?.skillPoints).slice(0, 16),
+        thinkTankEntries: asArray(module?.meta?.thinkTankEntries).slice(0, 24),
+        knowledgeBattle: module?.meta?.knowledgeBattle || null
+      }
     });
     return true;
   }
@@ -3400,6 +3900,91 @@ async function handleApi(req, res, url, providedSession = null) {
     return true;
   }
 
+  const battleMatch = pathname.match(/^\/api\/modules\/([^/]+)\/battle-result$/);
+  if (method === "POST" && battleMatch) {
+    const body = await parseJsonBody(req).catch((error) => ({ __error: error?.message || "Invalid body" }));
+    if (body.__error) {
+      writeJson(res, 400, { ok: false, error: body.__error });
+      return true;
+    }
+    const moduleSlug = decodeURIComponent(battleMatch[1] || "").trim();
+    if (!moduleSlug) {
+      writeJson(res, 400, { ok: false, error: "moduleSlug is required" });
+      return true;
+    }
+    const moduleMeta = await runtimeBookCatalog.getModule(moduleSlug);
+    if (!moduleMeta) {
+      writeJson(res, 404, { ok: false, error: "Module not found" });
+      return true;
+    }
+    if (isUserGeneratedBookId(moduleMeta.bookId) && !canSessionViewUserBook(session?.id, moduleMeta.bookId)) {
+      writeJson(res, 404, { ok: false, error: "Module not found" });
+      return true;
+    }
+
+    const bookId = resolveBookId(body.bookId, moduleSlug) || moduleMeta.bookId;
+    const score = toInt(body.score);
+    const maxScoreRaw = toInt(body.maxScore);
+    const maxScore = Math.max(1, maxScoreRaw || asArray(moduleMeta?.meta?.knowledgeBattle?.questions).length || 1);
+    const passScoreRaw = toInt(moduleMeta?.meta?.knowledgeBattle?.passScore);
+    const passScore = Math.max(1, Math.min(maxScore, passScoreRaw || Math.ceil(maxScore * 0.6)));
+    const won = body.won === true || score >= passScore;
+    const rewardPreset = moduleMeta?.meta?.knowledgeBattle?.reward || {};
+    const rewardBase = {
+      xp: clampIntRange(rewardPreset.xp, 20, 500, 80),
+      gems: clampIntRange(rewardPreset.gems, 2, 160, 12)
+    };
+
+    const bookProgress = getOrCreateBookProgress(session, bookId);
+    const moduleProgress = getOrCreateModuleProgress(bookProgress, moduleSlug);
+    moduleProgress.battleAttempts = toInt(moduleProgress.battleAttempts) + 1;
+    if (won) {
+      moduleProgress.battleWins = toInt(moduleProgress.battleWins) + 1;
+    }
+    moduleProgress.battleBestScore = Math.max(toInt(moduleProgress.battleBestScore), score);
+    moduleProgress.battleLastAt = nowIso();
+
+    let shouldGrant = false;
+    let reward = { xp: 0, gems: 0 };
+    if (won && !moduleProgress.battleClaimedAt) {
+      shouldGrant = true;
+      reward = rewardBase;
+      moduleProgress.battleClaimedAt = moduleProgress.battleLastAt;
+      moduleProgress.battleReward = reward;
+    } else if (moduleProgress.battleReward && typeof moduleProgress.battleReward === "object") {
+      reward = {
+        xp: toInt(moduleProgress.battleReward.xp),
+        gems: toInt(moduleProgress.battleReward.gems)
+      };
+    }
+
+    const nextEvent = {
+      at: moduleProgress.battleLastAt,
+      action: "battle",
+      label: won ? "win" : "lose",
+      value: { score, maxScore, passScore, rewardGranted: shouldGrant }
+    };
+    const events = Array.isArray(moduleProgress.events) ? moduleProgress.events : [];
+    events.push(nextEvent);
+    moduleProgress.events = events.slice(-40);
+    schedulePersist();
+
+    writeJson(res, 200, {
+      ok: true,
+      module: buildModuleResponse(bookId, moduleProgress),
+      battle: {
+        won,
+        score,
+        maxScore,
+        passScore,
+        claimed: Boolean(moduleProgress.battleClaimedAt),
+        shouldGrant,
+        reward
+      }
+    });
+    return true;
+  }
+
   const interactionMatch = pathname.match(/^\/api\/modules\/([^/]+)\/interactions$/);
   if (method === "POST" && interactionMatch) {
     const body = await parseJsonBody(req).catch((error) => ({ __error: error?.message || "Invalid body" }));
@@ -3466,6 +4051,14 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
+    const redirectPath = resolveCanonicalRedirectPath(url.pathname);
+    if (redirectPath && redirectPath !== url.pathname) {
+      const location = redirectPath + (url.search || "");
+      res.writeHead(308, { Location: location, "Cache-Control": "no-cache, no-transform" });
+      res.end();
+      return;
+    }
+
     let payload = await readDynamicPayloadForRequest(url.pathname, session.id);
     if (!payload) {
       payload = await readFileForRequest(req.url || "/");
@@ -3478,7 +4071,7 @@ const server = http.createServer(async (req, res) => {
 
     res.writeHead(200, {
       "Content-Type": contentTypes[payload.ext] || "application/octet-stream",
-      "Cache-Control": "no-store"
+      "Cache-Control": getStaticCacheControl(url, payload)
     });
     if (method === "HEAD") {
       res.end();

@@ -197,6 +197,163 @@ const BOOK_BLUEPRINTS = [
   }
 ];
 
+const CATEGORY_META_I18N = {
+  "personal-growth": {
+    label: { "zh-CN": "个人修炼", "en-US": "Personal Growth", "ko-KR": "개인 성장" },
+    includes: { "zh-CN": "心理学 · 自我提升 · 时间管理 · 思维模型", "en-US": "Psychology · Self-improvement · Time Management · Mental Models", "ko-KR": "심리학 · 자기계발 · 시간관리 · 사고모형" },
+    hint: { "zh-CN": "提升内功和基础属性", "en-US": "Boost your core capabilities and base attributes", "ko-KR": "기본 역량과 코어 스탯을 강화" },
+    axis: { "zh-CN": "⚡ 瞬发技能 · ⏳ 持续Buff · 💎 终极觉醒", "en-US": "⚡ Burst Skills · ⏳ Sustained Buffs · 💎 Ultimate Awakening", "ko-KR": "⚡ 즉발 스킬 · ⏳ 지속 버프 · 💎 궁극 각성" }
+  },
+  "career-wealth": {
+    label: { "zh-CN": "事业/财富", "en-US": "Career/Wealth", "ko-KR": "커리어/자산" },
+    includes: { "zh-CN": "经济金融 · 商业管理 · 职场技能 · 创业", "en-US": "Economics · Business · Workplace Skills · Entrepreneurship", "ko-KR": "경제·금융 · 경영 · 실무 역량 · 창업" },
+    hint: { "zh-CN": "获取金币和装备，通关职场副本", "en-US": "Earn coins and gear to clear career missions", "ko-KR": "코인과 장비를 획득해 커리어 미션을 공략" },
+    axis: { "zh-CN": "🍤 零食级 · 🍱 简餐级 · 🥩 大餐级", "en-US": "🍤 Snack Tier · 🍱 Standard Tier · 🥩 Advanced Tier", "ko-KR": "🍤 스낵 등급 · 🍱 스탠다드 등급 · 🥩 어드밴스 등급" }
+  },
+  "science-knowledge": {
+    label: { "zh-CN": "认知/硬核", "en-US": "Cognition/Core", "ko-KR": "인지/핵심" },
+    includes: { "zh-CN": "科学普及 · 历史 · 哲学 · 社会学", "en-US": "Science · History · Philosophy · Sociology", "ko-KR": "과학 · 역사 · 철학 · 사회학" },
+    hint: { "zh-CN": "开拓世界地图，解锁迷雾", "en-US": "Expand your world map and clear the fog", "ko-KR": "세계 지도를 확장하고 안개를 해제" },
+    axis: { "zh-CN": "🍤 零食级 · 🍱 简餐级 · 🥩 大餐级", "en-US": "🍤 Snack Tier · 🍱 Standard Tier · 🥩 Advanced Tier", "ko-KR": "🍤 스낵 등급 · 🍱 스탠다드 등급 · 🥩 어드밴스 등급" }
+  },
+  "lifestyle-creativity": {
+    label: { "zh-CN": "灵感/生活", "en-US": "Lifestyle/Creativity", "ko-KR": "라이프/창의" },
+    includes: { "zh-CN": "艺术设计 · 传记 · 文学虚构 · 生活美学", "en-US": "Art & Design · Biography · Fiction · Aesthetics", "ko-KR": "예술·디자인 · 전기 · 문학 · 라이프스타일" },
+    hint: { "zh-CN": "增加魅力值和情绪点数", "en-US": "Increase charm and emotional energy", "ko-KR": "매력치와 감정 에너지를 향상" },
+    axis: { "zh-CN": "🍤 零食级 · 🍱 简餐级 · 🥩 大餐级", "en-US": "🍤 Snack Tier · 🍱 Standard Tier · 🥩 Advanced Tier", "ko-KR": "🍤 스낵 등급 · 🍱 스탠다드 등급 · 🥩 어드밴스 등급" }
+  }
+};
+
+const TIER_I18N = {
+  "简餐级": { "zh-CN": "简餐级", "en-US": "Standard Tier", "ko-KR": "스탠다드 등급" },
+  "大餐级": { "zh-CN": "大餐级", "en-US": "Advanced Tier", "ko-KR": "어드밴스 등급" }
+};
+
+const TAG_I18N = {
+  "谈资盲盒": { "zh-CN": "谈资盲盒", "en-US": "Conversation Pack", "ko-KR": "대화 인사이트 팩" },
+  "大脑健身房": { "zh-CN": "大脑健身房", "en-US": "Brain Gym", "ko-KR": "두뇌 체육관" },
+  "避坑指南": { "zh-CN": "避坑指南", "en-US": "Risk Guide", "ko-KR": "리스크 가이드" },
+  "创业心法": { "zh-CN": "创业心法", "en-US": "Startup Playbook", "ko-KR": "창업 플레이북" }
+};
+
+const BOOK_PRESET_I18N = {
+  "wanli-fifteen": {
+    title: { "zh-CN": "《万历十五年》", "en-US": "The Wanli Fifteen Years", "ko-KR": "만력 15년" },
+    badgeTitle: { "zh-CN": "制度解码者", "en-US": "System Decoder", "ko-KR": "제도 해독자" },
+    highlights: {
+      "zh-CN": [
+        "大一统帝国中，制度惯性常常压过个人意志。",
+        "税制与官僚协同失灵，会把局部问题放大成系统危机。",
+        "理解历史要看结构约束，而不只看人物好坏。"
+      ],
+      "en-US": [
+        "In centralized empires, institutional inertia can overpower individual intent.",
+        "When tax systems and bureaucracy fail to coordinate, local issues escalate into systemic crises.",
+        "Historical interpretation requires structural analysis, not just judging personalities."
+      ],
+      "ko-KR": [
+        "중앙집권 제국에서는 제도 관성이 개인 의지를 압도하기 쉽습니다.",
+        "조세 제도와 관료 체계의 협업 실패는 국지 문제를 시스템 위기로 키웁니다.",
+        "역사는 인물 평가보다 구조적 제약으로 읽어야 정확합니다."
+      ]
+    }
+  },
+  sapiens: {
+    title: { "zh-CN": "《人类简史》", "en-US": "Sapiens", "ko-KR": "사피엔스" },
+    badgeTitle: { "zh-CN": "文明叙事官", "en-US": "Civilization Narrator", "ko-KR": "문명 서사관" },
+    highlights: {
+      "zh-CN": [
+        "智人崛起依赖共同想象与大规模协作能力。",
+        "农业革命带来产能，也重塑了个体自由与社会结构。",
+        "货币、国家与宗教是组织复杂社会的关键叙事工具。"
+      ],
+      "en-US": [
+        "Homo sapiens rose through shared imagination and large-scale collaboration.",
+        "The Agricultural Revolution increased output but reshaped freedom and social structures.",
+        "Money, states, and religion are core narratives for organizing complex societies."
+      ],
+      "ko-KR": [
+        "사피엔스의 부상은 공유된 상상과 대규모 협업 능력에 기반했습니다.",
+        "농업혁명은 생산성을 높였지만 개인의 자유와 사회 구조를 재편했습니다.",
+        "화폐·국가·종교는 복잡한 사회를 조직하는 핵심 서사 도구입니다."
+      ]
+    }
+  },
+  "principles-for-navigating-big-debt-crises": {
+    title: { "zh-CN": "《置身事外》", "en-US": "Principles for Navigating Big Debt Crises", "ko-KR": "빅 부채 위기 대응 원칙" },
+    badgeTitle: { "zh-CN": "周期掌舵手", "en-US": "Cycle Navigator", "ko-KR": "사이클 네비게이터" },
+    highlights: {
+      "zh-CN": [
+        "债务周期有迹可循，关键在于识别杠杆扩张与收缩拐点。",
+        "去杠杆需要在增长、通胀与社会稳定之间做动态平衡。",
+        "宏观政策影响微观资产配置，风险管理先于收益追逐。"
+      ],
+      "en-US": [
+        "Debt cycles are trackable; the key is spotting leverage expansion and contraction inflection points.",
+        "Deleveraging requires dynamic balance across growth, inflation, and social stability.",
+        "Macro policy shapes micro allocation, so risk management must lead return seeking."
+      ],
+      "ko-KR": [
+        "부채 사이클은 추적 가능합니다. 핵심은 레버리지 확장·축소의 전환점을 포착하는 것입니다.",
+        "디레버리징은 성장·물가·사회 안정 사이의 동적 균형이 필요합니다.",
+        "거시 정책은 미시 자산배분에 영향을 주므로 수익보다 리스크 관리가 우선입니다."
+      ]
+    }
+  },
+  "zero-to-one": {
+    title: { "zh-CN": "《从零到一》", "en-US": "Zero to One", "ko-KR": "제로 투 원" },
+    badgeTitle: { "zh-CN": "创业破局者", "en-US": "Startup Breakthrough", "ko-KR": "창업 브레이커" },
+    highlights: {
+      "zh-CN": [
+        "真正的创新是从 0 到 1，而不是在存量市场里复制竞争。",
+        "优质创业目标是构建小而深的垄断，而非价格战。",
+        "长期价值来自技术壁垒、产品差异与组织执行力协同。"
+      ],
+      "en-US": [
+        "Real innovation is moving from 0 to 1, not replaying competition in existing markets.",
+        "Strong startups build focused monopolies instead of entering price wars.",
+        "Long-term value comes from the combination of tech moats, product differentiation, and execution."
+      ],
+      "ko-KR": [
+        "진짜 혁신은 기존 경쟁의 반복이 아니라 0에서 1로 가는 전환입니다.",
+        "좋은 스타트업은 가격 경쟁보다 작지만 깊은 독점 지위를 만듭니다.",
+        "장기 가치는 기술 장벽, 제품 차별화, 조직 실행력이 결합될 때 만들어집니다."
+      ]
+    }
+  }
+};
+
+const BOOK_MODULE_TITLE_I18N = {
+  "tax-reform-dilemma-1": { "en-US": "Wanli Year 15: Imperial Tax Decision", "ko-KR": "만력 15년: 황실 조세 의사결정" },
+  "tax-reform-dilemma-2": { "en-US": "Wanli Court Memorial Review", "ko-KR": "만력 조정 상소문 검토" },
+  "tax-reform-dilemma-3": { "en-US": "Zhang Juzheng Tax Reform", "ko-KR": "장거정 조세 개혁" },
+  "tax-reform-dilemma-4": { "en-US": "Hai Rui Integrity Trial", "ko-KR": "해서 청렴성 시뮬레이션" },
+  "tax-reform-dilemma-5": { "en-US": "Qi Jiguang: Lone Innovator", "ko-KR": "척계광: 고독한 혁신가" },
+  "the-wheat-conquest-simulator": { "en-US": "Wheat Conquest Simulator", "ko-KR": "밀 정복 시뮬레이터" },
+  "human-domestication-dilemma-1": { "en-US": "Sapiens Dilemma I", "ko-KR": "사피엔스 딜레마 1" },
+  "human-domestication-dilemma-2": { "en-US": "Sapiens Dilemma II", "ko-KR": "사피엔스 딜레마 2" },
+  "bilingual-human-domestication-dilemma": { "en-US": "Luxury Trap", "ko-KR": "사치의 함정" },
+  "bilingual-human-domestication-dilemma-4": { "en-US": "The Religion of Money", "ko-KR": "돈의 종교" },
+  "bilingual-human-domestication-dilemma-1": { "en-US": "Scientific Revolution: Admitting Ignorance", "ko-KR": "과학혁명: 무지의 인정" },
+  "bilingual-human-domestication-dilemma-2": { "en-US": "Power of Fiction", "ko-KR": "허구의 힘" },
+  "bilingual-human-domestication-dilemma-3": { "en-US": "Paradox of Happiness", "ko-KR": "행복의 역설" },
+  "the-beautiful-deleveraging-challenge": { "en-US": "Beautiful Deleveraging Challenge", "ko-KR": "아름다운 디레버리징 챌린지" },
+  "the-subway-dilemma": { "en-US": "Debt Crisis Simulator", "ko-KR": "부채 위기 시뮬레이터" },
+  "debt-cycle-impact-analysis": { "en-US": "Debt Cycle Impact Analysis", "ko-KR": "부채 사이클 영향 분석" },
+  "1994": { "en-US": "1994 Tax Reform Defense", "ko-KR": "1994 분세제 재정 방어" },
+  "experience-75": { "en-US": "Land Finance Alchemy", "ko-KR": "토지 금융 연금술" },
+  "experience-76": { "en-US": "LGFV Leverage Balancing", "ko-KR": "지방융자플랫폼 레버리지 균형" },
+  "experience-77": { "en-US": "Industrial-Residential Cross-Subsidy", "ko-KR": "산업-주거 교차보조" },
+  "zero-to-one-the-monopolist-s-choice": { "en-US": "Zero to One: Monopolist Choice", "ko-KR": "제로 투 원: 독점 선택" },
+  "zero-to-one-the-monopolist-s-choice-1": { "en-US": "Founder Paradox Profile", "ko-KR": "창업자 역설 프로파일" },
+  "zero-to-one-the-monopolist-s-choice-2": { "en-US": "Monopoly vs Competition Game", "ko-KR": "독점 vs 경쟁 게임" },
+  "zero-to-one-the-monopolist-s-choice-3": { "en-US": "0→1 Transition Simulator", "ko-KR": "0→1 전환 시뮬레이터" },
+  "zero-to-one-the-monopolist-s-choice-4": { "en-US": "Startup Seven Questions", "ko-KR": "창업 7문 진단" },
+  "zero-to-one-the-monopolist-s-choice-5": { "en-US": "Business Secret Explorer", "ko-KR": "비즈니스 시크릿 탐색" },
+  "zero-to-one-the-monopolist-s-choice-6": { "en-US": "Evolution Path Simulator", "ko-KR": "진화 경로 시뮬레이션" },
+  "zero-to-one-the-monopolist-s-choice-7": { "en-US": "Monopoly Final Choice", "ko-KR": "독점 최종 선택" }
+};
+
 function slugify(value) {
   return value
     .toLowerCase()
@@ -251,40 +408,228 @@ function resolveBookCoverId(baseName) {
 }
 
 function buildBookCatalog(books) {
+  const categoryMeta = Object.fromEntries(
+    Object.entries(CATEGORY_META).map(([key, value]) => {
+      const i18n = CATEGORY_META_I18N[key] || {};
+      return [
+        key,
+        {
+          ...value,
+          labelI18n: { "zh-CN": value.label || key, ...(i18n.label || {}) },
+          includesI18n: { "zh-CN": value.includes || "", ...(i18n.includes || {}) },
+          hintI18n: { "zh-CN": value.hint || "", ...(i18n.hint || {}) },
+          axisI18n: { "zh-CN": value.axis || "", ...(i18n.axis || {}) }
+        }
+      ];
+    })
+  );
+
   return {
     storage: {
       unlockKey: UNLOCK_STORAGE_KEY,
       completedKey: COMPLETED_STORAGE_KEY
     },
-    categoryMeta: CATEGORY_META,
-    books: books.map((book) => ({
-      id: book.id,
-      title: book.title,
-      price: book.price,
-      category: book.category,
-      categoryLabel: CATEGORY_META[book.category]?.label || "书籍模块",
-      categoryIncludes: CATEGORY_META[book.category]?.includes || "",
-      categoryHint: CATEGORY_META[book.category]?.hint || "",
-      categoryIcon: CATEGORY_META[book.category]?.icon || "auto_stories",
-      axis: CATEGORY_META[book.category]?.axis || "",
-      tier: book.tier || "简餐级",
-      tags: book.rewardTags || [],
-      badgeTitle: book.badgeTitle || "知识徽章",
-      badgeIcon: book.badgeIcon || "workspace_premium",
-      highlights: book.highlights || [],
-      cover: book.cover,
-      moduleCount: book.modules.length,
-      hubHref: book.hubHref,
-      firstModuleHref: `/experiences/${book.modules[0].slug}.html`,
-      moduleSlugs: book.modules.map((module) => module.slug),
-      lastModuleSlug: book.modules[book.modules.length - 1].slug
-    }))
+    categoryMeta,
+    books: books.map((book) => {
+      const preset = BOOK_PRESET_I18N[book.id] || {};
+      const category = categoryMeta[book.category] || {};
+      const modules = book.modules.map((module, index) => ({
+        slug: module.slug,
+        order: index + 1,
+        title: module.title,
+        titleI18n: { "zh-CN": module.title, ...(BOOK_MODULE_TITLE_I18N[module.slug] || {}) }
+      }));
+      return {
+        id: book.id,
+        title: book.title,
+        titleI18n: { "zh-CN": book.title, ...(preset.title || {}) },
+        price: book.price,
+        category: book.category,
+        categoryLabel: category.label || "书籍模块",
+        categoryLabelI18n: category.labelI18n || { "zh-CN": category.label || "书籍模块" },
+        categoryIncludes: category.includes || "",
+        categoryIncludesI18n: category.includesI18n || { "zh-CN": category.includes || "" },
+        categoryHint: category.hint || "",
+        categoryHintI18n: category.hintI18n || { "zh-CN": category.hint || "" },
+        categoryIcon: category.icon || "auto_stories",
+        axis: category.axis || "",
+        axisI18n: category.axisI18n || { "zh-CN": category.axis || "" },
+        tier: book.tier || "简餐级",
+        tierI18n: { "zh-CN": book.tier || "简餐级", ...(TIER_I18N[book.tier] || {}) },
+        tags: book.rewardTags || [],
+        tagsI18n: (book.rewardTags || []).map((tag) => ({ "zh-CN": tag, ...(TAG_I18N[tag] || {}) })),
+        badgeTitle: book.badgeTitle || "知识徽章",
+        badgeTitleI18n: { "zh-CN": book.badgeTitle || "知识徽章", ...(preset.badgeTitle || {}) },
+        badgeIcon: book.badgeIcon || "workspace_premium",
+        highlights: book.highlights || [],
+        highlightsI18n: { "zh-CN": book.highlights || [], ...(preset.highlights || {}) },
+        cover: book.cover,
+        moduleCount: modules.length,
+        hubHref: book.hubHref,
+        firstModuleHref: modules[0]?.slug ? `/experiences/${modules[0].slug}` : "",
+        moduleSlugs: modules.map((module) => module.slug),
+        lastModuleSlug: modules[modules.length - 1]?.slug || "",
+        modules
+      };
+    })
   };
 }
 
 function buildSharedBookCatalogScript(books) {
   const catalog = buildBookCatalog(books);
-  return `window.${BOOK_CATALOG_GLOBAL} = ${JSON.stringify(catalog)};`;
+  return `(() => {
+  const rawCatalog = ${JSON.stringify(catalog)};
+  const FALLBACK_LANG = "en-US";
+
+  const normalizeLanguage = (input) => {
+    const text = String(input || "").trim();
+    if (!text) return "";
+    return text.replace("_", "-").toLowerCase();
+  };
+
+  const pickLocaleValue = (value, lang, fallback = "") => {
+    const normalized = normalizeLanguage(lang) || normalizeLanguage(FALLBACK_LANG);
+    if (Array.isArray(value)) return value.slice();
+    if (!value || typeof value !== "object") {
+      if (value === undefined || value === null || value === "") return Array.isArray(fallback) ? fallback.slice() : fallback;
+      return value;
+    }
+    const entries = Object.entries(value);
+    const exact = entries.find(([code]) => normalizeLanguage(code) === normalized);
+    if (exact) return Array.isArray(exact[1]) ? exact[1].slice() : exact[1];
+    const short = normalized.split("-")[0];
+    const shortMatch = entries.find(([code]) => normalizeLanguage(code).startsWith(short + "-") || normalizeLanguage(code) === short);
+    if (shortMatch) return Array.isArray(shortMatch[1]) ? shortMatch[1].slice() : shortMatch[1];
+    const english = entries.find(([code]) => normalizeLanguage(code).startsWith("en-"));
+    if (english) return Array.isArray(english[1]) ? english[1].slice() : english[1];
+    const chinese = entries.find(([code]) => normalizeLanguage(code).startsWith("zh-"));
+    if (chinese) return Array.isArray(chinese[1]) ? chinese[1].slice() : chinese[1];
+    const first = entries[0];
+    if (!first) return Array.isArray(fallback) ? fallback.slice() : fallback;
+    return Array.isArray(first[1]) ? first[1].slice() : first[1];
+  };
+
+  const hasCjk = (text) => /[\\u3400-\\u9fff]/.test(String(text || ""));
+
+  const humanizeSlug = (slug) => {
+    return String(slug || "")
+      .replace(/[-_]+/g, " ")
+      .replace(/\\s+/g, " ")
+      .trim()
+      .replace(/\\b\\w/g, (char) => char.toUpperCase()) || "Module";
+  };
+
+  const localizeCategoryMeta = (lang) => {
+    const source = rawCatalog?.categoryMeta && typeof rawCatalog.categoryMeta === "object" ? rawCatalog.categoryMeta : {};
+    return Object.fromEntries(
+      Object.entries(source).map(([key, value]) => {
+        const label = pickLocaleValue(value?.labelI18n, lang, value?.label || key);
+        const includes = pickLocaleValue(value?.includesI18n, lang, value?.includes || "");
+        const hint = pickLocaleValue(value?.hintI18n, lang, value?.hint || "");
+        const axis = pickLocaleValue(value?.axisI18n, lang, value?.axis || "");
+        return [
+          key,
+          {
+            ...value,
+            label,
+            includes,
+            hint,
+            axis
+          }
+        ];
+      })
+    );
+  };
+
+  const localizeBook = (book, categoryMeta, lang) => {
+    const category = categoryMeta?.[book?.category] || {};
+    const modules = Array.isArray(book?.modules) ? book.modules.map((module, index) => {
+      const rawTitle = pickLocaleValue(module?.titleI18n, lang, module?.title || "");
+      const title = (!String(lang || "").toLowerCase().startsWith("zh") && hasCjk(rawTitle))
+        ? humanizeSlug(module?.slug)
+        : (rawTitle || humanizeSlug(module?.slug));
+      return {
+        ...module,
+        order: Number.isFinite(module?.order) ? module.order : (index + 1),
+        title
+      };
+    }) : [];
+    const tags = Array.isArray(book?.tagsI18n)
+      ? book.tagsI18n.map((entry, index) => pickLocaleValue(entry, lang, (book?.tags || [])[index] || "")).filter(Boolean)
+      : (Array.isArray(book?.tags) ? book.tags.slice() : []);
+    const highlightsRaw = pickLocaleValue(book?.highlightsI18n, lang, Array.isArray(book?.highlights) ? book.highlights : []);
+    const highlights = Array.isArray(highlightsRaw) ? highlightsRaw.slice() : (highlightsRaw ? [String(highlightsRaw)] : []);
+    const firstSlug = modules[0]?.slug || (Array.isArray(book?.moduleSlugs) ? book.moduleSlugs[0] : "");
+    const lastSlug = modules[modules.length - 1]?.slug || book?.lastModuleSlug || "";
+    return {
+      ...book,
+      title: pickLocaleValue(book?.titleI18n, lang, book?.title || ""),
+      categoryLabel: pickLocaleValue(book?.categoryLabelI18n, lang, category?.label || book?.categoryLabel || ""),
+      categoryIncludes: pickLocaleValue(book?.categoryIncludesI18n, lang, category?.includes || book?.categoryIncludes || ""),
+      categoryHint: pickLocaleValue(book?.categoryHintI18n, lang, category?.hint || book?.categoryHint || ""),
+      axis: pickLocaleValue(book?.axisI18n, lang, category?.axis || book?.axis || ""),
+      tier: pickLocaleValue(book?.tierI18n, lang, book?.tier || ""),
+      tags,
+      badgeTitle: pickLocaleValue(book?.badgeTitleI18n, lang, book?.badgeTitle || ""),
+      highlights,
+      modules,
+      moduleCount: modules.length || Number(book?.moduleCount) || 0,
+      moduleSlugs: modules.map((module) => module.slug).filter(Boolean),
+      firstModuleHref: book?.firstModuleHref || (firstSlug ? ("/experiences/" + firstSlug) : ""),
+      lastModuleSlug: lastSlug
+    };
+  };
+
+  const buildLocalizedCatalog = (lang) => {
+    const sourceBooks = Array.isArray(rawCatalog?.books) ? rawCatalog.books : [];
+    const categoryMeta = localizeCategoryMeta(lang);
+    return {
+      ...rawCatalog,
+      lang,
+      categoryMeta,
+      books: sourceBooks.map((book) => localizeBook(book, categoryMeta, lang))
+    };
+  };
+
+  const getActiveLanguage = () => {
+    const fromI18n = window.ReadoI18n?.getCurrentLanguage?.();
+    const fromDoc = document?.documentElement?.getAttribute("lang");
+    const normalized = normalizeLanguage(fromI18n || fromDoc || FALLBACK_LANG);
+    return normalized ? normalized : FALLBACK_LANG;
+  };
+
+  const applyCatalog = (langOverride) => {
+    const lang = normalizeLanguage(langOverride || getActiveLanguage()) || FALLBACK_LANG;
+    const localized = buildLocalizedCatalog(lang);
+    window.${BOOK_CATALOG_GLOBAL} = localized;
+    window.dispatchEvent(new CustomEvent("reado:catalog-updated", { detail: { lang } }));
+    return localized;
+  };
+
+  window.__READO_BOOK_CATALOG_RAW__ = rawCatalog;
+  window.ReadoBookCatalog = {
+    getRaw() {
+      return rawCatalog;
+    },
+    getCatalog() {
+      return window.${BOOK_CATALOG_GLOBAL} || applyCatalog();
+    },
+    getBooks() {
+      const current = window.${BOOK_CATALOG_GLOBAL} || applyCatalog();
+      return Array.isArray(current?.books) ? current.books : [];
+    },
+    refresh(lang) {
+      return applyCatalog(lang);
+    }
+  };
+
+  window.addEventListener("reado:langchange", (event) => {
+    const lang = event?.detail?.lang;
+    applyCatalog(lang);
+  });
+
+  applyCatalog();
+})();`;
 }
 
 function buildSharedExperienceRuntimeScript() {
@@ -509,7 +854,52 @@ function injectAppShell(html, pageKey) {
   if (html.includes("<reado-app-shell")) {
     return html;
   }
-  const snippet = `<script src="/shared/book-catalog.js?v=${shellAssetVersion}"></script>
+  const snippet = `<style id="reado-shell-boot-style">
+body.reado-shell-pending {
+  background: #0b1220;
+}
+body.reado-shell-pending > :not(script):not(reado-app-shell):not(.reado-shell-boot-mask) {
+  visibility: hidden !important;
+}
+body > .reado-shell-boot-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    radial-gradient(1200px 420px at 20% -10%, rgba(47, 123, 255, 0.22), transparent 60%),
+    radial-gradient(900px 360px at 92% 112%, rgba(0, 234, 255, 0.14), transparent 58%),
+    #0b1220;
+  transition: opacity 180ms ease;
+}
+body.reado-shell-pending > .reado-shell-boot-mask {
+  opacity: 1;
+}
+body.reado-shell-ready > .reado-shell-boot-mask {
+  opacity: 0;
+}
+</style>
+<script>
+(function () {
+  var body = document.body;
+  if (!body) return;
+  body.classList.add("reado-shell-pending");
+  var mask = body.querySelector(".reado-shell-boot-mask");
+  if (!mask) {
+    mask = document.createElement("div");
+    mask.className = "reado-shell-boot-mask";
+    mask.setAttribute("aria-hidden", "true");
+    body.appendChild(mask);
+  }
+  window.setTimeout(function () {
+    if (!body.classList.contains("reado-shell-applied")) {
+      body.classList.remove("reado-shell-pending");
+    }
+  }, 4000);
+})();
+</script>
+<script src="/shared/book-catalog.js?v=${shellAssetVersion}"></script>
 <script type="module" src="/shared/shell.js?v=${shellAssetVersion}"></script>
 <reado-app-shell data-page="${pageKey}"></reado-app-shell>`;
   return injectAfterBodyOpen(html, snippet);
@@ -589,27 +979,27 @@ function rewireSidebarLinks(html) {
   const routes = [
     {
       labels: ["个人书库", "知识版图", "世界地图"],
-      href: "/pages/gamified-learning-hub-dashboard-1.html"
+      href: "/pages/gamified-learning-hub-dashboard-1"
     },
     {
       labels: ["道具仓库", "我的库存"],
-      href: "/pages/simulator-library-level-selection-1.html"
+      href: "/pages/simulator-library-level-selection-1"
     },
     {
       labels: ["任务中心"],
-      href: "/pages/simulator-library-level-selection-2.html"
+      href: "/pages/simulator-library-level-selection-2"
     },
     {
       labels: ["排行榜"],
-      href: "/pages/global-scholar-leaderboard.html"
+      href: "/pages/global-scholar-leaderboard"
     },
     {
       labels: ["交易中心", "交易市场"],
-      href: "/pages/gamified-learning-hub-dashboard-3.html"
+      href: "/pages/gamified-learning-hub-dashboard-3"
     },
     {
       labels: ["个人资料", "个人主页"],
-      href: "/pages/gamified-learning-hub-dashboard-2.html"
+      href: "/pages/gamified-learning-hub-dashboard-2"
     }
   ];
 
@@ -768,7 +1158,7 @@ function injectMarketplaceBooks(html, books) {
       }
       const last = localStorage.getItem("reado_book_last_" + id);
       const canResume = Boolean(last && Array.isArray(book?.moduleSlugs) && book.moduleSlugs.includes(last));
-      window.location.href = canResume ? "/experiences/" + last + ".html" : first;
+      window.location.href = canResume ? "/experiences/" + last : first;
       return;
     }
     unlocked.add(id);
@@ -816,7 +1206,7 @@ function injectKnowledgeMapBooks(html, books) {
     categoryHint: CATEGORY_META[book.category]?.hint || "",
     moduleCount: book.modules.length,
     hubHref: book.hubHref,
-    firstModuleHref: `/experiences/${book.modules[0].slug}.html`,
+    firstModuleHref: `/experiences/${book.modules[0].slug}`,
     moduleSlugs: book.modules.map((module) => module.slug)
   }));
 
@@ -974,7 +1364,7 @@ function injectKnowledgeMapBooks(html, books) {
     }
 
     const goToCategory = () => {
-      window.location.href = "/pages/simulator-library-level-selection-1.html?category=" + category.id;
+      window.location.href = "/pages/simulator-library-level-selection-1?category=" + category.id;
     };
 
     node.addEventListener("click", goToCategory);
@@ -1218,7 +1608,7 @@ function injectKnowledgeMapBooks(html, books) {
       const last = localStorage.getItem("reado_book_last_" + bookId);
       const canResume = !forceFirst && Boolean(last && Array.isArray(book.moduleSlugs) && book.moduleSlugs.includes(last));
       const entryHref = canResume
-        ? "/experiences/" + last + ".html"
+        ? "/experiences/" + last
         : (book.firstModuleHref || book.hubHref || "");
       if (entryHref) {
         window.location.href = entryHref;
@@ -1269,7 +1659,7 @@ function injectExperienceQuickNav(html, book, moduleSlug) {
   const disableAutoNext = Boolean(book && book.id === "wanli-fifteen");
   const autoNextSnippet = book && nextModuleSlug && !disableAutoNext
     ? `
-  const readoNextHref = ${JSON.stringify(`/experiences/${nextModuleSlug}.html`)};
+  const readoNextHref = ${JSON.stringify(`/experiences/${nextModuleSlug}`)};
   (() => {
     let isNavigating = false;
     const keywordList = ["开始", "继续", "下一", "进入", "模拟", "抉择", "选择", "确认", "提交", "挑战", "完成", "start", "next", "continue"];
@@ -1376,7 +1766,7 @@ function injectSimulatorCategoryBooks(html, books) {
     ])
   );
   const storageKey = catalog?.storage?.unlockKey || ${JSON.stringify(UNLOCK_STORAGE_KEY)};
-  const marketUrl = "/pages/gamified-learning-hub-dashboard-3.html";
+  const marketUrl = "/pages/gamified-learning-hub-dashboard-3";
   const params = new URLSearchParams(window.location.search);
   const allCategories = Object.keys(categoryMeta);
   const fallbackCategory = allCategories.includes("science-knowledge") ? "science-knowledge" : (allCategories[0] || "science-knowledge");
@@ -1557,7 +1947,7 @@ function injectSimulatorCategoryBooks(html, books) {
       }
       const last = localStorage.getItem("reado_book_last_" + bookId);
       const canResume = Boolean(last && Array.isArray(book?.moduleSlugs) && book.moduleSlugs.includes(last));
-      window.location.href = canResume ? "/experiences/" + last + ".html" : first;
+      window.location.href = canResume ? "/experiences/" + last : first;
       return;
     }
     window.location.href = marketUrl;
@@ -1653,7 +2043,7 @@ function injectProfileTalents(html) {
     const last = localStorage.getItem("reado_book_last_" + book.id);
     const forceFirst = book.id === "wanli-fifteen";
     const canResume = !forceFirst && Boolean(last && Array.isArray(book.moduleSlugs) && book.moduleSlugs.includes(last));
-    const continueHref = canResume ? "/experiences/" + last + ".html" : book.firstModuleHref;
+    const continueHref = canResume ? "/experiences/" + last : book.firstModuleHref;
     review.innerHTML = \`
       <div class="rounded-xl border border-white/10 bg-slate-950/70 p-4">
         <div class="text-cyan-300 text-xs font-bold mb-2">\${book.badgeTitle}</div>
@@ -1817,9 +2207,9 @@ function injectMissionCenter(html) {
     const s = getSnapshot();
     const openBook = books.find((book) => s.unlocked.has(book.id) && !s.completed.has(book.id));
     const firstBook = books[0];
-    const knowledgeHref = "/pages/gamified-learning-hub-dashboard-1.html";
-    const marketHref = "/pages/gamified-learning-hub-dashboard-3.html";
-    const profileHref = "/pages/gamified-learning-hub-dashboard-2.html";
+    const knowledgeHref = "/pages/gamified-learning-hub-dashboard-1";
+    const marketHref = "/pages/gamified-learning-hub-dashboard-3";
+    const profileHref = "/pages/gamified-learning-hub-dashboard-2";
 
     return {
       daily: [
@@ -2240,22 +2630,22 @@ function buildBookHubHtml(book) {
   const modulesHtml = book.modules
     .map(
       (module, index) => `
-      <a class="module-card" data-module="${escapeHtml(module.slug)}" href="/experiences/${escapeHtml(module.slug)}.html">
+      <a class="module-card" data-module="${escapeHtml(module.slug)}" href="/experiences/${escapeHtml(module.slug)}">
         <img src="/assets/experiences/${escapeHtml(module.slug)}.png" alt="${escapeHtml(module.title)}" loading="lazy" />
         <div>
-          <h3>模块 ${index + 1}: ${escapeHtml(module.title)}</h3>
-          <p>进入该模块体验</p>
+          <h3 data-module-heading data-module-index="${index + 1}" data-module-slug="${escapeHtml(module.slug)}">${escapeHtml(module.title)}</h3>
+          <p data-module-entry>进入该模块体验</p>
         </div>
       </a>`
     )
     .join("");
 
   return `<!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>reado: ${escapeHtml(book.title)} 模块中心</title>
+  <title>reado: ${escapeHtml(book.title)} Module Hub</title>
   <style>
     :root {
       color-scheme: dark;
@@ -2375,16 +2765,16 @@ function buildBookHubHtml(book) {
   <main class="container">
     <header class="head">
       <div>
-        <h1 class="title">${escapeHtml(book.title)}</h1>
-        <p class="sub">共 ${book.modules.length} 个模块，完成购买后可进入模块体验。</p>
+        <h1 class="title" id="book-title">${escapeHtml(book.title)}</h1>
+        <p class="sub" id="book-sub">共 ${book.modules.length} 个模块，完成购买后可进入模块体验。</p>
       </div>
       <div class="back-links">
-        <a href="/pages/gamified-learning-hub-dashboard-1.html">个人书库</a>
-        <a href="/pages/gamified-learning-hub-dashboard-3.html">交易中心</a>
+        <a href="/pages/gamified-learning-hub-dashboard-1" id="book-back-library">个人书库</a>
+        <a href="/pages/gamified-learning-hub-dashboard-3" id="book-back-market">交易中心</a>
       </div>
     </header>
     <section id="book-lock" class="lock" hidden>
-      <p>该书尚未购买，请先前往交易中心完成购买。</p>
+      <p id="book-lock-text">该书尚未购买，请先前往交易中心完成购买。</p>
       <button id="book-unlock-cta">去交易中心购买</button>
     </section>
     <section id="book-grid" class="grid">${modulesHtml}
@@ -2393,17 +2783,84 @@ function buildBookHubHtml(book) {
   <script>
     (() => {
       const bookId = ${JSON.stringify(book.id)};
+      const defaultTitle = ${JSON.stringify(book.title)};
       const storageKey = ${JSON.stringify(UNLOCK_STORAGE_KEY)};
       const lockEl = document.getElementById("book-lock");
       const gridEl = document.getElementById("book-grid");
       const cta = document.getElementById("book-unlock-cta");
+      const titleEl = document.getElementById("book-title");
+      const subEl = document.getElementById("book-sub");
+      const backLibraryEl = document.getElementById("book-back-library");
+      const backMarketEl = document.getElementById("book-back-market");
+      const lockTextEl = document.getElementById("book-lock-text");
+      const moduleCards = Array.from(document.querySelectorAll("a[data-module]"));
+      const tr = (key, fallback, params) => {
+        if (window.ReadoI18n && typeof window.ReadoI18n.t === "function") {
+          return window.ReadoI18n.t(key, fallback, params);
+        }
+        let text = String(fallback || key);
+        const entries = params && typeof params === "object" ? Object.entries(params) : [];
+        for (const [paramKey, paramValue] of entries) {
+          text = text.replaceAll("{" + paramKey + "}", String(paramValue));
+        }
+        return text;
+      };
+      const formatNumber = (value) => {
+        const lang = window.ReadoI18n?.getCurrentLanguage?.() || document.documentElement.lang || "en-US";
+        return new Intl.NumberFormat(lang).format(Math.max(0, Number(value) || 0));
+      };
+      const humanizeSlug = (slug) => {
+        return String(slug || "")
+          .replace(/[-_]+/g, " ")
+          .replace(/\s+/g, " ")
+          .trim()
+          .replace(/\b\w/g, (char) => char.toUpperCase()) || "Module";
+      };
+      const resolveBook = () => {
+        const catalogBooks = window.ReadoBookCatalog?.getBooks?.()
+          || (Array.isArray(window.${BOOK_CATALOG_GLOBAL}?.books) ? window.${BOOK_CATALOG_GLOBAL}.books : []);
+        return catalogBooks.find((item) => item && item.id === bookId) || null;
+      };
+      const renderLocalized = () => {
+        const current = resolveBook();
+        const title = current?.title || defaultTitle;
+        if (titleEl) titleEl.textContent = title;
+        if (subEl) {
+          const count = current?.moduleCount || current?.modules?.length || ${book.modules.length};
+          subEl.textContent = tr("bookhub.module_count", "共 {value} 个模块，完成购买后可进入模块体验。", {
+            value: formatNumber(count)
+          });
+        }
+        if (backLibraryEl) backLibraryEl.textContent = tr("bookhub.back_library", "个人书库");
+        if (backMarketEl) backMarketEl.textContent = tr("bookhub.back_market", "交易中心");
+        if (lockTextEl) lockTextEl.textContent = tr("bookhub.lock_message", "该书尚未购买，请先前往交易中心完成购买。");
+        if (cta) cta.textContent = tr("bookhub.unlock_cta", "去交易中心购买");
+        document.title = tr("bookhub.title_suffix", "reado: {title} 模块中心", { title });
+
+        const moduleMap = new Map((current?.modules || []).map((module) => [module.slug, module.title]));
+        moduleCards.forEach((card) => {
+          if (!(card instanceof HTMLElement)) return;
+          const slug = card.getAttribute("data-module") || "";
+          const index = Number(card.querySelector("[data-module-index]")?.getAttribute("data-module-index")) || 1;
+          const titleText = moduleMap.get(slug) || humanizeSlug(slug);
+          const heading = card.querySelector("[data-module-heading]");
+          const entry = card.querySelector("[data-module-entry]");
+          const image = card.querySelector("img");
+          if (heading) {
+            heading.textContent = tr("bookhub.module_prefix", "模块 {value}", { value: index }) + ": " + titleText;
+          }
+          if (entry) entry.textContent = tr("bookhub.enter_module", "进入该模块体验");
+          if (image) image.alt = titleText;
+        });
+      };
       const unlocked = new Set(JSON.parse(localStorage.getItem(storageKey) || "[]"));
       const isUnlocked = unlocked.has(bookId);
       lockEl.hidden = isUnlocked;
       gridEl.hidden = !isUnlocked;
+      renderLocalized();
       if (cta) {
         cta.addEventListener("click", () => {
-          window.location.href = "/pages/gamified-learning-hub-dashboard-3.html";
+          window.location.href = "/pages/gamified-learning-hub-dashboard-3";
         });
       }
       if (!isUnlocked) return;
@@ -2416,6 +2873,8 @@ function buildBookHubHtml(book) {
         if (!moduleSlug) return;
         localStorage.setItem("reado_book_last_" + bookId, moduleSlug);
       });
+      window.addEventListener("reado:catalog-updated", renderLocalized);
+      window.addEventListener("reado:langchange", renderLocalized);
     })();
   </script>
 </body>
@@ -2424,11 +2883,11 @@ function buildBookHubHtml(book) {
 
 function buildGemCenterHtml() {
   return `<!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>reado: 宝石中心</title>
+  <title>reado: Gem Center</title>
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <style>
     body {
@@ -2443,26 +2902,28 @@ function buildGemCenterHtml() {
 <body class="p-6 md:p-10">
   <main class="max-w-3xl mx-auto space-y-6">
     <header class="rounded-2xl border border-cyan-300/20 bg-slate-900/65 p-6">
-      <h1 class="text-3xl md:text-4xl font-black text-white">宝石中心</h1>
-      <p class="mt-2 text-slate-300">连续签到可提高奖励，第 1 天 <strong class="text-cyan-300">20 宝石</strong>，阶段日奖励更高。</p>
+      <h1 id="reado-gem-title" class="text-3xl md:text-4xl font-black text-white">宝石中心</h1>
+      <p id="reado-gem-subtitle" class="mt-2 text-slate-300">连续签到可提高奖励，第 1 天 20 宝石，阶段日奖励更高。</p>
       <div class="mt-5 inline-flex items-center gap-2 px-4 py-2 rounded-full border border-cyan-300/35 bg-cyan-400/10">
         <span class="material-icons text-cyan-300 text-base">diamond</span>
-        <span class="text-cyan-200 font-bold">当前宝石：<span id="reado-gem-total">--</span></span>
+        <span id="reado-gem-total-label" class="text-cyan-200 font-bold">当前宝石：--</span>
       </div>
     </header>
     <section class="rounded-2xl border border-white/10 bg-slate-900/55 p-6">
-      <h2 class="text-xl font-black text-white">每日补给</h2>
+      <h2 id="reado-gem-daily-title" class="text-xl font-black text-white">每日补给</h2>
       <p id="reado-gem-tip" class="mt-2 text-sm text-slate-300">正在读取领取状态...</p>
       <p id="reado-gem-streak" class="mt-2 text-xs text-cyan-200">连续签到：--</p>
       <div id="reado-gem-milestones" class="mt-3 flex flex-wrap gap-2 text-xs"></div>
       <button id="reado-gem-claim-btn" class="mt-4 px-5 py-2 rounded-lg font-bold text-sm transition-all bg-blue-600 text-white hover:brightness-110">今日签到领取 -- 宝石</button>
     </section>
     <section class="rounded-2xl border border-white/10 bg-slate-900/40 p-6">
-      <h3 class="text-lg font-black text-white">快速入口</h3>
+      <h3 id="reado-gem-quick-title" class="text-lg font-black text-white">快速入口</h3>
       <div class="mt-3 flex flex-wrap gap-2">
-        <a href="/pages/gamified-learning-hub-dashboard-3.html" class="px-3 py-2 rounded-lg border border-white/15 text-slate-200 text-sm font-bold">交易中心</a>
-        <a href="/pages/simulator-library-level-selection-2.html" class="px-3 py-2 rounded-lg border border-white/15 text-slate-200 text-sm font-bold">任务中心</a>
-        <a href="/pages/gamified-learning-hub-dashboard-2.html" class="px-3 py-2 rounded-lg border border-white/15 text-slate-200 text-sm font-bold">个人资料</a>
+        <a id="reado-gem-link-market" href="/pages/gamified-learning-hub-dashboard-3" class="px-3 py-2 rounded-lg border border-white/15 text-slate-200 text-sm font-bold">交易中心</a>
+        <a id="reado-gem-link-skill-tree" href="/pages/skill-tree" class="px-3 py-2 rounded-lg border border-white/15 text-slate-200 text-sm font-bold">技能树</a>
+        <a id="reado-gem-link-think-tank" href="/pages/think-tank" class="px-3 py-2 rounded-lg border border-white/15 text-slate-200 text-sm font-bold">智库</a>
+        <a id="reado-gem-link-mission" href="/pages/simulator-library-level-selection-2" class="px-3 py-2 rounded-lg border border-white/15 text-slate-200 text-sm font-bold">任务中心</a>
+        <a id="reado-gem-link-profile" href="/pages/gamified-learning-hub-dashboard-2" class="px-3 py-2 rounded-lg border border-white/15 text-slate-200 text-sm font-bold">个人资料</a>
       </div>
     </section>
   </main>
@@ -2482,12 +2943,59 @@ function buildGemCenterHtml() {
         25: 80,
         30: 110
       };
-      const totalEl = document.getElementById("reado-gem-total");
+      const dayOneReward = 20;
+      const titleEl = document.getElementById("reado-gem-title");
+      const subtitleEl = document.getElementById("reado-gem-subtitle");
+      const totalLabelEl = document.getElementById("reado-gem-total-label");
+      const dailyTitleEl = document.getElementById("reado-gem-daily-title");
+      const quickTitleEl = document.getElementById("reado-gem-quick-title");
+      const marketLinkEl = document.getElementById("reado-gem-link-market");
+      const skillTreeLinkEl = document.getElementById("reado-gem-link-skill-tree");
+      const thinkTankLinkEl = document.getElementById("reado-gem-link-think-tank");
+      const missionLinkEl = document.getElementById("reado-gem-link-mission");
+      const profileLinkEl = document.getElementById("reado-gem-link-profile");
       const tipEl = document.getElementById("reado-gem-tip");
       const streakEl = document.getElementById("reado-gem-streak");
       const milestonesEl = document.getElementById("reado-gem-milestones");
       const btnEl = document.getElementById("reado-gem-claim-btn");
-      if (!totalEl || !tipEl || !btnEl || !streakEl || !milestonesEl) return;
+      if (!totalLabelEl || !tipEl || !btnEl || !streakEl || !milestonesEl) return;
+
+      const tr = (key, fallback, params) => {
+        if (window.ReadoI18n && typeof window.ReadoI18n.t === "function") {
+          return window.ReadoI18n.t(key, fallback, params);
+        }
+        let text = String(fallback || key);
+        const entries = params && typeof params === "object" ? Object.entries(params) : [];
+        for (const [paramKey, paramValue] of entries) {
+          text = text.replaceAll("{" + paramKey + "}", String(paramValue));
+        }
+        return text;
+      };
+
+      const getLang = () => window.ReadoI18n?.getCurrentLanguage?.() || document.documentElement.lang || "en-US";
+      const formatNumber = (value) => new Intl.NumberFormat(getLang()).format(Math.max(0, Number(value) || 0));
+
+      const applyStaticText = () => {
+        if (titleEl) titleEl.textContent = tr("gem.title", "宝石中心");
+        if (subtitleEl) {
+          subtitleEl.textContent = tr("gem.subtitle", "连续签到可提高奖励，第 1 天 {value} 宝石，阶段日奖励更高。", {
+            value: formatNumber(dayOneReward)
+          });
+        }
+        if (dailyTitleEl) dailyTitleEl.textContent = tr("gem.daily_supply", "每日补给");
+        if (quickTitleEl) quickTitleEl.textContent = tr("gem.quick_access", "快速入口");
+        if (marketLinkEl) marketLinkEl.textContent = tr("route.market", "交易中心");
+        if (skillTreeLinkEl) skillTreeLinkEl.textContent = tr("route.skill_tree", "技能树");
+        if (thinkTankLinkEl) thinkTankLinkEl.textContent = tr("route.think_tank", "智库");
+        if (missionLinkEl) missionLinkEl.textContent = tr("route.mission", "任务中心");
+        if (profileLinkEl) profileLinkEl.textContent = tr("route.profile", "个人资料");
+        if (!totalLabelEl.textContent || totalLabelEl.textContent.includes("--")) {
+          totalLabelEl.textContent = tr("gem.current_gems", "当前宝石：{value}", { value: "--" });
+        }
+        if (!tipEl.textContent) {
+          tipEl.textContent = tr("gem.loading", "正在读取领取状态...");
+        }
+      };
 
       const dayKey = (source = new Date()) => {
         const y = source.getFullYear();
@@ -2577,13 +3085,19 @@ function buildGemCenterHtml() {
             : reached
               ? "border-emerald-300/50 bg-emerald-400/15 text-emerald-100"
               : "border-white/15 bg-white/5 text-slate-300";
-          return '<span class="px-2 py-1 rounded-md border ' + cls + '">第' + day + '天 +' + reward + "</span>";
+          return '<span class="px-2 py-1 rounded-md border ' + cls + '">' + tr("gem.milestone_item", "第 {day} 天 +{reward}", {
+            day: formatNumber(day),
+            reward: formatNumber(reward)
+          }) + "</span>";
         }).join("");
       };
 
       const render = () => {
         const user = window.ReadoUser?.getState?.();
-        if (user) totalEl.textContent = new Intl.NumberFormat("zh-CN").format(user.gems || 0);
+        const currentGems = user ? user.gems || 0 : "--";
+        totalLabelEl.textContent = tr("gem.current_gems", "当前宝石：{value}", {
+          value: typeof currentGems === "number" ? formatNumber(currentGems) : "--"
+        });
 
         const state = loadClaimState();
         const today = dayKey();
@@ -2597,18 +3111,31 @@ function buildGemCenterHtml() {
           : (lastDiff === 1 ? state.streak : 0);
 
         if (claimed) {
-          tipEl.textContent = "今日已领取 " + todayReward + " 宝石，明天继续签到可获得更多。";
+          tipEl.textContent = tr("gem.tip_claimed", "今日已领取 {value} 宝石，明天继续签到可获得更多。", {
+            value: formatNumber(todayReward)
+          });
         } else if (stableStreak > 0) {
-          tipEl.textContent = "连续签到第 " + nextStreak + " 天可领取 " + todayReward + " 宝石。";
+          tipEl.textContent = tr("gem.tip_streak", "连续签到第 {day} 天可领取 {value} 宝石。", {
+            day: formatNumber(nextStreak),
+            value: formatNumber(todayReward)
+          });
         } else if (state.streak > 0) {
-          tipEl.textContent = "签到已中断，今日重新开始可领取 " + todayReward + " 宝石。";
+          tipEl.textContent = tr("gem.tip_restart", "签到已中断，今日重新开始可领取 {value} 宝石。", {
+            value: formatNumber(todayReward)
+          });
         } else {
-          tipEl.textContent = "今日尚未领取，签到第 1 天可领取 " + todayReward + " 宝石。";
+          tipEl.textContent = tr("gem.tip_first", "今日尚未领取，签到第 1 天可领取 {value} 宝石。", {
+            value: formatNumber(todayReward)
+          });
         }
 
-        streakEl.textContent = "连续签到：" + stableStreak + " 天";
+        streakEl.textContent = tr("gem.streak_prefix", "连续签到：{value} 天", {
+          value: formatNumber(stableStreak)
+        });
         renderMilestones(cycleDay);
-        btnEl.textContent = claimed ? "今日已领取" : ("今日签到领取 " + todayReward + " 宝石");
+        btnEl.textContent = claimed
+          ? tr("gem.claimed_today", "今日已领取")
+          : tr("gem.claim_today", "今日签到领取 {value} 宝石", { value: formatNumber(todayReward) });
         btnEl.disabled = claimed;
         btnEl.className = claimed
           ? "mt-4 px-5 py-2 rounded-lg font-bold text-sm transition-all bg-white/10 text-slate-500 cursor-not-allowed"
@@ -2617,6 +3144,7 @@ function buildGemCenterHtml() {
 
       const waitUser = () => {
         if (window.ReadoUser?.getState && window.ReadoUser?.grantRewards) {
+          applyStaticText();
           render();
           return;
         }
@@ -2642,6 +3170,11 @@ function buildGemCenterHtml() {
       });
 
       window.addEventListener("reado:user-updated", render);
+      window.addEventListener("reado:langchange", () => {
+        applyStaticText();
+        render();
+      });
+      applyStaticText();
     })();
   </script>
 </body>
@@ -2947,7 +3480,7 @@ function buildAnalyticsDashboardHtml() {
 
 function buildIndexHtml(pages) {
   const home = pages.find((page) => page.slug === "gamified-learning-hub-dashboard-1");
-  const homeHref = home ? `/pages/${home.slug}.html` : `/pages/${pages[0].slug}.html`;
+  const homeHref = home ? `/pages/${home.slug}` : `/pages/${pages[0].slug}`;
 
   return `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -2975,12 +3508,12 @@ function buildIndexHtml(pages) {
 
 function buildSharedShellScript() {
   return `const ROUTES = [
-  { id: "knowledge-map", icon: "map", label: "个人书库", href: "/pages/gamified-learning-hub-dashboard-1.html" },
-  { id: "mission", icon: "assignment", label: "任务中心", href: "/pages/simulator-library-level-selection-2.html" },
-  { id: "studio", icon: "auto_awesome", label: "创作工坊", href: "/pages/playable-studio.html" },
-  { id: "ranking", icon: "leaderboard", label: "排行榜", href: "/pages/global-scholar-leaderboard.html" },
-  { id: "market", icon: "storefront", label: "交易中心", href: "/pages/gamified-learning-hub-dashboard-3.html" },
-  { id: "profile", icon: "person", label: "个人资料", href: "/pages/gamified-learning-hub-dashboard-2.html" }
+  { id: "knowledge-map", icon: "map", label: "个人书库", href: "/pages/gamified-learning-hub-dashboard-1" },
+  { id: "mission", icon: "assignment", label: "任务中心", href: "/pages/simulator-library-level-selection-2" },
+  { id: "studio", icon: "auto_awesome", label: "创作工坊", href: "/pages/playable-studio" },
+  { id: "ranking", icon: "leaderboard", label: "排行榜", href: "/pages/global-scholar-leaderboard" },
+  { id: "market", icon: "storefront", label: "交易中心", href: "/pages/gamified-learning-hub-dashboard-3" },
+  { id: "profile", icon: "person", label: "个人资料", href: "/pages/gamified-learning-hub-dashboard-2" }
 ];
 
 const STYLE_ID = "reado-shared-shell-style";
@@ -2996,7 +3529,7 @@ const DEFAULT_USER_STATE = {
   avatar:
     "/assets/remote-images/3ec2fbb52c0ab37789b9f619.png"
 };
-const GEM_CENTER_HREF = "/pages/gem-center.html";
+const GEM_CENTER_HREF = "/pages/gem-center";
 const LAST_EXPERIENCE_KEY = "reado_last_experience_href";
 const DEEPSEEK_KEY_STORAGE = "reado_deepseek_api_key";
 const DEEPSEEK_ENDPOINT_STORAGE = "reado_deepseek_endpoint";
@@ -4393,25 +4926,25 @@ class ReadoAppShell extends HTMLElement {
     if (isLearningPage) {
       document.body.classList.add("reado-experience-mode");
     }
-    if (path === "/pages/simulator-library-level-selection-2.html") {
+    if (path === "/pages/simulator-library-level-selection-2") {
       document.body.classList.add("reado-page-mission");
     }
-    if (path === "/pages/simulator-library-level-selection-1.html") {
+    if (path === "/pages/simulator-library-level-selection-1") {
       document.body.classList.add("reado-page-warehouse");
     }
-    if (path === "/pages/gamified-learning-hub-dashboard-1.html") {
+    if (path === "/pages/gamified-learning-hub-dashboard-1") {
       document.body.classList.add("reado-page-map");
     }
-    if (path === "/pages/gamified-learning-hub-dashboard-3.html") {
+    if (path === "/pages/gamified-learning-hub-dashboard-3") {
       document.body.classList.add("reado-page-market");
     }
-    if (path === "/pages/global-scholar-leaderboard.html") {
+    if (path === "/pages/global-scholar-leaderboard") {
       document.body.classList.add("reado-page-ranking");
     }
-    if (path === "/pages/gamified-learning-hub-dashboard-2.html") {
+    if (path === "/pages/gamified-learning-hub-dashboard-2") {
       document.body.classList.add("reado-page-profile");
     }
-    if (path === "/pages/analytics-dashboard.html") {
+    if (path === "/pages/analytics-dashboard") {
       document.body.classList.add("reado-page-analytics");
     }
     enableMobileProportionalMode(isExperiencePage);
@@ -4422,7 +4955,7 @@ class ReadoAppShell extends HTMLElement {
     const catalogBooks = Array.isArray(window.${BOOK_CATALOG_GLOBAL}?.books) ? window.${BOOK_CATALOG_GLOBAL}.books : [];
     const experienceSlugSet = new Set(catalogBooks.flatMap((book) => Array.isArray(book?.moduleSlugs) ? book.moduleSlugs : []));
     const savedExperienceHref = localStorage.getItem(LAST_EXPERIENCE_KEY);
-    const savedMatch = savedExperienceHref && savedExperienceHref.match(/^\\/experiences\\/([^/?#]+)\\.html(?:[?#].*)?$/);
+    const savedMatch = savedExperienceHref && savedExperienceHref.match(/^\\/experiences\\/([^/?#]+)(?:\\.html)?(?:[?#].*)?$/);
     const savedSlug = savedMatch ? savedMatch[1] : null;
     const resumeExperienceHref = savedSlug && experienceSlugSet.has(savedSlug) ? savedExperienceHref : null;
     if (savedExperienceHref && !resumeExperienceHref) {
@@ -4435,7 +4968,7 @@ class ReadoAppShell extends HTMLElement {
     const top = document.createElement("header");
     top.className = "reado-shell-top";
     top.innerHTML = \`
-      <a class="reado-shell-brand" href="/pages/gamified-learning-hub-dashboard-1.html">
+      <a class="reado-shell-brand" href="/pages/gamified-learning-hub-dashboard-1">
         <span class="reado-shell-brand-icon">📘</span>
         <span>reado</span>
       </a>
@@ -4456,9 +4989,9 @@ class ReadoAppShell extends HTMLElement {
             <span class="reado-shell-xp-label" data-shell-xp-label></span>
             <span class="reado-shell-xp-track" data-shell-xp-track><span data-shell-xp-bar></span></span>
           </div>
-          <span class="reado-shell-avatar" data-href="/pages/gamified-learning-hub-dashboard-2.html"><img data-shell-avatar src="" alt="用户头像" /></span>
+          <span class="reado-shell-avatar" data-href="/pages/gamified-learning-hub-dashboard-2"><img data-shell-avatar src="" alt="用户头像" /></span>
         </div>
-        \${isLearningPage ? '<button class="reado-shell-exit" type="button" data-href="/pages/gamified-learning-hub-dashboard-1.html">退出体验</button>' : ""}
+        \${isLearningPage ? '<button class="reado-shell-exit" type="button" data-href="/pages/gamified-learning-hub-dashboard-1">退出体验</button>' : ""}
         <button class="reado-shell-toggle" type="button" aria-label="Toggle menu">☰</button>
       </div>\`;
 
@@ -4611,7 +5144,7 @@ class ReadoAppShell extends HTMLElement {
             <p class="reado-task-title">人类简史：从动物到上帝</p>
             <p class="reado-task-sub">等级 3 / 10 · 30%</p>
             <div class="reado-task-line"><span style="width:30%"></span></div>
-            <button class="reado-task-btn" data-href="/books/sapiens.html">继续学习</button>
+            <button class="reado-task-btn" data-href="/books/sapiens">继续学习</button>
           </article>
           <article class="reado-task">
             <p class="reado-task-title">置身事外：债务周期</p>
@@ -4851,7 +5384,7 @@ function buildBooks(experiences, customCoverByBookId = new Map()) {
       highlights: blueprint.highlights,
       modules,
       cover: customCoverByBookId.get(blueprint.id) || `/assets/experiences/${modules[0].slug}.png`,
-      hubHref: `/books/${blueprint.id}.html`
+      hubHref: `/books/${blueprint.id}`
     });
   }
 
@@ -4945,11 +5478,18 @@ async function writeExperiencePages(experiences, moduleToBook) {
 async function writeSharedAssets(books) {
   const customShellSourcePath = path.join(rootDir, "scripts", "shared", "shell.js");
   const customI18nSourcePath = path.join(rootDir, "scripts", "shared", "i18n.js");
+  const customRuntimeSourcePath = path.join(rootDir, "scripts", "shared", "experience-runtime.js");
   let customShell = "";
+  let customRuntime = "";
   try {
     customShell = await fs.readFile(customShellSourcePath, "utf8");
   } catch {
     customShell = "";
+  }
+  try {
+    customRuntime = await fs.readFile(customRuntimeSourcePath, "utf8");
+  } catch {
+    customRuntime = "";
   }
   await fs.writeFile(path.join(sharedDir, "shell.js"), customShell || buildSharedShellScript(), "utf8");
   try {
@@ -4958,7 +5498,7 @@ async function writeSharedAssets(books) {
     // optional file, only needed when i18n is enabled
   }
   await fs.writeFile(path.join(sharedDir, "book-catalog.js"), buildSharedBookCatalogScript(books), "utf8");
-  await fs.writeFile(path.join(sharedDir, "experience-runtime.js"), buildSharedExperienceRuntimeScript(), "utf8");
+  await fs.writeFile(path.join(sharedDir, "experience-runtime.js"), customRuntime || buildSharedExperienceRuntimeScript(), "utf8");
 }
 
 async function writeStudioCustomPages() {

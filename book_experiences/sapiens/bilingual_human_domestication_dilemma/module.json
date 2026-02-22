@@ -1,0 +1,248 @@
+{
+  "slug": "bilingual-human-domestication-dilemma",
+  "title": "reado: 深度洞察 - 奢侈的陷阱",
+  "order": 4,
+  "generatedBy": "playable-content-engine",
+  "generatedAt": "2026-02-22T16:28:40.845Z",
+  "bookSummary": "Module 1: reado: 人类简史 - 小麦全球征服模拟 reado: 人类简史 - 小麦全球征服模拟 science api biotech public 人类简史: 全球驯化战争地图 BETA Sapiens Domestication War Map // YEAR -9500 BC 已驯化人数 accessibility_new 14,205 占领土地面积 map 840 km² 可用 DNA 点数 all_inclusive 45 引导 tips_and_updates 玩法说明 世界简报 RANGE 1 美索不达米亚的智人正在为扇出永久性背部问题 NEW AREA 黎凡特部落放弃狩猎，转向全天候除草作业 ALERT 干旱风险上升，需要更多劳动力挖掘灌溉渠",
+  "skillPoints": [
+    {
+      "id": "skill-science",
+      "name": "Skill · science",
+      "description": "Use \"science\" to diagnose tradeoffs before making a decision.",
+      "category": "execution",
+      "keywords": [
+        "science",
+        "tradeoff",
+        "mechanism"
+      ],
+      "difficulty": 4,
+      "power": 96,
+      "xpReward": 86,
+      "gemReward": 12,
+      "moduleHint": 4
+    }
+  ],
+  "knowledgeBattle": {
+    "passScore": 1,
+    "reward": {
+      "xp": 230,
+      "gems": 38
+    },
+    "questions": [
+      {
+        "id": "battle-entry-science",
+        "prompt": "关于「science」，哪项解释最符合书中机制？",
+        "options": [
+          "HISTORY 大航海时代尚未开启，小麦正在蓄力",
+          "Module 1: reado: 人类简史 - 小麦全球征服模拟 reado: 人类简史 - 小麦全球征服模拟 science api biotech public 人类简史: 全球驯化战争地图 BETA Sapiens Domestication War Map // YEAR -9500 BC 已驯化人数 accessibility_new 14,205 占领土地面积 map 840 km² 可用 DNA 点数 all_inclus",
+          "NEW AREA 黎凡特部落放弃狩猎，转向全天候除草作业",
+          "ALERT 干旱风险上升，需要更多劳动力挖掘灌溉渠"
+        ],
+        "answerIndex": 0,
+        "explanation": "Track how \"science\" changes outcomes across scenarios instead of judging single events.",
+        "skillId": "",
+        "entryId": "entry-science",
+        "moduleHint": 4
+      }
+    ]
+  },
+  "thinkTankEntries": [
+    {
+      "id": "entry-science",
+      "term": "science",
+      "title": "science",
+      "summary": "HISTORY 大航海时代尚未开启，小麦正在蓄力",
+      "insight": "Track how \"science\" changes outcomes across scenarios instead of judging single events.",
+      "sourceCue": "",
+      "tags": [
+        "science",
+        "knowledge-fragment"
+      ],
+      "relatedTerms": [
+        "reado",
+        "dna",
+        "人类简史"
+      ],
+      "moduleHint": 4,
+      "relatedEntryRefs": [
+        {
+          "id": "entry",
+          "title": "推行进度",
+          "term": "推行进度",
+          "books": [
+            "wanli-fifteen",
+            "sapiens",
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 5
+        },
+        {
+          "id": "entry-dna",
+          "title": "dna",
+          "term": "dna",
+          "books": [
+            "sapiens"
+          ],
+          "score": 5
+        },
+        {
+          "id": "entry-reado",
+          "title": "reado",
+          "term": "reado",
+          "books": [
+            "wanli-fifteen",
+            "sapiens",
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 5
+        },
+        {
+          "id": "entry-accessibility",
+          "title": "accessibility",
+          "term": "accessibility",
+          "books": [
+            "sapiens"
+          ],
+          "score": 4
+        },
+        {
+          "id": "entry-experiences",
+          "title": "experiences",
+          "term": "experiences",
+          "books": [
+            "wanli-fifteen",
+            "sapiens",
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 4
+        },
+        {
+          "id": "entry-history",
+          "title": "history",
+          "term": "history",
+          "books": [
+            "wanli-fifteen",
+            "sapiens"
+          ],
+          "score": 4
+        },
+        {
+          "id": "entry-map",
+          "title": "map",
+          "term": "map",
+          "books": [
+            "sapiens"
+          ],
+          "score": 4
+        },
+        {
+          "id": "entry-new",
+          "title": "new",
+          "term": "new",
+          "books": [
+            "sapiens"
+          ],
+          "score": 4
+        }
+      ]
+    },
+    {
+      "id": "entry",
+      "term": "小麦全球征服模拟",
+      "title": "小麦全球征服模拟",
+      "summary": "完成本幕，进入下一幕 导览卡 小麦全球征服模拟：玩法说明 你将扮演小麦，用“基因进化 + 人类劳作”扩张势力",
+      "insight": "Track how \"小麦全球征服模拟\" changes outcomes across scenarios instead of judging single events.",
+      "sourceCue": "",
+      "tags": [
+        "小麦全球征服模拟",
+        "knowledge-fragment"
+      ],
+      "relatedTerms": [
+        "reado",
+        "dna",
+        "人类简史"
+      ],
+      "moduleHint": 4,
+      "relatedEntryRefs": [
+        {
+          "id": "entry-reado",
+          "title": "reado",
+          "term": "reado",
+          "books": [
+            "wanli-fifteen",
+            "sapiens",
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 10
+        },
+        {
+          "id": "entry-experiences",
+          "title": "experiences",
+          "term": "experiences",
+          "books": [
+            "wanli-fifteen",
+            "sapiens",
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 8
+        },
+        {
+          "id": "entry-history",
+          "title": "history",
+          "term": "history",
+          "books": [
+            "wanli-fifteen",
+            "sapiens"
+          ],
+          "score": 7
+        },
+        {
+          "id": "entry-dna",
+          "title": "dna",
+          "term": "dna",
+          "books": [
+            "sapiens"
+          ],
+          "score": 6
+        },
+        {
+          "id": "entry-gavel",
+          "title": "gavel",
+          "term": "gavel",
+          "books": [
+            "wanli-fifteen"
+          ],
+          "score": 6
+        },
+        {
+          "id": "entry-science",
+          "title": "science",
+          "term": "science",
+          "books": [
+            "sapiens"
+          ],
+          "score": 6
+        },
+        {
+          "id": "entry-accessibility",
+          "title": "accessibility",
+          "term": "accessibility",
+          "books": [
+            "sapiens"
+          ],
+          "score": 5
+        },
+        {
+          "id": "entry-add",
+          "title": "add",
+          "term": "add",
+          "books": [
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 5
+        }
+      ]
+    }
+  ]
+}

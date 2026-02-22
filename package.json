@@ -8,7 +8,9 @@
     "build": "node scripts/build-app.mjs",
     "start": "node scripts/serve.mjs",
     "dev": "node scripts/build-app.mjs && node scripts/serve.mjs",
-    "stitch-bridge": "node scripts/studio-tools/stitch-bridge.mjs"
+    "stitch-bridge": "node scripts/studio-tools/stitch-bridge.mjs",
+    "pdf-mcp-bridge": "node scripts/studio-tools/pdf-mcp-bridge.mjs",
+    "backfill:builtin-knowledge": "node scripts/backfill-builtin-knowledge.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.26.0"

@@ -1,5 +1,261 @@
 {
   "slug": "tax-reform-dilemma-5",
   "title": "第五幕：结构复盘",
-  "order": 5
+  "order": 5,
+  "generatedBy": "playable-content-engine",
+  "generatedAt": "2026-02-22T16:27:19.403Z",
+  "bookSummary": "Module 1: reado: 万历十五年决策 (全中文版) reado: 万历十五年决策 (全中文版) reado 万历十五年 assessment 帝国现状 国库财富 65% 白银储备尚算充足，但增长乏力 礼教和谐 80% 文官集团对目前的礼法秩序感到满意 皇权 45% 陛下，您的敕令在内阁正面临重重阻力",
+  "skillPoints": [
+    {
+      "id": "skill",
+      "name": "Skill · 张居正",
+      "description": "Use \"张居正\" to diagnose tradeoffs before making a decision.",
+      "category": "analysis",
+      "keywords": [
+        "张居正",
+        "tradeoff",
+        "mechanism"
+      ],
+      "difficulty": 5,
+      "power": 114,
+      "xpReward": 100,
+      "gemReward": 14,
+      "moduleHint": 5
+    }
+  ],
+  "knowledgeBattle": {
+    "passScore": 2,
+    "reward": {
+      "xp": 140,
+      "gems": 23
+    },
+    "questions": [
+      {
+        "id": "fallback-tax-reform-dilemma-5-1",
+        "prompt": "在该模块中，「张居正」更强调哪种理解？",
+        "options": [
+          "臣斗胆请旨，将各省赋役一律并为一条， 折办银两纳贡",
+          "脱离机制地追求单点最优",
+          "忽略约束，只做理想化推演",
+          "随机选择，不看证据"
+        ],
+        "answerIndex": 0,
+        "explanation": "Track how \"张居正\" changes outcomes across scenarios instead of judging single events.",
+        "skillId": "",
+        "entryId": "entry",
+        "moduleHint": 0
+      },
+      {
+        "id": "fallback-tax-reform-dilemma-5-2",
+        "prompt": "在该模块中，「耗时」更强调哪种理解？",
+        "options": [
+          "皇帝自由度 15% 困于紫禁城，寸步难行",
+          "脱离机制地追求单点最优",
+          "忽略约束，只做理想化推演",
+          "随机选择，不看证据"
+        ],
+        "answerIndex": 0,
+        "explanation": "Track how \"耗时\" changes outcomes across scenarios instead of judging single events.",
+        "skillId": "",
+        "entryId": "entry",
+        "moduleHint": 0
+      }
+    ]
+  },
+  "thinkTankEntries": [
+    {
+      "id": "entry",
+      "term": "张居正",
+      "title": "张居正",
+      "summary": "臣斗胆请旨，将各省赋役一律并为一条， 折办银两纳贡",
+      "insight": "Track how \"张居正\" changes outcomes across scenarios instead of judging single events.",
+      "sourceCue": "",
+      "tags": [
+        "张居正",
+        "knowledge-fragment"
+      ],
+      "relatedTerms": [
+        "reado",
+        "推行进度",
+        "万历十五年"
+      ],
+      "moduleHint": 5,
+      "relatedEntryRefs": [
+        {
+          "id": "entry-reado",
+          "title": "reado",
+          "term": "reado",
+          "books": [
+            "wanli-fifteen",
+            "sapiens",
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 10
+        },
+        {
+          "id": "entry-experiences",
+          "title": "experiences",
+          "term": "experiences",
+          "books": [
+            "wanli-fifteen",
+            "sapiens",
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 8
+        },
+        {
+          "id": "entry-history",
+          "title": "history",
+          "term": "history",
+          "books": [
+            "wanli-fifteen",
+            "sapiens"
+          ],
+          "score": 7
+        },
+        {
+          "id": "entry-dna",
+          "title": "dna",
+          "term": "dna",
+          "books": [
+            "sapiens"
+          ],
+          "score": 6
+        },
+        {
+          "id": "entry-gavel",
+          "title": "gavel",
+          "term": "gavel",
+          "books": [
+            "wanli-fifteen"
+          ],
+          "score": 6
+        },
+        {
+          "id": "entry-science",
+          "title": "science",
+          "term": "science",
+          "books": [
+            "sapiens"
+          ],
+          "score": 6
+        },
+        {
+          "id": "entry-accessibility",
+          "title": "accessibility",
+          "term": "accessibility",
+          "books": [
+            "sapiens"
+          ],
+          "score": 5
+        },
+        {
+          "id": "entry-add",
+          "title": "add",
+          "term": "add",
+          "books": [
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 5
+        }
+      ]
+    },
+    {
+      "id": "entry",
+      "term": "耗时",
+      "title": "耗时",
+      "summary": "皇帝自由度 15% 困于紫禁城，寸步难行",
+      "insight": "Track how \"耗时\" changes outcomes across scenarios instead of judging single events.",
+      "sourceCue": "",
+      "tags": [
+        "耗时",
+        "knowledge-fragment"
+      ],
+      "relatedTerms": [
+        "reado",
+        "推行进度",
+        "万历十五年"
+      ],
+      "moduleHint": 5,
+      "relatedEntryRefs": [
+        {
+          "id": "entry-reado",
+          "title": "reado",
+          "term": "reado",
+          "books": [
+            "wanli-fifteen",
+            "sapiens",
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 10
+        },
+        {
+          "id": "entry-experiences",
+          "title": "experiences",
+          "term": "experiences",
+          "books": [
+            "wanli-fifteen",
+            "sapiens",
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 8
+        },
+        {
+          "id": "entry-history",
+          "title": "history",
+          "term": "history",
+          "books": [
+            "wanli-fifteen",
+            "sapiens"
+          ],
+          "score": 7
+        },
+        {
+          "id": "entry-dna",
+          "title": "dna",
+          "term": "dna",
+          "books": [
+            "sapiens"
+          ],
+          "score": 6
+        },
+        {
+          "id": "entry-gavel",
+          "title": "gavel",
+          "term": "gavel",
+          "books": [
+            "wanli-fifteen"
+          ],
+          "score": 6
+        },
+        {
+          "id": "entry-science",
+          "title": "science",
+          "term": "science",
+          "books": [
+            "sapiens"
+          ],
+          "score": 6
+        },
+        {
+          "id": "entry-accessibility",
+          "title": "accessibility",
+          "term": "accessibility",
+          "books": [
+            "sapiens"
+          ],
+          "score": 5
+        },
+        {
+          "id": "entry-add",
+          "title": "add",
+          "term": "add",
+          "books": [
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 5
+        }
+      ]
+    }
+  ]
 }

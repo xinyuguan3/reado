@@ -6,13 +6,20 @@ import {
 } from "/shared/i18n.js";
 
 const ROUTES = [
-  { id: "knowledge-map", icon: "map", labelKey: "route.knowledge_map", label: "个人书库", href: "/pages/gamified-learning-hub-dashboard-1.html" },
-  { id: "mission", icon: "assignment", labelKey: "route.mission", label: "任务中心", href: "/pages/simulator-library-level-selection-2.html" },
-  { id: "studio", icon: "auto_awesome", labelKey: "route.studio", label: "创作工坊", href: "/pages/playable-studio.html" },
-  { id: "ranking", icon: "leaderboard", labelKey: "route.ranking", label: "排行榜", href: "/pages/global-scholar-leaderboard.html" },
-  { id: "library", icon: "auto_stories", labelKey: "route.library", label: "体验库", href: "/pages/public-library.html" },
-  { id: "market", icon: "storefront", labelKey: "route.market", label: "交易中心", href: "/pages/gamified-learning-hub-dashboard-3.html" },
-  { id: "profile", icon: "person", labelKey: "route.profile", label: "个人资料", href: "/pages/gamified-learning-hub-dashboard-2.html" }
+  { id: "knowledge-map", section: "learn", icon: "map", labelKey: "route.knowledge_map", label: "个人书库", href: "/pages/gamified-learning-hub-dashboard-1" },
+  { id: "skill-tree", section: "learn", icon: "device_hub", labelKey: "route.skill_tree", label: "技能树", href: "/pages/skill-tree" },
+  { id: "think-tank", section: "learn", icon: "hub", labelKey: "route.think_tank", label: "智库", href: "/pages/think-tank" },
+  { id: "mission", section: "learn", icon: "assignment", labelKey: "route.mission", label: "任务中心", href: "/pages/simulator-library-level-selection-2" },
+  { id: "library", section: "learn", icon: "auto_stories", labelKey: "route.library", label: "体验库", href: "/pages/public-library" },
+  { id: "studio", section: "build", icon: "auto_awesome", labelKey: "route.studio", label: "创作工坊", href: "/pages/playable-studio" },
+  { id: "market", section: "build", icon: "storefront", labelKey: "route.market", label: "交易中心", href: "/pages/gamified-learning-hub-dashboard-3" },
+  { id: "ranking", section: "social", icon: "leaderboard", labelKey: "route.ranking", label: "排行榜", href: "/pages/global-scholar-leaderboard" },
+  { id: "profile", section: "social", icon: "person", labelKey: "route.profile", label: "个人资料", href: "/pages/gamified-learning-hub-dashboard-2" }
+];
+const ROUTE_SECTIONS = [
+  { id: "learn", labelKey: "shell.nav.learn", label: "学习" },
+  { id: "build", labelKey: "shell.nav.build", label: "创作" },
+  { id: "social", labelKey: "shell.nav.social", label: "社区" }
 ];
 
 const STYLE_ID = "reado-shared-shell-style";
@@ -29,104 +36,141 @@ const DEFAULT_USER_STATE = {
   streak: "Sign in to save progress",
   avatar: ""
 };
-const GEM_CENTER_HREF = "/pages/gem-center.html";
+const GEM_CENTER_HREF = "/pages/gem-center";
 const LAST_EXPERIENCE_KEY = "reado_last_experience_href";
 const DEEPSEEK_KEY_STORAGE = "reado_deepseek_api_key";
 const DEEPSEEK_ENDPOINT_STORAGE = "reado_deepseek_endpoint";
 const DEFAULT_DEEPSEEK_API_KEY = "";
 const DEFAULT_DEEPSEEK_ENDPOINT = "https://api.deepseek.com/chat/completions";
+const AUTO_TRANSLATE_CACHE_KEY = "reado_auto_translate_cache_v1";
+const AUTO_TRANSLATE_TARGET_LANG = "en";
+const AUTO_TRANSLATE_ATTRIBUTE_KEYS = ["title", "placeholder", "aria-label", "alt", "value"];
 const FALLBACK_AVATAR_DATA_URI = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23135bec'/%3E%3Cstop offset='100%25' stop-color='%2300eaff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='96' height='96' rx='48' fill='url(%23g)'/%3E%3Ccircle cx='48' cy='38' r='18' fill='rgba(255,255,255,0.92)'/%3E%3Cpath d='M18 84c4-16 16-24 30-24s26 8 30 24' fill='rgba(255,255,255,0.92)'/%3E%3C/svg%3E";
 const FALLBACK_IMAGE_DATA_URI = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 360'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%230f172a'/%3E%3Cstop offset='100%25' stop-color='%23135bec'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='640' height='360' fill='url(%23bg)'/%3E%3Ccircle cx='220' cy='140' r='50' fill='rgba(255,255,255,0.2)'/%3E%3Cpath d='M112 290c34-56 76-84 126-84s92 28 126 84' fill='rgba(255,255,255,0.22)'/%3E%3Cpath d='M438 128l44 44 78-78' stroke='rgba(255,255,255,0.65)' stroke-width='16' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ctext x='320' y='326' text-anchor='middle' fill='rgba(255,255,255,0.84)' font-family='Arial,sans-serif' font-size='24'%3EImage unavailable%3C/text%3E%3C/svg%3E";
 const BILLING_MODAL_ID = "reado-billing-modal";
 const AUTH_STATE_KEY = "reado_auth_state_v1";
-const AUTH_PAGE_PATH = "/pages/auth.html";
-const BILLING_PLAN_ORDER = ["starter", "trial", "pro"];
+const AUTH_PAGE_PATH = "/pages/auth";
+const BILLING_PLAN_ORDER = ["explorer", "scholar", "lifetime"];
+const PREFETCHED_PAGE_HREFS = new Set();
 const BILLING_PLAN_COPY = {
   monthly: {
-    starter: {
+    explorer: {
       price: "$15",
       unit: "/ month",
-      subtitle: "Standard monthly usage",
-      cta: "Upgrade",
+      subtitle: "Explorer membership",
+      cta: "Choose Explorer",
       featured: false,
       features: [
-        "300 refresh credits every day",
-        "4,000 credits per month",
-        "Professional websites for standard output",
-        "20 scheduled tasks"
+        "Unlimited access to curated playable library",
+        "4,000 transform credits per month (~8-15 standard transforms)",
+        "Grounded parsing for PDF/EPUB/URL sources",
+        "Buy add-on: $10 for +2,000 credits"
       ]
     },
-    trial: {
-      price: "7-Day Free",
-      unit: "",
-      subtitle: "then $15 / month",
-      cta: "Get started for free",
-      featured: true,
-      badge: "Free trial",
-      features: [
-        "300 refresh credits every day",
-        "8,000 credits per month",
-        "In-depth research with self-set usage",
-        "20 scheduled tasks"
-      ]
-    },
-    pro: {
-      price: "$150",
+    scholar: {
+      price: "$32",
       unit: "/ month",
-      subtitle: "Extended usage for productivity",
-      cta: "Upgrade",
-      featured: false,
+      subtitle: "Scholar for heavy study workloads",
+      cta: "Choose Scholar",
+      featured: true,
+      badge: "Most popular",
       features: [
-        "300 refresh credits every day",
-        "40,000 credits per month",
-        "Professional websites with data analytics",
-        "20 scheduled tasks"
+        "Unlimited access to curated playable library",
+        "12,000 transform credits per month (~25-45 standard transforms)",
+        "Priority generation queue and richer module depth",
+        "Early access to new model workflows"
+      ]
+    },
+    lifetime: {
+      price: "$129",
+      unit: "one-time",
+      subtitle: "Founders pass + 2,000 monthly credits",
+      cta: "Get Lifetime",
+      featured: false,
+      badge: "Founders",
+      features: [
+        "Lifetime access to curated playable library",
+        "2,000 transform credits every month",
+        "Perfect for long-term supporters",
+        "Still supports add-on credits when needed"
       ]
     }
   },
   annual: {
-    starter: {
-      price: "$150",
-      unit: "/ year",
-      subtitle: "Equivalent to $12.5 / month",
-      cta: "Upgrade",
+    explorer: {
+      price: "$12",
+      unit: "/ month, billed yearly",
+      subtitle: "$144 billed yearly",
+      cta: "Choose Explorer",
       featured: false,
       features: [
-        "300 refresh credits every day",
-        "4,000 credits per month",
-        "Professional websites for standard output",
-        "20 scheduled tasks"
+        "Unlimited access to curated playable library",
+        "4,000 transform credits per month (~8-15 standard transforms)",
+        "Grounded parsing for PDF/EPUB/URL sources",
+        "Buy add-on: $10 for +2,000 credits"
       ]
     },
-    trial: {
-      price: "7-Day Free",
-      unit: "",
-      subtitle: "then $150 / year",
-      cta: "Get started for free",
+    scholar: {
+      price: "$26",
+      unit: "/ month, billed yearly",
+      subtitle: "$312 billed yearly",
+      cta: "Choose Scholar",
       featured: true,
-      badge: "Free trial",
+      badge: "Best annual value",
       features: [
-        "300 refresh credits every day",
-        "8,000 credits per month",
-        "In-depth research with self-set usage",
-        "20 scheduled tasks"
+        "Unlimited access to curated playable library",
+        "12,000 transform credits per month (~25-45 standard transforms)",
+        "Priority generation queue and richer module depth",
+        "Early access to new model workflows"
       ]
     },
-    pro: {
-      price: "$1500",
-      unit: "/ year",
-      subtitle: "Equivalent to $125 / month",
-      cta: "Upgrade",
+    lifetime: {
+      price: "$129",
+      unit: "one-time",
+      subtitle: "Founders pass + 2,000 monthly credits",
+      cta: "Get Lifetime",
       featured: false,
+      badge: "Founders",
       features: [
-        "300 refresh credits every day",
-        "40,000 credits per month",
-        "Professional websites with data analytics",
-        "20 scheduled tasks"
+        "Lifetime access to curated playable library",
+        "2,000 transform credits every month",
+        "Perfect for long-term supporters",
+        "Still supports add-on credits when needed"
       ]
     }
   }
 };
+let autoTranslateObserver = null;
+let autoTranslateTimer = null;
+let autoTranslateCache = null;
+let autoTranslatePersistTimer = null;
+let autoTranslateRunning = false;
+let autoTranslateRerunRequested = false;
+
+function buildSideNavHtml(pageId) {
+  const groups = new Map();
+  for (const section of ROUTE_SECTIONS) {
+    groups.set(section.id, []);
+  }
+  for (const route of ROUTES) {
+    const sectionId = groups.has(route.section) ? route.section : ROUTE_SECTIONS[0].id;
+    groups.get(sectionId).push(route);
+  }
+  return ROUTE_SECTIONS.map((section) => {
+    const routes = groups.get(section.id) || [];
+    if (!routes.length) return "";
+    return `<section class="reado-shell-nav-group">
+      <p class="reado-shell-nav-title">${t(section.labelKey, section.label)}</p>
+      ${routes.map((route) => {
+    const active = route.id === pageId ? "active" : "";
+    return `<a class="reado-shell-link ${active}" href="${route.href}">
+          <span class="reado-shell-link-icon">${route.icon}</span>
+          <span>${t(route.labelKey, route.label)}</span>
+        </a>`;
+  }).join("")}
+    </section>`;
+  }).join("");
+}
 
 function formatNumber(value) {
   return new Intl.NumberFormat(getCurrentLanguage()).format(value);
@@ -166,10 +210,14 @@ function dayDiff(fromDay, toDay) {
 
 function buildStreakLabel(days) {
   const lang = String(getCurrentLanguage() || "").toLowerCase();
+  const value = formatNumber(Math.max(0, days));
   if (lang.startsWith("zh")) {
-    return "连续 " + formatNumber(Math.max(0, days)) + " 天";
+    return "连续 " + value + " 天";
   }
-  return formatNumber(Math.max(0, days)) + "-day streak";
+  if (lang.startsWith("ko")) {
+    return value + "일 연속";
+  }
+  return value + "-day streak";
 }
 
 function readDailyGemStreakDays() {
@@ -419,9 +467,13 @@ function createBillingModal(options = {}) {
       <div class="reado-billing-main">
         <div class="reado-billing-cycle" role="tablist" aria-label="Billing cycle">
           <button class="reado-billing-cycle-btn is-active" type="button" data-billing-cycle-btn="monthly">${t("billing.cycle_monthly", "Monthly")}</button>
-          <button class="reado-billing-cycle-btn" type="button" data-billing-cycle-btn="annual">${t("billing.cycle_annual", "Annually · Save 17%")}</button>
+          <button class="reado-billing-cycle-btn" type="button" data-billing-cycle-btn="annual">${t("billing.cycle_annual", "Annually · Save up to 20%")}</button>
         </div>
         <div class="reado-billing-cards" data-billing-cards></div>
+        <div class="reado-billing-addon" data-billing-addon-wrap hidden>
+          <span class="reado-billing-addon-label">Need more credits?</span>
+          <button class="reado-billing-btn is-dark" type="button" data-billing-addon-checkout data-billing-price-id="">Buy +2,000 credits</button>
+        </div>
         <p class="reado-billing-hint" data-billing-pricing-hint>${t("billing.loading", "Loading...")}</p>
       </div>
       <footer class="reado-billing-foot">
@@ -451,6 +503,8 @@ function createBillingModal(options = {}) {
   const updatedEl = modal.querySelector("[data-billing-updated]");
   const errorEl = modal.querySelector("[data-billing-error]");
   const cardsEl = modal.querySelector("[data-billing-cards]");
+  const addonWrapEl = modal.querySelector("[data-billing-addon-wrap]");
+  const addonCheckoutBtn = modal.querySelector("[data-billing-addon-checkout]");
   const pricingHintEl = modal.querySelector("[data-billing-pricing-hint]");
   const cycleBtnEls = Array.from(modal.querySelectorAll("[data-billing-cycle-btn]"));
 
@@ -479,13 +533,21 @@ function createBillingModal(options = {}) {
         ? t("billing.cta_refreshing", "Refreshing...")
         : t("billing.cta_refresh", "Refresh Status");
     }
+    if (addonCheckoutBtn) {
+      const priceId = String(addonCheckoutBtn.getAttribute("data-billing-price-id") || "").trim();
+      const isThisBusy = loading === ("checkout:" + priceId) && Boolean(priceId);
+      addonCheckoutBtn.disabled = Boolean(loading) || !priceId;
+      addonCheckoutBtn.textContent = isThisBusy
+        ? t("billing.cta_redirecting", "Redirecting...")
+        : "Buy +2,000 credits";
+    }
     renderPlans();
   };
 
   const getPlanCopy = (cycle, tier) => {
     const safeCycle = cycle === "annual" ? "annual" : "monthly";
     const source = BILLING_PLAN_COPY[safeCycle] || BILLING_PLAN_COPY.monthly;
-    return source[tier] || source.starter;
+    return source[tier] || source.explorer || Object.values(source)[0] || {};
   };
 
   const getCyclePrices = (cycle) => {
@@ -493,6 +555,18 @@ function createBillingModal(options = {}) {
     const prices = checkoutConfig?.prices && typeof checkoutConfig.prices === "object" ? checkoutConfig.prices : {};
     const cyclePrices = prices[safeCycle];
     return cyclePrices && typeof cyclePrices === "object" ? cyclePrices : {};
+  };
+
+  const renderAddon = () => {
+    if (!addonWrapEl || !addonCheckoutBtn) return;
+    const oneTime = checkoutConfig?.oneTime && typeof checkoutConfig.oneTime === "object" ? checkoutConfig.oneTime : {};
+    const addonPriceId = String(oneTime.addonCredits2000 || "").trim();
+    addonCheckoutBtn.setAttribute("data-billing-price-id", addonPriceId);
+    addonWrapEl.hidden = !addonPriceId;
+    if (addonPriceId) {
+      addonCheckoutBtn.textContent = "Buy +2,000 credits";
+      addonCheckoutBtn.disabled = Boolean(loading);
+    }
   };
 
   const getCheckoutConfigHint = () => {
@@ -504,17 +578,20 @@ function createBillingModal(options = {}) {
     if (!status.hasCancelUrl) missing.push("STRIPE_CANCEL_URL");
     const monthly = status.monthly && typeof status.monthly === "object" ? status.monthly : {};
     const annual = status.annual && typeof status.annual === "object" ? status.annual : {};
+    const oneTime = status.oneTime && typeof status.oneTime === "object" ? status.oneTime : {};
     const hasAnyPrice = Boolean(
       status.hasLegacyPrice
-      || monthly.starter
-      || monthly.trial
-      || monthly.pro
-      || annual.starter
-      || annual.trial
-      || annual.pro
+      || monthly.explorer
+      || monthly.scholar
+      || monthly.lifetime
+      || annual.explorer
+      || annual.scholar
+      || annual.lifetime
+      || oneTime.lifetime
+      || oneTime.addon2000
     );
     if (!hasAnyPrice) {
-      missing.push("STRIPE_PRICE_MONTHLY_* / STRIPE_PRICE_ANNUAL_*");
+      missing.push("STRIPE_PRICE_MONTHLY_EXPLORER / STRIPE_PRICE_MONTHLY_SCHOLAR / STRIPE_PRICE_LIFETIME");
     }
     return missing.length ? ("Missing: " + missing.join(", ")) : "";
   };
@@ -531,7 +608,10 @@ function createBillingModal(options = {}) {
       const copy = getPlanCopy(selectedCycle, tier);
       const priceId = String(cyclePrices[tier] || "").trim();
       const isReady = Boolean(checkoutConfig?.enabled && priceId);
-      const isCurrentPlan = Boolean(current?.subscriptionActive && current?.priceId && current.priceId === priceId);
+      const isLifetimeTier = tier === "lifetime";
+      const isCurrentPlan = isLifetimeTier
+        ? Boolean(current?.lifetimeAccess)
+        : Boolean(current?.subscriptionActive && current?.priceId && current.priceId === priceId);
       const isBusy = loading.startsWith("checkout:");
       const isThisBusy = loading === ("checkout:" + priceId);
       let cta = copy.cta;
@@ -540,7 +620,7 @@ function createBillingModal(options = {}) {
       } else if (!signedIn && isReady) {
         cta = t("billing.cta_signin", "Sign in to continue");
       } else if (isCurrentPlan) {
-        cta = t("billing.current_plan", "Current plan");
+        cta = isLifetimeTier ? "Owned" : t("billing.current_plan", "Current plan");
       } else if (!isReady) {
         cta = t("billing.plan_unavailable", "Not configured");
       }
@@ -566,21 +646,23 @@ function createBillingModal(options = {}) {
           <ul class="reado-plan-features">${featureItems}</ul>
         </article>`;
     }).join("");
+    renderAddon();
   };
 
   const render = () => {
     const status = current?.status || "none";
     const isActive = Boolean(current?.subscriptionActive);
+    const hasLifetime = Boolean(current?.lifetimeAccess);
     if (statusEl) {
       statusEl.textContent = isActive
         ? t("billing.status_active", "Pro Active")
-        : (status === "none" ? t("billing.status_none", "Not Subscribed") : status);
-      statusEl.classList.toggle("is-active", isActive);
+        : (hasLifetime ? "Lifetime Active" : (status === "none" ? t("billing.status_none", "Not Subscribed") : status));
+      statusEl.classList.toggle("is-active", isActive || hasLifetime);
     }
     if (periodEl) {
       periodEl.textContent = isActive
         ? t("billing.period_end", "Renews at {value}", { value: formatTimestamp(current?.currentPeriodEnd) })
-        : t("billing.period_none", "No active subscription found");
+        : (hasLifetime ? "Lifetime access enabled" : t("billing.period_none", "No active subscription found"));
     }
     if (updatedEl) {
       updatedEl.textContent = current?.updatedAt
@@ -624,7 +706,7 @@ function createBillingModal(options = {}) {
         setPricingHint(
           t(
             "billing.pricing_missing",
-            "Custom plans are not configured. Set STRIPE_PRICE_MONTHLY_* and STRIPE_PRICE_ANNUAL_* in server env."
+            "Custom plans are not configured. Set STRIPE_PRICE_MONTHLY_EXPLORER / STRIPE_PRICE_MONTHLY_SCHOLAR / STRIPE_PRICE_LIFETIME in server env."
           ) + (configHint ? " " + configHint : ""),
           true
         );
@@ -710,6 +792,12 @@ function createBillingModal(options = {}) {
       loadCheckoutConfig();
       return;
     }
+    const addonBtn = target.closest("[data-billing-addon-checkout]");
+    if (addonBtn instanceof HTMLElement) {
+      const selectedPriceId = addonBtn.getAttribute("data-billing-price-id") || "";
+      startCheckout(selectedPriceId);
+      return;
+    }
     const cycleBtn = target.closest("[data-billing-cycle-btn]");
     if (cycleBtn instanceof HTMLElement) {
       const nextCycle = cycleBtn.getAttribute("data-billing-cycle-btn") === "annual" ? "annual" : "monthly";
@@ -738,7 +826,7 @@ function createBillingModal(options = {}) {
     const monthlyBtn = modal.querySelector('[data-billing-cycle-btn="monthly"]');
     const annualBtn = modal.querySelector('[data-billing-cycle-btn="annual"]');
     if (monthlyBtn) monthlyBtn.textContent = t("billing.cycle_monthly", "Monthly");
-    if (annualBtn) annualBtn.textContent = t("billing.cycle_annual", "Annually · Save 17%");
+    if (annualBtn) annualBtn.textContent = t("billing.cycle_annual", "Annually · Save up to 20%");
     modal.querySelector(".reado-billing-label").textContent = t("billing.current_status", "Current Subscription Status");
     render();
     loadCheckoutConfig();
@@ -845,6 +933,10 @@ function ensureGlobalStyle() {
       body.reado-shell-applied {
         padding-right: var(--reado-right-width) !important;
       }
+    }
+    body.reado-shell-applied.reado-page-skill-tree,
+    body.reado-shell-applied.reado-page-think-tank {
+      overflow-x: hidden !important;
     }
     body.reado-shell-applied.reado-experience-mode {
       padding-left: 0 !important;
@@ -986,29 +1078,138 @@ function ensureGlobalStyle() {
     body.reado-shell-applied .reado-shell-pill.flash {
       animation: reado-shell-pop .45s ease;
     }
-    body.reado-shell-applied .reado-shell-lang {
+    body.reado-shell-applied .reado-shell-auth {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
+      padding-left: 10px;
+      border-left: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    body.reado-shell-applied.reado-experience-mode .reado-shell-auth {
+      padding-left: 0;
+      border-left: 0;
+    }
+    body.reado-shell-applied .reado-shell-auth[hidden] {
+      display: none;
+    }
+    body.reado-shell-applied .reado-shell-auth-btn {
+      border: 1px solid transparent;
+      border-radius: 999px;
+      padding: 7px 14px;
+      min-height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .01em;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
+      white-space: nowrap;
+    }
+    body.reado-shell-applied .reado-shell-auth-btn:hover {
+      transform: translateY(-1px);
+    }
+    body.reado-shell-applied .reado-shell-auth-btn.signin {
+      border-color: var(--reado-border);
+      background: rgba(16, 22, 34, 0.72);
+      color: #dbe6f9;
+    }
+    body.reado-shell-applied .reado-shell-auth-btn.signin:hover {
+      border-color: rgba(88, 173, 255, 0.45);
+      background: rgba(19, 91, 236, 0.12);
+    }
+    body.reado-shell-applied .reado-shell-auth-btn.signup {
+      border-color: rgba(88, 173, 255, 0.5);
+      background: linear-gradient(135deg, #135bec, #2c74ff);
+      color: #ffffff;
+      box-shadow: 0 6px 18px rgba(19, 91, 236, 0.35);
+    }
+    body.reado-shell-applied .reado-shell-auth-btn.signup:hover {
+      border-color: rgba(133, 198, 255, 0.78);
+      background: linear-gradient(135deg, #2b72ff, #135bec);
+    }
+    body.reado-shell-applied .reado-shell-lang {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+    body.reado-shell-applied .reado-shell-lang-trigger {
       border: 1px solid var(--reado-border);
       border-radius: 999px;
-      padding: 4px 10px;
       background: rgba(16, 22, 34, 0.72);
       color: #dbe6f9;
       font-size: 11px;
       font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 110px;
+      padding: 6px 10px;
+      cursor: pointer;
     }
-    body.reado-shell-applied .reado-shell-lang select {
+    body.reado-shell-applied .reado-shell-lang-trigger:hover {
+      border-color: rgba(88, 173, 255, 0.45);
+      background: rgba(19, 91, 236, 0.12);
+    }
+    body.reado-shell-applied .reado-shell-lang-chevron {
+      margin-left: auto;
+      font-family: "Material Icons";
+      font-size: 16px;
+      line-height: 1;
+      transition: transform 140ms ease;
+    }
+    body.reado-shell-applied .reado-shell-lang.open .reado-shell-lang-chevron {
+      transform: rotate(180deg);
+    }
+    body.reado-shell-applied .reado-shell-lang-content {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      min-width: 160px;
+      padding: 8px;
+      border-radius: 12px;
+      border: 1px solid rgba(126, 143, 167, 0.34);
+      background: rgba(12, 18, 30, 0.96);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.36);
+      backdrop-filter: blur(8px);
+      z-index: 12000;
+    }
+    body.reado-shell-applied .reado-shell-lang-content[hidden] {
+      display: none;
+    }
+    body.reado-shell-applied .reado-shell-lang-item {
+      width: 100%;
       border: 0;
-      outline: 0;
+      border-radius: 8px;
       background: transparent;
       color: #dbe6f9;
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 700;
-      min-width: 96px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 10px;
+      cursor: pointer;
+      text-align: left;
     }
-    body.reado-shell-applied .reado-shell-lang option {
-      color: #0f172a;
+    body.reado-shell-applied .reado-shell-lang-item:hover {
+      background: rgba(19, 91, 236, 0.2);
+    }
+    body.reado-shell-applied .reado-shell-lang-item.active {
+      color: #b8dcff;
+      background: rgba(19, 91, 236, 0.24);
+    }
+    body.reado-shell-applied .reado-shell-lang-item-check {
+      font-family: "Material Icons";
+      font-size: 16px;
+      line-height: 1;
+      opacity: 0;
+    }
+    body.reado-shell-applied .reado-shell-lang-item.active .reado-shell-lang-item-check {
+      opacity: 1;
     }
     body.reado-shell-applied .reado-shell-gain-hint {
       position: fixed;
@@ -1165,11 +1366,12 @@ function ensureGlobalStyle() {
       width: 256px;
       background: var(--reado-panel);
       border-right: 1px solid var(--reado-border);
-      padding: 14px;
+      padding: 16px 14px 14px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
       backdrop-filter: blur(12px);
+      overflow-y: auto;
     }
     body.reado-shell-applied.reado-experience-mode .reado-shell-side {
       top: 0;
@@ -1183,43 +1385,82 @@ function ensureGlobalStyle() {
       transform: translateX(0);
     }
     body.reado-shell-applied .reado-shell-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    body.reado-shell-applied .reado-shell-side-head {
+      display: grid;
+      gap: 3px;
+      padding: 2px 8px 6px;
+    }
+    body.reado-shell-applied .reado-shell-side-kicker {
+      margin: 0;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: #7f95b4;
+    }
+    body.reado-shell-applied .reado-shell-side-title {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 800;
+      color: #e8f1ff;
+    }
+    body.reado-shell-applied .reado-shell-nav-group {
       display: grid;
       gap: 6px;
+    }
+    body.reado-shell-applied .reado-shell-nav-title {
+      margin: 0 8px 3px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: #6f86a6;
     }
     body.reado-shell-applied .reado-shell-link {
       text-decoration: none;
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 11px 12px;
+      padding: 9px 10px;
       border-radius: 12px;
-      color: #94a4bf;
+      color: #a8b7ce;
       border: 1px solid transparent;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 700;
       transition: 140ms ease;
     }
     body.reado-shell-applied .reado-shell-link:hover {
       color: #fff;
+      border-color: rgba(96, 132, 177, 0.28);
       background: rgba(255, 255, 255, 0.05);
     }
     body.reado-shell-applied .reado-shell-link.active {
-      color: #1e78ff;
-      border-color: rgba(19, 91, 236, 0.35);
-      background: rgba(19, 91, 236, 0.14);
+      color: #dff0ff;
+      border-color: rgba(76, 167, 255, 0.38);
+      background: linear-gradient(135deg, rgba(19, 91, 236, 0.28), rgba(0, 234, 255, 0.08));
+      box-shadow: 0 8px 18px rgba(8, 24, 56, 0.3);
     }
     body.reado-shell-applied .reado-shell-link-icon {
-      width: 22px;
-      text-align: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      border: 1px solid rgba(126, 158, 197, 0.2);
+      background: rgba(255, 255, 255, 0.03);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       color: #9ca9bf;
-      font-size: 21px;
+      font-size: 18px;
       line-height: 1;
       font-family: "Material Icons";
       font-weight: normal;
       font-style: normal;
       letter-spacing: normal;
       text-transform: none;
-      display: inline-block;
       white-space: nowrap;
       word-wrap: normal;
       direction: ltr;
@@ -1227,14 +1468,16 @@ function ensureGlobalStyle() {
       -webkit-font-smoothing: antialiased;
     }
     body.reado-shell-applied .reado-shell-link.active .reado-shell-link-icon {
-      color: #1e78ff;
+      color: #8ddcff;
+      border-color: rgba(76, 167, 255, 0.45);
+      background: rgba(13, 93, 196, 0.3);
     }
     body.reado-shell-applied .reado-shell-weekly {
       margin-top: auto;
-      background: linear-gradient(135deg, rgba(67, 56, 202, 0.35), rgba(19, 91, 236, 0.25));
+      background: linear-gradient(135deg, rgba(58, 49, 180, 0.32), rgba(19, 91, 236, 0.24));
       border: 1px solid var(--reado-border);
       border-radius: 16px;
-      padding: 14px;
+      padding: 13px;
     }
     body.reado-shell-applied .reado-shell-weekly h4 {
       margin: 0 0 6px;
@@ -1599,6 +1842,26 @@ function ensureGlobalStyle() {
       border-radius: 999px;
       background: #7b7f87;
     }
+    body.reado-shell-applied .reado-billing-addon {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    body.reado-shell-applied .reado-billing-addon[hidden] {
+      display: none;
+    }
+    body.reado-shell-applied .reado-billing-addon-label {
+      color: #4b5563;
+      font-size: 13px;
+      font-weight: 700;
+    }
     body.reado-shell-applied .reado-billing-hint {
       margin: 12px 0 0;
       color: #6b7280;
@@ -1683,7 +1946,16 @@ function ensureGlobalStyle() {
       body.reado-shell-applied .reado-shell-side.open { transform: translateX(0); }
       body.reado-shell-applied .reado-shell-user-meta,
       body.reado-shell-applied .reado-shell-pill { display: none; }
-      body.reado-shell-applied .reado-shell-lang select { min-width: 78px; }
+      body.reado-shell-applied .reado-shell-lang-trigger { min-width: 88px; }
+      body.reado-shell-applied .reado-shell-auth {
+        gap: 6px;
+        padding-left: 6px;
+      }
+      body.reado-shell-applied .reado-shell-auth-btn {
+        padding: 6px 10px;
+        min-height: 30px;
+        font-size: 11px;
+      }
     }
     @media (max-width: 900px) {
       body.reado-shell-applied:not(.reado-experience-mode) {
@@ -1798,6 +2070,12 @@ function ensureGlobalStyle() {
       }
       body.reado-shell-applied.reado-page-mission .fixed.bottom-6.left-1\/2 {
         display: none !important;
+      }
+      body.reado-shell-applied.reado-page-skill-tree > main,
+      body.reado-shell-applied.reado-page-think-tank > main {
+        width: calc(100% - 16px) !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
       }
       body.reado-shell-applied.reado-experience-mode .reado-shell-top {
         top: 8px;
@@ -2044,9 +2322,278 @@ function enableImageFallbacks() {
   observer.observe(document.documentElement, { childList: true, subtree: true });
 }
 
+function ensureBootMask() {
+  const body = document.body;
+  if (!body) return null;
+  let mask = body.querySelector(".reado-shell-boot-mask");
+  if (mask instanceof HTMLElement) return mask;
+  mask = document.createElement("div");
+  mask.className = "reado-shell-boot-mask";
+  mask.setAttribute("aria-hidden", "true");
+  body.append(mask);
+  return mask;
+}
+
+function hasCjk(value) {
+  return /[\u3400-\u9fff]/.test(String(value || ""));
+}
+
+function normalizeLangCode(value) {
+  return String(value || "").trim().replace("_", "-").toLowerCase();
+}
+
+function shouldEnableAutoTranslate() {
+  const lang = normalizeLangCode(getCurrentLanguage());
+  return lang.startsWith(AUTO_TRANSLATE_TARGET_LANG);
+}
+
+function getAutoTranslateCache() {
+  if (autoTranslateCache) return autoTranslateCache;
+  autoTranslateCache = {};
+  try {
+    const raw = localStorage.getItem(AUTO_TRANSLATE_CACHE_KEY);
+    const parsed = raw ? JSON.parse(raw) : null;
+    if (parsed && typeof parsed === "object") {
+      autoTranslateCache = parsed;
+    }
+  } catch {}
+  return autoTranslateCache;
+}
+
+function scheduleAutoTranslateCachePersist() {
+  if (autoTranslatePersistTimer) return;
+  autoTranslatePersistTimer = window.setTimeout(() => {
+    autoTranslatePersistTimer = null;
+    try {
+      const cache = getAutoTranslateCache();
+      const entries = Object.entries(cache);
+      if (entries.length > 2000) {
+        const trimmed = Object.fromEntries(entries.slice(entries.length - 2000));
+        autoTranslateCache = trimmed;
+      }
+      localStorage.setItem(AUTO_TRANSLATE_CACHE_KEY, JSON.stringify(autoTranslateCache));
+    } catch {}
+  }, 300);
+}
+
+function getAutoTranslateCacheKey(text, targetLang) {
+  return String(targetLang || "") + "::" + String(text || "");
+}
+
+async function requestAutoTranslate(text, targetLang) {
+  const url = new URL("https://translate.googleapis.com/translate_a/single");
+  url.searchParams.set("client", "gtx");
+  url.searchParams.set("sl", "auto");
+  url.searchParams.set("tl", targetLang);
+  url.searchParams.set("dt", "t");
+  url.searchParams.set("q", text);
+  const response = await fetch(url.toString(), { method: "GET" });
+  if (!response.ok) throw new Error("translate failed");
+  const data = await response.json();
+  const seg = Array.isArray(data?.[0]) ? data[0] : [];
+  const joined = seg.map((item) => (Array.isArray(item) ? item[0] : "")).join("").trim();
+  return joined || text;
+}
+
+async function translateTextWithCache(text, targetLang) {
+  const source = String(text || "").trim();
+  if (!source) return source;
+  if (!hasCjk(source)) return source;
+  const key = getAutoTranslateCacheKey(source, targetLang);
+  const cache = getAutoTranslateCache();
+  if (typeof cache[key] === "string" && cache[key]) {
+    return cache[key];
+  }
+  try {
+    const translated = await requestAutoTranslate(source, targetLang);
+    cache[key] = translated || source;
+    scheduleAutoTranslateCachePersist();
+    return cache[key];
+  } catch {
+    cache[key] = source;
+    scheduleAutoTranslateCachePersist();
+    return source;
+  }
+}
+
+function collectAutoTranslateUnits(root = document) {
+  const units = [];
+  const isElementNode = (node) => node && node.nodeType === Node.ELEMENT_NODE;
+  const isBlockedTag = (tagName) => {
+    const tag = String(tagName || "").toUpperCase();
+    return tag === "SCRIPT" || tag === "STYLE" || tag === "NOSCRIPT" || tag === "TEXTAREA";
+  };
+
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  let node = walker.nextNode();
+  while (node) {
+    const textNode = node;
+    const parent = textNode.parentElement;
+    const nextNode = walker.nextNode();
+    node = nextNode;
+    if (!parent) continue;
+    if (!isElementNode(parent)) continue;
+    if (isBlockedTag(parent.tagName)) continue;
+    if (parent.closest(".reado-shell-wrap")) continue;
+    const raw = String(textNode.nodeValue || "");
+    if (!hasCjk(raw)) continue;
+    const match = raw.match(/^(\s*)([\s\S]*?)(\s*)$/);
+    if (!match) continue;
+    const lead = match[1] || "";
+    const core = match[2] || "";
+    const tail = match[3] || "";
+    if (!core.trim() || !hasCjk(core)) continue;
+    units.push({
+      text: core,
+      apply(translated) {
+        if (!translated || translated === core) return;
+        textNode.nodeValue = lead + translated + tail;
+      }
+    });
+  }
+
+  const elements = root instanceof Element || root instanceof Document
+    ? root.querySelectorAll?.("*") || []
+    : [];
+  for (const el of elements) {
+    if (!(el instanceof Element)) continue;
+    if (el.closest(".reado-shell-wrap")) continue;
+    if (isBlockedTag(el.tagName)) continue;
+    for (const key of AUTO_TRANSLATE_ATTRIBUTE_KEYS) {
+      const raw = el.getAttribute(key);
+      if (!raw || !hasCjk(raw)) continue;
+      units.push({
+        text: raw,
+        apply(translated) {
+          if (!translated || translated === raw) return;
+          el.setAttribute(key, translated);
+        }
+      });
+    }
+  }
+
+  if (root === document && hasCjk(document.title || "")) {
+    const rawTitle = document.title;
+    units.push({
+      text: rawTitle,
+      apply(translated) {
+        if (!translated || translated === rawTitle) return;
+        document.title = translated;
+      }
+    });
+  }
+
+  return units;
+}
+
+async function runAutoTranslate(root = document) {
+  if (!shouldEnableAutoTranslate()) return;
+  if (autoTranslateRunning) {
+    autoTranslateRerunRequested = true;
+    return;
+  }
+  autoTranslateRunning = true;
+  try {
+    const units = collectAutoTranslateUnits(root);
+    if (!units.length) return;
+    const targetLang = AUTO_TRANSLATE_TARGET_LANG;
+    const uniqueTexts = [...new Set(units.map((unit) => unit.text).filter(Boolean))];
+    const translatedMap = new Map();
+    for (let i = 0; i < uniqueTexts.length; i += 8) {
+      const chunk = uniqueTexts.slice(i, i + 8);
+      const values = await Promise.all(chunk.map((text) => translateTextWithCache(text, targetLang)));
+      chunk.forEach((text, idx) => {
+        translatedMap.set(text, values[idx] || text);
+      });
+    }
+    for (const unit of units) {
+      const translated = translatedMap.get(unit.text);
+      unit.apply(translated || unit.text);
+    }
+  } finally {
+    autoTranslateRunning = false;
+    if (autoTranslateRerunRequested) {
+      autoTranslateRerunRequested = false;
+      runAutoTranslate(document).catch(() => {});
+    }
+  }
+}
+
+function scheduleAutoTranslate(root = document) {
+  if (!shouldEnableAutoTranslate()) return;
+  if (autoTranslateTimer) return;
+  autoTranslateTimer = window.setTimeout(() => {
+    autoTranslateTimer = null;
+    runAutoTranslate(root).catch(() => {});
+  }, 120);
+}
+
+function initAutoTranslate() {
+  if (!shouldEnableAutoTranslate()) return;
+  runAutoTranslate(document).catch(() => {});
+  if (autoTranslateObserver) return;
+  const observerRoot = document.body || document.documentElement;
+  if (!observerRoot) return;
+  autoTranslateObserver = new MutationObserver(() => {
+    scheduleAutoTranslate(document);
+  });
+  autoTranslateObserver.observe(observerRoot, {
+    subtree: true,
+    childList: true,
+    characterData: true,
+    attributes: true,
+    attributeFilter: AUTO_TRANSLATE_ATTRIBUTE_KEYS
+  });
+}
+
+function markShellPending() {
+  const body = document.body;
+  if (!body) return;
+  body.classList.add("reado-shell-pending");
+  ensureBootMask();
+}
+
+function clearShellPending() {
+  const body = document.body;
+  if (!body) return;
+  body.classList.add("reado-shell-ready");
+  body.classList.remove("reado-shell-pending");
+  const mask = body.querySelector(".reado-shell-boot-mask");
+  if (mask instanceof HTMLElement) {
+    window.setTimeout(() => {
+      if (mask.isConnected) mask.remove();
+      body.classList.remove("reado-shell-ready");
+    }, 220);
+  }
+}
+
+function prefetchPage(href) {
+  if (!href) return;
+  let url;
+  try {
+    url = new URL(href, window.location.href);
+  } catch {
+    return;
+  }
+  if (url.origin !== window.location.origin) return;
+  if (url.pathname.startsWith("/api/")) return;
+  const key = url.origin + url.pathname + url.search;
+  if (PREFETCHED_PAGE_HREFS.has(key)) return;
+  PREFETCHED_PAGE_HREFS.add(key);
+  const link = document.createElement("link");
+  link.rel = "prefetch";
+  link.as = "document";
+  link.href = url.pathname + url.search;
+  document.head.append(link);
+}
+
 function hideLegacyAppChrome(isLearningPage) {
   if (isLearningPage) return;
-  const navTokens = ["个人书库", "知识版图", "任务中心", "排行榜", "交易中心", "个人资料", "世界地图", "我的库存", "道具仓库", "交易市场", "个人主页"];
+  const navTokens = [
+    "个人书库", "知识版图", "任务中心", "排行榜", "交易中心", "个人资料", "世界地图", "我的库存", "道具仓库", "交易市场", "个人主页",
+    "PersonalLibrary", "Missions", "Leaderboard", "Marketplace", "Profile", "Inventory",
+    "개인지식서고", "미션", "랭킹", "마켓", "프로필", "창고"
+  ];
   const hideNode = (node) => {
     if (!(node instanceof HTMLElement)) return;
     node.style.setProperty("display", "none", "important");
@@ -2080,10 +2627,12 @@ class ReadoAppShell extends HTMLElement {
   connectedCallback() {
     if (this.dataset.ready === "1") return;
     this.dataset.ready = "1";
+    markShellPending();
     ensureIconFont();
     ensureGlobalStyle();
     enableImageFallbacks();
     document.body.classList.add("reado-shell-applied");
+    initAutoTranslate();
     maybeMigrateLegacyMockUser();
 
     const page = this.dataset.page || "other";
@@ -2096,36 +2645,45 @@ class ReadoAppShell extends HTMLElement {
       document.body.classList.add("reado-experience-mode");
     }
     hideLegacyAppChrome(isLearningPage);
-    if (path === "/pages/simulator-library-level-selection-2.html") {
+    if (path === "/pages/simulator-library-level-selection-2") {
       document.body.classList.add("reado-page-mission");
     }
-    if (path === "/pages/simulator-library-level-selection-1.html") {
+    if (path === "/pages/simulator-library-level-selection-1") {
       document.body.classList.add("reado-page-warehouse");
     }
-    if (path === "/pages/gamified-learning-hub-dashboard-1.html") {
+    if (path === "/pages/gamified-learning-hub-dashboard-1") {
       document.body.classList.add("reado-page-map");
     }
-    if (path === "/pages/gamified-learning-hub-dashboard-3.html") {
+    if (path === "/pages/gamified-learning-hub-dashboard-3") {
       document.body.classList.add("reado-page-market");
     }
-    if (path === "/pages/global-scholar-leaderboard.html") {
+    if (path === "/pages/global-scholar-leaderboard") {
       document.body.classList.add("reado-page-ranking");
     }
-    if (path === "/pages/gamified-learning-hub-dashboard-2.html") {
+    if (path === "/pages/gamified-learning-hub-dashboard-2") {
       document.body.classList.add("reado-page-profile");
     }
-    if (path === "/pages/analytics-dashboard.html") {
+    if (path === "/pages/analytics-dashboard") {
       document.body.classList.add("reado-page-analytics");
+    }
+    if (path === "/pages/skill-tree") {
+      document.body.classList.add("reado-page-skill-tree");
+    }
+    if (path === "/pages/think-tank") {
+      document.body.classList.add("reado-page-think-tank");
     }
     enableMobileProportionalMode(isExperiencePage);
     if (isExperiencePage) {
       const fullHref = window.location.pathname + window.location.search + window.location.hash;
       localStorage.setItem(LAST_EXPERIENCE_KEY, fullHref);
     }
+    try {
+      window.ReadoBookCatalog?.refresh?.(getCurrentLanguage());
+    } catch {}
     const catalogBooks = Array.isArray(window.__READO_BOOK_CATALOG__?.books) ? window.__READO_BOOK_CATALOG__.books : [];
     const experienceSlugSet = new Set(catalogBooks.flatMap((book) => Array.isArray(book?.moduleSlugs) ? book.moduleSlugs : []));
     const savedExperienceHref = localStorage.getItem(LAST_EXPERIENCE_KEY);
-    const savedMatch = savedExperienceHref && savedExperienceHref.match(/^\/experiences\/([^/?#]+)\.html(?:[?#].*)?$/);
+    const savedMatch = savedExperienceHref && savedExperienceHref.match(/^\/experiences\/([^/?#]+)(?:\.html)?(?:[?#].*)?$/);
     const savedSlug = savedMatch ? savedMatch[1] : null;
     const resumeExperienceHref = savedSlug && experienceSlugSet.has(savedSlug) ? savedExperienceHref : null;
     if (savedExperienceHref && !resumeExperienceHref) {
@@ -2137,16 +2695,30 @@ class ReadoAppShell extends HTMLElement {
 
     const top = document.createElement("header");
     top.className = "reado-shell-top";
+    const signInHref = buildAuthRedirectUrl();
+    const signUpHref = (() => {
+      try {
+        const url = new URL(signInHref);
+        url.searchParams.set("mode", "signup");
+        return url.toString();
+      } catch {
+        return AUTH_PAGE_PATH + "?mode=signup";
+      }
+    })();
     top.innerHTML = `
-      <a class="reado-shell-brand" href="/pages/gamified-learning-hub-dashboard-1.html">
+      <a class="reado-shell-brand" href="/pages/gamified-learning-hub-dashboard-1">
         <span class="reado-shell-brand-icon">📘</span>
         <span>reado</span>
       </a>
       <div class="reado-shell-right">
-        <label class="reado-shell-lang">
-          <span class="reado-shell-pill-icon">language</span>
-          <select data-shell-lang></select>
-        </label>
+        <div class="reado-shell-lang" data-shell-lang-menu>
+          <button class="reado-shell-lang-trigger" type="button" aria-haspopup="menu" aria-expanded="false" data-shell-lang-trigger>
+            <span class="reado-shell-pill-icon">language</span>
+            <span data-shell-lang-label></span>
+            <span class="reado-shell-lang-chevron">expand_more</span>
+          </button>
+          <div class="reado-shell-lang-content" role="menu" hidden data-shell-lang-content></div>
+        </div>
         <span class="reado-shell-pill streak">🔥 <strong data-shell-streak></strong></span>
         <span class="reado-shell-pill gems" data-href="${GEM_CENTER_HREF}">
           <span class="reado-shell-pill-icon">diamond</span>
@@ -2156,6 +2728,10 @@ class ReadoAppShell extends HTMLElement {
           <span class="reado-shell-pill-icon">workspace_premium</span>
           <strong data-shell-pro-label>${t("billing.subscribe_short", "Subscribe Pro")}</strong>
         </button>
+        <div class="reado-shell-auth" data-shell-auth-actions hidden>
+          <button class="reado-shell-auth-btn signin" type="button" data-auth-mode="signin" data-auth-href="${signInHref}">${t("auth.sign_in", "Sign in")}</button>
+          <button class="reado-shell-auth-btn signup" type="button" data-auth-mode="signup" data-auth-href="${signUpHref}">${t("auth.sign_up", "Sign up")}</button>
+        </div>
         <div class="reado-shell-user">
           <div class="reado-shell-user-meta">
             <span class="reado-shell-user-name" data-shell-name></span>
@@ -2163,9 +2739,9 @@ class ReadoAppShell extends HTMLElement {
             <span class="reado-shell-xp-label" data-shell-xp-label></span>
             <span class="reado-shell-xp-track" data-shell-xp-track><span data-shell-xp-bar></span></span>
           </div>
-          <span class="reado-shell-avatar" data-href="/pages/gamified-learning-hub-dashboard-2.html"><img data-shell-avatar src="" alt="avatar" /></span>
+          <span class="reado-shell-avatar" data-href="/pages/gamified-learning-hub-dashboard-2"><img data-shell-avatar src="" alt="avatar" /></span>
         </div>
-        ${isLearningPage ? `<button class="reado-shell-exit" type="button" data-href="/pages/gamified-learning-hub-dashboard-1.html">${t("shell.exit_experience", "退出体验")}</button>` : ""}
+        ${isLearningPage ? `<button class="reado-shell-exit" type="button" data-href="/pages/gamified-learning-hub-dashboard-1">${t("shell.exit_experience", "退出体验")}</button>` : ""}
         <button class="reado-shell-toggle" type="button" aria-label="${t("shell.toggle_menu", "Toggle menu")}">☰</button>
       </div>`;
 
@@ -2179,7 +2755,14 @@ class ReadoAppShell extends HTMLElement {
     const avatarEl = top.querySelector("[data-shell-avatar]");
     const gemsPillEl = top.querySelector(".reado-shell-pill.gems");
     const proLabelEl = top.querySelector("[data-shell-pro-label]");
-    const langSelectEl = top.querySelector("[data-shell-lang]");
+    const langMenuEl = top.querySelector("[data-shell-lang-menu]");
+    const langTriggerEl = top.querySelector("[data-shell-lang-trigger]");
+    const langLabelEl = top.querySelector("[data-shell-lang-label]");
+    const langContentEl = top.querySelector("[data-shell-lang-content]");
+    const authActionsEl = top.querySelector("[data-shell-auth-actions]");
+    const userBoxEl = top.querySelector(".reado-shell-user");
+    const signInBtnEl = top.querySelector('[data-auth-mode="signin"]');
+    const signUpBtnEl = top.querySelector('[data-auth-mode="signup"]');
 
     const renderUser = (state, flash = false) => {
       const user = normalizeUserState(state);
@@ -2204,6 +2787,21 @@ class ReadoAppShell extends HTMLElement {
       }
     };
 
+    const syncAuthActions = () => {
+      const signedIn = isUserSignedIn();
+      if (userBoxEl instanceof HTMLElement) {
+        userBoxEl.hidden = !signedIn;
+      }
+      if (authActionsEl instanceof HTMLElement) {
+        authActionsEl.hidden = signedIn;
+      }
+    };
+
+    const syncAuthButtonLabels = () => {
+      if (signInBtnEl) signInBtnEl.textContent = t("auth.sign_in", "Sign in");
+      if (signUpBtnEl) signUpBtnEl.textContent = t("auth.sign_up", "Sign up");
+    };
+
     if (avatarEl) {
       avatarEl.addEventListener("error", () => {
         if (avatarEl.src !== FALLBACK_AVATAR_DATA_URI) {
@@ -2212,10 +2810,17 @@ class ReadoAppShell extends HTMLElement {
       });
     }
 
+    syncAuthButtonLabels();
     renderUser(readUserState(), false);
+    syncAuthActions();
     syncSignedInUser({ force: true }).finally(() => {
       refreshLiveProgress();
     });
+    const navigateTo = (href) => {
+      if (!href) return;
+      markShellPending();
+      window.location.href = href;
+    };
 
     const syncProLabel = (billing) => {
       if (!proLabelEl) return;
@@ -2255,6 +2860,7 @@ class ReadoAppShell extends HTMLElement {
       const detail = event?.detail || {};
       const gain = detail.gain || {};
       renderUser(detail.state || readUserState(), true);
+      syncAuthActions();
       if ((gain.gems || 0) > 0) {
         showGainHint(t("shell.gain_gems", "+{value} 宝石", { value: formatNumber(gain.gems) }), "gems");
       }
@@ -2277,6 +2883,15 @@ class ReadoAppShell extends HTMLElement {
     top.addEventListener("click", (event) => {
       const target = event.target;
       if (!(target instanceof HTMLElement)) return;
+      const authTrigger = target.closest("[data-auth-href]");
+      if (authTrigger instanceof HTMLElement) {
+        const authHref = authTrigger.getAttribute("data-auth-href");
+        if (authHref) {
+          event.preventDefault();
+          navigateTo(authHref);
+        }
+        return;
+      }
       const billingTrigger = target.closest("[data-open-billing]");
       if (billingTrigger) {
         event.preventDefault();
@@ -2286,7 +2901,7 @@ class ReadoAppShell extends HTMLElement {
       const clickable = target.closest("[data-href]");
       if (!clickable) return;
       const href = clickable.getAttribute("data-href");
-      if (href) window.location.href = href;
+      navigateTo(href);
     });
 
     const side = document.createElement("aside");
@@ -2294,16 +2909,14 @@ class ReadoAppShell extends HTMLElement {
     if (isLearningPage) {
       side.classList.remove("open");
     }
+    const sideHead = document.createElement("div");
+    sideHead.className = "reado-shell-side-head";
+    sideHead.innerHTML = `
+      <p class="reado-shell-side-kicker">${t("shell.nav.workspace", "Workspace")}</p>
+      <p class="reado-shell-side-title">${t("shell.nav.quick_access", "快速入口")}</p>`;
     const nav = document.createElement("nav");
     nav.className = "reado-shell-nav";
-    nav.innerHTML = ROUTES.map((route) => {
-      const active = route.id === page ? "active" : "";
-      const resolvedHref = route.href;
-      return `<a class="reado-shell-link ${active}" href="${resolvedHref}">
-        <span class="reado-shell-link-icon">${route.icon}</span>
-        <span>${t(route.labelKey, route.label)}</span>
-      </a>`;
-    }).join("");
+    nav.innerHTML = buildSideNavHtml(page);
     const weekly = document.createElement("section");
     weekly.className = "reado-shell-weekly";
     weekly.innerHTML = `
@@ -2312,7 +2925,7 @@ class ReadoAppShell extends HTMLElement {
       <div class="reado-shell-progress"><span></span></div>
       <p style="margin-top:8px;font-size:11px;color:#9cc2ff;font-weight:700;">${t("shell.weekly_progress", "已完成 2/3")}</p>
       <button class="reado-task-btn" type="button" data-open-billing>${t("billing.unlock_cta", "Unlock Pro")}</button>`;
-    side.append(nav, weekly);
+    side.append(sideHead, nav, weekly);
 
     const rightPanel = document.createElement("aside");
     rightPanel.className = "reado-shell-right-panel";
@@ -2323,16 +2936,16 @@ class ReadoAppShell extends HTMLElement {
         <div class="reado-rank-num" data-rank-number>#--</div>
         <div class="reado-rank-up" data-rank-total>--</div>
         <div class="reado-rank-progress"><span></span></div>
-        <p style="margin:8px 0 0;text-align:right;font-size:10px;color:#94a3b8;" data-rank-percent>Top --</p>
+        <p style="margin:8px 0 0;text-align:right;font-size:10px;color:#94a3b8;" data-rank-percent>${t("shell.rank_top_unknown", "Top --")}</p>
       </section>
       <section>
         <h3 class="reado-panel-title">${t("shell.current_tasks", "进行中的任务")}</h3>
         <div class="reado-tasks" data-task-history-list>
           <article class="reado-task active">
             <p class="reado-task-title">${t("shell.current_tasks", "进行中的任务")}</p>
-            <p class="reado-task-sub">Sign in to sync your mission history.</p>
+            <p class="reado-task-sub">${t("shell.task_signin_sync", "Sign in to sync your mission history.")}</p>
             <div class="reado-task-line"><span style="width:8%"></span></div>
-            <button class="reado-task-btn" data-href="/pages/simulator-library-level-selection-2.html">${t("shell.continue_learning", "继续学习")}</button>
+            <button class="reado-task-btn" data-href="/pages/simulator-library-level-selection-2">${t("shell.continue_learning", "继续学习")}</button>
           </article>
         </div>
       </section>`;
@@ -2348,21 +2961,23 @@ class ReadoAppShell extends HTMLElement {
         taskHistoryListEl.innerHTML = `
           <article class="reado-task active">
             <p class="reado-task-title">${t("shell.current_tasks", "进行中的任务")}</p>
-            <p class="reado-task-sub">No mission claim yet. Complete one mission to start tracking.</p>
+            <p class="reado-task-sub">${t("shell.task_no_claim", "No mission claim yet. Complete one mission to start tracking.")}</p>
             <div class="reado-task-line"><span style="width:6%"></span></div>
-            <button class="reado-task-btn" data-href="/pages/simulator-library-level-selection-2.html">${t("shell.continue_learning", "继续学习")}</button>
+            <button class="reado-task-btn" data-href="/pages/simulator-library-level-selection-2">${t("shell.continue_learning", "继续学习")}</button>
           </article>`;
         return;
       }
       taskHistoryListEl.innerHTML = items.slice(0, 3).map((item, index) => {
         const taskId = String(item?.taskId || "").trim() || "mission";
         const count = Math.max(1, Number(item?.count) || 0);
-        const updatedText = item?.lastClaimAt ? new Date(item.lastClaimAt).toLocaleString(getCurrentLanguage()) : "Recently";
+        const updatedText = item?.lastClaimAt
+          ? new Date(item.lastClaimAt).toLocaleString(getCurrentLanguage())
+          : t("shell.task_recently", "Recently");
         const percent = Math.max(10, 90 - index * 18);
         return `
           <article class="reado-task${index === 0 ? " active" : ""}">
             <p class="reado-task-title">${taskId.replace(/[-_]+/g, " ").slice(0, 42)}</p>
-            <p class="reado-task-sub">Claimed ${count} time(s) · ${updatedText}</p>
+            <p class="reado-task-sub">${t("shell.task_claimed_times", "Claimed {count} time(s) · {updated}", { count: formatNumber(count), updated: updatedText })}</p>
             <div class="reado-task-line"><span style="width:${percent}%"></span></div>
           </article>`;
       }).join("");
@@ -2378,15 +2993,15 @@ class ReadoAppShell extends HTMLElement {
       if (rankPercentEl) {
         if (me?.rank && totalPlayers) {
           const percentile = Math.max(1, Math.round((me.rank / Math.max(totalPlayers, 1)) * 100));
-          rankPercentEl.textContent = "Top " + percentile + "%";
+          rankPercentEl.textContent = t("shell.rank_top_pct", "Top {value}%", { value: percentile });
         } else {
-          rankPercentEl.textContent = "Top --";
+          rankPercentEl.textContent = t("shell.rank_top_unknown", "Top --");
         }
       }
     };
 
     const renderLeaderboardPage = (leaders = [], me = null) => {
-      if (window.location.pathname !== "/pages/global-scholar-leaderboard.html") return;
+      if (window.location.pathname !== "/pages/global-scholar-leaderboard") return;
       const host = document.querySelector("main .flex-1.h-full.overflow-y-auto");
       if (!host) return;
       let box = host.querySelector("[data-live-leaderboard]");
@@ -2399,21 +3014,21 @@ class ReadoAppShell extends HTMLElement {
         box.style.padding = "12px";
         box.style.background = "rgba(15,23,42,.45)";
         box.innerHTML = `
-          <h2 style="margin:0 0 8px;font-size:16px;font-weight:700;">Live Leaderboard</h2>
+          <h2 style="margin:0 0 8px;font-size:16px;font-weight:700;">${t("shell.live_leaderboard", "Live Leaderboard")}</h2>
           <div data-live-leaderboard-list style="display:grid;gap:8px;"></div>`;
         host.prepend(box);
       }
       const listEl = box.querySelector("[data-live-leaderboard-list]");
       if (!listEl) return;
       if (!Array.isArray(leaders) || !leaders.length) {
-        listEl.innerHTML = `<div style="opacity:.8;font-size:13px;">No synced players yet.</div>`;
+        listEl.innerHTML = `<div style="opacity:.8;font-size:13px;">${t("shell.no_synced_players", "No synced players yet.")}</div>`;
         return;
       }
       listEl.innerHTML = leaders.slice(0, 12).map((row) => {
         const isMe = Boolean(me?.userId && row.userId === me.userId);
         return `
           <div style="display:flex;justify-content:space-between;gap:10px;padding:8px 10px;border-radius:10px;border:1px solid ${isMe ? "rgba(19,91,236,.55)" : "rgba(148,163,184,.2)"};background:${isMe ? "rgba(19,91,236,.2)" : "rgba(15,23,42,.35)"};">
-            <strong>#${formatNumber(row.rank)} ${row.displayName || "Reader"}</strong>
+            <strong>#${formatNumber(row.rank)} ${row.displayName || t("shell.reader", "Reader")}</strong>
             <span>${formatNumber(row.rankScore || 0)} XP</span>
           </div>`;
       }).join("");
@@ -2440,27 +3055,93 @@ class ReadoAppShell extends HTMLElement {
       }
     };
 
-    if (langSelectEl) {
+    const closeLangMenu = () => {
+      if (!langMenuEl || !langTriggerEl || !langContentEl) return;
+      langMenuEl.classList.remove("open");
+      langTriggerEl.setAttribute("aria-expanded", "false");
+      langContentEl.hidden = true;
+    };
+
+    const syncLangMenuState = () => {
+      if (!langContentEl || !langLabelEl) return;
       const langs = listLanguages();
-      langSelectEl.innerHTML = langs
-        .map((lang) => `<option value="${lang.code}">${lang.label}</option>`)
+      const currentCode = getCurrentLanguage();
+      const active = langs.find((lang) => lang.code === currentCode) || langs[0];
+      langLabelEl.textContent = active?.label || currentCode || t("shell.language", "Language");
+      const items = langContentEl.querySelectorAll("[data-shell-lang-code]");
+      for (const item of items) {
+        const code = item.getAttribute("data-shell-lang-code");
+        const isActive = code === currentCode;
+        item.classList.toggle("active", isActive);
+        item.setAttribute("aria-checked", isActive ? "true" : "false");
+      }
+    };
+
+    const renderLangMenu = () => {
+      if (!langContentEl) return;
+      const langs = listLanguages();
+      const currentCode = getCurrentLanguage();
+      langContentEl.innerHTML = langs
+        .map((lang) => {
+          const active = lang.code === currentCode;
+          return `<button class="reado-shell-lang-item${active ? " active" : ""}" type="button" role="menuitemradio" aria-checked="${active ? "true" : "false"}" data-shell-lang-code="${lang.code}">
+            <span>${lang.label}</span>
+            <span class="reado-shell-lang-item-check">check</span>
+          </button>`;
+        })
         .join("");
-      langSelectEl.value = getCurrentLanguage();
-      langSelectEl.addEventListener("change", () => {
-        window.ReadoI18n?.setLanguage?.(langSelectEl.value);
+      syncLangMenuState();
+    };
+
+    if (langMenuEl && langTriggerEl && langContentEl) {
+      renderLangMenu();
+      langTriggerEl.addEventListener("click", () => {
+        const shouldOpen = !langMenuEl.classList.contains("open");
+        if (!shouldOpen) {
+          closeLangMenu();
+          return;
+        }
+        langMenuEl.classList.add("open");
+        langTriggerEl.setAttribute("aria-expanded", "true");
+        langContentEl.hidden = false;
+      });
+      langContentEl.addEventListener("click", (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) return;
+        const item = target.closest("[data-shell-lang-code]");
+        if (!(item instanceof HTMLElement)) return;
+        const code = item.getAttribute("data-shell-lang-code");
+        if (!code) return;
+        const previous = getCurrentLanguage();
+        window.ReadoI18n?.setLanguage?.(code);
+        if (previous !== code) {
+          window.location.reload();
+          return;
+        }
         renderUser(readUserState(), false);
+        syncLangMenuState();
+        closeLangMenu();
+      });
+      document.addEventListener("click", (event) => {
+        const target = event.target;
+        if (!(target instanceof Node)) return;
+        if (langMenuEl.contains(target)) return;
+        closeLangMenu();
+      });
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") closeLangMenu();
       });
     }
 
     onLanguageChange(() => {
       renderUser(readUserState(), false);
-      nav.innerHTML = ROUTES.map((route) => {
-        const active = route.id === page ? "active" : "";
-        return `<a class="reado-shell-link ${active}" href="${route.href}">
-          <span class="reado-shell-link-icon">${route.icon}</span>
-          <span>${t(route.labelKey, route.label)}</span>
-        </a>`;
-      }).join("");
+      syncAuthActions();
+      syncAuthButtonLabels();
+      nav.innerHTML = buildSideNavHtml(page);
+      const sideKicker = sideHead.querySelector(".reado-shell-side-kicker");
+      if (sideKicker) sideKicker.textContent = t("shell.nav.workspace", "Workspace");
+      const sideTitle = sideHead.querySelector(".reado-shell-side-title");
+      if (sideTitle) sideTitle.textContent = t("shell.nav.quick_access", "快速入口");
       weekly.querySelector("h4").textContent = t("shell.weekly_challenge", "每周挑战");
       weekly.querySelector("p").textContent = t("shell.weekly_goal", "阅读 3 章节历史书");
       weekly.querySelector("p[style]").textContent = t("shell.weekly_progress", "已完成 2/3");
@@ -2478,9 +3159,7 @@ class ReadoAppShell extends HTMLElement {
       if (exitBtn) exitBtn.textContent = t("shell.exit_experience", "退出体验");
       const toggleBtn = top.querySelector(".reado-shell-toggle");
       if (toggleBtn) toggleBtn.setAttribute("aria-label", t("shell.toggle_menu", "Toggle menu"));
-      if (langSelectEl) {
-        langSelectEl.value = getCurrentLanguage();
-      }
+      syncLangMenuState();
       syncProLabel(billingModalApi.getCurrent());
     });
 
@@ -2496,7 +3175,7 @@ class ReadoAppShell extends HTMLElement {
       const button = target.closest("button[data-href]");
       if (!button) return;
       const href = button.getAttribute("data-href");
-      if (href) window.location.href = href;
+      navigateTo(href);
     });
     side.addEventListener("click", (event) => {
       const target = event.target;
@@ -2512,6 +3191,7 @@ class ReadoAppShell extends HTMLElement {
       setTimeout(() => billingModalApi.open(), 150);
     }
     window.addEventListener("pageshow", () => {
+      clearShellPending();
       billingModalApi.refreshStatus();
     });
     document.addEventListener("visibilitychange", () => {
@@ -2527,8 +3207,57 @@ class ReadoAppShell extends HTMLElement {
       side.classList.remove("open");
     });
 
+    const prefetchFromEvent = (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+      const holder = target.closest("a[href], [data-href]");
+      if (!(holder instanceof HTMLElement)) return;
+      const href = holder.getAttribute("href") || holder.getAttribute("data-href");
+      prefetchPage(href);
+    };
+    top.addEventListener("pointerover", prefetchFromEvent, { passive: true });
+    side.addEventListener("pointerover", prefetchFromEvent, { passive: true });
+    rightPanel.addEventListener("pointerover", prefetchFromEvent, { passive: true });
+
+    const warmTargets = Array.from(new Set([
+      ...ROUTES.map((route) => route.href),
+      GEM_CENTER_HREF,
+      "/pages/analytics-dashboard"
+    ]));
+    const warmPages = () => {
+      for (const href of warmTargets) prefetchPage(href);
+    };
+    if (typeof window.requestIdleCallback === "function") {
+      window.requestIdleCallback(warmPages, { timeout: 1400 });
+    } else {
+      window.setTimeout(warmPages, 280);
+    }
+
+    wrap.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+      const link = target.closest("a[href]");
+      if (!(link instanceof HTMLAnchorElement)) return;
+      if (link.target && link.target !== "_self") return;
+      if (link.hasAttribute("download")) return;
+      const rawHref = link.getAttribute("href") || "";
+      if (!rawHref || rawHref.startsWith("#")) return;
+      let nextUrl;
+      try {
+        nextUrl = new URL(link.href, window.location.href);
+      } catch {
+        return;
+      }
+      if (nextUrl.origin !== window.location.origin) return;
+      if (nextUrl.pathname === window.location.pathname && nextUrl.search === window.location.search) return;
+      markShellPending();
+    }, true);
+
     wrap.append(top, side, rightPanel);
     document.body.append(wrap);
+    requestAnimationFrame(() => {
+      clearShellPending();
+    });
   }
 }
 

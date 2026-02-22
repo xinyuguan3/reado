@@ -1,0 +1,262 @@
+{
+  "slug": "experience-3",
+  "title": "reado: 土地炼金术 - 荒地变现界面",
+  "order": 3,
+  "generatedBy": "playable-content-engine",
+  "generatedAt": "2026-02-22T16:28:40.853Z",
+  "bookSummary": "Module 1: reado: 1994分税制 - 钱包保卫战 reado: 1994分税制 - 钱包保卫战 token READO OS Current Simulation Level 1: 1994 分税制改革 (Tax Sharing Reform) SYSTEM CRITICAL YEAR: 1994 settings 事权 (Responsibility) 刚性支出 trending_up ¥ 125 亿 WARNING: OVERLOAD > 公共服务支出 +15% > 基建维护 +8% > 人员薪资刚性增长 50 亿 财政缺口 (Fiscal Gap) warning 城市信用预警 (Credit Warning) Available Solution 激活：土地出让权 fingerprint COST: 制度成本 HIGH RECOMMENDED ACTION 财权 (Fiscal Power) 预算内收入",
+  "skillPoints": [
+    {
+      "id": "skill-warning",
+      "name": "Skill · warning",
+      "description": "Use \"warning\" to diagnose tradeoffs before making a decision.",
+      "category": "analysis",
+      "keywords": [
+        "warning",
+        "tradeoff",
+        "mechanism"
+      ],
+      "difficulty": 3,
+      "power": 78,
+      "xpReward": 72,
+      "gemReward": 10,
+      "moduleHint": 3
+    }
+  ],
+  "knowledgeBattle": {
+    "passScore": 2,
+    "reward": {
+      "xp": 176,
+      "gems": 29
+    },
+    "questions": [
+      {
+        "id": "battle-entry-warning",
+        "prompt": "关于「warning」，哪项解释最符合书中机制？",
+        "options": [
+          "5% warning Warning Alert 地价虚高，存在崩盘风险 注入资产 (土地) 银行贷款 (负债) SCALE_TILT: -6",
+          "Module 1: reado: 1994分税制 - 钱包保卫战 reado: 1994分税制 - 钱包保卫战 token READO OS Current Simulation Level 1: 1994 分税制改革 (Tax Sharing Reform) SYSTEM CRITICAL YEAR: 1994 settings 事权 (Responsibility) 刚性支出 trending_up ¥ 125 亿 WARNING:",
+          "reado | Level 3: 杠杆游戏 城投债模型 (LGFV Simulation) Current Cash Flow ¥ 2,400,000 Credibility Score AA+ trending_up settings 核心偿债公式 (Core Formula) 偿还能力 = 地价 x 面积 利息 Price: HIGH Area: STABLE Rate: 4",
+          "2deg PHYSICS_ENGINE: ACTIVE 操作台 (Controls) 注入土地资产 (Inject Land) 2,400 m² Conservative Aggressive 推高地价 (Push Land Price) ¥ 12,000 / m² Market Value Bubble Risk 申请银行贷款 (Request Loan) arrow_forward library_books Context: 置身"
+        ],
+        "answerIndex": 0,
+        "explanation": "Track how \"warning\" changes outcomes across scenarios instead of judging single events.",
+        "skillId": "",
+        "entryId": "entry-warning",
+        "moduleHint": 3
+      },
+      {
+        "id": "battle-entry-experiences",
+        "prompt": "关于「experiences」，哪项解释最符合书中机制？",
+        "options": [
+          "14:03:01 > WARNING: Leverage ratio critical",
+          "Module 1: reado: 1994分税制 - 钱包保卫战 reado: 1994分税制 - 钱包保卫战 token READO OS Current Simulation Level 1: 1994 分税制改革 (Tax Sharing Reform) SYSTEM CRITICAL YEAR: 1994 settings 事权 (Responsibility) 刚性支出 trending_up ¥ 125 亿 WARNING:",
+          "reado | Level 3: 杠杆游戏 城投债模型 (LGFV Simulation) Current Cash Flow ¥ 2,400,000 Credibility Score AA+ trending_up settings 核心偿债公式 (Core Formula) 偿还能力 = 地价 x 面积 利息 Price: HIGH Area: STABLE Rate: 4",
+          "5% warning Warning Alert 地价虚高，存在崩盘风险 注入资产 (土地) 银行贷款 (负债) SCALE_TILT: -6"
+        ],
+        "answerIndex": 0,
+        "explanation": "Track how \"experiences\" changes outcomes across scenarios instead of judging single events.",
+        "skillId": "",
+        "entryId": "entry-experiences",
+        "moduleHint": 3
+      }
+    ]
+  },
+  "thinkTankEntries": [
+    {
+      "id": "entry-warning",
+      "term": "warning",
+      "title": "warning",
+      "summary": "5% warning Warning Alert 地价虚高，存在崩盘风险 注入资产 (土地) 银行贷款 (负债) SCALE_TILT: -6",
+      "insight": "Track how \"warning\" changes outcomes across scenarios instead of judging single events.",
+      "sourceCue": "",
+      "tags": [
+        "warning",
+        "knowledge-fragment"
+      ],
+      "relatedTerms": [
+        "reado",
+        "trending",
+        "arrow"
+      ],
+      "moduleHint": 3,
+      "relatedEntryRefs": [
+        {
+          "id": "entry-arrow",
+          "title": "arrow",
+          "term": "arrow",
+          "books": [
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 5
+        },
+        {
+          "id": "entry-reado",
+          "title": "reado",
+          "term": "reado",
+          "books": [
+            "wanli-fifteen",
+            "sapiens",
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 5
+        },
+        {
+          "id": "entry-trending",
+          "title": "trending",
+          "term": "trending",
+          "books": [
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 5
+        },
+        {
+          "id": "entry",
+          "title": "推行进度",
+          "term": "推行进度",
+          "books": [
+            "wanli-fifteen",
+            "sapiens",
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 4
+        },
+        {
+          "id": "entry-add",
+          "title": "add",
+          "term": "add",
+          "books": [
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 4
+        },
+        {
+          "id": "entry-circle",
+          "title": "circle",
+          "term": "circle",
+          "books": [
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 4
+        },
+        {
+          "id": "entry-critical",
+          "title": "critical",
+          "term": "critical",
+          "books": [
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 4
+        },
+        {
+          "id": "entry-experiences",
+          "title": "experiences",
+          "term": "experiences",
+          "books": [
+            "wanli-fifteen",
+            "sapiens",
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 4
+        }
+      ]
+    },
+    {
+      "id": "entry-experiences",
+      "term": "experiences",
+      "title": "experiences",
+      "summary": "14:03:01 > WARNING: Leverage ratio critical",
+      "insight": "Track how \"experiences\" changes outcomes across scenarios instead of judging single events.",
+      "sourceCue": "",
+      "tags": [
+        "experiences",
+        "knowledge-fragment"
+      ],
+      "relatedTerms": [
+        "reado",
+        "trending",
+        "warning"
+      ],
+      "moduleHint": 3,
+      "relatedEntryRefs": [
+        {
+          "id": "entry",
+          "title": "推行进度",
+          "term": "推行进度",
+          "books": [
+            "wanli-fifteen",
+            "sapiens",
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 8
+        },
+        {
+          "id": "entry-reado",
+          "title": "reado",
+          "term": "reado",
+          "books": [
+            "wanli-fifteen",
+            "sapiens",
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 8
+        },
+        {
+          "id": "entry-history",
+          "title": "history",
+          "term": "history",
+          "books": [
+            "wanli-fifteen",
+            "sapiens"
+          ],
+          "score": 7
+        },
+        {
+          "id": "entry-accessibility",
+          "title": "accessibility",
+          "term": "accessibility",
+          "books": [
+            "sapiens"
+          ],
+          "score": 5
+        },
+        {
+          "id": "entry-add",
+          "title": "add",
+          "term": "add",
+          "books": [
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 5
+        },
+        {
+          "id": "entry-arrow",
+          "title": "arrow",
+          "term": "arrow",
+          "books": [
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 5
+        },
+        {
+          "id": "entry-balance",
+          "title": "balance",
+          "term": "balance",
+          "books": [
+            "wanli-fifteen"
+          ],
+          "score": 5
+        },
+        {
+          "id": "entry-circle",
+          "title": "circle",
+          "term": "circle",
+          "books": [
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 5
+        }
+      ]
+    }
+  ]
+}

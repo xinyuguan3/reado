@@ -1,0 +1,244 @@
+{
+  "slug": "debt-cycle-impact-analysis",
+  "title": "reado: 债务周期影响分析",
+  "order": 5,
+  "generatedBy": "playable-content-engine",
+  "generatedAt": "2026-02-22T16:28:40.853Z",
+  "bookSummary": "Module 1: reado: 1994分税制 - 钱包保卫战 reado: 1994分税制 - 钱包保卫战 token READO OS Current Simulation Level 1: 1994 分税制改革 (Tax Sharing Reform) SYSTEM CRITICAL YEAR: 1994 settings 事权 (Responsibility) 刚性支出 trending_up ¥ 125 亿 WARNING: OVERLOAD > 公共服务支出 +15% > 基建维护 +8% > 人员薪资刚性增长 50 亿 财政缺口 (Fiscal Gap) warning 城市信用预警 (Credit Warning) Available Solution 激活：土地出让权 fingerprint COST: 制度成本 HIGH RECOMMENDED ACTION 财权 (Fiscal Power) 预算内收入",
+  "skillPoints": [
+    {
+      "id": "skill-settings",
+      "name": "Skill · settings",
+      "description": "Use \"settings\" to diagnose tradeoffs before making a decision.",
+      "category": "analysis",
+      "keywords": [
+        "settings",
+        "tradeoff",
+        "mechanism"
+      ],
+      "difficulty": 5,
+      "power": 114,
+      "xpReward": 100,
+      "gemReward": 14,
+      "moduleHint": 5
+    }
+  ],
+  "knowledgeBattle": {
+    "passScore": 1,
+    "reward": {
+      "xp": 176,
+      "gems": 29
+    },
+    "questions": [
+      {
+        "id": "battle-entry-settings",
+        "prompt": "关于「settings」，哪项解释最符合书中机制？",
+        "options": [
+          "但这实际上是将未来的土地收益透支到了现在",
+          "Module 1: reado: 1994分税制 - 钱包保卫战 reado: 1994分税制 - 钱包保卫战 token READO OS Current Simulation Level 1: 1994 分税制改革 (Tax Sharing Reform) SYSTEM CRITICAL YEAR: 1994 settings 事权 (Responsibility) 刚性支出 trending_up ¥ 125 亿 WARNING:",
+          "reado | Level 3: 杠杆游戏 城投债模型 (LGFV Simulation) Current Cash Flow ¥ 2,400,000 Credibility Score AA+ trending_up settings 核心偿债公式 (Core Formula) 偿还能力 = 地价 x 面积 利息 Price: HIGH Area: STABLE Rate: 4",
+          "5% warning Warning Alert 地价虚高，存在崩盘风险 注入资产 (土地) 银行贷款 (负债) SCALE_TILT: -6"
+        ],
+        "answerIndex": 0,
+        "explanation": "Track how \"settings\" changes outcomes across scenarios instead of judging single events.",
+        "skillId": "",
+        "entryId": "entry-settings",
+        "moduleHint": 5
+      }
+    ]
+  },
+  "thinkTankEntries": [
+    {
+      "id": "entry-settings",
+      "term": "settings",
+      "title": "settings",
+      "summary": "但这实际上是将未来的土地收益透支到了现在",
+      "insight": "Track how \"settings\" changes outcomes across scenarios instead of judging single events.",
+      "sourceCue": "",
+      "tags": [
+        "settings",
+        "knowledge-fragment"
+      ],
+      "relatedTerms": [
+        "reado",
+        "trending",
+        "warning"
+      ],
+      "moduleHint": 5,
+      "relatedEntryRefs": [
+        {
+          "id": "entry",
+          "title": "推行进度",
+          "term": "推行进度",
+          "books": [
+            "wanli-fifteen",
+            "sapiens",
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 4
+        },
+        {
+          "id": "entry-add",
+          "title": "add",
+          "term": "add",
+          "books": [
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 4
+        },
+        {
+          "id": "entry-arrow",
+          "title": "arrow",
+          "term": "arrow",
+          "books": [
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 4
+        },
+        {
+          "id": "entry-circle",
+          "title": "circle",
+          "term": "circle",
+          "books": [
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 4
+        },
+        {
+          "id": "entry-critical",
+          "title": "critical",
+          "term": "critical",
+          "books": [
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 4
+        },
+        {
+          "id": "entry-experiences",
+          "title": "experiences",
+          "term": "experiences",
+          "books": [
+            "wanli-fifteen",
+            "sapiens",
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 4
+        },
+        {
+          "id": "entry-forward",
+          "title": "forward",
+          "term": "forward",
+          "books": [
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 4
+        },
+        {
+          "id": "entry-level",
+          "title": "level",
+          "term": "level",
+          "books": [
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 4
+        }
+      ]
+    },
+    {
+      "id": "entry-level",
+      "term": "level",
+      "title": "level",
+      "summary": "注意观察右侧财政成本变化",
+      "insight": "Track how \"level\" changes outcomes across scenarios instead of judging single events.",
+      "sourceCue": "",
+      "tags": [
+        "level",
+        "knowledge-fragment"
+      ],
+      "relatedTerms": [
+        "reado",
+        "trending",
+        "warning"
+      ],
+      "moduleHint": 5,
+      "relatedEntryRefs": [
+        {
+          "id": "entry",
+          "title": "推行进度",
+          "term": "推行进度",
+          "books": [
+            "wanli-fifteen",
+            "sapiens",
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 4
+        },
+        {
+          "id": "entry-add",
+          "title": "add",
+          "term": "add",
+          "books": [
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 4
+        },
+        {
+          "id": "entry-arrow",
+          "title": "arrow",
+          "term": "arrow",
+          "books": [
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 4
+        },
+        {
+          "id": "entry-circle",
+          "title": "circle",
+          "term": "circle",
+          "books": [
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 4
+        },
+        {
+          "id": "entry-critical",
+          "title": "critical",
+          "term": "critical",
+          "books": [
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 4
+        },
+        {
+          "id": "entry-experiences",
+          "title": "experiences",
+          "term": "experiences",
+          "books": [
+            "wanli-fifteen",
+            "sapiens",
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 4
+        },
+        {
+          "id": "entry-forward",
+          "title": "forward",
+          "term": "forward",
+          "books": [
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 4
+        },
+        {
+          "id": "entry-outline",
+          "title": "outline",
+          "term": "outline",
+          "books": [
+            "principles-for-navigating-big-debt-crises"
+          ],
+          "score": 4
+        }
+      ]
+    }
+  ]
+}

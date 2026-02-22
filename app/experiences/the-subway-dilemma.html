@@ -69,8 +69,53 @@
     </style>
 </head>
 <body class="bg-background-dark text-slate-200 font-sans min-h-screen overflow-hidden flex flex-col relative">
-<script src="/shared/book-catalog.js?v=1771767926839"></script>
-<script type="module" src="/shared/shell.js?v=1771767926839"></script>
+<style id="reado-shell-boot-style">
+body.reado-shell-pending {
+  background: #0b1220;
+}
+body.reado-shell-pending > :not(script):not(reado-app-shell):not(.reado-shell-boot-mask) {
+  visibility: hidden !important;
+}
+body > .reado-shell-boot-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    radial-gradient(1200px 420px at 20% -10%, rgba(47, 123, 255, 0.22), transparent 60%),
+    radial-gradient(900px 360px at 92% 112%, rgba(0, 234, 255, 0.14), transparent 58%),
+    #0b1220;
+  transition: opacity 180ms ease;
+}
+body.reado-shell-pending > .reado-shell-boot-mask {
+  opacity: 1;
+}
+body.reado-shell-ready > .reado-shell-boot-mask {
+  opacity: 0;
+}
+</style>
+<script>
+(function () {
+  var body = document.body;
+  if (!body) return;
+  body.classList.add("reado-shell-pending");
+  var mask = body.querySelector(".reado-shell-boot-mask");
+  if (!mask) {
+    mask = document.createElement("div");
+    mask.className = "reado-shell-boot-mask";
+    mask.setAttribute("aria-hidden", "true");
+    body.appendChild(mask);
+  }
+  window.setTimeout(function () {
+    if (!body.classList.contains("reado-shell-applied")) {
+      body.classList.remove("reado-shell-pending");
+    }
+  }, 4000);
+})();
+</script>
+<script src="/shared/book-catalog.js?v=1771779610833"></script>
+<script type="module" src="/shared/shell.js?v=1771779610833"></script>
 <reado-app-shell data-page="knowledge-map"></reado-app-shell>
 <div class="absolute inset-0 z-0 overflow-hidden bg-background-dark">
 <div class="absolute inset-0 bg-blueprint opacity-20 pointer-events-none"></div>
@@ -286,12 +331,12 @@
 <div class="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background-dark to-transparent z-0 pointer-events-none"></div>
 
 
-<script src="/shared/experience-runtime.js?v=1771767926839"></script>
+<script src="/shared/experience-runtime.js?v=1771779610833"></script>
 <script>
 (() => {
   
   localStorage.setItem("reado_book_last_principles-for-navigating-big-debt-crises", "the-subway-dilemma");
-  if ("the-subway-dilemma" === "experience-77") {
+  if ("the-subway-dilemma" === "experience-4") {
     try {
       const completedRaw = localStorage.getItem("reado_completed_books_v1") || "[]";
       const completedSet = new Set(JSON.parse(completedRaw));
@@ -300,7 +345,7 @@
     } catch {}
   }
   
-  const readoNextHref = "/experiences/debt-cycle-impact-analysis.html";
+  const readoNextHref = "/experiences/1994";
   (() => {
     let isNavigating = false;
     const keywordList = ["开始", "继续", "下一", "进入", "模拟", "抉择", "选择", "确认", "提交", "挑战", "完成", "start", "next", "continue"];
@@ -359,7 +404,7 @@
     window.ReadoExperienceRuntime.init({
       bookId: "principles-for-navigating-big-debt-crises",
       moduleSlug: "the-subway-dilemma",
-      moduleSlugs: ["the-beautiful-deleveraging-challenge","the-subway-dilemma","debt-cycle-impact-analysis","1994","experience-75","experience-76","experience-77"]
+      moduleSlugs: ["debt-cycle-impact-analysis","the-beautiful-deleveraging-challenge","the-subway-dilemma","1994","experience-2","experience-3","experience-4"]
     });
   }
 })();

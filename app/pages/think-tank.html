@@ -1,0 +1,1326 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>reado · 智库</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;700;800&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #070c14;
+      --panel: rgba(10, 17, 29, 0.8);
+      --panel-strong: rgba(8, 14, 24, 0.92);
+      --line: rgba(163, 187, 216, 0.24);
+      --text: #ecf3ff;
+      --muted: #8fa7c6;
+      --accent: #2dd4bf;
+      --accent-2: #f59e0b;
+      --accent-3: #60a5fa;
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+      background:
+        radial-gradient(980px 460px at 8% -10%, rgba(45, 212, 191, 0.24), transparent 60%),
+        radial-gradient(860px 460px at 100% 108%, rgba(245, 158, 11, 0.16), transparent 58%),
+        linear-gradient(120deg, #070c14, #081321 42%, #0a1829);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 22% 24%, rgba(255, 255, 255, 0.08) 0 1.2px, transparent 1.2px),
+        radial-gradient(circle at 71% 62%, rgba(255, 255, 255, 0.06) 0 1.1px, transparent 1.1px),
+        radial-gradient(circle at 44% 78%, rgba(255, 255, 255, 0.05) 0 1px, transparent 1px);
+      background-size: 180px 180px, 220px 220px, 240px 240px;
+      opacity: 0.42;
+      z-index: -1;
+    }
+
+    .page {
+      width: min(1460px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 96px 0 26px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 14px 40px rgba(2, 8, 20, 0.45);
+    }
+
+    .hero {
+      padding: 20px;
+      display: grid;
+      gap: 14px;
+      background:
+        radial-gradient(560px 220px at 96% 0%, rgba(245, 158, 11, 0.18), transparent 62%),
+        radial-gradient(520px 240px at 4% 100%, rgba(45, 212, 191, 0.16), transparent 64%),
+        var(--panel);
+    }
+
+    .hero-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-family: "Sora", "Noto Sans SC", sans-serif;
+      font-size: clamp(32px, 5vw, 54px);
+      letter-spacing: -0.03em;
+      line-height: 1;
+      color: #f7fcff;
+    }
+
+    .hero p {
+      margin: 10px 0 0;
+      max-width: 760px;
+      color: #b8cae2;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .status {
+      font-size: 12px;
+      color: #9dc0e6;
+    }
+
+    .status.error { color: #f5aa90; }
+
+    .toolbar {
+      display: grid;
+      gap: 9px;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+    }
+
+    .book-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .book-tab {
+      border: 1px solid rgba(163, 187, 216, 0.38);
+      border-radius: 999px;
+      background: rgba(6, 14, 24, 0.78);
+      color: #bfe4ff;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .book-tab:hover {
+      transform: translateY(-1px);
+      border-color: rgba(96, 165, 250, 0.74);
+    }
+
+    .book-tab.active {
+      color: #061422;
+      border-color: rgba(45, 212, 191, 0.8);
+      background: linear-gradient(135deg, #2dd4bf, #7ef0e0);
+    }
+
+    .mode-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px;
+      border: 1px solid rgba(163, 187, 216, 0.28);
+      border-radius: 999px;
+      background: rgba(4, 10, 19, 0.76);
+    }
+
+    .mode-btn {
+      border: none;
+      border-radius: 999px;
+      background: transparent;
+      color: #9fc3e9;
+      padding: 7px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .mode-btn.active {
+      background: linear-gradient(135deg, #2dd4bf, #7ef0e0);
+      color: #032016;
+    }
+
+    .metrics {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    }
+
+    .metric {
+      border: 1px solid rgba(163, 187, 216, 0.24);
+      border-radius: 14px;
+      background: rgba(6, 14, 24, 0.7);
+      padding: 12px;
+      min-height: 84px;
+      animation: reveal 0.35s ease both;
+    }
+
+    .metric .label {
+      font-size: 11px;
+      color: #88a5c8;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .metric .value {
+      margin-top: 5px;
+      font-family: "Sora", "Noto Sans SC", sans-serif;
+      font-size: 28px;
+      line-height: 1;
+      color: #f2fbff;
+    }
+
+    .metric .hint {
+      margin-top: 5px;
+      font-size: 12px;
+      color: #a2bedc;
+      line-height: 1.45;
+    }
+
+    .filters {
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+      grid-template-columns: 1.2fr 1fr;
+      align-items: end;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .field label {
+      font-size: 11px;
+      color: #90aacb;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .filters input,
+    .filters select {
+      width: 100%;
+      border: 1px solid rgba(163, 187, 216, 0.32);
+      border-radius: 11px;
+      background: rgba(4, 10, 19, 0.72);
+      color: #e3f2ff;
+      font-size: 13px;
+      padding: 10px 12px;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .filters input:focus,
+    .filters select:focus {
+      border-color: rgba(45, 212, 191, 0.78);
+      box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.13);
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      grid-column: 1 / -1;
+    }
+
+    .tag {
+      border: 1px solid rgba(163, 187, 216, 0.3);
+      border-radius: 999px;
+      background: rgba(5, 12, 22, 0.78);
+      color: #a7c7eb;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 5px 9px;
+      cursor: pointer;
+    }
+
+    .tag.active {
+      border-color: rgba(45, 212, 191, 0.8);
+      color: #043428;
+      background: linear-gradient(135deg, #2dd4bf, #7ef0e0);
+    }
+
+    .layout {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: minmax(0, 1.52fr) minmax(320px, 1fr);
+    }
+
+    .network {
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+      min-height: 640px;
+      background:
+        radial-gradient(460px 280px at 85% 15%, rgba(96, 165, 250, 0.13), transparent 70%),
+        radial-gradient(430px 260px at 8% 90%, rgba(45, 212, 191, 0.11), transparent 70%),
+        var(--panel);
+    }
+
+    .head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .title {
+      margin: 0;
+      font-size: 14px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #97c2ec;
+      font-weight: 800;
+    }
+
+    .tip {
+      font-size: 12px;
+      color: #8daacc;
+    }
+
+    .network-wrap {
+      border: 1px solid rgba(163, 187, 216, 0.22);
+      border-radius: 14px;
+      background:
+        radial-gradient(circle at 50% 44%, rgba(11, 24, 39, 0.78), rgba(4, 10, 18, 0.96));
+      overflow: hidden;
+      min-height: 540px;
+    }
+
+    #tank-graph {
+      width: 100%;
+      min-height: 540px;
+      display: block;
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip-row span {
+      border: 1px solid rgba(163, 187, 216, 0.3);
+      border-radius: 999px;
+      padding: 5px 9px;
+      font-size: 11px;
+      color: #a6c6e7;
+      background: rgba(4, 11, 20, 0.72);
+    }
+
+    .detail {
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+      align-content: start;
+      min-height: 640px;
+      background:
+        linear-gradient(150deg, rgba(96, 165, 250, 0.08), rgba(45, 212, 191, 0.05)),
+        var(--panel-strong);
+    }
+
+    .empty {
+      border: 1px dashed rgba(163, 187, 216, 0.34);
+      border-radius: 12px;
+      background: rgba(4, 10, 18, 0.54);
+      padding: 14px;
+      font-size: 12px;
+      color: #98b4d3;
+      line-height: 1.7;
+    }
+
+    .entry-kicker {
+      margin: 0;
+      color: #8db3d8;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .entry-title {
+      margin: 0;
+      font-family: "Sora", "Noto Sans SC", sans-serif;
+      font-size: 30px;
+      letter-spacing: -0.02em;
+      line-height: 1.08;
+      color: #f7fcff;
+    }
+
+    .entry-text {
+      margin: 0;
+      font-size: 13px;
+      color: #bed4ec;
+      line-height: 1.7;
+    }
+
+    .book-badges,
+    .entry-tags,
+    .relations {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .book-badges span,
+    .entry-tags span,
+    .relations button {
+      border: 1px solid rgba(163, 187, 216, 0.28);
+      border-radius: 999px;
+      padding: 5px 9px;
+      font-size: 11px;
+      background: rgba(4, 10, 19, 0.74);
+      color: #a6c6e8;
+    }
+
+    .relations button {
+      cursor: pointer;
+    }
+
+    .relations button:hover {
+      border-color: rgba(45, 212, 191, 0.8);
+      color: #dffdf9;
+    }
+
+    .cta-row {
+      display: grid;
+      gap: 8px;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .btn {
+      border: 1px solid rgba(163, 187, 216, 0.34);
+      border-radius: 11px;
+      background: rgba(5, 12, 21, 0.76);
+      color: #d8ebff;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 10px;
+      text-decoration: none;
+      text-align: center;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(45, 212, 191, 0.84);
+    }
+
+    .btn.primary {
+      color: #04291f;
+      border-color: rgba(45, 212, 191, 0.9);
+      background: linear-gradient(135deg, #2dd4bf, #7ef0e0);
+    }
+
+    .list {
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .entry-grid {
+      display: grid;
+      gap: 9px;
+      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+    }
+
+    .entry-card {
+      border: 1px solid rgba(163, 187, 216, 0.25);
+      border-radius: 12px;
+      background: rgba(5, 12, 22, 0.68);
+      padding: 11px;
+      display: grid;
+      gap: 8px;
+      cursor: pointer;
+      animation: reveal 0.45s ease both;
+    }
+
+    .entry-card.active {
+      border-color: rgba(45, 212, 191, 0.8);
+      box-shadow: 0 0 0 2px rgba(45, 212, 191, 0.14);
+      background: rgba(7, 17, 30, 0.9);
+    }
+
+    .entry-card h3 {
+      margin: 0;
+      font-size: 14px;
+      color: #e4f6ff;
+      line-height: 1.5;
+    }
+
+    .entry-card p {
+      margin: 0;
+      font-size: 12px;
+      color: #adc7e2;
+      line-height: 1.65;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
+      overflow: hidden;
+    }
+
+    .entry-card .mini {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .entry-card .mini span {
+      border: 1px solid rgba(163, 187, 216, 0.25);
+      border-radius: 999px;
+      padding: 3px 7px;
+      font-size: 10px;
+      color: #9ec1e7;
+      background: rgba(4, 10, 18, 0.65);
+    }
+
+    .g-link {
+      stroke: rgba(147, 180, 219, 0.2);
+      stroke-width: 1.2;
+    }
+
+    .g-link.active {
+      stroke: rgba(45, 212, 191, 0.74);
+      stroke-width: 1.8;
+    }
+
+    .g-node {
+      cursor: pointer;
+      transition: transform 0.2s ease;
+      transform-origin: center;
+    }
+
+    .g-node circle {
+      fill: rgba(96, 165, 250, 0.2);
+      stroke: rgba(157, 201, 255, 0.78);
+      stroke-width: 1.4;
+    }
+
+    .g-node text {
+      fill: #e6f5ff;
+      font-size: 10px;
+      font-weight: 700;
+      pointer-events: none;
+    }
+
+    .g-node:hover,
+    .g-node.active {
+      transform: scale(1.08);
+    }
+
+    .g-node.active circle {
+      fill: rgba(245, 158, 11, 0.25);
+      stroke: rgba(255, 205, 138, 0.95);
+    }
+
+    .g-empty {
+      fill: #9fb9d9;
+      font-size: 16px;
+      font-family: "Sora", "Noto Sans SC", sans-serif;
+    }
+
+    @keyframes reveal {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 1240px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+      .detail {
+        min-height: 0;
+      }
+    }
+
+    @media (max-width: 920px) {
+      .page {
+        width: calc(100% - 16px);
+        padding-top: 88px;
+      }
+      .hero {
+        padding: 14px;
+      }
+      .toolbar {
+        grid-template-columns: 1fr;
+      }
+      .filters {
+        grid-template-columns: 1fr;
+      }
+      .cta-row {
+        grid-template-columns: 1fr;
+      }
+      .entry-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+<style id="reado-shell-boot-style">
+body.reado-shell-pending {
+  background: #0b1220;
+}
+body.reado-shell-pending > :not(script):not(reado-app-shell):not(.reado-shell-boot-mask) {
+  visibility: hidden !important;
+}
+body > .reado-shell-boot-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    radial-gradient(1200px 420px at 20% -10%, rgba(47, 123, 255, 0.22), transparent 60%),
+    radial-gradient(900px 360px at 92% 112%, rgba(0, 234, 255, 0.14), transparent 58%),
+    #0b1220;
+  transition: opacity 180ms ease;
+}
+body.reado-shell-pending > .reado-shell-boot-mask {
+  opacity: 1;
+}
+body.reado-shell-ready > .reado-shell-boot-mask {
+  opacity: 0;
+}
+</style>
+<script>
+(function () {
+  var body = document.body;
+  if (!body) return;
+  body.classList.add("reado-shell-pending");
+  var mask = body.querySelector(".reado-shell-boot-mask");
+  if (!mask) {
+    mask = document.createElement("div");
+    mask.className = "reado-shell-boot-mask";
+    mask.setAttribute("aria-hidden", "true");
+    body.appendChild(mask);
+  }
+  window.setTimeout(function () {
+    if (!body.classList.contains("reado-shell-applied")) {
+      body.classList.remove("reado-shell-pending");
+    }
+  }, 4000);
+})();
+</script>
+<script src="/shared/book-catalog.js"></script>
+<script type="module" src="/shared/shell.js"></script>
+<reado-app-shell data-page="think-tank"></reado-app-shell>
+
+<main class="page">
+  <section class="card hero">
+    <div class="hero-head">
+      <div>
+        <h1>Think Tank Nexus</h1>
+        <p>把书里的碎片化知识压缩为可跳转、可关联、可追踪的网络。点开一个词条，即可沿着关联线追到其他书。</p>
+      </div>
+      <div id="status" class="status">正在载入智库...</div>
+    </div>
+
+    <div class="toolbar">
+      <div id="book-tabs" class="book-tabs"></div>
+      <div class="mode-toggle" role="tablist" aria-label="View mode">
+        <button id="mode-book" class="mode-btn active" type="button">本书视图</button>
+        <button id="mode-cross" class="mode-btn" type="button">跨书视图</button>
+      </div>
+    </div>
+
+    <div id="metrics" class="metrics"></div>
+  </section>
+
+  <section class="card filters">
+    <div class="field">
+      <label for="search-input">搜索词条</label>
+      <input id="search-input" type="search" placeholder="输入词条、摘要、来源提示" />
+    </div>
+    <div class="field">
+      <label for="sort-select">排序策略</label>
+      <select id="sort-select">
+        <option value="relevance">按关联强度</option>
+        <option value="books">按跨书覆盖</option>
+        <option value="name">按名称</option>
+      </select>
+    </div>
+    <div id="tags" class="tags"></div>
+  </section>
+
+  <section class="layout">
+    <article class="card network">
+      <header class="head">
+        <h2 class="title">知识网络</h2>
+        <span id="graph-tip" class="tip">点击节点查看词条详情与跨书关联。</span>
+      </header>
+      <div class="network-wrap">
+        <svg id="tank-graph" viewBox="0 0 1200 700" role="img" aria-label="Think tank graph"></svg>
+      </div>
+      <div id="legend" class="chip-row"></div>
+    </article>
+
+    <aside class="card detail" id="entry-detail"></aside>
+  </section>
+
+  <section class="card list">
+    <header class="head">
+      <h2 class="title">词条清单</h2>
+      <span class="tip">列表与图谱联动，点击即可定位。</span>
+    </header>
+    <div id="entry-grid" class="entry-grid"></div>
+  </section>
+</main>
+
+<script>
+(() => {
+  const tabsEl = document.getElementById("book-tabs");
+  const statusEl = document.getElementById("status");
+  const metricsEl = document.getElementById("metrics");
+  const searchEl = document.getElementById("search-input");
+  const sortEl = document.getElementById("sort-select");
+  const tagsEl = document.getElementById("tags");
+  const modeBookBtn = document.getElementById("mode-book");
+  const modeCrossBtn = document.getElementById("mode-cross");
+  const graphEl = document.getElementById("tank-graph");
+  const graphTipEl = document.getElementById("graph-tip");
+  const legendEl = document.getElementById("legend");
+  const detailEl = document.getElementById("entry-detail");
+  const entryGridEl = document.getElementById("entry-grid");
+
+  const state = {
+    books: [],
+    activeBookId: "",
+    mode: "book",
+    filters: {
+      query: "",
+      tag: "all",
+      sort: "relevance"
+    },
+    cache: new Map(),
+    entries: [],
+    selectedEntryId: "",
+    pendingEntryId: ""
+  };
+
+  const palette = ["#2dd4bf", "#60a5fa", "#f59e0b", "#fb7185", "#a78bfa", "#34d399", "#f97316", "#22d3ee"];
+
+  const asArray = (v) => Array.isArray(v) ? v : [];
+  const toText = (v, fallback = "") => typeof v === "string" && v.trim() ? v.trim() : fallback;
+  const toNumber = (v, fallback = 0) => Number.isFinite(Number(v)) ? Number(v) : fallback;
+  const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+  const formatNumber = (n) => new Intl.NumberFormat("zh-CN").format(Math.round(toNumber(n, 0)));
+
+  const escapeHtml = (value) => toText(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+
+  const fetchJson = async (url) => {
+    const response = await fetch(url, { credentials: "same-origin" });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok || data?.ok === false) {
+      throw new Error(data?.error || ("Request failed: " + response.status));
+    }
+    return data;
+  };
+
+  const setStatus = (text, kind = "") => {
+    statusEl.classList.toggle("error", kind === "error");
+    statusEl.textContent = text;
+  };
+
+  const computeBookColor = (bookId) => {
+    const index = Math.abs([...bookId].reduce((sum, ch) => sum + ch.charCodeAt(0), 0)) % palette.length;
+    return palette[index];
+  };
+
+  const normalizeEntry = (entry, book) => {
+    const row = entry && typeof entry === "object" ? entry : {};
+    const relatedRows = asArray(row.relatedEntries).map((item) => ({
+      id: toText(item.id),
+      title: toText(item.title, toText(item.id, "关联词条")),
+      score: clamp(toNumber(item.score, 0), 0, 999),
+      books: asArray(item.books).map((id) => toText(id)).filter(Boolean)
+    })).filter((item) => item.id);
+
+    return {
+      id: toText(row.id),
+      title: toText(row.title, toText(row.term, toText(row.id, "Untitled"))),
+      term: toText(row.term),
+      summary: toText(row.summary),
+      insight: toText(row.insight),
+      sourceCue: toText(row.sourceCue),
+      tags: asArray(row.tags).map((item) => toText(item)).filter(Boolean).slice(0, 10),
+      books: [toText(book?.id)].filter(Boolean),
+      bookTitles: [toText(book?.title)].filter(Boolean),
+      relatedEntries: relatedRows,
+      relatedScore: relatedRows.reduce((sum, item) => sum + item.score, 0),
+      relationCount: relatedRows.length,
+      primaryBookId: toText(book?.id),
+      primaryBookTitle: toText(book?.title)
+    };
+  };
+
+  const mergeEntries = (rows) => {
+    const map = new Map();
+    rows.forEach((entry) => {
+      if (!entry.id) return;
+      if (!map.has(entry.id)) {
+        map.set(entry.id, {
+          ...entry,
+          books: entry.books.slice(),
+          bookTitles: entry.bookTitles.slice(),
+          tags: entry.tags.slice(),
+          relatedEntries: entry.relatedEntries.slice()
+        });
+        return;
+      }
+      const current = map.get(entry.id);
+      current.title = current.title.length >= entry.title.length ? current.title : entry.title;
+      current.summary = current.summary.length >= entry.summary.length ? current.summary : entry.summary;
+      current.insight = current.insight.length >= entry.insight.length ? current.insight : entry.insight;
+      current.sourceCue = current.sourceCue.length >= entry.sourceCue.length ? current.sourceCue : entry.sourceCue;
+      current.tags = Array.from(new Set([...current.tags, ...entry.tags])).slice(0, 12);
+      current.books = Array.from(new Set([...current.books, ...entry.books]));
+      current.bookTitles = Array.from(new Set([...current.bookTitles, ...entry.bookTitles]));
+
+      const relMap = new Map(current.relatedEntries.map((item) => [item.id, item]));
+      entry.relatedEntries.forEach((rel) => {
+        if (!rel.id) return;
+        if (!relMap.has(rel.id)) {
+          relMap.set(rel.id, { ...rel });
+          return;
+        }
+        const prev = relMap.get(rel.id);
+        prev.score = Math.max(prev.score, rel.score);
+        prev.books = Array.from(new Set([...prev.books, ...rel.books]));
+      });
+      current.relatedEntries = Array.from(relMap.values()).slice(0, 12);
+      current.relatedScore = current.relatedEntries.reduce((sum, item) => sum + item.score, 0);
+      current.relationCount = current.relatedEntries.length;
+    });
+    return Array.from(map.values());
+  };
+
+  const loadBookEntries = async (bookId) => {
+    if (state.cache.has(bookId)) return state.cache.get(bookId);
+    const payload = await fetchJson("/api/think-tank/books/" + encodeURIComponent(bookId));
+    const book = payload?.book || { id: bookId, title: bookId };
+    const entries = asArray(payload?.entries).map((entry) => normalizeEntry(entry, book)).filter((entry) => entry.id);
+    const view = {
+      book: {
+        id: toText(book.id, bookId),
+        title: toText(book.title, bookId),
+        summary: toText(book.summary),
+        entryCount: entries.length
+      },
+      entries
+    };
+    state.cache.set(bookId, view);
+    return view;
+  };
+
+  const loadEntriesForMode = async () => {
+    if (state.mode === "book") {
+      const view = await loadBookEntries(state.activeBookId);
+      return view.entries.slice();
+    }
+    const allRows = [];
+    for (const book of state.books) {
+      const view = await loadBookEntries(book.id);
+      allRows.push(...view.entries);
+    }
+    return mergeEntries(allRows);
+  };
+
+  const buildTagCloud = (rows) => {
+    const tagMap = new Map();
+    rows.forEach((entry) => {
+      asArray(entry.tags).forEach((tag) => {
+        tagMap.set(tag, (tagMap.get(tag) || 0) + 1);
+      });
+    });
+    return Array.from(tagMap.entries())
+      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "zh-Hans-CN"))
+      .slice(0, 14);
+  };
+
+  const sortEntries = (rows) => {
+    const list = rows.slice();
+    const mode = state.filters.sort;
+    list.sort((a, b) => {
+      if (mode === "books") {
+        return b.books.length - a.books.length || b.relatedScore - a.relatedScore || a.title.localeCompare(b.title, "zh-Hans-CN");
+      }
+      if (mode === "name") {
+        return a.title.localeCompare(b.title, "zh-Hans-CN");
+      }
+      return b.relatedScore - a.relatedScore || b.relationCount - a.relationCount || a.title.localeCompare(b.title, "zh-Hans-CN");
+    });
+    return list;
+  };
+
+  const getFilteredEntries = () => {
+    const query = state.filters.query.trim().toLowerCase();
+    const tag = state.filters.tag;
+    const filtered = state.entries.filter((entry) => {
+      if (tag !== "all" && !entry.tags.includes(tag)) return false;
+      if (!query) return true;
+      const text = [
+        entry.title,
+        entry.term,
+        entry.summary,
+        entry.insight,
+        entry.sourceCue,
+        ...entry.tags,
+        ...entry.bookTitles
+      ].join(" ").toLowerCase();
+      return text.includes(query);
+    });
+    return sortEntries(filtered);
+  };
+
+  const getSelectedEntry = (rows) => {
+    if (!rows.length) return null;
+    const picked = rows.find((item) => item.id === state.selectedEntryId);
+    return picked || rows[0];
+  };
+
+  const renderTabs = () => {
+    tabsEl.innerHTML = state.books.map((book) => `
+      <button class="book-tab ${book.id === state.activeBookId ? "active" : ""}" type="button" data-book-id="${book.id}">${escapeHtml(book.title)}</button>
+    `).join("");
+  };
+
+  const renderMode = () => {
+    modeBookBtn.classList.toggle("active", state.mode === "book");
+    modeCrossBtn.classList.toggle("active", state.mode === "cross");
+  };
+
+  const renderMetrics = (filtered, selected) => {
+    const relationEdges = filtered.reduce((sum, row) => sum + row.relationCount, 0);
+    const avgDegree = filtered.length ? relationEdges / filtered.length : 0;
+    const involvedBooks = new Set(filtered.flatMap((entry) => entry.books)).size;
+
+    metricsEl.innerHTML = [
+      {
+        label: "词条数量",
+        value: formatNumber(filtered.length),
+        hint: state.mode === "book" ? "当前书籍已收录词条" : "跨书去重后的词条规模"
+      },
+      {
+        label: "关联边数",
+        value: formatNumber(relationEdges),
+        hint: "词条之间可追踪关系"
+      },
+      {
+        label: "平均连接度",
+        value: avgDegree.toFixed(1),
+        hint: "每个词条平均关联数量"
+      },
+      {
+        label: "覆盖书籍",
+        value: formatNumber(involvedBooks || 1),
+        hint: selected ? `当前聚焦：${escapeHtml(selected.title)}` : "等待选择词条"
+      }
+    ].map((item, idx) => `
+      <article class="metric" style="animation-delay:${idx * 50}ms">
+        <div class="label">${item.label}</div>
+        <div class="value">${item.value}</div>
+        <div class="hint">${item.hint}</div>
+      </article>
+    `).join("");
+  };
+
+  const renderTags = (filteredRows) => {
+    const tags = buildTagCloud(filteredRows);
+    if (!tags.length) {
+      tagsEl.innerHTML = "<span class='tag active'>暂无标签</span>";
+      return;
+    }
+    tagsEl.innerHTML = [
+      `<button class="tag ${state.filters.tag === "all" ? "active" : ""}" type="button" data-tag="all">全部</button>`,
+      ...tags.map(([tag, count]) => `<button class="tag ${state.filters.tag === tag ? "active" : ""}" type="button" data-tag="${escapeHtml(tag)}">${escapeHtml(tag)} · ${count}</button>`)
+    ].join("");
+  };
+
+  const renderLegend = (rows) => {
+    const bucket = new Map();
+    rows.forEach((entry) => {
+      entry.books.forEach((bookId) => {
+        bucket.set(bookId, (bucket.get(bookId) || 0) + 1);
+      });
+    });
+    if (!bucket.size) {
+      legendEl.innerHTML = "<span>暂无书籍分布</span>";
+      return;
+    }
+    legendEl.innerHTML = Array.from(bucket.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
+      .map(([bookId, count]) => {
+        const title = state.books.find((book) => book.id === bookId)?.title || bookId;
+        const color = computeBookColor(bookId);
+        return `<span style="border-color:${color};color:${color}">${escapeHtml(title)} · ${count}</span>`;
+      })
+      .join("");
+  };
+
+  const renderDetail = (entry) => {
+    if (!entry) {
+      detailEl.innerHTML = `<article class="empty">当前筛选条件下没有词条。可尝试清空搜索词或切换标签。</article>`;
+      return;
+    }
+
+    const relatedButtons = entry.relatedEntries.slice(0, 12).map((rel) => {
+      const candidateBook = rel.books.find((id) => id !== state.activeBookId) || rel.books[0] || "";
+      return `<button type="button" data-related-id="${escapeHtml(rel.id)}" data-related-book="${escapeHtml(candidateBook)}">${escapeHtml(rel.title)} · ${rel.score}</button>`;
+    }).join("");
+
+    const openBookHref = entry.primaryBookId ? "/books/" + encodeURIComponent(entry.primaryBookId) : "#";
+
+    detailEl.innerHTML = `
+      <p class="entry-kicker">${state.mode === "book" ? "本书主词条" : "跨书核心词条"}</p>
+      <h3 class="entry-title">${escapeHtml(entry.title)}</h3>
+      <p class="entry-text">${escapeHtml(entry.summary || "暂无摘要")}</p>
+      ${entry.insight ? `<p class="entry-text">${escapeHtml(entry.insight)}</p>` : ""}
+      ${entry.sourceCue ? `<p class="entry-text">来源线索：${escapeHtml(entry.sourceCue)}</p>` : ""}
+
+      <div class="book-badges">
+        ${entry.bookTitles.map((title) => `<span>${escapeHtml(title)}</span>`).join("") || "<span>未标注书籍</span>"}
+      </div>
+      <div class="entry-tags">
+        ${entry.tags.length ? entry.tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("") : "<span>暂无标签</span>"}
+      </div>
+
+      <div class="relations">
+        ${relatedButtons || "<span>暂无关联词条</span>"}
+      </div>
+
+      <div class="cta-row">
+        <a class="btn primary" href="${openBookHref}">进入所属书籍</a>
+        <button class="btn" type="button" data-focus-related="1">跳到最强关联</button>
+      </div>
+
+      <div class="empty">提示：在跨书模式下，点击关联词条会自动跳转到对应书籍上下文并刷新图谱焦点。</div>
+    `;
+  };
+
+  const buildGraphData = (rows) => {
+    const maxNodes = 56;
+    const clipped = rows.slice(0, maxNodes);
+    const indexById = new Map(clipped.map((row, idx) => [row.id, idx]));
+
+    const bookPool = Array.from(new Set(clipped.flatMap((row) => row.books))).slice(0, 8);
+    const centers = new Map();
+    const cx = 500;
+    const cy = 350;
+    const radius = 220;
+    bookPool.forEach((bookId, idx) => {
+      const angle = (idx / Math.max(1, bookPool.length)) * Math.PI * 2 - Math.PI / 2;
+      centers.set(bookId, {
+        x: cx + Math.cos(angle) * radius,
+        y: cy + Math.sin(angle) * radius
+      });
+    });
+
+    const nodes = clipped.map((entry, idx) => {
+      const home = centers.get(entry.books[0]) || { x: cx, y: cy };
+      const angle = idx * 2.399963;
+      const radial = 24 + (idx % 9) * 18;
+      const x = home.x + Math.cos(angle) * radial;
+      const y = home.y + Math.sin(angle) * radial;
+      return {
+        ...entry,
+        x,
+        y,
+        color: computeBookColor(entry.books[0] || "default"),
+        r: 9 + Math.min(8, Math.round(entry.relationCount / 2))
+      };
+    });
+
+    const edgeSet = new Set();
+    const edges = [];
+    nodes.forEach((entry) => {
+      asArray(entry.relatedEntries).forEach((rel) => {
+        if (!indexById.has(rel.id)) return;
+        const a = indexById.get(entry.id);
+        const b = indexById.get(rel.id);
+        if (a === b) return;
+        const key = a < b ? `${a}|${b}` : `${b}|${a}`;
+        if (edgeSet.has(key)) return;
+        edgeSet.add(key);
+        edges.push({
+          source: nodes[a],
+          target: nodes[b],
+          score: rel.score
+        });
+      });
+    });
+
+    return { nodes, edges };
+  };
+
+  const renderGraph = (rows, selected) => {
+    if (!rows.length) {
+      graphEl.innerHTML = `<text class="g-empty" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle">没有可视化词条</text>`;
+      return;
+    }
+
+    const { nodes, edges } = buildGraphData(rows);
+    const selectedId = selected ? selected.id : "";
+
+    const edgeSvg = edges.map((edge) => {
+      const active = selectedId && (edge.source.id === selectedId || edge.target.id === selectedId) ? "active" : "";
+      return `<line class="g-link ${active}" x1="${edge.source.x.toFixed(2)}" y1="${edge.source.y.toFixed(2)}" x2="${edge.target.x.toFixed(2)}" y2="${edge.target.y.toFixed(2)}" />`;
+    }).join("");
+
+    const nodeSvg = nodes.map((node) => {
+      const active = node.id === selectedId ? "active" : "";
+      const short = toText(node.title).slice(0, 11);
+      return `
+        <g class="g-node ${active}" data-entry-id="${escapeHtml(node.id)}" tabindex="0">
+          <circle cx="${node.x.toFixed(2)}" cy="${node.y.toFixed(2)}" r="${node.r}" fill="${node.color}22" stroke="${node.color}" />
+          <text x="${node.x.toFixed(2)}" y="${(node.y + node.r + 12).toFixed(2)}" text-anchor="middle">${escapeHtml(short)}</text>
+        </g>
+      `;
+    }).join("");
+
+    graphEl.innerHTML = `<g>${edgeSvg}${nodeSvg}</g>`;
+    graphTipEl.textContent = `显示 ${nodes.length} 个节点 · ${edges.length} 条关联线`;
+  };
+
+  const renderEntryGrid = (rows, selected) => {
+    if (!rows.length) {
+      entryGridEl.innerHTML = `<article class="empty">当前条件下没有词条。</article>`;
+      return;
+    }
+
+    entryGridEl.innerHTML = rows.slice(0, 72).map((entry, idx) => `
+      <article class="entry-card ${selected && entry.id === selected.id ? "active" : ""}" data-entry-id="${escapeHtml(entry.id)}" style="animation-delay:${idx * 20}ms">
+        <h3>${escapeHtml(entry.title)}</h3>
+        <p>${escapeHtml(entry.summary || entry.insight || "暂无摘要")}</p>
+        <div class="mini">
+          <span>关联 ${entry.relationCount}</span>
+          <span>跨书 ${entry.books.length}</span>
+          <span>分值 ${entry.relatedScore}</span>
+        </div>
+      </article>
+    `).join("");
+  };
+
+  const rerender = () => {
+    const filtered = getFilteredEntries();
+    const selected = getSelectedEntry(filtered);
+    state.selectedEntryId = selected ? selected.id : "";
+
+    renderMetrics(filtered, selected);
+    renderTags(state.entries);
+    renderLegend(filtered);
+    renderGraph(filtered, selected);
+    renderDetail(selected);
+    renderEntryGrid(filtered, selected);
+  };
+
+  const setMode = async (mode) => {
+    if (state.mode === mode) return;
+    state.mode = mode;
+    renderMode();
+    setStatus(mode === "book" ? "切换为本书视图..." : "切换为跨书视图...");
+    await refreshEntries();
+  };
+
+  const refreshEntries = async () => {
+    try {
+      state.entries = await loadEntriesForMode();
+      if (state.pendingEntryId) {
+        state.selectedEntryId = state.pendingEntryId;
+        state.pendingEntryId = "";
+      }
+      if (!state.entries.find((row) => row.id === state.selectedEntryId)) {
+        state.selectedEntryId = state.entries[0]?.id || "";
+      }
+      rerender();
+      const modeLabel = state.mode === "book" ? "本书" : "跨书";
+      setStatus(`${modeLabel}已加载 · ${state.entries.length} 个词条`);
+    } catch (error) {
+      setStatus(toText(error?.message, "智库加载失败"), "error");
+      graphEl.innerHTML = `<text class="g-empty" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle">加载失败</text>`;
+      detailEl.innerHTML = `<article class="empty">${escapeHtml(toText(error?.message, "加载失败"))}</article>`;
+      entryGridEl.innerHTML = `<article class="empty">加载失败</article>`;
+    }
+  };
+
+  const selectBook = async (bookId, preferredEntryId = "") => {
+    if (!bookId) return;
+    state.activeBookId = bookId;
+    if (preferredEntryId) state.pendingEntryId = preferredEntryId;
+    renderTabs();
+    setStatus("正在切换书籍...");
+    await refreshEntries();
+  };
+
+  tabsEl.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+    const btn = target.closest("[data-book-id]");
+    if (!(btn instanceof HTMLElement)) return;
+    const nextId = toText(btn.getAttribute("data-book-id"));
+    if (!nextId || nextId === state.activeBookId) return;
+    selectBook(nextId);
+  });
+
+  modeBookBtn.addEventListener("click", () => setMode("book"));
+  modeCrossBtn.addEventListener("click", () => setMode("cross"));
+
+  searchEl.addEventListener("input", () => {
+    state.filters.query = toText(searchEl.value);
+    rerender();
+  });
+
+  sortEl.addEventListener("change", () => {
+    state.filters.sort = toText(sortEl.value, "relevance");
+    rerender();
+  });
+
+  tagsEl.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+    const btn = target.closest("[data-tag]");
+    if (!(btn instanceof HTMLElement)) return;
+    const tag = toText(btn.getAttribute("data-tag"), "all");
+    state.filters.tag = tag;
+    rerender();
+  });
+
+  graphEl.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+    const node = target.closest("[data-entry-id]");
+    if (!(node instanceof HTMLElement)) return;
+    const entryId = toText(node.getAttribute("data-entry-id"));
+    if (!entryId) return;
+    state.selectedEntryId = entryId;
+    rerender();
+  });
+
+  graphEl.addEventListener("keydown", (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+    if (event.key !== "Enter" && event.key !== " ") return;
+    event.preventDefault();
+    const entryId = toText(target.getAttribute("data-entry-id"));
+    if (!entryId) return;
+    state.selectedEntryId = entryId;
+    rerender();
+  });
+
+  entryGridEl.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+    const card = target.closest("[data-entry-id]");
+    if (!(card instanceof HTMLElement)) return;
+    const entryId = toText(card.getAttribute("data-entry-id"));
+    if (!entryId) return;
+    state.selectedEntryId = entryId;
+    rerender();
+  });
+
+  detailEl.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+    const jumpBtn = target.closest("[data-related-id]");
+    if (jumpBtn instanceof HTMLElement) {
+      const entryId = toText(jumpBtn.getAttribute("data-related-id"));
+      const bookId = toText(jumpBtn.getAttribute("data-related-book"));
+      if (entryId && state.entries.find((row) => row.id === entryId)) {
+        state.selectedEntryId = entryId;
+        rerender();
+        return;
+      }
+      if (entryId && bookId) {
+        state.mode = "book";
+        renderMode();
+        selectBook(bookId, entryId);
+      }
+      return;
+    }
+
+    const focusRelated = target.closest("[data-focus-related]");
+    if (focusRelated) {
+      const current = state.entries.find((entry) => entry.id === state.selectedEntryId);
+      const strongest = asArray(current?.relatedEntries).slice().sort((a, b) => b.score - a.score)[0];
+      if (!strongest) return;
+      if (state.entries.find((entry) => entry.id === strongest.id)) {
+        state.selectedEntryId = strongest.id;
+        rerender();
+        return;
+      }
+      const nextBook = asArray(strongest.books)[0];
+      if (nextBook) {
+        state.mode = "book";
+        renderMode();
+        selectBook(nextBook, strongest.id);
+      }
+    }
+  });
+
+  const init = async () => {
+    setStatus("正在载入智库...");
+    try {
+      const payload = await fetchJson("/api/content/books");
+      state.books = asArray(payload?.books).filter((book) => book && book.id);
+      if (!state.books.length) {
+        setStatus("暂无书籍数据", "error");
+        detailEl.innerHTML = "<article class='empty'>暂无可用书籍。</article>";
+        return;
+      }
+      state.activeBookId = state.books[0].id;
+      renderTabs();
+      renderMode();
+      await refreshEntries();
+    } catch (error) {
+      setStatus(toText(error?.message, "加载失败"), "error");
+      detailEl.innerHTML = `<article class="empty">${escapeHtml(toText(error?.message, "加载失败"))}</article>`;
+    }
+  };
+
+  init();
+})();
+</script>
+</body>
+</html>

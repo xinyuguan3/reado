@@ -1,0 +1,271 @@
+{
+  "slug": "zero-to-one-the-monopolist-s-choice-1",
+  "title": "reado: 创始人悖论性格分析",
+  "order": 2,
+  "generatedBy": "playable-content-engine",
+  "generatedAt": "2026-02-22T16:28:59.834Z",
+  "bookSummary": "Module 1: reado: 从0到1模拟 (全中文版) reado: 从0到1模拟 (全中文版) rocket_launch reado: 从0到1模拟器 第四关：垄断者的抉择 构想 战略 增长 规模化 account_balance_wallet 1000万 创投资金 中文简体 analytics person 创始人数据 防御力 较低 市场规模 巨大 创始人远见 独特逆向 预估估值 ￥2800万 lightbulb 彼得·蒂尔的洞见： “竞争是给失败者准备的 如果你想创造持久的价值，那就建立垄断 ” 帕罗奥图, 加州 初创项目计划书 #8291 垂直搜索引擎 专为 AI 模型打造 一个索引研究论文和模型权重的专业平台，为机器学习工程师提供比通用搜索好10倍的相关性",
+  "skillPoints": [
+    {
+      "id": "skill-radio",
+      "name": "Skill · radio",
+      "description": "Use \"radio\" to diagnose tradeoffs before making a decision.",
+      "category": "execution",
+      "keywords": [
+        "radio",
+        "tradeoff",
+        "mechanism"
+      ],
+      "difficulty": 2,
+      "power": 60,
+      "xpReward": 58,
+      "gemReward": 8,
+      "moduleHint": 2
+    }
+  ],
+  "knowledgeBattle": {
+    "passScore": 2,
+    "reward": {
+      "xp": 194,
+      "gems": 32
+    },
+    "questions": [
+      {
+        "id": "battle-entry-radio",
+        "prompt": "关于「radio」，哪项解释最符合书中机制？",
+        "options": [
+          "如果你想创造持久的价值，那就建立垄断",
+          "Module 1: reado: 从0到1模拟 (全中文版) reado: 从0到1模拟 (全中文版) rocket_launch reado: 从0到1模拟器 第四关：垄断者的抉择 构想 战略 增长 规模化 account_balance_wallet 1000万 创投资金 中文简体 analytics person 创始人数据 防御力 较低 市场规模 巨大 创始人远见 独特逆向 预估估值 ￥2800万 lightbulb 彼得·蒂尔",
+          "” 帕罗奥图, 加州 初创项目计划书 #8291 垂直搜索引擎 专为 AI 模型打造 一个索引研究论文和模型权重的专业平台，为机器学习工程师提供比通用搜索好10倍的相关性",
+          "“通用搜索太宽泛了"
+        ],
+        "answerIndex": 0,
+        "explanation": "Track how \"radio\" changes outcomes across scenarios instead of judging single events.",
+        "skillId": "",
+        "entryId": "entry-radio",
+        "moduleHint": 2
+      },
+      {
+        "id": "battle-entry-down",
+        "prompt": "关于「down」，哪项解释最符合书中机制？",
+        "options": [
+          "总论 1 1 到 n 是复制；0 到 1 是创新",
+          "Module 1: reado: 从0到1模拟 (全中文版) reado: 从0到1模拟 (全中文版) rocket_launch reado: 从0到1模拟器 第四关：垄断者的抉择 构想 战略 增长 规模化 account_balance_wallet 1000万 创投资金 中文简体 analytics person 创始人数据 防御力 较低 市场规模 巨大 创始人远见 独特逆向 预估估值 ￥2800万 lightbulb 彼得·蒂尔",
+          "如果你想创造持久的价值，那就建立垄断",
+          "” 帕罗奥图, 加州 初创项目计划书 #8291 垂直搜索引擎 专为 AI 模型打造 一个索引研究论文和模型权重的专业平台，为机器学习工程师提供比通用搜索好10倍的相关性"
+        ],
+        "answerIndex": 0,
+        "explanation": "Track how \"down\" changes outcomes across scenarios instead of judging single events.",
+        "skillId": "",
+        "entryId": "entry-down",
+        "moduleHint": 2
+      }
+    ]
+  },
+  "thinkTankEntries": [
+    {
+      "id": "entry-radio",
+      "term": "radio",
+      "title": "radio",
+      "summary": "如果你想创造持久的价值，那就建立垄断",
+      "insight": "Track how \"radio\" changes outcomes across scenarios instead of judging single events.",
+      "sourceCue": "",
+      "tags": [
+        "radio",
+        "knowledge-fragment"
+      ],
+      "relatedTerms": [
+        "reado",
+        "button",
+        "unchecked"
+      ],
+      "moduleHint": 2,
+      "relatedEntryRefs": [
+        {
+          "id": "entry-button",
+          "title": "button",
+          "term": "button",
+          "books": [
+            "zero-to-one"
+          ],
+          "score": 5
+        },
+        {
+          "id": "entry-reado",
+          "title": "reado",
+          "term": "reado",
+          "books": [
+            "wanli-fifteen",
+            "sapiens",
+            "principles-for-navigating-big-debt-crises",
+            "zero-to-one"
+          ],
+          "score": 5
+        },
+        {
+          "id": "entry-unchecked",
+          "title": "unchecked",
+          "term": "unchecked",
+          "books": [
+            "zero-to-one"
+          ],
+          "score": 5
+        },
+        {
+          "id": "entry",
+          "title": "推行进度",
+          "term": "推行进度",
+          "books": [
+            "wanli-fifteen",
+            "sapiens",
+            "principles-for-navigating-big-debt-crises",
+            "zero-to-one"
+          ],
+          "score": 4
+        },
+        {
+          "id": "entry-down",
+          "title": "down",
+          "term": "down",
+          "books": [
+            "zero-to-one"
+          ],
+          "score": 4
+        },
+        {
+          "id": "entry-experiences",
+          "title": "experiences",
+          "term": "experiences",
+          "books": [
+            "wanli-fifteen",
+            "sapiens",
+            "principles-for-navigating-big-debt-crises",
+            "zero-to-one"
+          ],
+          "score": 4
+        },
+        {
+          "id": "entry-one",
+          "title": "one",
+          "term": "one",
+          "books": [
+            "zero-to-one"
+          ],
+          "score": 4
+        },
+        {
+          "id": "entry-psychology",
+          "title": "psychology",
+          "term": "psychology",
+          "books": [
+            "sapiens",
+            "zero-to-one"
+          ],
+          "score": 4
+        }
+      ]
+    },
+    {
+      "id": "entry-down",
+      "term": "down",
+      "title": "down",
+      "summary": "总论 1 1 到 n 是复制；0 到 1 是创新",
+      "insight": "Track how \"down\" changes outcomes across scenarios instead of judging single events.",
+      "sourceCue": "",
+      "tags": [
+        "down",
+        "knowledge-fragment"
+      ],
+      "relatedTerms": [
+        "reado",
+        "radio",
+        "button"
+      ],
+      "moduleHint": 2,
+      "relatedEntryRefs": [
+        {
+          "id": "entry",
+          "title": "推行进度",
+          "term": "推行进度",
+          "books": [
+            "wanli-fifteen",
+            "sapiens",
+            "principles-for-navigating-big-debt-crises",
+            "zero-to-one"
+          ],
+          "score": 4
+        },
+        {
+          "id": "entry-button",
+          "title": "button",
+          "term": "button",
+          "books": [
+            "zero-to-one"
+          ],
+          "score": 4
+        },
+        {
+          "id": "entry-experiences",
+          "title": "experiences",
+          "term": "experiences",
+          "books": [
+            "wanli-fifteen",
+            "sapiens",
+            "principles-for-navigating-big-debt-crises",
+            "zero-to-one"
+          ],
+          "score": 4
+        },
+        {
+          "id": "entry-one",
+          "title": "one",
+          "term": "one",
+          "books": [
+            "zero-to-one"
+          ],
+          "score": 4
+        },
+        {
+          "id": "entry-psychology",
+          "title": "psychology",
+          "term": "psychology",
+          "books": [
+            "sapiens",
+            "zero-to-one"
+          ],
+          "score": 4
+        },
+        {
+          "id": "entry-radio",
+          "title": "radio",
+          "term": "radio",
+          "books": [
+            "zero-to-one"
+          ],
+          "score": 4
+        },
+        {
+          "id": "entry-reado",
+          "title": "reado",
+          "term": "reado",
+          "books": [
+            "wanli-fifteen",
+            "sapiens",
+            "principles-for-navigating-big-debt-crises",
+            "zero-to-one"
+          ],
+          "score": 4
+        },
+        {
+          "id": "entry-status",
+          "title": "status",
+          "term": "status",
+          "books": [
+            "zero-to-one"
+          ],
+          "score": 4
+        }
+      ]
+    }
+  ]
+}

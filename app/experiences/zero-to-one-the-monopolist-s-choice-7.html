@@ -68,8 +68,53 @@
     </style>
 </head>
 <body class="min-h-screen text-gray-100 flex flex-col overflow-hidden relative">
-<script src="/shared/book-catalog.js?v=1771767926839"></script>
-<script type="module" src="/shared/shell.js?v=1771767926839"></script>
+<style id="reado-shell-boot-style">
+body.reado-shell-pending {
+  background: #0b1220;
+}
+body.reado-shell-pending > :not(script):not(reado-app-shell):not(.reado-shell-boot-mask) {
+  visibility: hidden !important;
+}
+body > .reado-shell-boot-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    radial-gradient(1200px 420px at 20% -10%, rgba(47, 123, 255, 0.22), transparent 60%),
+    radial-gradient(900px 360px at 92% 112%, rgba(0, 234, 255, 0.14), transparent 58%),
+    #0b1220;
+  transition: opacity 180ms ease;
+}
+body.reado-shell-pending > .reado-shell-boot-mask {
+  opacity: 1;
+}
+body.reado-shell-ready > .reado-shell-boot-mask {
+  opacity: 0;
+}
+</style>
+<script>
+(function () {
+  var body = document.body;
+  if (!body) return;
+  body.classList.add("reado-shell-pending");
+  var mask = body.querySelector(".reado-shell-boot-mask");
+  if (!mask) {
+    mask = document.createElement("div");
+    mask.className = "reado-shell-boot-mask";
+    mask.setAttribute("aria-hidden", "true");
+    body.appendChild(mask);
+  }
+  window.setTimeout(function () {
+    if (!body.classList.contains("reado-shell-applied")) {
+      body.classList.remove("reado-shell-pending");
+    }
+  }, 4000);
+})();
+</script>
+<script src="/shared/book-catalog.js?v=1771779610833"></script>
+<script type="module" src="/shared/shell.js?v=1771779610833"></script>
 <reado-app-shell data-page="knowledge-map"></reado-app-shell>
 <div class="fixed inset-0 pointer-events-none z-50 overflow-hidden opacity-20">
 <div class="scanline top-1/4"></div>
@@ -255,7 +300,7 @@
 </div>
 
 
-<script src="/shared/experience-runtime.js?v=1771767926839"></script>
+<script src="/shared/experience-runtime.js?v=1771779610833"></script>
 <script>
 (() => {
   

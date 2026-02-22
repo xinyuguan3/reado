@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>reado: 《万历十五年》 模块中心</title>
+  <title>reado: 《万历十五年》 Module Hub</title>
   <style>
     :root {
       color-scheme: dark;
@@ -120,58 +120,103 @@
   </style>
 </head>
 <body>
-<script src="/shared/book-catalog.js?v=1771767926839"></script>
-<script type="module" src="/shared/shell.js?v=1771767926839"></script>
+<style id="reado-shell-boot-style">
+body.reado-shell-pending {
+  background: #0b1220;
+}
+body.reado-shell-pending > :not(script):not(reado-app-shell):not(.reado-shell-boot-mask) {
+  visibility: hidden !important;
+}
+body > .reado-shell-boot-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    radial-gradient(1200px 420px at 20% -10%, rgba(47, 123, 255, 0.22), transparent 60%),
+    radial-gradient(900px 360px at 92% 112%, rgba(0, 234, 255, 0.14), transparent 58%),
+    #0b1220;
+  transition: opacity 180ms ease;
+}
+body.reado-shell-pending > .reado-shell-boot-mask {
+  opacity: 1;
+}
+body.reado-shell-ready > .reado-shell-boot-mask {
+  opacity: 0;
+}
+</style>
+<script>
+(function () {
+  var body = document.body;
+  if (!body) return;
+  body.classList.add("reado-shell-pending");
+  var mask = body.querySelector(".reado-shell-boot-mask");
+  if (!mask) {
+    mask = document.createElement("div");
+    mask.className = "reado-shell-boot-mask";
+    mask.setAttribute("aria-hidden", "true");
+    body.appendChild(mask);
+  }
+  window.setTimeout(function () {
+    if (!body.classList.contains("reado-shell-applied")) {
+      body.classList.remove("reado-shell-pending");
+    }
+  }, 4000);
+})();
+</script>
+<script src="/shared/book-catalog.js?v=1771779610833"></script>
+<script type="module" src="/shared/shell.js?v=1771779610833"></script>
 <reado-app-shell data-page="knowledge-map"></reado-app-shell>
   <main class="container">
     <header class="head">
       <div>
-        <h1 class="title">《万历十五年》</h1>
-        <p class="sub">共 5 个模块，完成购买后可进入模块体验。</p>
+        <h1 class="title" id="book-title">《万历十五年》</h1>
+        <p class="sub" id="book-sub">共 5 个模块，完成购买后可进入模块体验。</p>
       </div>
       <div class="back-links">
-        <a href="/pages/gamified-learning-hub-dashboard-1.html">个人书库</a>
-        <a href="/pages/gamified-learning-hub-dashboard-3.html">交易中心</a>
+        <a href="/pages/gamified-learning-hub-dashboard-1" id="book-back-library">个人书库</a>
+        <a href="/pages/gamified-learning-hub-dashboard-3" id="book-back-market">交易中心</a>
       </div>
     </header>
     <section id="book-lock" class="lock" hidden>
-      <p>该书尚未购买，请先前往交易中心完成购买。</p>
+      <p id="book-lock-text">该书尚未购买，请先前往交易中心完成购买。</p>
       <button id="book-unlock-cta">去交易中心购买</button>
     </section>
     <section id="book-grid" class="grid">
-      <a class="module-card" data-module="tax-reform-dilemma-1" href="/experiences/tax-reform-dilemma-1.html">
+      <a class="module-card" data-module="tax-reform-dilemma-1" href="/experiences/tax-reform-dilemma-1">
         <img src="/assets/experiences/tax-reform-dilemma-1.png" alt="reado: 万历十五年决策 (全中文版)" loading="lazy" />
         <div>
-          <h3>模块 1: reado: 万历十五年决策 (全中文版)</h3>
-          <p>进入该模块体验</p>
+          <h3 data-module-heading data-module-index="1" data-module-slug="tax-reform-dilemma-1">reado: 万历十五年决策 (全中文版)</h3>
+          <p data-module-entry>进入该模块体验</p>
         </div>
       </a>
-      <a class="module-card" data-module="tax-reform-dilemma-2" href="/experiences/tax-reform-dilemma-2.html">
+      <a class="module-card" data-module="tax-reform-dilemma-2" href="/experiences/tax-reform-dilemma-2">
         <img src="/assets/experiences/tax-reform-dilemma-2.png" alt="reado: 万历皇帝 - 奏折阅览界面" loading="lazy" />
         <div>
-          <h3>模块 2: reado: 万历皇帝 - 奏折阅览界面</h3>
-          <p>进入该模块体验</p>
+          <h3 data-module-heading data-module-index="2" data-module-slug="tax-reform-dilemma-2">reado: 万历皇帝 - 奏折阅览界面</h3>
+          <p data-module-entry>进入该模块体验</p>
         </div>
       </a>
-      <a class="module-card" data-module="tax-reform-dilemma-3" href="/experiences/tax-reform-dilemma-3.html">
+      <a class="module-card" data-module="tax-reform-dilemma-3" href="/experiences/tax-reform-dilemma-3">
         <img src="/assets/experiences/tax-reform-dilemma-3.png" alt="reado: 张居正 - 一条鞭法改革界面" loading="lazy" />
         <div>
-          <h3>模块 3: reado: 张居正 - 一条鞭法改革界面</h3>
-          <p>进入该模块体验</p>
+          <h3 data-module-heading data-module-index="3" data-module-slug="tax-reform-dilemma-3">reado: 张居正 - 一条鞭法改革界面</h3>
+          <p data-module-entry>进入该模块体验</p>
         </div>
       </a>
-      <a class="module-card" data-module="tax-reform-dilemma-4" href="/experiences/tax-reform-dilemma-4.html">
+      <a class="module-card" data-module="tax-reform-dilemma-4" href="/experiences/tax-reform-dilemma-4">
         <img src="/assets/experiences/tax-reform-dilemma-4.png" alt="reado: 海瑞 - 刚直不阿模拟界面" loading="lazy" />
         <div>
-          <h3>模块 4: reado: 海瑞 - 刚直不阿模拟界面</h3>
-          <p>进入该模块体验</p>
+          <h3 data-module-heading data-module-index="4" data-module-slug="tax-reform-dilemma-4">reado: 海瑞 - 刚直不阿模拟界面</h3>
+          <p data-module-entry>进入该模块体验</p>
         </div>
       </a>
-      <a class="module-card" data-module="tax-reform-dilemma-5" href="/experiences/tax-reform-dilemma-5.html">
+      <a class="module-card" data-module="tax-reform-dilemma-5" href="/experiences/tax-reform-dilemma-5">
         <img src="/assets/experiences/tax-reform-dilemma-5.png" alt="reado: 戚继光 - 孤独的创新者界面" loading="lazy" />
         <div>
-          <h3>模块 5: reado: 戚继光 - 孤独的创新者界面</h3>
-          <p>进入该模块体验</p>
+          <h3 data-module-heading data-module-index="5" data-module-slug="tax-reform-dilemma-5">reado: 戚继光 - 孤独的创新者界面</h3>
+          <p data-module-entry>进入该模块体验</p>
         </div>
       </a>
     </section>
@@ -179,17 +224,84 @@
   <script>
     (() => {
       const bookId = "wanli-fifteen";
+      const defaultTitle = "《万历十五年》";
       const storageKey = "reado_unlocked_books_v1";
       const lockEl = document.getElementById("book-lock");
       const gridEl = document.getElementById("book-grid");
       const cta = document.getElementById("book-unlock-cta");
+      const titleEl = document.getElementById("book-title");
+      const subEl = document.getElementById("book-sub");
+      const backLibraryEl = document.getElementById("book-back-library");
+      const backMarketEl = document.getElementById("book-back-market");
+      const lockTextEl = document.getElementById("book-lock-text");
+      const moduleCards = Array.from(document.querySelectorAll("a[data-module]"));
+      const tr = (key, fallback, params) => {
+        if (window.ReadoI18n && typeof window.ReadoI18n.t === "function") {
+          return window.ReadoI18n.t(key, fallback, params);
+        }
+        let text = String(fallback || key);
+        const entries = params && typeof params === "object" ? Object.entries(params) : [];
+        for (const [paramKey, paramValue] of entries) {
+          text = text.replaceAll("{" + paramKey + "}", String(paramValue));
+        }
+        return text;
+      };
+      const formatNumber = (value) => {
+        const lang = window.ReadoI18n?.getCurrentLanguage?.() || document.documentElement.lang || "en-US";
+        return new Intl.NumberFormat(lang).format(Math.max(0, Number(value) || 0));
+      };
+      const humanizeSlug = (slug) => {
+        return String(slug || "")
+          .replace(/[-_]+/g, " ")
+          .replace(/s+/g, " ")
+          .trim()
+          .replace(/w/g, (char) => char.toUpperCase()) || "Module";
+      };
+      const resolveBook = () => {
+        const catalogBooks = window.ReadoBookCatalog?.getBooks?.()
+          || (Array.isArray(window.__READO_BOOK_CATALOG__?.books) ? window.__READO_BOOK_CATALOG__.books : []);
+        return catalogBooks.find((item) => item && item.id === bookId) || null;
+      };
+      const renderLocalized = () => {
+        const current = resolveBook();
+        const title = current?.title || defaultTitle;
+        if (titleEl) titleEl.textContent = title;
+        if (subEl) {
+          const count = current?.moduleCount || current?.modules?.length || 5;
+          subEl.textContent = tr("bookhub.module_count", "共 {value} 个模块，完成购买后可进入模块体验。", {
+            value: formatNumber(count)
+          });
+        }
+        if (backLibraryEl) backLibraryEl.textContent = tr("bookhub.back_library", "个人书库");
+        if (backMarketEl) backMarketEl.textContent = tr("bookhub.back_market", "交易中心");
+        if (lockTextEl) lockTextEl.textContent = tr("bookhub.lock_message", "该书尚未购买，请先前往交易中心完成购买。");
+        if (cta) cta.textContent = tr("bookhub.unlock_cta", "去交易中心购买");
+        document.title = tr("bookhub.title_suffix", "reado: {title} 模块中心", { title });
+
+        const moduleMap = new Map((current?.modules || []).map((module) => [module.slug, module.title]));
+        moduleCards.forEach((card) => {
+          if (!(card instanceof HTMLElement)) return;
+          const slug = card.getAttribute("data-module") || "";
+          const index = Number(card.querySelector("[data-module-index]")?.getAttribute("data-module-index")) || 1;
+          const titleText = moduleMap.get(slug) || humanizeSlug(slug);
+          const heading = card.querySelector("[data-module-heading]");
+          const entry = card.querySelector("[data-module-entry]");
+          const image = card.querySelector("img");
+          if (heading) {
+            heading.textContent = tr("bookhub.module_prefix", "模块 {value}", { value: index }) + ": " + titleText;
+          }
+          if (entry) entry.textContent = tr("bookhub.enter_module", "进入该模块体验");
+          if (image) image.alt = titleText;
+        });
+      };
       const unlocked = new Set(JSON.parse(localStorage.getItem(storageKey) || "[]"));
       const isUnlocked = unlocked.has(bookId);
       lockEl.hidden = isUnlocked;
       gridEl.hidden = !isUnlocked;
+      renderLocalized();
       if (cta) {
         cta.addEventListener("click", () => {
-          window.location.href = "/pages/gamified-learning-hub-dashboard-3.html";
+          window.location.href = "/pages/gamified-learning-hub-dashboard-3";
         });
       }
       if (!isUnlocked) return;
@@ -202,6 +314,8 @@
         if (!moduleSlug) return;
         localStorage.setItem("reado_book_last_" + bookId, moduleSlug);
       });
+      window.addEventListener("reado:catalog-updated", renderLocalized);
+      window.addEventListener("reado:langchange", renderLocalized);
     })();
   </script>
 </body>

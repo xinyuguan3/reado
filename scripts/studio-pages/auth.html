@@ -324,7 +324,7 @@
     const AUTH_STATE_KEY = "reado_auth_state_v1";
     const USER_STATE_KEY = "reado_user_state_v1";
     const PROFILE_SETUP_KEY = "reado_profile_setup_v1";
-    const FALLBACK_NEXT = "/pages/gamified-learning-hub-dashboard-1.html";
+    const FALLBACK_NEXT = "/pages/gamified-learning-hub-dashboard-1";
     const params = new URLSearchParams(window.location.search);
     const intent = String(params.get("intent") || "").trim();
     const pendingPriceId = String(params.get("priceId") || "").trim();
@@ -368,7 +368,7 @@
     const nextPath = sanitizeNextPath(params.get("next"));
 
     function buildAuthReturnUrl() {
-      const url = new URL("/pages/auth.html", window.location.origin);
+      const url = new URL("/pages/auth", window.location.origin);
       url.searchParams.set("next", nextPath);
       if (intent === "checkout" && pendingPriceId) {
         url.searchParams.set("intent", "checkout");

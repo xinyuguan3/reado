@@ -53,8 +53,53 @@
     </style>
 </head>
 <body class="bg-background-dark text-slate-100 font-display antialiased h-screen w-full overflow-hidden flex selection:bg-primary selection:text-black">
-<script src="/shared/book-catalog.js?v=1771767926839"></script>
-<script type="module" src="/shared/shell.js?v=1771767926839"></script>
+<style id="reado-shell-boot-style">
+body.reado-shell-pending {
+  background: #0b1220;
+}
+body.reado-shell-pending > :not(script):not(reado-app-shell):not(.reado-shell-boot-mask) {
+  visibility: hidden !important;
+}
+body > .reado-shell-boot-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    radial-gradient(1200px 420px at 20% -10%, rgba(47, 123, 255, 0.22), transparent 60%),
+    radial-gradient(900px 360px at 92% 112%, rgba(0, 234, 255, 0.14), transparent 58%),
+    #0b1220;
+  transition: opacity 180ms ease;
+}
+body.reado-shell-pending > .reado-shell-boot-mask {
+  opacity: 1;
+}
+body.reado-shell-ready > .reado-shell-boot-mask {
+  opacity: 0;
+}
+</style>
+<script>
+(function () {
+  var body = document.body;
+  if (!body) return;
+  body.classList.add("reado-shell-pending");
+  var mask = body.querySelector(".reado-shell-boot-mask");
+  if (!mask) {
+    mask = document.createElement("div");
+    mask.className = "reado-shell-boot-mask";
+    mask.setAttribute("aria-hidden", "true");
+    body.appendChild(mask);
+  }
+  window.setTimeout(function () {
+    if (!body.classList.contains("reado-shell-applied")) {
+      body.classList.remove("reado-shell-pending");
+    }
+  }, 4000);
+})();
+</script>
+<script src="/shared/book-catalog.js?v=1771779610833"></script>
+<script type="module" src="/shared/shell.js?v=1771779610833"></script>
 <reado-app-shell data-page="knowledge-map"></reado-app-shell>
 <div class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
 <div class="absolute inset-0 bg-cover bg-center opacity-5 blur-2xl scale-110" style="background-image: url('/assets/remote-images/07e79e02e21e9fa07c8ab125.png');"></div>
@@ -110,23 +155,23 @@
 </div>
 </div>
 <nav class="flex-1 px-3 overflow-y-auto space-y-1">
-<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary border border-primary/20 font-medium transition-all group" href="/pages/gamified-learning-hub-dashboard-1.html">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary border border-primary/20 font-medium transition-all group" href="/pages/gamified-learning-hub-dashboard-1">
 <span class="material-symbols-outlined text-[20px]">map</span>
 <span class="text-sm">知识版图</span>
 </a>
-<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 text-gray-400 hover:text-white transition-all group" href="/pages/simulator-library-level-selection-2.html">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 text-gray-400 hover:text-white transition-all group" href="/pages/simulator-library-level-selection-2">
 <span class="material-symbols-outlined text-[20px] group-hover:text-primary/70">task_alt</span>
 <span class="text-sm">任务中心</span>
 </a>
-<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 text-gray-400 hover:text-white transition-all group" href="/pages/global-scholar-leaderboard.html">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 text-gray-400 hover:text-white transition-all group" href="/pages/global-scholar-leaderboard">
 <span class="material-symbols-outlined text-[20px] group-hover:text-primary/70">leaderboard</span>
 <span class="text-sm">排行榜</span>
 </a>
-<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 text-gray-400 hover:text-white transition-all group" href="/pages/gamified-learning-hub-dashboard-3.html">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 text-gray-400 hover:text-white transition-all group" href="/pages/gamified-learning-hub-dashboard-3">
 <span class="material-symbols-outlined text-[20px] group-hover:text-primary/70">storefront</span>
 <span class="text-sm">交易中心</span>
 </a>
-<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 text-gray-400 hover:text-white transition-all group" href="/pages/gamified-learning-hub-dashboard-2.html">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 text-gray-400 hover:text-white transition-all group" href="/pages/gamified-learning-hub-dashboard-2">
 <span class="material-symbols-outlined text-[20px] group-hover:text-primary/70">person</span>
 <span class="text-sm">个人资料</span>
 </a>
@@ -340,7 +385,7 @@
     ])
   );
   const storageKey = catalog?.storage?.unlockKey || "reado_unlocked_books_v1";
-  const marketUrl = "/pages/gamified-learning-hub-dashboard-3.html";
+  const marketUrl = "/pages/gamified-learning-hub-dashboard-3";
   const params = new URLSearchParams(window.location.search);
   const allCategories = Object.keys(categoryMeta);
   const fallbackCategory = allCategories.includes("science-knowledge") ? "science-knowledge" : (allCategories[0] || "science-knowledge");
@@ -521,7 +566,7 @@
       }
       const last = localStorage.getItem("reado_book_last_" + bookId);
       const canResume = Boolean(last && Array.isArray(book?.moduleSlugs) && book.moduleSlugs.includes(last));
-      window.location.href = canResume ? "/experiences/" + last + ".html" : first;
+      window.location.href = canResume ? "/experiences/" + last : first;
       return;
     }
     window.location.href = marketUrl;
