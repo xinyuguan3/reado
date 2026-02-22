@@ -159,6 +159,7 @@ const contentTypes = {
 function createDefaultState() {
   return {
     sessions: {},
+    players: {},
     analytics: {
       totals: {
         pageViews: 0,
@@ -201,6 +202,204 @@ function toInt(value) {
   return Math.max(0, Math.floor(next));
 }
 
+function sanitizeUserId(value) {
+  const raw = typeof value === "string" ? value.trim() : "";
+  if (!raw) return "";
+  if (!/^[a-zA-Z0-9._:-]{4,128}$/.test(raw)) return "";
+  return raw;
+}
+
+function sanitizeEmail(value) {
+  const raw = typeof value === "string" ? value.trim().toLowerCase() : "";
+  if (!raw) return "";
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(raw)) return "";
+  return raw;
+}
+
+function sanitizeDisplayName(value, fallback = "") {
+  const raw = typeof value === "string" ? value.trim() : "";
+  const base = raw || fallback || "";
+  if (!base) return "";
+  return base.slice(0, 60);
+}
+
+function deriveDisplayNameFromEmail(email) {
+  const cleanEmail = sanitizeEmail(email);
+  if (!cleanEmail) return "";
+  const left = cleanEmail.split("@")[0] || "";
+  return sanitizeDisplayName(left.replace(/[._-]+/g, " "), "Reader");
+}
+
+function estimateRankScore(level, xp, lifetimeXp) {
+  const fromLevel = toInt(level) * 1000 + toInt(xp);
+  const fromLifetime = toInt(lifetimeXp);
+  return Math.max(fromLevel, fromLifetime);
+}
+
+function normalizeTaskRecord(raw) {
+  const row = raw && typeof raw === "object" ? raw : {};
+  return {
+    count: toInt(row.count),
+    lastClaimAt: typeof row.lastClaimAt === "string" ? row.lastClaimAt : "",
+    updatedAt: typeof row.updatedAt === "string" ? row.updatedAt : ""
+  };
+}
+
+function normalizePlayerRecord(userId, rawRecord) {
+  const row = rawRecord && typeof rawRecord === "object" ? rawRecord : {};
+  const tasksRaw = row.tasks && typeof row.tasks === "object" ? row.tasks : {};
+  const tasks = {};
+  for (const [taskId, taskRow] of Object.entries(tasksRaw)) {
+    const taskKey = typeof taskId === "string" ? taskId.trim() : "";
+    if (!taskKey) continue;
+    tasks[taskKey] = normalizeTaskRecord(taskRow);
+  }
+  const email = sanitizeEmail(row.email);
+  const displayName = sanitizeDisplayName(
+    row.displayName,
+    deriveDisplayNameFromEmail(email) || "Reader"
+  );
+  const level = toInt(row.level) || 1;
+  const xp = toInt(row.xp);
+  const gems = toInt(row.gems);
+  const lifetimeXp = toInt(row.lifetimeXp);
+  const lifetimeGems = toInt(row.lifetimeGems);
+  return {
+    userId,
+    email,
+    displayName,
+    level,
+    xp,
+    gems,
+    lifetimeXp,
+    lifetimeGems,
+    missionClaims: toInt(row.missionClaims),
+    tasks,
+    rankScore: Math.max(toInt(row.rankScore), estimateRankScore(level, xp, lifetimeXp)),
+    createdAt: typeof row.createdAt === "string" ? row.createdAt : "",
+    updatedAt: typeof row.updatedAt === "string" ? row.updatedAt : "",
+    lastSeenAt: typeof row.lastSeenAt === "string" ? row.lastSeenAt : ""
+  };
+}
+
+function normalizePlayersState(rawPlayers) {
+  const input = rawPlayers && typeof rawPlayers === "object" ? rawPlayers : {};
+  const out = {};
+  for (const [key, value] of Object.entries(input)) {
+    const userId = sanitizeUserId(key);
+    if (!userId) continue;
+    out[userId] = normalizePlayerRecord(userId, value);
+  }
+  return out;
+}
+
+function getPlayersState() {
+  if (!state.players || typeof state.players !== "object") {
+    state.players = {};
+  }
+  return state.players;
+}
+
+function getOrCreatePlayer(userId) {
+  const cleanUserId = sanitizeUserId(userId);
+  if (!cleanUserId) return null;
+  const players = getPlayersState();
+  let row = players[cleanUserId];
+  if (!row || typeof row !== "object") {
+    row = normalizePlayerRecord(cleanUserId, null);
+    const now = nowIso();
+    row.createdAt = now;
+    row.updatedAt = now;
+    row.lastSeenAt = now;
+    players[cleanUserId] = row;
+  } else {
+    row = normalizePlayerRecord(cleanUserId, row);
+    players[cleanUserId] = row;
+  }
+  return row;
+}
+
+function toPublicPlayerSnapshot(row) {
+  const level = toInt(row?.level) || 1;
+  const xp = toInt(row?.xp);
+  const lifetimeXp = toInt(row?.lifetimeXp);
+  return {
+    userId: sanitizeUserId(row?.userId),
+    displayName: sanitizeDisplayName(row?.displayName, "Reader"),
+    email: sanitizeEmail(row?.email),
+    level,
+    xp,
+    gems: toInt(row?.gems),
+    lifetimeXp,
+    lifetimeGems: toInt(row?.lifetimeGems),
+    missionClaims: toInt(row?.missionClaims),
+    rankScore: Math.max(toInt(row?.rankScore), estimateRankScore(level, xp, lifetimeXp)),
+    updatedAt: typeof row?.updatedAt === "string" ? row.updatedAt : ""
+  };
+}
+
+function updatePlayerFromSync(payload = {}) {
+  const userId = sanitizeUserId(payload.userId);
+  if (!userId) return null;
+  const row = getOrCreatePlayer(userId);
+  if (!row) return null;
+  const now = nowIso();
+  const nextEmail = sanitizeEmail(payload.email);
+  if (nextEmail) row.email = nextEmail;
+  row.displayName = sanitizeDisplayName(
+    payload.displayName,
+    row.displayName || deriveDisplayNameFromEmail(row.email) || "Reader"
+  );
+  const nextState = payload.state && typeof payload.state === "object" ? payload.state : {};
+  row.level = Math.max(1, toInt(nextState.level) || row.level || 1);
+  row.xp = toInt(nextState.xp);
+  row.gems = toInt(nextState.gems);
+
+  const gain = payload.gain && typeof payload.gain === "object" ? payload.gain : {};
+  row.lifetimeXp += toInt(gain.xp);
+  row.lifetimeGems += toInt(gain.gems);
+
+  const reason = typeof payload.reason === "string" ? payload.reason.trim() : "";
+  if (reason.startsWith("mission-claim:")) {
+    const taskId = reason.slice("mission-claim:".length).trim();
+    if (taskId) {
+      const task = normalizeTaskRecord(row.tasks[taskId]);
+      task.count += 1;
+      task.lastClaimAt = now;
+      task.updatedAt = now;
+      row.tasks[taskId] = task;
+      row.missionClaims += 1;
+    }
+  }
+
+  row.rankScore = estimateRankScore(row.level, row.xp, row.lifetimeXp);
+  row.updatedAt = now;
+  row.lastSeenAt = now;
+  return row;
+}
+
+function buildLeaderboard(limit = 50) {
+  const rows = Object.values(getPlayersState())
+    .filter((row) => row && typeof row === "object")
+    .map((row) => normalizePlayerRecord(sanitizeUserId(row.userId), row))
+    .filter((row) => sanitizeUserId(row.userId))
+    .sort((a, b) => {
+      const scoreDiff = toInt(b.rankScore) - toInt(a.rankScore);
+      if (scoreDiff !== 0) return scoreDiff;
+      const xpDiff = toInt(b.lifetimeXp) - toInt(a.lifetimeXp);
+      if (xpDiff !== 0) return xpDiff;
+      const levelDiff = toInt(b.level) - toInt(a.level);
+      if (levelDiff !== 0) return levelDiff;
+      return sanitizeUserId(a.userId).localeCompare(sanitizeUserId(b.userId));
+    });
+
+  const capped = Math.max(1, Math.min(50000, toInt(limit) || 50));
+  return rows.slice(0, capped).map((row, index) => ({
+    rank: index + 1,
+    ...toPublicPlayerSnapshot(row)
+  }));
+}
+
 function normalizeAnalyticsState(nextState) {
   const candidate = nextState && typeof nextState === "object" ? nextState : createDefaultState();
   if (!candidate.sessions || typeof candidate.sessions !== "object") {
@@ -225,6 +424,7 @@ function normalizeAnalyticsState(nextState) {
   totals.durationMs = toInt(totals.durationMs);
   totals.durationSamples = toInt(totals.durationSamples);
   totals.lastUpdatedAt = typeof totals.lastUpdatedAt === "string" ? totals.lastUpdatedAt : "";
+  candidate.players = normalizePlayersState(candidate.players);
   candidate.billing = normalizeBillingState(candidate.billing);
 
   return candidate;
@@ -2785,7 +2985,8 @@ async function handleApi(req, res, url, providedSession = null) {
       ok: true,
       now: nowIso(),
       sessions: Object.keys(state.sessions || {}).length,
-      totalPageViews: toInt(state.analytics?.totals?.pageViews)
+      totalPageViews: toInt(state.analytics?.totals?.pageViews),
+      totalPlayers: Object.keys(getPlayersState()).length
     });
     return true;
   }
@@ -2798,6 +2999,88 @@ async function handleApi(req, res, url, providedSession = null) {
         supabaseUrl: supabasePublicUrl,
         supabaseAnonKey: supabaseAnonKey
       }
+    });
+    return true;
+  }
+
+  if (method === "POST" && pathname === "/api/user/sync") {
+    const body = await parseJsonBody(req, 128 * 1024).catch((error) => ({ __error: error?.message || "Invalid body" }));
+    if (body.__error) {
+      writeJson(res, 400, { ok: false, error: body.__error });
+      return true;
+    }
+    const userId = sanitizeUserId(body.userId);
+    if (!userId) {
+      writeJson(res, 400, { ok: false, error: "userId is required" });
+      return true;
+    }
+    const updated = updatePlayerFromSync(body);
+    if (!updated) {
+      writeJson(res, 400, { ok: false, error: "Unable to update user profile" });
+      return true;
+    }
+    schedulePersist();
+    const leaders = buildLeaderboard(50000);
+    const rank = leaders.find((row) => row.userId === userId)?.rank || 0;
+    writeJson(res, 200, {
+      ok: true,
+      user: toPublicPlayerSnapshot(updated),
+      rank,
+      totalPlayers: leaders.length
+    });
+    return true;
+  }
+
+  if (method === "GET" && pathname === "/api/leaderboard") {
+    const userId = sanitizeUserId(url.searchParams.get("userId"));
+    const limit = Math.max(1, Math.min(100, toInt(url.searchParams.get("limit")) || 20));
+    const leaders = buildLeaderboard(limit);
+    let me = null;
+    if (userId) {
+      const all = buildLeaderboard(10000);
+      const found = all.find((row) => row.userId === userId);
+      if (found) me = found;
+    }
+    writeJson(res, 200, {
+      ok: true,
+      leaders,
+      me,
+      totalPlayers: Object.keys(getPlayersState()).length,
+      updatedAt: nowIso()
+    });
+    return true;
+  }
+
+  if (method === "GET" && pathname === "/api/user/tasks") {
+    const userId = sanitizeUserId(url.searchParams.get("userId"));
+    if (!userId) {
+      writeJson(res, 400, { ok: false, error: "userId is required" });
+      return true;
+    }
+    const player = getOrCreatePlayer(userId);
+    if (!player) {
+      writeJson(res, 404, { ok: false, error: "User not found" });
+      return true;
+    }
+    const limit = Math.max(1, Math.min(100, toInt(url.searchParams.get("limit")) || 20));
+    const tasks = Object.entries(player.tasks || {})
+      .map(([taskId, row]) => ({
+        taskId,
+        count: toInt(row?.count),
+        lastClaimAt: typeof row?.lastClaimAt === "string" ? row.lastClaimAt : "",
+        updatedAt: typeof row?.updatedAt === "string" ? row.updatedAt : ""
+      }))
+      .sort((a, b) => {
+        const aTs = a.lastClaimAt ? Date.parse(a.lastClaimAt) : 0;
+        const bTs = b.lastClaimAt ? Date.parse(b.lastClaimAt) : 0;
+        return bTs - aTs;
+      })
+      .slice(0, limit);
+    writeJson(res, 200, {
+      ok: true,
+      user: toPublicPlayerSnapshot(player),
+      missionClaims: toInt(player.missionClaims),
+      tasks
     });
     return true;
   }

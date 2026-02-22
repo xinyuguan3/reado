@@ -234,6 +234,71 @@ function buildAuthRedirectUrl(priceId) {
   return url.toString();
 }
 
+function sanitizeClientUserId(value) {
+  const raw = typeof value === "string" ? value.trim() : "";
+  if (!raw) return "";
+  if (!/^[a-zA-Z0-9._:-]{4,128}$/.test(raw)) return "";
+  return raw;
+}
+
+let userSyncInFlight = false;
+let queuedUserSync = null;
+let lastUserSyncFingerprint = "";
+
+async function syncSignedInUser(extra = {}) {
+  const auth = readAuthState();
+  const userId = sanitizeClientUserId(auth?.userId);
+  if (!userId) return null;
+  const state = normalizeUserState(extra.state || readUserState());
+  const payload = {
+    userId,
+    email: typeof auth?.email === "string" ? auth.email : "",
+    displayName: state.name || "",
+    state: {
+      level: state.level,
+      xp: state.xp,
+      gems: state.gems
+    },
+    gain: extra.gain && typeof extra.gain === "object" ? extra.gain : undefined,
+    spend: extra.spend && typeof extra.spend === "object" ? extra.spend : undefined,
+    reason: typeof extra.reason === "string" ? extra.reason : "",
+    pathname: window.location.pathname,
+    at: new Date().toISOString()
+  };
+  const fingerprint = [
+    payload.userId,
+    payload.state.level,
+    payload.state.xp,
+    payload.state.gems,
+    payload.reason,
+    payload.gain?.xp || 0,
+    payload.gain?.gems || 0
+  ].join("|");
+  const force = Boolean(extra.force);
+  if (!force && !payload.reason && fingerprint === lastUserSyncFingerprint) {
+    return null;
+  }
+  if (userSyncInFlight) {
+    queuedUserSync = { ...extra, force: true };
+    return null;
+  }
+  userSyncInFlight = true;
+  try {
+    const response = await requestJson("POST", "/api/user/sync", payload);
+    lastUserSyncFingerprint = fingerprint;
+    return response;
+  } catch (error) {
+    return null;
+  } finally {
+    userSyncInFlight = false;
+    if (queuedUserSync) {
+      const next = queuedUserSync;
+      queuedUserSync = null;
+      syncSignedInUser(next);
+    }
+  }
+}
+
 function formatTimestamp(seconds) {
   const ts = Number(seconds);
   if (!Number.isFinite(ts) || ts <= 0) return t("billing.not_set", "Not set");
@@ -2020,6 +2085,9 @@ class ReadoAppShell extends HTMLElement {
     }
 
     renderUser(readUserState(), false);
+    syncSignedInUser({ force: true }).finally(() => {
+      refreshLiveProgress();
+    });
 
     const syncProLabel = (billing) => {
       if (!proLabelEl) return;
@@ -2068,6 +2136,14 @@ class ReadoAppShell extends HTMLElement {
       if ((gain.levelUps || 0) > 0) {
         showGainHint(t("shell.level_up", "等级提升 +{value}", { value: gain.levelUps }), "level");
       }
+      syncSignedInUser({
+        state: detail.state || readUserState(),
+        gain: detail.gain || {},
+        spend: detail.spend || {},
+        reason: detail.reason || ""
+      }).finally(() => {
+        refreshLiveProgress();
+      });
     });
 
     top.addEventListener("click", (event) => {
@@ -2116,32 +2192,125 @@ class ReadoAppShell extends HTMLElement {
       <section class="reado-rank-card">
         <h3 class="reado-rank-title">${t("shell.global_rank", "全球排名")}</h3>
         <div class="reado-rank-label">${t("shell.current_rank", "当前排名")}</div>
-        <div class="reado-rank-num">#1,248</div>
-        <div class="reado-rank-up">↑ 12</div>
+        <div class="reado-rank-num" data-rank-number>#--</div>
+        <div class="reado-rank-up" data-rank-total>--</div>
         <div class="reado-rank-progress"><span></span></div>
-        <p style="margin:8px 0 0;text-align:right;font-size:10px;color:#94a3b8;">全球前 5%</p>
+        <p style="margin:8px 0 0;text-align:right;font-size:10px;color:#94a3b8;" data-rank-percent>Top --</p>
       </section>
       <section>
         <h3 class="reado-panel-title">${t("shell.current_tasks", "进行中的任务")}</h3>
-        <div class="reado-tasks">
+        <div class="reado-tasks" data-task-history-list>
           <article class="reado-task active">
-            <p class="reado-task-title">人类简史：从动物到上帝</p>
-            <p class="reado-task-sub">等级 3 / 10 · 30%</p>
-            <div class="reado-task-line"><span style="width:30%"></span></div>
-            <button class="reado-task-btn" data-href="/books/sapiens.html">${t("shell.continue_learning", "继续学习")}</button>
-          </article>
-          <article class="reado-task">
-            <p class="reado-task-title">置身事外：债务周期</p>
-            <p class="reado-task-sub">等级 2 / 10 · 20%</p>
-            <div class="reado-task-line"><span style="width:20%"></span></div>
-          </article>
-          <article class="reado-task">
-            <p class="reado-task-title">从零到一：创业决策</p>
-            <p class="reado-task-sub">等级 1 / 8 · 12%</p>
-            <div class="reado-task-line"><span style="width:12%"></span></div>
+            <p class="reado-task-title">${t("shell.current_tasks", "进行中的任务")}</p>
+            <p class="reado-task-sub">Sign in to sync your mission history.</p>
+            <div class="reado-task-line"><span style="width:8%"></span></div>
+            <button class="reado-task-btn" data-href="/pages/simulator-library-level-selection-2.html">${t("shell.continue_learning", "继续学习")}</button>
           </article>
         </div>
       </section>`;
+
+    const rankNumEl = rightPanel.querySelector("[data-rank-number]");
+    const rankTotalEl = rightPanel.querySelector("[data-rank-total]");
+    const rankPercentEl = rightPanel.querySelector("[data-rank-percent]");
+    const taskHistoryListEl = rightPanel.querySelector("[data-task-history-list]");
+
+    const renderTaskHistory = (items = []) => {
+      if (!taskHistoryListEl) return;
+      if (!Array.isArray(items) || !items.length) {
+        taskHistoryListEl.innerHTML = `
+          <article class="reado-task active">
+            <p class="reado-task-title">${t("shell.current_tasks", "进行中的任务")}</p>
+            <p class="reado-task-sub">No mission claim yet. Complete one mission to start tracking.</p>
+            <div class="reado-task-line"><span style="width:6%"></span></div>
+            <button class="reado-task-btn" data-href="/pages/simulator-library-level-selection-2.html">${t("shell.continue_learning", "继续学习")}</button>
+          </article>`;
+        return;
+      }
+      taskHistoryListEl.innerHTML = items.slice(0, 3).map((item, index) => {
+        const taskId = String(item?.taskId || "").trim() || "mission";
+        const count = Math.max(1, Number(item?.count) || 0);
+        const updatedText = item?.lastClaimAt ? new Date(item.lastClaimAt).toLocaleString(getCurrentLanguage()) : "Recently";
+        const percent = Math.max(10, 90 - index * 18);
+        return `
+          <article class="reado-task${index === 0 ? " active" : ""}">
+            <p class="reado-task-title">${taskId.replace(/[-_]+/g, " ").slice(0, 42)}</p>
+            <p class="reado-task-sub">Claimed ${count} time(s) · ${updatedText}</p>
+            <div class="reado-task-line"><span style="width:${percent}%"></span></div>
+          </article>`;
+      }).join("");
+    };
+
+    const renderRank = (me, totalPlayers) => {
+      if (rankNumEl) {
+        rankNumEl.textContent = me?.rank ? "#" + formatNumber(me.rank) : "#--";
+      }
+      if (rankTotalEl) {
+        rankTotalEl.textContent = totalPlayers ? ("/" + formatNumber(totalPlayers)) : "--";
+      }
+      if (rankPercentEl) {
+        if (me?.rank && totalPlayers) {
+          const percentile = Math.max(1, Math.round((me.rank / Math.max(totalPlayers, 1)) * 100));
+          rankPercentEl.textContent = "Top " + percentile + "%";
+        } else {
+          rankPercentEl.textContent = "Top --";
+        }
+      }
+    };
+
+    const renderLeaderboardPage = (leaders = [], me = null) => {
+      if (window.location.pathname !== "/pages/global-scholar-leaderboard.html") return;
+      const host = document.querySelector("main .flex-1.h-full.overflow-y-auto");
+      if (!host) return;
+      let box = host.querySelector("[data-live-leaderboard]");
+      if (!box) {
+        box = document.createElement("section");
+        box.setAttribute("data-live-leaderboard", "1");
+        box.style.marginBottom = "16px";
+        box.style.border = "1px solid rgba(148,163,184,.25)";
+        box.style.borderRadius = "14px";
+        box.style.padding = "12px";
+        box.style.background = "rgba(15,23,42,.45)";
+        box.innerHTML = `
+          <h2 style="margin:0 0 8px;font-size:16px;font-weight:700;">Live Leaderboard</h2>
+          <div data-live-leaderboard-list style="display:grid;gap:8px;"></div>`;
+        host.prepend(box);
+      }
+      const listEl = box.querySelector("[data-live-leaderboard-list]");
+      if (!listEl) return;
+      if (!Array.isArray(leaders) || !leaders.length) {
+        listEl.innerHTML = `<div style="opacity:.8;font-size:13px;">No synced players yet.</div>`;
+        return;
+      }
+      listEl.innerHTML = leaders.slice(0, 12).map((row) => {
+        const isMe = Boolean(me?.userId && row.userId === me.userId);
+        return `
+          <div style="display:flex;justify-content:space-between;gap:10px;padding:8px 10px;border-radius:10px;border:1px solid ${isMe ? "rgba(19,91,236,.55)" : "rgba(148,163,184,.2)"};background:${isMe ? "rgba(19,91,236,.2)" : "rgba(15,23,42,.35)"};">
+            <strong>#${formatNumber(row.rank)} ${row.displayName || "Reader"}</strong>
+            <span>${formatNumber(row.rankScore || 0)} XP</span>
+          </div>`;
+      }).join("");
+    };
+
+    const refreshLiveProgress = async () => {
+      const auth = readAuthState();
+      const userId = sanitizeClientUserId(auth?.userId);
+      if (!userId) {
+        renderRank(null, 0);
+        renderTaskHistory([]);
+        return;
+      }
+      try {
+        const [leaderboard, taskHistory] = await Promise.all([
+          requestJson("GET", "/api/leaderboard?limit=100&userId=" + encodeURIComponent(userId)),
+          requestJson("GET", "/api/user/tasks?limit=20&userId=" + encodeURIComponent(userId))
+        ]);
+        renderRank(leaderboard?.me || null, Number(leaderboard?.totalPlayers) || 0);
+        renderTaskHistory(Array.isArray(taskHistory?.tasks) ? taskHistory.tasks : []);
+        renderLeaderboardPage(Array.isArray(leaderboard?.leaders) ? leaderboard.leaders : [], leaderboard?.me || null);
+      } catch {
+        renderRank(null, 0);
+      }
+    };
 
     if (langSelectEl) {
       const langs = listLanguages();
