@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Reado Auth</title>
+  <style>
+    :root {
+      --bg: #f7f7f7;
+      --card: #ffffff;
+      --text: #191919;
+      --muted: #737373;
+      --line: #dfdfdf;
+      --blue: #1d7dde;
+      --btn: #111111;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text);
+      background-color: var(--bg);
+      background-image: radial-gradient(circle at 1px 1px, #e1e1e1 1px, transparent 0);
+      background-size: 18px 18px;
+      display: flex;
+      flex-direction: column;
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 18px 26px;
+      font-size: 18px;
+      font-weight: 700;
+      color: #232323;
+    }
+    .topbar-mark {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      border: 1px solid #d6d6d6;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      background: #fff;
+    }
+    main {
+      width: 100%;
+      flex: 1;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+    .auth-wrap {
+      width: min(100%, 470px);
+      text-align: center;
+    }
+    .hero-icon {
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 10px;
+      border-radius: 999px;
+      background: #fff;
+      border: 1px solid var(--line);
+      display: grid;
+      place-items: center;
+      font-size: 34px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 46px;
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+      font-family: Georgia, "Times New Roman", serif;
+      font-weight: 600;
+    }
+    .subtitle {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 24px;
+    }
+    .panel {
+      margin-top: 22px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(4px);
+      padding: 16px;
+      display: grid;
+      gap: 10px;
+    }
+    .oauth-btn,
+    .email-btn,
+    .session-btn {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      min-height: 48px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      background: #fff;
+      color: #1f1f1f;
+    }
+    .oauth-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .google-dot {
+      width: 20px;
+      height: 20px;
+      border-radius: 999px;
+      display: inline-grid;
+      place-items: center;
+      background: conic-gradient(#ea4335 0 25%, #fbbc05 0 50%, #34a853 0 75%, #4285f4 0 100%);
+      color: #fff;
+      font-weight: 900;
+      font-size: 11px;
+    }
+    .divider {
+      margin: 2px 0;
+      color: #8a8a8a;
+      font-size: 14px;
+      position: relative;
+      text-align: center;
+    }
+    .divider::before,
+    .divider::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      width: 40%;
+      height: 1px;
+      background: #d9d9d9;
+    }
+    .divider::before { left: 0; }
+    .divider::after { right: 0; }
+    .email-form {
+      display: grid;
+      gap: 10px;
+    }
+    .email-input {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid #d7d7d7;
+      background: #fff;
+      min-height: 50px;
+      padding: 0 14px;
+      font-size: 16px;
+      outline: none;
+    }
+    .email-btn {
+      border-color: #a9a9a9;
+      background: #8e8e8e;
+      color: #fff;
+      min-height: 50px;
+    }
+    .status {
+      min-height: 20px;
+      margin: 2px 0 0;
+      font-size: 13px;
+      color: #666;
+      text-align: left;
+    }
+    .status.success { color: #047857; }
+    .status.error { color: #dc2626; }
+    .session-card {
+      border: 1px solid #d9e8fb;
+      border-radius: 14px;
+      background: #f5faff;
+      padding: 12px;
+      text-align: left;
+      display: grid;
+      gap: 8px;
+    }
+    .session-email {
+      margin: 0;
+      font-size: 14px;
+      color: #334155;
+      word-break: break-all;
+    }
+    .session-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .session-btn.primary {
+      border-color: var(--blue);
+      background: var(--blue);
+      color: #fff;
+    }
+    .session-btn {
+      min-height: 40px;
+      padding: 0 14px;
+      width: auto;
+      font-size: 14px;
+      border-radius: 999px;
+    }
+    .bottom-note {
+      margin-top: 16px;
+      color: #919191;
+      font-size: 12px;
+      text-align: center;
+    }
+    @media (max-width: 640px) {
+      .topbar {
+        padding: 14px 14px;
+        font-size: 16px;
+      }
+      .auth-wrap {
+        width: min(100%, 420px);
+      }
+      h1 {
+        font-size: 35px;
+      }
+      .subtitle {
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <span class="topbar-mark">R</span>
+    <span>reado</span>
+  </header>
+  <main>
+    <section class="auth-wrap" aria-label="Auth Panel">
+      <div class="hero-icon">✌</div>
+      <h1>Sign in or sign up</h1>
+      <p class="subtitle">Start creating with Reado</p>
+      <div class="panel">
+        <button id="googleBtn" class="oauth-btn" type="button">
+          <span class="google-dot">G</span>
+          <span>Continue with Google</span>
+        </button>
+        <div class="divider">Or</div>
+        <form id="emailForm" class="email-form">
+          <input id="emailInput" class="email-input" type="email" autocomplete="email" placeholder="Enter your email address" required>
+          <button id="emailBtn" class="email-btn" type="submit">Continue</button>
+        </form>
+        <p id="statusText" class="status"></p>
+        <section id="sessionCard" class="session-card" hidden>
+          <p class="session-email" id="sessionEmail"></p>
+          <div class="session-actions">
+            <button id="continueBtn" class="session-btn primary" type="button">Continue</button>
+            <button id="logoutBtn" class="session-btn" type="button">Sign out</button>
+          </div>
+        </section>
+      </div>
+      <p class="bottom-note">By continuing you agree to Reado terms and privacy policy.</p>
+    </section>
+  </main>
+
+  <script type="module">
+    const AUTH_STATE_KEY = "reado_auth_state_v1";
+    const FALLBACK_NEXT = "/pages/gamified-learning-hub-dashboard-1.html";
+    const params = new URLSearchParams(window.location.search);
+    const intent = String(params.get("intent") || "").trim();
+    const pendingPriceId = String(params.get("priceId") || "").trim();
+
+    const statusTextEl = document.getElementById("statusText");
+    const googleBtn = document.getElementById("googleBtn");
+    const emailForm = document.getElementById("emailForm");
+    const emailInput = document.getElementById("emailInput");
+    const emailBtn = document.getElementById("emailBtn");
+    const sessionCard = document.getElementById("sessionCard");
+    const sessionEmail = document.getElementById("sessionEmail");
+    const continueBtn = document.getElementById("continueBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    let supabase = null;
+
+    function setStatus(message, type = "") {
+      statusTextEl.textContent = message || "";
+      statusTextEl.className = "status" + (type ? " " + type : "");
+    }
+
+    function sanitizeNextPath(raw) {
+      const value = String(raw || "").trim();
+      if (!value) return FALLBACK_NEXT;
+      try {
+        const full = new URL(value, window.location.origin);
+        if (full.origin !== window.location.origin) return FALLBACK_NEXT;
+        return full.pathname + full.search + full.hash;
+      } catch {
+        return FALLBACK_NEXT;
+      }
+    }
+
+    const nextPath = sanitizeNextPath(params.get("next"));
+
+    function buildAuthReturnUrl() {
+      const url = new URL("/pages/auth.html", window.location.origin);
+      url.searchParams.set("next", nextPath);
+      if (intent === "checkout" && pendingPriceId) {
+        url.searchParams.set("intent", "checkout");
+        url.searchParams.set("priceId", pendingPriceId);
+      }
+      return url.toString();
+    }
+
+    function persistAuthState(session) {
+      const user = session?.user || {};
+      const expiresAtSeconds = Number(session?.expires_at);
+      const expiresAt = Number.isFinite(expiresAtSeconds) ? expiresAtSeconds * 1000 : 0;
+      const payload = {
+        userId: typeof user.id === "string" ? user.id : "",
+        email: typeof user.email === "string" ? user.email : "",
+        provider: typeof user?.app_metadata?.provider === "string" ? user.app_metadata.provider : "",
+        expiresAt,
+        updatedAt: new Date().toISOString()
+      };
+      localStorage.setItem(AUTH_STATE_KEY, JSON.stringify(payload));
+      return payload;
+    }
+
+    function clearAuthState() {
+      localStorage.removeItem(AUTH_STATE_KEY);
+    }
+
+    function setSignedInUi(payload) {
+      const email = payload?.email || "Signed in";
+      sessionEmail.textContent = `Signed in as ${email}`;
+      sessionCard.hidden = false;
+    }
+
+    async function continueCheckoutIfNeeded() {
+      if (intent !== "checkout" || !pendingPriceId) return false;
+      setStatus("Signing in successful, redirecting to checkout...", "success");
+      const response = await fetch("/api/billing/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({ priceId: pendingPriceId })
+      });
+      let data = {};
+      try { data = await response.json(); } catch {}
+      if (!response.ok || data?.ok === false) {
+        throw new Error(data?.error || `Checkout failed with ${response.status}`);
+      }
+      const checkoutUrl = String(data?.checkoutUrl || "").trim();
+      if (!checkoutUrl) throw new Error("Stripe checkout URL is empty");
+      window.location.assign(checkoutUrl);
+      return true;
+    }
+
+    async function applySignedIn(session) {
+      const payload = persistAuthState(session);
+      setSignedInUi(payload);
+      try {
+        const redirected = await continueCheckoutIfNeeded();
+        if (!redirected) {
+          setStatus("Signed in successfully.", "success");
+        }
+      } catch (error) {
+        setStatus(error?.message || "Signed in, but checkout redirect failed.", "error");
+      }
+    }
+
+    async function setupSupabase() {
+      setStatus("Loading authentication...", "");
+      const configRes = await fetch("/api/auth/config", { credentials: "same-origin" });
+      const config = await configRes.json().catch(() => ({}));
+      const auth = config?.auth || {};
+      const supabaseUrl = String(auth?.supabaseUrl || "").trim();
+      const supabaseAnonKey = String(auth?.supabaseAnonKey || "").trim();
+      if (!configRes.ok || !config?.enabled || !supabaseUrl || !supabaseAnonKey) {
+        throw new Error("Auth is not configured. Set SUPABASE_URL and SUPABASE_ANON_KEY on Railway.");
+      }
+
+      const supabasePkg = await import("https://esm.sh/@supabase/supabase-js@2");
+      supabase = supabasePkg.createClient(supabaseUrl, supabaseAnonKey, {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true
+        }
+      });
+
+      supabase.auth.onAuthStateChange(async (event, session) => {
+        if (!session) {
+          clearAuthState();
+          sessionCard.hidden = true;
+          if (event === "SIGNED_OUT") setStatus("Signed out.", "");
+          return;
+        }
+        await applySignedIn(session);
+      });
+
+      const { data, error } = await supabase.auth.getSession();
+      if (error) throw error;
+      if (data?.session) {
+        await applySignedIn(data.session);
+      } else {
+        clearAuthState();
+        setStatus("Use Google or email magic link to continue.", "");
+      }
+    }
+
+    googleBtn.addEventListener("click", async () => {
+      if (!supabase) return;
+      setStatus("Redirecting to Google...", "");
+      googleBtn.disabled = true;
+      try {
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: "google",
+          options: { redirectTo: buildAuthReturnUrl() }
+        });
+        if (error) throw error;
+      } catch (error) {
+        setStatus(error?.message || "Google sign-in failed", "error");
+        googleBtn.disabled = false;
+      }
+    });
+
+    emailForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!supabase) return;
+      const email = String(emailInput.value || "").trim();
+      if (!email) {
+        setStatus("Please enter your email address.", "error");
+        return;
+      }
+      setStatus("Sending magic link...", "");
+      emailBtn.disabled = true;
+      try {
+        const { error } = await supabase.auth.signInWithOtp({
+          email,
+          options: { emailRedirectTo: buildAuthReturnUrl() }
+        });
+        if (error) throw error;
+        setStatus("Magic link sent. Please check your inbox.", "success");
+      } catch (error) {
+        setStatus(error?.message || "Email login failed", "error");
+      } finally {
+        emailBtn.disabled = false;
+      }
+    });
+
+    continueBtn.addEventListener("click", () => {
+      window.location.assign(nextPath);
+    });
+
+    logoutBtn.addEventListener("click", async () => {
+      if (!supabase) return;
+      try {
+        await supabase.auth.signOut();
+      } finally {
+        clearAuthState();
+        sessionCard.hidden = true;
+      }
+    });
+
+    setupSupabase().catch((error) => {
+      setStatus(error?.message || "Failed to initialize auth.", "error");
+      googleBtn.disabled = true;
+      emailBtn.disabled = true;
+      emailInput.disabled = true;
+    });
+  </script>
+</body>
+</html>
