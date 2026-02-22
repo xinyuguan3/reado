@@ -81,8 +81,8 @@
     </style>
 </head>
 <body class="min-h-screen overflow-hidden flex flex-col relative selection:bg-monopoly-blue selection:text-black">
-<script src="/shared/book-catalog.js?v=1771257564240"></script>
-<script type="module" src="/shared/shell.js?v=1771257564240"></script>
+<script src="/shared/book-catalog.js?v=1771754453141"></script>
+<script type="module" src="/shared/shell.js?v=1771754453141"></script>
 <reado-app-shell data-page="knowledge-map"></reado-app-shell>
 <div class="fixed inset-0 grid-bg pointer-events-none z-0"></div>
 <div class="fixed inset-0 bg-radial-gradient pointer-events-none z-0" style="background: radial-gradient(circle at center, transparent 0%, #05070a 90%);"></div>
@@ -261,7 +261,7 @@
 </script>
 
 
-<script src="/shared/experience-runtime.js?v=1771257564240"></script>
+<script src="/shared/experience-runtime.js?v=1771754453141"></script>
 <script>
 (() => {
   
@@ -304,7 +304,8 @@
       if (target.closest(".reado-shell-wrap")) return;
       const candidate = target.closest("[data-next-scene],button,a[href],.concept-card,.item-card,[data-choice],[data-option]");
       if (!(candidate instanceof HTMLElement)) return;
-      if (!candidate.closest("main")) return;
+      const mainRoot = document.querySelector("main");
+      if (mainRoot instanceof HTMLElement && !mainRoot.contains(candidate)) return;
       if (candidate.hasAttribute("data-no-next")) return;
       if (candidate.matches("a[href]")) {
         const href = candidate.getAttribute("href") || "";

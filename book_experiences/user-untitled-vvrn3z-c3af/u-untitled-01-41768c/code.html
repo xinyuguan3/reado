@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>大空头 · 第 1 关 · 识别问题背景与约束条件</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #070b14;
+      --panel: rgba(12, 18, 32, 0.86);
+      --panel-2: rgba(14, 27, 52, 0.86);
+      --line: rgba(148, 163, 184, 0.22);
+      --text: #ecf3ff;
+      --sub: #9fb6d6;
+      --acc: #22d3ee;
+      --danger: #fb7185;
+      --good: #4ade80;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Noto Sans SC", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 18% 12%, rgba(34, 211, 238, 0.16), transparent 35%),
+        radial-gradient(circle at 88% 10%, rgba(14, 165, 233, 0.18), transparent 32%),
+        var(--bg);
+    }
+    .page {
+      width: min(1100px, calc(100% - 24px));
+      margin: 0 auto;
+      padding: 28px 0 40px;
+      display: grid;
+      grid-template-columns: minmax(220px, 300px) minmax(0, 1fr);
+      gap: 14px;
+    }
+    .panel {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      border-radius: 14px;
+      padding: 14px;
+      box-shadow: 0 16px 42px rgba(2, 8, 20, 0.42);
+    }
+    .side h1 {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.4;
+    }
+    .meta {
+      margin-top: 6px;
+      color: var(--sub);
+      font-size: 12px;
+    }
+    .hook {
+      margin-top: 10px;
+      color: #d4e9ff;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .stat { margin-top: 10px; }
+    .stat label {
+      display: flex;
+      justify-content: space-between;
+      color: var(--sub);
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+    .bar {
+      width: 100%;
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.18);
+      overflow: hidden;
+    }
+    .fill {
+      height: 100%;
+      border-radius: 999px;
+      width: 50%;
+      transition: width 220ms ease;
+    }
+    .fill.s { background: linear-gradient(90deg, #22d3ee, #38bdf8); }
+    .fill.t { background: linear-gradient(90deg, #f59e0b, #f97316); }
+    .fill.r { background: linear-gradient(90deg, #a78bfa, #6366f1); }
+    .main {
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: 0 20px 50px rgba(2, 8, 20, 0.45);
+    }
+    .chapter {
+      margin: 0;
+      font-size: clamp(24px, 3vw, 34px);
+      letter-spacing: -0.02em;
+    }
+    .opening, .mentor, .debrief {
+      color: #c7daf5;
+      line-height: 1.75;
+      font-size: 14px;
+    }
+    .mentor {
+      margin-top: 8px;
+      padding: 10px;
+      border: 1px dashed rgba(34, 211, 238, 0.36);
+      border-radius: 10px;
+      background: rgba(8, 47, 73, 0.28);
+    }
+    .round-title {
+      margin-top: 16px;
+      font-size: 17px;
+      font-weight: 800;
+    }
+    .round-prompt {
+      color: #d6e8ff;
+      font-size: 14px;
+      line-height: 1.72;
+      margin-top: 8px;
+    }
+    .options {
+      margin-top: 12px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .opt-btn {
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.9);
+      color: #e2ebff;
+      text-align: left;
+      padding: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 140ms ease, border-color 140ms ease;
+    }
+    .opt-btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(34, 211, 238, 0.72);
+    }
+    .feedback {
+      margin-top: 10px;
+      font-size: 13px;
+      color: #9ad8ff;
+      min-height: 20px;
+    }
+    .debrief {
+      margin-top: 14px;
+      display: none;
+      border-top: 1px solid var(--line);
+      padding-top: 12px;
+    }
+    .debrief.show { display: block; }
+    .end-actions {
+      margin-top: 12px;
+      display: none;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .end-actions.show { display: flex; }
+    .btn {
+      border: 1px solid rgba(148, 163, 184, 0.36);
+      background: rgba(30, 41, 59, 0.8);
+      color: #e2ebff;
+      padding: 9px 12px;
+      border-radius: 10px;
+      font-size: 13px;
+      text-decoration: none;
+      cursor: pointer;
+      font-weight: 700;
+    }
+    .btn.primary {
+      border-color: rgba(45, 212, 191, 0.72);
+      background: rgba(13, 148, 136, 0.34);
+    }
+    .takeaway {
+      margin-top: 10px;
+      color: #d9ecff;
+      font-size: 13px;
+    }
+    @media (max-width: 900px) {
+      .page { grid-template-columns: 1fr; }
+      .options { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <aside class="panel side">
+      <h1>大空头</h1>
+      <div class="meta">1 / 3 · 第 1 关 · 识别问题背景与约束条件</div>
+      <p class="hook">通过连续关卡，把文本知识转成可执行判断。</p>
+
+      <div class="stat">
+        <label><span>秩序稳定</span><span id="s-v">50</span></label>
+        <div class="bar"><div id="s-b" class="fill s"></div></div>
+      </div>
+      <div class="stat">
+        <label><span>资源收益</span><span id="t-v">50</span></label>
+        <div class="bar"><div id="t-b" class="fill t"></div></div>
+      </div>
+      <div class="stat">
+        <label><span>改革推进</span><span id="r-v">50</span></label>
+        <div class="bar"><div id="r-b" class="fill r"></div></div>
+      </div>
+    </aside>
+
+    <section class="main">
+      <h2 class="chapter">第 1 关 · 识别问题背景与约束条件</h2>
+      <p class="opening">识别问题背景与约束条件。你将以决策者视角推进情节。</p>
+      <p class="mentor">提示：先找结构矛盾，再做选项比较。</p>
+
+      <h3 id="round-title" class="round-title"></h3>
+      <p id="round-prompt" class="round-prompt"></p>
+
+      <div class="options">
+        <button id="opt-a" class="opt-btn"></button>
+        <button id="opt-b" class="opt-btn"></button>
+      </div>
+      <p id="feedback" class="feedback"></p>
+
+      <div id="debrief" class="debrief">
+        <p>这关训练的是在信息不完整条件下做权衡。</p>
+        <p class="takeaway">写下一个你在现实中可以立刻使用的判断准则。</p>
+      </div>
+      <div id="end-actions" class="end-actions">
+        <a class="btn primary" href="/experiences/u-untitled-02-bfaf3c.html">进入下一关</a>
+        
+        <button id="retry-btn" class="btn" type="button">重玩本关</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const rounds = [{"title":"抉择一：目标设定","prompt":"面对短期压力与长期收益冲突，你先保证哪一项？","optionA":{"label":"优先长期结构","feedback":"长期稳定性更高，但短期阻力会增加。","effects":{"stability":-4,"treasury":3,"reform":8}},"optionB":{"label":"优先短期止损","feedback":"短期冲击更小，但可能错过结构性窗口。","effects":{"stability":5,"treasury":-2,"reform":-6}}},{"title":"抉择二：执行节奏","prompt":"你会如何安排推进节奏？","optionA":{"label":"分阶段试点","feedback":"可控性更好，但见效慢。","effects":{"stability":6,"treasury":1,"reform":2}},"optionB":{"label":"全国同步推进","feedback":"见效快，但失败成本更高。","effects":{"stability":-7,"treasury":5,"reform":6}}},{"title":"抉择三：反馈修正","prompt":"第一轮反馈不及预期，你会怎么调整？","optionA":{"label":"保留目标，修正路径","feedback":"保住方向，同时降低组织摩擦。","effects":{"stability":4,"treasury":2,"reform":4}},"optionB":{"label":"快速回撤以求稳定","feedback":"短期风险下降，但改革信誉受损。","effects":{"stability":7,"treasury":-3,"reform":-8}}}];
+      const state = { i: 0, stability: 50, treasury: 50, reform: 50 };
+      const titleEl = document.getElementById("round-title");
+      const promptEl = document.getElementById("round-prompt");
+      const feedbackEl = document.getElementById("feedback");
+      const optA = document.getElementById("opt-a");
+      const optB = document.getElementById("opt-b");
+      const debriefEl = document.getElementById("debrief");
+      const endActionsEl = document.getElementById("end-actions");
+      const retryBtn = document.getElementById("retry-btn");
+      const sV = document.getElementById("s-v");
+      const tV = document.getElementById("t-v");
+      const rV = document.getElementById("r-v");
+      const sB = document.getElementById("s-b");
+      const tB = document.getElementById("t-b");
+      const rB = document.getElementById("r-b");
+
+      function clamp(v) {
+        return Math.max(0, Math.min(100, Math.round(v)));
+      }
+
+      function refreshBars() {
+        sV.textContent = String(state.stability);
+        tV.textContent = String(state.treasury);
+        rV.textContent = String(state.reform);
+        sB.style.width = state.stability + "%";
+        tB.style.width = state.treasury + "%";
+        rB.style.width = state.reform + "%";
+      }
+
+      function paintRound() {
+        const round = rounds[state.i];
+        if (!round) {
+          titleEl.textContent = "关卡结算";
+          promptEl.textContent = "你已完成本关所有抉择。";
+          optA.style.display = "none";
+          optB.style.display = "none";
+          debriefEl.classList.add("show");
+          endActionsEl.classList.add("show");
+          return;
+        }
+        titleEl.textContent = round.title || ("抉择 " + (state.i + 1));
+        promptEl.textContent = round.prompt || "";
+        optA.textContent = round.optionA?.label || "选项 A";
+        optB.textContent = round.optionB?.label || "选项 B";
+        optA.style.display = "";
+        optB.style.display = "";
+      }
+
+      function applyChoice(option) {
+        const effects = option?.effects || {};
+        state.stability = clamp(state.stability + (Number(effects.stability) || 0));
+        state.treasury = clamp(state.treasury + (Number(effects.treasury) || 0));
+        state.reform = clamp(state.reform + (Number(effects.reform) || 0));
+        refreshBars();
+        feedbackEl.textContent = option?.feedback || "你完成了一次选择。";
+        state.i += 1;
+        window.setTimeout(() => {
+          feedbackEl.textContent = "";
+          paintRound();
+        }, 480);
+      }
+
+      optA.addEventListener("click", () => {
+        const round = rounds[state.i];
+        applyChoice(round?.optionA || {});
+      });
+      optB.addEventListener("click", () => {
+        const round = rounds[state.i];
+        applyChoice(round?.optionB || {});
+      });
+      if (retryBtn) {
+        retryBtn.addEventListener("click", () => window.location.reload());
+      }
+
+      refreshBars();
+      paintRound();
+
+      try {
+        localStorage.setItem("reado_last_experience_href", "/experiences/u-untitled-01-41768c.html");
+      } catch {}
+    })();
+  </script>
+</body>
+</html>

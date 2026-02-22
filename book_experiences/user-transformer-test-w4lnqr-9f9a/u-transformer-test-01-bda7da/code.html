@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>模块一：WMT 控制室的架构换轨</title>
+  <style>
+    :root{
+      --bg:#060913;
+      --panel:rgba(10,16,32,.62);
+      --line:rgba(111,196,255,.45);
+      --cyan:#65d9ff;
+      --blue:#5a8dff;
+      --vio:#9b6bff;
+      --green:#7dffb6;
+      --warn:#ffcc66;
+      --bad:#ff7b95;
+      --text:#e9f2ff;
+      --muted:#95a7c7;
+      --ok:#00e6a8;
+      --shadow:0 10px 40px rgba(0,0,0,.45), inset 0 0 0 1px rgba(117,174,255,.25);
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: "Inter","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+      color:var(--text);
+      background: radial-gradient(1200px 600px at 10% -10%, rgba(84,120,255,.22), transparent 60%),
+                  radial-gradient(1000px 700px at 90% 110%, rgba(103,210,255,.18), transparent 55%),
+                  var(--bg);
+      overflow-x:hidden;
+    }
+    #bgCanvas{
+      position:fixed; inset:0; z-index:-2;
+      opacity:.8;
+    }
+    .scanline{
+      pointer-events:none;
+      position:fixed; inset:0; z-index:-1;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,.02) 0px,
+        rgba(255,255,255,.02) 1px,
+        transparent 2px,
+        transparent 5px
+      );
+      animation:scan 9s linear infinite;
+    }
+    @keyframes scan{from{transform:translateY(0)}to{transform:translateY(6px)}}
+
+    .shell{
+      width:min(1200px, 94vw);
+      margin:18px auto 110px;
+      display:grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap:14px;
+    }
+    .panel{
+      background:linear-gradient(160deg, rgba(14,23,46,.78), rgba(8,13,27,.58));
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      backdrop-filter: blur(8px);
+      border:1px solid rgba(125,172,255,.22);
+      position:relative;
+      overflow:hidden;
+    }
+    .panel:before{
+      content:"";
+      position:absolute; inset:-2px;
+      background:conic-gradient(from 180deg at 50% 50%, rgba(101,217,255,.08), rgba(155,107,255,.06), rgba(101,217,255,.08));
+      filter:blur(20px); z-index:-1;
+    }
+
+    .mission{
+      padding:20px 20px 16px;
+      min-height:245px;
+    }
+    .mission h1{
+      margin:0 0 10px; font-size:clamp(20px,2.3vw,30px); letter-spacing:.4px;
+    }
+    .book{
+      font-size:12px; letter-spacing:1.2px; text-transform:uppercase;
+      color:var(--cyan); opacity:.92;
+    }
+    .scene{
+      margin:12px 0 0; color:#d6e4ff; line-height:1.7; font-size:14px;
+    }
+    .goal{
+      margin-top:12px;
+      padding:11px 12px;
+      border-left:3px solid var(--cyan);
+      background:rgba(101,217,255,.08);
+      border-radius:10px;
+      color:#d9ecff;
+      font-size:13px;
+    }
+
+    .hud{
+      display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px;
+      padding:12px 16px 16px;
+    }
+    .metric{
+      background:rgba(13,24,47,.66);
+      border:1px solid rgba(131,183,255,.2);
+      border-radius:12px; padding:10px;
+    }
+    .metric .k{font-size:11px;color:var(--muted);letter-spacing:1px}
+    .metric .v{font-size:22px;font-weight:700;margin-top:4px}
+    .v.ok{color:var(--ok)} .v.warn{color:var(--warn)} .v.bad{color:var(--bad)}
+
+    .rounds{
+      grid-column:1/-1;
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:14px;
+    }
+    .round{
+      min-height:440px;
+      display:flex;
+      flex-direction:column;
+    }
+    .round-head{
+      display:flex; justify-content:space-between; align-items:flex-start;
+      padding:14px 14px 8px;
+      border-bottom:1px solid rgba(123,177,255,.18);
+      background:linear-gradient(180deg, rgba(97,140,255,.12), transparent);
+    }
+    .round-title{font-weight:700; font-size:16px}
+    .round-sub{font-size:12px;color:var(--muted);margin-top:3px}
+    .badge{
+      font-size:11px; color:var(--cyan); border:1px solid rgba(101,217,255,.45);
+      padding:4px 8px; border-radius:999px;
+    }
+    .round-body{padding:12px 14px; flex:1; display:flex; flex-direction:column; gap:10px}
+
+    .hint{
+      font-size:12px; color:#c7d7f5;
+      line-height:1.6; padding:8px 10px;
+      border-radius:10px; background:rgba(20,33,65,.46);
+      border:1px dashed rgba(115,162,242,.35);
+    }
+
+    .mode-switch{
+      display:flex; gap:8px;
+    }
+    .mode-switch button{
+      flex:1; padding:9px 8px; border-radius:10px;
+      color:#eaf5ff; background:rgba(22,35,69,.75);
+      border:1px solid rgba(122,177,255,.3); cursor:pointer;
+    }
+    .mode-switch button.active{
+      background:linear-gradient(145deg, rgba(89,148,255,.32), rgba(103,217,255,.2));
+      border-color:rgba(133,215,255,.7);
+      box-shadow:inset 0 0 20px rgba(123,215,255,.2);
+    }
+
+    .chips, .slots{
+      display:flex; flex-wrap:wrap; gap:8px;
+    }
+    .chip{
+      padding:8px 10px;
+      border-radius:999px;
+      background:rgba(25,41,79,.85);
+      border:1px solid rgba(116,171,255,.42);
+      font-size:12px;
+      cursor:grab;
+      user-select:none;
+      transition:.2s;
+    }
+    .chip:active{cursor:grabbing;transform:scale(.98)}
+    .chip.selected{outline:2px solid var(--cyan)}
+    .slot{
+      min-height:38px;
+      min-width:100px;
+      display:flex; align-items:center; justify-content:center;
+      padding:6px 8px;
+      border-radius:12px;
+      background:rgba(15,26,51,.55);
+      border:1px dashed rgba(125,183,255,.5);
+      font-size:12px; color:var(--muted);
+    }
+    .slot.filled{
+      border-style:solid;
+      color:#e8f3ff;
+      background:rgba(50,75,128,.28);
+    }
+
+    .controls{
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap:8px;
+      align-items:center;
+      margin-top:auto;
+    }
+    .btn{
+      border:1px solid rgba(125,184,255,.45);
+      color:#ebf6ff;
+      background:linear-gradient(135deg, rgba(43,75,141,.72), rgba(32,132,170,.52));
+      padding:10px 12px;
+      border-radius:10px;
+      cursor:pointer;
+      font-weight:600;
+      letter-spacing:.2px;
+    }
+    .btn.secondary{
+      background:rgba(25,39,73,.65);
+      color:#cfe1ff;
+    }
+
+    .feedback{
+      min-height:40px;
+      font-size:12px; line-height:1.5; color:#d9e8ff;
+      border-radius:10px; padding:8px 10px;
+      border:1px solid rgba(122,177,255,.28);
+      background:rgba(15,25,49,.54);
+    }
+    .feedback.good{border-color:rgba(42,240,171,.55); color:#d8fff1; background:rgba(10,70,54,.34)}
+    .feedback.bad{border-color:rgba(255,123,149,.58); color:#ffe1e9; background:rgba(93,20,42,.34)}
+
+    .slider-wrap label{
+      font-size:12px; color:#c6daf9; display:flex; justify-content:space-between;
+      margin:4px 0;
+    }
+    input[type="range"]{
+      width:100%;
+      accent-color:#66d8ff;
+    }
+    .toggles{
+      display:grid; gap:7px;
+      margin-top:4px;
+    }
+    .toggle{
+      display:flex; align-items:flex-start; gap:8px;
+      font-size:12px; color:#d9e7ff;
+      background:rgba(20,31,60,.5);
+      border:1px solid rgba(110,162,243,.22);
+      border-radius:10px; padding:7px 8px;
+    }
+    .toggle input{margin-top:2px}
+
+    .timeline{
+      display:flex; gap:6px; flex-wrap:wrap;
+    }
+    .timeline button{
+      flex:1; min-width:88px;
+      border:1px solid rgba(121,176,255,.3);
+      background:rgba(20,35,68,.62);
+      color:#d7e8ff; font-size:12px; border-radius:10px; padding:8px 6px; cursor:pointer;
+    }
+    .timeline button.active{
+      background:linear-gradient(160deg, rgba(89,147,255,.35), rgba(155,107,255,.22));
+      border-color:rgba(157,192,255,.75);
+    }
+    .scene-line{
+      font-size:12px; color:#d2e4ff; line-height:1.5;
+      padding:8px 10px; border-radius:10px;
+      background:rgba(19,31,57,.55); border:1px solid rgba(118,169,247,.26);
+      min-height:48px;
+    }
+
+    .match-grid{
+      display:grid; grid-template-columns:1fr 1fr; gap:8px;
+    }
+    .claim, .evi{
+      padding:8px; font-size:12px; border-radius:10px;
+      border:1px solid rgba(119,173,250,.35);
+      background:rgba(20,34,64,.58);
+      cursor:pointer; line-height:1.45;
+    }
+    .claim.active, .evi.active{outline:2px solid #7fdfff}
+    .claim.done, .evi.done{opacity:.56}
+    .pairs{
+      font-size:11px; color:#b5c8eb; min-height:34px;
+      padding:7px 8px; border-radius:10px;
+      background:rgba(12,21,41,.58); border:1px dashed rgba(122,170,245,.35);
+    }
+
+    .summary{
+      grid-column:1/-1;
+      padding:14px 16px 16px;
+      display:grid; gap:10px;
+    }
+    .summary h3{margin:0;font-size:16px}
+    .bars{display:grid; gap:7px}
+    .bar{
+      height:10px; border-radius:999px; background:rgba(38,55,90,.6); overflow:hidden;
+      border:1px solid rgba(112,165,243,.28);
+    }
+    .bar i{
+      display:block; height:100%; width:0%;
+      background:linear-gradient(90deg, var(--cyan), var(--vio));
+      transition:width .45s ease;
+    }
+    .summary-note{
+      font-size:13px; line-height:1.6; color:#dbe9ff;
+      background:rgba(16,27,52,.58); border:1px solid rgba(126,178,252,.25);
+      border-radius:10px; padding:10px;
+    }
+
+    .nav{
+      position:fixed;
+      left:50%; transform:translateX(-50%);
+      bottom:14px;
+      width:min(760px, calc(100vw - 20px));
+      z-index:10;
+      display:grid; grid-template-columns:repeat(3,1fr); gap:8px;
+      background:rgba(7,12,24,.76);
+      border:1px solid rgba(110,165,245,.32);
+      backdrop-filter:blur(8px);
+      border-radius:12px; padding:8px;
+      box-shadow:0 12px 30px rgba(0,0,0,.35);
+    }
+    .nav a{
+      text-align:center; text-decoration:none; color:#e6f2ff;
+      font-weight:700; font-size:14px;
+      background:linear-gradient(145deg, rgba(35,60,114,.78), rgba(39,111,144,.55));
+      border:1px solid rgba(122,179,255,.45);
+      border-radius:9px; padding:10px 8px;
+    }
+    .nav a:nth-child(2){background:linear-gradient(145deg, rgba(54,84,155,.9), rgba(87,145,255,.6))}
+    .nav a:hover{filter:brightness(1.1)}
+
+    .floating-score{
+      position:fixed; right:14px; top:14px; z-index:8;
+      background:rgba(8,15,31,.72);
+      border:1px solid rgba(122,176,254,.3);
+      border-radius:12px; padding:8px 10px;
+      font-size:12px; color:#cde2ff;
+      backdrop-filter:blur(6px);
+    }
+    .floating-score b{color:#89f8c9; font-size:18px}
+
+    @media (max-width: 980px){
+      .shell{grid-template-columns:1fr}
+      .rounds{grid-template-columns:1fr}
+      .round{min-height:auto}
+      .floating-score{top:auto;bottom:86px}
+    }
+  </style>
+</head>
+<body>
+  <canvas id="bgCanvas"></canvas>
+  <div class="scanline"></div>
+
+  <div class="floating-score">控制室可信度：<b id="trustTotal">0</b>/300</div>
+
+  <main class="shell">
+    <section class="panel mission">
+      <div class="book">Transformer Test：注意力决策演练</div>
+      <h1>模块一：WMT 控制室的架构换轨</h1>
+      <div class="scene">
+        你推开控制室门，凌晨的评测大屏滚动 <b>WMT</b> 榜单。旧系统稳定但提分乏力，实验组递来简报，主张由
+        <b>based on recurrent/convolution 的 encoder-decoder</b> 转向
+        <b>based solely on attention 的 Transformer</b>。运维组担心风险，所有人都在等你一句“今晚走哪条路”。
+      </div>
+      <div class="goal">
+        任务目标：在不伪造未披露统计的前提下，完成三轮策略选择（架构、训练投放、任务外扩），所有决策必须锚定来源术语：
+        <b>wmt</b>、<b>bleu</b>、<b>best</b>、<b>our model</b>、<b>training cost</b>、<b>generalizes to other tasks</b>。
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="hud">
+        <div class="metric">
+          <div class="k">ROUND 1</div>
+          <div class="v" id="m1">待决策</div>
+        </div>
+        <div class="metric">
+          <div class="k">ROUND 2</div>
+          <div class="v" id="m2">待决策</div>
+        </div>
+        <div class="metric">
+          <div class="k">ROUND 3</div>
+          <div class="v" id="m3">待决策</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="rounds">
+      <article class="panel round" id="round1">
+        <div class="round-head">
+          <div>
+            <div class="round-title">第一轮：架构换轨</div>
+            <div class="round-sub">交互机制：架构开关 + 拖拽证据锚点</div>
+          </div>
+          <span class="badge">R1</span>
+        </div>
+        <div class="round-body">
+          <div class="hint">情报卡A：旧路线是 encoder-decoder（recurrent/convolution）；新路线是 Transformer（based solely on attention）。把关键证据拖入“批准槽”，并下达路线指令。</div>
+          <div class="mode-switch" id="archSwitch">
+            <button data-arch="old">维持旧架构</button>
+            <button data-arch="transformer">切换 Transformer</button>
+          </div>
+          <div class="chips" id="chipsR1">
+            <div class="chip" draggable="true" data-id="solely_attention">based solely on attention mechanisms</div>
+            <div class="chip" draggable="true" data-id="no_rec_conv">dispensing with recurrence and convolutions entirely</div>
+            <div class="chip" draggable="true" data-id="dual_gain">superior in quality + less time to train</div>
+            <div class="chip" draggable="true" data-id="wmt_only">WMT 榜单在滚动</div>
+            <div class="chip" draggable="true" data-id="best_connect">best performing models connect encoder and decoder through attention</div>
+            <div class="chip" draggable="true" data-id="unknown_hypers">全部超参数已披露</div>
+          </div>
+          <div class="slots" id="slotsR1">
+            <div class="slot" data-index="0">批准槽 1</div>
+            <div class="slot" data-index="1">批准槽 2</div>
+            <div class="slot" data-index="2">批准槽 3</div>
+          </div>
+          <div class="feedback" id="fb1">等待你的架构口令…</div>
+          <div class="controls">
+            <button class="btn" id="submitR1">锁定架构指令</button>
+            <button class="btn secondary" id="resetR1">重置</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="panel round" id="round2">
+        <div class="round-head">
+          <div>
+            <div class="round-title">第二轮：训练投放沙盘</div>
+            <div class="round-sub">交互机制：滑块 + 参数开关</div>
+          </div>
+          <span class="badge">R2</span>
+        </div>
+        <div class="round-body">
+          <div class="hint">情报卡B：来源显示“两项 translation tasks 质量与训练效率双提升”，但未披露全部超参数与工程细节。请只发布可证实数据。</div>
+
+          <div class="slider-wrap">
+            <label>GPU 投放（公开口径）<span id="gpuVal">8</span></label>
+            <input id="gpu" type="range" min="1" max="16" step="1" value="8" />
+          </div>
+          <div class="slider-wrap">
+            <label>训练时长（天）<span id="dayVal">3.5</span></label>
+            <input id="days" type="range" min="1" max="7" step="0.5" value="3.5" />
+          </div>
+
+          <div class="toggles">
+            <label class="toggle"><input type="checkbox" id="c28" checked />公开：our model achieves <b>28.4 BLEU</b> on <b>WMT 2014 En-De</b></label>
+            <label class="toggle"><input type="checkbox" id="c41" checked />公开：single-model <b>41.8 BLEU</b> on <b>WMT 2014 En-Fr</b></label>
+            <label class="toggle"><input type="checkbox" id="c2" checked />公开：improving over existing <b>best</b> by over <b>2 BLEU</b>（En-De）</label>
+            <label class="toggle"><input type="checkbox" id="cAll" />声称：已披露全部超参数与工程细节</label>
+            <label class="toggle"><input type="checkbox" id="cCost" checked />表述：training for <b>3.5 days on eight GPUs</b>，且为 best models 的 <b>small fraction of training costs</b></label>
+          </div>
+
+          <div class="feedback" id="fb2">先调整投放，再提交外宣口径。</div>
+          <div class="controls">
+            <button class="btn" id="submitR2">提交训练投放</button>
+            <button class="btn secondary" id="resetR2">重置</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="panel round" id="round3">
+        <div class="round-head">
+          <div>
+            <div class="round-title">第三轮：任务外扩判断</div>
+            <div class="round-sub">交互机制：时间线切换 + 证据配对</div>
+          </div>
+          <span class="badge">R3</span>
+        </div>
+        <div class="round-body">
+          <div class="hint">情报卡C：关键锚点可直接引用 wmt / bleu / best / our model / training cost / generalizes to other tasks。把“主张”与“来源证据”配对。</div>
+
+          <div class="timeline" id="timeline">
+            <button data-t="0" class="active">00:20 架构声明</button>
+            <button data-t="1">01:10 WMT-BLEU</button>
+            <button data-t="2">02:00 Other Tasks</button>
+          </div>
+          <div class="scene-line" id="sceneLine">“We propose ... Transformer, based solely on attention mechanisms.” 你准备把架构理由写进夜间变更单。</div>
+
+          <div class="match-grid">
+            <div id="claims"></div>
+            <div id="evis"></div>
+          </div>
+          <div class="pairs" id="pairLog">配对记录：暂无</div>
+
+          <div class="feedback" id="fb3">点击左侧主张，再点击右侧证据完成连线。</div>
+          <div class="controls">
+            <button class="btn" id="submitR3">完成外扩决策</button>
+            <button class="btn secondary" id="resetR3">重置</button>
+          </div>
+        </div>
+      </article>
+
+      <section class="panel summary">
+        <h3>阶段结算 · 控制室战报</h3>
+        <div class="bars">
+          <div>证据锚定度 <div class="bar"><i id="barA"></i></div></div>
+          <div>统计合规度 <div class="bar"><i id="barB"></i></div></div>
+          <div>策略推进度 <div class="bar"><i id="barC"></i></div></div>
+        </div>
+        <div class="summary-note" id="summaryText">等待三轮结束后生成结算。你需要让 every claim 与来源文本逐项对齐。</div>
+      </section>
+    </section>
+  </main>
+
+  <nav class="nav">
+    <a href="/pages/gamified-learning-hub-dashboard-1.html">上一关</a>
+    <a href="/books/user-transformer-test-w4lnqr-9f9a.html">返回书籍</a>
+    <a href="/books/user-transformer-test-w4lnqr-9f9a.html">下一关</a>
+  </nav>
+
+  <script>
+    // Background canvas
+    (() => {
+      const canvas = document.getElementById('bgCanvas');
+      const ctx = canvas.getContext('2d');
+      let w,h,pts=[];
+      const resize=()=>{w=canvas.width=innerWidth;h=canvas.height=innerHeight;pts=Array.from({length:70},()=>({x:Math.random()*w,y:Math.random()*h,vx:(Math.random()-.5)*.35,vy:(Math.random()-.5)*.35,r:Math.random()*1.8+.6}))}
+      addEventListener('resize',resize); resize();
+      const tick=()=>{
+        ctx.clearRect(0,0,w,h);
+        ctx.fillStyle='rgba(130,200,255,.65)';
+        for(const p of pts){
+          p.x+=p.vx; p.y+=p.vy;
+          if(p.x<0||p.x>w)p.vx*=-1;
+          if(p.y<0||p.y>h)p.vy*=-1;
+          ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();
+        }
+        for(let i=0;i<pts.length;i++){
+          for(let j=i+1;j<pts.length;j++){
+            const a=pts[i], b=pts[j];
+            const dx=a.x-b.x, dy=a.y-b.y;
+            const d=Math.hypot(dx,dy);
+            if(d<110){
+              ctx.strokeStyle=`rgba(111,196,255,${(1-d/110)*0.18})`;
+              ctx.lineWidth=1;
+              ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+            }
+          }
+        }
+        requestAnimationFrame(tick);
+      }; tick();
+    })();
+
+    const state = {
+      r1:0, r2:0, r3:0,
+      arch:null,
+      slots:[null,null,null],
+      selectedChip:null,
+      pairs:{},
+      selectedClaim:null,
+      completed:[false,false,false]
+    };
+
+    const m1=document.getElementById('m1'), m2=document.getElementById('m2'), m3=document.getElementById('m3');
+    const trustTotal=document.getElementById('trustTotal');
+    const barA=document.getElementById('barA'), barB=document.getElementById('barB'), barC=document.getElementById('barC');
+    const summaryText=document.getElementById('summaryText');
+
+    function updateHUD(){
+      const total = state.r1 + state.r2 + state.r3;
+      trustTotal.textContent = total;
+      m1.textContent = state.completed[0] ? `${state.r1}分` : '待决策';
+      m2.textContent = state.completed[1] ? `${state.r2}分` : '待决策';
+      m3.textContent = state.completed[2] ? `${state.r3}分` : '待决策';
+
+      m1.className = 'v ' + (state.completed[0] ? (state.r1>=80?'ok':state.r1>=50?'warn':'bad') : '');
+      m2.className = 'v ' + (state.completed[1] ? (state.r2>=80?'ok':state.r2>=50?'warn':'bad') : '');
+      m3.className = 'v ' + (state.completed[2] ? (state.r3>=80?'ok':state.r3>=50?'warn':'bad') : '');
+
+      const a = Math.round((state.r1 + state.r3)/2);
+      const b = state.r2;
+      const c = Math.round((state.r1 + state.r2 + state.r3)/3);
+      barA.style.width = a + '%';
+      barB.style.width = b + '%';
+      barC.style.width = c + '%';
+
+      if(state.completed.every(Boolean)){
+        let rank = total>=255 ? 'A 级：你给出了一套“可追溯、可落地、可解释”的换轨方案。' :
+                   total>=190 ? 'B 级：决策基本稳健，但个别锚点仍可更严谨。' :
+                   'C 级：你推进了流程，但证据锚定与统计合规仍有风险。';
+        summaryText.innerHTML =
+          `结算完成：总分 <b>${total}/300</b>。${rank}<br>` +
+          `你最终采用了以 <b>attention</b> 为核心的架构判断，并围绕 <b>WMT / BLEU / best / our model / training cost / generalizes to other tasks</b> 完成了全链路陈述。`;
+      }else{
+        summaryText.textContent = '等待三轮结束后生成结算。你需要让 every claim 与来源文本逐项对齐。';
+      }
+    }
+
+    // ROUND 1: switch + drag/select
+    const archSwitch = document.getElementById('archSwitch');
+    archSwitch.querySelectorAll('button').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        archSwitch.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        state.arch = btn.dataset.arch;
+      });
+    });
+
+    const chips = [...document.querySelectorAll('#chipsR1 .chip')];
+    const slots = [...document.querySelectorAll('#slotsR1 .slot')];
+
+    function placeChipToSlot(chip, slot){
+      const idx = +slot.dataset.index;
+      // if chip already in another slot, clear it first
+      for(let i=0;i<state.slots.length;i++){
+        if(state.slots[i]===chip.dataset.id){
+          state.slots[i]=null;
+          slots[i].textContent = `批准槽 ${i+1}`;
+          slots[i].classList.remove('filled');
+        }
+      }
+      state.slots[idx]=chip.dataset.id;
+      slot.textContent = chip.textContent;
+      slot.classList.add('filled');
+    }
+
+    chips.forEach(ch=>{
+      ch.addEventListener('dragstart', e=>{
+        e.dataTransfer.setData('text/plain', ch.dataset.id);
+      });
+      ch.addEventListener('click', ()=>{
+        chips.forEach(c=>c.classList.remove('selected'));
+        ch.classList.add('selected');
+        state.selectedChip = ch.dataset.id;
+      });
+    });
+
+    slots.forEach(slot=>{
+      slot.addEventListener('dragover', e=>e.preventDefault());
+      slot.addEventListener('drop', e=>{
+        e.preventDefault();
+        const id = e.dataTransfer.getData('text/plain');
+        const chip = chips.find(c=>c.dataset.id===id);
+        if(chip) placeChipToSlot(chip, slot);
+      });
+      slot.addEventListener('click', ()=>{
+        if(!state.selectedChip) return;
+        const chip = chips.find(c=>c.dataset.id===state.selectedChip);
+        if(chip) placeChipToSlot(chip, slot);
+      });
+    });
+
+    function setFeedback(el, msg, good=null){
+      el.textContent = msg;
+      el.classList.remove('good','bad');
+      if(good===true) el.classList.add('good');
+      if(good===false) el.classList.add('bad');
+    }
+
+    document.getElementById('submitR1').addEventListener('click', ()=>{
+      const fb = document.getElementById('fb1');
+      const must = ['solely_attention','no_rec_conv','dual_gain'];
+      const hasMust = must.every(m=>state.slots.includes(m));
+      const hasBad = state.slots.includes('unknown_hypers');
+      let score=0;
+      if(state.arch==='transformer') score += 45;
+      if(hasMust) score += 45;
+      if(state.slots.includes('best_connect')) score += 10;
+      if(hasBad) score -= 25;
+      if(score<0) score=0;
+      if(score>100) score=100;
+      state.r1 = score; state.completed[0]=true;
+      if(score>=80){
+        setFeedback(fb, '✅ 架构批准通过：你明确锚定“based solely on attention”与“dispensing with recurrence and convolutions entirely”，且未越界造数。', true);
+      }else{
+        setFeedback(fb, '⚠️ 证据链不足：请优先使用 attention-only、去除 recurrence/convolutions、以及质量+训练效率双提升。', false);
+      }
+      updateHUD();
+    });
+
+    document.getElementById('resetR1').addEventListener('click', ()=>{
+      state.slots=[null,null,null];
+      state.selectedChip=null;
+      chips.forEach(c=>c.classList.remove('selected'));
+      slots.forEach((s,i)=>{s.textContent=`批准槽 ${i+1}`; s.classList.remove('filled')});
+      archSwitch.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+      state.arch=null;
+      setFeedback(document.getElementById('fb1'),'等待你的架构口令…');
+    });
+
+    // ROUND 2: sliders + toggles
+    const gpu = document.getElementById('gpu');
+    const days = document.getElementById('days');
+    gpu.addEventListener('input',()=>document.getElementById('gpuVal').textContent=gpu.value);
+    days.addEventListener('input',()=>document.getElementById('dayVal').textContent=days.value);
+
+    document.getElementById('submitR2').addEventListener('click', ()=>{
+      const fb=document.getElementById('fb2');
+      const c28=document.getElementById('c28').checked;
+      const c41=document.getElementById('c41').checked;
+      const c2=document.getElementById('c2').checked;
+      const cAll=document.getElementById('cAll').checked;
+      const cCost=document.getElementById('cCost').checked;
+      const g=+gpu.value, d=+days.value;
+
+      let score=0;
+      if(g===8) score+=20; else score += Math.max(0, 20 - Math.abs(g-8)*3);
+      if(d===3.5) score+=20; else score += Math.max(0, 20 - Math.abs(d-3.5)*6);
+      if(c28) score+=12;
+      if(c41) score+=12;
+      if(c2) score+=12;
+      if(cCost) score+=14;
+      if(cAll) score-=35; // violates "未披露全部超参数"
+      if(score<0) score=0;
+      if(score>100) score=100;
+
+      state.r2=score; state.completed[1]=true;
+
+      if(score>=80){
+        setFeedback(fb,'✅ 投放与口径合规：你保持“3.5 days on eight GPUs”和“small fraction of training costs”，并避免声称未披露细节。',true);
+      }else{
+        setFeedback(fb,'⚠️ 统计口径有风险：请回到已披露数据（28.4/41.8 BLEU、>2 BLEU、3.5天8卡、small fraction cost）。',false);
+      }
+      updateHUD();
+    });
+
+    document.getElementById('resetR2').addEventListener('click', ()=>{
+      gpu.value=8; days.value=3.5;
+      document.getElementById('gpuVal').textContent='8';
+      document.getElementById('dayVal').textContent='3.5';
+      ['c28','c41','c2','cCost'].forEach(id=>document.getElementById(id).checked=true);
+      document.getElementById('cAll').checked=false;
+      setFeedback(document.getElementById('fb2'),'先调整投放，再提交外宣口径。');
+    });
+
+    // ROUND 3: timeline + matching
+    const timelineTexts = [
+      '“We propose ... Transformer, based solely on attention mechanisms.” 你准备把架构理由写进夜间变更单。',
+      '“Our model achieves 28.4 BLEU on WMT 2014 En-De ... 41.8 on WMT 2014 En-Fr.” 大屏等待你确认指标。',
+      '“We show that the Transformer generalizes well to other tasks ... English constituency parsing.” 你决定外扩边界。'
+    ];
+    document.querySelectorAll('#timeline button').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        document.querySelectorAll('#timeline button').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('sceneLine').textContent = timelineTexts[+btn.dataset.t];
+      });
+    });
+
+    const claimData = [
+      {id:'c1', text:'主张A：our model 在 WMT 2014 English-to-German 达到 28.4 BLEU，并超过 existing best（含 ensembles）2+ BLEU。'},
+      {id:'c2', text:'主张B：WMT 2014 English-to-French 单模型 41.8 BLEU，训练 3.5 days on eight GPUs，training cost 是 best models 的 small fraction。'},
+      {id:'c3', text:'主张C：Transformer generalizes to other tasks，已成功用于 English constituency parsing（large/limited data）。'}
+    ];
+    const eviData = [
+      {id:'e1', text:'证据1：“Our model achieves 28.4 BLEU on the WMT 2014 English-to-German ... improving ... by over 2 BLEU.”', to:'c1'},
+      {id:'e2', text:'证据2：“41.8 ... after training for 3.5 days on eight GPUs, a small fraction of training costs.”', to:'c2'},
+      {id:'e3', text:'证据3：“generalizes well to other tasks ... English constituency parsing ... large and limited training data.”', to:'c3'},
+      {id:'e4', text:'干扰项：已公开全部超参数和工程细节。', to:null},
+      {id:'e5', text:'干扰项：在 WMT 外所有任务都达到 SOTA。', to:null}
+    ];
+
+    const claimsBox=document.getElementById('claims');
+    const evisBox=document.getElementById('evis');
+
+    claimData.forEach(c=>{
+      const d=document.createElement('div');
+      d.className='claim'; d.dataset.id=c.id; d.textContent=c.text;
+      claimsBox.appendChild(d);
+    });
+    eviData.forEach(e=>{
+      const d=document.createElement('div');
+      d.className='evi'; d.dataset.id=e.id; d.dataset.to=e.to; d.textContent=e.text;
+      evisBox.appendChild(d);
+    });
+
+    function renderPairLog(){
+      const entries = Object.entries(state.pairs);
+      const log = document.getElementById('pairLog');
+      if(!entries.length){ log.textContent='配对记录：暂无'; return; }
+      log.textContent = '配对记录：' + entries.map(([c,e])=>`${c}→${e}`).join(' | ');
+    }
+
+    claimsBox.addEventListener('click',(e)=>{
+      const claim=e.target.closest('.claim'); if(!claim || claim.classList.contains('done')) return;
+      document.querySelectorAll('.claim').forEach(x=>x.classList.remove('active'));
+      claim.classList.add('active');
+      state.selectedClaim = claim.dataset.id;
+    });
+
+    evisBox.addEventListener('click',(e)=>{
+      const ev=e.target.closest('.evi'); if(!ev || ev.classList.contains('done') || !state.selectedClaim) return;
+      state.pairs[state.selectedClaim]=ev.dataset.id;
+      document.querySelector(`.claim[data-id="${state.selectedClaim}"]`).classList.add('done');
+      document.querySelector(`.claim[data-id="${state.selectedClaim}"]`).classList.remove('active');
+      ev.classList.add('done');
+      state.selectedClaim=null;
+      renderPairLog();
+    });
+
+    document.getElementById('submitR3').addEventListener('click', ()=>{
+      const fb=document.getElementById('fb3');
+      if(Object.keys(state.pairs).length<3){
+        setFeedback(fb,'⚠️ 你还没完成 3 组配对。',false); return;
+      }
+      let score=0;
+      for(const c of claimData){
+        const picked = state.pairs[c.id];
+        const ev = eviData.find(x=>x.id===picked);
+        if(ev && ev.to===c.id) score += 33;
+      }
+      if(score>100) score=100;
+      state.r3=score; state.completed[2]=true;
+      if(score>=85){
+        setFeedback(fb,'✅ 外扩边界清晰：你把 WMT-BLEU 与 generalizes to other tasks 的证据链完整闭环。',true);
+      }else{
+        setFeedback(fb,'⚠️ 证据配对错误：请确保每条主张都对应原文可追溯句。',false);
+      }
+      updateHUD();
+    });
+
+    document.getElementById('resetR3').addEventListener('click', ()=>{
+      state.pairs={}; state.selectedClaim=null;
+      document.querySelectorAll('.claim,.evi').forEach(x=>{x.classList.remove('active','done')});
+      renderPairLog();
+      setFeedback(document.getElementById('fb3'),'点击左侧主张，再点击右侧证据完成连线。');
+    });
+
+    updateHUD();
+  </script>
+</body>
+</html>

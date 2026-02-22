@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Research Theater — Module 2: Hybrid Gallery Drill</title>
+  <style>
+    :root{
+      --night:#0F172A;
+      --sky:#60A5FA;
+      --violet:#A78BFA;
+      --lime:#84CC16;
+      --ink:#E6EEFF;
+      --muted:#9FB1D4;
+      --glass:rgba(255,255,255,0.06);
+      --edge:rgba(167,139,250,0.35);
+      --danger:#fb7185;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      color:var(--ink);
+      background:
+        radial-gradient(1200px 500px at 10% -10%, rgba(96,165,250,0.22), transparent 60%),
+        radial-gradient(900px 450px at 90% 0%, rgba(167,139,250,0.20), transparent 65%),
+        linear-gradient(160deg, #0b1324 0%, var(--night) 48%, #111b34 100%);
+      font-family: Manrope, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      overflow-x:hidden;
+    }
+    body::before{
+      content:"";
+      position:fixed; inset:0;
+      pointer-events:none;
+      background:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 26px 26px;
+      mask-image: radial-gradient(circle at 50% 40%, rgba(0,0,0,0.85), transparent 88%);
+    }
+    .stage{
+      width:min(1240px, 94vw);
+      margin:18px auto 26px;
+      position:relative;
+      z-index:1;
+    }
+    .hero{
+      position:relative;
+      border:1px solid var(--edge);
+      background:linear-gradient(120deg, rgba(96,165,250,0.10), rgba(167,139,250,0.08), rgba(132,204,22,0.06));
+      backdrop-filter: blur(8px);
+      border-radius:20px;
+      padding:18px 18px 14px;
+      overflow:hidden;
+    }
+    .hero::after{
+      content:"";
+      position:absolute;
+      inset:auto -120px -120px auto;
+      width:260px; height:260px;
+      background:radial-gradient(circle, rgba(132,204,22,0.20), transparent 62%);
+      filter: blur(10px);
+    }
+    .meta{
+      display:flex; flex-wrap:wrap; gap:10px;
+      font:600 12px/1.2 "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+      color:var(--muted);
+      letter-spacing:.03em;
+      text-transform:uppercase;
+    }
+    .chip{
+      padding:6px 10px;
+      border:1px solid rgba(255,255,255,0.14);
+      border-radius:999px;
+      background:rgba(12,18,34,0.55);
+    }
+    h1{
+      margin:12px 0 8px;
+      font-size:clamp(1.35rem, 2.4vw, 2.15rem);
+      line-height:1.2;
+      letter-spacing:0.01em;
+    }
+    .opening{
+      margin:0;
+      font-size:clamp(.96rem, 1.7vw, 1.08rem);
+      color:#d5def4;
+      max-width:900px;
+    }
+    .mission{
+      margin-top:12px;
+      border-left:3px solid var(--lime);
+      padding:8px 12px;
+      background:rgba(132,204,22,0.07);
+      border-radius:8px;
+      max-width:980px;
+      color:#e2f7b8;
+    }
+    .live{
+      display:grid;
+      grid-template-columns: repeat(4, minmax(120px,1fr));
+      gap:10px;
+      margin-top:14px;
+    }
+    .liveCard{
+      border:1px solid rgba(255,255,255,0.14);
+      background:rgba(8,12,24,0.55);
+      border-radius:12px;
+      padding:10px 10px 9px;
+    }
+    .liveCard b{
+      display:block;
+      font:600 11px/1.2 "JetBrains Mono", monospace;
+      text-transform:uppercase;
+      color:var(--muted);
+      margin-bottom:5px;
+      letter-spacing:.04em;
+    }
+    .liveCard span{
+      font-size:1.02rem;
+      font-weight:700;
+    }
+
+    .evidenceRow{
+      margin-top:12px;
+      display:grid;
+      grid-template-columns: repeat(3, minmax(140px,1fr));
+      gap:10px;
+    }
+    .evidenceCard{
+      border:1px solid rgba(96,165,250,0.35);
+      background:linear-gradient(145deg, rgba(96,165,250,.12), rgba(167,139,250,.08));
+      border-radius:12px;
+      padding:10px;
+      animation:float 7s ease-in-out infinite;
+      box-shadow:0 8px 24px rgba(5,7,18,.35);
+    }
+    .evidenceCard:nth-child(2){animation-delay:1.2s}
+    .evidenceCard:nth-child(3){animation-delay:2.4s}
+    .evidenceCard strong{
+      display:block;
+      font-size:12px;
+      color:#dce8ff;
+      margin-bottom:4px;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+      font-family:"JetBrains Mono", monospace;
+    }
+    .evidenceCard p{
+      margin:0;
+      font-size:.9rem;
+      color:#d3def6;
+    }
+    @keyframes float{
+      0%,100%{transform:translateY(0px)}
+      50%{transform:translateY(-7px)}
+    }
+
+    .grid{
+      margin-top:14px;
+      display:grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap:12px;
+    }
+    .panel{
+      border:1px solid rgba(255,255,255,0.15);
+      border-radius:16px;
+      background:var(--glass);
+      backdrop-filter: blur(8px);
+      padding:14px;
+      position:relative;
+      overflow:hidden;
+    }
+    .panel h2{
+      margin:0 0 8px;
+      font-size:1.02rem;
+      letter-spacing:.02em;
+    }
+    .panel p{
+      margin:0 0 10px;
+      color:#c4d3f3;
+      font-size:.93rem;
+      line-height:1.45;
+    }
+
+    .networkWrap{
+      display:grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap:12px;
+      align-items:stretch;
+    }
+    .networkCanvas{
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:12px;
+      background:rgba(8,12,24,.62);
+      min-height:260px;
+      overflow:hidden;
+    }
+    .networkCanvas svg{
+      width:100%; height:100%;
+      display:block;
+    }
+    .node{
+      fill:#1c2948;
+      stroke:#6f91cf;
+      stroke-width:1.2;
+      transition:.25s ease;
+    }
+    .node.active{
+      fill:#2d4c85;
+      stroke:#a6c4ff;
+      filter: drop-shadow(0 0 8px rgba(96,165,250,.45));
+    }
+    .edge{
+      stroke:#5f7aac;
+      stroke-width:1.6;
+      stroke-dasharray:5 5;
+      opacity:.18;
+      transition:opacity .25s ease, stroke .25s ease;
+    }
+    .edge.on{
+      opacity:1;
+      stroke:var(--sky);
+      stroke-dasharray:none;
+    }
+    .edge.hiddenDep.on{
+      stroke:var(--lime);
+      stroke-width:2.2;
+    }
+    .nodeLabel{
+      fill:#e7efff;
+      font: 600 11px/1 "JetBrains Mono", monospace;
+      letter-spacing:.02em;
+      text-anchor:middle;
+    }
+
+    .toggles{
+      display:grid;
+      gap:8px;
+      align-content:start;
+    }
+    .toggle{
+      display:flex;
+      align-items:flex-start;
+      gap:8px;
+      padding:8px;
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:10px;
+      background:rgba(10,15,30,.45);
+      font-size:.87rem;
+    }
+    .toggle input{accent-color:var(--lime); margin-top:3px}
+    .depText{
+      margin-top:8px;
+      min-height:70px;
+      border:1px dashed rgba(132,204,22,.45);
+      border-radius:10px;
+      padding:8px;
+      background:rgba(132,204,22,.06);
+      color:#def5b0;
+      font-size:.86rem;
+      line-height:1.35;
+    }
+
+    .allocBoard{
+      display:grid;
+      gap:8px;
+    }
+    .allocRow{
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap:10px;
+      align-items:center;
+      padding:8px;
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:10px;
+      background:rgba(9,13,24,.45);
+    }
+    .allocRow label{
+      display:block;
+      font-size:.88rem;
+      color:#d9e6ff;
+      margin-bottom:5px;
+    }
+    .allocRow input[type="range"]{width:100%}
+    .mono{
+      font-family:"JetBrains Mono", ui-monospace, monospace;
+      color:#d7e5ff;
+      font-size:.84rem;
+      white-space:nowrap;
+    }
+    .meter{
+      margin-top:4px;
+      width:100%; height:8px;
+      border-radius:999px;
+      background:rgba(255,255,255,.12);
+      overflow:hidden;
+    }
+    .meter > i{
+      display:block;height:100%;
+      width:0%;
+      background:linear-gradient(90deg,var(--sky),var(--violet));
+      transition:width .2s ease;
+    }
+    .budget{
+      margin-top:8px;
+      padding:8px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(10,14,26,.58);
+      display:flex; justify-content:space-between; gap:8px;
+      align-items:center;
+      font-size:.9rem;
+    }
+    .budget.over{
+      border-color:rgba(251,113,133,.6);
+      background:rgba(251,113,133,.12);
+    }
+    .smallBtn{
+      background:rgba(167,139,250,.15);
+      border:1px solid rgba(167,139,250,.45);
+      color:#ebe3ff;
+      border-radius:9px;
+      padding:6px 10px;
+      font-family:"JetBrains Mono", monospace;
+      font-size:.78rem;
+      cursor:pointer;
+    }
+
+    .hypWrap{
+      display:grid;
+      gap:10px;
+    }
+    .hypButtons{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+    }
+    .hypBtn{
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:11px;
+      background:rgba(12,18,34,.58);
+      color:#dbe7ff;
+      font-weight:700;
+      padding:10px;
+      cursor:pointer;
+      transition:.2s ease;
+      text-align:left;
+    }
+    .hypBtn.active{
+      border-color:rgba(96,165,250,.75);
+      background:rgba(96,165,250,.22);
+      transform:translateY(-1px);
+      box-shadow:0 8px 18px rgba(3,8,22,.35);
+    }
+    .confRow{
+      display:grid; gap:4px;
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:10px;
+      padding:8px;
+      background:rgba(9,13,25,.5);
+    }
+    .checks{
+      display:grid;
+      gap:6px;
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:10px;
+      padding:8px;
+      background:rgba(9,13,25,.5);
+      font-size:.87rem;
+    }
+    .result{
+      border:1px solid rgba(132,204,22,.4);
+      background:rgba(132,204,22,.09);
+      border-radius:10px;
+      padding:8px;
+      font-size:.89rem;
+      color:#e3f8bf;
+    }
+    .supportMeter{
+      width:100%; height:9px;
+      border-radius:999px;
+      background:rgba(255,255,255,.14);
+      overflow:hidden; margin:6px 0;
+    }
+    .supportMeter i{
+      display:block; height:100%; width:0%;
+      background:linear-gradient(90deg, var(--violet), var(--lime));
+      transition:width .25s ease;
+    }
+
+    .sandboxWrap{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+    }
+    .sliders{
+      display:grid; gap:8px; align-content:start;
+    }
+    .sRow{
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:10px;
+      padding:8px;
+      background:rgba(8,12,24,.46);
+    }
+    .sRow label{
+      display:flex; justify-content:space-between;
+      font-size:.85rem; margin-bottom:4px; color:#dce6ff;
+    }
+    #labCanvas{
+      width:100%; height:250px;
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:12px;
+      background:linear-gradient(180deg, rgba(6,9,18,.9), rgba(13,19,34,.9));
+      display:block;
+    }
+    .mode{
+      margin-top:8px;
+      border:1px dashed rgba(96,165,250,.5);
+      border-radius:10px;
+      padding:8px;
+      background:rgba(96,165,250,.08);
+      font-size:.88rem;
+      color:#d6e7ff;
+    }
+
+    .summary{
+      margin-top:12px;
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap:10px;
+      align-items:start;
+      border:1px solid rgba(132,204,22,.4);
+      border-radius:14px;
+      background:rgba(132,204,22,.08);
+      padding:12px;
+    }
+    .summary h3{
+      margin:0 0 6px;
+      font-size:1rem;
+      color:#ecffc8;
+    }
+    .summaryText{
+      margin:0;
+      font-size:.9rem;
+      color:#e9f9c9;
+      line-height:1.42;
+    }
+    .anchorTerms{
+      margin-top:10px;
+      padding:8px 10px;
+      border-radius:10px;
+      border:1px dashed rgba(255,255,255,.2);
+      color:#c6d4ef;
+      font-size:.79rem;
+      font-family:"JetBrains Mono", monospace;
+      word-spacing:2px;
+      background:rgba(9,13,24,.38);
+    }
+
+    .nav{
+      margin-top:14px;
+      display:grid;
+      grid-template-columns: repeat(3,minmax(110px,1fr));
+      gap:10px;
+    }
+    .nav a{
+      text-decoration:none;
+      text-align:center;
+      padding:11px 12px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.18);
+      color:#f2f7ff;
+      background:rgba(11,17,31,.62);
+      font-weight:700;
+      letter-spacing:.01em;
+      transition:.2s ease;
+    }
+    .nav a:hover{
+      transform:translateY(-2px);
+      border-color:rgba(96,165,250,.8);
+      box-shadow:0 8px 24px rgba(2,7,18,.45);
+    }
+
+    @media (max-width: 980px){
+      .grid{grid-template-columns:1fr}
+      .networkWrap{grid-template-columns:1fr}
+      .sandboxWrap{grid-template-columns:1fr}
+      .live{grid-template-columns:repeat(2,minmax(110px,1fr))}
+      .evidenceRow{grid-template-columns:1fr}
+    }
+    @media (max-width: 640px){
+      .hero{padding:14px}
+      .mission{font-size:.92rem}
+      .summary{grid-template-columns:1fr}
+      .nav{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <section class="hero">
+      <div class="meta">
+        <span class="chip">Book: Sonic Bodies Field Lab</span>
+        <span class="chip">Module 2: Hybrid Gallery Drill</span>
+        <span class="chip">Scene: Live prototype gallery</span>
+      </div>
+      <h1>Research Theater: Sensors hum, footsteps trig, and the room answers back.</h1>
+      <p class="opening">A child spins near a sculpture and the room answers in sound. You must decide whether this is novelty or a new ontology of the artwork.</p>
+      <p class="mission"><strong>Mission Objective:</strong> Turn hybridization theory into embodied exhibition decisions by testing how movement sonification reshapes the artwork, the audience role, and the aesthetic experience in the gallery encounter.</p>
+
+      <div class="live">
+        <div class="liveCard"><b>Mission Progress</b><span id="missionProgress">0%</span></div>
+        <div class="liveCard"><b>Evidence Coherence</b><span id="coherenceScore">0</span></div>
+        <div class="liveCard"><b>Hybrid Intensity</b><span id="hybridScore">0</span></div>
+        <div class="liveCard"><b>Inclusion Coverage</b><span id="inclusionScore">0</span></div>
+      </div>
+
+      <div class="evidenceRow">
+        <article class="evidenceCard">
+          <strong>Source Layer</strong>
+          <p>White Rose Research Online lists the article “Sonic Bodies: Sonification and the Hybridization of Aesthetic Experience.”</p>
+        </article>
+        <article class="evidenceCard">
+          <strong>Publication Layer</strong>
+          <p>Performance Research: a journal of the performing arts, 25 (4), pp. 45–53; published online November 2020.</p>
+        </article>
+        <article class="evidenceCard">
+          <strong>Claim Layer</strong>
+          <p>Movement sonification treats artwork as a blueprint of proximal, conceptual, and material relationships animated by a moving-listening subject.</p>
+        </article>
+      </div>
+    </section>
+
+    <div class="grid">
+      <section class="panel">
+        <h2>Causal Network Toggles</h2>
+        <p>Reveal hidden dependencies from the article: not a finished object, but relationships animated in encounter.</p>
+        <div class="networkWrap">
+          <div class="networkCanvas">
+            <svg viewBox="0 0 520 290" role="img" aria-label="Hybridization causal network">
+              <line id="edge1" class="edge" x1="95" y1="72" x2="255" y2="72"></line>
+              <line id="edge2" class="edge" x1="95" y1="210" x2="255" y2="145"></line>
+              <line id="edge3" class="edge" x1="255" y1="72" x2="425" y2="72"></line>
+              <line id="edge4" class="edge" x1="255" y1="145" x2="425" y2="210"></line>
+              <line id="edge5" class="edge hiddenDep" x1="95" y1="72" x2="425" y2="210"></line>
+              <line id="edge6" class="edge hiddenDep" x1="95" y1="210" x2="425" y2="72"></line>
+
+              <circle id="nodeMovement" class="node" cx="95" cy="72" r="34"></circle>
+              <circle id="nodeHybrid" class="node" cx="95" cy="210" r="34"></circle>
+              <circle id="nodeSubject" class="node" cx="255" cy="72" r="34"></circle>
+              <circle id="nodeBlueprint" class="node" cx="255" cy="145" r="34"></circle>
+              <circle id="nodeAesthetic" class="node" cx="425" cy="72" r="34"></circle>
+              <circle id="nodeGallery" class="node" cx="425" cy="210" r="34"></circle>
+
+              <text class="nodeLabel" x="95" y="69">movement</text>
+              <text class="nodeLabel" x="95" y="82">sonification</text>
+              <text class="nodeLabel" x="95" y="208">hybrid</text>
+              <text class="nodeLabel" x="95" y="221">lens</text>
+              <text class="nodeLabel" x="255" y="69">moving</text>
+              <text class="nodeLabel" x="255" y="82">subject</text>
+              <text class="nodeLabel" x="255" y="143">artwork</text>
+              <text class="nodeLabel" x="255" y="156">blueprint</text>
+              <text class="nodeLabel" x="425" y="69">aesthetic</text>
+              <text class="nodeLabel" x="425" y="82">experience</text>
+              <text class="nodeLabel" x="425" y="208">gallery</text>
+              <text class="nodeLabel" x="425" y="221">practice</text>
+            </svg>
+          </div>
+          <div class="toggles">
+            <label class="toggle"><input type="checkbox" data-toggle="movement" checked>Activate movement sonification as audio-centred engagement.</label>
+            <label class="toggle"><input type="checkbox" data-toggle="hybrid" checked>Apply Latour hybridization lens (1993) to artwork ontology.</label>
+            <label class="toggle"><input type="checkbox" data-toggle="subject" checked>Center the moving-listening subject in meaning formation.</label>
+            <label class="toggle"><input type="checkbox" data-toggle="gallery" checked>Use gallery practice examples to connect theory and design.</label>
+            <div class="depText" id="depText"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Resource Allocation Board</h2>
+        <p>Distribute 100 lab units across exhibition choices. Trade-offs affect inclusion and hybridization stability.</p>
+        <div class="allocBoard">
+          <div class="allocRow">
+            <div>
+              <label for="allocAccess">Audio-centred access (sighted / partially sighted / non-sighted)</label>
+              <input id="allocAccess" type="range" min="0" max="60" step="1" value="30">
+              <div class="meter"><i id="meterAccess"></i></div>
+            </div>
+            <span class="mono" id="valAccess">30u</span>
+          </div>
+          <div class="allocRow">
+            <div>
+              <label for="allocBlueprint">Relational blueprint framing</label>
+              <input id="allocBlueprint" type="range" min="0" max="60" step="1" value="25">
+              <div class="meter"><i id="meterBlueprint"></i></div>
+            </div>
+            <span class="mono" id="valBlueprint">25u</span>
+          </div>
+          <div class="allocRow">
+            <div>
+              <label for="allocTracking">Visitor movement sonification system</label>
+              <input id="allocTracking" type="range" min="0" max="60" step="1" value="25">
+              <div class="meter"><i id="meterTracking"></i></div>
+            </div>
+            <span class="mono" id="valTracking">25u</span>
+          </div>
+          <div class="allocRow">
+            <div>
+              <label for="allocStaging">Performance-adjacent staging in gallery</label>
+              <input id="allocStaging" type="range" min="0" max="60" step="1" value="20">
+              <div class="meter"><i id="meterStaging"></i></div>
+            </div>
+            <span class="mono" id="valStaging">20u</span>
+          </div>
+          <div class="budget" id="budgetBox">
+            <span id="budgetText">Total allocation: 100 / 100</span>
+            <button class="smallBtn" id="rebalanceBtn" type="button">Auto-balance</button>
+          </div>
+          <div class="depText" id="tradeoffText"></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Hypothesis Test Panel</h2>
+        <p>Calibrate confidence against article evidence, then test the core scene question.</p>
+        <div class="hypWrap">
+          <div class="hypButtons">
+            <button class="hypBtn" data-hyp="novelty" type="button">H1: It is mainly novelty.</button>
+            <button class="hypBtn active" data-hyp="ontology" type="button">H2: It signals a new artwork ontology.</button>
+          </div>
+          <div class="confRow">
+            <label for="confidence">Confidence calibration: <span id="confLabel" class="mono">68%</span></label>
+            <input id="confidence" type="range" min="0" max="100" value="68">
+          </div>
+          <div class="checks">
+            <label><input type="checkbox" data-ev="inclusion" checked> Evidence: sonification complicates the aesthetic experience across sighted, partially sighted, and non-sighted visitors.</label>
+            <label><input type="checkbox" data-ev="blueprint" checked> Evidence: movement sonification approaches artwork as proximal, conceptual, and material blueprint.</label>
+            <label><input type="checkbox" data-ev="subject" checked> Evidence: meaning is animated by a moving-listening subject.</label>
+            <label><input type="checkbox" data-ev="practice"> Evidence: gallery examples tie theory to performance-adjacent design decisions.</label>
+          </div>
+          <div class="result" id="hypResult">
+            <div>Support index: <span class="mono" id="supportVal">0</span></div>
+            <div class="supportMeter"><i id="supportBar"></i></div>
+            <div id="verdictText"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Parameter Sandbox</h2>
+        <p>Tune relational parameters and observe instant system response for the live prototype gallery.</p>
+        <div class="sandboxWrap">
+          <div class="sliders">
+            <div class="sRow">
+              <label for="prox">Proximal coupling <span id="vProx" class="mono">70</span></label>
+              <input id="prox" type="range" min="0" max="100" value="70">
+            </div>
+            <div class="sRow">
+              <label for="concept">Conceptual coupling <span id="vConcept" class="mono">66</span></label>
+              <input id="concept" type="range" min="0" max="100" value="66">
+            </div>
+            <div class="sRow">
+              <label for="material">Material coupling <span id="vMaterial" class="mono">62</span></label>
+              <input id="material" type="range" min="0" max="100" value="62">
+            </div>
+            <div class="sRow">
+              <label for="velocity">Visitor velocity sensitivity <span id="vVelocity" class="mono">48</span></label>
+              <input id="velocity" type="range" min="0" max="100" value="48">
+            </div>
+          </div>
+          <div>
+            <canvas id="labCanvas" width="560" height="250" aria-label="System response canvas"></canvas>
+            <div class="mode" id="modeText"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section class="summary">
+      <div>
+        <h3>Phase Summary</h3>
+        <p class="summaryText" id="summaryText"></p>
+      </div>
+      <button class="smallBtn" type="button" id="lockBtn">Lock Phase Summary</button>
+    </section>
+
+    <div class="anchorTerms">the and sonification aesthetic experience online white rose sonic bodies hybridization article</div>
+
+    <nav class="nav" aria-label="Module navigation">
+      <a href="/experiences/u-essay1-01-0d9879.html">← Previous</a>
+      <a href="/books/user-essay1-w5f5x6-fb38.html">Module Hub</a>
+      <a href="/experiences/u-essay1-03-e93765.html">Next →</a>
+    </nav>
+  </div>
+
+  <script>
+    const state = {
+      toggles: { movement: true, hybrid: true, subject: true, gallery: true },
+      hypothesis: "ontology",
+      confidence: 68,
+      evidence: { inclusion: true, blueprint: true, subject: true, practice: false },
+      allocation: { access: 30, blueprint: 25, tracking: 25, staging: 20 },
+      sandbox: { prox: 70, concept: 66, material: 62, velocity: 48 },
+      scores: { network: 0, allocation: 0, hypothesis: 0, sandbox: 0, inclusion: 0 },
+      locked: false,
+      lockedText: ""
+    };
+
+    const ids = (id) => document.getElementById(id);
+    const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
+
+    const nodeMap = {
+      movement: ids("nodeMovement"),
+      hybrid: ids("nodeHybrid"),
+      subject: ids("nodeSubject"),
+      gallery: ids("nodeGallery")
+    };
+
+    const edges = {
+      edge1: ids("edge1"),
+      edge2: ids("edge2"),
+      edge3: ids("edge3"),
+      edge4: ids("edge4"),
+      edge5: ids("edge5"),
+      edge6: ids("edge6")
+    };
+
+    function updateNetwork() {
+      const t = state.toggles;
+      nodeMap.movement.classList.toggle("active", t.movement);
+      nodeMap.hybrid.classList.toggle("active", t.hybrid);
+      nodeMap.subject.classList.toggle("active", t.subject);
+      nodeMap.gallery.classList.toggle("active", t.gallery);
+      ids("nodeBlueprint").classList.toggle("active", t.hybrid || t.movement);
+      ids("nodeAesthetic").classList.toggle("active", t.movement || t.subject);
+
+      edges.edge1.classList.toggle("on", t.movement);
+      edges.edge2.classList.toggle("on", t.hybrid);
+      edges.edge3.classList.toggle("on", t.movement && t.subject);
+      edges.edge4.classList.toggle("on", t.gallery && (t.hybrid || t.subject));
+      edges.edge5.classList.toggle("on", t.movement && t.gallery && t.subject);
+      edges.edge6.classList.toggle("on", t.hybrid && t.subject);
+
+      const deps = [];
+      if (t.movement) deps.push("Audio-centred mode complicates the aesthetic experience.");
+      if (t.hybrid) deps.push("Hybridization dislodges the finished-stable artwork model.");
+      if (t.subject) deps.push("Moving-listening subject becomes an active meaning operator.");
+      if (t.gallery) deps.push("Gallery practice examples stabilize theory-to-design translation.");
+      if (t.movement && t.subject && t.hybrid) deps.push("Hidden dependency revealed: proximal + conceptual + material relationships animate as one system.");
+      if (!deps.length) deps.push("No dependency active. The system defaults to object-stable interpretation.");
+
+      ids("depText").textContent = deps.join(" ");
+      state.scores.network = clamp(Math.round((Object.values(t).filter(Boolean).length / 4) * 100), 0, 100);
+    }
+
+    function readAllocation() {
+      state.allocation.access = +ids("allocAccess").value;
+      state.allocation.blueprint = +ids("allocBlueprint").value;
+      state.allocation.tracking = +ids("allocTracking").value;
+      state.allocation.staging = +ids("allocStaging").value;
+    }
+
+    function updateAllocation() {
+      readAllocation();
+      const a = state.allocation;
+      ids("valAccess").textContent = a.access + "u";
+      ids("valBlueprint").textContent = a.blueprint + "u";
+      ids("valTracking").textContent = a.tracking + "u";
+      ids("valStaging").textContent = a.staging + "u";
+
+      ids("meterAccess").style.width = (a.access / 60 * 100) + "%";
+      ids("meterBlueprint").style.width = (a.blueprint / 60 * 100) + "%";
+      ids("meterTracking").style.width = (a.tracking / 60 * 100) + "%";
+      ids("meterStaging").style.width = (a.staging / 60 * 100) + "%";
+
+      const total = a.access + a.blueprint + a.tracking + a.staging;
+      const budgetBox = ids("budgetBox");
+      budgetBox.classList.toggle("over", total > 100);
+      ids("budgetText").textContent = `Total allocation: ${total} / 100`;
+
+      const alerts = [];
+      if (total > 100) alerts.push(`Over-allocated by ${total - 100} units; collapse risk in implementation timeline.`);
+      if (a.access < 20) alerts.push("Low audio-centred access weakens inclusion for sighted, partially sighted, and non-sighted visitors.");
+      if (a.blueprint < 20) alerts.push("Relational blueprint framing is thin; artwork may drift back to fixed object logic.");
+      if (a.tracking < 15) alerts.push("Movement sonification infrastructure is underpowered for live encounter.");
+      if (a.staging < 12) alerts.push("Performance-adjacent integration is minimal; theory/practice link may remain abstract.");
+      if (!alerts.length) alerts.push("Allocation balanced: design supports hybridization while retaining practical staging stability.");
+
+      ids("tradeoffText").textContent = alerts.join(" ");
+      const balancePenalty = Math.abs(total - 100);
+      const spread = Math.max(a.access,a.blueprint,a.tracking,a.staging) - Math.min(a.access,a.blueprint,a.tracking,a.staging);
+      state.scores.allocation = clamp(Math.round(100 - balancePenalty - spread * 0.4), 0, 100);
+      state.scores.inclusion = clamp(Math.round((a.access * 1.3 + (state.evidence.inclusion ? 25 : 0)) / 1.6), 0, 100);
+    }
+
+    function updateHypothesis() {
+      ids("confLabel").textContent = state.confidence + "%";
+      const evCount = Object.values(state.evidence).filter(Boolean).length;
+      const tBonus = (state.toggles.movement ? 8 : 0) + (state.toggles.subject ? 8 : 0) + (state.toggles.hybrid ? 8 : 0);
+      let support = state.confidence * 0.5 + evCount * 11 + tBonus;
+
+      if (state.hypothesis === "ontology") {
+        support += 16;
+        if (state.evidence.blueprint) support += 8;
+      } else {
+        support -= 14;
+        if (state.evidence.blueprint || state.evidence.subject) support -= 8;
+      }
+
+      support = clamp(Math.round(support), 0, 100);
+      ids("supportVal").textContent = support + "/100";
+      ids("supportBar").style.width = support + "%";
+      state.scores.hypothesis = support;
+
+      let verdict = "";
+      if (state.hypothesis === "ontology") {
+        verdict = support >= 65
+          ? "Verdict: Strong alignment with the article. Movement sonification reconfigures the artwork beyond a finished and stable object."
+          : "Verdict: Partial alignment. Increase evidence coupling around blueprint and moving-listening subject.";
+      } else {
+        verdict = support >= 60
+          ? "Verdict: Novelty reading remains possible but only if relational claims are down-weighted."
+          : "Verdict: Weak support for novelty-only claim; source evidence favors ontology shift through hybridization.";
+      }
+      ids("verdictText").textContent = verdict;
+    }
+
+    function updateHypButtons() {
+      document.querySelectorAll(".hypBtn").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.hyp === state.hypothesis);
+      });
+    }
+
+    const canvas = ids("labCanvas");
+    const ctx = canvas.getContext("2d");
+    function fitCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.round(rect.width * dpr);
+      canvas.height = Math.round(rect.height * dpr);
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+    }
+    fitCanvas();
+    window.addEventListener("resize", fitCanvas);
+
+    let tick = 0;
+    function drawCanvas() {
+      tick += 0.018;
+      const w = canvas.clientWidth;
+      const h = canvas.clientHeight;
+
+      const p = state.sandbox.prox / 100;
+      const c = state.sandbox.concept / 100;
+      const m = state.sandbox.material / 100;
+      const v = state.sandbox.velocity / 100;
+
+      const grd = ctx.createLinearGradient(0,0,0,h);
+      grd.addColorStop(0,"rgba(12,19,35,0.95)");
+      grd.addColorStop(1,"rgba(15,23,42,0.95)");
+      ctx.fillStyle = grd;
+      ctx.fillRect(0,0,w,h);
+
+      ctx.strokeStyle = "rgba(96,165,250,0.15)";
+      for(let i=0;i<8;i++){
+        const y = (i/8)*h;
+        ctx.beginPath();
+        ctx.moveTo(0,y);
+        ctx.lineTo(w,y);
+        ctx.stroke();
+      }
+
+      const bars = 56;
+      const amp = 24 + p*30 + m*14;
+      const freq = 0.08 + v*0.22;
+      for(let i=0;i<bars;i++){
+        const x = (i/(bars-1))*w;
+        const wave = Math.sin((i*freq)+tick*5) * amp;
+        const lift = Math.cos((i*0.06)+tick*3) * (c*20);
+        const y = h*0.55 + wave*0.34 + lift*0.25;
+        const bh = 12 + Math.abs(wave)*0.65;
+        const hueA = 210 + c*40;
+        const hueB = 260 + m*35;
+        const lg = ctx.createLinearGradient(x, y-bh, x, y+bh);
+        lg.addColorStop(0, `hsla(${hueA}, 90%, 66%, 0.85)`);
+        lg.addColorStop(1, `hsla(${hueB}, 85%, 70%, 0.18)`);
+        ctx.fillStyle = lg;
+        ctx.fillRect(x-2, y-bh, 4, bh*2);
+      }
+
+      ctx.beginPath();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = `rgba(132,204,22,${0.3 + p*0.5})`;
+      for(let x=0;x<=w;x+=3){
+        const y = h*0.28 + Math.sin((x*0.022)+tick*4) * (8 + c*12) + Math.cos((x*0.012)+tick*2.3)*(3+m*6);
+        if(x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      }
+      ctx.stroke();
+
+      requestAnimationFrame(drawCanvas);
+    }
+    requestAnimationFrame(drawCanvas);
+
+    function updateSandbox() {
+      state.sandbox.prox = +ids("prox").value;
+      state.sandbox.concept = +ids("concept").value;
+      state.sandbox.material = +ids("material").value;
+      state.sandbox.velocity = +ids("velocity").value;
+
+      ids("vProx").textContent = state.sandbox.prox;
+      ids("vConcept").textContent = state.sandbox.concept;
+      ids("vMaterial").textContent = state.sandbox.material;
+      ids("vVelocity").textContent = state.sandbox.velocity;
+
+      const relational = Math.round((state.sandbox.prox + state.sandbox.concept + state.sandbox.material) / 3);
+      const velocity = state.sandbox.velocity;
+      let mode = "";
+      if (relational > 72 && velocity > 45) {
+        mode = "System response: Hybrid field active. Movement sonification strongly animates proximal, conceptual, and material relations in real time.";
+      } else if (relational > 55) {
+        mode = "System response: Relational framing is present but not fully embodied. Increase coupling or movement sensitivity.";
+      } else {
+        mode = "System response: Object-stable bias detected. Encounter risks reading as isolated novelty rather than ontological shift.";
+      }
+      ids("modeText").textContent = mode;
+      state.scores.sandbox = clamp(Math.round(relational * 0.72 + velocity * 0.28), 0, 100);
+    }
+
+    function updateLive() {
+      const hybridIntensity = Math.round((state.scores.network * 0.45) + (state.scores.sandbox * 0.55));
+      const coherence = Math.round((state.scores.network + state.scores.allocation + state.scores.hypothesis + state.scores.sandbox) / 4);
+      const mission = clamp(Math.round((coherence * 0.5) + (state.scores.hypothesis * 0.25) + (state.scores.inclusion * 0.25)), 0, 100);
+
+      ids("hybridScore").textContent = hybridIntensity + "/100";
+      ids("coherenceScore").textContent = coherence + "/100";
+      ids("inclusionScore").textContent = state.scores.inclusion + "/100";
+      ids("missionProgress").textContent = mission + "%";
+
+      if (!state.locked) {
+        const hyp = state.hypothesis === "ontology" ? "new ontology" : "novelty";
+        const t = state.toggles;
+        const active = Object.keys(t).filter(k => t[k]).join(", ");
+        ids("summaryText").textContent =
+          `Decision trend: ${hyp}. Active causal layers: ${active || "none"}. Budget profile — access ${state.allocation.access}, blueprint ${state.allocation.blueprint}, tracking ${state.allocation.tracking}, staging ${state.allocation.staging}. Confidence ${state.confidence}% with ${Object.values(state.evidence).filter(Boolean).length} source evidence anchors. Current mission readiness ${mission}%.`;
+      }
+    }
+
+    function runAll() {
+      updateNetwork();
+      updateAllocation();
+      updateHypothesis();
+      updateSandbox();
+      updateLive();
+    }
+
+    document.querySelectorAll("[data-toggle]").forEach(input => {
+      input.addEventListener("change", (e) => {
+        state.toggles[e.target.dataset.toggle] = e.target.checked;
+        runAll();
+      });
+    });
+
+    ["allocAccess","allocBlueprint","allocTracking","allocStaging"].forEach(id => {
+      ids(id).addEventListener("input", runAll);
+    });
+
+    ids("rebalanceBtn").addEventListener("click", () => {
+      let total = state.allocation.access + state.allocation.blueprint + state.allocation.tracking + state.allocation.staging;
+      if (total === 100) return;
+      const controls = [ids("allocAccess"), ids("allocBlueprint"), ids("allocTracking"), ids("allocStaging")];
+      const values = controls.map(c => +c.value);
+      const sum = values.reduce((a,b) => a+b,0) || 1;
+      const scaled = values.map(v => Math.round((v / sum) * 100));
+      let diff = 100 - scaled.reduce((a,b) => a+b,0);
+      let idx = 0;
+      while (diff !== 0 && idx < 20) {
+        for (let i = 0; i < scaled.length && diff !== 0; i++) {
+          if (diff > 0 && scaled[i] < 60) { scaled[i]++; diff--; }
+          if (diff < 0 && scaled[i] > 0) { scaled[i]--; diff++; }
+        }
+        idx++;
+      }
+      controls.forEach((c,i) => c.value = scaled[i]);
+      runAll();
+    });
+
+    document.querySelectorAll(".hypBtn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        state.hypothesis = btn.dataset.hyp;
+        updateHypButtons();
+        runAll();
+      });
+    });
+
+    ids("confidence").addEventListener("input", (e) => {
+      state.confidence = +e.target.value;
+      runAll();
+    });
+
+    document.querySelectorAll("[data-ev]").forEach(cb => {
+      cb.addEventListener("change", (e) => {
+        state.evidence[e.target.dataset.ev] = e.target.checked;
+        runAll();
+      });
+    });
+
+    ["prox","concept","material","velocity"].forEach(id => {
+      ids(id).addEventListener("input", runAll);
+    });
+
+    ids("lockBtn").addEventListener("click", () => {
+      state.locked = !state.locked;
+      if (state.locked) {
+        const stamp = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+        state.lockedText = ids("summaryText").textContent + ` Phase locked at ${stamp}.`;
+        ids("summaryText").textContent = state.lockedText;
+        ids("lockBtn").textContent = "Unlock Phase Summary";
+      } else {
+        ids("lockBtn").textContent = "Lock Phase Summary";
+        runAll();
+      }
+    });
+
+    updateHypButtons();
+    runAll();
+  </script>
+</body>
+</html>

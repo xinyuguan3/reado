@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>reado: 数据看板</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at top right, #1f3b66 0%, transparent 40%), #070d16;
+      color: #e4edf8;
+      font-family: "Noto Sans SC", sans-serif;
+    }
+    .analytics-main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+      display: grid;
+      gap: 16px;
+    }
+    .analytics-card {
+      border: 1px solid rgba(148, 163, 184, 0.24);
+      border-radius: 16px;
+      background: rgba(11, 19, 32, 0.75);
+      padding: 16px;
+    }
+    .analytics-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .analytics-kpi {
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.6);
+      padding: 12px;
+    }
+    .analytics-kpi-label {
+      font-size: 12px;
+      color: #94a3b8;
+    }
+    .analytics-kpi-value {
+      margin-top: 8px;
+      font-size: 24px;
+      font-weight: 800;
+      color: #e2e8f0;
+    }
+    .analytics-table-wrap {
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 640px;
+    }
+    th, td {
+      text-align: left;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+      padding: 10px 8px;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+    th {
+      color: #9fb2cc;
+      font-weight: 700;
+      font-size: 12px;
+    }
+    .actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      background: rgba(2, 132, 199, 0.18);
+      color: #dbeafe;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 10px;
+      padding: 7px 12px;
+      cursor: pointer;
+    }
+    .hint {
+      font-size: 12px;
+      color: #94a3b8;
+    }
+    .error {
+      display: none;
+      color: #fecaca;
+      border: 1px solid rgba(248, 113, 113, 0.5);
+      background: rgba(127, 29, 29, 0.28);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 12px;
+    }
+    @media (max-width: 960px) {
+      .analytics-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+    @media (max-width: 640px) {
+      .analytics-main {
+        padding: 16px;
+      }
+      .analytics-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+<script src="/shared/book-catalog.js?v=1771754453141"></script>
+<script type="module" src="/shared/shell.js?v=1771754453141"></script>
+<reado-app-shell data-page="analytics"></reado-app-shell>
+  <main class="analytics-main">
+    <section class="analytics-card">
+      <h1 style="margin:0;font-size:30px;font-weight:900;">运营数据看板</h1>
+      <p style="margin:8px 0 0;color:#94a3b8;font-size:13px;">统计口径：总浏览量（页面 PV）、每本书游玩次数（进入任意模块次数）、每本书平均停留时长。</p>
+      <div class="actions" style="margin-top:14px;">
+        <p id="analytics-updated-at" class="hint">最后更新：--</p>
+        <button id="analytics-refresh" class="btn" type="button">刷新数据</button>
+      </div>
+    </section>
+
+    <section class="analytics-grid">
+      <article class="analytics-kpi">
+        <div class="analytics-kpi-label">总浏览量</div>
+        <div id="kpi-total-page-views" class="analytics-kpi-value">--</div>
+      </article>
+      <article class="analytics-kpi">
+        <div class="analytics-kpi-label">总游玩次数</div>
+        <div id="kpi-total-book-plays" class="analytics-kpi-value">--</div>
+      </article>
+      <article class="analytics-kpi">
+        <div class="analytics-kpi-label">平均停留时长</div>
+        <div id="kpi-average-stay" class="analytics-kpi-value">--</div>
+      </article>
+      <article class="analytics-kpi">
+        <div class="analytics-kpi-label">已跟踪会话数</div>
+        <div id="kpi-tracked-sessions" class="analytics-kpi-value">--</div>
+      </article>
+    </section>
+
+    <section class="analytics-card">
+      <h2 style="margin:0 0 10px;font-size:18px;font-weight:800;">每本书统计</h2>
+      <div class="analytics-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>书名</th>
+              <th>游玩次数</th>
+              <th>平均停留</th>
+              <th>累计停留</th>
+              <th>最近游玩</th>
+            </tr>
+          </thead>
+          <tbody id="analytics-books-body">
+            <tr><td colspan="5" class="hint">加载中...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="analytics-card">
+      <h2 style="margin:0 0 10px;font-size:18px;font-weight:800;">热门页面（Top 20）</h2>
+      <div class="analytics-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>路径</th>
+              <th>浏览次数</th>
+              <th>最近浏览</th>
+            </tr>
+          </thead>
+          <tbody id="analytics-pages-body">
+            <tr><td colspan="3" class="hint">加载中...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <p id="analytics-error" class="error"></p>
+  </main>
+  <script>
+    (() => {
+      const fmt = new Intl.NumberFormat("zh-CN");
+      const updatedAtEl = document.getElementById("analytics-updated-at");
+      const pageViewsEl = document.getElementById("kpi-total-page-views");
+      const bookPlaysEl = document.getElementById("kpi-total-book-plays");
+      const averageStayEl = document.getElementById("kpi-average-stay");
+      const trackedSessionsEl = document.getElementById("kpi-tracked-sessions");
+      const booksBodyEl = document.getElementById("analytics-books-body");
+      const pagesBodyEl = document.getElementById("analytics-pages-body");
+      const errorEl = document.getElementById("analytics-error");
+      const refreshBtnEl = document.getElementById("analytics-refresh");
+
+      function formatTime(isoText) {
+        if (!isoText) return "--";
+        const dt = new Date(isoText);
+        if (Number.isNaN(dt.getTime())) return "--";
+        return dt.toLocaleString("zh-CN", { hour12: false });
+      }
+
+      function formatDuration(ms) {
+        const safe = Number.isFinite(ms) ? Math.max(0, Math.floor(ms)) : 0;
+        if (safe < 1000) return safe + " ms";
+        const sec = safe / 1000;
+        if (sec < 60) return sec.toFixed(1) + " s";
+        const min = Math.floor(sec / 60);
+        const remSec = Math.round(sec % 60);
+        return min + "m " + remSec + "s";
+      }
+
+      function escapeHtml(value) {
+        return String(value || "")
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#39;");
+      }
+
+      function renderRows(summary) {
+        const books = Array.isArray(summary?.books) ? summary.books : [];
+        const pages = Array.isArray(summary?.pages) ? summary.pages : [];
+
+        if (books.length === 0) {
+          booksBodyEl.innerHTML = '<tr><td colspan="5" class="hint">暂无书籍游玩数据。</td></tr>';
+        } else {
+          booksBodyEl.innerHTML = books.map((book) => {
+            return '<tr>'
+              + '<td>' + escapeHtml(book.title || book.id || "--") + '</td>'
+              + '<td>' + fmt.format(Number(book.playCount) || 0) + '</td>'
+              + '<td>' + formatDuration(Number(book.averageStayMs) || 0) + '</td>'
+              + '<td>' + formatDuration(Number(book.durationMs) || 0) + '</td>'
+              + '<td>' + escapeHtml(formatTime(book.lastPlayedAt)) + '</td>'
+              + '</tr>';
+          }).join("");
+        }
+
+        if (pages.length === 0) {
+          pagesBodyEl.innerHTML = '<tr><td colspan="3" class="hint">暂无页面浏览数据。</td></tr>';
+        } else {
+          pagesBodyEl.innerHTML = pages.slice(0, 20).map((page) => {
+            return '<tr>'
+              + '<td>' + escapeHtml(page.path || "--") + '</td>'
+              + '<td>' + fmt.format(Number(page.viewCount) || 0) + '</td>'
+              + '<td>' + escapeHtml(formatTime(page.lastViewedAt)) + '</td>'
+              + '</tr>';
+          }).join("");
+        }
+      }
+
+      async function loadSummary() {
+        if (errorEl) {
+          errorEl.style.display = "none";
+          errorEl.textContent = "";
+        }
+        if (refreshBtnEl) refreshBtnEl.disabled = true;
+        try {
+          const response = await fetch("/api/analytics/summary", { cache: "no-store" });
+          const data = await response.json().catch(() => ({}));
+          if (!response.ok || data?.ok === false) {
+            throw new Error(data?.error || ("Request failed with " + response.status));
+          }
+          const summary = data?.summary || {};
+          pageViewsEl.textContent = fmt.format(Number(summary.totalPageViews) || 0);
+          bookPlaysEl.textContent = fmt.format(Number(summary.totalBookPlays) || 0);
+          averageStayEl.textContent = formatDuration(Number(summary.averageBookStayMs) || 0);
+          trackedSessionsEl.textContent = fmt.format(Number(summary.trackedSessions) || 0);
+          updatedAtEl.textContent = "最后更新：" + formatTime(summary.lastUpdatedAt);
+          renderRows(data);
+        } catch (error) {
+          if (errorEl) {
+            errorEl.textContent = "加载失败：" + (error?.message || "unknown error");
+            errorEl.style.display = "block";
+          }
+        } finally {
+          if (refreshBtnEl) refreshBtnEl.disabled = false;
+        }
+      }
+
+      if (refreshBtnEl) {
+        refreshBtnEl.addEventListener("click", () => {
+          loadSummary();
+        });
+      }
+
+      loadSummary();
+      window.setInterval(loadSummary, 30000);
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Reado: The Eight-GPU Gambit</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#b7821f", // Brass
+                        "background-light": "#f5efe2", // Parchment
+                        "background-dark": "#201b12",
+                        "teal-accent": "#0f766e",
+                        "charcoal": "#1f2937",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "serif": ["'Source Serif 4'", "serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>.parchment-texture {
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuDHlVeYPNZRk1IWACMTYbdp0RDHM16WdI6u4FitKg6-g0yTwGQI37qdaDYf0A_53bUhtU02IzSa6KdAGaZ8Y_RxFqSVxKcxncQqOMNh2PF6tK01l771bKjuZeQpD_pdOQvz3nFg_MnKbPRtCdlbEM80fNI3bX7XeMwPtzdcyWWi2_ITX7WIcMU-Q2qDvoc_2jGdqyaKF4bWZ92V0_awegfopbrlznMDL_EzEZj9tcZ-ICwF8xVYCCB3oi2mLe8ha4ZFvCnezM0nWCM)
+    }
+.grain-overlay {
+    position: relative
+    }
+.grain-overlay::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuD57X5RB0raPyehFSLcSqiSUeEFW01d3D_BcxAyMesM1XX1_Cym0NdtR5asckj0TNoV4UgRoXuV_sFmBin-gjVbsnWYrMWWPEr4OM7wkrunXHm4qd9o7NM8hs32HHaXDQIpicRvCYEeGmEw78ceuHuq7tnf9TK0U2QsANRlMlcdF-cnS-KTJPCyzTaS925_aqOmraSUHt0NVHN5825-1SdCc1sUePlif33IdUJwXq7qlQ0Hy4fqj_ZKKT5oJ61daeXKwh5tKixRbZA);
+    opacity: 0.05;
+    pointer-events: none
+    }
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #b7821f;
+    cursor: pointer;
+    border-radius: 50%;
+    border: 2px solid #f5efe2
+    }</style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-charcoal dark:text-slate-100 parchment-texture">
+<!-- Top Progress Bar -->
+<div class="fixed top-0 left-0 w-full h-1 bg-primary/20 z-50">
+<div class="h-full bg-primary w-1/3 transition-all duration-500"></div>
+</div>
+<!-- Header / Navigation -->
+<header class="flex items-center justify-between p-4 pt-6 bg-background-light/80 backdrop-blur-sm sticky top-0 z-40 border-b border-primary/10">
+<button class="flex items-center gap-1 text-primary font-semibold text-sm">
+<span class="material-symbols-outlined text-lg">arrow_back</span>
+            Hub
+        </button>
+<div class="text-center">
+<h1 class="font-serif text-lg font-bold leading-none">Operation Parallel Dawn</h1>
+<p class="text-[10px] uppercase tracking-widest text-primary/80 font-bold">Mission: 01</p>
+</div>
+<button class="flex items-center gap-1 text-primary font-semibold text-sm">
+            Next
+            <span class="material-symbols-outlined text-lg">arrow_forward</span>
+</button>
+</header>
+<main class="p-4 pb-32 space-y-8">
+<!-- War Room Briefing -->
+<section class="space-y-3">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
+<span class="material-symbols-outlined text-primary text-sm">military_tech</span>
+<span class="text-[10px] font-bold uppercase tracking-wider text-primary">War Room Briefing</span>
+</div>
+<h2 class="font-serif text-2xl font-bold italic text-charcoal/90">The Eight-GPU Gambit</h2>
+<p class="text-sm leading-relaxed text-charcoal/70 dark:text-slate-300">
+                Commander, the objective is clear. We must scrap the sequential bottlenecks. Use the <span class="text-teal-accent font-bold italic">"Attention Is All You Need"</span> blueprint to deliver a strategy that achieves SOTA results within 3.5 days.
+            </p>
+</section>
+<!-- Parameter Sandbox -->
+<section class="bg-white/40 dark:bg-white/5 p-4 rounded-xl border border-primary/10 shadow-sm space-y-6">
+<div class="flex items-center justify-between">
+<h3 class="font-serif text-lg font-bold">Parameter Sandbox</h3>
+<span class="material-symbols-outlined text-teal-accent">query_stats</span>
+</div>
+<!-- SVG Diagram Placeholder -->
+<div class="relative aspect-video bg-teal-accent/5 rounded-lg border border-teal-accent/20 flex items-center justify-center overflow-hidden">
+<svg class="w-full h-full p-4" fill="none" viewbox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
+<!-- Encoder Blocks -->
+<rect class="fill-teal-accent/10 stroke-teal-accent" height="80" rx="4" stroke-dasharray="2 2" stroke-width="1" width="40" x="20" y="20"></rect>
+<rect class="fill-teal-accent/10 stroke-teal-accent" height="80" rx="4" stroke-dasharray="2 2" stroke-width="1" width="40" x="140" y="20"></rect>
+<!-- Attention Lines -->
+<path class="stroke-teal-accent/40" d="M60 40 L140 40" stroke-width="1"></path>
+<path class="stroke-teal-accent/40" d="M60 60 L140 60" stroke-width="1"></path>
+<path class="stroke-teal-accent/40" d="M60 80 L140 80" stroke-width="1"></path>
+<circle class="fill-teal-accent/20 stroke-teal-accent" cx="100" cy="60" r="15" stroke-width="1"></circle>
+<text class="fill-teal-accent font-bold text-[8px]" font-family="Inter" text-anchor="middle" x="100" y="64">ATTN</text>
+</svg>
+<div class="absolute bottom-2 right-2 text-[10px] font-mono text-teal-accent/60 uppercase">Transformer v1.0</div>
+</div>
+<div class="space-y-4">
+<div class="space-y-2">
+<div class="flex justify-between text-xs font-bold uppercase text-charcoal/60">
+<span>Recurrence Degree</span>
+<span class="text-primary">Low</span>
+</div>
+<input class="w-full h-1.5 bg-primary/20 rounded-lg appearance-none cursor-pointer accent-primary" max="100" min="0" type="range" value="20"/>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-xs font-bold uppercase text-charcoal/60">
+<span>Parallelization Level</span>
+<span class="text-teal-accent">Maximized</span>
+</div>
+<input class="w-full h-1.5 bg-teal-accent/20 rounded-lg appearance-none cursor-pointer accent-teal-accent" max="100" min="0" type="range" value="95"/>
+</div>
+</div>
+</section>
+<!-- Evidence Sorting Zone -->
+<section class="space-y-4">
+<h3 class="font-serif text-lg font-bold">Evidence Sorting</h3>
+<p class="text-xs text-charcoal/60 italic">Drag source quotes to their respective paradigms</p>
+<div class="space-y-3">
+<!-- Draggable Card 1 -->
+<div class="bg-background-light p-4 rounded border-b-2 border-r-2 border-primary/30 shadow-md rotate-1 transform cursor-grab active:cursor-grabbing">
+<p class="font-serif text-sm italic leading-tight">"28.4 BLEU on English-to-German, a new state-of-the-art..."</p>
+<div class="mt-2 flex justify-end">
+<span class="text-[10px] font-mono text-primary/60">— Vaswani et al. (2017)</span>
+</div>
+</div>
+<!-- Draggable Card 2 -->
+<div class="bg-background-light p-4 rounded border-b-2 border-r-2 border-primary/30 shadow-md -rotate-1 transform cursor-grab active:cursor-grabbing">
+<p class="font-serif text-sm italic leading-tight">"Sequential nature precludes parallelization within training examples..."</p>
+<div class="mt-2 flex justify-end">
+<span class="text-[10px] font-mono text-primary/60">— Section 1: Intro</span>
+</div>
+</div>
+</div>
+<!-- Buckets -->
+<div class="grid grid-cols-2 gap-4 pt-4">
+<div class="aspect-square border-2 border-dashed border-charcoal/20 rounded-xl flex flex-col items-center justify-center text-center p-3 group hover:border-charcoal/40 transition-colors">
+<span class="material-symbols-outlined text-charcoal/40 mb-2">history</span>
+<span class="text-[10px] font-bold uppercase text-charcoal/60">Old Recurrent Habits</span>
+</div>
+<div class="aspect-square border-2 border-dashed border-teal-accent/30 rounded-xl flex flex-col items-center justify-center text-center p-3 group hover:border-teal-accent/60 transition-colors bg-teal-accent/5">
+<span class="material-symbols-outlined text-teal-accent/60 mb-2">rocket_launch</span>
+<span class="text-[10px] font-bold uppercase text-teal-accent/60">Transformer Paradigm</span>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Timeline Switch & Footer Nav -->
+<div class="fixed bottom-0 left-0 w-full bg-background-light border-t border-primary/20 pb-6 px-4 pt-4 z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+<div class="max-w-md mx-auto space-y-4">
+<!-- Timeline Toggle -->
+<div class="bg-charcoal/5 p-1 rounded-full flex relative">
+<div class="absolute left-1 top-1 w-[49%] h-[calc(100%-8px)] bg-white rounded-full shadow-sm transition-all duration-300 translate-x-[100%]"></div>
+<button class="flex-1 py-2 text-xs font-bold uppercase tracking-wider text-charcoal/40 z-10 transition-colors">Before</button>
+<button class="flex-1 py-2 text-xs font-bold uppercase tracking-wider text-charcoal z-10 transition-colors">After</button>
+</div>
+<!-- Navigation Actions -->
+<div class="flex gap-2 border-t border-primary/5 pt-4">
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-primary" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined">description</span>
+</div>
+<p class="text-[10px] font-bold uppercase tracking-tighter">Paper</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-primary" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined">military_tech</span>
+</div>
+<p class="text-[10px] font-bold uppercase tracking-tighter">Mission</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-primary/40" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined">map</span>
+</div>
+<p class="text-[10px] font-bold uppercase tracking-tighter">Map</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-primary/40" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined">inventory_2</span>
+</div>
+<p class="text-[10px] font-bold uppercase tracking-tighter">Archive</p>
+</a>
+</div>
+</div>
+</div>
+<!-- State Shift Overlay (Invisible by default) -->
+<div class="fixed inset-0 pointer-events-none bg-primary/5 mix-blend-multiply opacity-0 transition-opacity duration-700" id="legacy-overlay"></div>
+</body></html>

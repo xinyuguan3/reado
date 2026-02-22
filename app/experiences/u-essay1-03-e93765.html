@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sonic Bodies Field Lab — Economic War Table</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --coal:#111827;
+      --amber:#F59E0B;
+      --blue:#3B82F6;
+      --rose:#FB7185;
+      --ink:#dbe5ff;
+      --muted:#8da0c4;
+      --panel:rgba(17,24,39,.78);
+      --line:rgba(141,160,196,.25);
+      --good:#34d399;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      color:var(--ink);
+      font-family:"Sora",system-ui,sans-serif;
+      background:
+        radial-gradient(circle at 15% 10%, rgba(59,130,246,.14), transparent 30%),
+        radial-gradient(circle at 85% 90%, rgba(245,158,11,.12), transparent 35%),
+        linear-gradient(180deg, #0d1322 0%, #0b1020 45%, #0a0f1b 100%);
+      overflow-x:hidden;
+    }
+    body::before{
+      content:"";
+      position:fixed; inset:0;
+      background-image:
+        linear-gradient(rgba(141,160,196,.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(141,160,196,.08) 1px, transparent 1px);
+      background-size:32px 32px;
+      pointer-events:none;
+      mask-image:radial-gradient(circle at center, black 35%, transparent 95%);
+    }
+    .shell{
+      max-width:1280px;
+      margin:0 auto;
+      padding:20px 16px 24px;
+    }
+    .headline{
+      border:1px solid var(--line);
+      background:linear-gradient(150deg, rgba(17,24,39,.88), rgba(17,24,39,.6));
+      border-radius:18px;
+      padding:16px;
+      position:relative;
+      overflow:hidden;
+    }
+    .headline::after{
+      content:"";
+      position:absolute; right:-80px; top:-80px;
+      width:220px; height:220px;
+      background:radial-gradient(circle, rgba(251,113,133,.25), transparent 70%);
+      filter:blur(8px);
+      pointer-events:none;
+    }
+    .kicker{
+      font-family:"IBM Plex Mono",monospace;
+      font-size:.78rem;
+      color:var(--amber);
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      margin-bottom:8px;
+    }
+    .title{
+      font-size:clamp(1.2rem,3vw,2rem);
+      margin:0;
+      line-height:1.2;
+    }
+    .subtitle{
+      margin:8px 0 10px;
+      color:#c2d0f0;
+      font-size:.95rem;
+    }
+    .mission{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:12px;
+    }
+    .chip{
+      border:1px solid var(--line);
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:.76rem;
+      background:rgba(59,130,246,.09);
+    }
+    .chip.amber{background:rgba(245,158,11,.14);border-color:rgba(245,158,11,.35)}
+    .chip.rose{background:rgba(251,113,133,.12);border-color:rgba(251,113,133,.35)}
+    .layout{
+      display:grid;
+      grid-template-columns:1.9fr 1fr;
+      gap:14px;
+      margin-top:14px;
+    }
+    .stack{display:grid; gap:14px;}
+    .panel{
+      border:1px solid var(--line);
+      background:var(--panel);
+      border-radius:16px;
+      padding:14px;
+      box-shadow:0 8px 30px rgba(0,0,0,.25);
+    }
+    .panel h2{
+      margin:0 0 10px;
+      font-size:1rem;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:8px;
+    }
+    .mono{
+      font-family:"IBM Plex Mono",monospace;
+      color:var(--muted);
+      font-size:.78rem;
+    }
+    .resource-row,.slider-row{
+      display:grid;
+      grid-template-columns:1.2fr 2fr auto;
+      gap:10px;
+      align-items:center;
+      margin:8px 0;
+    }
+    .resource-row label,.slider-row label{
+      font-size:.85rem;
+      color:#d3def8;
+    }
+    input[type=range]{
+      width:100%;
+      accent-color:var(--amber);
+      cursor:pointer;
+    }
+    .val{
+      min-width:46px;
+      text-align:right;
+      font-family:"IBM Plex Mono",monospace;
+      font-size:.8rem;
+      color:#d9e3fb;
+    }
+    .meter{
+      height:10px;
+      width:100%;
+      border-radius:99px;
+      border:1px solid var(--line);
+      overflow:hidden;
+      background:rgba(14,20,35,.9);
+      margin-top:8px;
+    }
+    .meter>span{
+      display:block;height:100%;
+      width:0%;
+      transition:width .25s ease;
+      background:linear-gradient(90deg,var(--blue),var(--amber));
+    }
+    .meter.over>span{background:linear-gradient(90deg,var(--rose),#ef4444)}
+    .three{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:8px;
+      margin-top:10px;
+    }
+    .stat{
+      border:1px solid var(--line);
+      border-radius:10px;
+      padding:8px;
+      background:rgba(8,12,24,.45);
+    }
+    .stat .k{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+    .stat .v{margin-top:3px;font-size:1.05rem}
+    .h-card{
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:10px;
+      margin:10px 0;
+      background:rgba(8,13,26,.5);
+    }
+    .h-card p{margin:0 0 8px;font-size:.85rem;line-height:1.4;color:#ced9f6}
+    .stance{
+      display:flex; gap:6px; margin-bottom:8px; flex-wrap:wrap;
+    }
+    .stance button{
+      background:rgba(17,24,39,.9);
+      border:1px solid var(--line);
+      color:#cfe0ff;
+      border-radius:8px;
+      padding:5px 9px;
+      font-size:.75rem;
+      cursor:pointer;
+    }
+    .stance button.active[data-stance="support"]{border-color:rgba(52,211,153,.8);color:#6ee7b7}
+    .stance button.active[data-stance="uncertain"]{border-color:rgba(245,158,11,.8);color:#f8cb71}
+    .stance button.active[data-stance="challenge"]{border-color:rgba(251,113,133,.8);color:#fda4af}
+    .conf{
+      display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px;
+    }
+    .gauge{
+      margin-top:10px;
+      width:90px;height:90px;border-radius:50%;
+      background:conic-gradient(var(--blue) 0%, rgba(59,130,246,.2) 0%);
+      display:grid;place-items:center;
+      border:1px solid var(--line);
+      font-family:"IBM Plex Mono",monospace;
+      font-size:.8rem;
+      color:#d8e4ff;
+    }
+    .gauge::before{
+      content:"";
+      width:66px;height:66px;border-radius:50%;
+      background:#0f1628;border:1px solid var(--line);
+      position:absolute;
+    }
+    .gauge span{position:relative;z-index:2}
+    .gauge-wrap{display:flex;align-items:center;gap:12px}
+    .map svg{width:100%;height:auto;display:block;background:rgba(9,13,24,.5);border:1px solid var(--line);border-radius:12px}
+    .signal{
+      margin-top:10px;
+      border:1px solid rgba(245,158,11,.4);
+      background:rgba(245,158,11,.09);
+      padding:9px;
+      border-radius:10px;
+      font-size:.84rem;
+      line-height:1.35;
+      color:#fde7b4;
+    }
+    .sort-wrap{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+    .deck,.bucket{
+      border:1px dashed var(--line);
+      border-radius:12px;
+      min-height:130px;
+      padding:8px;
+      background:rgba(7,11,20,.48);
+    }
+    .deck h3,.bucket h3{
+      margin:0 0 8px;
+      font-size:.78rem;
+      font-family:"IBM Plex Mono",monospace;
+      color:var(--muted);
+      letter-spacing:.05em;
+      text-transform:uppercase;
+    }
+    .evidence{
+      border:1px solid rgba(59,130,246,.4);
+      background:rgba(59,130,246,.12);
+      border-radius:10px;
+      padding:8px;
+      font-size:.76rem;
+      margin:7px 0;
+      cursor:grab;
+      user-select:none;
+      line-height:1.3;
+    }
+    .evidence.selected{outline:2px solid var(--amber); background:rgba(245,158,11,.15)}
+    .bucket.hot,.deck.hot{border-color:var(--amber); background:rgba(245,158,11,.1)}
+    .bucket.good{border-color:rgba(52,211,153,.6)}
+    .bucket.bad{border-color:rgba(251,113,133,.6)}
+    .phase li{
+      list-style:none;
+      display:flex;justify-content:space-between;align-items:center;
+      padding:7px 0;border-bottom:1px solid rgba(141,160,196,.15);
+      font-size:.84rem;
+    }
+    .phase li:last-child{border-bottom:none}
+    .badge{
+      font-family:"IBM Plex Mono",monospace;
+      border:1px solid var(--line);
+      border-radius:999px;
+      font-size:.72rem;
+      padding:2px 8px;
+      color:#becff2;
+    }
+    .badge.done{border-color:rgba(52,211,153,.6);color:#86efac}
+    .log{
+      margin-top:10px; max-height:168px; overflow:auto;
+      border:1px solid var(--line);
+      border-radius:10px; padding:8px;
+      background:rgba(6,10,18,.62);
+    }
+    .log div{
+      font-family:"IBM Plex Mono",monospace;
+      font-size:.72rem;color:#b8c8e8;padding:4px 0;border-bottom:1px dashed rgba(141,160,196,.2);
+    }
+    .log div:last-child{border-bottom:none}
+    .anchor-terms{
+      margin-top:10px;
+      display:flex;flex-wrap:wrap;gap:6px;
+    }
+    .anchor-terms span{
+      font-family:"IBM Plex Mono",monospace;
+      font-size:.69rem;
+      border:1px solid var(--line);
+      border-radius:999px;padding:3px 7px;color:#c8d6f4;background:rgba(17,24,39,.7)
+    }
+    .footer-nav{
+      display:flex;gap:10px;justify-content:space-between;flex-wrap:wrap;
+      margin-top:14px;
+    }
+    .nav-btn{
+      text-decoration:none;
+      color:white;
+      background:linear-gradient(120deg,rgba(59,130,246,.35),rgba(245,158,11,.35));
+      border:1px solid var(--line);
+      padding:10px 14px;border-radius:12px;
+      font-size:.83rem; letter-spacing:.03em;
+      min-width:120px;text-align:center;
+    }
+    .nav-btn:hover{filter:brightness(1.1)}
+    @media (max-width:980px){
+      .layout{grid-template-columns:1fr}
+      .sort-wrap{grid-template-columns:1fr}
+    }
+    @media (max-width:640px){
+      .resource-row,.slider-row{grid-template-columns:1fr}
+      .val{text-align:left}
+      .headline{padding:14px}
+      .panel{padding:12px}
+      .three{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+<script src="/shared/book-catalog.js?v=1771754453141"></script>
+<script type="module" src="/shared/shell.js?v=1771754453141"></script>
+<reado-app-shell data-page="knowledge-map"></reado-app-shell>
+  <div class="shell">
+    <section class="headline">
+      <div class="kicker">Sonic Bodies Field Lab · Module 3: Performance Reckoning</div>
+      <h1 class="title">Economic War Table: from opening-night applause to online scrutiny</h1>
+      <p class="subtitle">Applause fades and questions sharpen: what changed in practice, and what remains uncertain? Scene pivot: opening night transitions into an online forum where critics pressure every claim.</p>
+      <div class="mission">
+        <span class="chip amber">Mission Objective: institutionalize lessons from the article without turning them into dogma</span>
+        <span class="chip">Intel: movement sonification in galleries and museums</span>
+        <span class="chip rose">Constraint: evidence supports directional reform, not absolute universal outcomes</span>
+      </div>
+    </section>
+
+    <div class="layout">
+      <div class="stack">
+        <section class="panel" id="resources-panel">
+          <h2>Resource Allocation Board <span class="mono">Trade-offs under 100 command points</span></h2>
+          <div class="resource-row">
+            <label for="rGallery">Gallery interface retrofit</label>
+            <input id="rGallery" type="range" min="0" max="60" value="24">
+            <div class="val" id="vGallery">24</div>
+          </div>
+          <div class="resource-row">
+            <label for="rMovement">Movement sonification protocols</label>
+            <input id="rMovement" type="range" min="0" max="60" value="34">
+            <div class="val" id="vMovement">34</div>
+          </div>
+          <div class="resource-row">
+            <label for="rAccess">Cross-visitor accessibility mediation</label>
+            <input id="rAccess" type="range" min="0" max="60" value="22">
+            <div class="val" id="vAccess">22</div>
+          </div>
+          <div class="resource-row">
+            <label for="rRepo">White Rose online transparency ops</label>
+            <input id="rRepo" type="range" min="0" max="60" value="14">
+            <div class="val" id="vRepo">14</div>
+          </div>
+          <div class="meter" id="budgetMeter"><span id="budgetFill"></span></div>
+          <div class="three">
+            <div class="stat"><div class="k">Total points</div><div class="v" id="budgetTotal">94 / 100</div></div>
+            <div class="stat"><div class="k">Reserve</div><div class="v" id="budgetReserve">6</div></div>
+            <div class="stat"><div class="k">Reallocation pressure</div><div class="v" id="pressure">Low</div></div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Parameter Sandbox <span class="mono">Instant system response</span></h2>
+          <div class="slider-row">
+            <label for="pAudio">Audio-centred engagement intensity</label>
+            <input id="pAudio" type="range" min="0" max="100" value="62">
+            <div class="val" id="vAudio">62%</div>
+          </div>
+          <div class="slider-row">
+            <label for="pMotion">Moving-listening subject mobility</label>
+            <input id="pMotion" type="range" min="0" max="100" value="58">
+            <div class="val" id="vMotion">58%</div>
+          </div>
+          <div class="slider-row">
+            <label for="pOpen">Institutional openness to hybridization</label>
+            <input id="pOpen" type="range" min="0" max="100" value="54">
+            <div class="val" id="vOpen">54%</div>
+          </div>
+          <div class="three">
+            <div class="stat"><div class="k">Engagement shift</div><div class="v" id="engageShift">0</div></div>
+            <div class="stat"><div class="k">Aesthetic reconfiguration</div><div class="v" id="aestheticShift">0</div></div>
+            <div class="stat"><div class="k">Dogma risk</div><div class="v" id="dogmaRisk">0</div></div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Hypothesis Test Panel <span class="mono">Confidence calibration</span></h2>
+
+          <div class="h-card hypothesis" data-index="0">
+            <p>H1: The article supports sonification as a tool for engagement with artworks in galleries and museums, across sighted, partially sighted, and non-sighted visitors.</p>
+            <div class="stance">
+              <button data-stance="support">Support</button>
+              <button data-stance="uncertain">Uncertain</button>
+              <button data-stance="challenge">Challenge</button>
+            </div>
+            <div class="conf">
+              <input class="confidence" type="range" min="0" max="100" value="55">
+              <span class="val conf-readout">55%</span>
+            </div>
+          </div>
+
+          <div class="h-card hypothesis" data-index="1">
+            <p>H2: Movement sonification reframes the artwork from stable object to blueprint of proximal, conceptual, and material relationships animated by a moving-listening subject.</p>
+            <div class="stance">
+              <button data-stance="support">Support</button>
+              <button data-stance="uncertain">Uncertain</button>
+              <button data-stance="challenge">Challenge</button>
+            </div>
+            <div class="conf">
+              <input class="confidence" type="range" min="0" max="100" value="60">
+              <span class="val conf-readout">60%</span>
+            </div>
+          </div>
+
+          <div class="h-card hypothesis" data-index="2">
+            <p>H3: The operational lesson is directional reform and careful institutional rollout, not universal guaranteed outcomes.</p>
+            <div class="stance">
+              <button data-stance="support">Support</button>
+              <button data-stance="uncertain">Uncertain</button>
+              <button data-stance="challenge">Challenge</button>
+            </div>
+            <div class="conf">
+              <input class="confidence" type="range" min="0" max="100" value="52">
+              <span class="val conf-readout">52%</span>
+            </div>
+          </div>
+
+          <div class="gauge-wrap">
+            <div class="gauge" id="calGauge"><span id="calScore">0%</span></div>
+            <div>
+              <div class="mono">Calibration vs evidence placement</div>
+              <div id="calText">Select stances and tune confidence.</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Evidence Sorting Drill <span class="mono">Drag or tap card then tap bucket</span></h2>
+          <div class="sort-wrap">
+            <div class="deck dropzone" data-bucket="deck" id="deck">
+              <h3>Evidence Deck</h3>
+              <div class="evidence" draggable="true" data-card="c1">“This article examines the use of sonification, and movement sonification, as a tool for engagement with artworks in galleries and museums.”</div>
+              <div class="evidence" draggable="true" data-card="c2">“White Rose Research Online” provides public metadata context for the published record.</div>
+              <div class="evidence" draggable="true" data-card="c3">The conclusion states radical implications for how artworks are conceived and how the aesthetic experience is configured.</div>
+              <div class="evidence" draggable="true" data-card="c4">The source states directional reform is defensible; absolute universal outcomes are not claimed.</div>
+              <div class="evidence" draggable="true" data-card="c5">Focus includes relationship among sighted, partially sighted, and non-sighted visitors.</div>
+              <div class="evidence" draggable="true" data-card="c6">Published online November 2020; deposited January 2021 in white rose repository context.</div>
+            </div>
+            <div>
+              <div class="bucket dropzone" data-bucket="reform">
+                <h3>Supports Directional Reform (<span id="count-reform">0</span>)</h3>
+                <div class="bucket-cards"></div>
+              </div>
+              <div class="bucket dropzone" data-bucket="metadata" style="margin-top:8px;">
+                <h3>Repository Context Metadata (<span id="count-metadata">0</span>)</h3>
+                <div class="bucket-cards"></div>
+              </div>
+              <div class="bucket dropzone" data-bucket="limits" style="margin-top:8px;">
+                <h3>Avoid Overgeneralization (<span id="count-limits">0</span>)</h3>
+                <div class="bucket-cards"></div>
+              </div>
+            </div>
+          </div>
+          <div class="signal" id="sortSignal">Sorter status: 0 / 6 cards placed.</div>
+        </section>
+      </div>
+
+      <aside class="stack">
+        <section class="panel map">
+          <h2>Causal Map / Timeline <span class="mono">Live doctrine trace</span></h2>
+          <svg viewBox="0 0 640 290" role="img" aria-label="Causal map of sonification and institutional reform">
+            <defs>
+              <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+                <path d="M0,0 L8,3 L0,6 Z" fill="#3B82F6"></path>
+              </marker>
+            </defs>
+
+            <rect x="18" y="20" width="604" height="250" rx="12" fill="rgba(17,24,39,.45)" stroke="rgba(141,160,196,.25)"></rect>
+
+            <path d="M110,83 C190,50 238,55 306,80" stroke="#3B82F6" stroke-width="2.2" fill="none" marker-end="url(#arrow)"></path>
+            <path d="M328,88 C408,102 440,132 500,168" stroke="#3B82F6" stroke-width="2.2" fill="none" marker-end="url(#arrow)"></path>
+            <path d="M110,205 C200,188 250,176 316,170" stroke="#F59E0B" stroke-width="2.2" fill="none" marker-end="url(#arrow)"></path>
+            <path d="M335,170 C425,180 468,214 530,230" stroke="#FB7185" stroke-width="2.2" fill="none" marker-end="url(#arrow)"></path>
+
+            <g>
+              <circle cx="90" cy="80" r="24" fill="rgba(59,130,246,.18)" stroke="#3B82F6"></circle>
+              <text x="90" y="84" text-anchor="middle" fill="#cfe0ff" font-size="11" font-family="IBM Plex Mono">article</text>
+            </g>
+            <g>
+              <circle cx="320" cy="86" r="26" fill="rgba(59,130,246,.2)" stroke="#3B82F6"></circle>
+              <text x="320" y="82" text-anchor="middle" fill="#dbe7ff" font-size="11" font-family="IBM Plex Mono">sonification</text>
+              <text x="320" y="95" text-anchor="middle" fill="#dbe7ff" font-size="11" font-family="IBM Plex Mono">mode</text>
+            </g>
+            <g>
+              <circle cx="520" cy="175" r="25" fill="rgba(59,130,246,.16)" stroke="#3B82F6"></circle>
+              <text x="520" y="172" text-anchor="middle" fill="#dbe7ff" font-size="10" font-family="IBM Plex Mono">aesthetic</text>
+              <text x="520" y="186" text-anchor="middle" fill="#dbe7ff" font-size="10" font-family="IBM Plex Mono">experience</text>
+            </g>
+            <g>
+              <circle cx="90" cy="210" r="24" fill="rgba(245,158,11,.2)" stroke="#F59E0B"></circle>
+              <text x="90" y="214" text-anchor="middle" fill="#ffe0a3" font-size="10" font-family="IBM Plex Mono">online record</text>
+            </g>
+            <g>
+              <circle cx="325" cy="170" r="25" fill="rgba(245,158,11,.18)" stroke="#F59E0B"></circle>
+              <text x="325" y="166" text-anchor="middle" fill="#ffe8bd" font-size="10" font-family="IBM Plex Mono">white rose</text>
+              <text x="325" y="180" text-anchor="middle" fill="#ffe8bd" font-size="10" font-family="IBM Plex Mono">context</text>
+            </g>
+            <g>
+              <circle cx="540" cy="230" r="26" fill="rgba(251,113,133,.16)" stroke="#FB7185"></circle>
+              <text x="540" y="226" text-anchor="middle" fill="#ffd6de" font-size="10" font-family="IBM Plex Mono">policy</text>
+              <text x="540" y="240" text-anchor="middle" fill="#ffd6de" font-size="10" font-family="IBM Plex Mono">reform</text>
+            </g>
+
+            <text x="24" y="272" fill="#97aad0" font-size="10" font-family="IBM Plex Mono">engagement:<tspan id="svgEngage">0</tspan> · reform confidence:<tspan id="svgReform">0</tspan> · dogma risk:<tspan id="svgDogma">0</tspan></text>
+          </svg>
+          <div class="signal" id="commandSignal">Signal pending: align budget, hypotheses, and evidence placement.</div>
+        </section>
+
+        <section class="panel">
+          <h2>Phase Summary <span class="mono">Mission lock status</span></h2>
+          <ul class="phase" id="phaseList">
+            <li><span>Phase 1 — Allocate tactical resources</span><span class="badge" id="phase1">pending</span></li>
+            <li><span>Phase 2 — Simulate hybridization parameters</span><span class="badge" id="phase2">pending</span></li>
+            <li><span>Phase 3 — Calibrate hypothesis confidence</span><span class="badge" id="phase3">pending</span></li>
+            <li><span>Phase 4 — Sort source evidence accurately</span><span class="badge" id="phase4">pending</span></li>
+          </ul>
+          <div class="signal" id="finalBrief">Briefing: institutional lessons not yet stabilized.</div>
+        </section>
+
+        <section class="panel">
+          <h2>Live Forum Feed <span class="mono">Real-time feedback</span></h2>
+          <div class="log" id="log"></div>
+          <div class="anchor-terms">
+            <span>the</span><span>and</span><span>sonification</span><span>aesthetic</span><span>experience</span><span>online</span><span>white</span><span>rose</span><span>sonic</span><span>bodies</span><span>hybridization</span><span>article</span>
+          </div>
+        </section>
+      </aside>
+    </div>
+
+    <nav class="footer-nav">
+      <a class="nav-btn" href="/experiences/u-essay1-02-b21741.html">← Previous</a>
+      <a class="nav-btn" href="/books/user-essay1-w5f5x6-fb38.html">Mission Hub</a>
+      <a class="nav-btn" href="/books/user-essay1-w5f5x6-fb38.html">Next →</a>
+    </nav>
+  </div>
+
+  <script>
+    const state = {
+      resources: { gallery:24, movement:34, access:22, repo:14 },
+      sandbox: { audio:62, motion:58, open:54 },
+      touched: { resource:false, sandbox:false, sorting:false },
+      hypotheses: [
+        { stance:null, confidence:55 },
+        { stance:null, confidence:60 },
+        { stance:null, confidence:52 }
+      ],
+      placements: {},
+      selectedCard: null
+    };
+
+    const correctBucket = {
+      c1:"reform", c2:"metadata", c3:"reform", c4:"limits", c5:"reform", c6:"metadata"
+    };
+
+    const allCards = Object.keys(correctBucket);
+
+    const ids = {
+      rGallery: document.getElementById("rGallery"),
+      rMovement: document.getElementById("rMovement"),
+      rAccess: document.getElementById("rAccess"),
+      rRepo: document.getElementById("rRepo"),
+      pAudio: document.getElementById("pAudio"),
+      pMotion: document.getElementById("pMotion"),
+      pOpen: document.getElementById("pOpen")
+    };
+
+    function clamp(n,min,max){ return Math.max(min,Math.min(max,n)); }
+
+    function pushLog(msg){
+      const log = document.getElementById("log");
+      const t = new Date();
+      const stamp = t.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit",second:"2-digit"});
+      const row = document.createElement("div");
+      row.textContent = "[" + stamp + "] " + msg;
+      log.prepend(row);
+      while(log.children.length > 9) log.removeChild(log.lastChild);
+    }
+
+    function resourceDerived(){
+      const r = state.resources;
+      const total = r.gallery + r.movement + r.access + r.repo;
+      const reserve = 100 - total;
+      const pressure = total > 100 ? "Severe" : total > 94 ? "High" : total > 80 ? "Moderate" : "Low";
+      return { total, reserve, pressure };
+    }
+
+    function sortingDerived(){
+      let placed = 0, correct = 0;
+      allCards.forEach(c=>{
+        const b = state.placements[c];
+        if(b && b !== "deck"){
+          placed++;
+          if(correctBucket[c] === b) correct++;
+        }
+      });
+      return { placed, correct, total: allCards.length };
+    }
+
+    function hypothesisDerived(){
+      const selected = state.hypotheses.filter(h=>h.stance !== null).length;
+      const avgConf = state.hypotheses.reduce((a,h)=>a+h.confidence,0)/state.hypotheses.length;
+      const uncertainCount = state.hypotheses.filter(h=>h.stance==="uncertain").length;
+      const {correct,total} = sortingDerived();
+      const evidenceFit = (correct/total)*100;
+      const targetConf = 46 + evidenceFit * 0.42;
+      const mismatch = Math.abs(avgConf - targetConf);
+      let calibration = clamp(100 - mismatch - (selected<3?18:0) + uncertainCount*2, 0, 100);
+      return { selected, avgConf, calibration: Math.round(calibration) };
+    }
+
+    function sandboxDerived(){
+      const s = state.sandbox;
+      const h = hypothesisDerived();
+      const engagement = clamp((s.audio*0.43 + s.motion*0.31 + s.open*0.26),0,100);
+      const aesthetic = clamp((s.audio*0.48 + s.motion*0.34 + s.open*0.18),0,100);
+      const dogma = clamp((100-s.open)*0.5 + Math.max(0,h.avgConf-62)*0.65,0,100);
+      return { engagement: Math.round(engagement), aesthetic: Math.round(aesthetic), dogma: Math.round(dogma) };
+    }
+
+    function doctrineScore(){
+      const r = resourceDerived();
+      const s = sandboxDerived();
+      const h = hypothesisDerived();
+      const sort = sortingDerived();
+      const allocQuality = r.total <= 100 ? 100 - Math.abs(100-r.total)*0.7 : 32 - (r.total-100)*1.4;
+      const evidenceQuality = (sort.correct/sort.total)*100;
+      const score = clamp((allocQuality*0.25 + s.engagement*0.25 + h.calibration*0.25 + evidenceQuality*0.25),0,100);
+      return Math.round(score);
+    }
+
+    function updateResourcesUI(){
+      const { total, reserve, pressure } = resourceDerived();
+
+      document.getElementById("vGallery").textContent = state.resources.gallery;
+      document.getElementById("vMovement").textContent = state.resources.movement;
+      document.getElementById("vAccess").textContent = state.resources.access;
+      document.getElementById("vRepo").textContent = state.resources.repo;
+
+      document.getElementById("budgetTotal").textContent = total + " / 100";
+      document.getElementById("budgetReserve").textContent = reserve;
+      document.getElementById("pressure").textContent = pressure;
+
+      const fill = document.getElementById("budgetFill");
+      const meter = document.getElementById("budgetMeter");
+      fill.style.width = clamp(total,0,130) + "%";
+      meter.classList.toggle("over", total > 100);
+    }
+
+    function updateSandboxUI(){
+      const s = sandboxDerived();
+      document.getElementById("vAudio").textContent = state.sandbox.audio + "%";
+      document.getElementById("vMotion").textContent = state.sandbox.motion + "%";
+      document.getElementById("vOpen").textContent = state.sandbox.open + "%";
+      document.getElementById("engageShift").textContent = s.engagement;
+      document.getElementById("aestheticShift").textContent = s.aesthetic;
+      document.getElementById("dogmaRisk").textContent = s.dogma;
+    }
+
+    function updateHypothesisUI(){
+      document.querySelectorAll(".hypothesis").forEach((card, index)=>{
+        const h = state.hypotheses[index];
+        card.querySelector(".conf-readout").textContent = h.confidence + "%";
+        card.querySelectorAll(".stance button").forEach(btn=>{
+          btn.classList.toggle("active", btn.dataset.stance === h.stance);
+        });
+      });
+
+      const h = hypothesisDerived();
+      const gauge = document.getElementById("calGauge");
+      gauge.style.background = "conic-gradient(var(--blue) " + h.calibration + "%, rgba(59,130,246,.2) " + h.calibration + "%)";
+      document.getElementById("calScore").textContent = h.calibration + "%";
+
+      const text = document.getElementById("calText");
+      text.textContent = h.calibration > 74
+        ? "Well calibrated: confidence tracks evidence."
+        : h.calibration > 45
+        ? "Partially calibrated: tighten claims or improve sorting."
+        : "Calibration drift: confidence misaligned with evidence.";
+    }
+
+    function updateSortingUI(){
+      const count = {reform:0, metadata:0, limits:0};
+      Object.values(state.placements).forEach(b=>{
+        if(count[b] !== undefined) count[b]++;
+      });
+
+      document.getElementById("count-reform").textContent = count.reform;
+      document.getElementById("count-metadata").textContent = count.metadata;
+      document.getElementById("count-limits").textContent = count.limits;
+
+      const d = sortingDerived();
+      document.getElementById("sortSignal").textContent = "Sorter status: " + d.placed + " / " + d.total + " cards placed · " + d.correct + " correctly grouped.";
+      document.querySelectorAll(".bucket").forEach(b=>b.classList.remove("good","bad"));
+      if(d.placed === d.total){
+        document.querySelectorAll(".bucket").forEach(bucket=>{
+          const id = bucket.dataset.bucket;
+          const cards = [...bucket.querySelectorAll(".evidence")];
+          const ok = cards.every(c => correctBucket[c.dataset.card] === id);
+          bucket.classList.add(ok ? "good" : "bad");
+        });
+      }
+    }
+
+    function updateMapAndSignal(){
+      const s = sandboxDerived();
+      const dScore = doctrineScore();
+      document.getElementById("svgEngage").textContent = s.engagement;
+      document.getElementById("svgReform").textContent = dScore;
+      document.getElementById("svgDogma").textContent = s.dogma;
+
+      const r = resourceDerived();
+      const h = hypothesisDerived();
+      const sort = sortingDerived();
+
+      let signal = "";
+      if(r.total > 100){
+        signal = "Budget breach: strategic intent is credible, execution is unstable.";
+      } else if(s.dogma > 70){
+        signal = "Warning: dogma risk rising; increase openness and temper certainty.";
+      } else if(sort.placed < sort.total){
+        signal = "Forum asks for traceability: finish placing source evidence cards.";
+      } else if(dScore > 72){
+        signal = "Command signal: reform pathway is strong, grounded, and non-absolute.";
+      } else {
+        signal = "Mixed signal: rebalance resources and recalibrate confidence.";
+      }
+      document.getElementById("commandSignal").textContent = signal;
+    }
+
+    function updatePhases(){
+      const r = resourceDerived();
+      const h = hypothesisDerived();
+      const sort = sortingDerived();
+      const p1 = state.touched.resource && r.total <= 100;
+      const p2 = state.touched.sandbox;
+      const p3 = h.selected === 3;
+      const p4 = sort.placed === sort.total;
+
+      const setBadge = (id, done)=>{
+        const el = document.getElementById(id);
+        el.textContent = done ? "complete" : "pending";
+        el.classList.toggle("done", done);
+      };
+      setBadge("phase1",p1); setBadge("phase2",p2); setBadge("phase3",p3); setBadge("phase4",p4);
+
+      const completeCount = [p1,p2,p3,p4].filter(Boolean).length;
+      const doctrine = doctrineScore();
+      const brief = document.getElementById("finalBrief");
+      brief.textContent = completeCount === 4
+        ? "Briefing: lessons institutionalized with live uncertainty preserved. Doctrine score " + doctrine + "/100."
+        : "Briefing: " + completeCount + "/4 phases complete. Doctrine score " + doctrine + "/100.";
+    }
+
+    function updateAll(){
+      updateResourcesUI();
+      updateSandboxUI();
+      updateHypothesisUI();
+      updateSortingUI();
+      updateMapAndSignal();
+      updatePhases();
+    }
+
+    function bindRanges(){
+      ids.rGallery.addEventListener("input", e=>{
+        state.resources.gallery = +e.target.value; state.touched.resource = true; updateAll();
+      });
+      ids.rMovement.addEventListener("input", e=>{
+        state.resources.movement = +e.target.value; state.touched.resource = true; updateAll();
+      });
+      ids.rAccess.addEventListener("input", e=>{
+        state.resources.access = +e.target.value; state.touched.resource = true; updateAll();
+      });
+      ids.rRepo.addEventListener("input", e=>{
+        state.resources.repo = +e.target.value; state.touched.resource = true; updateAll();
+      });
+
+      ids.pAudio.addEventListener("input", e=>{
+        state.sandbox.audio = +e.target.value; state.touched.sandbox = true; updateAll();
+      });
+      ids.pMotion.addEventListener("input", e=>{
+        state.sandbox.motion = +e.target.value; state.touched.sandbox = true; updateAll();
+      });
+      ids.pOpen.addEventListener("input", e=>{
+        state.sandbox.open = +e.target.value; state.touched.sandbox = true; updateAll();
+      });
+    }
+
+    function bindHypotheses(){
+      document.querySelectorAll(".hypothesis").forEach((card, i)=>{
+        card.querySelectorAll(".stance button").forEach(btn=>{
+          btn.addEventListener("click", ()=>{
+            state.hypotheses[i].stance = btn.dataset.stance;
+            pushLog("Hypothesis " + (i+1) + " set to " + btn.dataset.stance + ".");
+            updateAll();
+          });
+        });
+
+        card.querySelector(".confidence").addEventListener("input", (e)=>{
+          state.hypotheses[i].confidence = +e.target.value;
+          updateAll();
+        });
+      });
+    }
+
+    function placeCard(cardId, bucketId){
+      const card = document.querySelector('.evidence[data-card="'+cardId+'"]');
+      if(!card) return;
+
+      let target;
+      if(bucketId === "deck"){
+        target = document.getElementById("deck");
+        delete state.placements[cardId];
+      } else {
+        target = document.querySelector('.bucket[data-bucket="'+bucketId+'"] .bucket-cards');
+        state.placements[cardId] = bucketId;
+        state.touched.sorting = true;
+      }
+
+      target.appendChild(card);
+      state.selectedCard = null;
+      document.querySelectorAll(".evidence").forEach(c=>c.classList.remove("selected"));
+      updateAll();
+    }
+
+    function bindSorting(){
+      document.querySelectorAll(".evidence").forEach(card=>{
+        card.addEventListener("dragstart", e=>{
+          e.dataTransfer.setData("text/plain", card.dataset.card);
+          e.dataTransfer.effectAllowed = "move";
+          state.selectedCard = card.dataset.card;
+        });
+        card.addEventListener("click", ()=>{
+          const same = state.selectedCard === card.dataset.card;
+          state.selectedCard = same ? null : card.dataset.card;
+          document.querySelectorAll(".evidence").forEach(c=>c.classList.remove("selected"));
+          if(!same) card.classList.add("selected");
+        });
+      });
+
+      document.querySelectorAll(".dropzone").forEach(zone=>{
+        zone.addEventListener("dragover", e=>{
+          e.preventDefault();
+          zone.classList.add("hot");
+        });
+        zone.addEventListener("dragleave", ()=> zone.classList.remove("hot"));
+        zone.addEventListener("drop", e=>{
+          e.preventDefault();
+          zone.classList.remove("hot");
+          const cardId = e.dataTransfer.getData("text/plain");
+          const b = zone.dataset.bucket;
+          placeCard(cardId,b);
+          pushLog("Card " + cardId.toUpperCase() + " moved to " + b + ".");
+        });
+        zone.addEventListener("click", ()=>{
+          if(state.selectedCard){
+            const b = zone.dataset.bucket;
+            placeCard(state.selectedCard,b);
+            pushLog("Card " + state.selectedCard.toUpperCase() + " moved to " + b + ".");
+          }
+        });
+      });
+    }
+
+    bindRanges();
+    bindHypotheses();
+    bindSorting();
+    updateAll();
+    pushLog("Forum active: allocate, simulate, calibrate, and sort.");
+  </script>
+
+
+<script>
+(() => {
+  
+  
+  
+})();
+</script>
+</body>
+</html>

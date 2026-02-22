@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Attention Test：WMT决策风暴 · 模块一：并行化赌局</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --panel: rgba(8, 23, 31, 0.88);
+      --line: rgba(148, 163, 184, 0.24);
+      --text: #edf4ff;
+      --sub: #afc5e2;
+      --accent: #14b8a6;
+      --accent-soft: rgba(20, 184, 166, 0.26);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Noto Sans SC", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+      color: var(--text);
+      background: radial-gradient(circle at 12% 10%, rgba(20, 184, 166, 0.16), transparent 35%), radial-gradient(circle at 88% 10%, rgba(14, 165, 233, 0.2), transparent 35%), #07111a;
+    }
+    .page {
+      width: min(1160px, calc(100% - 24px));
+      margin: 0 auto;
+      padding: 22px 0 36px;
+      display: grid;
+      grid-template-columns: minmax(280px, 330px) minmax(0, 1fr);
+      gap: 14px;
+    }
+    .panel {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      border-radius: 14px;
+      padding: 14px;
+      box-shadow: 0 18px 42px rgba(2, 8, 20, 0.46);
+    }
+    .hero {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      background: linear-gradient(160deg, var(--accent-soft), rgba(15, 23, 42, 0.62));
+    }
+    .chip-row { display: flex; gap: 7px; flex-wrap: wrap; }
+    .chip {
+      border: 1px solid rgba(148, 163, 184, 0.34);
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 11px;
+      color: #deebff;
+      font-weight: 700;
+      background: rgba(2, 6, 23, 0.45);
+    }
+    .hero h1 { margin: 10px 0 0; font-size: clamp(24px, 3vw, 34px); letter-spacing: -0.02em; line-height: 1.1; }
+    .hero .sub { margin-top: 8px; color: #d4e8ff; line-height: 1.72; font-size: 14px; }
+    .hero .mission {
+      margin-top: 10px;
+      color: #f0f8ff;
+      background: rgba(2, 6, 23, 0.38);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      border-radius: 10px;
+      padding: 9px 10px;
+      font-size: 13px;
+      line-height: 1.64;
+    }
+    .side h2 { margin: 0; font-size: 16px; }
+    .small { margin-top: 7px; color: var(--sub); font-size: 12px; line-height: 1.6; }
+    .stat { margin-top: 9px; }
+    .stat label { display: flex; justify-content: space-between; color: #cfe3fc; font-size: 12px; margin-bottom: 4px; }
+    .bar { width: 100%; height: 9px; border-radius: 999px; overflow: hidden; background: rgba(148, 163, 184, 0.2); }
+    .fill { height: 100%; width: 50%; transition: width 220ms ease; }
+    .fill.s { background: linear-gradient(90deg, #34d399, #10b981); }
+    .fill.t { background: linear-gradient(90deg, #f59e0b, #f97316); }
+    .fill.r { background: linear-gradient(90deg, #60a5fa, #3b82f6); }
+    .intel, .log { margin-top: 12px; border-top: 1px solid var(--line); padding-top: 10px; }
+    .intel ul, .log ul {
+      margin: 8px 0 0;
+      padding-left: 18px;
+      color: #d7e9ff;
+      font-size: 13px;
+      display: grid;
+      gap: 6px;
+      line-height: 1.62;
+    }
+    .log ul { max-height: 180px; overflow: auto; padding-right: 6px; }
+    .main {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(11, 18, 34, 0.88);
+      padding: 14px;
+      box-shadow: 0 20px 50px rgba(2, 8, 20, 0.48);
+    }
+    .module-head { display: flex; justify-content: space-between; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .module-title { margin: 0; font-size: 22px; letter-spacing: -0.015em; }
+    .module-scene {
+      color: #d4e9ff;
+      font-size: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.36);
+      border-radius: 999px;
+      padding: 4px 9px;
+    }
+    .opening { margin-top: 10px; color: #d6e8ff; line-height: 1.75; font-size: 14px; }
+    .mentor {
+      margin-top: 8px;
+      border: 1px dashed rgba(148, 163, 184, 0.38);
+      border-radius: 10px;
+      padding: 9px;
+      font-size: 13px;
+      color: #c8dcf7;
+      background: rgba(2, 6, 23, 0.36);
+    }
+    .scenario { margin-top: 14px; border: 1px solid var(--line); border-radius: 12px; background: rgba(15, 23, 42, 0.76); padding: 12px; }
+    .scenario h3 { margin: 0; font-size: 17px; }
+    .situation { margin-top: 8px; font-size: 14px; color: #d8e9ff; line-height: 1.7; }
+    .prompt { margin-top: 8px; font-size: 14px; color: #eff6ff; font-weight: 700; line-height: 1.7; }
+    .hint {
+      margin-top: 8px;
+      border-radius: 8px;
+      border: 1px solid rgba(148, 163, 184, 0.34);
+      padding: 6px 8px;
+      font-size: 12px;
+      color: #bfd6f5;
+      background: rgba(2, 6, 23, 0.35);
+    }
+    .options { margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .opt-btn {
+      text-align: left;
+      border: 1px solid rgba(148, 163, 184, 0.36);
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.92);
+      color: #e2eeff;
+      padding: 11px;
+      cursor: pointer;
+      display: grid;
+      gap: 6px;
+      transition: border-color 140ms ease, transform 140ms ease;
+    }
+    .opt-btn:hover { transform: translateY(-1px); border-color: rgba(56, 189, 248, 0.78); }
+    .opt-stance {
+      font-size: 11px;
+      color: #cfe3ff;
+      border: 1px solid rgba(148, 163, 184, 0.36);
+      border-radius: 999px;
+      padding: 2px 8px;
+      width: fit-content;
+      background: rgba(2, 6, 23, 0.5);
+    }
+    .opt-label { font-size: 14px; font-weight: 700; line-height: 1.5; }
+    .opt-effect { font-size: 12px; color: #9fc0e9; }
+    .report { margin-top: 10px; min-height: 22px; color: #9ad8ff; font-size: 13px; line-height: 1.65; }
+    .debrief { margin-top: 14px; border-top: 1px solid var(--line); padding-top: 10px; display: none; }
+    .debrief.show { display: block; }
+    .debrief p { color: #d8ebff; font-size: 13px; line-height: 1.7; margin: 0; }
+    .debrief p + p { margin-top: 8px; }
+    .end-actions { margin-top: 12px; display: none; gap: 8px; flex-wrap: wrap; }
+    .end-actions.show { display: flex; }
+    .btn {
+      border: 1px solid rgba(148, 163, 184, 0.36);
+      border-radius: 10px;
+      padding: 9px 12px;
+      background: rgba(30, 41, 59, 0.82);
+      color: #e2edff;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn.primary { border-color: rgba(34, 211, 238, 0.66); background: rgba(8, 145, 178, 0.34); }
+    @media (max-width: 960px) {
+      .page { grid-template-columns: 1fr; }
+      .options { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<script src="/shared/book-catalog.js?v=1771754453141"></script>
+<script type="module" src="/shared/shell.js?v=1771754453141"></script>
+<reado-app-shell data-page="knowledge-map"></reado-app-shell>
+  <main class="page">
+    <aside class="panel side">
+      <h2>Attention Test：WMT决策风暴</h2>
+      <p class="small">1 / 1 · 模块一：并行化赌局</p>
+      <p class="small">角色：你是跨语种系统的总指挥，负责在公开基准前做最终技术路线决策。</p>
+      <p class="small">世界：地点在“联合翻译评测作战室”。背景是序列转导系统长期由复杂循环或卷积编码器-解码器主导，而团队正在评估是否全面切向仅依赖注意力机制的方案。</p>
+      <p class="small">评测周只剩一轮训练窗口，你必须在旧范式与新架构之间拍板；每个决定都会改写团队稳定度、经费压力与改革进度。</p>
+
+      <div class="stat">
+        <label><span>系统稳定度</span><span id="s-v">50</span></label>
+        <div class="bar"><div id="s-b" class="fill s"></div></div>
+      </div>
+      <div class="stat">
+        <label><span>资源活性</span><span id="t-v">50</span></label>
+        <div class="bar"><div id="t-b" class="fill t"></div></div>
+      </div>
+      <div class="stat">
+        <label><span>结构推进</span><span id="r-v">50</span></label>
+        <div class="bar"><div id="r-b" class="fill r"></div></div>
+      </div>
+
+      <section class="intel">
+        <h2>情报卡</h2>
+        <p class="small">本关目标：在证据充分但窗口有限的条件下，做出可执行、可复盘的架构与训练决策。</p>
+        <ul><li>情报卡A：dominant sequence transduction models过去多为复杂RNN/CNN编码器-解码器；best performing models常配合attention桥接。</li><li>情报卡B：Transformer路线是based solely on attention，明确去掉recurrence and convolutions，目标是提升并行训练效率。</li><li>情报卡C：两项translation tasks结果show质量提升与更短training时间可同时出现，但这不自动等于所有场景都无风险。</li><li>情报卡D：公开数字仅包括WMT 2014英德28.4 BLEU、英法41.8 BLEU、3.5天/8 GPU等信息；除此之外不做虚构统计。</li></ul>
+      </section>
+
+      <section class="log">
+        <h2>事件日志</h2>
+        <ul id="event-log"></ul>
+      </section>
+    </aside>
+
+    <section class="main">
+      <header class="hero">
+        <div class="chip-row">
+          <span class="chip">商业战情室</span>
+          <span class="chip">深夜的评测作战室，墙上滚动着WMT榜单与GPU占用曲线。你和团队要在凌晨前锁定训练路线。</span>
+          <span class="chip">任务 1</span>
+        </div>
+        <h1>模块一：并行化赌局</h1>
+        <p class="sub">门外是催促上线的产品方，门内是分裂的工程组：一派坚持旧models更稳，一派主张new transformer。你接过最终决策令。</p>
+        <p class="mission">主线任务：基于已知证据完成三次关键抉择：架构取舍、训练部署、任务扩展，目标是在可控风险内争取质量与效率的双重领先。</p>
+      </header>
+
+      <p class="mentor">导师“Lin”提醒：只根据已知结果行动，缺失信息要保守表达，不夸大到未验证数据集。</p>
+
+      <article class="scenario">
+        <h3 id="round-title"></h3>
+        <p id="round-situation" class="situation"></p>
+        <p id="round-prompt" class="prompt"></p>
+        <p id="round-hint" class="hint"></p>
+
+        <div class="options">
+          <button id="opt-a" class="opt-btn">
+            <span id="opt-a-stance" class="opt-stance"></span>
+            <span id="opt-a-label" class="opt-label"></span>
+            <span id="opt-a-effect" class="opt-effect"></span>
+          </button>
+          <button id="opt-b" class="opt-btn">
+            <span id="opt-b-stance" class="opt-stance"></span>
+            <span id="opt-b-label" class="opt-label"></span>
+            <span id="opt-b-effect" class="opt-effect"></span>
+          </button>
+        </div>
+      </article>
+
+      <p id="report" class="report"></p>
+
+      <div id="debrief" class="debrief">
+        <p>你的三次选择将决定团队是否把“attention优先”变成可落地优势，而不是一次高风险口号。</p>
+        <p>核心不是盲目追新，而是用已证据化结论把架构、训练和任务泛化串成同一条策略链。</p>
+      </div>
+      <div id="end-actions" class="end-actions">
+        <a class="btn primary" href="/books/user-attention-test-w1b3tq-3652.html">返回书籍总览</a>
+        
+        <button id="retry-btn" class="btn" type="button">重开本关</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const rounds = [{"title":"回合1：架构总开关","situation":"基础设施组请求你确认本周期主干：继续堆叠循环/卷积，还是切到仅attention的transformer主线。","prompt":"你要如何下达首个指令？","knowledgeHint":"已知结论指向：new transformer是based on attention，且在translation任务上show更优质量与并行潜力；但迁移成本需管理。","optionA":{"stance":"主动改革","label":"主干切换到Transformer，明确去除recurrence与convolutions","feedback":"团队获得统一方向，工程复杂度从“多机制耦合”转向“attention中心化”；短期磨合存在，但改革势能显著提升。","effects":{"stability":3,"treasury":2,"reform":9}},"optionB":{"stance":"保守延续","label":"维持旧编码器-解码器，仅在连接处继续加attention补丁","feedback":"发布风险较低，但并行化红利释放有限，训练时长压力仍高，团队对new路线的探索被推迟。","effects":{"stability":6,"treasury":-3,"reform":-5}}},{"title":"回合2：训练窗口分配","situation":"算力排班只给你一个核心窗口。你可以复刻公开高效训练节奏，或押注更重更慢的旧式堆叠方案。","prompt":"你如何安排training计划与对外预期？","knowledgeHint":"来源给出3.5天、8 GPU、WMT BLEU表现与较低成本结论；未给出的收益区间应保守表述。","optionA":{"stance":"证据驱动","label":"按公开节奏执行高并行训练，并仅承诺“对齐已知WMT证据”","feedback":"你把目标锚定在可验证区间，避免夸张承诺；团队在时间和成本上更可控，外部预期管理更稳。","effects":{"stability":5,"treasury":4,"reform":4}},"optionB":{"stance":"高耗冒险","label":"继续重资源旧models与集成路线，试图以长训练换确定性","feedback":"短期看似熟悉，但资源被高强度占用，迭代速度下降；若收益不超best基线，窗口机会将被消耗。","effects":{"stability":-2,"treasury":-9,"reform":-3}}},{"title":"回合3：跨任务扩展令","situation":"翻译线初步稳定后，平台组建议把同一架构试到其他tasks，验证是否具备更广泛可迁移性。","prompt":"你是否推动跨任务试点？","knowledgeHint":"已知文本show：transformer在英语成分句法分析上可行，且在large/limited training data下都有结果；但范围外结论应谨慎。","optionA":{"stance":"受控扩张","label":"启动小规模跨任务试点，沿用our model配置并设保守成功门槛","feedback":"你把“translation优势”转化为“平台能力”验证，既利用已有证据，又通过门槛控制扩张风险。","effects":{"stability":2,"treasury":-1,"reform":7}},"optionB":{"stance":"单线防守","label":"仅守住translation，不投入other tasks验证","feedback":"短期资源最省，但团队失去验证generalization的窗口，架构价值难从单榜单走向长期能力。","effects":{"stability":1,"treasury":3,"reform":-4}}}];
+      const state = { i: 0, stability: 50, treasury: 50, reform: 50 };
+      const titleEl = document.getElementById("round-title");
+      const situationEl = document.getElementById("round-situation");
+      const promptEl = document.getElementById("round-prompt");
+      const hintEl = document.getElementById("round-hint");
+      const reportEl = document.getElementById("report");
+      const logEl = document.getElementById("event-log");
+      const optA = document.getElementById("opt-a");
+      const optB = document.getElementById("opt-b");
+      const optAStance = document.getElementById("opt-a-stance");
+      const optAEffect = document.getElementById("opt-a-effect");
+      const optALabel = document.getElementById("opt-a-label");
+      const optBStance = document.getElementById("opt-b-stance");
+      const optBEffect = document.getElementById("opt-b-effect");
+      const optBLabel = document.getElementById("opt-b-label");
+      const debriefEl = document.getElementById("debrief");
+      const endActionsEl = document.getElementById("end-actions");
+      const retryBtn = document.getElementById("retry-btn");
+      const sV = document.getElementById("s-v");
+      const tV = document.getElementById("t-v");
+      const rV = document.getElementById("r-v");
+      const sB = document.getElementById("s-b");
+      const tB = document.getElementById("t-b");
+      const rB = document.getElementById("r-b");
+
+      function clamp(v) {
+        return Math.max(0, Math.min(100, Math.round(v)));
+      }
+
+      function fmtDelta(v, label) {
+        const n = Number(v) || 0;
+        const sign = n > 0 ? "+" : "";
+        return label + " " + sign + n;
+      }
+
+      function effectSummary(effects) {
+        return [
+          fmtDelta(effects?.stability, "稳"),
+          fmtDelta(effects?.treasury, "资"),
+          fmtDelta(effects?.reform, "推")
+        ].join(" · ");
+      }
+
+      function refreshBars() {
+        sV.textContent = String(state.stability);
+        tV.textContent = String(state.treasury);
+        rV.textContent = String(state.reform);
+        sB.style.width = state.stability + "%";
+        tB.style.width = state.treasury + "%";
+        rB.style.width = state.reform + "%";
+      }
+
+      function pushLog(text) {
+        const li = document.createElement("li");
+        li.textContent = text;
+        logEl.prepend(li);
+        while (logEl.children.length > 8) {
+          logEl.removeChild(logEl.lastChild);
+        }
+      }
+
+      function showFinal() {
+        titleEl.textContent = "场景结算";
+        situationEl.textContent = "你已完成本关全部关键抉择。";
+        promptEl.textContent = "回看你的日志，检查你是否始终沿着同一因果逻辑推进。";
+        hintEl.textContent = "复盘建议：提炼一条可迁移到现实的判断规则。";
+        optA.style.display = "none";
+        optB.style.display = "none";
+        debriefEl.classList.add("show");
+        endActionsEl.classList.add("show");
+      }
+
+      function paintRound() {
+        const round = rounds[state.i];
+        if (!round) {
+          showFinal();
+          return;
+        }
+        titleEl.textContent = round.title || ("抉择 " + (state.i + 1));
+        situationEl.textContent = round.situation || "局势正在发生变化。";
+        promptEl.textContent = round.prompt || "";
+        hintEl.textContent = "知识锚点：" + (round.knowledgeHint || "先识别约束，再判断代价。");
+        optAStance.textContent = round.optionA?.stance || "方案 A";
+        optALabel.textContent = round.optionA?.label || "选项 A";
+        optAEffect.textContent = "预期影响：" + effectSummary(round.optionA?.effects || {});
+        optBStance.textContent = round.optionB?.stance || "方案 B";
+        optBLabel.textContent = round.optionB?.label || "选项 B";
+        optBEffect.textContent = "预期影响：" + effectSummary(round.optionB?.effects || {});
+        optA.style.display = "";
+        optB.style.display = "";
+      }
+
+      function applyChoice(option) {
+        const effects = option?.effects || {};
+        state.stability = clamp(state.stability + (Number(effects.stability) || 0));
+        state.treasury = clamp(state.treasury + (Number(effects.treasury) || 0));
+        state.reform = clamp(state.reform + (Number(effects.reform) || 0));
+        refreshBars();
+
+        const choiceLabel = option?.label || "未命名策略";
+        const outcome = option?.feedback || "你完成了一次关键抉择。";
+        const line = "第 " + (state.i + 1) + " 回合 · 选择「" + choiceLabel + "」 · " + effectSummary(effects);
+        pushLog(line);
+        reportEl.textContent = "后果速报：" + outcome;
+
+        state.i += 1;
+        window.setTimeout(() => {
+          paintRound();
+        }, 320);
+      }
+
+      optA.addEventListener("click", () => {
+        const round = rounds[state.i];
+        applyChoice(round?.optionA || {});
+      });
+      optB.addEventListener("click", () => {
+        const round = rounds[state.i];
+        applyChoice(round?.optionB || {});
+      });
+      if (retryBtn) {
+        retryBtn.addEventListener("click", () => window.location.reload());
+      }
+
+      pushLog("已进入场景：深夜的评测作战室，墙上滚动着WMT榜单与GPU占用曲线。你和团队要在凌晨前锁定训练路线。");
+      pushLog("角色就位：你是跨语种系统的总指挥，负责在公开基准前做最终技术路线决策。");
+      refreshBars();
+      paintRound();
+
+      try {
+        localStorage.setItem("reado_last_experience_href", "/experiences/u-attention-test-01-3b0a4b.html");
+      } catch {}
+    })();
+  </script>
+
+
+<script>
+(() => {
+  
+  
+  
+})();
+</script>
+</body>
+</html>

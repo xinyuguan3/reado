@@ -1,0 +1,1434 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>reado · Playable Studio</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f4f6fb;
+      --card: #f6f7fb;
+      --line: #cfd6e3;
+      --line-strong: #3b5bff;
+      --text: #1f2937;
+      --sub: #667085;
+      --chip: #eef2ff;
+      --chip-line: #c7d2fe;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at 10% 8%, rgba(112, 154, 255, 0.18), transparent 32%), var(--bg);
+      font-family: "Noto Sans SC", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+      color: var(--text);
+    }
+    .wrap {
+      width: min(1240px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 98px 0 36px;
+      display: grid;
+      gap: 14px;
+    }
+    .panel {
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      background: rgba(255, 255, 255, 0.82);
+      border-radius: 22px;
+      box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
+      padding: 26px;
+    }
+    h1 {
+      margin: 0;
+      text-align: center;
+      font-size: clamp(34px, 4.5vw, 60px);
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+    }
+    .hero-sub {
+      margin-top: 8px;
+      text-align: center;
+      font-size: clamp(24px, 3.5vw, 44px);
+      background: linear-gradient(90deg, #4f46e5, #06b6d4, #22c55e);
+      -webkit-background-clip: text;
+      color: transparent;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .composer {
+      margin-top: 18px;
+      border: 2px solid var(--line-strong);
+      border-radius: 20px;
+      background: var(--card);
+      padding: 16px;
+      display: grid;
+      gap: 10px;
+    }
+    .search-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      border-radius: 14px;
+      background: #fff;
+      padding: 0 12px;
+      min-height: 54px;
+    }
+    .search-box input {
+      border: 0;
+      outline: 0;
+      width: 100%;
+      font-size: 32px;
+      letter-spacing: -0.02em;
+      color: #334155;
+      background: transparent;
+    }
+    .go-btn {
+      width: 54px;
+      height: 54px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      background: #eef2ff;
+      color: #334155;
+      font-size: 26px;
+      cursor: pointer;
+    }
+    .chip-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .chip {
+      border: 1px solid var(--chip-line);
+      background: var(--chip);
+      border-radius: 999px;
+      padding: 7px 14px;
+      font-size: 14px;
+      color: #334155;
+      font-weight: 600;
+    }
+    .drop-zone {
+      margin-top: 14px;
+      border: 3px dashed #d5dbe8;
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.6);
+      padding: 22px;
+      text-align: center;
+      transition: border-color 140ms ease, background 140ms ease;
+    }
+    .drop-zone.dragover {
+      border-color: #4f46e5;
+      background: rgba(238, 242, 255, 0.8);
+    }
+    .drop-title {
+      margin: 8px 0 0;
+      font-size: 50px;
+      letter-spacing: -0.03em;
+      color: #374151;
+      font-weight: 700;
+    }
+    .drop-sub {
+      margin: 8px 0 0;
+      font-size: 22px;
+      color: #6b7280;
+      letter-spacing: -0.02em;
+    }
+    .drop-actions {
+      margin-top: 18px;
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .source-add-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .source-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      min-width: 210px;
+      border: 1px solid #cbd5e1;
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: 0 16px 36px rgba(15, 23, 42, 0.14);
+      padding: 8px;
+      display: grid;
+      gap: 6px;
+      z-index: 20;
+    }
+    .source-menu[hidden] { display: none; }
+    .menu-item {
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      background: #f8fafc;
+      color: #0f172a;
+      padding: 8px 10px;
+      cursor: pointer;
+      font-size: 13px;
+      text-align: left;
+      font-weight: 600;
+    }
+    .menu-item:hover {
+      border-color: #c7d2fe;
+      background: #eef2ff;
+    }
+    .source-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 90;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(2px);
+    }
+    .source-modal[hidden] { display: none; }
+    .source-modal-card {
+      width: min(760px, 100%);
+      border: 1px solid rgba(99, 102, 241, 0.35);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.98);
+      box-shadow: 0 26px 56px rgba(15, 23, 42, 0.26);
+      padding: 18px;
+      display: grid;
+      gap: 10px;
+    }
+    .source-modal-title {
+      margin: 0;
+      font-size: 20px;
+      letter-spacing: -0.02em;
+      color: #0f172a;
+      font-weight: 800;
+    }
+    .source-modal-label {
+      margin: 2px 0 0;
+      font-size: 13px;
+      color: #334155;
+      font-weight: 700;
+    }
+    .source-modal-input,
+    .source-modal-textarea {
+      width: 100%;
+      border: 1px solid #cbd5e1;
+      border-radius: 14px;
+      background: #fff;
+      color: #0f172a;
+      font-size: 15px;
+      font-family: inherit;
+      padding: 12px;
+      outline: none;
+      transition: border-color 140ms ease, box-shadow 140ms ease;
+    }
+    .source-modal-input:focus,
+    .source-modal-textarea:focus {
+      border-color: #4f46e5;
+      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.14);
+    }
+    .source-modal-textarea {
+      min-height: 170px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+    .source-modal-actions {
+      margin-top: 4px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .source-modal-btn {
+      border: 1px solid #cbd5e1;
+      border-radius: 999px;
+      background: #f8fafc;
+      color: #334155;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .source-modal-btn.primary {
+      border-color: #4f46e5;
+      background: #4f46e5;
+      color: #fff;
+    }
+    .btn {
+      border: 1px solid #cbd5e1;
+      border-radius: 999px;
+      background: #fff;
+      color: #111827;
+      padding: 10px 16px;
+      font-size: 16px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .btn.primary {
+      border-color: #4f46e5;
+      background: #4f46e5;
+      color: #fff;
+    }
+    .source-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .block {
+      border: 1px solid #d8deea;
+      border-radius: 16px;
+      background: #fff;
+      padding: 12px;
+      min-height: 220px;
+    }
+    .block h3 {
+      margin: 0;
+      font-size: 15px;
+      color: #111827;
+    }
+    .list {
+      margin-top: 10px;
+      display: grid;
+      gap: 8px;
+      max-height: 360px;
+      overflow: auto;
+      padding-right: 2px;
+    }
+    .item {
+      border: 1px solid #d6dbe7;
+      border-radius: 12px;
+      background: #f8fafc;
+      padding: 10px;
+      display: grid;
+      gap: 5px;
+    }
+    .item.pending {
+      border-style: dashed;
+      background: #f8fbff;
+    }
+    .item h4 {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.4;
+      color: #0f172a;
+    }
+    .item p {
+      margin: 0;
+      font-size: 12px;
+      color: #64748b;
+      line-height: 1.5;
+    }
+    .item .ops {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+    .pending-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #475569;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .spinner {
+      width: 14px;
+      height: 14px;
+      border: 2px solid #cbd5e1;
+      border-top-color: #3b82f6;
+      border-radius: 999px;
+      animation: spin 0.9s linear infinite;
+      flex: 0 0 14px;
+    }
+    .pending-meta {
+      color: #64748b;
+      font-size: 11px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .tiny {
+      font-size: 12px;
+      border-radius: 999px;
+      border: 1px solid #cbd5e1;
+      background: #fff;
+      padding: 4px 10px;
+      color: #334155;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .meta-line {
+      margin-top: 10px;
+      color: #64748b;
+      font-size: 12px;
+      white-space: pre-wrap;
+    }
+    .error { color: #dc2626; }
+    .progress-wrap {
+      margin-top: 12px;
+      border: 1px solid #d8deea;
+      border-radius: 16px;
+      background: #fff;
+      padding: 12px;
+      display: grid;
+      gap: 8px;
+    }
+    .progress-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .status-badge {
+      border: 1px solid #c7d2fe;
+      border-radius: 999px;
+      background: #eef2ff;
+      color: #3730a3;
+      font-size: 12px;
+      padding: 4px 10px;
+      font-weight: 700;
+    }
+    .progress-track {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: #e2e8f0;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #4f46e5, #22c55e);
+      transition: width 180ms ease;
+    }
+    .log-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 6px;
+      max-height: 190px;
+      overflow: auto;
+    }
+    .log-item {
+      border: 1px solid #d8deea;
+      border-radius: 10px;
+      background: #f8fafc;
+      padding: 8px;
+      font-size: 12px;
+      color: #334155;
+      line-height: 1.5;
+    }
+    .log-item .time {
+      color: #64748b;
+      margin-right: 6px;
+      font-variant-numeric: tabular-nums;
+    }
+    @media (max-width: 980px) {
+      .source-grid { grid-template-columns: 1fr; }
+      .drop-title { font-size: 38px; }
+      .search-box input { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <reado-app-shell data-page="studio"></reado-app-shell>
+
+  <main class="wrap">
+    <section class="panel">
+      <h1 data-i18n="studio.title">Generate Playable Learning Missions from Sources</h1>
+      <p class="hero-sub" data-i18n="studio.subtitle">Your Notebook</p>
+
+      <div class="composer">
+        <div class="search-row">
+          <div class="search-box">
+            <span style="font-size:26px;color:#94a3b8;">🔍</span>
+            <input id="search-input" type="text" placeholder="Search web sources (paper title, DOI, keywords)" data-i18n-placeholder="studio.search_placeholder" />
+          </div>
+          <button id="search-btn" class="go-btn" title="Search Sources" data-i18n-title="studio.search_btn_title">➜</button>
+        </div>
+        <div class="chip-row">
+          <span class="chip" data-i18n="studio.chip_web">🌐 Web</span>
+          <span class="chip" data-i18n="studio.chip_fast">⚡ Fast Research</span>
+          <span class="chip" data-i18n="studio.chip_multi">🧠 Multi-source</span>
+        </div>
+      </div>
+
+      <section id="drop-zone" class="drop-zone">
+        <p class="drop-title" data-i18n="studio.drop_title">Or drag and drop files</p>
+        <p class="drop-sub" data-i18n="studio.drop_sub">EPUB, TXT, Markdown, PDF, web text, and more</p>
+        <div class="drop-actions">
+          <div class="source-add-wrap">
+            <button id="add-source-btn" class="btn"><span>➕ </span><span data-i18n="studio.add_source">Add Source</span></button>
+            <div id="add-source-menu" class="source-menu" hidden>
+              <button id="upload-btn" class="menu-item" type="button"><span>⬆️ </span><span data-i18n="studio.upload">Upload</span></button>
+              <button id="website-btn" class="menu-item" type="button"><span>🔗 </span><span data-i18n="studio.website">Website</span></button>
+              <button id="paste-btn" class="menu-item" type="button"><span>📋 </span><span data-i18n="studio.paste">Paste Text</span></button>
+            </div>
+          </div>
+          <button id="generate-btn" class="btn primary" data-i18n="studio.generate">Generate Playable Web</button>
+        </div>
+        <input
+          id="file-input"
+          type="file"
+          multiple
+          accept=".txt,.md,.markdown,.csv,.json,.html,.htm,.epub,.pdf,text/plain,text/markdown,text/csv,application/json,text/html,application/epub+zip,application/pdf"
+          hidden
+        />
+      </section>
+
+      <div class="source-grid">
+        <section class="block">
+          <h3 data-i18n="studio.search_results">Search Results</h3>
+          <div id="search-results" class="list"></div>
+        </section>
+        <section class="block">
+          <h3 data-i18n="studio.selected_sources">Selected Sources</h3>
+          <div id="selected-sources" class="list"></div>
+        </section>
+      </div>
+
+      <section class="progress-wrap">
+        <div class="progress-head">
+          <h3 style="margin:0;font-size:15px;color:#111827;" data-i18n="studio.progress">Processing Progress</h3>
+          <span id="status-badge" class="status-badge">idle</span>
+        </div>
+        <div class="progress-track"><div id="progress-fill" class="progress-fill"></div></div>
+        <p id="progress-text" class="meta-line" style="margin-top:0;"></p>
+        <ul id="log-list" class="log-list"></ul>
+      </section>
+
+      <section class="block" style="margin-top:12px;">
+        <div class="progress-head">
+          <h3 style="margin:0;font-size:15px;color:#111827;" data-i18n="studio.my_works">My Playable Books</h3>
+          <button id="refresh-works-btn" class="tiny" type="button" data-i18n="studio.refresh">Refresh</button>
+        </div>
+        <div id="my-works" class="list"></div>
+      </section>
+
+      <p id="meta-line" class="meta-line"></p>
+      <p id="error-line" class="meta-line error"></p>
+    </section>
+  </main>
+  <div id="source-modal" class="source-modal" hidden>
+    <div class="source-modal-card" role="dialog" aria-modal="true" aria-labelledby="source-modal-title">
+      <h3 id="source-modal-title" class="source-modal-title">Add source</h3>
+      <p id="source-modal-label" class="source-modal-label">Input</p>
+      <input id="source-modal-input" class="source-modal-input" type="text" />
+      <textarea id="source-modal-textarea" class="source-modal-textarea" hidden></textarea>
+      <div class="source-modal-actions">
+        <button id="source-modal-cancel" class="source-modal-btn" type="button">Cancel</button>
+        <button id="source-modal-confirm" class="source-modal-btn primary" type="button">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import "/shared/shell.js";
+    import { onLanguageChange, translateDom, t } from "/shared/i18n.js";
+
+    const searchInput = document.getElementById("search-input");
+    const searchBtn = document.getElementById("search-btn");
+    const generateBtn = document.getElementById("generate-btn");
+    const addSourceBtn = document.getElementById("add-source-btn");
+    const addSourceMenu = document.getElementById("add-source-menu");
+    const uploadBtn = document.getElementById("upload-btn");
+    const websiteBtn = document.getElementById("website-btn");
+    const pasteBtn = document.getElementById("paste-btn");
+    const fileInput = document.getElementById("file-input");
+    const dropZone = document.getElementById("drop-zone");
+    const searchResultsEl = document.getElementById("search-results");
+    const selectedSourcesEl = document.getElementById("selected-sources");
+    const metaLineEl = document.getElementById("meta-line");
+    const errorLineEl = document.getElementById("error-line");
+    const progressFillEl = document.getElementById("progress-fill");
+    const progressTextEl = document.getElementById("progress-text");
+    const statusBadgeEl = document.getElementById("status-badge");
+    const logListEl = document.getElementById("log-list");
+    const myWorksEl = document.getElementById("my-works");
+    const refreshWorksBtn = document.getElementById("refresh-works-btn");
+    const sourceModalEl = document.getElementById("source-modal");
+    const sourceModalTitleEl = document.getElementById("source-modal-title");
+    const sourceModalLabelEl = document.getElementById("source-modal-label");
+    const sourceModalInputEl = document.getElementById("source-modal-input");
+    const sourceModalTextareaEl = document.getElementById("source-modal-textarea");
+    const sourceModalCancelEl = document.getElementById("source-modal-cancel");
+    const sourceModalConfirmEl = document.getElementById("source-modal-confirm");
+    const ACTIVE_JOB_KEY = "reado_studio_active_job_id";
+
+    const state = {
+      searchResults: [],
+      selectedSources: [],
+      pendingSources: [],
+      myWorks: [],
+      job: null,
+      clientLogs: [],
+      currentStream: null,
+      pollTimer: null,
+      openedJobId: ""
+    };
+
+    function esc(value) {
+      return String(value || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll("\"", "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function setMeta(text) {
+      metaLineEl.textContent = text || "";
+    }
+
+    function setError(text) {
+      errorLineEl.textContent = text || "";
+    }
+
+    function setStatus(text) {
+      statusBadgeEl.textContent = text || "idle";
+    }
+
+    function setProgress(percent, text = "") {
+      const safe = Math.max(0, Math.min(100, Math.round(Number(percent) || 0)));
+      progressFillEl.style.width = safe + "%";
+      progressTextEl.textContent = text || (t("studio.progress_pct", "Progress {value}%", { value: safe }));
+    }
+
+    function formatTime(iso) {
+      const date = iso ? new Date(iso) : new Date();
+      if (Number.isNaN(date.getTime())) return "";
+      return date.toLocaleTimeString([], { hour12: false });
+    }
+
+    function pushClientLog(message, step = "client", progress = null) {
+      const line = String(message || "").trim();
+      if (!line) return;
+      state.clientLogs.unshift({
+        at: new Date().toISOString(),
+        step,
+        progress: Number.isFinite(Number(progress)) ? Number(progress) : null,
+        message: line
+      });
+      state.clientLogs = state.clientLogs.slice(0, 120);
+      renderLogs();
+    }
+
+    function renderLogs() {
+      const rows = state.job && Array.isArray(state.job.logs) && state.job.logs.length
+        ? state.job.logs
+        : state.clientLogs;
+      if (!rows.length) {
+        logListEl.innerHTML = `<li class="log-item">${esc(t("studio.logs_empty", "No logs yet."))}</li>`;
+        return;
+      }
+      const stepMap = {
+        queued: "Queued",
+        preparing_sources: "Preparing sources",
+        searching_sources: "Searching sources",
+        ingesting_file: "Ingesting file",
+        ingesting_url: "Ingesting URL",
+        enriching_sources: "Enriching sources",
+        gathering_context: "Gathering context",
+        generating_blueprint: "Generating blueprint",
+        compiling_modules: "Compiling modules",
+        publishing_catalog: "Publishing catalog",
+        done: "Done",
+        error: "Error"
+      };
+      logListEl.innerHTML = rows.map((row) => {
+        const time = formatTime(row.at);
+        const stepName = row.step ? (stepMap[row.step] || row.step) : "";
+        const step = stepName ? "[" + stepName + "] " : "";
+        const pct = Number.isFinite(Number(row.progress)) ? (" (" + Number(row.progress) + "%)") : "";
+        const message = row.message || (stepMap[row.step] || "");
+        return `<li class="log-item"><span class="time">${esc(time)}</span>${esc(step + message + pct)}</li>`;
+      }).join("");
+    }
+
+    async function request(method, url, body) {
+      const response = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: body ? JSON.stringify(body) : undefined
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || data?.ok === false) {
+        const error = new Error(data?.error || ("Request failed with " + response.status));
+        error.status = response.status;
+        error.payload = data;
+        throw error;
+      }
+      return data;
+    }
+
+    function sourceKey(item) {
+      return (String(item.url || "") + "::" + String(item.title || "")).toLowerCase();
+    }
+
+    function estimateModuleCountFromSources(sources) {
+      const rows = Array.isArray(sources) ? sources : [];
+      const text = rows
+        .map((item) => String(item?.content || item?.snippet || ""))
+        .join("\n");
+      const compact = text.replace(/\s+/g, " ").trim();
+      const headingMatches = text.match(/(?:^|\n)\s*(?:chapter|ch\.|part|section|第[一二三四五六七八九十百0-9]+章|第[一二三四五六七八九十百0-9]+节)\b/gi) || [];
+      let count = 0;
+      if (headingMatches.length > 0) {
+        count = Math.min(headingMatches.length, 6);
+      } else if (compact.length <= 7000) {
+        count = 1;
+      } else if (compact.length <= 18000) {
+        count = 2;
+      } else if (compact.length <= 34000) {
+        count = 3;
+      } else if (compact.length <= 52000) {
+        count = 4;
+      } else if (compact.length <= 72000) {
+        count = 5;
+      } else {
+        count = 6;
+      }
+      if (rows.length >= 5 && count < 6) count += 1;
+      if (rows.length <= 1 && count > 4) count = 4;
+      return Math.max(1, Math.min(6, count || 3));
+    }
+
+    function estimateGenerationCreditCost(sources, moduleCount) {
+      const rows = Array.isArray(sources) ? sources : [];
+      const chars = rows.reduce((sum, item) => (
+        sum + String(item?.content || item?.snippet || "").length
+      ), 0);
+      const sourceCount = Math.max(1, rows.length);
+      const modules = Math.max(1, Math.min(6, Number(moduleCount) || 1));
+      const notebookLikeParse = Math.ceil(chars / 5000);
+      const notebookLikeContext = Math.ceil(chars / 14000) * 2 + Math.ceil(sourceCount / 2);
+      const stitchRender = modules * 4;
+      const base = 8;
+      const total = base + notebookLikeParse + notebookLikeContext + stitchRender;
+      const scaled = Math.round(total * 10);
+      return Math.max(100, Math.min(4800, scaled));
+    }
+
+    function openSourceInputModal({
+      title = "",
+      label = "",
+      placeholder = "",
+      defaultValue = "",
+      multiline = false,
+      confirmText = "",
+      cancelText = ""
+    } = {}) {
+      return new Promise((resolve) => {
+        if (!sourceModalEl) {
+          resolve("");
+          return;
+        }
+
+        const inputEl = multiline ? sourceModalTextareaEl : sourceModalInputEl;
+        const hiddenEl = multiline ? sourceModalInputEl : sourceModalTextareaEl;
+        const previousActive = document.activeElement;
+
+        sourceModalTitleEl.textContent = title || t("studio.add_source", "Add Source");
+        sourceModalLabelEl.textContent = label || "";
+        sourceModalConfirmEl.textContent = confirmText || t("studio.modal_confirm", "Confirm");
+        sourceModalCancelEl.textContent = cancelText || t("studio.modal_cancel", "Cancel");
+
+        inputEl.value = String(defaultValue || "");
+        inputEl.placeholder = placeholder || "";
+        inputEl.hidden = false;
+        hiddenEl.hidden = true;
+
+        sourceModalEl.hidden = false;
+        requestAnimationFrame(() => inputEl.focus());
+
+        let done = false;
+        const finish = (value = "") => {
+          if (done) return;
+          done = true;
+          sourceModalEl.hidden = true;
+          sourceModalInputEl.hidden = false;
+          sourceModalTextareaEl.hidden = true;
+          sourceModalInputEl.value = "";
+          sourceModalTextareaEl.value = "";
+          sourceModalInputEl.placeholder = "";
+          sourceModalTextareaEl.placeholder = "";
+          sourceModalEl.removeEventListener("click", onBackdropClick);
+          sourceModalCancelEl.removeEventListener("click", onCancel);
+          sourceModalConfirmEl.removeEventListener("click", onConfirm);
+          inputEl.removeEventListener("keydown", onInputKeydown);
+          window.removeEventListener("keydown", onEscape);
+          if (previousActive && typeof previousActive.focus === "function") {
+            try { previousActive.focus(); } catch {}
+          }
+          resolve(String(value || "").trim());
+        };
+
+        const onCancel = () => finish("");
+        const onConfirm = () => finish(inputEl.value);
+        const onEscape = (event) => {
+          if (event.key !== "Escape") return;
+          event.preventDefault();
+          finish("");
+        };
+        const onInputKeydown = (event) => {
+          if (multiline) {
+            if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) {
+              event.preventDefault();
+              finish(inputEl.value);
+            }
+            return;
+          }
+          if (event.key === "Enter") {
+            event.preventDefault();
+            finish(inputEl.value);
+          }
+        };
+        const onBackdropClick = (event) => {
+          if (event.target === sourceModalEl) finish("");
+        };
+
+        sourceModalEl.addEventListener("click", onBackdropClick);
+        sourceModalCancelEl.addEventListener("click", onCancel);
+        sourceModalConfirmEl.addEventListener("click", onConfirm);
+        inputEl.addEventListener("keydown", onInputKeydown);
+        window.addEventListener("keydown", onEscape);
+      });
+    }
+
+    function createPendingSource({ title, status, progress, kind }) {
+      const row = {
+        id: "pending-" + Math.random().toString(36).slice(2, 9),
+        title: title || t("studio.pending_source", "Processing source"),
+        status: status || t("studio.pending_uploading", "Uploading and parsing..."),
+        progress: Number.isFinite(Number(progress)) ? Number(progress) : null,
+        kind: kind || "file",
+        createdAt: new Date().toISOString()
+      };
+      state.pendingSources.unshift(row);
+      renderSelectedSources();
+      return row.id;
+    }
+
+    function patchPendingSource(id, patch = {}) {
+      const idx = state.pendingSources.findIndex((row) => row.id === id);
+      if (idx < 0) return;
+      state.pendingSources[idx] = { ...state.pendingSources[idx], ...patch };
+      renderSelectedSources();
+    }
+
+    function removePendingSource(id) {
+      const idx = state.pendingSources.findIndex((row) => row.id === id);
+      if (idx < 0) return;
+      state.pendingSources.splice(idx, 1);
+      renderSelectedSources();
+    }
+
+    function addSelectedSource(item) {
+      const key = sourceKey(item);
+      if (!key.trim()) return;
+      if (state.selectedSources.some((row) => sourceKey(row) === key)) return;
+      state.selectedSources.push(item);
+      renderSelectedSources();
+    }
+
+    function removeSelectedSource(index) {
+      state.selectedSources.splice(index, 1);
+      renderSelectedSources();
+    }
+
+    function renderSearchResults() {
+      const rows = Array.isArray(state.searchResults) ? state.searchResults : [];
+      if (!rows.length) {
+        searchResultsEl.innerHTML = `<div class="item"><p>${esc(t("studio.search_empty", "No search results yet."))}</p></div>`;
+        return;
+      }
+      searchResultsEl.innerHTML = rows.map((item, index) => `
+        <article class="item">
+          <h4>${esc(item.title || t("studio.source_default", "Source {value}", { value: index + 1 }))}</h4>
+          <p>${esc(item.snippet || t("studio.snippet_empty", "No snippet"))}</p>
+          <div class="ops">
+            ${item.url ? `<a class="tiny" href="${esc(item.url)}" target="_blank" rel="noreferrer">${esc(t("studio.open", "Open"))}</a>` : ""}
+            <button class="tiny" data-act="add" data-idx="${index}">${esc(t("studio.add_source", "Add Source"))}</button>
+          </div>
+        </article>
+      `).join("");
+      searchResultsEl.querySelectorAll('button[data-act="add"]').forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const idx = Number(btn.getAttribute("data-idx"));
+          const row = state.searchResults[idx];
+          if (row) addSelectedSource(row);
+        });
+      });
+    }
+
+    function renderSelectedSources() {
+      const rows = Array.isArray(state.selectedSources) ? state.selectedSources : [];
+      const pending = Array.isArray(state.pendingSources) ? state.pendingSources : [];
+      if (!rows.length && !pending.length) {
+        selectedSourcesEl.innerHTML = `<div class="item"><p>${esc(t("studio.selected_empty", "No sources yet. Search or upload first."))}</p></div>`;
+        return;
+      }
+      const pendingHtml = pending.map((item) => {
+        const progressText = Number.isFinite(Number(item.progress)) ? ` ${Math.max(0, Math.min(100, Math.round(Number(item.progress))))}%` : "";
+        return `
+          <article class="item pending">
+            <h4>${esc(item.title || t("studio.pending_source", "Processing source"))}</h4>
+            <div class="pending-row">
+              <span class="spinner" aria-hidden="true"></span>
+              <span>${esc((item.status || t("studio.pending_uploading", "Uploading and parsing...")) + progressText)}</span>
+            </div>
+            <p class="pending-meta">${esc(t("studio.pending_desc", "Source is being uploaded/parsing. It will appear here when ready."))}</p>
+          </article>
+        `;
+      }).join("");
+      const selectedHtml = rows.map((item, index) => `
+        <article class="item">
+          <h4>${esc(item.title || t("studio.source_default", "Source {value}", { value: index + 1 }))}</h4>
+          <p>${esc((item.snippet || item.content || "").slice(0, 220))}</p>
+          <div class="ops">
+            ${item.url ? `<a class="tiny" href="${esc(item.url)}" target="_blank" rel="noreferrer">${esc(t("studio.open", "Open"))}</a>` : ""}
+            <button class="tiny" data-act="remove" data-idx="${index}">${esc(t("studio.remove", "Remove"))}</button>
+          </div>
+        </article>
+      `).join("");
+      selectedSourcesEl.innerHTML = pendingHtml + selectedHtml;
+      selectedSourcesEl.querySelectorAll('button[data-act="remove"]').forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const idx = Number(btn.getAttribute("data-idx"));
+          removeSelectedSource(idx);
+        });
+      });
+    }
+
+    async function searchSources() {
+      const query = (searchInput.value || "").trim();
+      if (!query) {
+        setError(t("studio.err_enter_query", "Please enter a query."));
+        return;
+      }
+      setError("");
+      setMeta(t("studio.meta_searching", "Searching sources..."));
+      setStatus("searching");
+      setProgress(8, t("studio.progress_searching", "Searching web sources..."));
+      searchBtn.disabled = true;
+      try {
+        const data = await request("GET", "/api/studio/sources/search?q=" + encodeURIComponent(query) + "&limit=10");
+        state.searchResults = Array.isArray(data.results) ? data.results : [];
+        renderSearchResults();
+        pushClientLog(t("studio.log_search_done", "Search completed. Candidates: {value}", { value: state.searchResults.length }), "search", 100);
+        setMeta(t("studio.meta_search_done", "Found {value} sources.", { value: state.searchResults.length }));
+        setStatus("ready");
+        setProgress(100, t("studio.progress_search_done", "Search completed"));
+      } catch (error) {
+        setError(error?.message || t("studio.err_search_failed", "Search failed"));
+        pushClientLog(t("studio.log_search_failed", "Search failed: {value}", { value: error?.message || "unknown" }), "search");
+        setStatus("error");
+      } finally {
+        searchBtn.disabled = false;
+      }
+    }
+
+    function readFileAsBase64(file, onProgress) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error("File read failed: " + file.name));
+        reader.onprogress = (event) => {
+          if (!event.lengthComputable) return;
+          if (typeof onProgress === "function") {
+            onProgress(Math.max(0, Math.min(1, event.loaded / Math.max(event.total, 1))));
+          }
+        };
+        reader.onload = () => {
+          const result = String(reader.result || "");
+          const idx = result.indexOf(",");
+          if (idx < 0) {
+            reject(new Error("File encoding failed: " + file.name));
+            return;
+          }
+          resolve(result.slice(idx + 1));
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function ingestFile(file, index, total, pendingId = "") {
+      const maxMb = 12;
+      if (!file) return;
+      if (file.size > maxMb * 1024 * 1024) {
+        throw new Error(file.name + " exceeds " + maxMb + "MB");
+      }
+      const baseStart = Math.round((index / Math.max(total, 1)) * 100);
+      setStatus("ingesting");
+      setProgress(baseStart, "Reading file: " + file.name);
+      patchPendingSource(pendingId, {
+        status: t("studio.pending_reading", "Reading local file..."),
+        progress: baseStart
+      });
+      const contentBase64 = await readFileAsBase64(file, (ratio) => {
+        const pct = baseStart + Math.round((100 / Math.max(total, 1)) * ratio * 0.6);
+        setProgress(pct, "Uploading: " + file.name);
+        patchPendingSource(pendingId, {
+          status: t("studio.pending_uploading", "Uploading and parsing..."),
+          progress: pct
+        });
+      });
+      patchPendingSource(pendingId, {
+        status: t("studio.pending_server", "Server parsing file..."),
+        progress: Math.max(baseStart + 62, 62)
+      });
+      const data = await request("POST", "/api/studio/files/ingest", {
+        name: file.name,
+        type: file.type,
+        contentBase64
+      });
+      const events = Array.isArray(data.events) ? data.events : [];
+      for (const event of events) {
+        pushClientLog(event.message || "Processing file", event.step || "ingest", event.progress);
+        if (Number.isFinite(Number(event.progress))) {
+          patchPendingSource(pendingId, {
+            status: event.message || t("studio.pending_server", "Server parsing file..."),
+            progress: Number(event.progress)
+          });
+        }
+      }
+      setProgress(Math.round(((index + 1) / Math.max(total, 1)) * 100), "Done: " + file.name);
+      patchPendingSource(pendingId, {
+        status: t("studio.pending_done", "Parsed, adding to source list..."),
+        progress: 100
+      });
+      return data.source;
+    }
+
+    async function ingestFileList(files) {
+      const list = Array.from(files || []);
+      if (!list.length) return;
+      setError("");
+      setMeta(t("studio.meta_parsing_files", "Parsing files..."));
+      setStatus("ingesting");
+      pushClientLog(t("studio.log_import_start", "Start importing files. Count: {value}", { value: list.length }), "ingest", 0);
+      for (let i = 0; i < list.length; i += 1) {
+        const file = list[i];
+        const pendingId = createPendingSource({
+          title: file.name,
+          kind: "file",
+          status: t("studio.pending_queue", "Queued for upload..."),
+          progress: 0
+        });
+        try {
+          const source = await ingestFile(file, i, list.length, pendingId);
+          removePendingSource(pendingId);
+          addSelectedSource(source);
+          pushClientLog(t("studio.log_import_done", "Imported: {name}", { name: file.name }) + (source?.parsedBy ? (" (skill: " + source.parsedBy + ")") : ""), "ingest", 100);
+        } catch (error) {
+          removePendingSource(pendingId);
+          setError(error?.message || (t("studio.err_file_parse", "File parse failed: {name}", { name: file.name })));
+          pushClientLog(t("studio.log_import_failed", "Import failed: {name} - {error}", { name: file.name, error: error?.message || "unknown" }), "ingest");
+        }
+      }
+      setStatus("ready");
+      setMeta(t("studio.meta_file_done", "File import completed. Selected: {value}", { value: state.selectedSources.length }));
+      setProgress(100, t("studio.progress_file_done", "File import completed"));
+    }
+
+    function closeJobChannels() {
+      if (state.currentStream) {
+        try {
+          state.currentStream.close();
+        } catch {}
+        state.currentStream = null;
+      }
+      if (state.pollTimer) {
+        clearInterval(state.pollTimer);
+        state.pollTimer = null;
+      }
+    }
+
+    async function loadMyWorks() {
+      try {
+        const data = await request("GET", "/api/studio/works?scope=mine&limit=120");
+        state.myWorks = Array.isArray(data.works) ? data.works : [];
+      } catch (error) {
+        pushClientLog(t("studio.err_search_failed", "Search failed") + ": " + (error?.message || "unknown"), "works");
+        state.myWorks = [];
+      }
+      renderMyWorks();
+    }
+
+    function renderMyWorks() {
+      const rows = Array.isArray(state.myWorks) ? state.myWorks : [];
+      if (!rows.length) {
+        myWorksEl.innerHTML = `<div class="item"><p>${esc(t("studio.my_works_empty", "No playable books yet."))}</p></div>`;
+        return;
+      }
+      myWorksEl.innerHTML = rows.map((item) => `
+        <article class="item">
+          <h4>${esc(item.title || "Untitled")}</h4>
+          <p>${esc(item.subtitle || item.hook || "")}</p>
+          <p>${esc("Mode: " + (item.html_generation_mode || "unknown") + (item.html_generation_error ? (" · " + item.html_generation_error) : ""))}</p>
+          <div class="ops">
+            <a class="tiny" href="${esc(item.book_href || "#")}" target="_blank" rel="noreferrer">${esc(t("studio.open_book", "Open Book"))}</a>
+            <button class="tiny" data-act="rename" data-id="${esc(item.id)}">${esc(t("studio.rename", "Rename"))}</button>
+            <button class="tiny" data-act="publish" data-id="${esc(item.id)}">${esc(item.is_public ? t("studio.unpublish", "Unpublish") : t("studio.publish", "Publish to Library"))}</button>
+            <button class="tiny" data-act="delete" data-id="${esc(item.id)}">${esc(t("studio.delete", "Delete"))}</button>
+          </div>
+        </article>
+      `).join("");
+
+      myWorksEl.querySelectorAll('button[data-act="rename"]').forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const id = btn.getAttribute("data-id") || "";
+          const row = rows.find((item) => item.id === id);
+          if (!id || !row) return;
+          const nextTitle = (window.prompt(t("studio.prompt_rename", "Rename this playable book"), row.title || "") || "").trim();
+          if (!nextTitle || nextTitle === row.title) return;
+          btn.disabled = true;
+          try {
+            await request("PATCH", "/api/studio/works/" + encodeURIComponent(id), { title: nextTitle });
+            setMeta(t("studio.meta_rename_done", "Title updated."));
+            await loadMyWorks();
+          } catch (error) {
+            setError(error?.message || t("studio.err_rename_failed", "Rename failed"));
+          } finally {
+            btn.disabled = false;
+          }
+        });
+      });
+
+      myWorksEl.querySelectorAll('button[data-act="publish"]').forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const id = btn.getAttribute("data-id") || "";
+          const row = rows.find((item) => item.id === id);
+          if (!id || !row) return;
+          btn.disabled = true;
+          try {
+            await request("PATCH", "/api/studio/works/" + encodeURIComponent(id), {
+              is_public: !Boolean(row.is_public)
+            });
+            setMeta(t("studio.meta_publish_done", "Visibility updated."));
+            await loadMyWorks();
+          } catch (error) {
+            setError(error?.message || t("studio.err_publish_failed", "Publish failed"));
+          } finally {
+            btn.disabled = false;
+          }
+        });
+      });
+
+      myWorksEl.querySelectorAll('button[data-act="delete"]').forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const id = btn.getAttribute("data-id") || "";
+          if (!id) return;
+          if (!window.confirm(t("studio.confirm_delete", "Delete this playable book? This action cannot be undone."))) return;
+          btn.disabled = true;
+          try {
+            await request("DELETE", "/api/studio/works/" + encodeURIComponent(id));
+            setMeta(t("studio.meta_delete_done", "Book deleted."));
+            await loadMyWorks();
+          } catch (error) {
+            setError(error?.message || t("studio.err_delete_failed", "Delete failed"));
+          } finally {
+            btn.disabled = false;
+          }
+        });
+      });
+    }
+
+    function applyJobSnapshot(job) {
+      state.job = job && typeof job === "object" ? job : null;
+      const step = state.job?.step || "unknown";
+      const status = state.job?.status || "running";
+      const progress = Number(state.job?.progress || 0);
+      setStatus(status + " · " + step);
+      const lastLog = Array.isArray(state.job?.logs) && state.job.logs[0] ? state.job.logs[0].message : "";
+      setProgress(progress, lastLog || ("Processing: " + step));
+      renderLogs();
+
+      if (status === "error") {
+        const charge = state.job?.creditCharge || null;
+        const creditSnapshot = state.job?.creditSnapshot || null;
+        if (charge && Number(charge.amount || 0) > 0 && charge.status === "refunded") {
+          pushClientLog(`Refunded credits: ${Number(charge.amount || 0)}`, "credits", 0);
+        }
+        if (creditSnapshot && Number.isFinite(Number(creditSnapshot.available))) {
+          setMeta(`Credits available: ${Number(creditSnapshot.available)}`);
+        }
+        setError(state.job?.error || t("studio.err_generation_failed", "Generation failed"));
+        try { localStorage.removeItem(ACTIVE_JOB_KEY); } catch {}
+        closeJobChannels();
+        loadMyWorks().catch(() => {});
+        return;
+      }
+      if (status === "done") {
+        const work = state.job?.work || {};
+        const charge = state.job?.creditCharge || null;
+        const creditSnapshot = state.job?.creditSnapshot || null;
+        const href = "/books/" + encodeURIComponent(work.book_id || "") + ".html";
+        const info = [
+          t("studio.info_done", "Generation completed"),
+          t("studio.info_book_url", "Book URL: {value}", { value: href }),
+          t("studio.info_generation_mode", "Generation mode: {value}", { value: work.generation_mode || "unknown" }),
+          t("studio.info_html_mode", "HTML mode: {value}", { value: work.html_generation_mode || "unknown" }),
+          charge && Number(charge.amount || 0) > 0
+            ? `Credits charged: ${Number(charge.amount || 0)} (${charge.status || "reserved"})`
+            : "",
+          creditSnapshot && Number.isFinite(Number(creditSnapshot.available))
+            ? `Credits available: ${Number(creditSnapshot.available)}`
+            : "",
+          work.html_generation_error ? t("studio.info_html_error", "HTML generation issue: {value}", { value: work.html_generation_error }) : "",
+          work.llm_error ? t("studio.info_fallback_reason", "Fallback reason: {value}", { value: work.llm_error }) : ""
+        ].filter(Boolean).join("\n");
+        setMeta(info);
+        try { localStorage.removeItem(ACTIVE_JOB_KEY); } catch {}
+        loadMyWorks().catch(() => {});
+        if (state.job.id && state.openedJobId !== state.job.id && href) {
+          state.openedJobId = state.job.id;
+          window.open(href, "_blank", "noopener,noreferrer");
+        }
+        closeJobChannels();
+      }
+    }
+
+    async function pollJob(jobId) {
+      try {
+        const data = await request("GET", "/api/studio/jobs/" + encodeURIComponent(jobId));
+        applyJobSnapshot(data.job || {});
+      } catch (error) {
+        setError(error?.message || t("studio.err_poll_failed", "Job polling failed"));
+      }
+    }
+
+    function attachJobStream(jobId) {
+      closeJobChannels();
+      const es = new EventSource("/api/studio/jobs/" + encodeURIComponent(jobId) + "/stream");
+      state.currentStream = es;
+      es.addEventListener("update", (event) => {
+        try {
+          const payload = JSON.parse(event.data || "{}");
+          applyJobSnapshot(payload);
+        } catch {}
+      });
+      es.onerror = () => {
+        try { es.close(); } catch {}
+        state.currentStream = null;
+        if (state.pollTimer) return;
+        state.pollTimer = setInterval(() => {
+          pollJob(jobId).catch(() => {});
+        }, 1500);
+      };
+    }
+
+    async function startGenerationJob(payload) {
+      const data = await request("POST", "/api/studio/jobs", payload);
+      const job = data.job || {};
+      if (!job.id) {
+        throw new Error("Failed to create job");
+      }
+      try { localStorage.setItem(ACTIVE_JOB_KEY, job.id); } catch {}
+      applyJobSnapshot(job);
+      attachJobStream(job.id);
+      return job;
+    }
+
+    async function generatePlayable() {
+      if (state.pendingSources.length > 0) {
+        setError(t("studio.err_wait_pending", "Please wait until source uploads/parsing complete."));
+        return;
+      }
+      if (!state.selectedSources.length) {
+        setError(t("studio.err_need_source", "Add at least one source first (search result or uploaded file)."));
+        return;
+      }
+      setError("");
+      setMeta(t("studio.meta_generating", "Generating playable web, please wait..."));
+      generateBtn.disabled = true;
+      setStatus("queued");
+      setProgress(2, t("studio.progress_job_submitted", "Job submitted, waiting..."));
+      pushClientLog(t("studio.log_generate_start", "Start generating playable web"), "job", 2);
+      pushClientLog(t("studio.warn_active_job", "Generation keeps running in background. You can switch sections and come back later."), "job", 4);
+      try {
+        const estimatedModules = estimateModuleCountFromSources(state.selectedSources);
+        const creditCost = estimateGenerationCreditCost(state.selectedSources, estimatedModules);
+        setMeta(`Submitting job and reserving credits (estimated ${creditCost}, auto modules ${estimatedModules})...`);
+        const payload = {
+          mode: "sources",
+          input: searchInput.value || "custom sources",
+          sources: state.selectedSources
+        };
+        await startGenerationJob(payload);
+      } catch (error) {
+        const available = Number(error?.payload?.credits?.available);
+        if (error?.payload?.code === "INSUFFICIENT_CREDITS" && Number.isFinite(available)) {
+          setMeta(`Credits available: ${available}`);
+        }
+        setError(error?.message || t("studio.err_generation_failed", "Generation failed"));
+        setStatus("error");
+        pushClientLog(t("studio.log_generation_failed", "Generation failed: {value}", { value: error?.message || "unknown" }), "job");
+      } finally {
+        generateBtn.disabled = false;
+      }
+    }
+
+    function setupDropZone() {
+      ["dragenter", "dragover"].forEach((evt) => {
+        dropZone.addEventListener(evt, (event) => {
+          event.preventDefault();
+          dropZone.classList.add("dragover");
+        });
+      });
+      ["dragleave", "drop"].forEach((evt) => {
+        dropZone.addEventListener(evt, (event) => {
+          event.preventDefault();
+          dropZone.classList.remove("dragover");
+        });
+      });
+      dropZone.addEventListener("drop", (event) => {
+        const files = event.dataTransfer?.files;
+        ingestFileList(files).catch((error) => setError(error?.message || t("studio.err_file_import_failed", "File import failed")));
+      });
+    }
+
+    function closeAddSourceMenu() {
+      if (!addSourceMenu) return;
+      addSourceMenu.hidden = true;
+    }
+
+    function toggleAddSourceMenu() {
+      if (!addSourceMenu) return;
+      addSourceMenu.hidden = !addSourceMenu.hidden;
+    }
+
+    searchBtn.addEventListener("click", searchSources);
+    searchInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") searchSources();
+    });
+    generateBtn.addEventListener("click", generatePlayable);
+
+    addSourceBtn.addEventListener("click", (event) => {
+      event.stopPropagation();
+      toggleAddSourceMenu();
+    });
+    document.addEventListener("click", (event) => {
+      if (!addSourceMenu || addSourceMenu.hidden) return;
+      if (addSourceMenu.contains(event.target) || addSourceBtn.contains(event.target)) return;
+      closeAddSourceMenu();
+    });
+
+    uploadBtn.addEventListener("click", () => {
+      closeAddSourceMenu();
+      fileInput.click();
+    });
+    fileInput.addEventListener("change", () => {
+      ingestFileList(fileInput.files).catch((error) => setError(error?.message || t("studio.err_file_import_failed", "File import failed")));
+      fileInput.value = "";
+    });
+
+    websiteBtn.addEventListener("click", async () => {
+      closeAddSourceMenu();
+      const url = await openSourceInputModal({
+        title: t("studio.website", "Website"),
+        label: t("studio.prompt_url", "Paste website / paper URL"),
+        placeholder: "https://",
+        multiline: false,
+        confirmText: t("studio.modal_add_source", "Add Source"),
+        cancelText: t("studio.modal_cancel", "Cancel")
+      });
+      if (!url) return;
+      setError("");
+      setStatus("ingesting");
+      setProgress(12, t("studio.progress_fetching_page", "Fetching page content..."));
+      pushClientLog(t("studio.log_fetch_start", "Start fetching source: {value}", { value: url }), "source", 12);
+      const pendingId = createPendingSource({
+        title: url,
+        kind: "url",
+        status: t("studio.pending_fetching", "Fetching web source..."),
+        progress: 12
+      });
+      try {
+        const data = await request("POST", "/api/studio/sources/ingest-url", { url });
+        const events = Array.isArray(data.events) ? data.events : [];
+        for (const event of events) {
+          pushClientLog(event.message || t("studio.log_processing_web", "Processing webpage"), event.step || "ingest_url", event.progress);
+          if (Number.isFinite(Number(event.progress))) {
+            patchPendingSource(pendingId, {
+              status: event.message || t("studio.pending_fetching", "Fetching web source..."),
+              progress: Number(event.progress)
+            });
+          }
+        }
+        if (data.source) {
+          patchPendingSource(pendingId, {
+            status: t("studio.pending_done", "Parsed, adding to source list..."),
+            progress: 100
+          });
+          removePendingSource(pendingId);
+          addSelectedSource(data.source);
+        }
+        setMeta(t("studio.meta_website_added", "Website source added with extracted content."));
+        setStatus("ready");
+        setProgress(100, t("studio.progress_website_done", "Website source import completed"));
+      } catch (error) {
+        removePendingSource(pendingId);
+        setStatus("error");
+        setError(error?.message || t("studio.err_website_failed", "Website source fetch failed"));
+        pushClientLog(t("studio.log_website_failed", "Website fetch failed: {value}", { value: error?.message || "unknown" }), "source");
+      }
+    });
+
+    pasteBtn.addEventListener("click", async () => {
+      closeAddSourceMenu();
+      const text = await openSourceInputModal({
+        title: t("studio.paste", "Paste Text"),
+        label: t("studio.prompt_paste", "Paste text content for generation context"),
+        placeholder: t("studio.prompt_paste", "Paste text content for generation context"),
+        multiline: true,
+        confirmText: t("studio.modal_add_source", "Add Source"),
+        cancelText: t("studio.modal_cancel", "Cancel")
+      });
+      if (!text) return;
+      addSelectedSource({
+        title: t("studio.paste_title", "Manually pasted text"),
+        url: "",
+        snippet: text.slice(0, 220),
+        content: text
+      });
+      setMeta(t("studio.meta_text_added", "Text source added."));
+      pushClientLog(t("studio.log_text_added", "Pasted text source added"), "source");
+    });
+
+    setupDropZone();
+    renderSearchResults();
+    renderSelectedSources();
+    renderLogs();
+    loadMyWorks().catch(() => {});
+    refreshWorksBtn.addEventListener("click", () => {
+      loadMyWorks().catch(() => {});
+    });
+    translateDom(document);
+    onLanguageChange(() => {
+      translateDom(document);
+    });
+    setProgress(0, t("studio.progress_waiting", "Waiting for sources"));
+    setStatus("idle");
+    try {
+      const activeJobId = localStorage.getItem(ACTIVE_JOB_KEY) || "";
+      if (activeJobId) {
+        setMeta(t("studio.meta_resumed_job", "Resumed tracking for background generation job."));
+        attachJobStream(activeJobId);
+        pollJob(activeJobId).catch(() => {});
+      }
+    } catch {}
+  </script>
+</body>
+</html>

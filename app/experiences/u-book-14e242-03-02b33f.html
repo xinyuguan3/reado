@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>幕启：表演艺术论文行动局 · 第三幕：答辩之夜</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --panel: rgba(10, 17, 37, 0.88);
+      --line: rgba(148, 163, 184, 0.24);
+      --text: #edf4ff;
+      --sub: #afc5e2;
+      --accent: #60a5fa;
+      --accent-soft: rgba(96, 165, 250, 0.26);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Noto Sans SC", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+      color: var(--text);
+      background: radial-gradient(circle at 14% 12%, rgba(96, 165, 250, 0.2), transparent 33%), radial-gradient(circle at 90% 10%, rgba(59, 130, 246, 0.18), transparent 36%), #060c19;
+    }
+    .page {
+      width: min(1160px, calc(100% - 24px));
+      margin: 0 auto;
+      padding: 22px 0 36px;
+      display: grid;
+      grid-template-columns: minmax(280px, 330px) minmax(0, 1fr);
+      gap: 14px;
+    }
+    .panel {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      border-radius: 14px;
+      padding: 14px;
+      box-shadow: 0 18px 42px rgba(2, 8, 20, 0.46);
+    }
+    .hero {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      background: linear-gradient(160deg, var(--accent-soft), rgba(15, 23, 42, 0.62));
+    }
+    .chip-row { display: flex; gap: 7px; flex-wrap: wrap; }
+    .chip {
+      border: 1px solid rgba(148, 163, 184, 0.34);
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 11px;
+      color: #deebff;
+      font-weight: 700;
+      background: rgba(2, 6, 23, 0.45);
+    }
+    .hero h1 { margin: 10px 0 0; font-size: clamp(24px, 3vw, 34px); letter-spacing: -0.02em; line-height: 1.1; }
+    .hero .sub { margin-top: 8px; color: #d4e8ff; line-height: 1.72; font-size: 14px; }
+    .hero .mission {
+      margin-top: 10px;
+      color: #f0f8ff;
+      background: rgba(2, 6, 23, 0.38);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      border-radius: 10px;
+      padding: 9px 10px;
+      font-size: 13px;
+      line-height: 1.64;
+    }
+    .side h2 { margin: 0; font-size: 16px; }
+    .small { margin-top: 7px; color: var(--sub); font-size: 12px; line-height: 1.6; }
+    .stat { margin-top: 9px; }
+    .stat label { display: flex; justify-content: space-between; color: #cfe3fc; font-size: 12px; margin-bottom: 4px; }
+    .bar { width: 100%; height: 9px; border-radius: 999px; overflow: hidden; background: rgba(148, 163, 184, 0.2); }
+    .fill { height: 100%; width: 50%; transition: width 220ms ease; }
+    .fill.s { background: linear-gradient(90deg, #34d399, #10b981); }
+    .fill.t { background: linear-gradient(90deg, #f59e0b, #f97316); }
+    .fill.r { background: linear-gradient(90deg, #60a5fa, #3b82f6); }
+    .intel, .log { margin-top: 12px; border-top: 1px solid var(--line); padding-top: 10px; }
+    .intel ul, .log ul {
+      margin: 8px 0 0;
+      padding-left: 18px;
+      color: #d7e9ff;
+      font-size: 13px;
+      display: grid;
+      gap: 6px;
+      line-height: 1.62;
+    }
+    .log ul { max-height: 180px; overflow: auto; padding-right: 6px; }
+    .main {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(11, 18, 34, 0.88);
+      padding: 14px;
+      box-shadow: 0 20px 50px rgba(2, 8, 20, 0.48);
+    }
+    .module-head { display: flex; justify-content: space-between; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .module-title { margin: 0; font-size: 22px; letter-spacing: -0.015em; }
+    .module-scene {
+      color: #d4e9ff;
+      font-size: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.36);
+      border-radius: 999px;
+      padding: 4px 9px;
+    }
+    .opening { margin-top: 10px; color: #d6e8ff; line-height: 1.75; font-size: 14px; }
+    .mentor {
+      margin-top: 8px;
+      border: 1px dashed rgba(148, 163, 184, 0.38);
+      border-radius: 10px;
+      padding: 9px;
+      font-size: 13px;
+      color: #c8dcf7;
+      background: rgba(2, 6, 23, 0.36);
+    }
+    .scenario { margin-top: 14px; border: 1px solid var(--line); border-radius: 12px; background: rgba(15, 23, 42, 0.76); padding: 12px; }
+    .scenario h3 { margin: 0; font-size: 17px; }
+    .situation { margin-top: 8px; font-size: 14px; color: #d8e9ff; line-height: 1.7; }
+    .prompt { margin-top: 8px; font-size: 14px; color: #eff6ff; font-weight: 700; line-height: 1.7; }
+    .hint {
+      margin-top: 8px;
+      border-radius: 8px;
+      border: 1px solid rgba(148, 163, 184, 0.34);
+      padding: 6px 8px;
+      font-size: 12px;
+      color: #bfd6f5;
+      background: rgba(2, 6, 23, 0.35);
+    }
+    .options { margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .opt-btn {
+      text-align: left;
+      border: 1px solid rgba(148, 163, 184, 0.36);
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.92);
+      color: #e2eeff;
+      padding: 11px;
+      cursor: pointer;
+      display: grid;
+      gap: 6px;
+      transition: border-color 140ms ease, transform 140ms ease;
+    }
+    .opt-btn:hover { transform: translateY(-1px); border-color: rgba(56, 189, 248, 0.78); }
+    .opt-stance {
+      font-size: 11px;
+      color: #cfe3ff;
+      border: 1px solid rgba(148, 163, 184, 0.36);
+      border-radius: 999px;
+      padding: 2px 8px;
+      width: fit-content;
+      background: rgba(2, 6, 23, 0.5);
+    }
+    .opt-label { font-size: 14px; font-weight: 700; line-height: 1.5; }
+    .opt-effect { font-size: 12px; color: #9fc0e9; }
+    .report { margin-top: 10px; min-height: 22px; color: #9ad8ff; font-size: 13px; line-height: 1.65; }
+    .debrief { margin-top: 14px; border-top: 1px solid var(--line); padding-top: 10px; display: none; }
+    .debrief.show { display: block; }
+    .debrief p { color: #d8ebff; font-size: 13px; line-height: 1.7; margin: 0; }
+    .debrief p + p { margin-top: 8px; }
+    .end-actions { margin-top: 12px; display: none; gap: 8px; flex-wrap: wrap; }
+    .end-actions.show { display: flex; }
+    .btn {
+      border: 1px solid rgba(148, 163, 184, 0.36);
+      border-radius: 10px;
+      padding: 9px 12px;
+      background: rgba(30, 41, 59, 0.82);
+      color: #e2edff;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn.primary { border-color: rgba(34, 211, 238, 0.66); background: rgba(8, 145, 178, 0.34); }
+    @media (max-width: 960px) {
+      .page { grid-template-columns: 1fr; }
+      .options { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<script src="/shared/book-catalog.js?v=1771754453141"></script>
+<script type="module" src="/shared/shell.js?v=1771754453141"></script>
+<reado-app-shell data-page="knowledge-map"></reado-app-shell>
+  <main class="page">
+    <aside class="panel side">
+      <h2>幕启：表演艺术论文行动局</h2>
+      <p class="small">3 / 3 · 第三幕：答辩之夜</p>
+      <p class="small">角色：你是艺术学院表演研究方向的研究生，受命在学期末前完成一篇表演艺术论文。</p>
+      <p class="small">世界：学院档案馆、黑盒剧场与答辩厅交错成一条研究战线。当前可参照来源主要是 White Rose ePrint 条目与手动添加网页，公开细节有限。</p>
+      <p class="small">你将进入一场“叙事体验 + 决策推演”：从开题到答辩，每一步都在平衡学术稳健、资源压力与方法创新。</p>
+
+      <div class="stat">
+        <label><span>系统稳定度</span><span id="s-v">50</span></label>
+        <div class="bar"><div id="s-b" class="fill s"></div></div>
+      </div>
+      <div class="stat">
+        <label><span>资源活性</span><span id="t-v">50</span></label>
+        <div class="bar"><div id="t-b" class="fill t"></div></div>
+      </div>
+      <div class="stat">
+        <label><span>结构推进</span><span id="r-v">50</span></label>
+        <div class="bar"><div id="r-b" class="fill r"></div></div>
+      </div>
+
+      <section class="intel">
+        <h2>情报卡</h2>
+        <p class="small">本关目标：完成论文定稿与答辩沟通，确保主张、证据与结论边界一致。</p>
+        <ul><li>情报卡：评审常关注“你没做什么、为何没做”，提前写入限制说明可减少被动。</li><li>情报卡：当来源细节有限时，强调方法路径与证据可追溯性比追求大结论更有效。</li><li>情报卡：修订回应应逐条对应，不宜用情绪化辩护替代实质修改。</li><li>情报卡：结论章节应区分“研究发现”与“未来研究建议”。</li></ul>
+      </section>
+
+      <section class="log">
+        <h2>事件日志</h2>
+        <ul id="event-log"></ul>
+      </section>
+    </aside>
+
+    <section class="main">
+      <header class="hero">
+        <div class="chip-row">
+          <span class="chip">研究任务局</span>
+          <span class="chip">答辩厅灯光亮起，评审席前摆着你的论文打印稿，最后一轮抉择开始。</span>
+          <span class="chip">任务 3</span>
+        </div>
+        <h1>第三幕：答辩之夜</h1>
+        <p class="sub">你收到预审意见：结构扎实，但希望你进一步说明来源限制与理论外推边界。</p>
+        <p class="mission">主线任务：在不伪造具体统计、不夸大证据的前提下，完成选题、方法与写作三阶段推进，交付一篇论证清晰、边界明确的表演艺术论文。</p>
+      </header>
+
+      <p class="mentor">沈老师（答辩主席）</p>
+
+      <article class="scenario">
+        <h3 id="round-title"></h3>
+        <p id="round-situation" class="situation"></p>
+        <p id="round-prompt" class="prompt"></p>
+        <p id="round-hint" class="hint"></p>
+
+        <div class="options">
+          <button id="opt-a" class="opt-btn">
+            <span id="opt-a-stance" class="opt-stance"></span>
+            <span id="opt-a-label" class="opt-label"></span>
+            <span id="opt-a-effect" class="opt-effect"></span>
+          </button>
+          <button id="opt-b" class="opt-btn">
+            <span id="opt-b-stance" class="opt-stance"></span>
+            <span id="opt-b-label" class="opt-label"></span>
+            <span id="opt-b-effect" class="opt-effect"></span>
+          </button>
+        </div>
+      </article>
+
+      <p id="report" class="report"></p>
+
+      <div id="debrief" class="debrief">
+        <p>你意识到，成熟的研究者不是从不被质疑，而是能把质疑转化为更清晰的表达。</p>
+        <p>答辩不是终点，而是让研究从“个人理解”走向“公共可讨论文本”。</p>
+      </div>
+      <div id="end-actions" class="end-actions">
+        <a class="btn primary" href="/books/user-book-14e242-vx4cf7-588a.html">返回书籍总览</a>
+        <a class="btn" href="/experiences/u-book-14e242-02-063799.html">回到上一场景</a>
+        <button id="retry-btn" class="btn" type="button">重开本关</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const rounds = [{"title":"回合一：回应评审","situation":"评审指出你对来源限制写得过短，建议扩写方法边界。","prompt":"你如何处理这一意见？","knowledgeHint":"主动承认边界通常优于被动防守。","optionA":{"stance":"实质修订","label":"新增“资料可得性限制”小节并重写相关结论语气","feedback":"论文更完整，评审感受到你对证据责任的重视。","effects":{"stability":5,"treasury":-2,"reform":2}},"optionB":{"stance":"最小改动","label":"仅在脚注补一句“受限于篇幅”","feedback":"节省时间，但核心问题未解决，复评风险上升。","effects":{"stability":-5,"treasury":3,"reform":-1}}},{"title":"回合二：结论力度","situation":"你在最终结论中犹豫：是强调突破，还是强调条件性发现？","prompt":"结论基调如何选择？","knowledgeHint":"条件性结论并不削弱价值，反而提高可持续讨论空间。","optionA":{"stance":"条件性总结","label":"明确研究贡献，同时标注适用条件与未覆盖范围","feedback":"结论更可信，可为后续研究留下清晰接口。","effects":{"stability":4,"treasury":1,"reform":3}},"optionB":{"stance":"全面性宣告","label":"将阶段性发现表述为普遍规律","feedback":"语气强，但与前文证据密度不匹配，容易被质疑过度外推。","effects":{"stability":-6,"treasury":0,"reform":1}}},{"title":"回合三：后续发布","situation":"答辩通过后，你要决定如何公开你的研究成果。","prompt":"你选择哪种发布策略？","knowledgeHint":"公开传播时同样需要保留方法说明与限制声明。","optionA":{"stance":"分层传播","label":"学术版保留完整方法，公众版用通俗语言但不删边界说明","feedback":"影响力与严谨性兼顾，研究更易被正确理解。","effects":{"stability":3,"treasury":2,"reform":4}},"optionB":{"stance":"传播优先","label":"只发布强结论摘要以追求快速关注","feedback":"短期声量上升，但被同行复核时争议显著增加。","effects":{"stability":-4,"treasury":4,"reform":-2}}}];
+      const state = { i: 0, stability: 50, treasury: 50, reform: 50 };
+      const titleEl = document.getElementById("round-title");
+      const situationEl = document.getElementById("round-situation");
+      const promptEl = document.getElementById("round-prompt");
+      const hintEl = document.getElementById("round-hint");
+      const reportEl = document.getElementById("report");
+      const logEl = document.getElementById("event-log");
+      const optA = document.getElementById("opt-a");
+      const optB = document.getElementById("opt-b");
+      const optAStance = document.getElementById("opt-a-stance");
+      const optAEffect = document.getElementById("opt-a-effect");
+      const optALabel = document.getElementById("opt-a-label");
+      const optBStance = document.getElementById("opt-b-stance");
+      const optBEffect = document.getElementById("opt-b-effect");
+      const optBLabel = document.getElementById("opt-b-label");
+      const debriefEl = document.getElementById("debrief");
+      const endActionsEl = document.getElementById("end-actions");
+      const retryBtn = document.getElementById("retry-btn");
+      const sV = document.getElementById("s-v");
+      const tV = document.getElementById("t-v");
+      const rV = document.getElementById("r-v");
+      const sB = document.getElementById("s-b");
+      const tB = document.getElementById("t-b");
+      const rB = document.getElementById("r-b");
+
+      function clamp(v) {
+        return Math.max(0, Math.min(100, Math.round(v)));
+      }
+
+      function fmtDelta(v, label) {
+        const n = Number(v) || 0;
+        const sign = n > 0 ? "+" : "";
+        return label + " " + sign + n;
+      }
+
+      function effectSummary(effects) {
+        return [
+          fmtDelta(effects?.stability, "稳"),
+          fmtDelta(effects?.treasury, "资"),
+          fmtDelta(effects?.reform, "推")
+        ].join(" · ");
+      }
+
+      function refreshBars() {
+        sV.textContent = String(state.stability);
+        tV.textContent = String(state.treasury);
+        rV.textContent = String(state.reform);
+        sB.style.width = state.stability + "%";
+        tB.style.width = state.treasury + "%";
+        rB.style.width = state.reform + "%";
+      }
+
+      function pushLog(text) {
+        const li = document.createElement("li");
+        li.textContent = text;
+        logEl.prepend(li);
+        while (logEl.children.length > 8) {
+          logEl.removeChild(logEl.lastChild);
+        }
+      }
+
+      function showFinal() {
+        titleEl.textContent = "场景结算";
+        situationEl.textContent = "你已完成本关全部关键抉择。";
+        promptEl.textContent = "回看你的日志，检查你是否始终沿着同一因果逻辑推进。";
+        hintEl.textContent = "复盘建议：提炼一条可迁移到现实的判断规则。";
+        optA.style.display = "none";
+        optB.style.display = "none";
+        debriefEl.classList.add("show");
+        endActionsEl.classList.add("show");
+      }
+
+      function paintRound() {
+        const round = rounds[state.i];
+        if (!round) {
+          showFinal();
+          return;
+        }
+        titleEl.textContent = round.title || ("抉择 " + (state.i + 1));
+        situationEl.textContent = round.situation || "局势正在发生变化。";
+        promptEl.textContent = round.prompt || "";
+        hintEl.textContent = "知识锚点：" + (round.knowledgeHint || "先识别约束，再判断代价。");
+        optAStance.textContent = round.optionA?.stance || "方案 A";
+        optALabel.textContent = round.optionA?.label || "选项 A";
+        optAEffect.textContent = "预期影响：" + effectSummary(round.optionA?.effects || {});
+        optBStance.textContent = round.optionB?.stance || "方案 B";
+        optBLabel.textContent = round.optionB?.label || "选项 B";
+        optBEffect.textContent = "预期影响：" + effectSummary(round.optionB?.effects || {});
+        optA.style.display = "";
+        optB.style.display = "";
+      }
+
+      function applyChoice(option) {
+        const effects = option?.effects || {};
+        state.stability = clamp(state.stability + (Number(effects.stability) || 0));
+        state.treasury = clamp(state.treasury + (Number(effects.treasury) || 0));
+        state.reform = clamp(state.reform + (Number(effects.reform) || 0));
+        refreshBars();
+
+        const choiceLabel = option?.label || "未命名策略";
+        const outcome = option?.feedback || "你完成了一次关键抉择。";
+        const line = "第 " + (state.i + 1) + " 回合 · 选择「" + choiceLabel + "」 · " + effectSummary(effects);
+        pushLog(line);
+        reportEl.textContent = "后果速报：" + outcome;
+
+        state.i += 1;
+        window.setTimeout(() => {
+          paintRound();
+        }, 320);
+      }
+
+      optA.addEventListener("click", () => {
+        const round = rounds[state.i];
+        applyChoice(round?.optionA || {});
+      });
+      optB.addEventListener("click", () => {
+        const round = rounds[state.i];
+        applyChoice(round?.optionB || {});
+      });
+      if (retryBtn) {
+        retryBtn.addEventListener("click", () => window.location.reload());
+      }
+
+      pushLog("已进入场景：答辩厅灯光亮起，评审席前摆着你的论文打印稿，最后一轮抉择开始。");
+      pushLog("角色就位：你是艺术学院表演研究方向的研究生，受命在学期末前完成一篇表演艺术论文。");
+      refreshBars();
+      paintRound();
+
+      try {
+        localStorage.setItem("reado_last_experience_href", "/experiences/u-book-14e242-03-02b33f.html");
+      } catch {}
+    })();
+  </script>
+
+
+<script>
+(() => {
+  
+  
+  
+})();
+</script>
+</body>
+</html>

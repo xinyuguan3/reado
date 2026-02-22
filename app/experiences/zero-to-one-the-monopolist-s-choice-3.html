@@ -104,8 +104,8 @@
     </style>
 </head>
 <body class="bg-deep-black min-h-screen text-gray-100 flex flex-col items-center justify-center p-4 md:p-8 relative overflow-hidden font-sans">
-<script src="/shared/book-catalog.js?v=1771257564240"></script>
-<script type="module" src="/shared/shell.js?v=1771257564240"></script>
+<script src="/shared/book-catalog.js?v=1771754453141"></script>
+<script type="module" src="/shared/shell.js?v=1771754453141"></script>
 <reado-app-shell data-page="knowledge-map"></reado-app-shell>
 <div class="scanline"></div>
 <div class="fixed top-0 left-0 w-full h-full pointer-events-none z-0">
@@ -254,7 +254,7 @@
 </div>
 
 
-<script src="/shared/experience-runtime.js?v=1771257564240"></script>
+<script src="/shared/experience-runtime.js?v=1771754453141"></script>
 <script>
 (() => {
   
@@ -297,7 +297,8 @@
       if (target.closest(".reado-shell-wrap")) return;
       const candidate = target.closest("[data-next-scene],button,a[href],.concept-card,.item-card,[data-choice],[data-option]");
       if (!(candidate instanceof HTMLElement)) return;
-      if (!candidate.closest("main")) return;
+      const mainRoot = document.querySelector("main");
+      if (mainRoot instanceof HTMLElement && !mainRoot.contains(candidate)) return;
       if (candidate.hasAttribute("data-no-next")) return;
       if (candidate.matches("a[href]")) {
         const href = candidate.getAttribute("href") || "";

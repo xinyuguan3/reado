@@ -56,8 +56,8 @@
     </style>
 </head>
 <body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-100 font-display min-h-screen flex flex-col overflow-hidden relative selection:bg-primary/30">
-<script src="/shared/book-catalog.js?v=1771257564240"></script>
-<script type="module" src="/shared/shell.js?v=1771257564240"></script>
+<script src="/shared/book-catalog.js?v=1771754453141"></script>
+<script type="module" src="/shared/shell.js?v=1771754453141"></script>
 <reado-app-shell data-page="knowledge-map"></reado-app-shell>
 <div class="absolute inset-0 z-0 pointer-events-none">
 <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-primary/10 rounded-full blur-[100px]"></div>
@@ -248,12 +248,12 @@
 <img class="hidden" data-alt="Abstract subway map network connecting city districts with glowing lines" data-location="Metropolis Subway System" src="/assets/remote-images/a15f03c7df8b0a8b6344d33f.png"/>
 
 
-
+<script src="/shared/experience-runtime.js?v=1771754453141"></script>
 <script>
 (() => {
   
   localStorage.setItem("reado_book_last_principles-for-navigating-big-debt-crises", "debt-cycle-impact-analysis");
-  if ("debt-cycle-impact-analysis" === "experience-30") {
+  if ("debt-cycle-impact-analysis" === "experience-77") {
     try {
       const completedRaw = localStorage.getItem("reado_completed_books_v1") || "[]";
       const completedSet = new Set(JSON.parse(completedRaw));
@@ -291,7 +291,8 @@
       if (target.closest(".reado-shell-wrap")) return;
       const candidate = target.closest("[data-next-scene],button,a[href],.concept-card,.item-card,[data-choice],[data-option]");
       if (!(candidate instanceof HTMLElement)) return;
-      if (!candidate.closest("main")) return;
+      const mainRoot = document.querySelector("main");
+      if (mainRoot instanceof HTMLElement && !mainRoot.contains(candidate)) return;
       if (candidate.hasAttribute("data-no-next")) return;
       if (candidate.matches("a[href]")) {
         const href = candidate.getAttribute("href") || "";
@@ -316,6 +317,13 @@
     });
   })();
   
+  if (window.ReadoExperienceRuntime && typeof window.ReadoExperienceRuntime.init === "function") {
+    window.ReadoExperienceRuntime.init({
+      bookId: "principles-for-navigating-big-debt-crises",
+      moduleSlug: "debt-cycle-impact-analysis",
+      moduleSlugs: ["the-beautiful-deleveraging-challenge","the-subway-dilemma","debt-cycle-impact-analysis","1994","experience-75","experience-76","experience-77"]
+    });
+  }
 })();
 </script>
 </body></html>

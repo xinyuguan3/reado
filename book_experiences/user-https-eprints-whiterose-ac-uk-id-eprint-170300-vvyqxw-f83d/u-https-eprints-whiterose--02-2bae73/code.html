@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>证据迷雾：170300号档案 · 模块二：试点蓝图落地</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --panel: rgba(10, 17, 37, 0.88);
+      --line: rgba(148, 163, 184, 0.24);
+      --text: #edf4ff;
+      --sub: #afc5e2;
+      --accent: #60a5fa;
+      --accent-soft: rgba(96, 165, 250, 0.26);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Noto Sans SC", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+      color: var(--text);
+      background: radial-gradient(circle at 14% 12%, rgba(96, 165, 250, 0.2), transparent 33%), radial-gradient(circle at 90% 10%, rgba(59, 130, 246, 0.18), transparent 36%), #060c19;
+    }
+    .page {
+      width: min(1160px, calc(100% - 24px));
+      margin: 0 auto;
+      padding: 22px 0 36px;
+      display: grid;
+      grid-template-columns: minmax(280px, 330px) minmax(0, 1fr);
+      gap: 14px;
+    }
+    .panel {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      border-radius: 14px;
+      padding: 14px;
+      box-shadow: 0 18px 42px rgba(2, 8, 20, 0.46);
+    }
+    .hero {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      background: linear-gradient(160deg, var(--accent-soft), rgba(15, 23, 42, 0.62));
+    }
+    .chip-row { display: flex; gap: 7px; flex-wrap: wrap; }
+    .chip {
+      border: 1px solid rgba(148, 163, 184, 0.34);
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 11px;
+      color: #deebff;
+      font-weight: 700;
+      background: rgba(2, 6, 23, 0.45);
+    }
+    .hero h1 { margin: 10px 0 0; font-size: clamp(24px, 3vw, 34px); letter-spacing: -0.02em; line-height: 1.1; }
+    .hero .sub { margin-top: 8px; color: #d4e8ff; line-height: 1.72; font-size: 14px; }
+    .hero .mission {
+      margin-top: 10px;
+      color: #f0f8ff;
+      background: rgba(2, 6, 23, 0.38);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      border-radius: 10px;
+      padding: 9px 10px;
+      font-size: 13px;
+      line-height: 1.64;
+    }
+    .side h2 { margin: 0; font-size: 16px; }
+    .small { margin-top: 7px; color: var(--sub); font-size: 12px; line-height: 1.6; }
+    .stat { margin-top: 9px; }
+    .stat label { display: flex; justify-content: space-between; color: #cfe3fc; font-size: 12px; margin-bottom: 4px; }
+    .bar { width: 100%; height: 9px; border-radius: 999px; overflow: hidden; background: rgba(148, 163, 184, 0.2); }
+    .fill { height: 100%; width: 50%; transition: width 220ms ease; }
+    .fill.s { background: linear-gradient(90deg, #34d399, #10b981); }
+    .fill.t { background: linear-gradient(90deg, #f59e0b, #f97316); }
+    .fill.r { background: linear-gradient(90deg, #60a5fa, #3b82f6); }
+    .intel, .log { margin-top: 12px; border-top: 1px solid var(--line); padding-top: 10px; }
+    .intel ul, .log ul {
+      margin: 8px 0 0;
+      padding-left: 18px;
+      color: #d7e9ff;
+      font-size: 13px;
+      display: grid;
+      gap: 6px;
+      line-height: 1.62;
+    }
+    .log ul { max-height: 180px; overflow: auto; padding-right: 6px; }
+    .main {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(11, 18, 34, 0.88);
+      padding: 14px;
+      box-shadow: 0 20px 50px rgba(2, 8, 20, 0.48);
+    }
+    .module-head { display: flex; justify-content: space-between; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .module-title { margin: 0; font-size: 22px; letter-spacing: -0.015em; }
+    .module-scene {
+      color: #d4e9ff;
+      font-size: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.36);
+      border-radius: 999px;
+      padding: 4px 9px;
+    }
+    .opening { margin-top: 10px; color: #d6e8ff; line-height: 1.75; font-size: 14px; }
+    .mentor {
+      margin-top: 8px;
+      border: 1px dashed rgba(148, 163, 184, 0.38);
+      border-radius: 10px;
+      padding: 9px;
+      font-size: 13px;
+      color: #c8dcf7;
+      background: rgba(2, 6, 23, 0.36);
+    }
+    .scenario { margin-top: 14px; border: 1px solid var(--line); border-radius: 12px; background: rgba(15, 23, 42, 0.76); padding: 12px; }
+    .scenario h3 { margin: 0; font-size: 17px; }
+    .situation { margin-top: 8px; font-size: 14px; color: #d8e9ff; line-height: 1.7; }
+    .prompt { margin-top: 8px; font-size: 14px; color: #eff6ff; font-weight: 700; line-height: 1.7; }
+    .hint {
+      margin-top: 8px;
+      border-radius: 8px;
+      border: 1px solid rgba(148, 163, 184, 0.34);
+      padding: 6px 8px;
+      font-size: 12px;
+      color: #bfd6f5;
+      background: rgba(2, 6, 23, 0.35);
+    }
+    .options { margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .opt-btn {
+      text-align: left;
+      border: 1px solid rgba(148, 163, 184, 0.36);
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.92);
+      color: #e2eeff;
+      padding: 11px;
+      cursor: pointer;
+      display: grid;
+      gap: 6px;
+      transition: border-color 140ms ease, transform 140ms ease;
+    }
+    .opt-btn:hover { transform: translateY(-1px); border-color: rgba(56, 189, 248, 0.78); }
+    .opt-stance {
+      font-size: 11px;
+      color: #cfe3ff;
+      border: 1px solid rgba(148, 163, 184, 0.36);
+      border-radius: 999px;
+      padding: 2px 8px;
+      width: fit-content;
+      background: rgba(2, 6, 23, 0.5);
+    }
+    .opt-label { font-size: 14px; font-weight: 700; line-height: 1.5; }
+    .opt-effect { font-size: 12px; color: #9fc0e9; }
+    .report { margin-top: 10px; min-height: 22px; color: #9ad8ff; font-size: 13px; line-height: 1.65; }
+    .debrief { margin-top: 14px; border-top: 1px solid var(--line); padding-top: 10px; display: none; }
+    .debrief.show { display: block; }
+    .debrief p { color: #d8ebff; font-size: 13px; line-height: 1.7; margin: 0; }
+    .debrief p + p { margin-top: 8px; }
+    .end-actions { margin-top: 12px; display: none; gap: 8px; flex-wrap: wrap; }
+    .end-actions.show { display: flex; }
+    .btn {
+      border: 1px solid rgba(148, 163, 184, 0.36);
+      border-radius: 10px;
+      padding: 9px 12px;
+      background: rgba(30, 41, 59, 0.82);
+      color: #e2edff;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn.primary { border-color: rgba(34, 211, 238, 0.66); background: rgba(8, 145, 178, 0.34); }
+    @media (max-width: 960px) {
+      .page { grid-template-columns: 1fr; }
+      .options { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <aside class="panel side">
+      <h2>证据迷雾：170300号档案</h2>
+      <p class="small">2 / 4 · 模块二：试点蓝图落地</p>
+      <p class="small">角色：市政改革办公室新任“证据转化官”</p>
+      <p class="small">世界：近未来沿海城市“岚港”，财政紧张、舆论敏感、部门协同薄弱</p>
+      <p class="small">你接手一座城市的改革办公室，桌上只有一份来自白玫瑰学术库的研究链接与迫在眉睫的社会压力。</p>
+
+      <div class="stat">
+        <label><span>系统稳定度</span><span id="s-v">50</span></label>
+        <div class="bar"><div id="s-b" class="fill s"></div></div>
+      </div>
+      <div class="stat">
+        <label><span>资源活性</span><span id="t-v">50</span></label>
+        <div class="bar"><div id="t-b" class="fill t"></div></div>
+      </div>
+      <div class="stat">
+        <label><span>结构推进</span><span id="r-v">50</span></label>
+        <div class="bar"><div id="r-b" class="fill r"></div></div>
+      </div>
+
+      <section class="intel">
+        <h2>情报卡</h2>
+        <p class="small">本关目标：把研究启发转成低风险、可回滚的政策试点</p>
+        <ul><li>情报卡A：公开治理常识表明，先行试点应优先覆盖“高可观测、可纠偏”场景。</li><li>情报卡B：预算受限时，阶段闸门（stage gate）比一次性铺开更稳健。</li><li>情报卡C：执行手册若缺乏例外处理条款，基层常会出现机械执行。</li></ul>
+      </section>
+
+      <section class="log">
+        <h2>事件日志</h2>
+        <ul id="event-log"></ul>
+      </section>
+    </aside>
+
+    <section class="main">
+      <header class="hero">
+        <div class="chip-row">
+          <span class="chip">研究任务局</span>
+          <span class="chip">旧港区临时作战室，白板上写满资源缺口与时间节点</span>
+          <span class="chip">任务 2</span>
+        </div>
+        <h1>模块二：试点蓝图落地</h1>
+        <p class="sub">你拿到三个月窗口期：既要看见变化，又不能让财政和基层体系失控。</p>
+        <p class="mission">主线任务：在无法完整掌握原文细节的前提下，基于公开常识和谨慎推断，把研究线索转化为一套低风险、可评估、可迭代的政策试点。</p>
+      </header>
+
+      <p class="mentor">导师“顾闻”提醒：试点不是缩小版运动式推进，而是可学习系统。</p>
+
+      <article class="scenario">
+        <h3 id="round-title"></h3>
+        <p id="round-situation" class="situation"></p>
+        <p id="round-prompt" class="prompt"></p>
+        <p id="round-hint" class="hint"></p>
+
+        <div class="options">
+          <button id="opt-a" class="opt-btn">
+            <span id="opt-a-stance" class="opt-stance"></span>
+            <span id="opt-a-label" class="opt-label"></span>
+            <span id="opt-a-effect" class="opt-effect"></span>
+          </button>
+          <button id="opt-b" class="opt-btn">
+            <span id="opt-b-stance" class="opt-stance"></span>
+            <span id="opt-b-label" class="opt-label"></span>
+            <span id="opt-b-effect" class="opt-effect"></span>
+          </button>
+        </div>
+      </article>
+
+      <p id="report" class="report"></p>
+
+      <div id="debrief" class="debrief">
+        <p>你的选择将决定试点是“会学习的系统”还是“高风险表演”。</p>
+        <p>可回滚设计和阶段评估，是不确定环境下的改革护栏。</p>
+      </div>
+      <div id="end-actions" class="end-actions">
+        <a class="btn primary" href="/experiences/u-https-eprints-whiterose--03-20e521.html">进入下一场景</a>
+        <a class="btn" href="/experiences/u-https-eprints-whiterose--01-19359a.html">回到上一场景</a>
+        <button id="retry-btn" class="btn" type="button">重开本关</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const rounds = [{"title":"回合1：范围划定","situation":"区长要求一次覆盖全区，称“否则看不出改革决心”。","prompt":"你如何确定首批范围？","knowledgeHint":"在证据外推有限时，分层抽样或分区推进更有利于识别真实效果。","optionA":{"stance":"分区推进","label":"先选2个代表性街区试点，设置对照区并约定扩围条件。","feedback":"推进速度较慢，但数据可解释性明显提升。","effects":{"stability":5,"treasury":3,"reform":5}},"optionB":{"stance":"全域铺开","label":"一次覆盖全区，强调统一行动与行政效率。","feedback":"政治信号强，但失败时缺少对照，纠错成本高。","effects":{"stability":-4,"treasury":-6,"reform":4}}},{"title":"回合2：预算结构","situation":"财务官只愿给你一笔固定包干经费，不接受机动预算。","prompt":"你如何谈判预算？","knowledgeHint":"在试点阶段保留小比例机动资金，可降低执行中断概率。","optionA":{"stance":"弹性预算","label":"主预算之外争取小比例应急池，并绑定触发条件与审批路径。","feedback":"前期沟通成本上升，但能避免关键节点因小额缺口停摆。","effects":{"stability":4,"treasury":-2,"reform":6}},"optionB":{"stance":"刚性包干","label":"接受固定预算，要求部门自行消化所有突发事项。","feedback":"账面整齐，但基层会把风险转嫁为隐性减配。","effects":{"stability":-3,"treasury":4,"reform":-2}}},{"title":"回合3：执行规则","situation":"一线主管希望“按旧流程套新名字”，以减少培训时间。","prompt":"你是否允许沿用旧流程？","knowledgeHint":"流程复用可节约成本，但若目标机制不同，需最小必要重构。","optionA":{"stance":"最小重构","label":"保留可复用部分，但新增关键节点与例外处置清单。","feedback":"学习曲线可控，且更接近试点真正要验证的机制。","effects":{"stability":6,"treasury":1,"reform":5}},"optionB":{"stance":"完全沿用","label":"不改流程，只改口径，先把试点“跑起来”。","feedback":"启动迅速，但你很快发现“新政策被旧路径吞没”。","effects":{"stability":-2,"treasury":2,"reform":-5}}}];
+      const state = { i: 0, stability: 50, treasury: 50, reform: 50 };
+      const titleEl = document.getElementById("round-title");
+      const situationEl = document.getElementById("round-situation");
+      const promptEl = document.getElementById("round-prompt");
+      const hintEl = document.getElementById("round-hint");
+      const reportEl = document.getElementById("report");
+      const logEl = document.getElementById("event-log");
+      const optA = document.getElementById("opt-a");
+      const optB = document.getElementById("opt-b");
+      const optAStance = document.getElementById("opt-a-stance");
+      const optAEffect = document.getElementById("opt-a-effect");
+      const optALabel = document.getElementById("opt-a-label");
+      const optBStance = document.getElementById("opt-b-stance");
+      const optBEffect = document.getElementById("opt-b-effect");
+      const optBLabel = document.getElementById("opt-b-label");
+      const debriefEl = document.getElementById("debrief");
+      const endActionsEl = document.getElementById("end-actions");
+      const retryBtn = document.getElementById("retry-btn");
+      const sV = document.getElementById("s-v");
+      const tV = document.getElementById("t-v");
+      const rV = document.getElementById("r-v");
+      const sB = document.getElementById("s-b");
+      const tB = document.getElementById("t-b");
+      const rB = document.getElementById("r-b");
+
+      function clamp(v) {
+        return Math.max(0, Math.min(100, Math.round(v)));
+      }
+
+      function fmtDelta(v, label) {
+        const n = Number(v) || 0;
+        const sign = n > 0 ? "+" : "";
+        return label + " " + sign + n;
+      }
+
+      function effectSummary(effects) {
+        return [
+          fmtDelta(effects?.stability, "稳"),
+          fmtDelta(effects?.treasury, "资"),
+          fmtDelta(effects?.reform, "推")
+        ].join(" · ");
+      }
+
+      function refreshBars() {
+        sV.textContent = String(state.stability);
+        tV.textContent = String(state.treasury);
+        rV.textContent = String(state.reform);
+        sB.style.width = state.stability + "%";
+        tB.style.width = state.treasury + "%";
+        rB.style.width = state.reform + "%";
+      }
+
+      function pushLog(text) {
+        const li = document.createElement("li");
+        li.textContent = text;
+        logEl.prepend(li);
+        while (logEl.children.length > 8) {
+          logEl.removeChild(logEl.lastChild);
+        }
+      }
+
+      function showFinal() {
+        titleEl.textContent = "场景结算";
+        situationEl.textContent = "你已完成本关全部关键抉择。";
+        promptEl.textContent = "回看你的日志，检查你是否始终沿着同一因果逻辑推进。";
+        hintEl.textContent = "复盘建议：提炼一条可迁移到现实的判断规则。";
+        optA.style.display = "none";
+        optB.style.display = "none";
+        debriefEl.classList.add("show");
+        endActionsEl.classList.add("show");
+      }
+
+      function paintRound() {
+        const round = rounds[state.i];
+        if (!round) {
+          showFinal();
+          return;
+        }
+        titleEl.textContent = round.title || ("抉择 " + (state.i + 1));
+        situationEl.textContent = round.situation || "局势正在发生变化。";
+        promptEl.textContent = round.prompt || "";
+        hintEl.textContent = "知识锚点：" + (round.knowledgeHint || "先识别约束，再判断代价。");
+        optAStance.textContent = round.optionA?.stance || "方案 A";
+        optALabel.textContent = round.optionA?.label || "选项 A";
+        optAEffect.textContent = "预期影响：" + effectSummary(round.optionA?.effects || {});
+        optBStance.textContent = round.optionB?.stance || "方案 B";
+        optBLabel.textContent = round.optionB?.label || "选项 B";
+        optBEffect.textContent = "预期影响：" + effectSummary(round.optionB?.effects || {});
+        optA.style.display = "";
+        optB.style.display = "";
+      }
+
+      function applyChoice(option) {
+        const effects = option?.effects || {};
+        state.stability = clamp(state.stability + (Number(effects.stability) || 0));
+        state.treasury = clamp(state.treasury + (Number(effects.treasury) || 0));
+        state.reform = clamp(state.reform + (Number(effects.reform) || 0));
+        refreshBars();
+
+        const choiceLabel = option?.label || "未命名策略";
+        const outcome = option?.feedback || "你完成了一次关键抉择。";
+        const line = "第 " + (state.i + 1) + " 回合 · 选择「" + choiceLabel + "」 · " + effectSummary(effects);
+        pushLog(line);
+        reportEl.textContent = "后果速报：" + outcome;
+
+        state.i += 1;
+        window.setTimeout(() => {
+          paintRound();
+        }, 320);
+      }
+
+      optA.addEventListener("click", () => {
+        const round = rounds[state.i];
+        applyChoice(round?.optionA || {});
+      });
+      optB.addEventListener("click", () => {
+        const round = rounds[state.i];
+        applyChoice(round?.optionB || {});
+      });
+      if (retryBtn) {
+        retryBtn.addEventListener("click", () => window.location.reload());
+      }
+
+      pushLog("已进入场景：旧港区临时作战室，白板上写满资源缺口与时间节点");
+      pushLog("角色就位：市政改革办公室新任“证据转化官”");
+      refreshBars();
+      paintRound();
+
+      try {
+        localStorage.setItem("reado_last_experience_href", "/experiences/u-https-eprints-whiterose--02-2bae73.html");
+      } catch {}
+    })();
+  </script>
+</body>
+</html>

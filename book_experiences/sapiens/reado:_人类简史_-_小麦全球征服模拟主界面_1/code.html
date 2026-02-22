@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>reado: 人类简史 - 小麦全球征服模拟</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#F59E0B", // Amber-500 for wheat/DNA
+                        secondary: "#0EA5E9", // Sky-500 for sci-fi/tech elements
+                        "background-light": "#1a202c", // Fallback for light mode (though this design is dark-heavy)
+                        "background-dark": "#0B1120", // Deep space blue/black
+                        "panel-dark": "rgba(15, 23, 42, 0.85)", // Semi-transparent slate
+                        "panel-light": "rgba(255, 255, 255, 0.9)",
+                    },
+                    fontFamily: {
+                        display: ["'Noto Sans SC'", "sans-serif"],
+                        mono: ["'Courier New'", "monospace"], // For stats
+                    },
+                    backgroundImage: {
+                        'earth-texture': "url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2672&auto=format&fit=crop')", // High quality earth satellite view
+                    }
+                },
+            },
+        };
+    </script>
+<style>.glass-panel {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+        .dna-pulse {
+            animation: pulse-glow 2s infinite;
+        }
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+        }
+        .map-marker {
+            transition: transform 0.2s ease;
+        }
+        .map-marker:hover {
+            transform: scale(1.2);
+            cursor: pointer;
+        }.wheat-glow {
+            filter: drop-shadow(0 0 8px #F59E0B);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-white font-display overflow-hidden h-screen w-screen relative select-none">
+<div class="absolute inset-0 z-0 bg-earth-texture bg-cover bg-center opacity-90">
+<div class="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/80 pointer-events-none"></div>
+</div>
+<svg class="absolute inset-0 z-0 w-full h-full pointer-events-none opacity-80" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<filter id="glow">
+<feGaussianBlur result="coloredBlur" stdDeviation="2.5"></feGaussianBlur>
+<feMerge>
+<feMergeNode in="coloredBlur"></feMergeNode>
+<feMergeNode in="SourceGraphic"></feMergeNode>
+</feMerge>
+</filter>
+</defs>
+<path d="M 600 400 Q 750 350 900 380 T 1100 350" fill="none" filter="url(#glow)" opacity="0.6" stroke="#F59E0B" stroke-dasharray="5,5" stroke-width="2"></path>
+<path d="M 600 400 Q 500 450 400 420 T 200 480" fill="none" filter="url(#glow)" opacity="0.4" stroke="#F59E0B" stroke-dasharray="5,5" stroke-width="2"></path>
+<circle cx="600" cy="400" fill="#F59E0B" fill-opacity="0.2" filter="url(#glow)" r="80"></circle>
+<circle cx="650" cy="380" fill="#F59E0B" fill-opacity="0.25" filter="url(#glow)" r="60"></circle>
+<circle cx="900" cy="380" fill="#F59E0B" fill-opacity="0.15" filter="url(#glow)" r="40"></circle>
+</svg>
+<div class="absolute top-1/3 left-1/4 z-10 map-marker">
+<div class="relative flex items-center justify-center w-12 h-12 bg-primary/20 rounded-full border-2 border-primary text-primary dna-pulse glass-panel">
+<span class="material-icons-outlined text-2xl">science</span>
+</div>
+</div>
+<div class="absolute top-1/2 left-1/2 z-10 map-marker">
+<div class="relative flex items-center justify-center w-14 h-14 bg-primary/20 rounded-full border-2 border-primary text-primary dna-pulse glass-panel">
+<span class="material-icons-outlined text-3xl">api</span>
+</div>
+</div>
+<div class="absolute bottom-1/3 right-1/3 z-10 map-marker">
+<div class="relative flex items-center justify-center w-10 h-10 bg-primary/20 rounded-full border-2 border-primary text-primary dna-pulse glass-panel">
+<span class="material-icons-outlined text-xl">biotech</span>
+</div>
+</div>
+<div class="relative z-20 flex flex-col h-full justify-between p-6">
+<div class="flex flex-col md:flex-row justify-between items-start gap-4">
+<div class="glass-panel bg-panel-dark rounded-xl p-4 max-w-md border-l-4 border-primary">
+<div class="flex items-center gap-3 mb-1">
+<span class="material-icons-outlined text-secondary">public</span>
+<h1 class="text-xl font-bold tracking-wide">人类简史: 全球驯化战争地图</h1>
+<span class="bg-primary text-black text-xs font-bold px-2 py-0.5 rounded">BETA</span>
+</div>
+<p class="text-xs text-slate-400 font-mono tracking-wider uppercase">Sapiens Domestication War Map // YEAR -9500 BC</p>
+</div>
+<div class="flex gap-4">
+<div class="glass-panel bg-panel-dark rounded-lg p-3 text-center min-w-[120px]">
+<div class="text-xs text-slate-400 mb-1">已驯化人数</div>
+<div class="text-xl font-mono text-secondary font-bold flex justify-center items-center gap-1">
+<span class="material-icons-outlined text-sm">accessibility_new</span>
+                        14,205
+                    </div>
+</div>
+<div class="glass-panel bg-panel-dark rounded-lg p-3 text-center min-w-[120px]">
+<div class="text-xs text-slate-400 mb-1">占领土地面积</div>
+<div class="text-xl font-mono text-primary font-bold flex justify-center items-center gap-1">
+<span class="material-icons-outlined text-sm">map</span>
+                        840 km²
+                    </div>
+</div>
+<div class="glass-panel bg-panel-dark rounded-lg p-3 text-center min-w-[120px]">
+<div class="text-xs text-slate-400 mb-1">可用 DNA 点数</div>
+<div class="text-xl font-mono text-primary font-bold flex justify-center items-center gap-1">
+<span class="material-icons-outlined text-sm">all_inclusive</span>
+                        45
+                    </div>
+</div>
+</div>
+</div>
+<div class="flex-grow flex items-center justify-center relative">
+<div class="absolute right-0 top-10 w-80 glass-panel bg-panel-dark rounded-xl p-4 hidden md:block">
+<div class="flex items-center gap-2 mb-3 border-b border-slate-700 pb-2">
+<span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+<h3 class="font-bold text-sm text-slate-200">世界简报</h3>
+</div>
+<div class="space-y-4 max-h-[300px] overflow-y-auto custom-scrollbar">
+<div class="text-sm text-secondary">
+<div class="text-xs text-slate-500 mb-1">RANGE 1</div>
+<p>美索不达米亚的智人正在为扇出永久性背部问题。</p>
+</div>
+<div class="text-sm text-slate-300">
+<div class="text-xs text-slate-500 mb-1">NEW AREA</div>
+<p>黎凡特部落放弃狩猎，转向全天候除草作业。</p>
+</div>
+<div class="text-sm text-red-400">
+<div class="text-xs text-slate-500 mb-1">ALERT</div>
+<p>干旱风险上升，需要更多劳动力挖掘灌溉渠。</p>
+</div>
+<div class="text-sm text-slate-400 opacity-60">
+<div class="text-xs text-slate-600 mb-1">HISTORY</div>
+<p>大航海时代尚未开启，小麦正在蓄力...</p>
+</div>
+</div>
+</div>
+<div class="glass-panel bg-slate-900/90 rounded-2xl p-8 max-w-lg w-full shadow-2xl border border-primary/30 transform transition-all scale-100 z-50">
+<div class="flex justify-between items-start mb-6">
+<div class="flex items-center gap-3">
+<div class="p-3 bg-red-500/20 rounded-lg text-red-400">
+<span class="material-icons-outlined text-3xl">warning</span>
+</div>
+<div>
+<h2 class="text-2xl font-bold text-white">严重干旱</h2>
+<p class="text-red-400 text-sm">环境危机事件</p>
+</div>
+</div>
+</div>
+<p class="text-slate-300 mb-8 leading-relaxed">
+                    地中海东部地区降水量骤减，刚被驯化的小麦面临枯萎风险。智人部落正在考虑放弃耕种回归采集生活。
+                </p>
+<div class="grid grid-cols-2 gap-4">
+<button class="group relative flex flex-col items-start p-4 bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-primary rounded-xl transition-all duration-300">
+<div class="text-primary font-bold mb-1 flex items-center gap-2">
+<span class="material-icons-outlined text-sm">water_drop</span>
+                            演化耐旱根系
+                        </div>
+<div class="text-xs text-slate-400 text-left">消耗 <span class="text-primary font-bold">15 DNA</span> 点数，提高存活率。</div>
+</button>
+<button class="group relative flex flex-col items-start p-4 bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-slate-500 rounded-xl transition-all duration-300">
+<div class="text-slate-300 font-bold mb-1 flex items-center gap-2">
+<span class="material-icons-outlined text-sm">close</span>
+                            无视风险
+                        </div>
+<div class="text-xs text-slate-400 text-left">可能会损失 <span class="text-red-400 font-bold">15%</span> 的传播区域。</div>
+</button>
+</div>
+</div>
+</div>
+<div class="w-full">
+<div class="flex justify-center mb-4 gap-4">
+<button class="flex items-center gap-2 px-8 py-3 bg-secondary/20 text-secondary border border-secondary rounded-full backdrop-blur hover:bg-secondary/30 transition shadow-[0_0_15px_rgba(14,165,233,0.3)]">
+<span class="material-icons-outlined">hourglass_top</span>
+<span class="font-bold tracking-widest">进化</span>
+</button>
+<button class="flex items-center gap-2 px-8 py-3 bg-primary/20 text-primary border border-primary rounded-full backdrop-blur hover:bg-primary/30 transition shadow-[0_0_15px_rgba(245,158,11,0.3)]">
+<span class="material-icons-outlined">hub</span>
+<span class="font-bold tracking-widest">传播</span>
+</button>
+<button class="flex items-center gap-2 px-8 py-3 bg-slate-700/50 text-slate-300 border border-slate-600 rounded-full backdrop-blur hover:bg-slate-700/70 transition">
+<span class="material-icons-outlined">dna</span>
+<span class="font-bold tracking-widest">能力</span>
+</button>
+</div>
+<div class="glass-panel bg-panel-dark rounded-xl p-6 flex flex-col md:flex-row gap-6 items-stretch min-h-[160px]">
+<div class="flex items-center gap-4 border-r border-slate-700 pr-6 min-w-[200px]">
+<div class="w-12 h-12 rounded-lg bg-gradient-to-br from-secondary to-blue-700 flex items-center justify-center shadow-lg">
+<span class="material-icons-outlined text-white text-2xl">science</span>
+</div>
+<div>
+<h4 class="font-bold text-white text-lg">进化实验室</h4>
+<p class="text-xs text-slate-400 mt-1">修改小麦基因以控制人类</p>
+</div>
+</div>
+<div class="flex-1 bg-slate-800/50 rounded-lg p-3 border border-secondary/30 relative overflow-hidden group hover:bg-slate-800/80 transition cursor-pointer">
+<div class="absolute top-2 right-2 text-[10px] bg-secondary text-black px-1.5 rounded font-bold">已进化</div>
+<div class="flex gap-3">
+<span class="material-icons-outlined text-secondary text-3xl">accessibility</span>
+<div>
+<h5 class="text-secondary font-bold text-sm">折损麦秆</h5>
+<p class="text-xs text-slate-400 mt-1 leading-snug">迫使人类弯腰收割，造成其脊柱永久性损伤，增加对土地的依赖。</p>
+</div>
+</div>
+</div>
+<div class="flex-1 bg-slate-800/30 rounded-lg p-3 border border-transparent hover:border-primary/50 relative overflow-hidden group hover:bg-slate-800/60 transition cursor-pointer">
+<div class="absolute top-2 right-2 text-[10px] bg-slate-700 text-slate-300 px-1.5 rounded font-mono">15 DNA</div>
+<div class="flex gap-3">
+<span class="material-icons-outlined text-primary text-3xl opacity-80">grain</span>
+<div>
+<h5 class="text-slate-200 group-hover:text-primary font-bold text-sm transition">难以消化的谷粒</h5>
+<p class="text-xs text-slate-400 mt-1 leading-snug">人类必须花费数小时研磨，限制其乱跑狩猎，建立定居点。</p>
+</div>
+</div>
+</div>
+<div class="flex-1 bg-slate-800/30 rounded-lg p-3 border border-transparent hover:border-primary/50 relative overflow-hidden group hover:bg-slate-800/60 transition cursor-pointer">
+<div class="absolute top-2 right-2 text-[10px] bg-slate-700 text-slate-300 px-1.5 rounded font-mono">25 DNA</div>
+<div class="flex gap-3">
+<span class="material-icons-outlined text-primary text-3xl opacity-80">water_drop</span>
+<div>
+<h5 class="text-slate-200 group-hover:text-primary font-bold text-sm transition">干渴根系</h5>
+<p class="text-xs text-slate-400 mt-1 leading-snug">对水的极高需求，迫使人类聚集在河流旁并建立社会协作灌溉。</p>
+</div>
+</div>
+</div>
+<div class="w-[200px] bg-slate-900/40 rounded-lg p-3 border border-slate-800 flex flex-col justify-center opacity-60">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-icons-outlined text-slate-500 text-sm">lock</span>
+<div class="text-xs text-slate-500 font-mono ml-auto">277 DNA</div>
+</div>
+<h5 class="text-slate-400 font-bold text-sm">人口大爆炸</h5>
+<p class="text-[10px] text-slate-600 mt-1">解锁条件：全球人口总量达到 5000。</p>
+</div>
+</div>
+</div>
+</div>
+
+</body></html>

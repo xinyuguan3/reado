@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sonic Bodies: Hybridization Drill Mission Screen</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=IBM+Plex+Sans:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#22D3EE",
+                        "accent-mint": "#34D399",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#0B1020",
+                        "panel-glass": "rgba(16, 31, 34, 0.7)",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"],
+                        "body": ["IBM Plex Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'IBM Plex Sans', sans-serif;
+            background-color: #0B1020;
+        }
+        .font-display {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(34, 211, 238, 0.1);
+        }
+        .scanline {
+            width: 100%;
+            height: 2px;
+            background: rgba(34, 211, 238, 0.1);
+            position: absolute;
+            z-index: 10;
+        }
+        input[type=range] {
+            -webkit-appearance: none;
+            background: rgba(34, 211, 238, 0.2);
+            height: 4px;
+            border-radius: 2px;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #22D3EE;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(34, 211, 238, 0.8);
+        }
+        .node-active {
+            filter: drop-shadow(0 0 8px #22D3EE);
+        }
+    </style>
+</head>
+<body class="bg-background-dark text-slate-100 min-h-screen overflow-x-hidden selection:bg-primary/30">
+<!-- Background Schematic Layer -->
+<div class="fixed inset-0 pointer-events-none opacity-20 overflow-hidden">
+<svg class="w-full h-full" viewbox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<pattern height="40" id="grid" patternunits="userSpaceOnUse" width="40">
+<path d="M 40 0 L 0 0 0 40" fill="none" stroke="#22D3EE" stroke-width="0.5"></path>
+</pattern>
+</defs>
+<rect fill="url(#grid)" height="100%" width="100%"></rect>
+<circle cx="500" cy="500" fill="none" r="300" stroke="#22D3EE" stroke-dasharray="10 5" stroke-width="1"></circle>
+<path d="M 200 200 Q 500 100 800 200" fill="none" stroke="#34D399" stroke-width="2"></path>
+<circle class="animate-pulse" cx="500" cy="500" fill="#22D3EE" r="10"></circle>
+</svg>
+</div>
+<div class="relative z-10 flex flex-col min-h-screen">
+<!-- Header -->
+<header class="border-b border-primary/20 bg-background-dark/80 backdrop-blur-md px-6 py-4 flex items-center justify-between">
+<div class="flex flex-col">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-xl">account_tree</span>
+<h1 class="font-display font-bold text-lg tracking-widest text-primary uppercase">Mission: Hybridization Drill</h1>
+</div>
+<nav class="flex items-center gap-2 mt-1 text-xs font-display text-slate-400">
+<a class="hover:text-primary" href="#">Sonic Bodies</a>
+<span>/</span>
+<span class="text-slate-300">Kapsali</span>
+</nav>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex flex-col items-end">
+<span class="text-[10px] uppercase tracking-tighter text-slate-500 font-display font-bold">Signal Strength</span>
+<div class="flex gap-1 mt-1">
+<div class="w-1 h-3 bg-primary"></div>
+<div class="w-1 h-3 bg-primary"></div>
+<div class="w-1 h-3 bg-primary"></div>
+<div class="w-1 h-3 bg-primary/30"></div>
+</div>
+</div>
+<div class="text-right">
+<div class="text-[10px] uppercase font-display text-slate-500">Local Time</div>
+<div class="font-display text-sm">23:42:09 // OPS_ACTIVE</div>
+</div>
+</div>
+</header>
+<main class="flex-1 p-6 grid grid-cols-12 gap-6 max-w-[1600px] mx-auto w-full">
+<!-- Left Column: Narrative & Schematic -->
+<div class="col-span-12 lg:col-span-4 flex flex-col gap-6">
+<!-- Mission Brief -->
+<section class="glass-panel p-6 rounded-xl relative overflow-hidden">
+<div class="absolute top-0 left-0 w-1 h-full bg-primary/50"></div>
+<h3 class="font-display text-primary text-sm font-bold uppercase mb-4 tracking-wider flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">terminal</span>
+                        Narrative Protocol: Booth 04
+                    </h3>
+<div class="space-y-4 text-sm leading-relaxed text-slate-300 font-body">
+<p>You are in the after-hours control booth of the Kapsali Exhibit. The gallery is empty of human staff, but the causal network is still active.</p>
+<p class="border-l-2 border-primary/20 pl-4 italic">
+                            "The hybrid is not a midpoint, but a new entity entirely—a sonic body where the digital and physical dissolve."
+                        </p>
+<p>Objective: Reconfigure the <span class="text-primary font-bold">White Rose Protocol</span>. Link visitor kinetic data to sonic density to achieve a radical aesthetic shift. Monitor for system instability.</p>
+</div>
+</section>
+<!-- Interactive Schematic -->
+<section class="glass-panel rounded-xl flex-1 flex flex-col overflow-hidden">
+<div class="px-6 py-4 border-b border-primary/10 flex justify-between items-center">
+<h3 class="font-display text-primary text-sm font-bold uppercase tracking-wider">Spatial HUD</h3>
+<span class="text-[10px] font-display bg-primary/20 text-primary px-2 py-0.5 rounded">LIVE FEED</span>
+</div>
+<div class="flex-1 relative bg-black/40 p-4">
+<div class="absolute inset-0 flex items-center justify-center">
+<img class="w-full h-full object-contain opacity-60" data-alt="Stylized blueprint of a gallery space with sonic wave patterns" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBDk8Uj9QKx_sKnfmytsDwFQVMilOa7k9X2wf6wLWzhVfNTLltitLsMCSI-6vhNHS77xUt6GXWml2Qg3bou1nLOj7gVhXRoxWJny7KGFrH3l5aUQQuhRNCdPx8A1dlYPll-t2oaiHYcg_V3Lv9keMCSSwT8GIF5W11zS1bSzkPCchvV8kLpSxOUfVCKjtPmJzLfY-hz-WS1MhZF0QaOKUaQr3US_pLpjiVGK6HyOI3DgfLPCnGERJk0kYrTVyOUuqlpc2JrnnaAeJII"/>
+</div>
+<!-- UI Overlays for SVG -->
+<div class="absolute top-8 left-8 flex items-center gap-2">
+<div class="size-2 bg-primary rounded-full animate-ping"></div>
+<span class="text-[10px] text-primary font-display font-bold">VISITOR_ALPHA</span>
+</div>
+<div class="absolute bottom-8 right-8 border border-accent-mint/40 p-2 rounded bg-background-dark/80 backdrop-blur">
+<div class="text-[8px] text-accent-mint uppercase font-bold">Audio Node 04</div>
+<div class="text-[10px] text-slate-300">Resonance: 44.2Hz</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: System Interactions -->
+<div class="col-span-12 lg:col-span-8 flex flex-col gap-6">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Interaction 1: Causal Network -->
+<section class="glass-panel p-6 rounded-xl flex flex-col">
+<h3 class="font-display text-primary text-sm font-bold uppercase mb-6 tracking-wider flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">hub</span>
+                            1. Causal Network Architecture
+                        </h3>
+<div class="flex-1 flex flex-col justify-center items-center gap-8 relative py-4">
+<div class="flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-32 h-10 border border-primary/40 flex items-center justify-center rounded bg-primary/5 text-xs font-display group-hover:bg-primary/20 transition-all">SONIFICATION</div>
+<span class="material-symbols-outlined text-slate-500">expand_more</span>
+<div class="w-32 h-10 border border-primary flex items-center justify-center rounded bg-primary/20 text-xs font-display text-primary shadow-[0_0_15px_rgba(34,211,238,0.3)]">VISITOR MOVEMENT</div>
+</div>
+<!-- Toggle Link -->
+<div class="w-full flex justify-center py-2">
+<button class="flex items-center gap-2 px-4 py-1.5 rounded-full border border-accent-mint text-accent-mint text-[10px] font-bold font-display hover:bg-accent-mint hover:text-background-dark transition-all">
+<span class="material-symbols-outlined text-xs">add</span>
+                                    INITIATE HYBRID LINK
+                                </button>
+</div>
+<div class="w-full h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent"></div>
+<div class="opacity-40 flex flex-col items-center gap-2">
+<div class="w-48 h-10 border border-slate-700 border-dashed flex items-center justify-center rounded text-xs font-display text-slate-500 uppercase italic">
+                                    Radical Aesthetic Shift
+                                </div>
+<p class="text-[10px] text-slate-500 text-center px-4">Dependency locked. Await hybridization link signal.</p>
+</div>
+</div>
+</section>
+<!-- Interaction 2: Resource HUD -->
+<section class="glass-panel p-6 rounded-xl">
+<h3 class="font-display text-primary text-sm font-bold uppercase mb-6 tracking-wider flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">settings_input_component</span>
+                            2. Resource Allocation
+                        </h3>
+<div class="space-y-6">
+<div class="space-y-2">
+<div class="flex justify-between text-[10px] font-display uppercase font-bold">
+<label class="text-slate-400">Audio Layering</label>
+<span class="text-primary">64%</span>
+</div>
+<input class="w-full" type="range" value="64"/>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-[10px] font-display uppercase font-bold">
+<label class="text-slate-400">Tactile Integration</label>
+<span class="text-primary">42%</span>
+</div>
+<input class="w-full" type="range" value="42"/>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-[10px] font-display uppercase font-bold">
+<label class="text-slate-400">Staff Facilitation</label>
+<span class="text-primary">85%</span>
+</div>
+<input class="w-full" type="range" value="85"/>
+</div>
+</div>
+<div class="mt-8 grid grid-cols-2 gap-4">
+<div class="p-3 border border-primary/20 rounded bg-primary/5">
+<div class="text-[10px] font-display text-slate-500 uppercase mb-1">Budget Load</div>
+<div class="h-1 w-full bg-slate-800 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-3/4"></div>
+</div>
+</div>
+<div class="p-3 border border-accent-mint/20 rounded bg-accent-mint/5">
+<div class="text-[10px] font-display text-slate-500 uppercase mb-1">Access Score</div>
+<div class="h-1 w-full bg-slate-800 rounded-full overflow-hidden">
+<div class="h-full bg-accent-mint w-1/2"></div>
+</div>
+</div>
+</div>
+<p class="mt-4 text-[10px] italic text-slate-500 leading-tight">
+                            Note: High staff facilitation improves access for non-sighted visitors but reduces aesthetic "purity" in the White Rose model.
+                        </p>
+</section>
+</div>
+<!-- Interaction 3: Hypothesis Sandbox -->
+<section class="glass-panel p-6 rounded-xl flex-1">
+<h3 class="font-display text-primary text-sm font-bold uppercase mb-6 tracking-wider flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">biotech</span>
+                        3. Hypothesis Sandbox
+                    </h3>
+<div class="flex flex-col md:flex-row gap-8 items-center h-full">
+<div class="flex-1 w-full">
+<label class="text-xs font-display text-slate-400 uppercase mb-4 block">Confidence Calibration</label>
+<div class="flex items-center gap-4">
+<span class="text-xs font-display text-slate-500">0%</span>
+<input class="flex-1 accent-primary" type="range" value="75"/>
+<span class="text-xs font-display text-slate-500">100%</span>
+</div>
+<div class="mt-8 grid grid-cols-2 gap-4">
+<button class="p-4 border border-primary/20 rounded-lg text-left hover:bg-primary/10 transition-colors group">
+<div class="text-[10px] text-slate-500 font-display uppercase group-hover:text-primary transition-colors">Object Mode</div>
+<div class="font-display font-bold text-sm mt-1">Finished Object</div>
+</button>
+<button class="p-4 border border-accent-mint bg-accent-mint/10 rounded-lg text-left hover:bg-accent-mint/20 transition-colors group relative overflow-hidden">
+<div class="absolute top-0 right-0 p-1">
+<span class="material-symbols-outlined text-accent-mint text-sm">check_circle</span>
+</div>
+<div class="text-[10px] text-accent-mint font-display uppercase">Hybrid Mode</div>
+<div class="font-display font-bold text-sm mt-1 text-accent-mint">Relational Blueprint</div>
+</button>
+</div>
+</div>
+<div class="w-full md:w-64 p-4 border-l border-primary/10 flex flex-col justify-center">
+<div class="flex items-center gap-2 mb-2 text-accent-mint">
+<span class="material-symbols-outlined text-sm">description</span>
+<span class="text-[10px] font-display font-bold uppercase">Evidence Log</span>
+</div>
+<p class="text-[11px] leading-relaxed text-slate-400">
+<span class="text-accent-mint font-bold">SUCCESS:</span> "Latour’s hybrids challenge the modern constitution by existing in the space between things... the Relational Blueprint allows for visitor agency."
+                            </p>
+<div class="mt-4 pt-4 border-t border-slate-800">
+<span class="text-[9px] text-slate-600 font-display">SOURCE REF: Kapsali (2021) p.14</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Global Status Footer -->
+<footer class="bg-background-dark border-t border-primary/20 p-4 flex items-center justify-between gap-8">
+<div class="flex-1 grid grid-cols-2 md:grid-cols-4 gap-6">
+<div class="flex flex-col gap-1">
+<div class="flex justify-between text-[10px] font-display font-bold uppercase">
+<span class="text-slate-500">Operational Stability</span>
+<span class="text-primary">85%</span>
+</div>
+<div class="h-1.5 w-full bg-primary/10 rounded-full">
+<div class="h-full bg-primary rounded-full" style="width: 85%"></div>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex justify-between text-[10px] font-display font-bold uppercase">
+<span class="text-slate-500">Source Alignment</span>
+<span class="text-accent-mint">92%</span>
+</div>
+<div class="h-1.5 w-full bg-accent-mint/10 rounded-full">
+<div class="h-full bg-accent-mint rounded-full" style="width: 92%"></div>
+</div>
+</div>
+<div class="hidden md:flex flex-col gap-1">
+<div class="flex justify-between text-[10px] font-display font-bold uppercase">
+<span class="text-slate-500">Data Throughput</span>
+<span class="text-primary">1.2 TB/s</span>
+</div>
+<div class="h-1.5 w-full bg-primary/10 rounded-full">
+<div class="h-full bg-primary/60 rounded-full" style="width: 45%"></div>
+</div>
+</div>
+<div class="hidden md:flex flex-col gap-1">
+<div class="flex justify-between text-[10px] font-display font-bold uppercase">
+<span class="text-slate-500">Hybrid Node Density</span>
+<span class="text-primary">Active</span>
+</div>
+<div class="h-1.5 w-full bg-primary/10 rounded-full flex gap-1 bg-transparent">
+<div class="h-full bg-primary flex-1"></div>
+<div class="h-full bg-primary flex-1"></div>
+<div class="h-full bg-primary/30 flex-1"></div>
+<div class="h-full bg-primary/30 flex-1"></div>
+<div class="h-full bg-primary/30 flex-1"></div>
+</div>
+</div>
+</div>
+<button class="flex items-center gap-2 bg-primary text-background-dark px-6 py-2.5 rounded font-display font-bold text-sm hover:brightness-110 transition-all uppercase tracking-widest whitespace-nowrap">
+                Complete Mission
+                <span class="material-symbols-outlined text-lg">arrow_forward</span>
+</button>
+</footer>
+</div>
+<!-- Scanline Overlay Effect -->
+<div class="fixed inset-0 pointer-events-none opacity-[0.03] overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent h-[10%] animate-[scan_8s_linear_infinite]"></div>
+</div>
+<style>
+        @keyframes scan {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(1000%); }
+        }
+    </style>
+</body></html>

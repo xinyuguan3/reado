@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Zero to One：从无到有创业推演 · 模块一：雾中起航</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --panel: rgba(8, 23, 31, 0.88);
+      --line: rgba(148, 163, 184, 0.24);
+      --text: #edf4ff;
+      --sub: #afc5e2;
+      --accent: #14b8a6;
+      --accent-soft: rgba(20, 184, 166, 0.26);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Noto Sans SC", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+      color: var(--text);
+      background: radial-gradient(circle at 12% 10%, rgba(20, 184, 166, 0.16), transparent 35%), radial-gradient(circle at 88% 10%, rgba(14, 165, 233, 0.2), transparent 35%), #07111a;
+    }
+    .page {
+      width: min(1160px, calc(100% - 24px));
+      margin: 0 auto;
+      padding: 22px 0 36px;
+      display: grid;
+      grid-template-columns: minmax(280px, 330px) minmax(0, 1fr);
+      gap: 14px;
+    }
+    .panel {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      border-radius: 14px;
+      padding: 14px;
+      box-shadow: 0 18px 42px rgba(2, 8, 20, 0.46);
+    }
+    .hero {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      background: linear-gradient(160deg, var(--accent-soft), rgba(15, 23, 42, 0.62));
+    }
+    .chip-row { display: flex; gap: 7px; flex-wrap: wrap; }
+    .chip {
+      border: 1px solid rgba(148, 163, 184, 0.34);
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 11px;
+      color: #deebff;
+      font-weight: 700;
+      background: rgba(2, 6, 23, 0.45);
+    }
+    .hero h1 { margin: 10px 0 0; font-size: clamp(24px, 3vw, 34px); letter-spacing: -0.02em; line-height: 1.1; }
+    .hero .sub { margin-top: 8px; color: #d4e8ff; line-height: 1.72; font-size: 14px; }
+    .hero .mission {
+      margin-top: 10px;
+      color: #f0f8ff;
+      background: rgba(2, 6, 23, 0.38);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      border-radius: 10px;
+      padding: 9px 10px;
+      font-size: 13px;
+      line-height: 1.64;
+    }
+    .side h2 { margin: 0; font-size: 16px; }
+    .small { margin-top: 7px; color: var(--sub); font-size: 12px; line-height: 1.6; }
+    .stat { margin-top: 9px; }
+    .stat label { display: flex; justify-content: space-between; color: #cfe3fc; font-size: 12px; margin-bottom: 4px; }
+    .bar { width: 100%; height: 9px; border-radius: 999px; overflow: hidden; background: rgba(148, 163, 184, 0.2); }
+    .fill { height: 100%; width: 50%; transition: width 220ms ease; }
+    .fill.s { background: linear-gradient(90deg, #34d399, #10b981); }
+    .fill.t { background: linear-gradient(90deg, #f59e0b, #f97316); }
+    .fill.r { background: linear-gradient(90deg, #60a5fa, #3b82f6); }
+    .intel, .log { margin-top: 12px; border-top: 1px solid var(--line); padding-top: 10px; }
+    .intel ul, .log ul {
+      margin: 8px 0 0;
+      padding-left: 18px;
+      color: #d7e9ff;
+      font-size: 13px;
+      display: grid;
+      gap: 6px;
+      line-height: 1.62;
+    }
+    .log ul { max-height: 180px; overflow: auto; padding-right: 6px; }
+    .main {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(11, 18, 34, 0.88);
+      padding: 14px;
+      box-shadow: 0 20px 50px rgba(2, 8, 20, 0.48);
+    }
+    .module-head { display: flex; justify-content: space-between; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .module-title { margin: 0; font-size: 22px; letter-spacing: -0.015em; }
+    .module-scene {
+      color: #d4e9ff;
+      font-size: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.36);
+      border-radius: 999px;
+      padding: 4px 9px;
+    }
+    .opening { margin-top: 10px; color: #d6e8ff; line-height: 1.75; font-size: 14px; }
+    .mentor {
+      margin-top: 8px;
+      border: 1px dashed rgba(148, 163, 184, 0.38);
+      border-radius: 10px;
+      padding: 9px;
+      font-size: 13px;
+      color: #c8dcf7;
+      background: rgba(2, 6, 23, 0.36);
+    }
+    .scenario { margin-top: 14px; border: 1px solid var(--line); border-radius: 12px; background: rgba(15, 23, 42, 0.76); padding: 12px; }
+    .scenario h3 { margin: 0; font-size: 17px; }
+    .situation { margin-top: 8px; font-size: 14px; color: #d8e9ff; line-height: 1.7; }
+    .prompt { margin-top: 8px; font-size: 14px; color: #eff6ff; font-weight: 700; line-height: 1.7; }
+    .hint {
+      margin-top: 8px;
+      border-radius: 8px;
+      border: 1px solid rgba(148, 163, 184, 0.34);
+      padding: 6px 8px;
+      font-size: 12px;
+      color: #bfd6f5;
+      background: rgba(2, 6, 23, 0.35);
+    }
+    .options { margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .opt-btn {
+      text-align: left;
+      border: 1px solid rgba(148, 163, 184, 0.36);
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.92);
+      color: #e2eeff;
+      padding: 11px;
+      cursor: pointer;
+      display: grid;
+      gap: 6px;
+      transition: border-color 140ms ease, transform 140ms ease;
+    }
+    .opt-btn:hover { transform: translateY(-1px); border-color: rgba(56, 189, 248, 0.78); }
+    .opt-stance {
+      font-size: 11px;
+      color: #cfe3ff;
+      border: 1px solid rgba(148, 163, 184, 0.36);
+      border-radius: 999px;
+      padding: 2px 8px;
+      width: fit-content;
+      background: rgba(2, 6, 23, 0.5);
+    }
+    .opt-label { font-size: 14px; font-weight: 700; line-height: 1.5; }
+    .opt-effect { font-size: 12px; color: #9fc0e9; }
+    .report { margin-top: 10px; min-height: 22px; color: #9ad8ff; font-size: 13px; line-height: 1.65; }
+    .debrief { margin-top: 14px; border-top: 1px solid var(--line); padding-top: 10px; display: none; }
+    .debrief.show { display: block; }
+    .debrief p { color: #d8ebff; font-size: 13px; line-height: 1.7; margin: 0; }
+    .debrief p + p { margin-top: 8px; }
+    .end-actions { margin-top: 12px; display: none; gap: 8px; flex-wrap: wrap; }
+    .end-actions.show { display: flex; }
+    .btn {
+      border: 1px solid rgba(148, 163, 184, 0.36);
+      border-radius: 10px;
+      padding: 9px 12px;
+      background: rgba(30, 41, 59, 0.82);
+      color: #e2edff;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn.primary { border-color: rgba(34, 211, 238, 0.66); background: rgba(8, 145, 178, 0.34); }
+    @media (max-width: 960px) {
+      .page { grid-template-columns: 1fr; }
+      .options { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<script src="/shared/book-catalog.js?v=1771754453141"></script>
+<script type="module" src="/shared/shell.js?v=1771754453141"></script>
+<reado-app-shell data-page="knowledge-map"></reado-app-shell>
+  <main class="page">
+    <aside class="panel side">
+      <h2>Zero to One：从无到有创业推演</h2>
+      <p class="small">1 / 1 · 模块一：雾中起航</p>
+      <p class="small">角色：你是创始人兼产品负责人</p>
+      <p class="small">世界：近未来城市的创业加速营。资源有限、时间紧迫，团队需要在三个关键节点做出方向性决策。</p>
+      <p class="small">你接手一家刚起步的产品团队。市场喧闹、资本焦虑、对手众多——你要决定它是“从 1 到 n 的跟随者”，还是“从 0 到 1 的创造者”。</p>
+
+      <div class="stat">
+        <label><span>系统稳定度</span><span id="s-v">50</span></label>
+        <div class="bar"><div id="s-b" class="fill s"></div></div>
+      </div>
+      <div class="stat">
+        <label><span>资源活性</span><span id="t-v">50</span></label>
+        <div class="bar"><div id="t-b" class="fill t"></div></div>
+      </div>
+      <div class="stat">
+        <label><span>结构推进</span><span id="r-v">50</span></label>
+        <div class="bar"><div id="r-b" class="fill r"></div></div>
+      </div>
+
+      <section class="intel">
+        <h2>情报卡</h2>
+        <p class="small">本关目标：在压力下完成三次战略选择，验证你是否真正践行“Zero to One”思维。</p>
+        <ul><li>情报卡 1：常见经验认为，同质化竞争会让价格和利润承压，但不同赛道差异很大，应谨慎类比。</li><li>情报卡 2：许多早期团队把精力几乎全投在功能上，后期才发现分销体系缺位，增长难以持续。</li><li>情报卡 3：先服务小而明确的人群，通常更容易打磨产品与口碑，再考虑扩张边界。</li><li>情报卡 4：没有任何公开框架能替代一线验证；保守做法是小步试错、持续复盘。</li></ul>
+      </section>
+
+      <section class="log">
+        <h2>事件日志</h2>
+        <ul id="event-log"></ul>
+      </section>
+    </aside>
+
+    <section class="main">
+      <header class="hero">
+        <div class="chip-row">
+          <span class="chip">商业战情室</span>
+          <span class="chip">凌晨的会议室里，白板写满竞争对手功能图。投资人催增长，用户访谈却显示主流产品仍有“高频但被忽视”的痛点。</span>
+          <span class="chip">任务 1</span>
+        </div>
+        <h1>模块一：雾中起航</h1>
+        <p class="sub">你看着团队的两份路线图：一份是“快速抄优功能、冲榜拿量”，另一份是“聚焦狭窄人群，做一个别人没认真做过的解法”。</p>
+        <p class="mission">主线任务：用三个回合完成一次“Zero to One”战略试炼：找到独特价值、构建分销路径、形成可持续优势。</p>
+      </header>
+
+      <p class="mentor">导师林岚（连续创业者）提醒你：公开信息只能给出方向，无法保证结果；关键是你是否敢于形成并验证自己的独立判断。</p>
+
+      <article class="scenario">
+        <h3 id="round-title"></h3>
+        <p id="round-situation" class="situation"></p>
+        <p id="round-prompt" class="prompt"></p>
+        <p id="round-hint" class="hint"></p>
+
+        <div class="options">
+          <button id="opt-a" class="opt-btn">
+            <span id="opt-a-stance" class="opt-stance"></span>
+            <span id="opt-a-label" class="opt-label"></span>
+            <span id="opt-a-effect" class="opt-effect"></span>
+          </button>
+          <button id="opt-b" class="opt-btn">
+            <span id="opt-b-stance" class="opt-stance"></span>
+            <span id="opt-b-label" class="opt-label"></span>
+            <span id="opt-b-effect" class="opt-effect"></span>
+          </button>
+        </div>
+      </article>
+
+      <p id="report" class="report"></p>
+
+      <div id="debrief" class="debrief">
+        <p>你经历了“短期诱惑 vs 长期构建”的连续拉扯。每一步都没有标准答案，但你的选择会累积成企业的路径依赖。</p>
+        <p>Zero to One 的核心不是喊口号，而是在关键时刻选择“创造独特性”并为之配置资源。</p>
+      </div>
+      <div id="end-actions" class="end-actions">
+        <a class="btn primary" href="/books/user-zero-to-one-vwt9s0-bb0b.html">返回书籍总览</a>
+        
+        <button id="retry-btn" class="btn" type="button">重开本关</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const rounds = [{"title":"回合一：要不要跟风上线爆款功能","situation":"竞品刚发布热门新功能，社媒讨论火热。团队担心不跟进会被认为“落后”。","prompt":"你决定下一季度主线：先追热点保声量，还是先啃那个少有人做透的垂直痛点？","knowledgeHint":"Zero to One 强调“差异化创造”而非“高效率模仿”。先定义独特价值，再谈规模复制。","optionA":{"stance":"跟随市场","label":"快速复刻热门功能，争取短期曝光","feedback":"你获得了短期讨论度，团队情绪暂时稳定，但产品定位进一步靠近同质化赛道，后续议价能力可能受限。","effects":{"stability":3,"treasury":2,"reform":-5}},"optionB":{"stance":"创造差异","label":"聚焦被忽视痛点，做小而深的首版方案","feedback":"短期数据压力变大，但团队开始围绕明确用户价值协同。你为后续形成局部优势埋下种子。","effects":{"stability":-2,"treasury":-3,"reform":8}}},{"title":"回合二：增长靠投放还是靠分销设计","situation":"首版产品上线后，留存尚可但新增缓慢。市场同学建议加大广告预算“先把量做起来”。","prompt":"你是立刻重投放冲曲线，还是优先搭建可复用的渠道与转介绍机制？","knowledgeHint":"公开经验普遍提示：分销不是附属环节。产品再好，若没有稳定触达路径，也很难形成持续增长。","optionA":{"stance":"预算换速度","label":"集中预算做短期投放，快速拉新","feedback":"新增上来了，但成本压力明显，且用户质量波动。你拿到时间，却没有真正解决增长结构问题。","effects":{"stability":-3,"treasury":-6,"reform":2}},"optionB":{"stance":"机制优先","label":"先做渠道闭环与转介绍激励，再渐进投放","feedback":"增长节奏偏慢，但获取路径更可解释、可迭代。团队开始建立“产品+分销”双轮思维。","effects":{"stability":2,"treasury":-1,"reform":5}}},{"title":"回合三：规模扩张还是先固化护城河","situation":"你在细分市场初见优势。此时外部建议你降价抢份额、快速扩城，以免“窗口期关闭”。","prompt":"你会打价格战冲规模，还是优先巩固技术与服务壁垒，再选择性扩张？","knowledgeHint":"Zero to One 倾向先建立可持续优势，再扩张。竞争激烈的无差别扩张，常带来利润与组织双重压力。","optionA":{"stance":"激进扩张","label":"降价抢量，快速进入多个相邻市场","feedback":"规模看起来更大，但组织负荷和现金消耗同步上升，产品稀释风险增加，团队进入高压运营期。","effects":{"stability":-5,"treasury":-7,"reform":1}},"optionB":{"stance":"先筑壁垒","label":"巩固核心能力与高价值客户，再分阶段扩张","feedback":"节奏更克制，但单位经济性与客户粘性更稳。你为长期可持续增长建立了更清晰的底座。","effects":{"stability":4,"treasury":3,"reform":6}}}];
+      const state = { i: 0, stability: 50, treasury: 50, reform: 50 };
+      const titleEl = document.getElementById("round-title");
+      const situationEl = document.getElementById("round-situation");
+      const promptEl = document.getElementById("round-prompt");
+      const hintEl = document.getElementById("round-hint");
+      const reportEl = document.getElementById("report");
+      const logEl = document.getElementById("event-log");
+      const optA = document.getElementById("opt-a");
+      const optB = document.getElementById("opt-b");
+      const optAStance = document.getElementById("opt-a-stance");
+      const optAEffect = document.getElementById("opt-a-effect");
+      const optALabel = document.getElementById("opt-a-label");
+      const optBStance = document.getElementById("opt-b-stance");
+      const optBEffect = document.getElementById("opt-b-effect");
+      const optBLabel = document.getElementById("opt-b-label");
+      const debriefEl = document.getElementById("debrief");
+      const endActionsEl = document.getElementById("end-actions");
+      const retryBtn = document.getElementById("retry-btn");
+      const sV = document.getElementById("s-v");
+      const tV = document.getElementById("t-v");
+      const rV = document.getElementById("r-v");
+      const sB = document.getElementById("s-b");
+      const tB = document.getElementById("t-b");
+      const rB = document.getElementById("r-b");
+
+      function clamp(v) {
+        return Math.max(0, Math.min(100, Math.round(v)));
+      }
+
+      function fmtDelta(v, label) {
+        const n = Number(v) || 0;
+        const sign = n > 0 ? "+" : "";
+        return label + " " + sign + n;
+      }
+
+      function effectSummary(effects) {
+        return [
+          fmtDelta(effects?.stability, "稳"),
+          fmtDelta(effects?.treasury, "资"),
+          fmtDelta(effects?.reform, "推")
+        ].join(" · ");
+      }
+
+      function refreshBars() {
+        sV.textContent = String(state.stability);
+        tV.textContent = String(state.treasury);
+        rV.textContent = String(state.reform);
+        sB.style.width = state.stability + "%";
+        tB.style.width = state.treasury + "%";
+        rB.style.width = state.reform + "%";
+      }
+
+      function pushLog(text) {
+        const li = document.createElement("li");
+        li.textContent = text;
+        logEl.prepend(li);
+        while (logEl.children.length > 8) {
+          logEl.removeChild(logEl.lastChild);
+        }
+      }
+
+      function showFinal() {
+        titleEl.textContent = "场景结算";
+        situationEl.textContent = "你已完成本关全部关键抉择。";
+        promptEl.textContent = "回看你的日志，检查你是否始终沿着同一因果逻辑推进。";
+        hintEl.textContent = "复盘建议：提炼一条可迁移到现实的判断规则。";
+        optA.style.display = "none";
+        optB.style.display = "none";
+        debriefEl.classList.add("show");
+        endActionsEl.classList.add("show");
+      }
+
+      function paintRound() {
+        const round = rounds[state.i];
+        if (!round) {
+          showFinal();
+          return;
+        }
+        titleEl.textContent = round.title || ("抉择 " + (state.i + 1));
+        situationEl.textContent = round.situation || "局势正在发生变化。";
+        promptEl.textContent = round.prompt || "";
+        hintEl.textContent = "知识锚点：" + (round.knowledgeHint || "先识别约束，再判断代价。");
+        optAStance.textContent = round.optionA?.stance || "方案 A";
+        optALabel.textContent = round.optionA?.label || "选项 A";
+        optAEffect.textContent = "预期影响：" + effectSummary(round.optionA?.effects || {});
+        optBStance.textContent = round.optionB?.stance || "方案 B";
+        optBLabel.textContent = round.optionB?.label || "选项 B";
+        optBEffect.textContent = "预期影响：" + effectSummary(round.optionB?.effects || {});
+        optA.style.display = "";
+        optB.style.display = "";
+      }
+
+      function applyChoice(option) {
+        const effects = option?.effects || {};
+        state.stability = clamp(state.stability + (Number(effects.stability) || 0));
+        state.treasury = clamp(state.treasury + (Number(effects.treasury) || 0));
+        state.reform = clamp(state.reform + (Number(effects.reform) || 0));
+        refreshBars();
+
+        const choiceLabel = option?.label || "未命名策略";
+        const outcome = option?.feedback || "你完成了一次关键抉择。";
+        const line = "第 " + (state.i + 1) + " 回合 · 选择「" + choiceLabel + "」 · " + effectSummary(effects);
+        pushLog(line);
+        reportEl.textContent = "后果速报：" + outcome;
+
+        state.i += 1;
+        window.setTimeout(() => {
+          paintRound();
+        }, 320);
+      }
+
+      optA.addEventListener("click", () => {
+        const round = rounds[state.i];
+        applyChoice(round?.optionA || {});
+      });
+      optB.addEventListener("click", () => {
+        const round = rounds[state.i];
+        applyChoice(round?.optionB || {});
+      });
+      if (retryBtn) {
+        retryBtn.addEventListener("click", () => window.location.reload());
+      }
+
+      pushLog("已进入场景：凌晨的会议室里，白板写满竞争对手功能图。投资人催增长，用户访谈却显示主流产品仍有“高频但被忽视”的痛点。");
+      pushLog("角色就位：你是创始人兼产品负责人");
+      refreshBars();
+      paintRound();
+
+      try {
+        localStorage.setItem("reado_last_experience_href", "/experiences/u-zero-to-one-01-eac9b4.html");
+      } catch {}
+    })();
+  </script>
+
+
+<script>
+(() => {
+  
+  
+  
+})();
+</script>
+</body>
+</html>

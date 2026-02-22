@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Module 2: Gallery Movement Lab — Sonic Bodies Protocol</title>
+  <style>
+    :root{
+      --parchment:#F5EFE2;
+      --charcoal:#1F2937;
+      --brass:#B7791F;
+      --teal:#0F766E;
+      --ink:#2A3446;
+      --muted:#6b7280;
+      --paper-shadow:0 14px 40px rgba(31,41,55,.12);
+      --card-shadow:0 10px 24px rgba(31,41,55,.1);
+      --radius:16px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{
+      background:
+        radial-gradient(1200px 700px at 85% -10%, rgba(183,121,31,.13), transparent 60%),
+        radial-gradient(800px 600px at 10% 120%, rgba(15,118,110,.10), transparent 55%),
+        var(--parchment);
+      color:var(--charcoal);
+      font-family:"Inter Tight","Avenir Next","Segoe UI",sans-serif;
+      line-height:1.45;
+      min-height:100vh;
+      overflow-x:hidden;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background:
+        repeating-linear-gradient(25deg, rgba(31,41,55,.015) 0 2px, transparent 2px 6px),
+        repeating-linear-gradient(-15deg, rgba(183,121,31,.02) 0 1px, transparent 1px 5px);
+      mix-blend-mode:multiply;
+      opacity:.5;
+    }
+
+    .page{
+      width:min(1200px,94vw);
+      margin:24px auto 40px;
+      display:grid;
+      grid-template-columns:1.2fr .9fr;
+      gap:18px;
+      position:relative;
+      z-index:1;
+    }
+
+    .panel{
+      background:rgba(255,255,255,.34);
+      backdrop-filter: blur(1px);
+      border:1px solid rgba(31,41,55,.08);
+      border-radius:var(--radius);
+      box-shadow:var(--paper-shadow);
+    }
+
+    .intro{
+      grid-column:1 / -1;
+      padding:22px 24px 20px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .intro::after{
+      content:"ARCHIVE NARRATIVE";
+      position:absolute;
+      right:-24px;
+      top:18px;
+      font-size:12px;
+      letter-spacing:.2em;
+      color:rgba(31,41,55,.35);
+      transform:rotate(6deg);
+      font-weight:700;
+    }
+
+    .kicker{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+      margin-bottom:10px;
+      font-size:12px;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+    }
+
+    .kicker span{
+      background:rgba(183,121,31,.12);
+      color:var(--ink);
+      border:1px solid rgba(183,121,31,.35);
+      border-radius:999px;
+      padding:4px 10px;
+      font-weight:700;
+    }
+
+    h1,h2,h3{
+      margin:0;
+      font-family:"Source Serif 4","Georgia",serif;
+      color:var(--ink);
+    }
+
+    h1{
+      font-size:clamp(28px,4.5vw,48px);
+      line-height:1.06;
+      margin-bottom:8px;
+    }
+
+    .intro-grid{
+      display:grid;
+      grid-template-columns:1.05fr .95fr;
+      gap:18px;
+      margin-top:12px;
+      align-items:start;
+    }
+
+    .lead{
+      font-size:17px;
+      color:#253041;
+      margin:0;
+      max-width:65ch;
+    }
+
+    .annotation{
+      margin-top:14px;
+      color:var(--muted);
+      font-size:14px;
+      border-left:3px solid rgba(15,118,110,.5);
+      padding-left:12px;
+    }
+
+    .terms{
+      margin-top:12px;
+      font-size:12px;
+      color:rgba(31,41,55,.74);
+      background:rgba(31,41,55,.05);
+      border-radius:10px;
+      padding:7px 10px;
+      letter-spacing:.02em;
+    }
+
+    .console{
+      padding:18px;
+      display:grid;
+      gap:14px;
+      position:sticky;
+      top:16px;
+      align-self:start;
+      height:max-content;
+    }
+
+    .console h3{font-size:20px}
+    .live{
+      background:#fff8ec;
+      border:1px solid rgba(183,121,31,.35);
+      border-radius:12px;
+      padding:12px;
+      font-size:14px;
+    }
+
+    .live strong{color:var(--brass)}
+    .stat{display:grid;gap:8px}
+    .stat-row{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:8px;
+      align-items:center;
+      font-size:13px;
+    }
+
+    .meter{
+      height:8px;
+      background:rgba(31,41,55,.12);
+      border-radius:999px;
+      overflow:hidden;
+      margin-top:4px;
+    }
+
+    .meter > i{
+      display:block;height:100%;width:0%;
+      background:linear-gradient(90deg,var(--teal),#14b8a6);
+      transition:width .25s ease, background .25s ease;
+    }
+
+    .phase-list{
+      list-style:none;
+      margin:0;padding:0;
+      display:grid;gap:8px;
+      font-size:13px;
+    }
+    .phase-list li{
+      padding:8px 10px;
+      border-radius:10px;
+      background:rgba(31,41,55,.05);
+      border:1px solid rgba(31,41,55,.08);
+      display:flex;
+      justify-content:space-between;
+      gap:8px;
+    }
+    .done{color:var(--teal);font-weight:700}
+    .open{color:var(--brass);font-weight:700}
+
+    .module{
+      display:grid;
+      gap:16px;
+    }
+
+    .block{
+      padding:18px;
+    }
+
+    .block h2{
+      font-size:27px;
+      margin-bottom:10px;
+    }
+
+    .sub{
+      color:var(--muted);
+      font-size:14px;
+      margin:0 0 12px;
+    }
+
+    .alloc-grid{
+      display:grid;
+      gap:12px;
+    }
+
+    .alloc-item{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:8px;
+      align-items:center;
+      background:rgba(255,255,255,.45);
+      border:1px solid rgba(31,41,55,.1);
+      border-radius:12px;
+      padding:10px 12px;
+    }
+
+    .alloc-item label{
+      font-weight:700;
+      color:#273446;
+      display:block;
+      margin-bottom:6px;
+      font-size:14px;
+    }
+
+    input[type="range"]{
+      width:100%;
+      accent-color:var(--teal);
+      cursor:pointer;
+    }
+
+    .small{
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    .alloc-note{
+      margin-top:8px;
+      color:#374151;
+      font-size:14px;
+      background:rgba(15,118,110,.08);
+      border-left:3px solid var(--teal);
+      padding:9px 10px;
+      border-radius:0 8px 8px 0;
+    }
+
+    .hypothesis-wrap{
+      display:grid;
+      gap:10px;
+    }
+
+    .hypo-buttons{
+      display:grid;
+      gap:8px;
+    }
+
+    .hypo-btn{
+      text-align:left;
+      width:100%;
+      border:1px solid rgba(31,41,55,.16);
+      background:rgba(255,255,255,.5);
+      border-radius:12px;
+      padding:10px;
+      color:#1f2937;
+      cursor:pointer;
+      transition:.2s ease;
+      font-size:14px;
+    }
+
+    .hypo-btn:hover{border-color:var(--teal)}
+    .hypo-btn.active{
+      border-color:var(--teal);
+      background:rgba(15,118,110,.12);
+      box-shadow:inset 0 0 0 1px rgba(15,118,110,.25);
+    }
+
+    .confidence{
+      display:grid;
+      gap:6px;
+      background:rgba(183,121,31,.08);
+      border:1px solid rgba(183,121,31,.25);
+      padding:10px;
+      border-radius:10px;
+      font-size:14px;
+    }
+
+    .verdict{
+      min-height:42px;
+      border-left:3px solid var(--brass);
+      padding:8px 10px;
+      background:rgba(255,250,240,.8);
+      border-radius:0 8px 8px 0;
+      font-size:14px;
+      color:#374151;
+    }
+
+    .sandbox-grid{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:12px;
+    }
+
+    #sonicCanvas{
+      width:100%;
+      height:auto;
+      border-radius:12px;
+      background:linear-gradient(180deg,rgba(255,255,255,.65),rgba(255,255,255,.38));
+      border:1px solid rgba(31,41,55,.12);
+    }
+
+    .svg-shell{
+      background:rgba(255,255,255,.5);
+      border-radius:12px;
+      border:1px solid rgba(31,41,55,.12);
+      padding:8px;
+    }
+
+    svg text{font-family:"Inter Tight","Segoe UI",sans-serif}
+
+    .sorting{
+      display:grid;
+      gap:12px;
+    }
+
+    .bucket-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:10px;
+    }
+
+    .bucket{
+      border:1px dashed rgba(31,41,55,.28);
+      background:rgba(255,255,255,.5);
+      border-radius:12px;
+      padding:10px;
+      min-height:122px;
+    }
+
+    .bucket h4{
+      margin:0 0 2px;
+      font-size:15px;
+      color:#263245;
+      font-family:"Source Serif 4","Georgia",serif;
+    }
+
+    .bucket .hint{
+      font-size:12px;
+      color:var(--muted);
+      margin-bottom:8px;
+    }
+
+    .card-stack{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      min-height:42px;
+    }
+
+    .evidence-card{
+      width:100%;
+      border:1px solid rgba(31,41,55,.16);
+      background:linear-gradient(180deg,#fff,rgba(255,255,255,.9));
+      border-radius:10px;
+      padding:8px 10px;
+      font-size:13px;
+      cursor:grab;
+      box-shadow:var(--card-shadow);
+      position:relative;
+      user-select:none;
+    }
+
+    .evidence-card:active{cursor:grabbing}
+    .evidence-card::before{
+      content:"";
+      position:absolute;
+      top:0;left:0;right:0;height:3px;
+      border-radius:10px 10px 0 0;
+      background:linear-gradient(90deg,var(--brass),var(--teal));
+      opacity:.55;
+    }
+
+    .summary{
+      border:1px solid rgba(15,118,110,.25);
+      background:rgba(15,118,110,.08);
+      border-radius:12px;
+      padding:12px;
+      font-size:14px;
+      color:#24423f;
+    }
+
+    .nav{
+      grid-column:1 / -1;
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      justify-content:space-between;
+      align-items:center;
+      padding:14px 16px;
+      background:rgba(255,255,255,.5);
+      border:1px solid rgba(31,41,55,.12);
+      border-radius:14px;
+      box-shadow:var(--paper-shadow);
+    }
+
+    .nav a{
+      text-decoration:none;
+      color:#203243;
+      padding:10px 14px;
+      border:1px solid rgba(31,41,55,.22);
+      border-radius:999px;
+      background:rgba(255,255,255,.7);
+      font-weight:700;
+      font-size:14px;
+      transition:.2s ease;
+    }
+    .nav a:hover{
+      border-color:var(--teal);
+      color:var(--teal);
+      transform:translateY(-1px);
+    }
+
+    @media (max-width:1020px){
+      .page{grid-template-columns:1fr}
+      .console{position:static}
+      .intro-grid{grid-template-columns:1fr}
+    }
+
+    @media (max-width:700px){
+      .bucket-grid{grid-template-columns:1fr}
+      .nav{justify-content:center}
+      h1{font-size:34px}
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="intro panel">
+      <div class="kicker">
+        <span>论文2: Sonic Bodies Protocol</span>
+        <span>Module 2: Gallery Movement Lab</span>
+      </div>
+      <h1>Prototype Gallery, Midweek Evening</h1>
+      <div class="intro-grid">
+        <div>
+          <p class="lead">
+            Technicians ask for final settings while community partners wait at the entrance route. Your mission is to configure movement sonification so the encounter keeps aesthetic complexity alive, instead of reducing visitors to numeric traces.
+          </p>
+          <p class="annotation">
+            Intel from the source record: this article examines sonification in gallery and museum contexts, reports that audio-centred engagement complicates the aesthetic experience, and frames artwork as relational blueprints animated by moving-listening subjects rather than fixed objects.
+          </p>
+          <div class="terms">the and sonification aesthetic experience online white rose sonic bodies hybridization article</div>
+        </div>
+        <div class="svg-shell">
+          <svg id="gallerySvg" viewBox="0 0 360 210" width="100%" aria-label="Gallery route diagram">
+            <defs>
+              <linearGradient id="routeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#B7791F"/>
+                <stop offset="100%" stop-color="#0F766E"/>
+              </linearGradient>
+            </defs>
+            <rect x="8" y="8" width="344" height="194" rx="16" fill="#fdfaf2" stroke="#c7b89c" />
+            <path id="routePath" d="M30 170 C 72 132, 116 148, 151 111 C 187 73, 248 89, 326 36" fill="none" stroke="url(#routeGrad)" stroke-width="5" stroke-linecap="round"/>
+            <circle id="sensorProx" cx="74" cy="135" r="12" fill="#0F766E88" stroke="#0F766E"/>
+            <circle id="sensorConc" cx="162" cy="106" r="12" fill="#B7791F88" stroke="#B7791F"/>
+            <circle id="sensorMat" cx="250" cy="90" r="12" fill="#1F293788" stroke="#1F2937"/>
+            <circle cx="326" cy="36" r="8" fill="#1F2937"/>
+            <text x="24" y="188" font-size="11" fill="#364152">Entrance partners</text>
+            <text x="268" y="28" font-size="11" fill="#364152">Test exit</text>
+            <text x="22" y="24" font-size="11" fill="#6b7280">Sonic Bodies / White Rose Research Online</text>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <section class="module">
+      <article class="block panel">
+        <h2>Phase 1 · Resource Allocation Board</h2>
+        <p class="sub">Allocate setup focus across proximal, conceptual, and material relations; watch trade-off meters update in real time.</p>
+        <div class="alloc-grid">
+          <div class="alloc-item">
+            <div>
+              <label for="proximal">Proximal relation sensing</label>
+              <input id="proximal" type="range" min="0" max="100" value="45">
+            </div>
+            <strong id="proximalVal">45</strong>
+          </div>
+          <div class="alloc-item">
+            <div>
+              <label for="conceptual">Conceptual cue layering</label>
+              <input id="conceptual" type="range" min="0" max="100" value="55">
+            </div>
+            <strong id="conceptualVal">55</strong>
+          </div>
+          <div class="alloc-item">
+            <div>
+              <label for="material">Material resonance mapping</label>
+              <input id="material" type="range" min="0" max="100" value="40">
+            </div>
+            <strong id="materialVal">40</strong>
+          </div>
+        </div>
+        <div class="alloc-note" id="allocationNote"></div>
+      </article>
+
+      <article class="block panel">
+        <h2>Phase 2 · Hypothesis Test Panel</h2>
+        <p class="sub">Choose one hypothesis and calibrate confidence against source evidence.</p>
+        <div class="hypothesis-wrap">
+          <div class="hypo-buttons">
+            <button class="hypo-btn" data-h="h1">H1: Audio-centred mode replaces complexity and sight relations.</button>
+            <button class="hypo-btn" data-h="h2">H2: Movement sonification hybridization co-produces proximal, conceptual, and material relations.</button>
+            <button class="hypo-btn" data-h="h3">H3: Route scoring by single speed metric risks flattening visitors into data.</button>
+          </div>
+          <div class="confidence">
+            <label for="confidence">Confidence calibration</label>
+            <input id="confidence" type="range" min="0" max="100" value="58">
+            <div><strong id="confidenceVal">58%</strong> confidence</div>
+          </div>
+          <div id="verdict" class="verdict">Awaiting hypothesis selection.</div>
+        </div>
+      </article>
+
+      <article class="block panel">
+        <h2>Phase 3 · Parameter Sandbox</h2>
+        <p class="sub">Tune the system and watch immediate response in waveform and route behavior.</p>
+        <div class="sandbox-grid">
+          <div class="alloc-item">
+            <div>
+              <label for="audio">Audio-centred prominence</label>
+              <input id="audio" type="range" min="0" max="100" value="62">
+            </div>
+            <strong id="audioVal">62</strong>
+          </div>
+          <div class="alloc-item">
+            <div>
+              <label for="speed">Visitor speed sensitivity</label>
+              <input id="speed" type="range" min="0" max="100" value="50">
+            </div>
+            <strong id="speedVal">50</strong>
+          </div>
+          <div class="alloc-item">
+            <div>
+              <label for="hybrid">Hybrid coupling strength</label>
+              <input id="hybrid" type="range" min="0" max="100" value="66">
+            </div>
+            <strong id="hybridVal">66</strong>
+          </div>
+          <div class="alloc-item">
+            <div>
+              <label for="resonance">Floor material resonance</label>
+              <input id="resonance" type="range" min="0" max="100" value="48">
+            </div>
+            <strong id="resonanceVal">48</strong>
+          </div>
+          <canvas id="sonicCanvas" width="760" height="240"></canvas>
+          <p class="small" id="sandboxText"></p>
+        </div>
+      </article>
+
+      <article class="block panel">
+        <h2>Phase 4 · Evidence Sorting</h2>
+        <p class="sub">Drag cards into buckets (or tap cards on mobile to cycle buckets).</p>
+        <div class="sorting">
+          <div class="bucket-grid">
+            <section class="bucket" data-bucket="pool">
+              <h4>Evidence Deck</h4>
+              <div class="hint">Dispatch each fragment to the most accurate archive bucket.</div>
+              <div class="card-stack" id="bucketPool">
+                <div class="evidence-card" id="c1" draggable="true">Movement sonification appears as engagement practice in galleries and museums.</div>
+                <div class="evidence-card" id="c2" draggable="true">Audio-centred engagement complicates the aesthetic experience, not a total replacement.</div>
+                <div class="evidence-card" id="c3" draggable="true">The article invokes Latour hybrids to frame relational co-production.</div>
+                <div class="evidence-card" id="c4" draggable="true">Artwork is treated as fixed and complete without challenge.</div>
+                <div class="evidence-card" id="c5" draggable="true">Examples question assumptions of artwork as finished stable object.</div>
+                <div class="evidence-card" id="c6" draggable="true">Record notes published online 30 November 2020, Performance Research 25(4), White Rose Research Online.</div>
+              </div>
+            </section>
+
+            <section class="bucket" data-bucket="0">
+              <h4>Corroborated by source</h4>
+              <div class="hint">Directly supported in the source abstract or metadata.</div>
+              <div class="card-stack" id="bucket0"></div>
+            </section>
+
+            <section class="bucket" data-bucket="1">
+              <h4>Hybridization framing</h4>
+              <div class="hint">Accurate but meaningful with relational framing context.</div>
+              <div class="card-stack" id="bucket1"></div>
+            </section>
+
+            <section class="bucket" data-bucket="2">
+              <h4>Contradicted / unsupported</h4>
+              <div class="hint">Claims not upheld by the provided source evidence.</div>
+              <div class="card-stack" id="bucket2"></div>
+            </section>
+          </div>
+          <div class="summary" id="phaseSummary">Phase summary will update as you complete each operation.</div>
+        </div>
+      </article>
+    </section>
+
+    <aside class="console panel">
+      <h3>Mission Feed</h3>
+      <div class="live">
+        <div><strong>Objective:</strong> preserve complexity while avoiding metric flattening.</div>
+        <div id="liveLine">Console ready. Adjust one control to begin.</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-row"><span>Aesthetic complexity</span><strong id="mAVal">0</strong></div>
+        <div class="meter"><i id="mA"></i></div>
+
+        <div class="stat-row"><span>Flattening risk</span><strong id="mFVal">0</strong></div>
+        <div class="meter"><i id="mF"></i></div>
+
+        <div class="stat-row"><span>Access breadth</span><strong id="mBVal">0</strong></div>
+        <div class="meter"><i id="mB"></i></div>
+
+        <div class="stat-row"><span>Evidence alignment</span><strong id="mEVal">0</strong></div>
+        <div class="meter"><i id="mE"></i></div>
+      </div>
+
+      <ul class="phase-list">
+        <li><span>Phase 1 allocation</span><span id="p1" class="open">Open</span></li>
+        <li><span>Phase 2 hypothesis</span><span id="p2" class="open">Open</span></li>
+        <li><span>Phase 3 sandbox</span><span id="p3" class="open">Open</span></li>
+        <li><span>Phase 4 evidence sort</span><span id="p4" class="open">Open</span></li>
+      </ul>
+    </aside>
+
+    <nav class="nav">
+      <a href="/experiences/u-2-01-693e90.html">← Previous</a>
+      <a href="/books/user-2-wjtqrj-6b20.html">Module Hub</a>
+      <a href="/experiences/u-2-03-90d1c3.html">Next →</a>
+    </nav>
+  </main>
+
+  <script>
+    const state = {
+      touched: { allocation:false, sandbox:false },
+      hypothesis: "",
+      confidence: 58,
+      resources: { proximal:45, conceptual:55, material:40 },
+      sandbox: { audio:62, speed:50, hybrid:66, resonance:48 },
+      cards: { c1:null, c2:null, c3:null, c4:null, c5:null, c6:null }
+    };
+
+    const correctBuckets = { c1:0, c2:0, c3:1, c4:2, c5:0, c6:0 };
+
+    const ids = ["proximal","conceptual","material","audio","speed","hybrid","resonance","confidence"];
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      el.addEventListener("input", () => {
+        const val = +el.value;
+        if (state.resources[id] !== undefined) {
+          state.resources[id] = val;
+          state.touched.allocation = true;
+        }
+        if (state.sandbox[id] !== undefined) {
+          state.sandbox[id] = val;
+          state.touched.sandbox = true;
+        }
+        if (id === "confidence") state.confidence = val;
+        const v = document.getElementById(id + "Val");
+        if (v) v.textContent = id === "confidence" ? val + "%" : val;
+        refresh();
+      });
+    });
+
+    document.querySelectorAll(".hypo-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".hypo-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        state.hypothesis = btn.dataset.h;
+        refresh();
+      });
+    });
+
+    document.querySelectorAll(".evidence-card").forEach(card => {
+      card.addEventListener("dragstart", ev => {
+        ev.dataTransfer.setData("text/plain", card.id);
+      });
+      card.addEventListener("click", () => {
+        const cur = state.cards[card.id];
+        const next = cur === null ? 0 : cur === 0 ? 1 : cur === 1 ? 2 : null;
+        moveCard(card.id, next);
+      });
+    });
+
+    document.querySelectorAll(".bucket").forEach(bucket => {
+      bucket.addEventListener("dragover", ev => ev.preventDefault());
+      bucket.addEventListener("drop", ev => {
+        ev.preventDefault();
+        const id = ev.dataTransfer.getData("text/plain");
+        const target = bucket.dataset.bucket === "pool" ? null : +bucket.dataset.bucket;
+        moveCard(id, target);
+      });
+    });
+
+    function clamp(value, min=0, max=100){ return Math.max(min, Math.min(max, value)); }
+
+    function cardAlignment() {
+      const keys = Object.keys(state.cards);
+      let assigned = 0;
+      let correct = 0;
+      keys.forEach(k => {
+        if (state.cards[k] !== null) {
+          assigned++;
+          if (state.cards[k] === correctBuckets[k]) correct++;
+        }
+      });
+      return {
+        assigned,
+        total: keys.length,
+        score: keys.length ? Math.round((correct / keys.length) * 100) : 0
+      };
+    }
+
+    function moveCard(cardId, targetBucket) {
+      state.cards[cardId] = targetBucket;
+      const stack = targetBucket === null ? document.getElementById("bucketPool") : document.getElementById("bucket" + targetBucket);
+      stack.appendChild(document.getElementById(cardId));
+      refresh();
+    }
+
+    function hypothesisVerdict(eScore, flattening) {
+      if (!state.hypothesis) return "Awaiting hypothesis selection.";
+      const c = state.confidence;
+      if (state.hypothesis === "h1") {
+        if (c > 60) return "High confidence conflicts with source: the article says audio-centred engagement complicates experience rather than replacing relational complexity.";
+        return "Low confidence is sensible; keep this as a stress-test, not a final claim.";
+      }
+      if (state.hypothesis === "h2") {
+        if (eScore >= 60 && state.sandbox.hybrid >= 55) return "Strong alignment: hybridization and co-produced relations are supported by the source article.";
+        return "Partially aligned: raise hybrid coupling or improve evidence sorting to substantiate this claim.";
+      }
+      if (state.hypothesis === "h3") {
+        if (flattening >= 58) return "Warning confirmed: single-metric speed emphasis is flattening the encounter.";
+        return "Risk currently moderated, but monitor if audio prominence rises without conceptual layering.";
+      }
+      return "No verdict.";
+    }
+
+    function drawCanvas() {
+      const canvas = document.getElementById("sonicCanvas");
+      const ctx = canvas.getContext("2d");
+      const w = canvas.width, h = canvas.height;
+      const { audio, speed, hybrid, resonance } = state.sandbox;
+
+      ctx.clearRect(0,0,w,h);
+      ctx.fillStyle = "#f9f4e8";
+      ctx.fillRect(0,0,w,h);
+
+      ctx.strokeStyle = "rgba(31,41,55,.22)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(28,h*0.75);
+      ctx.lineTo(w-24,h*0.75);
+      ctx.stroke();
+
+      const amp = 18 + audio * 0.28 + resonance * 0.16;
+      const freq = 0.009 + speed * 0.00017;
+      const drift = hybrid * 0.22;
+
+      ctx.beginPath();
+      ctx.lineWidth = 2.2;
+      ctx.strokeStyle = "#0F766E";
+      for(let x=24; x<w-24; x++){
+        const y = h*0.55 + Math.sin(x*freq) * amp * 0.5 + Math.sin((x+drift)*0.022) * 12;
+        if(x===24) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      }
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.lineWidth = 1.8;
+      ctx.strokeStyle = "#B7791F";
+      for(let x=24; x<w-24; x++){
+        const y = h*0.62 + Math.sin((x*freq*1.5)+1.2) * (amp*0.38);
+        if(x===24) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      }
+      ctx.stroke();
+
+      ctx.fillStyle = "rgba(31,41,55,.6)";
+      for(let i=0; i<8; i++){
+        const x = 40 + i*((w-80)/7);
+        const y = h*0.75 - (Math.sin((i+audio)*0.35)*12 + speed*0.08);
+        ctx.beginPath();
+        ctx.arc(x,y,3 + (hybrid*0.012),0,Math.PI*2);
+        ctx.fill();
+      }
+
+      ctx.fillStyle = "rgba(31,41,55,.72)";
+      ctx.font = "13px Inter Tight, sans-serif";
+      ctx.fillText("Live sonification response: movement-listening waveform", 24, 24);
+    }
+
+    function refreshSvg() {
+      const p = state.resources.proximal;
+      const c = state.resources.conceptual;
+      const m = state.resources.material;
+      const h = state.sandbox.hybrid;
+
+      const prox = document.getElementById("sensorProx");
+      const conc = document.getElementById("sensorConc");
+      const mat = document.getElementById("sensorMat");
+      const route = document.getElementById("routePath");
+
+      prox.setAttribute("r", (8 + p*0.09).toFixed(1));
+      conc.setAttribute("r", (8 + c*0.09).toFixed(1));
+      mat.setAttribute("r", (8 + m*0.09).toFixed(1));
+      route.setAttribute("stroke-width", (3 + h*0.04).toFixed(2));
+      route.setAttribute("opacity", (0.45 + h*0.005).toFixed(2));
+    }
+
+    function refresh() {
+      const r = state.resources, s = state.sandbox;
+      const a = cardAlignment();
+
+      const avg = (r.proximal + r.conceptual + r.material) / 3;
+      const spread = (Math.abs(r.proximal-avg)+Math.abs(r.conceptual-avg)+Math.abs(r.material-avg))/3;
+
+      const complexity = clamp(24 + r.conceptual*0.31 + r.material*0.24 + s.hybrid*0.28 - Math.max(0,s.audio-82)*0.45 - spread*0.3);
+      const flattening = clamp(68 + s.audio*0.24 + s.speed*0.11 - r.conceptual*0.23 - s.hybrid*0.33 - a.score*0.22);
+      const breadth = clamp(20 + r.proximal*0.33 + s.speed*0.22 + r.material*0.19 + Math.min(r.conceptual,60)*0.15);
+
+      setMeter("mA","mAVal",complexity,false);
+      setMeter("mF","mFVal",flattening,true);
+      setMeter("mB","mBVal",breadth,false);
+      setMeter("mE","mEVal",a.score,false);
+
+      document.getElementById("allocationNote").textContent =
+        `Current mix: proximal ${r.proximal}, conceptual ${r.conceptual}, material ${r.material}. Balance spread ${Math.round(spread)}; lower spread sustains hybrid encounter texture.`;
+
+      document.getElementById("sandboxText").textContent =
+        `Audio prominence ${s.audio}, speed sensitivity ${s.speed}, hybrid coupling ${s.hybrid}, resonance ${s.resonance}. System response now ${flattening > 60 ? "leans toward metric pressure." : "keeps relational nuance in play."}`;
+
+      const verdict = hypothesisVerdict(a.score, flattening);
+      document.getElementById("verdict").textContent = verdict;
+
+      const p1 = state.touched.allocation && r.proximal > 15 && r.conceptual > 15 && r.material > 15;
+      const p2 = !!state.hypothesis && state.confidence >= 35;
+      const p3 = state.touched.sandbox;
+      const p4 = a.assigned === a.total;
+
+      setPhase("p1", p1);
+      setPhase("p2", p2);
+      setPhase("p3", p3);
+      setPhase("p4", p4);
+
+      const completed = [p1,p2,p3,p4].filter(Boolean).length;
+      const live = document.getElementById("liveLine");
+      live.textContent = `Completed ${completed}/4 phases · complexity ${Math.round(complexity)} · flattening risk ${Math.round(flattening)} · evidence ${a.score}%`;
+
+      const summary = document.getElementById("phaseSummary");
+      if (completed < 4) {
+        summary.textContent = `In progress: ${completed}/4 phases complete. Next strongest move is ${!p1 ? "resource balancing" : !p2 ? "hypothesis calibration" : !p3 ? "sandbox tuning" : "evidence sorting"} to secure mission coherence.`;
+      } else {
+        const readiness =
+          complexity >= 62 && flattening <= 52 && a.score >= 67
+          ? "Route ready for community test: design keeps sonic bodies relational and avoids flattening."
+          : "Route usable but unstable: revisit evidence alignment and coupling before final technician lock.";
+        summary.textContent = `${readiness} Final reading: complexity ${Math.round(complexity)}, flattening ${Math.round(flattening)}, access breadth ${Math.round(breadth)}, evidence alignment ${a.score}%.`;
+      }
+
+      drawCanvas();
+      refreshSvg();
+    }
+
+    function setMeter(barId, valId, value, inverse) {
+      const bar = document.getElementById(barId);
+      const val = document.getElementById(valId);
+      bar.style.width = value + "%";
+      val.textContent = Math.round(value);
+      if (inverse) {
+        bar.style.background = value > 60 ? "linear-gradient(90deg,#b91c1c,#f97316)" : "linear-gradient(90deg,#0F766E,#14b8a6)";
+      } else {
+        bar.style.background = value < 40 ? "linear-gradient(90deg,#B7791F,#f59e0b)" : "linear-gradient(90deg,#0F766E,#14b8a6)";
+      }
+    }
+
+    function setPhase(id, done) {
+      const el = document.getElementById(id);
+      el.className = done ? "done" : "open";
+      el.textContent = done ? "Done" : "Open";
+    }
+
+    refresh();
+  </script>
+</body>
+</html>

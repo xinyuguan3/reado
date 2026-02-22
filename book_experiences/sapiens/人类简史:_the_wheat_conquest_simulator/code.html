@@ -1,531 +1,408 @@
 <!DOCTYPE html>
-<html class="dark" lang="zh-CN"><head>
+<html lang="zh-CN"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>人类简史：小麦征服模拟器</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
+<title>reado: 人类简史 - 小麦全球征服模拟</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<script>
         tailwind.config = {
             darkMode: "class",
             theme: {
                 extend: {
                     colors: {
-                        "primary": "#f4d125",
-                        "background-light": "#f8f8f5",
-                        "background-dark": "#1a180e",
-                        "earth-dark": "#2a2618",
-                        "earth-light": "#3d3826",
+                        primary: "#F59E0B", // Amber-500 for wheat/DNA
+                        secondary: "#0EA5E9", // Sky-500 for sci-fi/tech elements
+                        "background-light": "#1a202c", // Fallback for light mode (though this design is dark-heavy)
+                        "background-dark": "#0B1120", // Deep space blue/black
+                        "panel-dark": "rgba(15, 23, 42, 0.85)", // Semi-transparent slate
+                        "panel-light": "rgba(255, 255, 255, 0.9)",
                     },
                     fontFamily: {
-                        "sans": ["Noto Sans SC", "Source Han Sans SC", "sans-serif"],
-                        "display": ["Noto Sans SC", "Source Han Sans SC", "sans-serif"]
+                        display: ["'Noto Sans SC'", "sans-serif"],
+                        mono: ["'Courier New'", "monospace"], // For stats
                     },
-                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "2xl": "2xl", "full": "9999px"},
                     backgroundImage: {
-                        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+                        'earth-texture': "url('/experiences/media/the-wheat-conquest-simulator/world-map-2d.svg')",
                     }
                 },
             },
-        }
+        };
     </script>
-<style type="text/tailwindcss">
-        body {
-            font-family: 'Noto Sans SC', 'Source Han Sans SC', sans-serif;
+<style>.glass-panel {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
         }
-        ::-webkit-scrollbar {
+        .dna-pulse {
+            animation: pulse-glow 2s infinite;
+        }
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+        }
+        .map-marker {
+            transition: transform 0.2s ease;
+        }
+        .map-marker:hover {
+            transform: scale(1.2);
+            cursor: pointer;
+        }.wheat-glow {
+            filter: drop-shadow(0 0 8px #F59E0B);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
             width: 6px;
         }
-        ::-webkit-scrollbar-track {
-            background: #2a2618; 
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.4);
         }
-        ::-webkit-scrollbar-thumb {
-            background: #f4d125; 
-            border-radius: 3px;
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.5);
+            border-radius: 9999px;
         }
-        .glass-panel {
-            background: rgba(42, 38, 24, 0.6);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(244, 209, 37, 0.1);
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(148, 163, 184, 0.8);
         }
-        .text-glow {
-            text-shadow: 0 0 10px rgba(244, 209, 37, 0.3);
+        .tip-float {
+            animation: tip-float 2.8s ease-in-out infinite;
         }
-        .map-grid {
-            background-size: 40px 40px;
-            background-image: 
-                linear-gradient(to right, rgba(244, 209, 37, 0.05) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(244, 209, 37, 0.05) 1px, transparent 1px);
+        @keyframes tip-float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
         }
     </style>
 </head>
-<body class="bg-background-light dark:bg-background-dark text-gray-800 dark:text-gray-200 min-h-screen flex flex-col overflow-hidden relative selection:bg-primary selection:text-background-dark">
-<div class="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-<div class="absolute top-1/4 left-1/4 w-2 h-2 bg-primary/20 rounded-full blur-[1px] animate-pulse"></div>
-<div class="absolute top-3/4 left-1/2 w-3 h-3 bg-primary/10 rounded-full blur-[2px]"></div>
-<div class="absolute bottom-10 right-20 w-1 h-1 bg-primary/40 rounded-full"></div>
-<div class="absolute -top-[20%] -right-[10%] w-[800px] h-[800px] bg-primary/5 rounded-full blur-[100px]"></div>
-<div class="absolute -bottom-[20%] -left-[10%] w-[600px] h-[600px] bg-[#4a7c59]/10 rounded-full blur-[80px]"></div>
-<div class="absolute inset-0 map-grid opacity-30 z-0"></div>
+<body class="bg-background-light dark:bg-background-dark text-white font-display overflow-hidden h-screen w-screen relative select-none">
+<div class="absolute inset-0 z-0 bg-earth-texture bg-cover bg-center opacity-95">
+<div class="absolute inset-0 bg-gradient-to-b from-black/35 via-black/20 to-black/75 pointer-events-none"></div>
+<div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(245,158,11,0.08),transparent_55%)] pointer-events-none"></div>
 </div>
-<nav class="relative z-50 w-full px-6 py-4 flex justify-between items-center glass-panel border-b border-primary/10">
-<div class="flex items-center gap-4">
-<div class="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center border border-primary/40">
-<span class="material-icons text-primary">science</span>
-</div>
-<div>
-<h1 class="text-lg font-bold tracking-tight leading-none text-white">人类简史 <span class="text-primary text-xs ml-1 uppercase tracking-widest border border-primary/30 px-2 py-0.5 rounded-full">模拟器</span></h1>
-<div class="flex items-center gap-2 text-xs text-gray-400 mt-1">
-<span class="material-icons text-[10px]">menu_book</span>
-<span>第五章：农业革命</span>
-</div>
-</div>
-</div>
-<div class="flex items-center gap-6">
-<div class="hidden md:flex items-center gap-2 text-sm text-gray-400">
-<span>历史</span>
-<span class="material-icons text-xs">chevron_right</span>
-<span>农作物</span>
-<span class="material-icons text-xs">chevron_right</span>
-<span class="text-primary">普通小麦</span>
+<svg class="absolute inset-0 z-0 w-full h-full pointer-events-none opacity-80" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<filter id="glow">
+<feGaussianBlur result="coloredBlur" stdDeviation="2.5"></feGaussianBlur>
+<feMerge>
+<feMergeNode in="coloredBlur"></feMergeNode>
+<feMergeNode in="SourceGraphic"></feMergeNode>
+</feMerge>
+</filter>
+</defs>
+<path d="M 600 400 Q 750 350 900 380 T 1100 350" fill="none" filter="url(#glow)" opacity="0.6" stroke="#F59E0B" stroke-dasharray="5,5" stroke-width="2"></path>
+<path d="M 600 400 Q 500 450 400 420 T 200 480" fill="none" filter="url(#glow)" opacity="0.4" stroke="#F59E0B" stroke-dasharray="5,5" stroke-width="2"></path>
+<circle cx="600" cy="400" fill="#F59E0B" fill-opacity="0.2" filter="url(#glow)" r="80"></circle>
+<circle cx="650" cy="380" fill="#F59E0B" fill-opacity="0.25" filter="url(#glow)" r="60"></circle>
+<circle cx="900" cy="380" fill="#F59E0B" fill-opacity="0.15" filter="url(#glow)" r="40"></circle>
+</svg>
+<div class="absolute top-1/3 left-1/4 z-10 map-marker" data-region-tip="新月沃土：最早的大规模驯化区，智人开始长期定居。">
+<div class="relative flex items-center justify-center w-12 h-12 bg-primary/20 rounded-full border-2 border-primary text-primary dna-pulse glass-panel">
+<span class="material-icons-outlined text-2xl">science</span>
 </div>
 </div>
-</nav>
-<main class="relative z-10 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 p-6 lg:p-8 h-full">
-<div class="lg:col-span-3 flex flex-col gap-6 h-full overflow-y-auto pr-2">
-<div class="glass-panel p-6 rounded-xl border-l-4 border-primary shadow-lg shadow-black/20">
-<div class="flex justify-between items-start mb-2">
-<span class="text-xs uppercase tracking-widest text-primary font-bold">实验对象 #001</span>
-<span class="material-icons text-primary/50 text-sm">verified</span>
-</div>
-<h2 class="text-3xl font-display font-bold text-white mb-1">小麦</h2>
-<h3 class="text-lg font-display text-gray-400 mb-4">Triticum Aestivum</h3>
-<div class="text-xs text-gray-500 font-sans mb-4">
-                起源：新月沃土<br/>
-                类别：驯化禾本科草本<br/>
-                状态：全球统治
-            </div>
-<div class="w-full bg-earth-dark h-1.5 rounded-full overflow-hidden">
-<div class="h-full bg-primary w-[98%] shadow-[0_0_10px_rgba(244,209,37,0.5)]"></div>
-</div>
-<div class="flex justify-between text-[10px] uppercase text-gray-400 mt-2">
-<span>生存率</span>
-<span class="text-primary font-mono">99.8%</span>
+<div class="absolute top-1/2 left-1/2 z-10 map-marker" data-region-tip="欧亚大陆核心：传播加速区，劳作与人口同步上升。">
+<div class="relative flex items-center justify-center w-14 h-14 bg-primary/20 rounded-full border-2 border-primary text-primary dna-pulse glass-panel">
+<span class="material-icons-outlined text-3xl">api</span>
 </div>
 </div>
-<div class="glass-panel p-6 rounded-xl flex flex-col gap-5">
-<h4 class="text-sm uppercase tracking-wider text-gray-400 border-b border-primary/10 pb-2 flex items-center gap-2">
-<span class="material-icons text-xs text-primary">analytics</span>
-                物种指标
-            </h4>
-<div>
-<div class="flex justify-between items-end mb-1">
-<span class="text-sm text-gray-300">基因扩散</span>
-<span class="text-xl font-bold text-primary font-mono">98%</span>
-</div>
-<div class="w-full bg-earth-dark h-2 rounded-full overflow-hidden relative">
-<div class="absolute inset-0 bg-repeat-x opacity-20" style="background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, #000 5px, #000 10px);"></div>
-<div class="h-full bg-gradient-to-r from-primary/40 to-primary w-[98%]"></div>
+<div class="absolute bottom-1/3 right-1/3 z-10 map-marker" data-region-tip="扩散前沿：小麦借助贸易与迁徙进入新的生态带。">
+<div class="relative flex items-center justify-center w-10 h-10 bg-primary/20 rounded-full border-2 border-primary text-primary dna-pulse glass-panel">
+<span class="material-icons-outlined text-xl">biotech</span>
 </div>
 </div>
-<div class="relative group">
-<div class="flex justify-between items-end mb-1">
-<span class="text-sm text-gray-300">人类驯化程度</span>
-<span class="text-xl font-bold text-red-400 font-mono">最高等级</span>
+<div class="relative z-20 flex flex-col h-full justify-between p-6">
+<div class="flex flex-col md:flex-row justify-between items-start gap-4">
+<div class="glass-panel bg-panel-dark rounded-xl p-4 max-w-md border-l-4 border-primary">
+<div class="flex items-center gap-3 mb-1">
+<span class="material-icons-outlined text-secondary">public</span>
+<h1 class="text-xl font-bold tracking-wide">人类简史: 全球驯化战争地图</h1>
+<span class="bg-primary text-black text-xs font-bold px-2 py-0.5 rounded">BETA</span>
 </div>
-<div class="w-full bg-earth-dark h-2 rounded-full overflow-hidden">
-<div class="h-full bg-gradient-to-r from-red-900 to-red-500 w-[100%] animate-pulse"></div>
+<p class="text-xs text-slate-400 font-mono tracking-wider uppercase">Sapiens Domestication War Map // YEAR -9500 BC</p>
 </div>
-<div class="absolute top-0 right-0 -mt-12 opacity-0 group-hover:opacity-100 transition-opacity bg-black border border-red-500/30 text-xs p-2 rounded text-red-200 pointer-events-none w-48 shadow-xl z-20">
-                    警告：实验对象显示出脊柱损伤和关节炎迹象。
-                </div>
-</div>
-<div class="grid grid-cols-2 gap-4 mt-2">
-<div class="bg-earth-dark/50 p-3 rounded-lg border border-primary/10 text-center">
-<span class="block text-xs text-gray-500 mb-1">全球面积</span>
-<span class="block text-lg font-bold text-white">2.2 亿</span>
-<span class="block text-[10px] text-primary">公顷</span>
-</div>
-<div class="bg-earth-dark/50 p-3 rounded-lg border border-primary/10 text-center">
-<span class="block text-xs text-gray-500 mb-1">总生物量</span>
-<span class="block text-lg font-bold text-white">7.5 亿</span>
-<span class="block text-[10px] text-primary">吨</span>
-</div>
-</div>
-</div>
-<div class="glass-panel p-6 rounded-xl flex-1 flex flex-col justify-center">
-<div class="flex items-center gap-2 mb-3 text-primary">
-<span class="material-icons text-sm">lightbulb</span>
-<span class="text-xs font-bold uppercase">洞察：奢侈的陷阱</span>
-</div>
-<p class="text-gray-300 leading-relaxed text-sm border-l-2 border-primary/30 pl-3">
-<span class="text-white font-medium block mb-1">“究竟是谁驯化了谁？”</span>
-                一万年前，小麦只是野草。今天，它覆盖了全球。为了照顾这种植物，人类不得不付出极大的代价：弯腰清理石块、挑水灌溉，并日夜保护它免受害虫侵扰。
-            </p>
-</div>
-</div>
-<div class="lg:col-span-6 relative flex flex-col items-center justify-center min-h-[400px]">
-<div class="relative w-full h-full flex items-center justify-center z-10 group cursor-pointer">
-<div class="absolute w-[80%] aspect-square rounded-full border border-primary/10 animate-[spin_10s_linear_infinite]"></div>
-<div class="absolute w-[60%] aspect-square rounded-full border border-dashed border-primary/20 animate-[spin_15s_linear_infinite_reverse]"></div>
-<div class="absolute w-[90%] aspect-square rounded-full border border-primary/5 scale-110"></div>
-<div class="relative z-20 transform transition-transform duration-500 group-hover:scale-105">
-<img alt="小麦秸秆3D模型" class="h-[500px] w-auto object-cover drop-shadow-[0_0_50px_rgba(244,209,37,0.3)]" src="/assets/remote-images/f1993dafaed9cf84f49a4b96.png" style="mask-image: linear-gradient(to bottom, black 70%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%); clip-path: polygon(15% 0, 100% 0, 100% 85%, 85% 100%, 0 100%, 0 15%);"/>
-<div class="absolute top-[30%] right-[20%] w-3 h-3 bg-white rounded-full animate-ping"></div>
-<div class="absolute top-[30%] right-[20%] w-3 h-3 bg-primary rounded-full border-2 border-white cursor-pointer hover:scale-125 transition-transform">
-<div class="absolute left-6 top-1/2 -translate-y-1/2 w-32 bg-black/80 text-[10px] text-white p-2 rounded border border-primary/30 opacity-0 hover:opacity-100 transition-opacity backdrop-blur-sm pointer-events-none">
-                        麸质结构
+<div class="flex gap-4">
+<div class="glass-panel bg-panel-dark rounded-lg p-3 text-center min-w-[120px]">
+<div class="text-xs text-slate-400 mb-1">已驯化人数</div>
+<div class="text-xl font-mono text-secondary font-bold flex justify-center items-center gap-1">
+<span class="material-icons-outlined text-sm">accessibility_new</span>
+                        14,205
                     </div>
 </div>
-<div class="absolute bottom-[40%] left-[30%] w-3 h-3 bg-white rounded-full animate-ping delay-700"></div>
-<div class="absolute bottom-[40%] left-[30%] w-3 h-3 bg-primary rounded-full border-2 border-white cursor-pointer hover:scale-125 transition-transform"></div>
+<div class="glass-panel bg-panel-dark rounded-lg p-3 text-center min-w-[120px]">
+<div class="text-xs text-slate-400 mb-1">占领土地面积</div>
+<div class="text-xl font-mono text-primary font-bold flex justify-center items-center gap-1">
+<span class="material-icons-outlined text-sm">map</span>
+                        840 km²
+                    </div>
 </div>
-<div class="absolute top-10 left-10 glass-panel px-4 py-2 rounded-lg border-l-2 border-primary transform -rotate-1">
-<span class="text-xs text-primary font-bold block">基因组大小</span>
-<span class="text-sm text-white font-mono">170 亿个碱基对</span>
+<div class="glass-panel bg-panel-dark rounded-lg p-3 text-center min-w-[120px]">
+<div class="text-xs text-slate-400 mb-1">可用 DNA 点数</div>
+<div class="text-xl font-mono text-primary font-bold flex justify-center items-center gap-1">
+<span class="material-icons-outlined text-sm">all_inclusive</span>
+                        45
+                    </div>
 </div>
-<div class="absolute bottom-20 right-10 glass-panel px-4 py-2 rounded-lg border-r-2 border-primary transform rotate-1">
-<span class="text-xs text-primary font-bold block">热量产量</span>
-<span class="text-sm text-white font-mono">340 千卡/100克</span>
+<button id="open-guide-tip" data-no-next="" class="tip-float glass-panel bg-slate-900/80 rounded-lg p-3 text-center min-w-[120px] hover:bg-slate-800 transition">
+<div class="text-xs text-slate-400 mb-1">引导</div>
+<div class="text-sm font-bold text-amber-300 flex items-center justify-center gap-1">
+<span class="material-icons-outlined text-sm">tips_and_updates</span>
+<span>玩法说明</span>
 </div>
-</div>
-<div class="absolute bottom-0 z-30 w-full flex flex-col items-center">
-<button id="start-simulation-btn" data-no-next="" class="bg-primary hover:bg-[#ffe045] text-background-dark font-bold text-lg px-12 py-4 rounded-full shadow-[0_0_30px_rgba(244,209,37,0.4)] transition-all transform hover:translate-y-[-2px] flex items-center gap-3">
-<span class="material-icons">play_arrow</span>
-<span>开始模拟：奢侈的陷阱</span>
 </button>
-<span class="text-xs text-gray-500 mt-3 font-sans">预计体验时长：5 分钟</span>
 </div>
 </div>
-<div class="lg:col-span-3 flex flex-col gap-6 h-full">
-<div class="glass-panel p-1 rounded-xl overflow-hidden relative group h-[300px]">
-<div class="absolute top-4 left-4 z-10">
-<h4 class="text-sm font-bold text-white shadow-black drop-shadow-md">征服版图</h4>
-<span class="text-[10px] text-primary bg-black/50 px-1 rounded">新月沃土</span>
+<div class="flex-grow flex items-center justify-center relative">
+<div class="absolute right-0 top-10 w-80 glass-panel bg-panel-dark rounded-xl p-4 hidden md:block">
+<div class="flex items-center gap-2 mb-3 border-b border-slate-700 pb-2">
+<span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+<h3 class="font-bold text-sm text-slate-200">世界简报</h3>
 </div>
-<div class="w-full h-full bg-earth-dark relative overflow-hidden">
-<img alt="地图" class="w-full h-full object-cover opacity-40 grayscale mix-blend-luminosity" src="/assets/remote-images/55920bffa3af1ae88274089a.png"/>
-<div class="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.8)_100%)]"></div>
-<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] border border-primary/20 rounded-full animate-[ping_3s_linear_infinite]"></div>
-<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100px] h-[100px] bg-primary/10 rounded-full blur-md"></div>
-<div class="absolute top-1/2 left-1/2 w-[150px] h-[2px] bg-gradient-to-r from-transparent to-primary origin-left animate-[spin_4s_linear_infinite]"></div>
+<div class="space-y-4 max-h-[300px] overflow-y-auto custom-scrollbar">
+<div class="text-sm text-secondary">
+<div class="text-xs text-slate-500 mb-1">RANGE 1</div>
+<p>美索不达米亚的智人正在为扇出永久性背部问题。</p>
 </div>
-<div class="absolute bottom-3 left-3 right-3 flex justify-between text-[10px] text-gray-400 bg-black/60 p-2 rounded backdrop-blur-sm">
-<div class="flex items-center gap-1">
-<div class="w-2 h-2 rounded-full bg-primary"></div>
-<span>高密度分布区</span>
+<div class="text-sm text-slate-300">
+<div class="text-xs text-slate-500 mb-1">NEW AREA</div>
+<p>黎凡特部落放弃狩猎，转向全天候除草作业。</p>
 </div>
-<div class="flex items-center gap-1">
-<div class="w-2 h-2 rounded-full bg-gray-600"></div>
-<span>野生区域</span>
+<div class="text-sm text-red-400">
+<div class="text-xs text-slate-500 mb-1">ALERT</div>
+<p>干旱风险上升，需要更多劳动力挖掘灌溉渠。</p>
+</div>
+<div class="text-sm text-slate-400 opacity-60">
+<div class="text-xs text-slate-600 mb-1">HISTORY</div>
+<p>大航海时代尚未开启，小麦正在蓄力...</p>
 </div>
 </div>
 </div>
-<div class="glass-panel p-6 rounded-xl flex-1 flex flex-col">
-<h4 class="text-sm uppercase tracking-wider text-gray-400 border-b border-primary/10 pb-2 mb-4">环境状态</h4>
-<div class="space-y-4">
-<div class="flex items-center justify-between">
+<div class="glass-panel bg-slate-900/90 rounded-2xl p-8 max-w-lg w-full shadow-2xl border border-primary/30 transform transition-all scale-100 z-50">
+<div class="flex justify-between items-start mb-6">
 <div class="flex items-center gap-3">
-<div class="w-8 h-8 rounded bg-earth-dark flex items-center justify-center text-primary">
-<span class="material-icons text-sm">wb_sunny</span>
+<div class="p-3 bg-red-500/20 rounded-lg text-red-400">
+<span class="material-icons-outlined text-3xl">warning</span>
 </div>
 <div>
-<span class="block text-sm text-gray-200">日照周期</span>
-<span class="block text-xs text-gray-500">全新世时期</span>
+<h2 class="text-2xl font-bold text-white">严重干旱</h2>
+<p class="text-red-400 text-sm">环境危机事件</p>
 </div>
 </div>
-<span class="text-primary font-mono text-sm">峰值</span>
 </div>
-<div class="flex items-center justify-between">
-<div class="flex items-center gap-3">
-<div class="w-8 h-8 rounded bg-earth-dark flex items-center justify-center text-blue-400">
-<span class="material-icons text-sm">water_drop</span>
+<p class="text-slate-300 mb-8 leading-relaxed">
+                    地中海东部地区降水量骤减，刚被驯化的小麦面临枯萎风险。智人部落正在考虑放弃耕种回归采集生活。
+                </p>
+<div class="grid grid-cols-2 gap-4">
+<button id="drought-option-evolve" data-no-next="" class="group relative flex flex-col items-start p-4 bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-primary rounded-xl transition-all duration-300">
+<div class="text-primary font-bold mb-1 flex items-center gap-2">
+<span class="material-icons-outlined text-sm">water_drop</span>
+                            演化耐旱根系
+                        </div>
+<div class="text-xs text-slate-400 text-left">消耗 <span class="text-primary font-bold">15 DNA</span> 点数，提高存活率。</div>
+</button>
+<button id="drought-option-ignore" data-no-next="" class="group relative flex flex-col items-start p-4 bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-slate-500 rounded-xl transition-all duration-300">
+<div class="text-slate-300 font-bold mb-1 flex items-center gap-2">
+<span class="material-icons-outlined text-sm">close</span>
+                            无视风险
+                        </div>
+<div class="text-xs text-slate-400 text-left">可能会损失 <span class="text-red-400 font-bold">15%</span> 的传播区域。</div>
+</button>
+</div>
+<p id="drought-feedback" class="mt-4 text-xs text-slate-300 border-t border-slate-700 pt-3">请先选择一个策略，系统将即时反馈后果。</p>
+</div>
+</div>
+<div class="w-full">
+<div class="flex justify-center mb-4 gap-4">
+<button data-no-next="" class="flex items-center gap-2 px-8 py-3 bg-secondary/20 text-secondary border border-secondary rounded-full backdrop-blur hover:bg-secondary/30 transition shadow-[0_0_15px_rgba(14,165,233,0.3)]">
+<span class="material-icons-outlined">hourglass_top</span>
+<span class="font-bold tracking-widest">进化</span>
+</button>
+<button data-no-next="" class="flex items-center gap-2 px-8 py-3 bg-primary/20 text-primary border border-primary rounded-full backdrop-blur hover:bg-primary/30 transition shadow-[0_0_15px_rgba(245,158,11,0.3)]">
+<span class="material-icons-outlined">hub</span>
+<span class="font-bold tracking-widest">传播</span>
+</button>
+<button data-no-next="" class="flex items-center gap-2 px-8 py-3 bg-slate-700/50 text-slate-300 border border-slate-600 rounded-full backdrop-blur hover:bg-slate-700/70 transition">
+<span class="material-icons-outlined">dna</span>
+<span class="font-bold tracking-widest">能力</span>
+</button>
+</div>
+<div class="glass-panel bg-panel-dark rounded-xl p-6 flex flex-col md:flex-row gap-6 items-stretch min-h-[160px]">
+<div class="flex items-center gap-4 border-r border-slate-700 pr-6 min-w-[200px]">
+<div class="w-12 h-12 rounded-lg bg-gradient-to-br from-secondary to-blue-700 flex items-center justify-center shadow-lg">
+<span class="material-icons-outlined text-white text-2xl">science</span>
 </div>
 <div>
-<span class="block text-sm text-gray-200">灌溉需求</span>
-<span class="block text-xs text-gray-500">需要大量劳动力</span>
+<h4 class="font-bold text-white text-lg">进化实验室</h4>
+<p class="text-xs text-slate-400 mt-1">修改小麦基因以控制人类</p>
 </div>
 </div>
-<span class="text-red-400 font-mono text-sm">紧急</span>
-</div>
-<div class="flex items-center justify-between">
-<div class="flex items-center gap-3">
-<div class="w-8 h-8 rounded bg-earth-dark flex items-center justify-center text-green-400">
-<span class="material-icons text-sm">pest_control</span>
-</div>
+<div class="flex-1 bg-slate-800/50 rounded-lg p-3 border border-secondary/30 relative overflow-hidden group hover:bg-slate-800/80 transition cursor-pointer">
+<div class="absolute top-2 right-2 text-[10px] bg-secondary text-black px-1.5 rounded font-bold">已进化</div>
+<div class="flex gap-3">
+<span class="material-icons-outlined text-secondary text-3xl">accessibility</span>
 <div>
-<span class="block text-sm text-gray-200">病虫害威胁</span>
-<span class="block text-xs text-gray-500">蝗灾风险</span>
-</div>
-</div>
-<span class="text-yellow-400 font-mono text-sm">中等</span>
-</div>
-</div>
-<div class="mt-auto pt-6">
-<div class="p-3 bg-primary/10 rounded border border-primary/20">
-<p class="text-[10px] text-gray-300 leading-tight">
-<span class="text-primary font-bold mr-1">提示：</span>
-                        鼓励人类定居在水源附近，以最大化粮食产量和人口增长。
-                    </p>
+<h5 class="text-secondary font-bold text-sm">折损麦秆</h5>
+<p class="text-xs text-slate-400 mt-1 leading-snug">迫使人类弯腰收割，造成其脊柱永久性损伤，增加对土地的依赖。</p>
 </div>
 </div>
 </div>
+<div class="flex-1 bg-slate-800/30 rounded-lg p-3 border border-transparent hover:border-primary/50 relative overflow-hidden group hover:bg-slate-800/60 transition cursor-pointer">
+<div class="absolute top-2 right-2 text-[10px] bg-slate-700 text-slate-300 px-1.5 rounded font-mono">15 DNA</div>
+<div class="flex gap-3">
+<span class="material-icons-outlined text-primary text-3xl opacity-80">grain</span>
+<div>
+<h5 class="text-slate-200 group-hover:text-primary font-bold text-sm transition">难以消化的谷粒</h5>
+<p class="text-xs text-slate-400 mt-1 leading-snug">人类必须花费数小时研磨，限制其乱跑狩猎，建立定居点。</p>
 </div>
-</main>
-<div class="fixed bottom-6 left-6 z-40 hidden lg:block">
-<div class="flex flex-col gap-1 text-[10px] text-gray-600 font-mono">
-<span>系统版本 2.4.1</span>
-<span>内存占用: 64TB</span>
-<span>模拟状态: 运行中</span>
 </div>
 </div>
-<div class="fixed top-1/2 right-6 -translate-y-1/2 z-40 hidden lg:flex flex-col gap-4">
-<div class="w-1 h-16 bg-gray-800 rounded-full relative">
-<div class="absolute top-0 w-full h-1/3 bg-primary rounded-full"></div>
+<div class="flex-1 bg-slate-800/30 rounded-lg p-3 border border-transparent hover:border-primary/50 relative overflow-hidden group hover:bg-slate-800/60 transition cursor-pointer">
+<div class="absolute top-2 right-2 text-[10px] bg-slate-700 text-slate-300 px-1.5 rounded font-mono">25 DNA</div>
+<div class="flex gap-3">
+<span class="material-icons-outlined text-primary text-3xl opacity-80">water_drop</span>
+<div>
+<h5 class="text-slate-200 group-hover:text-primary font-bold text-sm transition">干渴根系</h5>
+<p class="text-xs text-slate-400 mt-1 leading-snug">对水的极高需求，迫使人类聚集在河流旁并建立社会协作灌溉。</p>
 </div>
-<div class="w-1 h-2 bg-gray-800 rounded-full"></div>
-<div class="w-1 h-2 bg-gray-800 rounded-full"></div>
 </div>
-<div id="museum-intro-panel" class="fixed inset-0 z-[120] bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
-<div class="w-full max-w-3xl rounded-2xl border border-primary/30 bg-background-dark/95 shadow-[0_20px_60px_rgba(0,0,0,0.55)] overflow-hidden">
-<div class="px-6 md:px-8 py-5 border-b border-primary/20 bg-gradient-to-r from-primary/10 to-transparent">
-<p class="text-xs font-bold tracking-[0.22em] text-primary uppercase">展厅导览 · 农业革命</p>
-<h2 class="text-xl md:text-2xl font-black text-white mt-2">第一幕前情提要：谁驯化了谁？</h2>
 </div>
-<div class="px-6 md:px-8 py-6 space-y-4 text-sm text-gray-300 leading-relaxed">
-<p>《人类简史》提出的核心反转：农业革命并不一定让人更幸福。小麦扩张了，但个体劳动强度上升、饮食单一化加重，很多人从“采集自由”进入了“定居劳作”。</p>
+<div class="w-[200px] bg-slate-900/40 rounded-lg p-3 border border-slate-800 flex flex-col justify-center opacity-60">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-icons-outlined text-slate-500 text-sm">lock</span>
+<div class="text-xs text-slate-500 font-mono ml-auto">277 DNA</div>
+</div>
+<h5 class="text-slate-400 font-bold text-sm">人口大爆炸</h5>
+<p class="text-[10px] text-slate-600 mt-1">解锁条件：全球人口总量达到 5000。</p>
+</div>
+</div>
+<div class="mt-4 flex justify-end">
+<button id="go-next-scene" data-next-scene="wheat-next" class="px-6 py-3 rounded-xl bg-primary text-black font-black tracking-[0.08em] hover:bg-amber-400 transition shadow-[0_0_18px_rgba(245,158,11,0.45)]">
+完成本幕，进入下一幕
+</button>
+</div>
+</div>
+</div>
+
+<div id="wheat-onboarding-modal" class="fixed inset-0 z-[130] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+<div class="w-full max-w-2xl rounded-2xl border border-secondary/40 bg-slate-950/95 shadow-[0_20px_60px_rgba(0,0,0,0.65)] overflow-hidden">
+<div class="px-6 py-4 border-b border-secondary/25 bg-gradient-to-r from-secondary/20 to-transparent">
+<p class="text-xs uppercase tracking-[0.22em] text-secondary font-bold">导览卡</p>
+<h2 class="text-2xl font-black text-white mt-2">小麦全球征服模拟：玩法说明</h2>
+</div>
+<div class="px-6 py-5 space-y-4 text-sm text-slate-300 leading-relaxed">
+<p>你将扮演小麦，用“基因进化 + 人类劳作”扩张势力。请重点看右侧事件、下方策略与地图势力区。</p>
 <div class="grid md:grid-cols-3 gap-3">
-<div class="rounded-xl border border-white/10 bg-earth-dark/60 p-3">
-<p class="text-xs uppercase tracking-widest text-primary font-bold mb-1">知识点 1</p>
-<p class="text-xs text-gray-300">农业提高总体热量供应，但并未同步提升个体生活质量。</p>
+<div class="rounded-lg border border-white/10 bg-slate-900/60 p-3">
+<p class="text-xs text-amber-300 font-bold uppercase tracking-wide mb-1">1. 看事件</p>
+<p class="text-xs text-slate-300">每次危机会给出抉择，选择会改变传播结果。</p>
 </div>
-<div class="rounded-xl border border-white/10 bg-earth-dark/60 p-3">
-<p class="text-xs uppercase tracking-widest text-primary font-bold mb-1">知识点 2</p>
-<p class="text-xs text-gray-300">“更多粮食”带来“更多人口”，社会复杂度与治理成本同步抬升。</p>
+<div class="rounded-lg border border-white/10 bg-slate-900/60 p-3">
+<p class="text-xs text-amber-300 font-bold uppercase tracking-wide mb-1">2. 点地图</p>
+<p class="text-xs text-slate-300">点击地图上的脉冲节点，可查看当前势力区解释。</p>
 </div>
-<div class="rounded-xl border border-white/10 bg-earth-dark/60 p-3">
-<p class="text-xs uppercase tracking-widest text-primary font-bold mb-1">知识点 3</p>
-<p class="text-xs text-gray-300">本幕要观察的不是产量，而是产量背后的人类代价。</p>
-</div>
-</div>
-<div class="rounded-xl border border-primary/20 bg-primary/5 p-3">
-<p class="text-xs text-gray-200"><span class="text-primary font-bold">观展任务：</span>先理解“奢侈的陷阱”概念，再点击下方主按钮进入下一幕模拟。</p>
-</div>
-</div>
-<div class="px-6 md:px-8 py-4 border-t border-white/10 flex justify-end">
-<button id="museum-intro-enter" class="px-5 py-2.5 rounded-lg bg-primary text-background-dark text-sm font-black tracking-wide hover:bg-[#ffe045] transition-colors">我已了解，开始体验</button>
+<div class="rounded-lg border border-white/10 bg-slate-900/60 p-3">
+<p class="text-xs text-amber-300 font-bold uppercase tracking-wide mb-1">3. 进下一幕</p>
+<p class="text-xs text-slate-300">完成本幕后点击“进入下一幕”，继续后续剧情。</p>
 </div>
 </div>
 </div>
+<div class="px-6 py-4 border-t border-white/10 flex justify-end">
+<button id="close-wheat-onboarding" data-no-next="" class="px-5 py-2.5 rounded-lg bg-primary text-black text-sm font-black hover:bg-amber-400 transition-colors">我已了解，开始模拟</button>
+</div>
+</div>
+</div>
+
+<div id="guide-tip-modal" class="fixed inset-0 z-[125] hidden items-center justify-center p-4 bg-black/65 backdrop-blur-sm">
+<div class="w-full max-w-xl rounded-2xl border border-amber-400/30 bg-slate-950/95 shadow-[0_20px_60px_rgba(0,0,0,0.65)] overflow-hidden">
+<div class="px-5 py-4 border-b border-white/10 flex items-center justify-between">
+<h3 class="text-lg font-black text-white">策略提示</h3>
+<button id="close-guide-tip-top" data-no-next="" class="h-8 w-8 rounded-lg border border-white/10 text-slate-300 hover:text-white hover:bg-white/5 transition-colors">×</button>
+</div>
+<div class="px-5 py-4 space-y-3 text-sm text-slate-300 leading-relaxed">
+<p>优先处理会影响“生存率”和“传播面积”的危机事件，避免一次失误导致区域大规模流失。</p>
+<p>地图脉冲节点代表三类区域：起源区、核心扩散区、扩散前沿。三类区域需要不同策略。</p>
+<p>你可以先选择“演化耐旱根系”观察反馈，再进入下一幕对比长期收益。</p>
+</div>
+<div class="px-5 py-4 border-t border-white/10 flex justify-end">
+<button id="close-guide-tip" data-no-next="" class="px-4 py-2 rounded-lg bg-secondary text-white text-sm font-bold hover:bg-sky-400 transition-colors">继续模拟</button>
+</div>
+</div>
+</div>
+
+<div id="region-tip-toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[126] hidden rounded-full border border-amber-300/40 bg-slate-950/90 px-4 py-2 text-xs text-amber-100 shadow-[0_8px_24px_rgba(0,0,0,0.45)]"></div>
+
 <script>
 (() => {
-  const panel = document.getElementById("museum-intro-panel");
-  const enter = document.getElementById("museum-intro-enter");
-  if (!panel || !enter) return;
-  enter.addEventListener("click", () => {
-    panel.classList.add("opacity-0", "pointer-events-none", "transition-opacity", "duration-200");
-    window.setTimeout(() => {
-      panel.remove();
-      const starter = document.getElementById("start-simulation-btn");
-      if (starter instanceof HTMLElement) {
-        starter.focus();
-      }
-    }, 220);
-  });
-})();
+  const onboarding = document.getElementById("wheat-onboarding-modal");
+  const closeOnboarding = document.getElementById("close-wheat-onboarding");
+  const openGuide = document.getElementById("open-guide-tip");
+  const guideModal = document.getElementById("guide-tip-modal");
+  const closeGuide = document.getElementById("close-guide-tip");
+  const closeGuideTop = document.getElementById("close-guide-tip-top");
+  const regionToast = document.getElementById("region-tip-toast");
+  const droughtEvolve = document.getElementById("drought-option-evolve");
+  const droughtIgnore = document.getElementById("drought-option-ignore");
+  const droughtFeedback = document.getElementById("drought-feedback");
 
-(() => {
-  const startButton = document.getElementById("start-simulation-btn");
-  if (!startButton) return;
-
-  const STORAGE_KEY = "reado_sapiens_era_challenge_v1";
-  const eraKey = "agriculture";
-  const nextHref = "/experiences/human-domestication-dilemma-1.html";
-  const incidents = [
-    {
-      title: "突发事件 1：连月干旱",
-      description: "灌溉水源紧张，你要优先保哪一部分田地？",
-      options: [
-        { label: "优先保核心种子田", correct: true, feedback: "你保住了下一季的播种能力。" },
-        { label: "平均分水到所有地块", correct: false, feedback: "水量都不够，整体绝收。" }
-      ]
-    },
-    {
-      title: "突发事件 2：蝗灾爆发",
-      description: "虫群逼近，你必须马上调配劳动力。",
-      options: [
-        { label: "组织集中围堵并保住主产区", correct: true, feedback: "主产区幸存，损失可控。" },
-        { label: "继续按原计划慢慢处理", correct: false, feedback: "错过窗口期，虫害失控。" }
-      ]
-    },
-    {
-      title: "突发事件 3：部落迁徙冲突",
-      description: "外来部落要求共享仓储粮食，如何决策？",
-      options: [
-        { label: "以粮换劳，建立防务与灌溉协作", correct: true, feedback: "你换来稳定协作与秩序。" },
-        { label: "直接拒绝，封锁仓储", correct: false, feedback: "冲突升级，仓储被洗劫。" }
-      ]
-    }
-  ];
-
-  const challengeLayer = document.createElement("div");
-  challengeLayer.className = "fixed inset-0 z-[140] hidden items-center justify-center p-4 bg-black/80 backdrop-blur-sm";
-  challengeLayer.innerHTML = `
-    <div class="w-full max-w-2xl rounded-2xl border border-primary/30 bg-background-dark/95 shadow-[0_20px_60px_rgba(0,0,0,0.55)] overflow-hidden">
-      <div class="px-6 py-4 border-b border-primary/20 bg-gradient-to-r from-primary/10 to-transparent flex items-center justify-between">
-        <p class="text-xs font-bold tracking-[0.22em] text-primary uppercase">农业时代突发事件</p>
-        <span id="era-incident-progress" class="text-xs text-gray-400 font-bold">事件 1/3</span>
-      </div>
-      <div id="era-incident-body" class="px-6 py-6 space-y-4">
-        <h3 id="era-incident-title" class="text-xl font-black text-white"></h3>
-        <p id="era-incident-desc" class="text-sm text-gray-300 leading-relaxed"></p>
-        <div id="era-incident-options" class="space-y-3"></div>
-        <p id="era-incident-feedback" class="text-xs text-primary font-bold min-h-[1.2rem]"></p>
-      </div>
-      <div class="px-6 py-4 border-t border-white/10 flex justify-end">
-        <button id="era-incident-cancel" class="px-4 py-2 rounded-lg text-xs font-bold text-gray-300 border border-white/10 hover:bg-white/5 transition-colors">稍后再试</button>
-      </div>
-    </div>`;
-  document.body.append(challengeLayer);
-
-  const progressEl = challengeLayer.querySelector("#era-incident-progress");
-  const titleEl = challengeLayer.querySelector("#era-incident-title");
-  const descEl = challengeLayer.querySelector("#era-incident-desc");
-  const optionsEl = challengeLayer.querySelector("#era-incident-options");
-  const feedbackEl = challengeLayer.querySelector("#era-incident-feedback");
-  const bodyEl = challengeLayer.querySelector("#era-incident-body");
-  const cancelBtn = challengeLayer.querySelector("#era-incident-cancel");
-
-  let incidentIndex = 0;
-  let running = false;
-
-  const readState = () => {
-    try {
-      const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
-      return parsed && typeof parsed === "object" ? parsed : {};
-    } catch {
-      return {};
-    }
+  const hideGuide = () => {
+    if (!guideModal) return;
+    guideModal.classList.add("hidden");
+    guideModal.classList.remove("flex");
+  };
+  const showGuide = () => {
+    if (!guideModal) return;
+    guideModal.classList.remove("hidden");
+    guideModal.classList.add("flex");
   };
 
-  const writeState = (next) => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-  };
-
-  const touchEntry = (state) => {
-    const entry = state[eraKey] || { attempts: 0, failures: 0, passed: false };
-    state[eraKey] = entry;
-    return entry;
-  };
-
-  const closeLayer = () => {
-    challengeLayer.classList.add("hidden");
-    challengeLayer.classList.remove("flex");
-  };
-
-  const openLayer = () => {
-    challengeLayer.classList.remove("hidden");
-    challengeLayer.classList.add("flex");
-  };
-
-  const failRun = (reason) => {
-    const state = readState();
-    const entry = touchEntry(state);
-    entry.failures += 1;
-    entry.passed = false;
-    writeState(state);
-    bodyEl.innerHTML = `
-      <h3 class="text-xl font-black text-red-400">模拟失败</h3>
-      <p class="text-sm text-gray-300 leading-relaxed">${reason}</p>
-      <p class="text-xs text-gray-500">根据规则需要从头开始本时代挑战。</p>
-      <div class="pt-2">
-        <button id="era-incident-restart" class="px-5 py-2.5 rounded-lg bg-red-500 text-white text-sm font-black hover:bg-red-400 transition-colors">从头重开</button>
-      </div>`;
-    const restartBtn = bodyEl.querySelector("#era-incident-restart");
-    if (restartBtn) {
-      restartBtn.addEventListener("click", () => window.location.reload());
-    }
-  };
-
-  const passRun = () => {
-    const state = readState();
-    const entry = touchEntry(state);
-    entry.passed = true;
-    entry.updatedAt = Date.now();
-    writeState(state);
-    bodyEl.innerHTML = `
-      <h3 class="text-xl font-black text-emerald-400">时代挑战通过</h3>
-      <p class="text-sm text-gray-300 leading-relaxed">你已处理完 3 个突发事件，农业时代稳定运行，准备进入下一幕。</p>
-      <div class="pt-2">
-        <button id="era-incident-next" class="px-5 py-2.5 rounded-lg bg-primary text-background-dark text-sm font-black hover:bg-[#ffe045] transition-colors">进入下一幕</button>
-      </div>`;
-    const nextBtn = bodyEl.querySelector("#era-incident-next");
-    if (nextBtn) {
-      nextBtn.addEventListener("click", () => {
-        window.location.href = nextHref;
-      });
-      nextBtn.focus();
-    }
-  };
-
-  const renderIncident = () => {
-    const current = incidents[incidentIndex];
-    if (!current) {
-      passRun();
-      return;
-    }
-    progressEl.textContent = `事件 ${incidentIndex + 1}/${incidents.length}`;
-    titleEl.textContent = current.title;
-    descEl.textContent = current.description;
-    feedbackEl.textContent = "";
-    optionsEl.innerHTML = current.options.map((option, idx) => `
-      <button data-incident-option="${idx}" class="w-full text-left px-4 py-3 rounded-lg border border-primary/20 bg-earth-dark/60 text-sm font-bold text-gray-100 hover:border-primary/60 hover:bg-earth-dark transition-colors">
-        ${option.label}
-      </button>`).join("");
-  };
-
-  optionsEl.addEventListener("click", (event) => {
-    const target = event.target;
-    if (!(target instanceof HTMLElement)) return;
-    const button = target.closest("[data-incident-option]");
-    if (!(button instanceof HTMLElement)) return;
-    const current = incidents[incidentIndex];
-    if (!current) return;
-    const selectedIndex = Number(button.getAttribute("data-incident-option"));
-    const selected = current.options[selectedIndex];
-    if (!selected) return;
-    if (!selected.correct) {
-      failRun(selected.feedback || "决策失误。");
-      return;
-    }
-    feedbackEl.textContent = selected.feedback || "决策正确，进入下一事件。";
-    incidentIndex += 1;
-    window.setTimeout(renderIncident, 450);
-  });
-
-  if (cancelBtn) {
-    cancelBtn.addEventListener("click", () => {
-      closeLayer();
-      running = false;
-      incidentIndex = 0;
+  if (closeOnboarding && onboarding) {
+    closeOnboarding.addEventListener("click", () => {
+      onboarding.classList.add("hidden");
     });
   }
 
-  startButton.addEventListener("click", (event) => {
-    event.preventDefault();
-    if (running) return;
-    running = true;
-    incidentIndex = 0;
-    const state = readState();
-    const entry = touchEntry(state);
-    entry.attempts += 1;
-    entry.passed = false;
-    writeState(state);
-    renderIncident();
-    openLayer();
+  if (openGuide) {
+    openGuide.addEventListener("click", (event) => {
+      event.preventDefault();
+      showGuide();
+    });
+  }
+  if (closeGuide) closeGuide.addEventListener("click", hideGuide);
+  if (closeGuideTop) closeGuideTop.addEventListener("click", hideGuide);
+  if (guideModal) {
+    guideModal.addEventListener("click", (event) => {
+      if (event.target === guideModal) hideGuide();
+    });
+  }
+
+  document.querySelectorAll("[data-region-tip]").forEach((node) => {
+    node.addEventListener("click", () => {
+      if (!regionToast) return;
+      const tip = node.getAttribute("data-region-tip") || "";
+      regionToast.textContent = tip;
+      regionToast.classList.remove("hidden");
+      window.clearTimeout(window.__readoRegionToastTimer);
+      window.__readoRegionToastTimer = window.setTimeout(() => {
+        regionToast.classList.add("hidden");
+      }, 2400);
+    });
   });
+
+  if (droughtEvolve && droughtFeedback) {
+    droughtEvolve.addEventListener("click", (event) => {
+      event.preventDefault();
+      droughtFeedback.textContent = "已执行：耐旱根系进化。小麦存活率提升，DNA 点数 -15。";
+      droughtFeedback.className = "mt-4 text-xs text-emerald-300 border-t border-slate-700 pt-3";
+    });
+  }
+  if (droughtIgnore && droughtFeedback) {
+    droughtIgnore.addEventListener("click", (event) => {
+      event.preventDefault();
+      droughtFeedback.textContent = "已执行：无视风险。传播区域衰减，后续扩张将更困难。";
+      droughtFeedback.className = "mt-4 text-xs text-red-300 border-t border-slate-700 pt-3";
+    });
+  }
 })();
 </script>
+
 </body></html>

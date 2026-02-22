@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>reado: 人类简史 - 全球驯化战争 (带入门引导)</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#F59E0B", // Amber-500 for wheat/DNA
+                        secondary: "#0EA5E9", // Sky-500 for sci-fi/tech elements
+                        "background-light": "#1a202c", // Fallback for light mode
+                        "background-dark": "#0B1120", // Deep space blue/black
+                        "panel-dark": "rgba(15, 23, 42, 0.85)", // Semi-transparent slate
+                        "panel-light": "rgba(255, 255, 255, 0.9)",
+                    },
+                    fontFamily: {
+                        display: ["'Noto Sans SC'", "sans-serif"],
+                        mono: ["'Courier New'", "monospace"], // For stats
+                    },
+                    backgroundImage: {
+                        'earth-texture': "url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2672&auto=format&fit=crop')", // High quality earth satellite view
+                    }
+                },
+            },
+        };
+    </script>
+<style>
+        .glass-panel {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+        .dna-pulse {
+            animation: pulse-glow 2s infinite;
+        }
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+        }
+        .map-marker {
+            transition: transform 0.2s ease;
+        }
+        .map-marker:hover {
+            transform: scale(1.2);
+            cursor: pointer;
+        }
+        .wheat-glow {
+            filter: drop-shadow(0 0 8px #F59E0B);
+        }.custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-white font-display overflow-hidden h-screen w-screen relative select-none">
+<div class="absolute inset-0 z-0 bg-earth-texture bg-cover bg-center opacity-100">
+<div class="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/90 pointer-events-none"></div>
+<div class="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.6)_100%)] pointer-events-none"></div>
+</div>
+<svg class="absolute inset-0 z-0 w-full h-full pointer-events-none opacity-80" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<filter id="glow">
+<feGaussianBlur result="coloredBlur" stdDeviation="2.5"></feGaussianBlur>
+<feMerge>
+<feMergeNode in="coloredBlur"></feMergeNode>
+<feMergeNode in="SourceGraphic"></feMergeNode>
+</feMerge>
+</filter>
+</defs>
+<path d="M 600 400 Q 750 350 900 380 T 1100 350" fill="none" filter="url(#glow)" opacity="0.6" stroke="#F59E0B" stroke-dasharray="5,5" stroke-width="2"></path>
+<path d="M 600 400 Q 500 450 400 420 T 200 480" fill="none" filter="url(#glow)" opacity="0.4" stroke="#F59E0B" stroke-dasharray="5,5" stroke-width="2"></path>
+<circle cx="600" cy="400" fill="#F59E0B" fill-opacity="0.2" filter="url(#glow)" r="80"></circle>
+<circle cx="650" cy="380" fill="#F59E0B" fill-opacity="0.25" filter="url(#glow)" r="60"></circle>
+<circle cx="900" cy="380" fill="#F59E0B" fill-opacity="0.15" filter="url(#glow)" r="40"></circle>
+</svg>
+<div class="absolute top-1/3 left-1/4 z-10 map-marker">
+<div class="relative flex items-center justify-center w-12 h-12 bg-primary/20 rounded-full border-2 border-primary text-primary dna-pulse glass-panel shadow-[0_0_15px_rgba(245,158,11,0.5)]">
+<span class="material-icons-outlined text-2xl">science</span>
+</div>
+</div>
+<div class="absolute top-1/2 left-1/2 z-10 map-marker">
+<div class="relative flex items-center justify-center w-14 h-14 bg-primary/20 rounded-full border-2 border-primary text-primary dna-pulse glass-panel shadow-[0_0_20px_rgba(245,158,11,0.6)]">
+<span class="material-icons-outlined text-3xl">api</span>
+</div>
+</div>
+<div class="absolute bottom-1/3 right-1/3 z-10 map-marker">
+<div class="relative flex items-center justify-center w-10 h-10 bg-primary/20 rounded-full border-2 border-primary text-primary dna-pulse glass-panel shadow-[0_0_10px_rgba(245,158,11,0.4)]">
+<span class="material-icons-outlined text-xl">biotech</span>
+</div>
+</div>
+<div class="relative z-20 flex flex-col h-full justify-between p-6 pointer-events-none">
+<div class="flex flex-col md:flex-row justify-between items-start gap-4 pointer-events-auto">
+<div class="glass-panel bg-panel-dark rounded-xl p-4 max-w-md border-l-4 border-primary">
+<div class="flex items-center gap-3 mb-1">
+<span class="material-icons-outlined text-secondary">public</span>
+<h1 class="text-xl font-bold tracking-wide">人类简史: 全球驯化战争</h1>
+<span class="bg-primary text-black text-xs font-bold px-2 py-0.5 rounded">SIMULATION</span>
+</div>
+<p class="text-xs text-slate-400 font-mono tracking-wider uppercase">Sapiens Domestication War Map // YEAR -9500 BC</p>
+</div>
+<div class="flex gap-4">
+<div class="glass-panel bg-panel-dark rounded-lg p-3 text-center min-w-[120px]">
+<div class="text-xs text-slate-400 mb-1">已驯化人数</div>
+<div class="text-xl font-mono text-secondary font-bold flex justify-center items-center gap-1">
+<span class="material-icons-outlined text-sm">accessibility_new</span>
+                        14,205
+                    </div>
+</div>
+<div class="glass-panel bg-panel-dark rounded-lg p-3 text-center min-w-[120px]">
+<div class="text-xs text-slate-400 mb-1">占领土地面积</div>
+<div class="text-xl font-mono text-primary font-bold flex justify-center items-center gap-1">
+<span class="material-icons-outlined text-sm">map</span>
+                        840 km²
+                    </div>
+</div>
+</div>
+</div>
+<div class="flex-grow flex items-center justify-center relative pointer-events-none">
+<div class="absolute right-0 top-4 w-80 glass-panel bg-panel-dark rounded-xl p-4 hidden md:block pointer-events-auto border border-slate-700/50">
+<div class="flex items-center gap-2 mb-3 border-b border-slate-700 pb-2">
+<span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+<h3 class="font-bold text-sm text-slate-200">世界简报 / 事件日志</h3>
+</div>
+<div class="space-y-4 max-h-[300px] overflow-y-auto custom-scrollbar">
+<div class="text-sm text-secondary bg-secondary/10 p-2 rounded border-l-2 border-secondary">
+<div class="text-xs text-slate-400 mb-1 font-mono">RANGE 1</div>
+<p>美索不达米亚的智人正在为扇出永久性背部问题。</p>
+</div>
+<div class="text-sm text-slate-300 p-2">
+<div class="text-xs text-slate-500 mb-1 font-mono">NEW AREA</div>
+<p>黎凡特部落放弃狩猎，转向全天候除草作业。</p>
+</div>
+<div class="text-sm text-red-400 bg-red-500/10 p-2 rounded border-l-2 border-red-500">
+<div class="text-xs text-slate-500 mb-1 font-mono">ALERT</div>
+<p>干旱风险上升，需要更多劳动力挖掘灌溉渠。</p>
+</div>
+<div class="text-sm text-slate-400 opacity-60 p-2">
+<div class="text-xs text-slate-600 mb-1 font-mono">HISTORY</div>
+<p>大航海时代尚未开启，小麦正在蓄力...</p>
+</div>
+</div>
+</div>
+<div class="absolute z-50 pointer-events-auto bg-black/60 backdrop-blur-sm inset-0 flex items-center justify-center">
+<div class="glass-panel bg-slate-900 rounded-2xl p-8 max-w-2xl w-full shadow-2xl border border-secondary/50 relative overflow-hidden">
+<div class="absolute -right-20 -top-20 w-64 h-64 bg-primary/10 rounded-full blur-3xl"></div>
+<div class="flex justify-between items-start mb-6 relative z-10">
+<div class="flex flex-col gap-2">
+<span class="text-primary font-mono text-xs tracking-[0.2em] uppercase">Mission Briefing</span>
+<h2 class="text-3xl font-bold text-white">伟大的驯化骗局</h2>
+<p class="text-secondary font-medium">代号：小麦征服计划</p>
+</div>
+<div class="p-3 bg-primary/20 rounded-full border border-primary/30">
+<span class="material-icons-outlined text-3xl text-primary">psychology</span>
+</div>
+</div>
+<div class="space-y-4 text-slate-300 leading-relaxed relative z-10">
+<p>
+<strong class="text-white">身份确认：</strong> 你是小麦 (Triticum)。
+                        </p>
+<p>
+<strong class="text-white">核心目标：</strong> 迫使“智人”这种灵长类动物为你服务，通过他们的劳作将你的基因传播到全球每一个角落。
+                        </p>
+<div class="bg-slate-800/50 p-4 rounded-lg border-l-4 border-secondary my-4">
+<p class="text-sm italic text-slate-400">
+                                “人类以为是他们驯化了你，但事实恰恰相反。是你驯化了人类。你原本只是生长在小片区域的野草，现在却占据了全球几百万平方公里的沃土。”
+                            </p>
+</div>
+<p class="text-sm">
+                            利用进化点数改变自身性状，让人类为你除草、施肥、引水。让人类放弃自由的采集生活，为了你的繁衍而弯腰劳作，甚至建立帝国来保护你的粮仓。
+                        </p>
+</div>
+<div class="mt-8 flex justify-end relative z-10">
+<button class="group flex items-center gap-2 px-8 py-3 bg-primary text-black font-bold rounded hover:bg-amber-400 transition shadow-[0_0_20px_rgba(245,158,11,0.4)]" onclick="this.parentElement.parentElement.parentElement.style.display='none'">
+<span>开始征服</span>
+<span class="material-icons-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="w-full pointer-events-auto flex flex-col gap-4">
+<div class="flex justify-center -mb-6 relative z-30">
+<div class="glass-panel bg-slate-900/90 rounded-t-2xl px-8 py-3 border-t border-x border-primary/50 shadow-[0_-5px_20px_rgba(245,158,11,0.15)] flex flex-col items-center min-w-[200px]">
+<span class="text-xs text-slate-400 font-mono tracking-widest uppercase mb-1">Total DNA</span>
+<div class="text-4xl font-mono font-bold text-primary flex items-center gap-2 drop-shadow-[0_0_5px_rgba(245,158,11,0.8)]">
+<span class="material-icons-outlined text-3xl animate-pulse">all_inclusive</span>
+                        45
+                    </div>
+</div>
+</div>
+<div class="flex justify-center mb-2 gap-4 relative z-20">
+<button class="flex items-center gap-2 px-8 py-3 bg-secondary/20 text-secondary border border-secondary rounded-full backdrop-blur hover:bg-secondary/30 transition shadow-[0_0_15px_rgba(14,165,233,0.3)] group">
+<span class="material-icons-outlined group-hover:rotate-180 transition-transform duration-500">hourglass_top</span>
+<span class="font-bold tracking-widest">进化</span>
+</button>
+<button class="flex items-center gap-2 px-8 py-3 bg-primary/20 text-primary border border-primary rounded-full backdrop-blur hover:bg-primary/30 transition shadow-[0_0_15px_rgba(245,158,11,0.3)] group">
+<span class="material-icons-outlined group-hover:scale-110 transition-transform">hub</span>
+<span class="font-bold tracking-widest">传播</span>
+</button>
+<button class="flex items-center gap-2 px-8 py-3 bg-slate-700/50 text-slate-300 border border-slate-600 rounded-full backdrop-blur hover:bg-slate-700/70 transition group">
+<span class="material-icons-outlined group-hover:text-white transition-colors">dna</span>
+<span class="font-bold tracking-widest">能力</span>
+</button>
+</div>
+<div class="glass-panel bg-panel-dark rounded-xl p-4 flex flex-col md:flex-row gap-6 items-stretch min-h-[140px] z-20">
+<div class="flex items-center gap-4 border-r border-slate-700 pr-6 min-w-[200px]">
+<div class="w-12 h-12 rounded-lg bg-gradient-to-br from-secondary to-blue-700 flex items-center justify-center shadow-lg">
+<span class="material-icons-outlined text-white text-2xl">science</span>
+</div>
+<div>
+<h4 class="font-bold text-white text-lg">基因库</h4>
+<p class="text-xs text-slate-400 mt-1">修改小麦基因以控制人类</p>
+</div>
+</div>
+<div class="flex-1 bg-slate-800/50 rounded-lg p-3 border border-secondary/30 relative overflow-hidden group hover:bg-slate-800/80 transition cursor-pointer">
+<div class="absolute top-2 right-2 text-[10px] bg-secondary text-black px-1.5 rounded font-bold">已进化</div>
+<div class="flex gap-3">
+<span class="material-icons-outlined text-secondary text-3xl">accessibility</span>
+<div>
+<h5 class="text-secondary font-bold text-sm">折损麦秆</h5>
+<p class="text-xs text-slate-400 mt-1 leading-snug">迫使人类弯腰收割，造成其脊柱永久性损伤，增加对土地的依赖。</p>
+</div>
+</div>
+</div>
+<div class="flex-1 bg-slate-800/30 rounded-lg p-3 border border-transparent hover:border-primary/50 relative overflow-hidden group hover:bg-slate-800/60 transition cursor-pointer">
+<div class="absolute top-2 right-2 text-[10px] bg-slate-700 text-slate-300 px-1.5 rounded font-mono">15 DNA</div>
+<div class="flex gap-3">
+<span class="material-icons-outlined text-primary text-3xl opacity-80">grain</span>
+<div>
+<h5 class="text-slate-200 group-hover:text-primary font-bold text-sm transition">难以消化的谷粒</h5>
+<p class="text-xs text-slate-400 mt-1 leading-snug">人类必须花费数小时研磨，限制其乱跑狩猎，建立定居点。</p>
+</div>
+</div>
+</div>
+<div class="w-[200px] bg-slate-900/40 rounded-lg p-3 border border-slate-800 flex flex-col justify-center opacity-60">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-icons-outlined text-slate-500 text-sm">lock</span>
+<div class="text-xs text-slate-500 font-mono ml-auto">277 DNA</div>
+</div>
+<h5 class="text-slate-400 font-bold text-sm">人口大爆炸</h5>
+<p class="text-[10px] text-slate-600 mt-1">解锁条件：全球人口总量达到 5000。</p>
+</div>
+</div>
+</div>
+</div>
+
+</body></html>

@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Module 1: Smoke Test at Dawn — Research Theater</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --night:#0F172A;
+      --sky:#60A5FA;
+      --violet:#A78BFA;
+      --lime:#84CC16;
+      --ink:#E2E8F0;
+      --muted:#94A3B8;
+      --glass:rgba(15,23,42,.62);
+      --line:rgba(148,163,184,.25);
+      --danger:#fb7185;
+      --good:#84CC16;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;height:100%}
+    body{
+      font-family:"Manrope",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+      background:
+        radial-gradient(1200px 700px at 10% -10%, rgba(96,165,250,.16), transparent 60%),
+        radial-gradient(1000px 700px at 95% 10%, rgba(167,139,250,.14), transparent 60%),
+        linear-gradient(180deg,#0b1225 0%, var(--night) 45%, #0b1020 100%);
+      color:var(--ink);
+      overflow-x:hidden;
+    }
+    #dataLayer{
+      position:fixed; inset:0; z-index:0; opacity:.45; pointer-events:none;
+    }
+    .app{
+      position:relative; z-index:1;
+      max-width:1200px; margin:0 auto; padding:18px 16px 24px;
+    }
+    .hero{
+      background:linear-gradient(130deg, rgba(15,23,42,.76), rgba(30,41,59,.5));
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:16px;
+      box-shadow:0 20px 50px rgba(2,6,23,.35), inset 0 0 0 1px rgba(255,255,255,.02);
+      backdrop-filter: blur(10px);
+    }
+    .kicker{
+      font-size:12px;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      color:var(--sky);
+      font-weight:700;
+      margin-bottom:6px;
+    }
+    h1{
+      margin:4px 0 6px;
+      font-size:clamp(1.3rem,2.4vw,2rem);
+      line-height:1.15;
+      font-weight:800;
+    }
+    .subtitle{
+      color:var(--muted);
+      margin:0 0 10px;
+      font-size:.95rem;
+    }
+    .objective{
+      display:flex; gap:10px; align-items:flex-start;
+      background:rgba(10,15,30,.45);
+      border:1px solid rgba(96,165,250,.25);
+      border-radius:12px; padding:10px 12px;
+      font-size:.95rem;
+      line-height:1.45;
+    }
+    .objective b{color:var(--sky)}
+    .term-rail{
+      margin-top:10px;
+      display:flex; flex-wrap:wrap; gap:8px;
+    }
+    .term{
+      font-family:"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size:.72rem;
+      padding:5px 8px;
+      border-radius:999px;
+      background:rgba(167,139,250,.14);
+      border:1px solid rgba(167,139,250,.4);
+      color:#d8ccff;
+    }
+
+    .status-strip{
+      margin-top:12px;
+      display:grid; grid-template-columns: 1.2fr .8fr;
+      gap:12px;
+    }
+    .meter, .feed{
+      background:var(--glass);
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:12px;
+    }
+    .meter-head{
+      display:flex; justify-content:space-between; align-items:center;
+      margin-bottom:8px;
+      font-size:.9rem;
+    }
+    .meter-bar{
+      height:10px; width:100%; border-radius:999px;
+      background:rgba(148,163,184,.2);
+      overflow:hidden;
+      border:1px solid rgba(148,163,184,.26);
+    }
+    .meter-fill{
+      height:100%; width:0%;
+      background:linear-gradient(90deg,var(--sky),var(--violet),var(--lime));
+      box-shadow:0 0 16px rgba(132,204,22,.45);
+      transition:width .35s ease;
+    }
+    .meter-sub{
+      margin-top:8px; color:var(--muted); font-size:.85rem;
+    }
+    .feed h3{
+      margin:0 0 8px;
+      font-size:.9rem;
+      color:#cbd5e1;
+      font-weight:700;
+    }
+    #liveFeed{
+      margin:0; padding:0; list-style:none;
+      max-height:86px; overflow:auto;
+      font-family:"JetBrains Mono", ui-monospace, monospace;
+      font-size:.72rem;
+      color:#cfe4ff;
+    }
+    #liveFeed li{
+      padding:4px 0; border-bottom:1px dashed rgba(148,163,184,.2);
+    }
+
+    .grid{
+      margin-top:14px;
+      display:grid;
+      grid-template-columns: repeat(12, minmax(0,1fr));
+      gap:12px;
+    }
+    .panel{
+      background:linear-gradient(155deg, rgba(15,23,42,.72), rgba(15,23,42,.52));
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.02);
+      backdrop-filter: blur(8px);
+      min-height:120px;
+    }
+    .panel h2{
+      margin:0 0 8px;
+      font-size:1rem;
+      font-weight:800;
+      display:flex; align-items:center; gap:8px;
+    }
+    .panel h2 .tag{
+      font-size:.7rem;
+      font-family:"JetBrains Mono", ui-monospace, monospace;
+      color:var(--sky);
+      border:1px solid rgba(96,165,250,.35);
+      padding:2px 6px; border-radius:999px;
+      background:rgba(96,165,250,.12);
+    }
+    .timeline{grid-column:span 7}
+    .hypothesis{grid-column:span 5}
+    .sandbox{grid-column:span 6}
+    .sorting{grid-column:span 6}
+    .summary{grid-column:span 12}
+
+    .switch{
+      display:flex; gap:8px; margin-bottom:10px;
+      flex-wrap:wrap;
+    }
+    .timeline-btn{
+      border:1px solid rgba(96,165,250,.4);
+      background:rgba(96,165,250,.12);
+      color:#dbeafe;
+      font-weight:700;
+      border-radius:10px;
+      padding:8px 10px;
+      cursor:pointer;
+      transition:.2s ease;
+    }
+    .timeline-btn.active{
+      background:linear-gradient(90deg, rgba(96,165,250,.4), rgba(167,139,250,.35));
+      border-color:rgba(167,139,250,.8);
+      transform:translateY(-1px);
+      box-shadow:0 8px 20px rgba(96,165,250,.2);
+    }
+    .timeline-meta{
+      margin-top:10px;
+      color:#cbd5e1;
+      font-size:.9rem;
+      line-height:1.4;
+    }
+    .risk-wrap{
+      margin-top:8px;
+      display:flex; gap:10px; align-items:center;
+      font-family:"JetBrains Mono", ui-monospace, monospace;
+      font-size:.78rem;
+      color:#bfd9ff;
+    }
+    .risk-bar{
+      flex:1; height:8px; border-radius:999px;
+      border:1px solid rgba(148,163,184,.3);
+      background:rgba(148,163,184,.14);
+      overflow:hidden;
+    }
+    .risk-fill{
+      height:100%;
+      width:45%;
+      background:linear-gradient(90deg,#fb7185,#fbbf24,#84cc16);
+      transition:width .35s ease;
+    }
+    svg{
+      width:100%; height:220px; border-radius:12px;
+      border:1px solid rgba(148,163,184,.28);
+      background: radial-gradient(circle at 30% 20%, rgba(96,165,250,.12), rgba(15,23,42,.32));
+    }
+
+    .hypo-options{
+      display:grid; gap:8px;
+    }
+    .hypo-option{
+      border:1px solid rgba(167,139,250,.35);
+      background:rgba(167,139,250,.11);
+      border-radius:10px;
+      padding:9px;
+      font-size:.89rem;
+      line-height:1.35;
+      cursor:pointer;
+      transition:.2s ease;
+    }
+    .hypo-option.active{
+      border-color:rgba(132,204,22,.75);
+      background:rgba(132,204,22,.15);
+      transform:translateX(2px);
+    }
+    .control-row{
+      margin-top:10px;
+      display:grid; grid-template-columns:1fr auto; gap:8px; align-items:center;
+    }
+    .range{
+      width:100%;
+      accent-color:var(--sky);
+    }
+    .calib{
+      font-family:"JetBrains Mono", ui-monospace, monospace;
+      color:#dbeafe;
+      font-size:.8rem;
+    }
+    .run-btn{
+      margin-top:8px;
+      border:1px solid rgba(132,204,22,.45);
+      background:rgba(132,204,22,.16);
+      color:#ecfccb;
+      padding:8px 10px;
+      border-radius:10px;
+      cursor:pointer;
+      font-weight:700;
+    }
+    #hypoFeedback{
+      margin-top:8px;
+      font-size:.88rem;
+      line-height:1.35;
+      color:#d1fae5;
+      min-height:34px;
+    }
+
+    .sliders{display:grid; gap:10px}
+    .slider-row{
+      background:rgba(15,23,42,.45);
+      border:1px solid rgba(96,165,250,.18);
+      border-radius:10px;
+      padding:8px;
+    }
+    .slider-row label{
+      display:flex; justify-content:space-between;
+      font-size:.84rem; color:#dbeafe; margin-bottom:6px;
+    }
+    .slider-row output{
+      font-family:"JetBrains Mono", ui-monospace, monospace;
+      color:var(--sky);
+    }
+    .sim-grid{
+      margin-top:10px;
+      display:grid; grid-template-columns:repeat(3,1fr); gap:8px;
+    }
+    .sim{
+      background:rgba(2,6,23,.42);
+      border:1px solid rgba(148,163,184,.2);
+      border-radius:10px;
+      padding:8px;
+      font-size:.82rem;
+    }
+    .sim b{
+      display:block;
+      font-family:"JetBrains Mono", ui-monospace, monospace;
+      font-size:1rem;
+      margin-top:4px;
+      color:#dbeafe;
+    }
+    .sandbox-note{
+      margin-top:8px;
+      font-size:.86rem;
+      color:#cbd5e1;
+      line-height:1.35;
+    }
+
+    .tray{
+      display:flex; flex-wrap:wrap; gap:8px;
+      min-height:62px;
+      margin-bottom:10px;
+    }
+    .evidence-card{
+      width:calc(50% - 4px);
+      min-width:210px;
+      background:linear-gradient(160deg, rgba(96,165,250,.12), rgba(167,139,250,.12));
+      border:1px solid rgba(96,165,250,.35);
+      border-radius:10px;
+      padding:8px;
+      font-size:.83rem;
+      line-height:1.35;
+      cursor:grab;
+      transition: transform .15s ease, border-color .15s ease;
+    }
+    .evidence-card:hover{transform:translateY(-2px)}
+    .evidence-card.selected{
+      border-color:rgba(132,204,22,.9);
+      box-shadow:0 0 0 2px rgba(132,204,22,.2) inset;
+    }
+    .evidence-card .idx{
+      font-family:"JetBrains Mono", ui-monospace, monospace;
+      color:#bfdbfe; font-size:.72rem;
+      margin-bottom:4px;
+    }
+    .buckets{
+      display:grid; grid-template-columns:1fr 1fr; gap:10px;
+    }
+    .bucket{
+      background:rgba(2,6,23,.32);
+      border:1px dashed rgba(148,163,184,.4);
+      border-radius:10px;
+      padding:8px;
+      min-height:145px;
+    }
+    .bucket h4{
+      margin:0 0 6px; font-size:.84rem;
+      display:flex; justify-content:space-between;
+      color:#e2e8f0;
+    }
+    .bucket.good{border-color:rgba(132,204,22,.45)}
+    .bucket.bad{border-color:rgba(251,113,133,.5)}
+    .bucket .stack{display:grid; gap:6px}
+    .sorting-controls{
+      margin-top:8px;
+      display:flex; justify-content:space-between; align-items:center; gap:10px;
+      font-size:.82rem; color:#d1d5db;
+    }
+    .reset-btn{
+      border:1px solid rgba(148,163,184,.4);
+      background:rgba(148,163,184,.14);
+      color:#e2e8f0;
+      border-radius:8px; padding:6px 8px; cursor:pointer;
+      font-size:.8rem;
+    }
+
+    .phase-list{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:8px;
+      margin-top:8px;
+    }
+    .phase{
+      border:1px solid rgba(148,163,184,.3);
+      border-radius:10px;
+      padding:8px;
+      font-size:.82rem;
+      color:#cbd5e1;
+      background:rgba(15,23,42,.4);
+    }
+    .phase.done{
+      border-color:rgba(132,204,22,.6);
+      background:rgba(132,204,22,.12);
+      color:#ecfccb;
+    }
+    #finalCall{
+      margin-top:10px;
+      padding:10px;
+      border-radius:10px;
+      border:1px solid rgba(96,165,250,.3);
+      background:rgba(96,165,250,.12);
+      font-size:.9rem;
+      line-height:1.45;
+      color:#dbeafe;
+      min-height:46px;
+    }
+
+    .nav{
+      margin-top:14px;
+      display:flex; justify-content:space-between; gap:8px;
+      flex-wrap:wrap;
+    }
+    .nav a{
+      text-decoration:none;
+      color:white;
+      font-weight:700;
+      font-size:.88rem;
+      border-radius:10px;
+      padding:10px 12px;
+      border:1px solid rgba(148,163,184,.32);
+      background:rgba(15,23,42,.55);
+      transition:.2s ease;
+    }
+    .nav a:hover{transform:translateY(-1px); border-color:rgba(96,165,250,.7)}
+    .nav .next{background:linear-gradient(90deg, rgba(96,165,250,.3), rgba(167,139,250,.3))}
+    .nav .hub{background:linear-gradient(90deg, rgba(132,204,22,.2), rgba(96,165,250,.2))}
+
+    @media (max-width: 900px){
+      .status-strip{grid-template-columns:1fr}
+      .timeline,.hypothesis,.sandbox,.sorting{grid-column:span 12}
+      .phase-list{grid-template-columns:1fr 1fr}
+      .evidence-card{width:100%; min-width:unset}
+      .buckets{grid-template-columns:1fr}
+      svg{height:200px}
+    }
+  </style>
+</head>
+<body>
+<canvas id="dataLayer"></canvas>
+<div class="app">
+  <section class="hero">
+    <div class="kicker">Research Theater · Release Bridge</div>
+    <h1>Module 1: Smoke Test at Dawn</h1>
+    <p class="subtitle">Parser Fix Smoke Test: Attention Under Pressure</p>
+    <div class="objective">
+      <div>🎛️</div>
+      <div>
+        <b>Mission Objective:</b> Choose response actions that keep service stable while staying faithful to what the evidence actually shows.
+        A pager storm wakes the floor. The parser fix compiles, but integration smoke tests fail on edge syntax trees. You have one deployment window left before peak demand.
+      </div>
+    </div>
+    <div class="term-rail">
+      <span class="term">the</span><span class="term">models</span><span class="term">and</span><span class="term">attention</span><span class="term">best</span><span class="term">translation</span><span class="term">bleu</span><span class="term">training</span><span class="term">based</span><span class="term">new</span><span class="term">transformer</span><span class="term">tasks</span>
+    </div>
+
+    <div class="status-strip">
+      <div class="meter">
+        <div class="meter-head">
+          <strong>Mission Integrity Meter</strong>
+          <span id="integrityValue">0/100</span>
+        </div>
+        <div class="meter-bar"><div class="meter-fill" id="integrityFill"></div></div>
+        <div class="meter-sub" id="integrityLabel">Awaiting first decision from the release bridge.</div>
+      </div>
+      <div class="feed">
+        <h3>Real-time Console</h3>
+        <ul id="liveFeed"></ul>
+      </div>
+    </div>
+  </section>
+
+  <main class="grid">
+    <section class="panel timeline">
+      <h2>Timeline Switch <span class="tag">before / after</span></h2>
+      <div class="switch">
+        <button class="timeline-btn active" data-mode="before">Before Hotfix Path</button>
+        <button class="timeline-btn" data-mode="after">After Attention Path</button>
+      </div>
+
+      <svg viewBox="0 0 760 220" aria-label="Parser architecture transition">
+        <defs>
+          <linearGradient id="glowBlue" x1="0%" x2="100%">
+            <stop offset="0%" stop-color="#60A5FA"/>
+            <stop offset="100%" stop-color="#A78BFA"/>
+          </linearGradient>
+          <filter id="softGlow">
+            <feGaussianBlur stdDeviation="2.2" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <rect x="8" y="8" width="744" height="204" rx="14" fill="rgba(15,23,42,.42)" stroke="rgba(148,163,184,.25)"/>
+        <g id="beforeLayer">
+          <text x="24" y="30" fill="#93C5FD" font-size="12" font-family="JetBrains Mono">BEFORE: recurrent/convolutional chain bottlenecks smoke tasks</text>
+          <rect x="35" y="60" width="120" height="36" rx="8" fill="#1e293b" stroke="#60A5FA"/>
+          <text x="52" y="82" fill="#dbeafe" font-size="11">encoder</text>
+          <rect x="195" y="60" width="120" height="36" rx="8" fill="#1e293b" stroke="#60A5FA"/>
+          <text x="228" y="82" fill="#dbeafe" font-size="11">recurrent</text>
+          <rect x="355" y="60" width="120" height="36" rx="8" fill="#1e293b" stroke="#60A5FA"/>
+          <text x="383" y="82" fill="#dbeafe" font-size="11">convolution</text>
+          <rect x="515" y="60" width="120" height="36" rx="8" fill="#1e293b" stroke="#fb7185"/>
+          <text x="555" y="82" fill="#fecdd3" font-size="11">parser</text>
+
+          <line x1="155" y1="78" x2="195" y2="78" stroke="#60A5FA" stroke-width="3"/>
+          <line x1="315" y1="78" x2="355" y2="78" stroke="#60A5FA" stroke-width="3"/>
+          <line x1="475" y1="78" x2="515" y2="78" stroke="#fb7185" stroke-width="3"/>
+
+          <rect x="145" y="138" width="470" height="42" rx="10" fill="rgba(251,113,133,.12)" stroke="rgba(251,113,133,.6)"/>
+          <text x="165" y="164" fill="#fecdd3" font-size="12" font-family="JetBrains Mono">edge syntax trees queue up; low parallelization under pressure</text>
+        </g>
+
+        <g id="afterLayer" style="display:none;">
+          <text x="24" y="30" fill="#C4B5FD" font-size="12" font-family="JetBrains Mono">AFTER: transformer based on attention; throughput recovers</text>
+          <rect x="34" y="62" width="140" height="40" rx="9" fill="#1e293b" stroke="#A78BFA"/>
+          <text x="50" y="86" fill="#ede9fe" font-size="11">token embedding</text>
+
+          <rect x="216" y="48" width="150" height="68" rx="10" fill="#1e293b" stroke="url(#glowBlue)" filter="url(#softGlow)"/>
+          <text x="250" y="73" fill="#dbeafe" font-size="11">multi-head</text>
+          <text x="252" y="91" fill="#dbeafe" font-size="11">attention</text>
+
+          <rect x="410" y="62" width="150" height="40" rx="9" fill="#1e293b" stroke="#60A5FA"/>
+          <text x="430" y="86" fill="#dbeafe" font-size="11">parallel decoder</text>
+
+          <rect x="602" y="62" width="120" height="40" rx="9" fill="#1e293b" stroke="#84CC16"/>
+          <text x="626" y="86" fill="#ecfccb" font-size="11">stable parse</text>
+
+          <line x1="174" y1="82" x2="216" y2="82" stroke="#A78BFA" stroke-width="3"/>
+          <line x1="366" y1="82" x2="410" y2="82" stroke="#60A5FA" stroke-width="3"/>
+          <line x1="560" y1="82" x2="602" y2="82" stroke="#84CC16" stroke-width="3"/>
+
+          <circle cx="286" cy="158" r="26" fill="rgba(132,204,22,.18)" stroke="#84CC16"/>
+          <text x="272" y="163" fill="#ecfccb" font-size="11">BLEU</text>
+          <circle cx="378" cy="158" r="26" fill="rgba(96,165,250,.18)" stroke="#60A5FA"/>
+          <text x="356" y="163" fill="#dbeafe" font-size="11">faster</text>
+          <circle cx="470" cy="158" r="26" fill="rgba(167,139,250,.18)" stroke="#A78BFA"/>
+          <text x="444" y="163" fill="#ede9fe" font-size="11">tasks</text>
+        </g>
+      </svg>
+      <div class="timeline-meta" id="timelineText"></div>
+      <div class="risk-wrap">
+        <span>Stability Window</span>
+        <div class="risk-bar"><div class="risk-fill" id="stabilityFill"></div></div>
+        <span id="stabilityValue">0%</span>
+      </div>
+    </section>
+
+    <section class="panel hypothesis">
+      <h2>Hypothesis Test Panel <span class="tag">confidence calibration</span></h2>
+      <div class="hypo-options">
+        <button class="hypo-option" data-id="h1">The new transformer, based solely on attention, can beat prior best translation quality while reducing training time.</button>
+        <button class="hypo-option" data-id="h2">The best models must keep recurrence and convolutions to sustain translation BLEU on WMT 2014.</button>
+        <button class="hypo-option" data-id="h3">The model fails to generalize to other tasks and does not hold under limited training data.</button>
+      </div>
+      <div class="control-row">
+        <label for="confidence">Confidence</label>
+        <div class="calib" id="confidenceText">65%</div>
+      </div>
+      <input class="range" id="confidence" type="range" min="0" max="100" value="65" />
+      <button class="run-btn" id="evaluateHypothesis">Run Evidence Check</button>
+      <div id="hypoFeedback">Select a hypothesis, calibrate confidence, then run the evidence check.</div>
+    </section>
+
+    <section class="panel sandbox">
+      <h2>Parameter Sandbox <span class="tag">instant system response</span></h2>
+      <div class="sliders">
+        <div class="slider-row">
+          <label>Attention Share <output id="attOut">72%</output></label>
+          <input class="range slider" id="att" type="range" min="0" max="100" value="72" />
+        </div>
+        <div class="slider-row">
+          <label>Parallel Batch Lanes <output id="parOut">4</output></label>
+          <input class="range slider" id="par" type="range" min="1" max="16" value="4" />
+        </div>
+        <div class="slider-row">
+          <label>Training Days Budget <output id="dayOut">4.0</output></label>
+          <input class="range slider" id="days" type="range" min="1" max="6" step="0.1" value="4.0" />
+        </div>
+        <div class="slider-row">
+          <label>Recurrence Dependency <output id="recOut">45%</output></label>
+          <input class="range slider" id="rec" type="range" min="0" max="100" value="45" />
+        </div>
+      </div>
+
+      <div class="sim-grid">
+        <div class="sim">EN→DE BLEU projection<b id="deBleu">24.0</b></div>
+        <div class="sim">EN→FR BLEU projection<b id="frBleu">37.0</b></div>
+        <div class="sim">Evidence Fit<b id="fitScore">0%</b></div>
+      </div>
+      <div class="sandbox-note" id="sandboxNote"></div>
+    </section>
+
+    <section class="panel sorting">
+      <h2>Evidence Grouping <span class="tag">drag or tap-to-place</span></h2>
+      <div class="tray" id="evidenceTray"></div>
+      <div class="buckets">
+        <div class="bucket good" data-bucket="supported">
+          <h4><span>Supported by source</span><span id="supportedCount">0</span></h4>
+          <div class="stack" id="supported-cards"></div>
+        </div>
+        <div class="bucket bad" data-bucket="contradicted">
+          <h4><span>Contradicted by source</span><span id="contradictedCount">0</span></h4>
+          <div class="stack" id="contradicted-cards"></div>
+        </div>
+      </div>
+      <div class="sorting-controls">
+        <span id="sortingFeedback">Sort all evidence cues into the correct bucket.</span>
+        <button class="reset-btn" id="resetSorting">Reset cards</button>
+      </div>
+    </section>
+
+    <section class="panel summary">
+      <h2>Phase Summary <span class="tag">release call</span></h2>
+      <div class="phase-list">
+        <div class="phase" id="phase1">Timeline switch enacted</div>
+        <div class="phase" id="phase2">Hypothesis calibrated</div>
+        <div class="phase" id="phase3">Sandbox aligned to evidence</div>
+        <div class="phase" id="phase4">Evidence grouping complete</div>
+      </div>
+      <div id="finalCall">Complete each phase to generate the deployment call.</div>
+    </section>
+  </main>
+
+  <nav class="nav">
+    <a class="prev" href="/pages/gamified-learning-hub-dashboard-1.html">← Previous</a>
+    <a class="hub" href="/books/user-parser-fix-smoke-test-wkwtsv-512a.html">Mission Hub</a>
+    <a class="next" href="/books/user-parser-fix-smoke-test-wkwtsv-512a.html">Next →</a>
+  </nav>
+</div>
+
+<script>
+(() => {
+  const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
+
+  const evidenceCards = [
+    { id: "e1", truth: "supported", text: "A new simple network architecture, the Transformer, is based solely on attention and dispenses with recurrence and convolutions." },
+    { id: "e2", truth: "supported", text: "On WMT 2014 English-to-German translation, the reported score is 28.4 BLEU, over 2 BLEU above existing best results including ensembles." },
+    { id: "e3", truth: "supported", text: "On WMT 2014 English-to-French translation, the model reaches 41.8 BLEU after 3.5 days on eight GPUs." },
+    { id: "e4", truth: "supported", text: "Experiments on two machine translation tasks show better quality, more parallelizability, and significantly less time to train." },
+    { id: "e5", truth: "supported", text: "The model generalizes to other tasks via English constituency parsing with both large and limited training data." },
+    { id: "e6", truth: "contradicted", text: "The paper concludes the best translation systems require recurrence to remain state-of-the-art." },
+    { id: "e7", truth: "contradicted", text: "Only one translation task was evaluated, so no cross-task comparison was reported." }
+  ];
+
+  const state = {
+    timelineMode: "before",
+    timelineTouched: false,
+    timelineScore: 0,
+    hypothesisChoice: null,
+    confidence: 65,
+    hypothesisDone: false,
+    hypothesisScore: 0,
+    sandboxTouched: false,
+    sandboxDone: false,
+    sandboxScore: 0,
+    att: 72,
+    par: 4,
+    days: 4.0,
+    rec: 45,
+    placements: {},
+    sortingDone: false,
+    sortingScore: 0,
+    selectedCard: null
+  };
+
+  const dom = {
+    integrityFill: document.getElementById("integrityFill"),
+    integrityValue: document.getElementById("integrityValue"),
+    integrityLabel: document.getElementById("integrityLabel"),
+    liveFeed: document.getElementById("liveFeed"),
+
+    beforeLayer: document.getElementById("beforeLayer"),
+    afterLayer: document.getElementById("afterLayer"),
+    timelineBtns: document.querySelectorAll(".timeline-btn"),
+    timelineText: document.getElementById("timelineText"),
+    stabilityFill: document.getElementById("stabilityFill"),
+    stabilityValue: document.getElementById("stabilityValue"),
+
+    hypoOptions: document.querySelectorAll(".hypo-option"),
+    confidence: document.getElementById("confidence"),
+    confidenceText: document.getElementById("confidenceText"),
+    evaluateHypothesis: document.getElementById("evaluateHypothesis"),
+    hypoFeedback: document.getElementById("hypoFeedback"),
+
+    att: document.getElementById("att"),
+    par: document.getElementById("par"),
+    days: document.getElementById("days"),
+    rec: document.getElementById("rec"),
+    attOut: document.getElementById("attOut"),
+    parOut: document.getElementById("parOut"),
+    dayOut: document.getElementById("dayOut"),
+    recOut: document.getElementById("recOut"),
+    deBleu: document.getElementById("deBleu"),
+    frBleu: document.getElementById("frBleu"),
+    fitScore: document.getElementById("fitScore"),
+    sandboxNote: document.getElementById("sandboxNote"),
+
+    evidenceTray: document.getElementById("evidenceTray"),
+    supportedCards: document.getElementById("supported-cards"),
+    contradictedCards: document.getElementById("contradicted-cards"),
+    supportedCount: document.getElementById("supportedCount"),
+    contradictedCount: document.getElementById("contradictedCount"),
+    sortingFeedback: document.getElementById("sortingFeedback"),
+    resetSorting: document.getElementById("resetSorting"),
+    buckets: document.querySelectorAll(".bucket"),
+
+    phase1: document.getElementById("phase1"),
+    phase2: document.getElementById("phase2"),
+    phase3: document.getElementById("phase3"),
+    phase4: document.getElementById("phase4"),
+    finalCall: document.getElementById("finalCall")
+  };
+
+  function log(msg){
+    const li = document.createElement("li");
+    const t = new Date();
+    const stamp = `${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}:${String(t.getSeconds()).padStart(2,'0')}`;
+    li.textContent = `${stamp}  ${msg}`;
+    dom.liveFeed.prepend(li);
+    while (dom.liveFeed.children.length > 5) dom.liveFeed.removeChild(dom.liveFeed.lastChild);
+  }
+
+  function updateIntegrity(){
+    const total = clamp(
+      state.timelineScore + state.hypothesisScore + state.sandboxScore + state.sortingScore,
+      0, 100
+    );
+    dom.integrityFill.style.width = `${total}%`;
+    dom.integrityValue.textContent = `${total.toFixed(0)}/100`;
+    let label = "Signal weak: evidence-action alignment incomplete.";
+    if (total >= 85) label = "Launch-ready: stable and evidence-faithful release call.";
+    else if (total >= 65) label = "Controlled: one more evidence pass to lock confidence.";
+    else if (total >= 40) label = "Mixed state: parser risk reduced, but assumptions still leak.";
+    dom.integrityLabel.textContent = label;
+  }
+
+  function setTimeline(mode){
+    state.timelineMode = mode;
+    state.timelineTouched = true;
+    dom.timelineBtns.forEach(btn => btn.classList.toggle("active", btn.dataset.mode === mode));
+
+    if (mode === "before") {
+      dom.beforeLayer.style.display = "block";
+      dom.afterLayer.style.display = "none";
+      dom.timelineText.textContent = "Before hotfix path: sequence models and parser integration create queue pressure. Structural consequence: edge syntax trees saturate the release bridge and shrink your stability window.";
+      dom.stabilityFill.style.width = "28%";
+      dom.stabilityValue.textContent = "28%";
+      state.timelineScore = 12;
+      log("Timeline set to BEFORE structure; bottlenecks remain visible.");
+    } else {
+      dom.beforeLayer.style.display = "none";
+      dom.afterLayer.style.display = "block";
+      dom.timelineText.textContent = "After attention path: transformer-based routing increases parallelization, aligns with reported results, and re-opens a stable smoke-test window under deployment pressure.";
+      dom.stabilityFill.style.width = "82%";
+      dom.stabilityValue.textContent = "82%";
+      state.timelineScore = 25;
+      log("Timeline shifted to AFTER attention structure; stability rises.");
+    }
+    updateIntegrity();
+    updatePhases();
+  }
+
+  function setupHypothesis(){
+    dom.hypoOptions.forEach(btn => {
+      btn.addEventListener("click", () => {
+        state.hypothesisChoice = btn.dataset.id;
+        dom.hypoOptions.forEach(b => b.classList.toggle("active", b === btn));
+      });
+    });
+    dom.confidence.addEventListener("input", () => {
+      state.confidence = parseInt(dom.confidence.value, 10);
+      dom.confidenceText.textContent = `${state.confidence}%`;
+    });
+    dom.evaluateHypothesis.addEventListener("click", () => {
+      if (!state.hypothesisChoice){
+        dom.hypoFeedback.textContent = "Pick one hypothesis first so the console can calibrate confidence against evidence.";
+        return;
+      }
+      const correct = state.hypothesisChoice === "h1";
+      const target = correct ? 82 : 28;
+      const gap = Math.abs(state.confidence - target);
+      state.hypothesisScore = correct
+        ? clamp(25 - gap * 0.22, 4, 25)
+        : clamp(10 - state.confidence * 0.09, 0, 10);
+      state.hypothesisDone = true;
+
+      if (correct){
+        dom.hypoFeedback.textContent =
+          `Confirmed. This aligns with source evidence: new transformer architecture based on attention, superior translation quality on two tasks, 28.4 and 41.8 BLEU, and lower training time. Calibration gap: ${gap.toFixed(0)} points.`;
+        log("Hypothesis passed evidence check with calibrated confidence.");
+      } else {
+        dom.hypoFeedback.textContent =
+          `Rejected by evidence. Source reports attention-based gains over recurrent/convolutional setups and successful generalization to parsing tasks. Calibration gap: ${gap.toFixed(0)} points.`;
+        log("Hypothesis contradicted by source evidence.");
+      }
+      updateIntegrity();
+      updatePhases();
+    });
+  }
+
+  function updateSandbox(){
+    state.att = parseInt(dom.att.value, 10);
+    state.par = parseInt(dom.par.value, 10);
+    state.days = parseFloat(dom.days.value);
+    state.rec = parseInt(dom.rec.value, 10);
+
+    dom.attOut.textContent = `${state.att}%`;
+    dom.parOut.textContent = `${state.par}`;
+    dom.dayOut.textContent = `${state.days.toFixed(1)}`;
+    dom.recOut.textContent = `${state.rec}%`;
+
+    const de = clamp(18 + state.att * 0.09 + state.par * 0.55 - state.rec * 0.05 - Math.abs(state.days - 3.5) * 1.4, 20, 30);
+    const fr = clamp(31 + state.att * 0.10 + state.par * 0.70 - state.rec * 0.06 - Math.abs(state.days - 3.5) * 1.8, 33, 43);
+
+    const target = { att: 92, par: 8, days: 3.5, rec: 8 };
+    const dist = (
+      Math.abs(state.att - target.att) / 100 +
+      Math.abs(state.par - target.par) / 15 +
+      Math.abs(state.days - target.days) / 6 +
+      Math.abs(state.rec - target.rec) / 100
+    ) / 4;
+    const fit = clamp((1 - dist) * 100, 0, 100);
+
+    state.sandboxScore = clamp(fit / 4, 0, 25);
+    state.sandboxDone = state.sandboxTouched && fit >= 70;
+
+    dom.deBleu.textContent = de.toFixed(1);
+    dom.frBleu.textContent = fr.toFixed(1);
+    dom.fitScore.textContent = `${fit.toFixed(0)}%`;
+
+    if (!state.sandboxTouched){
+      dom.sandboxNote.textContent = "Tune parameters toward evidence: high attention, stronger parallel lanes, lower recurrence dependency, and training near 3.5 days.";
+    } else if (fit >= 80){
+      dom.sandboxNote.textContent = "Strong alignment: response resembles reported behavior—higher BLEU, better parallelizability, and reduced training cost envelope.";
+    } else if (fit >= 60){
+      dom.sandboxNote.textContent = "Partial alignment: close to source, but either recurrence remains too high or training budget drifts from the reported 3.5-day profile.";
+    } else {
+      dom.sandboxNote.textContent = "Low alignment: this setting conflicts with paper evidence on attention focus, translation quality, or training efficiency.";
+    }
+
+    updateIntegrity();
+    updatePhases();
+  }
+
+  function setupSandbox(){
+    [dom.att, dom.par, dom.days, dom.rec].forEach(slider => {
+      slider.addEventListener("input", () => {
+        state.sandboxTouched = true;
+        updateSandbox();
+      });
+    });
+  }
+
+  function createCard(card, index){
+    const el = document.createElement("div");
+    el.className = "evidence-card";
+    el.draggable = true;
+    el.dataset.id = card.id;
+    el.innerHTML = `<div class="idx">E${index + 1}</div><div>${card.text}</div>`;
+    el.addEventListener("dragstart", (e) => {
+      e.dataTransfer.setData("text/plain", card.id);
+    });
+    el.addEventListener("click", () => {
+      document.querySelectorAll(".evidence-card").forEach(c => c.classList.remove("selected"));
+      el.classList.add("selected");
+      state.selectedCard = card.id;
+      dom.sortingFeedback.textContent = `Selected E${index + 1}. Tap a bucket to place it, or drag it.`;
+    });
+    return el;
+  }
+
+  function placeCard(id, bucket){
+    const cardEl = document.querySelector(`.evidence-card[data-id="${id}"]`);
+    if (!cardEl) return;
+    state.placements[id] = bucket;
+    cardEl.classList.remove("selected");
+    state.selectedCard = null;
+    if (bucket === "supported") dom.supportedCards.appendChild(cardEl);
+    if (bucket === "contradicted") dom.contradictedCards.appendChild(cardEl);
+    updateSortingState();
+    log(`Evidence ${id.toUpperCase()} placed in ${bucket}.`);
+  }
+
+  function updateSortingState(){
+    let placed = 0, correct = 0, supported = 0, contradicted = 0;
+    evidenceCards.forEach(card => {
+      const pick = state.placements[card.id];
+      if (pick){
+        placed++;
+        if (pick === "supported") supported++;
+        if (pick === "contradicted") contradicted++;
+        if (pick === card.truth) correct++;
+      }
+    });
+
+    dom.supportedCount.textContent = supported;
+    dom.contradictedCount.textContent = contradicted;
+
+    state.sortingDone = placed === evidenceCards.length;
+    state.sortingScore = clamp((correct / evidenceCards.length) * 25, 0, 25);
+
+    if (!state.sortingDone){
+      dom.sortingFeedback.textContent = `${placed}/${evidenceCards.length} placed · ${correct} correct so far.`;
+    } else {
+      dom.sortingFeedback.textContent = `Sorting complete: ${correct}/${evidenceCards.length} correctly grouped to source support vs contradiction.`;
+    }
+
+    updateIntegrity();
+    updatePhases();
+  }
+
+  function setupSorting(){
+    evidenceCards.forEach((card, index) => {
+      dom.evidenceTray.appendChild(createCard(card, index));
+    });
+
+    dom.buckets.forEach(bucket => {
+      bucket.addEventListener("dragover", (e) => e.preventDefault());
+      bucket.addEventListener("drop", (e) => {
+        e.preventDefault();
+        const id = e.dataTransfer.getData("text/plain");
+        placeCard(id, bucket.dataset.bucket);
+      });
+      bucket.addEventListener("click", () => {
+        if (state.selectedCard) placeCard(state.selectedCard, bucket.dataset.bucket);
+      });
+    });
+
+    dom.resetSorting.addEventListener("click", () => {
+      state.placements = {};
+      state.selectedCard = null;
+      dom.evidenceTray.innerHTML = "";
+      evidenceCards.forEach((card, index) => dom.evidenceTray.appendChild(createCard(card, index)));
+      dom.supportedCards.innerHTML = "";
+      dom.contradictedCards.innerHTML = "";
+      dom.supportedCount.textContent = "0";
+      dom.contradictedCount.textContent = "0";
+      state.sortingDone = false;
+      state.sortingScore = 0;
+      dom.sortingFeedback.textContent = "Cards reset. Rebuild the evidence grouping.";
+      log("Evidence grouping reset.");
+      updateIntegrity();
+      updatePhases();
+    });
+  }
+
+  function updatePhases(){
+    const p1 = state.timelineTouched;
+    const p2 = state.hypothesisDone;
+    const p3 = state.sandboxDone;
+    const p4 = state.sortingDone;
+
+    dom.phase1.classList.toggle("done", p1);
+    dom.phase2.classList.toggle("done", p2);
+    dom.phase3.classList.toggle("done", p3);
+    dom.phase4.classList.toggle("done", p4);
+
+    if (p1 && p2 && p3 && p4){
+      dom.finalCall.textContent =
+        "Release Call: proceed with the attention-centered transformer path and keep decision language tight to evidence. You validated two translation tasks, 28.4 BLEU (EN→DE), 41.8 BLEU (EN→FR), lower training time around 3.5 days on eight GPUs, and successful transfer to parsing tasks with large and limited training data.";
+    } else {
+      const pending = [];
+      if (!p1) pending.push("timeline consequence");
+      if (!p2) pending.push("hypothesis confidence check");
+      if (!p3) pending.push("sandbox fit ≥ 70%");
+      if (!p4) pending.push("full evidence grouping");
+      dom.finalCall.textContent = `Pending phases: ${pending.join(", ")}. Complete all to lock the final deployment recommendation.`;
+    }
+  }
+
+  function setupTimeline(){
+    dom.timelineBtns.forEach(btn => {
+      btn.addEventListener("click", () => setTimeline(btn.dataset.mode));
+    });
+  }
+
+  function initDataLayer(){
+    const canvas = document.getElementById("dataLayer");
+    const ctx = canvas.getContext("2d");
+    let particles = [];
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    function resize(){
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      particles = Array.from({length: Math.min(65, Math.floor(canvas.width / 18))}, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 0.35,
+        vy: (Math.random() - 0.5) * 0.35,
+        r: Math.random() * 1.6 + 0.5
+      }));
+    }
+
+    function frame(){
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      for (let i = 0; i < particles.length; i++){
+        const p = particles[i];
+        if (!reduceMotion){
+          p.x += p.vx; p.y += p.vy;
+          if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+          if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+        }
+        ctx.beginPath();
+        ctx.fillStyle = "rgba(96,165,250,.65)";
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+
+        for (let j = i + 1; j < particles.length; j++){
+          const q = particles[j];
+          const dx = p.x - q.x;
+          const dy = p.y - q.y;
+          const d = Math.hypot(dx, dy);
+          if (d < 90){
+            ctx.strokeStyle = `rgba(167,139,250,${(1 - d/90) * 0.2})`;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(q.x, q.y);
+            ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(frame);
+    }
+    resize();
+    frame();
+    window.addEventListener("resize", resize);
+  }
+
+  function init(){
+    initDataLayer();
+    setupTimeline();
+    setupHypothesis();
+    setupSandbox();
+    setupSorting();
+
+    setTimeline("before");
+    updateSandbox();
+    updateIntegrity();
+    updatePhases();
+
+    log("Bridge online. Pager storm active at dawn.");
+    log("Intel loaded from Attention Is All You Need source cues.");
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>

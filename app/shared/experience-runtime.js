@@ -128,6 +128,29 @@ function createTracker(bookId, moduleSlug) {
   };
 }
 
+function sendDuration(bookId, moduleSlug, durationMs, reason) {
+  const path = "/api/modules/" + encodeURIComponent(moduleSlug) + "/duration";
+  const payload = JSON.stringify({
+    bookId,
+    durationMs,
+    reason
+  });
+  if (typeof navigator !== "undefined" && typeof navigator.sendBeacon === "function") {
+    try {
+      const blob = new Blob([payload], { type: "application/json" });
+      if (navigator.sendBeacon(path, blob)) {
+        return;
+      }
+    } catch {}
+  }
+  fetch(path, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: payload,
+    keepalive: true
+  }).catch(() => {});
+}
+
 function init(config) {
   const bookId = typeof config?.bookId === "string" ? config.bookId.trim() : "";
   const moduleSlug = typeof config?.moduleSlug === "string" ? config.moduleSlug.trim() : "";
@@ -138,6 +161,15 @@ function init(config) {
   ensureStyle();
   markPseudoInteractive();
   const track = createTracker(bookId, moduleSlug);
+  const enteredAt = Date.now();
+  let durationReported = false;
+
+  const reportDuration = (reason) => {
+    if (durationReported) return;
+    durationReported = true;
+    const stayMs = Math.max(0, Date.now() - enteredAt);
+    sendDuration(bookId, moduleSlug, stayMs, reason || "leave");
+  };
 
   apiRequest("POST", "/api/modules/" + encodeURIComponent(moduleSlug) + "/visit", { bookId }).catch(() => {});
 
@@ -156,6 +188,14 @@ function init(config) {
     const value = "value" in target ? target.value : null;
     track("change", getNodeLabel(target), value);
   });
+
+  window.addEventListener("pagehide", () => reportDuration("pagehide"), { once: true });
+  window.addEventListener("beforeunload", () => reportDuration("beforeunload"), { once: true });
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") {
+      reportDuration("hidden");
+    }
+  }, { once: true });
 }
 
 window.ReadoExperienceRuntime = { init };

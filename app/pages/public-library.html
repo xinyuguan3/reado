@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>reado · Experience Library</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Noto Sans SC", "PingFang SC", "Segoe UI", sans-serif;
+      color: #e2e8f0;
+      background:
+        radial-gradient(circle at 12% 10%, rgba(56, 189, 248, 0.26), transparent 38%),
+        radial-gradient(circle at 86% 6%, rgba(59, 130, 246, 0.2), transparent 30%),
+        #050b16;
+    }
+    .page {
+      width: min(1220px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 98px 0 32px;
+    }
+    .hero {
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 18px;
+      background: rgba(15, 23, 42, 0.74);
+      box-shadow: 0 18px 42px rgba(2, 8, 20, 0.38);
+      padding: 18px;
+      margin-bottom: 14px;
+    }
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(30px, 4vw, 48px);
+      letter-spacing: -0.02em;
+      line-height: 1.05;
+    }
+    .hero p {
+      margin: 9px 0 0;
+      color: #a4b5cc;
+      line-height: 1.7;
+      font-size: 14px;
+    }
+    .top {
+      margin-top: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .meta {
+      color: #94a3b8;
+      font-size: 13px;
+    }
+    .btn {
+      border: 1px solid rgba(148, 163, 184, 0.38);
+      border-radius: 999px;
+      padding: 8px 13px;
+      background: rgba(15, 23, 42, 0.8);
+      color: #e2e8f0;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: border-color 120ms ease, transform 120ms ease;
+    }
+    .btn:hover {
+      border-color: rgba(96, 165, 250, 0.82);
+      transform: translateY(-1px);
+    }
+    .btn.primary {
+      border-color: rgba(56, 189, 248, 0.75);
+      background: rgba(8, 145, 178, 0.34);
+    }
+    .grid {
+      margin-top: 12px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 12px;
+    }
+    .card {
+      border: 1px solid rgba(148, 163, 184, 0.24);
+      border-radius: 14px;
+      overflow: hidden;
+      background: rgba(15, 23, 42, 0.78);
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+    .card img {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      display: block;
+      background: rgba(30, 41, 59, 0.7);
+    }
+    .content {
+      padding: 12px;
+      display: grid;
+      gap: 7px;
+    }
+    .title {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.4;
+      color: #e2e8f0;
+    }
+    .sub {
+      margin: 0;
+      color: #9fb3cc;
+      font-size: 13px;
+      line-height: 1.55;
+      min-height: 40px;
+    }
+    .ops {
+      margin-top: 4px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .empty {
+      margin-top: 14px;
+      border: 1px dashed rgba(148, 163, 184, 0.36);
+      border-radius: 14px;
+      padding: 16px;
+      color: #94a3b8;
+    }
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 90;
+      background: rgba(2, 6, 23, 0.68);
+      backdrop-filter: blur(3px);
+      display: grid;
+      place-items: center;
+      padding: 16px;
+    }
+    .modal[hidden] { display: none; }
+    .dialog {
+      width: min(980px, 100%);
+      max-height: calc(100vh - 32px);
+      overflow: auto;
+      border: 1px solid rgba(148, 163, 184, 0.34);
+      border-radius: 18px;
+      background: rgba(10, 16, 30, 0.96);
+      box-shadow: 0 24px 58px rgba(2, 8, 20, 0.55);
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+    }
+    .dialog-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .dialog-title {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
+    .dialog-grid {
+      display: grid;
+      grid-template-columns: minmax(240px, 300px) minmax(0, 1fr);
+      gap: 12px;
+    }
+    .panel {
+      border: 1px solid rgba(148, 163, 184, 0.26);
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.7);
+      padding: 10px;
+    }
+    .panel h3 {
+      margin: 0;
+      font-size: 14px;
+      color: #cbd5e1;
+    }
+    .panel p {
+      margin: 8px 0 0;
+      font-size: 13px;
+      line-height: 1.62;
+      color: #9fb3cc;
+      white-space: pre-wrap;
+    }
+    .panel img {
+      width: 100%;
+      aspect-ratio: 4 / 5;
+      object-fit: cover;
+      display: block;
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.24);
+      background: rgba(30, 41, 59, 0.7);
+    }
+    .module-list, .mods-list, .source-list {
+      margin-top: 8px;
+      display: grid;
+      gap: 8px;
+      max-height: 220px;
+      overflow: auto;
+      padding-right: 2px;
+    }
+    .line {
+      border: 1px solid rgba(148, 163, 184, 0.24);
+      border-radius: 10px;
+      padding: 8px;
+      background: rgba(15, 23, 42, 0.6);
+      display: grid;
+      gap: 5px;
+    }
+    .line h4 {
+      margin: 0;
+      font-size: 13px;
+      color: #e2e8f0;
+      line-height: 1.45;
+    }
+    .line p {
+      margin: 0;
+      font-size: 12px;
+      color: #94a3b8;
+      line-height: 1.5;
+    }
+    .line .ops {
+      margin-top: 2px;
+    }
+    .modify-box {
+      margin-top: 8px;
+      display: grid;
+      gap: 8px;
+    }
+    .modify-box textarea {
+      width: 100%;
+      min-height: 90px;
+      resize: vertical;
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      background: rgba(2, 6, 23, 0.76);
+      color: #dbeafe;
+      font-size: 13px;
+      line-height: 1.55;
+      padding: 9px;
+      font-family: inherit;
+      outline: none;
+    }
+    .muted {
+      margin: 0;
+      color: #8ea3c0;
+      font-size: 12px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+    }
+    @media (max-width: 960px) {
+      .dialog-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <reado-app-shell data-page="library"></reado-app-shell>
+  <main class="page">
+    <section class="hero">
+      <h1>Public Experience Library</h1>
+      <p>Explore community-published playable books and papers. Open details in-place, download packages, and build longer mod versions from existing works.</p>
+      <div class="top">
+        <p id="meta" class="meta">Loading...</p>
+        <button id="refresh-btn" class="btn" type="button">Refresh</button>
+      </div>
+    </section>
+    <section id="grid" class="grid"></section>
+    <section id="empty" class="empty" hidden>No public experiences yet. Publish from Studio to list one here.</section>
+  </main>
+
+  <div id="detail-modal" class="modal" hidden>
+    <section class="dialog" role="dialog" aria-modal="true">
+      <header class="dialog-head">
+        <h2 id="detail-title" class="dialog-title">Loading...</h2>
+        <button id="close-detail-btn" class="btn" type="button">Close</button>
+      </header>
+      <div class="dialog-grid">
+        <article class="panel">
+          <img id="detail-cover" alt="cover" />
+          <div class="ops" style="margin-top:10px;">
+            <a id="detail-open-book" class="btn" href="#" target="_blank" rel="noreferrer">Open Book</a>
+            <a id="detail-start" class="btn primary" href="#" target="_blank" rel="noreferrer">Start</a>
+            <a id="detail-download" class="btn" href="#">Download</a>
+          </div>
+          <p id="detail-meta" class="muted"></p>
+        </article>
+        <article class="panel">
+          <h3>Summary</h3>
+          <p id="detail-summary"></p>
+
+          <h3 style="margin-top:10px;">Modules</h3>
+          <div id="detail-modules" class="module-list"></div>
+
+          <h3 style="margin-top:10px;">Sources</h3>
+          <div id="detail-sources" class="source-list"></div>
+
+          <h3 style="margin-top:10px;">Modify (Extend This Book)</h3>
+          <p class="muted">Input what to expand (new chapter angles, deeper case studies, extra simulations). A new mod version will be generated and listed below.</p>
+          <div class="modify-box">
+            <textarea id="modify-input" placeholder="Example: Expand the methods/results section into 2 additional missions, add a counterfactual simulation and a policy tradeoff board."></textarea>
+            <div class="ops">
+              <button id="modify-btn" class="btn primary" type="button">Generate Mod Version</button>
+            </div>
+            <p id="modify-status" class="muted"></p>
+          </div>
+
+          <h3 style="margin-top:10px;">Mod Versions</h3>
+          <div id="detail-mods" class="mods-list"></div>
+        </article>
+      </div>
+    </section>
+  </div>
+
+  <script type="module">
+    import "/shared/shell.js";
+
+    const gridEl = document.getElementById("grid");
+    const emptyEl = document.getElementById("empty");
+    const metaEl = document.getElementById("meta");
+    const refreshBtn = document.getElementById("refresh-btn");
+    const modalEl = document.getElementById("detail-modal");
+    const closeDetailBtn = document.getElementById("close-detail-btn");
+    const detailTitleEl = document.getElementById("detail-title");
+    const detailCoverEl = document.getElementById("detail-cover");
+    const detailMetaEl = document.getElementById("detail-meta");
+    const detailSummaryEl = document.getElementById("detail-summary");
+    const detailModulesEl = document.getElementById("detail-modules");
+    const detailSourcesEl = document.getElementById("detail-sources");
+    const detailModsEl = document.getElementById("detail-mods");
+    const detailOpenBookEl = document.getElementById("detail-open-book");
+    const detailStartEl = document.getElementById("detail-start");
+    const detailDownloadEl = document.getElementById("detail-download");
+    const modifyInputEl = document.getElementById("modify-input");
+    const modifyBtn = document.getElementById("modify-btn");
+    const modifyStatusEl = document.getElementById("modify-status");
+
+    const state = {
+      items: [],
+      currentWorkId: "",
+      currentWork: null,
+      activeJobId: "",
+      pollTimer: null
+    };
+
+    function esc(value) {
+      return String(value || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll("\"", "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    async function request(path, options = {}) {
+      const response = await fetch(path, options);
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || data?.ok === false) {
+        throw new Error(data?.error || ("Request failed with " + response.status));
+      }
+      return data;
+    }
+
+    function setModifyStatus(text) {
+      modifyStatusEl.textContent = text || "";
+    }
+
+    function closeDetailModal() {
+      modalEl.hidden = true;
+      state.currentWorkId = "";
+      state.currentWork = null;
+      setModifyStatus("");
+      modifyInputEl.value = "";
+      if (state.pollTimer) {
+        clearInterval(state.pollTimer);
+        state.pollTimer = null;
+      }
+    }
+
+    function render(items) {
+      const rows = Array.isArray(items) ? items : [];
+      metaEl.textContent = rows.length + " published experiences";
+      if (!rows.length) {
+        gridEl.innerHTML = "";
+        emptyEl.hidden = false;
+        return;
+      }
+      emptyEl.hidden = true;
+      gridEl.innerHTML = rows.map((item) => `
+        <article class="card">
+          <img src="${esc(item.cover || "")}" alt="${esc(item.title || "cover")}" loading="lazy" />
+          <div class="content">
+            <h3 class="title">${esc(item.title || "Untitled")}</h3>
+            <p class="sub">${esc(item.subtitle || item.hook || "")}</p>
+            <p class="meta">${esc((item.module_count || 0) + " modules")}</p>
+            <div class="ops">
+              ${item.first_module_href ? `<a class="btn primary" href="${esc(item.first_module_href)}" target="_blank" rel="noreferrer">Start</a>` : ""}
+              <button class="btn" type="button" data-act="detail" data-id="${esc(item.id)}">Details</button>
+            </div>
+          </div>
+        </article>
+      `).join("");
+      gridEl.querySelectorAll('button[data-act="detail"]').forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-id") || "";
+          if (!id) return;
+          openDetail(id).catch((error) => {
+            metaEl.textContent = "Open detail failed: " + (error?.message || "unknown");
+          });
+        });
+      });
+    }
+
+    function renderDetail(work) {
+      state.currentWork = work || null;
+      if (!work) return;
+      detailTitleEl.textContent = work.title || "Untitled";
+      detailCoverEl.src = work.cover || "";
+      detailCoverEl.alt = work.title || "cover";
+      detailSummaryEl.textContent = [
+        work.subtitle || "",
+        work.hook ? ("Hook: " + work.hook) : ""
+      ].filter(Boolean).join("\n");
+      detailMetaEl.textContent = [
+        "Modules: " + (work.module_count || 0),
+        "Mode: " + (work.html_generation_mode || "unknown"),
+        work.created_at ? ("Created: " + work.created_at) : ""
+      ].filter(Boolean).join("\n");
+      detailOpenBookEl.href = work.book_href || "#";
+      detailStartEl.href = work.first_module_href || work.book_href || "#";
+      detailDownloadEl.href = "/api/studio/works/" + encodeURIComponent(work.id || "") + "/download";
+
+      const modules = Array.isArray(work.modules) ? work.modules : [];
+      detailModulesEl.innerHTML = modules.length
+        ? modules.map((item) => `
+            <article class="line">
+              <h4>${esc((item.index || 0) + ". " + (item.title || "Untitled module"))}</h4>
+              <div class="ops">
+                <a class="btn" href="${esc(item.href || "#")}" target="_blank" rel="noreferrer">Open</a>
+              </div>
+            </article>
+          `).join("")
+        : `<article class="line"><p>No modules found.</p></article>`;
+
+      const sources = Array.isArray(work.sources) ? work.sources : [];
+      detailSourcesEl.innerHTML = sources.length
+        ? sources.map((item, index) => `
+            <article class="line">
+              <h4>${esc(item.title || ("Source " + (index + 1)))}</h4>
+              <p>${esc((item.snippet || "").slice(0, 260))}</p>
+              <div class="ops">
+                ${item.url ? `<a class="btn" href="${esc(item.url)}" target="_blank" rel="noreferrer">Open Source</a>` : ""}
+              </div>
+            </article>
+          `).join("")
+        : `<article class="line"><p>No source metadata.</p></article>`;
+
+      const mods = Array.isArray(work.mods) ? work.mods : [];
+      detailModsEl.innerHTML = mods.length
+        ? mods.map((item) => `
+            <article class="line">
+              <h4>${esc(item.title || "Untitled mod")}</h4>
+              <p>${esc((item.subtitle || item.hook || "").slice(0, 200))}</p>
+              <div class="ops">
+                <a class="btn" href="${esc(item.book_href || "#")}" target="_blank" rel="noreferrer">Open Book</a>
+                ${item.first_module_href ? `<a class="btn primary" href="${esc(item.first_module_href)}" target="_blank" rel="noreferrer">Start</a>` : ""}
+                <a class="btn" href="/api/studio/works/${encodeURIComponent(item.id || "")}/download">Download</a>
+              </div>
+            </article>
+          `).join("")
+        : `<article class="line"><p>No mod versions yet.</p></article>`;
+    }
+
+    async function openDetail(workId) {
+      state.currentWorkId = workId;
+      modalEl.hidden = false;
+      detailTitleEl.textContent = "Loading...";
+      detailSummaryEl.textContent = "";
+      detailMetaEl.textContent = "";
+      detailModulesEl.innerHTML = "";
+      detailSourcesEl.innerHTML = "";
+      detailModsEl.innerHTML = "";
+      setModifyStatus("");
+      const data = await request("/api/studio/works/" + encodeURIComponent(workId) + "/detail");
+      renderDetail(data.work || {});
+    }
+
+    async function load() {
+      metaEl.textContent = "Loading...";
+      try {
+        const data = await request("/api/studio/library/public?limit=200");
+        state.items = Array.isArray(data.items) ? data.items : [];
+        render(state.items);
+      } catch (error) {
+        metaEl.textContent = "Load failed: " + (error?.message || "unknown");
+      }
+    }
+
+    async function pollJobUntilDone(jobId) {
+      if (!jobId) return;
+      if (state.pollTimer) {
+        clearInterval(state.pollTimer);
+        state.pollTimer = null;
+      }
+      state.activeJobId = jobId;
+      setModifyStatus("Mod generation started. Running in background...");
+      state.pollTimer = setInterval(async () => {
+        try {
+          const data = await request("/api/studio/jobs/" + encodeURIComponent(jobId));
+          const job = data.job || {};
+          const status = String(job.status || "running");
+          const step = String(job.step || "processing");
+          const progress = Number(job.progress || 0);
+          setModifyStatus("Status: " + status + " · " + step + " (" + progress + "%)");
+          if (status === "done") {
+            clearInterval(state.pollTimer);
+            state.pollTimer = null;
+            setModifyStatus("Mod generation completed. Refreshing detail...");
+            if (state.currentWorkId) {
+              const detailData = await request("/api/studio/works/" + encodeURIComponent(state.currentWorkId) + "/detail");
+              renderDetail(detailData.work || {});
+            }
+            await load();
+          } else if (status === "error") {
+            clearInterval(state.pollTimer);
+            state.pollTimer = null;
+            setModifyStatus("Generation failed: " + String(job.error || "unknown"));
+          }
+        } catch (error) {
+          setModifyStatus("Job polling failed: " + (error?.message || "unknown"));
+        }
+      }, 1600);
+    }
+
+    modifyBtn.addEventListener("click", async () => {
+      const workId = state.currentWorkId || "";
+      const prompt = (modifyInputEl.value || "").trim();
+      if (!workId) return;
+      if (!prompt) {
+        setModifyStatus("Please enter modify prompt first.");
+        return;
+      }
+      modifyBtn.disabled = true;
+      try {
+        const data = await request("/api/studio/works/" + encodeURIComponent(workId) + "/modify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt })
+        });
+        const jobId = data?.job?.id || "";
+        if (!jobId) {
+          throw new Error("Modify job not created");
+        }
+        await pollJobUntilDone(jobId);
+      } catch (error) {
+        setModifyStatus("Modify failed: " + (error?.message || "unknown"));
+      } finally {
+        modifyBtn.disabled = false;
+      }
+    });
+
+    modalEl.addEventListener("click", (event) => {
+      if (event.target === modalEl) closeDetailModal();
+    });
+    closeDetailBtn.addEventListener("click", closeDetailModal);
+    refreshBtn.addEventListener("click", load);
+    load();
+  </script>
+</body>
+</html>

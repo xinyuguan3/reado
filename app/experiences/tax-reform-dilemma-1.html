@@ -76,8 +76,8 @@
     </style>
 </head>
 <body class="bg-background-light dark:bg-background-dark text-white font-sans min-h-screen flex flex-col relative overflow-hidden">
-<script src="/shared/book-catalog.js?v=1771257564240"></script>
-<script type="module" src="/shared/shell.js?v=1771257564240"></script>
+<script src="/shared/book-catalog.js?v=1771754453141"></script>
+<script type="module" src="/shared/shell.js?v=1771754453141"></script>
 <reado-app-shell data-page="knowledge-map"></reado-app-shell>
 <header class="absolute top-6 left-8 z-30">
 <div class="flex items-center gap-2">
@@ -513,7 +513,7 @@
 </script>
 
 
-
+<script src="/shared/experience-runtime.js?v=1771754453141"></script>
 <script>
 (() => {
   
@@ -528,6 +528,13 @@
   }
   
   
+  if (window.ReadoExperienceRuntime && typeof window.ReadoExperienceRuntime.init === "function") {
+    window.ReadoExperienceRuntime.init({
+      bookId: "wanli-fifteen",
+      moduleSlug: "tax-reform-dilemma-1",
+      moduleSlugs: ["tax-reform-dilemma-1","tax-reform-dilemma-2","tax-reform-dilemma-3","tax-reform-dilemma-4","tax-reform-dilemma-5"]
+    });
+  }
 })();
 </script>
 </body></html>

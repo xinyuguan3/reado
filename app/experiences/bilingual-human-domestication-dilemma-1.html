@@ -64,8 +64,8 @@
     </style>
 </head>
 <body class="text-slate-200 h-screen w-screen flex flex-col font-display overflow-hidden relative selection:bg-accent selection:text-background-dark">
-<script src="/shared/book-catalog.js?v=1771257564240"></script>
-<script type="module" src="/shared/shell.js?v=1771257564240"></script>
+<script src="/shared/book-catalog.js?v=1771754453141"></script>
+<script type="module" src="/shared/shell.js?v=1771754453141"></script>
 <reado-app-shell data-page="knowledge-map"></reado-app-shell>
 <header class="relative z-50 w-full px-8 py-4 flex items-center justify-between border-b border-white/5 bg-background-dark/40 backdrop-blur-xl">
 <div class="flex items-center gap-8">
@@ -247,7 +247,7 @@
 </main>
 
 
-<script src="/shared/experience-runtime.js?v=1771257564240"></script>
+<script src="/shared/experience-runtime.js?v=1771754453141"></script>
 <script>
 (() => {
   
@@ -290,7 +290,8 @@
       if (target.closest(".reado-shell-wrap")) return;
       const candidate = target.closest("[data-next-scene],button,a[href],.concept-card,.item-card,[data-choice],[data-option]");
       if (!(candidate instanceof HTMLElement)) return;
-      if (!candidate.closest("main")) return;
+      const mainRoot = document.querySelector("main");
+      if (mainRoot instanceof HTMLElement && !mainRoot.contains(candidate)) return;
       if (candidate.hasAttribute("data-no-next")) return;
       if (candidate.matches("a[href]")) {
         const href = candidate.getAttribute("href") || "";
@@ -319,7 +320,7 @@
     window.ReadoExperienceRuntime.init({
       bookId: "sapiens",
       moduleSlug: "bilingual-human-domestication-dilemma-1",
-      moduleSlugs: ["the-wheat-conquest-simulator","human-domestication-dilemma-1","human-domestication-dilemma-2","bilingual-human-domestication-dilemma","sapiens-the-wheat-conquest-simulator-1","sapiens-the-wheat-conquest-simulator-2","bilingual-human-domestication-dilemma-4","bilingual-human-domestication-dilemma-1","bilingual-human-domestication-dilemma-2","bilingual-human-domestication-dilemma-3"]
+      moduleSlugs: ["the-wheat-conquest-simulator","human-domestication-dilemma-1","human-domestication-dilemma-2","bilingual-human-domestication-dilemma","bilingual-human-domestication-dilemma-4","bilingual-human-domestication-dilemma-1","bilingual-human-domestication-dilemma-2","bilingual-human-domestication-dilemma-3"]
     });
   }
 })();

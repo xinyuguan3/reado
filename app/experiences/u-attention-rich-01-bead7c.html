@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Attention Rich：并行风暴｜模块一：注意力总线接管计划</title>
+  <style>
+    :root{
+      --bg:#060911;
+      --bg2:#0a1330;
+      --panel:rgba(16,25,53,.58);
+      --panel-strong:rgba(12,20,46,.85);
+      --line:rgba(127,211,255,.35);
+      --cyan:#7fe3ff;
+      --blue:#6ba3ff;
+      --violet:#bb8cff;
+      --green:#7dffb2;
+      --warn:#ffdb73;
+      --danger:#ff7a95;
+      --text:#e9f2ff;
+      --muted:#9fb2d7;
+      --shadow:0 20px 50px rgba(0,0,0,.45);
+      --radius:18px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: "Inter","Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(80% 120% at 10% -10%, #1d2a5d 0%, transparent 55%),
+        radial-gradient(80% 120% at 90% 0%, #401f5f 0%, transparent 56%),
+        linear-gradient(160deg, var(--bg) 0%, #070d1f 38%, var(--bg2) 100%);
+      overflow-x:hidden;
+    }
+
+    #storm{
+      position:fixed;
+      inset:0;
+      z-index:0;
+      opacity:.55;
+      pointer-events:none;
+    }
+
+    .grid{
+      position:fixed;
+      inset:0;
+      z-index:0;
+      pointer-events:none;
+      background:
+        linear-gradient(rgba(126,160,255,.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(126,160,255,.08) 1px, transparent 1px);
+      background-size:40px 40px;
+      mask-image: radial-gradient(circle at 50% 30%, black 30%, transparent 90%);
+      animation:gridShift 28s linear infinite;
+    }
+
+    .scan{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:0;
+      background:linear-gradient(to bottom, transparent 0%, rgba(160,230,255,.05) 45%, transparent 100%);
+      background-size:100% 7px;
+      opacity:.25;
+    }
+
+    @keyframes gridShift{
+      from{transform:translateY(0)}
+      to{transform:translateY(40px)}
+    }
+
+    .app{
+      position:relative;
+      z-index:1;
+      width:min(1180px, 94vw);
+      margin:20px auto 110px;
+    }
+
+    .hero{
+      position:relative;
+      border:1px solid var(--line);
+      border-radius:calc(var(--radius) + 6px);
+      background:linear-gradient(160deg, rgba(14,23,52,.75), rgba(10,15,36,.88));
+      box-shadow:var(--shadow);
+      padding:20px clamp(14px, 2.4vw, 28px) 22px;
+      overflow:hidden;
+    }
+
+    .hero::before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      border-radius:inherit;
+      background:
+        radial-gradient(circle at 20% 0%, rgba(127,227,255,.35), transparent 35%),
+        radial-gradient(circle at 90% 20%, rgba(187,140,255,.28), transparent 40%);
+      z-index:-1;
+      filter:blur(10px);
+    }
+
+    .bookline{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px 14px;
+      align-items:center;
+      color:var(--muted);
+      font-size:13px;
+      letter-spacing:.2px;
+    }
+
+    .pill{
+      padding:4px 10px;
+      border:1px solid rgba(127,227,255,.45);
+      border-radius:999px;
+      color:var(--cyan);
+      background:rgba(95,158,255,.08);
+    }
+
+    h1{
+      margin:12px 0 8px;
+      font-size:clamp(22px, 4vw, 34px);
+      line-height:1.2;
+      letter-spacing:.5px;
+    }
+
+    .opening{
+      margin:0 0 10px;
+      color:#d4e2ff;
+      font-size:15px;
+      line-height:1.75;
+      max-width:980px;
+    }
+
+    .mission{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+      margin-top:14px;
+    }
+
+    .mission-card{
+      border:1px solid rgba(127,227,255,.26);
+      background:rgba(9,17,38,.66);
+      border-radius:14px;
+      padding:12px 14px;
+      min-height:88px;
+    }
+
+    .mission-card b{
+      color:var(--cyan);
+      display:block;
+      margin-bottom:6px;
+      font-size:13px;
+      text-transform:uppercase;
+      letter-spacing:.9px;
+    }
+
+    .progress{
+      margin-top:16px;
+      border:1px solid rgba(127,227,255,.3);
+      background:rgba(8,14,30,.7);
+      border-radius:14px;
+      padding:12px;
+    }
+
+    .track{
+      position:relative;
+      height:9px;
+      border-radius:999px;
+      background:rgba(117,146,210,.2);
+      overflow:hidden;
+    }
+
+    .track > span{
+      position:absolute;
+      inset:0 auto 0 0;
+      width:0%;
+      border-radius:999px;
+      background:linear-gradient(90deg, #6fd9ff, #a38bff 70%, #76ffca 100%);
+      box-shadow:0 0 24px rgba(127,227,255,.45);
+      transition:width .45s ease;
+    }
+
+    .psteps{
+      margin-top:10px;
+      display:grid;
+      grid-template-columns:repeat(4, minmax(0,1fr));
+      gap:8px;
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    .pstep{
+      border:1px solid rgba(127,227,255,.18);
+      border-radius:10px;
+      padding:8px;
+      text-align:center;
+      background:rgba(12,18,38,.58);
+      transition:.25s;
+    }
+
+    .pstep.active{
+      color:var(--cyan);
+      border-color:rgba(127,227,255,.55);
+      box-shadow:inset 0 0 18px rgba(127,227,255,.14);
+    }
+
+    .pstep.done{
+      color:#c9ffe2;
+      border-color:rgba(125,255,178,.45);
+      background:rgba(22,52,44,.42);
+    }
+
+    .stages{
+      margin-top:16px;
+      display:grid;
+      gap:14px;
+    }
+
+    .stage{
+      position:relative;
+      border:1px solid rgba(127,227,255,.28);
+      border-radius:var(--radius);
+      background:var(--panel);
+      backdrop-filter:blur(8px);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+
+    .stage.locked{
+      opacity:.45;
+      pointer-events:none;
+      filter:saturate(.75);
+    }
+
+    .stage-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      border-bottom:1px solid rgba(127,227,255,.2);
+      background:rgba(9,15,34,.72);
+      padding:12px 14px;
+    }
+
+    .stage-title{
+      margin:0;
+      font-size:16px;
+      letter-spacing:.3px;
+    }
+
+    .stage-id{
+      font-size:12px;
+      color:var(--cyan);
+      border:1px solid rgba(127,227,255,.4);
+      border-radius:999px;
+      padding:4px 9px;
+    }
+
+    .stage-body{
+      padding:14px;
+    }
+
+    .source{
+      border:1px solid rgba(127,227,255,.25);
+      border-radius:12px;
+      background:rgba(8,13,29,.75);
+      padding:10px;
+      margin-bottom:12px;
+      font-size:13px;
+      color:#d3dfff;
+      line-height:1.65;
+    }
+
+    .source summary{
+      cursor:pointer;
+      color:var(--cyan);
+      margin-bottom:8px;
+    }
+
+    .board{
+      display:grid;
+      grid-template-columns:1.1fr 1fr;
+      gap:12px;
+    }
+
+    .panel{
+      border:1px solid rgba(127,227,255,.23);
+      border-radius:14px;
+      background:rgba(7,14,33,.72);
+      padding:10px;
+    }
+
+    .sub{
+      font-size:12px;
+      color:var(--muted);
+      margin-bottom:8px;
+      letter-spacing:.2px;
+    }
+
+    .cards{
+      display:grid;
+      gap:8px;
+    }
+
+    .card{
+      border:1px solid rgba(127,227,255,.32);
+      background:rgba(17,28,61,.58);
+      color:var(--text);
+      border-radius:12px;
+      padding:10px;
+      text-align:left;
+      cursor:pointer;
+      transition:.2s;
+    }
+
+    .card:hover{transform:translateY(-2px)}
+    .card.active{
+      border-color:var(--warn);
+      box-shadow:0 0 0 2px rgba(255,219,115,.2);
+    }
+
+    .card strong{color:#ffe5a2}
+
+    .slots{
+      display:grid;
+      gap:8px;
+    }
+
+    .slot{
+      width:100%;
+      border:1px dashed rgba(127,227,255,.45);
+      background:rgba(11,20,46,.5);
+      color:var(--text);
+      border-radius:12px;
+      padding:10px;
+      text-align:left;
+      cursor:pointer;
+      min-height:72px;
+      transition:.2s;
+    }
+
+    .slot:hover{border-color:var(--cyan)}
+    .slot-title{display:block;font-weight:700;margin-bottom:7px;color:#d8e6ff}
+    .slot-tag{font-size:12px;color:var(--muted)}
+
+    .term-wall{
+      margin-top:10px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:7px;
+    }
+
+    .term{
+      border:1px solid rgba(127,227,255,.35);
+      background:rgba(12,20,42,.72);
+      color:#cde5ff;
+      padding:6px 9px;
+      border-radius:999px;
+      font-size:12px;
+      cursor:pointer;
+      transition:.2s;
+      user-select:none;
+    }
+
+    .term.on{
+      color:#08111f;
+      background:linear-gradient(90deg, #7fe3ff, #b7a0ff);
+      border-color:transparent;
+      box-shadow:0 0 16px rgba(127,227,255,.35);
+    }
+
+    .actions{
+      margin-top:12px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+    }
+
+    .btn{
+      border:1px solid rgba(127,227,255,.45);
+      background:linear-gradient(130deg, rgba(18,33,71,.95), rgba(17,22,56,.95));
+      color:var(--text);
+      border-radius:11px;
+      padding:10px 14px;
+      font-weight:700;
+      letter-spacing:.2px;
+      cursor:pointer;
+      transition:.2s;
+    }
+
+    .btn:hover{transform:translateY(-1px);border-color:var(--cyan)}
+    .btn.primary{
+      background:linear-gradient(120deg, #59bfff, #9068ff);
+      color:#081021;
+      border:none;
+    }
+
+    .feed{
+      flex:1;
+      min-width:220px;
+      border:1px solid rgba(127,227,255,.25);
+      border-radius:10px;
+      padding:8px 10px;
+      color:#b9cfff;
+      background:rgba(11,18,38,.6);
+      font-size:13px;
+    }
+
+    .route-list{
+      list-style:none;
+      margin:0;
+      padding:0;
+      display:grid;
+      gap:8px;
+    }
+
+    .route-item{
+      border:1px solid rgba(127,227,255,.3);
+      background:rgba(13,24,52,.64);
+      border-radius:12px;
+      padding:10px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      cursor:grab;
+    }
+
+    .route-item.dragging{opacity:.45}
+    .drag{
+      width:28px;
+      height:28px;
+      border-radius:8px;
+      border:1px solid rgba(127,227,255,.4);
+      display:grid;
+      place-items:center;
+      color:var(--cyan);
+      background:rgba(10,16,36,.7);
+      font-weight:700;
+      flex:none;
+    }
+
+    .route-text{
+      flex:1;
+      font-size:14px;
+      color:#dce9ff;
+    }
+
+    .move{
+      display:flex;
+      gap:4px;
+    }
+
+    .mini{
+      width:28px;height:28px;
+      border-radius:8px;
+      border:1px solid rgba(127,227,255,.4);
+      background:rgba(12,19,43,.9);
+      color:#dce8ff;
+      cursor:pointer;
+    }
+
+    .sandbox{
+      display:grid;
+      grid-template-columns:1fr .95fr;
+      gap:12px;
+    }
+
+    .ctl{
+      display:grid;
+      gap:9px;
+    }
+
+    .line{
+      border:1px solid rgba(127,227,255,.22);
+      border-radius:12px;
+      background:rgba(9,16,37,.72);
+      padding:10px;
+    }
+
+    .line b{
+      display:block;
+      margin-bottom:8px;
+      font-size:13px;
+      color:#d5e8ff;
+    }
+
+    .switches{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .sw{
+      display:flex;
+      align-items:center;
+      gap:6px;
+      border:1px solid rgba(127,227,255,.28);
+      border-radius:999px;
+      background:rgba(14,23,52,.64);
+      padding:6px 10px;
+      font-size:13px;
+      color:#cfe0ff;
+    }
+
+    input[type="checkbox"]{
+      accent-color:#70dbff;
+      width:16px;height:16px;
+    }
+
+    input[type="range"]{
+      width:100%;
+      accent-color:#7fe3ff;
+    }
+
+    .taskpick{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .view-toggle{
+      display:flex;
+      gap:8px;
+    }
+
+    .view-btn{
+      flex:1;
+      border:1px solid rgba(127,227,255,.3);
+      border-radius:10px;
+      padding:8px 10px;
+      background:rgba(11,19,44,.7);
+      color:#ccdefe;
+      cursor:pointer;
+    }
+
+    .view-btn.active{
+      background:linear-gradient(120deg, rgba(88,191,255,.35), rgba(150,110,255,.35));
+      border-color:rgba(127,227,255,.6);
+      color:#f0f7ff;
+    }
+
+    .meter{
+      margin-top:8px;
+      border:1px solid rgba(127,227,255,.24);
+      border-radius:12px;
+      background:rgba(8,14,31,.72);
+      padding:10px;
+    }
+
+    .meter .v{
+      font-size:30px;
+      font-weight:800;
+      letter-spacing:.8px;
+      color:#e8f4ff;
+    }
+
+    .bar{
+      margin-top:8px;
+      height:8px;
+      border-radius:999px;
+      background:rgba(140,170,240,.22);
+      overflow:hidden;
+    }
+
+    .bar > span{
+      display:block;height:100%;
+      width:0%;
+      border-radius:999px;
+      background:linear-gradient(90deg, #62d8ff, #8f7aff);
+      transition:width .35s ease;
+    }
+
+    .status{
+      margin-top:10px;
+      display:grid;
+      gap:7px;
+      font-size:13px;
+    }
+
+    .tag{
+      border:1px solid rgba(127,227,255,.22);
+      border-radius:10px;
+      padding:8px;
+      background:rgba(10,17,37,.64);
+      color:#cce0ff;
+    }
+
+    .ok{border-color:rgba(125,255,178,.5);color:#ccffe4;background:rgba(22,53,45,.44)}
+    .bad{border-color:rgba(255,122,149,.5);color:#ffd0da;background:rgba(56,24,34,.45)}
+
+    .settle{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+
+    .summary{
+      border:1px solid rgba(127,227,255,.25);
+      border-radius:14px;
+      background:rgba(7,13,32,.72);
+      padding:12px;
+      min-height:120px;
+    }
+
+    .summary b{
+      color:var(--cyan);
+      font-size:13px;
+      display:block;
+      margin-bottom:8px;
+    }
+
+    .score{
+      font-size:38px;
+      font-weight:900;
+      color:#f1f8ff;
+      line-height:1;
+      margin:4px 0 8px;
+      letter-spacing:1px;
+    }
+
+    .nav{
+      position:fixed;
+      left:50%;
+      bottom:14px;
+      transform:translateX(-50%);
+      width:min(860px, calc(100vw - 16px));
+      z-index:3;
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:8px;
+      padding:8px;
+      border:1px solid rgba(127,227,255,.34);
+      border-radius:14px;
+      background:rgba(7,12,29,.88);
+      backdrop-filter:blur(8px);
+    }
+
+    .nav a{
+      text-decoration:none;
+      text-align:center;
+      color:#e7f2ff;
+      border:1px solid rgba(127,227,255,.3);
+      border-radius:10px;
+      padding:11px 10px;
+      background:linear-gradient(130deg, rgba(16,28,60,.95), rgba(13,18,44,.95));
+      font-weight:700;
+      letter-spacing:.4px;
+    }
+
+    .nav a:hover{border-color:var(--cyan)}
+
+    @media (max-width:980px){
+      .mission,.board,.sandbox,.settle{grid-template-columns:1fr}
+      .psteps{grid-template-columns:1fr 1fr}
+    }
+
+    @media (max-width:640px){
+      .app{margin:10px auto 118px}
+      .hero{padding:14px}
+      .stage-head{padding:10px}
+      .stage-body{padding:10px}
+      .route-item{align-items:flex-start}
+      .drag{margin-top:2px}
+      .nav{grid-template-columns:1fr 1fr 1fr;gap:6px;padding:7px}
+      .nav a{padding:10px 6px;font-size:14px}
+    }
+  </style>
+</head>
+<body>
+<script src="/shared/book-catalog.js?v=1771754453141"></script>
+<script type="module" src="/shared/shell.js?v=1771754453141"></script>
+<reado-app-shell data-page="knowledge-map"></reado-app-shell>
+  <canvas id="storm"></canvas>
+  <div class="grid"></div>
+  <div class="scan"></div>
+
+  <main class="app">
+    <section class="hero">
+      <div class="bookline">
+        <span class="pill">Attention Rich：并行风暴</span>
+        <span>模块一：注意力总线接管计划</span>
+        <span>场景：夜间指挥室 · 英德 / 英法评测屏并行滚动</span>
+      </div>
+      <h1>速度、质量、成本，不止二选二</h1>
+      <p class="opening">你推开会议室门，墙上写着“速度、质量、成本只能选二？”。争论焦点是：是否继续依赖循环/卷积主干。你的任务不是写口号，而是在不伪造额外数据前提下，用摘要里可核对的结论给出可执行的架构与验证路线。</p>
+
+      <div class="mission">
+        <div class="mission-card">
+          <b>任务目标</b>
+          锚定原文术语与数字证据，完成从旧范式到 <code>new Transformer based solely on attention</code> 的接管决议，并落地验证顺序。
+        </div>
+        <div class="mission-card">
+          <b>成功判据</b>
+          同时覆盖 <code>WMT 2014 English-to-German 28.4 BLEU</code> 与 <code>English-to-French 41.8 BLEU / 3.5 days on eight GPUs</code>，且不引入来源外数据。
+        </div>
+      </div>
+
+      <div class="progress">
+        <div class="track"><span id="progressBar"></span></div>
+        <div class="psteps">
+          <div class="pstep active" data-step="1">情报锚定</div>
+          <div class="pstep" data-step="2">路线排序</div>
+          <div class="pstep" data-step="3">参数沙盘</div>
+          <div class="pstep" data-step="4">阶段结算</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="stages">
+      <article id="stage1" class="stage">
+        <div class="stage-head">
+          <h2 class="stage-title">阶段一：情报映射台（证据卡配对 + 术语锚点）</h2>
+          <span class="stage-id">STAGE 01</span>
+        </div>
+        <div class="stage-body">
+          <details class="source" open>
+            <summary>来源文本锚点（arxiv | https://arxiv.org/abs/1706.03762）</summary>
+            The dominant sequence transduction <code>models</code> are <code>based</code> on complex recurrent or convolutional neural networks in an encoder-decoder configuration. The <code>best</code> performing <code>models</code> also connect the encoder and decoder through an <code>attention</code> mechanism. We propose a <code>new</code> simple network architecture, the <code>Transformer</code>, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. Experiments on two machine <code>translation</code> <code>tasks</code> <code>show</code> these models to be superior in quality while being more parallelizable and requiring significantly less time to <code>train</code>. <code>Our model</code> achieves 28.4 <code>BLEU</code> on the <code>WMT</code> 2014 English-to-German translation task ... and 41.8 <code>BLEU</code> on English-to-French after <code>training</code> for 3.5 days on eight GPUs.
+          </details>
+
+          <div class="board">
+            <div class="panel">
+              <div class="sub">点击左侧情报卡，再点击右侧锚点槽完成配对</div>
+              <div class="cards">
+                <button class="card" data-card="A"><strong>情报卡A</strong><br>过去主流多为复杂循环或卷积结构；best 系统常用 attention 连接 encoder-decoder。</button>
+                <button class="card" data-card="B"><strong>情报卡B</strong><br><code>new transformer based solely on attention</code> 是方法核心，不是附属优化。</button>
+                <button class="card" data-card="C"><strong>情报卡C</strong><br><code>WMT 2014</code>：英德 <code>BLEU 28.4</code>、英法 <code>BLEU 41.8</code>；training 时间与成本显著下降。</button>
+                <button class="card" data-card="D"><strong>情报卡D</strong><br>术语锚点清单：the, models, and, best, translation, bleu, training, based, attention, new, transformer, tasks, show, our, model, wmt。</button>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="sub">锚点槽（目标语义）</div>
+              <div class="slots">
+                <button class="slot" data-slot="1"><span class="slot-title">旧范式与连接方式</span><span class="slot-tag">待接入</span></button>
+                <button class="slot" data-slot="2"><span class="slot-title">方法核心声明</span><span class="slot-tag">待接入</span></button>
+                <button class="slot" data-slot="3"><span class="slot-title">翻译指标与训练成本</span><span class="slot-tag">待接入</span></button>
+                <button class="slot" data-slot="4"><span class="slot-title">术语原词锚点</span><span class="slot-tag">待接入</span></button>
+              </div>
+
+              <div class="sub" style="margin-top:10px;">术语锚点雷达（需全部点亮）</div>
+              <div class="term-wall" id="termWall"></div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn primary" id="checkStage1">锁定阶段一</button>
+            <div class="feed" id="feed1">等待你完成四张情报卡映射，并点亮全部术语锚点。</div>
+          </div>
+        </div>
+      </article>
+
+      <article id="stage2" class="stage locked">
+        <div class="stage-head">
+          <h2 class="stage-title">阶段二：执行路线排程（可拖拽排序）</h2>
+          <span class="stage-id">STAGE 02</span>
+        </div>
+        <div class="stage-body">
+          <div class="source">
+            将步骤拖拽为“可执行且可核查”路线：先承认旧范式，再落点 <code>based solely on attention</code>，再跑双任务与指标，最后输出不伪造额外数据的决议。
+          </div>
+          <ul class="route-list" id="routeList">
+            <li class="route-item" draggable="true" data-step="metrics">
+              <div class="drag">⋮⋮</div>
+              <div class="route-text">记录结果：<code>WMT 2014</code> 英德 <code>28.4 BLEU</code>、英法 <code>41.8 BLEU</code>，并注明 training 成本显著下降。</div>
+              <div class="move"><button class="mini move-up">↑</button><button class="mini move-down">↓</button></div>
+            </li>
+            <li class="route-item" draggable="true" data-step="core">
+              <div class="drag">⋮⋮</div>
+              <div class="route-text">确立核心：<code>new Transformer</code>，<code>based solely on attention</code>，彻底去掉 recurrence 与 convolutions。</div>
+              <div class="move"><button class="mini move-up">↑</button><button class="mini move-down">↓</button></div>
+            </li>
+            <li class="route-item" draggable="true" data-step="history">
+              <div class="drag">⋮⋮</div>
+              <div class="route-text">复述来源：dominant models 过去主要是 complex recurrent 或 convolutional encoder-decoder。</div>
+              <div class="move"><button class="mini move-up">↑</button><button class="mini move-down">↓</button></div>
+            </li>
+            <li class="route-item" draggable="true" data-step="decision">
+              <div class="drag">⋮⋮</div>
+              <div class="route-text">形成执行令：不伪造额外数据，仅按摘要可验证证据推进架构接管。</div>
+              <div class="move"><button class="mini move-up">↑</button><button class="mini move-down">↓</button></div>
+            </li>
+            <li class="route-item" draggable="true" data-step="tasks">
+              <div class="drag">⋮⋮</div>
+              <div class="route-text">验证场景：执行 two machine translation tasks（English-to-German 与 English-to-French）。</div>
+              <div class="move"><button class="mini move-up">↑</button><button class="mini move-down">↓</button></div>
+            </li>
+          </ul>
+
+          <div class="actions">
+            <button class="btn primary" id="checkStage2">校验排序并锁定阶段二</button>
+            <div class="feed" id="feed2">拖拽或用↑↓调整顺序，目标是从“现状→核心→任务→指标→决议”。</div>
+          </div>
+        </div>
+      </article>
+
+      <article id="stage3" class="stage locked">
+        <div class="stage-head">
+          <h2 class="stage-title">阶段三：参数沙盘（开关 + 滑块 + 任务视图切换）</h2>
+          <span class="stage-id">STAGE 03</span>
+        </div>
+        <div class="stage-body">
+          <div class="sandbox">
+            <div class="ctl">
+              <div class="line">
+                <b>架构开关（必须符合原文）</b>
+                <div class="switches">
+                  <label class="sw"><input id="recSwitch" type="checkbox" checked>保留 recurrence</label>
+                  <label class="sw"><input id="convSwitch" type="checkbox" checked>保留 convolutions</label>
+                  <label class="sw"><input id="fakeSwitch" type="checkbox">伪造额外数据</label>
+                </div>
+              </div>
+
+              <div class="line">
+                <b><code>attention</code> 占比滑块（solely = 100%）</b>
+                <input id="attnRange" type="range" min="0" max="100" step="1" value="45">
+                <div style="margin-top:6px;color:var(--muted);font-size:13px;">当前占比：<span id="attnVal">45%</span></div>
+              </div>
+
+              <div class="line">
+                <b>验证任务覆盖（必须两项都选）</b>
+                <div class="taskpick">
+                  <label class="sw"><input id="deTask" type="checkbox">WMT 2014 English-to-German</label>
+                  <label class="sw"><input id="frTask" type="checkbox">WMT 2014 English-to-French</label>
+                </div>
+              </div>
+
+              <div class="line">
+                <b>训练时长预算（用于核对英法记录）</b>
+                <input id="dayRange" type="range" min="1" max="7" step="0.1" value="2.8">
+                <div style="margin-top:6px;color:var(--muted);font-size:13px;">当前预算：<span id="dayVal">2.8</span> 天（来源锚点：英法为 3.5 天 / 8 GPUs）</div>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="sub">任务视图切换（时间线切面）</div>
+              <div class="view-toggle">
+                <button class="view-btn active" data-view="de">EN→DE</button>
+                <button class="view-btn" data-view="fr">EN→FR</button>
+              </div>
+
+              <div class="meter">
+                <div style="font-size:13px;color:var(--muted);">当前视图证据值</div>
+                <div class="v"><span id="bleuValue">28.4</span> BLEU</div>
+                <div class="bar"><span id="bleuBar"></span></div>
+                <div id="detailLine" style="margin-top:8px;font-size:13px;color:#cfdeff;line-height:1.55;"></div>
+              </div>
+
+              <div class="status">
+                <div class="tag" id="archStatus">架构一致性：待评估</div>
+                <div class="tag" id="taskStatus">证据覆盖：待评估</div>
+                <div class="tag" id="costStatus">训练与成本：待评估</div>
+                <div class="tag" id="passStatus">任务结论：待评估</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn primary" id="checkStage3">锁定阶段三并生成结算</button>
+            <div class="feed" id="feed3">将 recurrence/convolutions 关闭，把 attention 拉到 100%，覆盖双任务，并确保不伪造数据。</div>
+          </div>
+        </div>
+      </article>
+
+      <article id="stage4" class="stage locked">
+        <div class="stage-head">
+          <h2 class="stage-title">阶段四：结算与执行令</h2>
+          <span class="stage-id">STAGE 04</span>
+        </div>
+        <div class="stage-body">
+          <div class="settle">
+            <div class="summary">
+              <b>架构决议</b>
+              <div id="finalArch">待生成</div>
+            </div>
+            <div class="summary">
+              <b>验证路线</b>
+              <div id="finalRoute">待生成</div>
+            </div>
+            <div class="summary">
+              <b>阶段得分</b>
+              <div class="score" id="finalScore">0</div>
+              <div id="finalBadge" style="color:#c8d8f8;">待评定</div>
+            </div>
+            <div class="summary">
+              <b>即时反馈</b>
+              <div id="finalFeedback">完成前三阶段后自动写入。</div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn" id="refreshSettle">刷新结算</button>
+            <div class="feed" id="feed4">结算面板会严格引用来源术语，不引入“如何写论文”类泛化建议。</div>
+          </div>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <nav class="nav">
+    <a href="/pages/gamified-learning-hub-dashboard-1.html">上一关</a>
+    <a href="/books/user-attention-rich-w4fncq-5391.html">返回书籍</a>
+    <a href="/books/user-attention-rich-w4fncq-5391.html">下一关</a>
+  </nav>
+
+  <script>
+    (() => {
+      const state = {
+        stage1:false,
+        stage2:false,
+        stage3:false,
+        settled:false,
+        selectedCard:null,
+        pairs:{},
+        terms:new Set(),
+        view:"de"
+      };
+
+      const terms = ["the","models","and","best","translation","bleu","training","based","attention","new","transformer","tasks","show","our","model","wmt"];
+      const correctPairs = {1:"A",2:"B",3:"C",4:"D"};
+      const correctOrder = ["history","core","tasks","metrics","decision"];
+
+      const progressBar = document.getElementById("progressBar");
+      const psteps = [...document.querySelectorAll(".pstep")];
+
+      function updateProgress(){
+        const done = [state.stage1, state.stage2, state.stage3, state.settled].filter(Boolean).length;
+        progressBar.style.width = `${(done / 4) * 100}%`;
+        psteps.forEach((el, idx) => {
+          el.classList.remove("done","active");
+          if(idx < done) el.classList.add("done");
+          else if(idx === done) el.classList.add("active");
+        });
+      }
+
+      function unlockStage(id){
+        document.getElementById(id).classList.remove("locked");
+      }
+
+      function updateSettlement(){
+        const attn = Number(document.getElementById("attnRange").value);
+        const fake = document.getElementById("fakeSwitch").checked;
+        const rec = document.getElementById("recSwitch").checked;
+        const conv = document.getElementById("convSwitch").checked;
+        const de = document.getElementById("deTask").checked;
+        const fr = document.getElementById("frTask").checked;
+        const day = Number(document.getElementById("dayRange").value);
+
+        let score = 0;
+        if(state.stage1) score += 30;
+        if(state.stage2) score += 30;
+        if(state.stage3) score += 30;
+        if(attn === 100) score += 4;
+        if(!fake) score += 3;
+        if(!rec && !conv) score += 3;
+
+        document.getElementById("finalScore").textContent = String(score);
+
+        let badge = "待评定";
+        if(score >= 95) badge = "指挥官评级：Attention Bus 接管成功";
+        else if(score >= 85) badge = "战术评级：方案可执行，仍需收紧参数";
+        else badge = "预警评级：证据链不完整";
+        document.getElementById("finalBadge").textContent = badge;
+
+        document.getElementById("finalArch").innerHTML =
+          `采用 <code>new Transformer</code>，要求 <code>based solely on attention</code>，并 <code>dispensing with recurrence and convolutions entirely</code>。`;
+
+        document.getElementById("finalRoute").innerHTML =
+          `1) 复述 dominant <code>models</code> 历史基线；2) 锁定核心方法；3) 覆盖两项 <code>translation tasks</code>；4) 核对 <code>WMT</code> 英德 <code>28.4 BLEU</code> 与英法 <code>41.8 BLEU</code> + <code>training 3.5 days on eight GPUs</code>。`;
+
+        const fb = [];
+        fb.push(state.stage1 ? "情报映射已闭环。" : "阶段一未完成。");
+        fb.push(state.stage2 ? "执行顺序可落地。" : "阶段二顺序未锁定。");
+        fb.push(state.stage3 ? "沙盘参数与来源一致。" : "阶段三仍与来源冲突。");
+        fb.push(fake ? "检测到“伪造额外数据”开关开启，违背任务约束。" : "未发现伪造额外数据。");
+        fb.push((de && fr) ? "双任务覆盖完整。" : "缺失 translation task 覆盖。");
+        fb.push(day >= 3.5 ? "训练时长预算覆盖英法锚点。" : "训练时长预算未覆盖 3.5 天锚点。");
+        document.getElementById("finalFeedback").textContent = fb.join(" ");
+        document.getElementById("feed4").textContent = "结算已刷新：结果仅使用来源中可核对术语与数字。";
+      }
+
+      updateProgress();
+
+      const termWall = document.getElementById("termWall");
+      terms.forEach(t => {
+        const b = document.createElement("button");
+        b.className = "term";
+        b.textContent = t;
+        b.dataset.term = t;
+        b.addEventListener("click", () => {
+          if(state.terms.has(t)){
+            state.terms.delete(t);
+            b.classList.remove("on");
+          }else{
+            state.terms.add(t);
+            b.classList.add("on");
+          }
+          document.getElementById("feed1").textContent = `术语锚点已点亮 ${state.terms.size}/${terms.length}。`;
+        });
+        termWall.appendChild(b);
+      });
+
+      const cards = [...document.querySelectorAll(".card")];
+      const slots = [...document.querySelectorAll(".slot")];
+
+      cards.forEach(card => {
+        card.addEventListener("click", () => {
+          cards.forEach(c => c.classList.remove("active"));
+          card.classList.add("active");
+          state.selectedCard = card.dataset.card;
+          document.getElementById("feed1").textContent = `已选择情报卡 ${state.selectedCard}，请点击目标锚点槽。`;
+        });
+      });
+
+      slots.forEach(slot => {
+        slot.addEventListener("click", () => {
+          if(!state.selectedCard){
+            document.getElementById("feed1").textContent = "先选择左侧情报卡，再绑定锚点槽。";
+            return;
+          }
+          const slotId = slot.dataset.slot;
+          const cardId = state.selectedCard;
+          for(const s of slots){
+            if(s.dataset.assigned === cardId){
+              s.dataset.assigned = "";
+              s.querySelector(".slot-tag").textContent = "待接入";
+            }
+          }
+          slot.dataset.assigned = cardId;
+          state.pairs[slotId] = cardId;
+          slot.querySelector(".slot-tag").textContent = `已接入 情报卡${cardId}`;
+          document.getElementById("feed1").textContent = `情报卡 ${cardId} 已绑定到槽位 ${slotId}。`;
+        });
+      });
+
+      document.getElementById("checkStage1").addEventListener("click", () => {
+        const pairOk = Object.entries(correctPairs).every(([k,v]) => state.pairs[k] === v);
+        const termOk = state.terms.size === terms.length;
+        if(pairOk && termOk){
+          state.stage1 = true;
+          unlockStage("stage2");
+          updateProgress();
+          document.getElementById("feed1").textContent = "阶段一锁定成功：证据映射与术语锚点全部通过。";
+          document.getElementById("stage2").scrollIntoView({behavior:"smooth", block:"start"});
+        }else{
+          const reason = [];
+          if(!pairOk) reason.push("证据卡配对未完成");
+          if(!termOk) reason.push(`术语锚点 ${state.terms.size}/${terms.length}`);
+          document.getElementById("feed1").textContent = `未通过：${reason.join("；")}。`;
+        }
+      });
+
+      const routeList = document.getElementById("routeList");
+      let dragged = null;
+
+      routeList.addEventListener("dragstart", e => {
+        const li = e.target.closest(".route-item");
+        if(!li) return;
+        dragged = li;
+        li.classList.add("dragging");
+      });
+
+      routeList.addEventListener("dragend", e => {
+        const li = e.target.closest(".route-item");
+        if(li) li.classList.remove("dragging");
+      });
+
+      routeList.addEventListener("dragover", e => {
+        e.preventDefault();
+        if(!dragged) return;
+        const after = getAfterElement(routeList, e.clientY);
+        if(after == null) routeList.appendChild(dragged);
+        else routeList.insertBefore(dragged, after);
+      });
+
+      function getAfterElement(container, y){
+        const els = [...container.querySelectorAll(".route-item:not(.dragging)")];
+        return els.reduce((closest, child) => {
+          const box = child.getBoundingClientRect();
+          const offset = y - box.top - box.height / 2;
+          if(offset < 0 && offset > closest.offset){
+            return {offset, element:child};
+          }
+          return closest;
+        }, {offset:Number.NEGATIVE_INFINITY, element:null}).element;
+      }
+
+      routeList.addEventListener("click", e => {
+        if(!e.target.classList.contains("mini")) return;
+        const li = e.target.closest(".route-item");
+        if(!li) return;
+        if(e.target.classList.contains("move-up") && li.previousElementSibling){
+          routeList.insertBefore(li, li.previousElementSibling);
+        }
+        if(e.target.classList.contains("move-down") && li.nextElementSibling){
+          routeList.insertBefore(li.nextElementSibling, li);
+        }
+      });
+
+      document.getElementById("checkStage2").addEventListener("click", () => {
+        const current = [...routeList.querySelectorAll(".route-item")].map(i => i.dataset.step);
+        const ok = current.every((v, i) => v === correctOrder[i]);
+        if(ok){
+          state.stage2 = true;
+          unlockStage("stage3");
+          updateProgress();
+          document.getElementById("feed2").textContent = "阶段二锁定成功：执行路线已具备可执行顺序。";
+          document.getElementById("stage3").scrollIntoView({behavior:"smooth", block:"start"});
+        }else{
+          document.getElementById("feed2").textContent = "排序未通过：请对齐“现状→核心→任务→指标→决议”。";
+        }
+      });
+
+      const recSwitch = document.getElementById("recSwitch");
+      const convSwitch = document.getElementById("convSwitch");
+      const fakeSwitch = document.getElementById("fakeSwitch");
+      const attnRange = document.getElementById("attnRange");
+      const deTask = document.getElementById("deTask");
+      const frTask = document.getElementById("frTask");
+      const dayRange = document.getElementById("dayRange");
+      const dayVal = document.getElementById("dayVal");
+      const attnVal = document.getElementById("attnVal");
+      const archStatus = document.getElementById("archStatus");
+      const taskStatus = document.getElementById("taskStatus");
+      const costStatus = document.getElementById("costStatus");
+      const passStatus = document.getElementById("passStatus");
+      const bleuValue = document.getElementById("bleuValue");
+      const bleuBar = document.getElementById("bleuBar");
+      const detailLine = document.getElementById("detailLine");
+      const viewBtns = [...document.querySelectorAll(".view-btn")];
+
+      function setTag(el, ok, text){
+        el.textContent = text;
+        el.classList.remove("ok","bad");
+        el.classList.add(ok ? "ok" : "bad");
+      }
+
+      function updateView(){
+        if(state.view === "de"){
+          bleuValue.textContent = "28.4";
+          bleuBar.style.width = `${(28.4/45)*100}%`;
+          detailLine.innerHTML = `EN→DE：<code>WMT 2014 English-to-German translation task</code> 达到 <code>28.4 BLEU</code>，并“improving over the existing best results ... by over 2 BLEU”。`;
+        }else{
+          bleuValue.textContent = "41.8";
+          bleuBar.style.width = `${(41.8/45)*100}%`;
+          detailLine.innerHTML = `EN→FR：<code>WMT 2014 English-to-French</code> 建立 <code>41.8 BLEU</code>，并给出 <code>training for 3.5 days on eight GPUs</code>，训练成本为文献 best 模型的一小部分。`;
+        }
+      }
+
+      function updateSandbox(){
+        const rec = recSwitch.checked;
+        const conv = convSwitch.checked;
+        const fake = fakeSwitch.checked;
+        const attn = Number(attnRange.value);
+        const day = Number(dayRange.value);
+        const de = deTask.checked;
+        const fr = frTask.checked;
+
+        attnVal.textContent = `${attn}%`;
+        dayVal.textContent = day.toFixed(1);
+
+        const archOk = !rec && !conv && attn === 100;
+        const taskOk = de && fr;
+        const costOk = day >= 3.5 && !fake;
+        const pass = archOk && taskOk && costOk;
+
+        setTag(archStatus, archOk, archOk
+          ? "架构一致性：满足 based solely on attention，且去除 recurrence / convolutions。"
+          : "架构一致性：与“based solely on attention, dispensing with recurrence and convolutions entirely”冲突。");
+
+        setTag(taskStatus, taskOk, taskOk
+          ? "证据覆盖：已覆盖两项 machine translation tasks（EN→DE 与 EN→FR）。"
+          : "证据覆盖：需同时勾选 EN→DE 与 EN→FR 两项任务。");
+
+        setTag(costStatus, costOk, costOk
+          ? "训练与成本：未伪造数据，且时长预算覆盖英法 3.5 天锚点。"
+          : "训练与成本：请关闭“伪造额外数据”，并将预算至少拉到 3.5 天。");
+
+        setTag(passStatus, pass, pass
+          ? "任务结论：可执行。你已证明速度、质量、成本存在第三条路径。"
+          : "任务结论：未达成。请继续调整开关与滑块。");
+      }
+
+      viewBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+          viewBtns.forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          state.view = btn.dataset.view;
+          updateView();
+        });
+      });
+
+      [recSwitch, convSwitch, fakeSwitch, attnRange, deTask, frTask, dayRange].forEach(el => {
+        el.addEventListener("input", updateSandbox);
+        el.addEventListener("change", updateSandbox);
+      });
+
+      updateView();
+      updateSandbox();
+
+      document.getElementById("checkStage3").addEventListener("click", () => {
+        const rec = recSwitch.checked;
+        const conv = convSwitch.checked;
+        const fake = fakeSwitch.checked;
+        const attn = Number(attnRange.value);
+        const day = Number(dayRange.value);
+        const de = deTask.checked;
+        const fr = frTask.checked;
+
+        const pass = (!rec && !conv && attn === 100 && !fake && de && fr && day >= 3.5);
+        if(pass){
+          state.stage3 = true;
+          unlockStage("stage4");
+          state.settled = true;
+          updateSettlement();
+          updateProgress();
+          document.getElementById("feed3").textContent = "阶段三锁定成功：参数与来源证据一致，结算已生成。";
+          document.getElementById("stage4").scrollIntoView({behavior:"smooth", block:"start"});
+        }else{
+          document.getElementById("feed3").textContent = "未通过：请确保 solely attention=100%，关闭 recurrence/convolutions 与伪造数据，并覆盖双任务 + 3.5天锚点。";
+        }
+      });
+
+      document.getElementById("refreshSettle").addEventListener("click", () => {
+        updateSettlement();
+      });
+
+      const canvas = document.getElementById("storm");
+      const ctx = canvas.getContext("2d");
+      let w, h;
+      const particles = Array.from({length:52}, () => ({
+        x: Math.random(),
+        y: Math.random(),
+        vx: (Math.random() - .5) * .00065,
+        vy: (Math.random() - .5) * .00065,
+        r: 1 + Math.random() * 2
+      }));
+
+      function resize(){
+        w = canvas.width = window.innerWidth * devicePixelRatio;
+        h = canvas.height = window.innerHeight * devicePixelRatio;
+        ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+      }
+
+      function frame(){
+        ctx.clearRect(0,0,window.innerWidth,window.innerHeight);
+        for(const p of particles){
+          p.x += p.vx; p.y += p.vy;
+          if(p.x < 0 || p.x > 1) p.vx *= -1;
+          if(p.y < 0 || p.y > 1) p.vy *= -1;
+
+          const px = p.x * window.innerWidth;
+          const py = p.y * window.innerHeight;
+
+          ctx.beginPath();
+          ctx.fillStyle = "rgba(141,213,255,.45)";
+          ctx.arc(px, py, p.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        for(let i=0;i<particles.length;i++){
+          for(let j=i+1;j<particles.length;j++){
+            const a = particles[i], b = particles[j];
+            const dx = (a.x - b.x) * window.innerWidth;
+            const dy = (a.y - b.y) * window.innerHeight;
+            const d = Math.hypot(dx,dy);
+            if(d < 130){
+              ctx.beginPath();
+              ctx.strokeStyle = `rgba(127,227,255,${0.15 - d/950})`;
+              ctx.lineWidth = 1;
+              ctx.moveTo(a.x * window.innerWidth, a.y * window.innerHeight);
+              ctx.lineTo(b.x * window.innerWidth, b.y * window.innerHeight);
+              ctx.stroke();
+            }
+          }
+        }
+        requestAnimationFrame(frame);
+      }
+
+      window.addEventListener("resize", resize);
+      resize();
+      frame();
+    })();
+  </script>
+
+
+<script>
+(() => {
+  
+  
+  
+})();
+</script>
+</body>
+</html>

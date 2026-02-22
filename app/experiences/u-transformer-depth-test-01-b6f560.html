@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Transformer Depth Test — Module 1: The Depth Decision</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --night:#0F172A;
+      --sky:#60A5FA;
+      --violet:#A78BFA;
+      --lime:#84CC16;
+      --ink:#dbe7ff;
+      --muted:#8ca0c4;
+      --panel:rgba(14,24,46,.68);
+      --border:rgba(132,204,22,.22);
+      --warn:#f59e0b;
+      --bad:#ef4444;
+      --good:#22c55e;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:"Manrope",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+      color:var(--ink);
+      background:
+        radial-gradient(circle at 15% 20%, rgba(96,165,250,.23), transparent 35%),
+        radial-gradient(circle at 82% 8%, rgba(167,139,250,.18), transparent 28%),
+        radial-gradient(circle at 50% 110%, rgba(132,204,22,.12), transparent 42%),
+        var(--night);
+      overflow-x:hidden;
+    }
+    body::before{
+      content:"";
+      position:fixed; inset:0;
+      background:
+        linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px);
+      background-size:28px 28px;
+      mask-image:radial-gradient(circle at 50% 50%, black 35%, transparent 95%);
+      pointer-events:none;
+      z-index:-1;
+    }
+    .app{
+      max-width:1300px;
+      margin:0 auto;
+      padding:20px 18px 28px;
+      display:grid;
+      gap:14px;
+    }
+    .panel{
+      background:var(--panel);
+      border:1px solid rgba(96,165,250,.2);
+      border-radius:16px;
+      backdrop-filter: blur(8px);
+      box-shadow:0 8px 40px rgba(4,7,18,.35);
+    }
+    .header{
+      display:grid;
+      grid-template-columns:1.4fr .8fr;
+      gap:12px;
+      padding:16px;
+    }
+    .title{
+      line-height:1.2;
+    }
+    .kicker{
+      font-family:"JetBrains Mono", monospace;
+      color:var(--lime);
+      font-size:12px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+    h1{
+      margin:.2rem 0 .4rem;
+      font-size:clamp(1.2rem,2.6vw,2rem);
+      font-weight:800;
+    }
+    .scene{
+      color:var(--muted);
+      font-size:14px;
+      margin-bottom:8px;
+    }
+    .objective{
+      font-size:14px;
+      color:#c4d4f8;
+      margin:0;
+    }
+    .nav-top{
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .nav-top .mission{
+      font-size:13px;
+      color:#d4def7;
+      background:rgba(15,23,42,.55);
+      border:1px solid rgba(167,139,250,.35);
+      border-radius:12px;
+      padding:10px;
+    }
+    .nav-links{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .btn{
+      border:none;
+      border-radius:10px;
+      padding:10px 12px;
+      font-weight:700;
+      font-size:13px;
+      text-decoration:none;
+      color:#eef5ff;
+      background:linear-gradient(135deg, rgba(96,165,250,.28), rgba(167,139,250,.22));
+      border:1px solid rgba(96,165,250,.45);
+      cursor:pointer;
+      transition:.2s transform,.2s box-shadow,.2s border-color;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:7px;
+    }
+    .btn:hover{transform:translateY(-1px); box-shadow:0 8px 20px rgba(96,165,250,.15)}
+    .btn:active{transform:translateY(0)}
+    .layout{
+      display:grid;
+      grid-template-columns:1.1fr .9fr;
+      gap:14px;
+    }
+    .left-stack,.right-stack{
+      display:grid; gap:14px;
+    }
+    .panel-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      margin-bottom:12px;
+    }
+    .panel h2{
+      margin:0;
+      font-size:1.02rem;
+      font-weight:800;
+      letter-spacing:.01em;
+    }
+    .mono{
+      font-family:"JetBrains Mono",monospace;
+      font-size:12px;
+      color:#9dc0ff;
+    }
+    .stage{
+      padding:14px;
+    }
+    .timeline-switch{
+      display:inline-grid;
+      grid-template-columns:1fr 1fr;
+      background:rgba(15,23,42,.7);
+      border:1px solid rgba(132,204,22,.3);
+      border-radius:11px;
+      overflow:hidden;
+    }
+    .timeline-btn{
+      padding:9px 12px;
+      font-size:12px;
+      font-weight:700;
+      color:#bed4ff;
+      cursor:pointer;
+      background:transparent;
+      border:none;
+    }
+    .timeline-btn.active{
+      background:linear-gradient(120deg, rgba(96,165,250,.35), rgba(132,204,22,.18));
+      color:#fff;
+    }
+    .diagram-wrap{
+      margin-top:10px;
+      padding:12px;
+      border-radius:12px;
+      border:1px solid rgba(96,165,250,.2);
+      background:rgba(15,23,42,.7);
+    }
+    svg{width:100%;height:auto;display:block}
+    .before-layer,.after-layer{transition:opacity .35s ease, transform .35s ease}
+    #archDiagram[data-mode="before"] .after-layer{opacity:.12; transform:translateY(8px)}
+    #archDiagram[data-mode="before"] .before-layer{opacity:1; transform:translateY(0)}
+    #archDiagram[data-mode="after"] .before-layer{opacity:.14; transform:translateY(-6px)}
+    #archDiagram[data-mode="after"] .after-layer{opacity:1; transform:translateY(0)}
+    .consequence-list{
+      margin:10px 0 0;
+      padding:0;
+      list-style:none;
+      display:grid;
+      gap:7px;
+    }
+    .consequence-list li{
+      font-size:13px;
+      color:#d5e3ff;
+      padding:8px 10px;
+      background:rgba(15,23,42,.55);
+      border-radius:10px;
+      border:1px solid rgba(96,165,250,.18);
+    }
+
+    .sandbox{
+      padding:14px;
+    }
+    .sliders{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px 14px;
+    }
+    .slider-row{
+      background:rgba(12,20,39,.62);
+      border:1px solid rgba(167,139,250,.25);
+      border-radius:11px;
+      padding:9px 10px;
+    }
+    .slider-row label{
+      display:flex; justify-content:space-between; align-items:center;
+      font-size:12px; color:#c8d7f7; margin-bottom:8px;
+    }
+    input[type="range"]{
+      width:100%;
+      accent-color:#60A5FA;
+      cursor:pointer;
+    }
+    .sandbox-metrics{
+      margin-top:12px;
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:10px;
+    }
+    .metric{
+      background:rgba(9,15,31,.8);
+      border:1px solid rgba(96,165,250,.2);
+      border-radius:11px;
+      padding:10px;
+    }
+    .metric .label{
+      font-size:11px; color:#9fb6de; margin-bottom:6px;
+      font-family:"JetBrains Mono",monospace;
+    }
+    .metric .value{
+      font-size:1rem;
+      font-weight:800;
+      color:#f3f8ff;
+    }
+    .bar{
+      margin-top:7px;
+      height:6px; border-radius:99px;
+      background:rgba(255,255,255,.08);
+      overflow:hidden;
+    }
+    .bar i{
+      display:block; height:100%;
+      width:40%;
+      background:linear-gradient(90deg, var(--sky), var(--violet));
+    }
+    .bar.warn i{background:linear-gradient(90deg,var(--warn),#f97316)}
+    .bar.good i{background:linear-gradient(90deg,var(--lime),#22c55e)}
+
+    .hypothesis{
+      padding:14px;
+    }
+    .claim-grid{
+      display:grid;
+      gap:8px;
+    }
+    .claim{
+      border:1px solid rgba(96,165,250,.3);
+      background:rgba(10,17,35,.7);
+      color:#dbe8ff;
+      border-radius:12px;
+      padding:10px;
+      text-align:left;
+      cursor:pointer;
+      font-size:13px;
+      transition:.18s;
+    }
+    .claim.active{
+      border-color:rgba(132,204,22,.58);
+      background:linear-gradient(120deg, rgba(96,165,250,.22), rgba(132,204,22,.13));
+      box-shadow:0 0 0 1px rgba(132,204,22,.25) inset;
+    }
+    .confidence{
+      margin-top:10px;
+      background:rgba(10,16,30,.65);
+      border-radius:11px;
+      border:1px solid rgba(167,139,250,.24);
+      padding:10px;
+    }
+    .confidence .row{
+      display:flex; justify-content:space-between; font-size:12px; color:#c9dafd;
+    }
+    .run{
+      margin-top:10px;
+      width:100%;
+      background:linear-gradient(120deg, rgba(132,204,22,.35), rgba(96,165,250,.3));
+      border:1px solid rgba(132,204,22,.5);
+      color:#fff;
+      font-weight:800;
+      padding:11px 12px;
+      border-radius:11px;
+      cursor:pointer;
+    }
+    .feedback{
+      margin-top:10px;
+      border-radius:10px;
+      padding:10px;
+      border:1px solid rgba(96,165,250,.2);
+      background:rgba(10,18,34,.8);
+      font-size:13px;
+      line-height:1.38;
+      min-height:72px;
+      color:#d8e5ff;
+    }
+
+    .feed{
+      margin-top:12px;
+      border-top:1px solid rgba(255,255,255,.08);
+      padding-top:10px;
+    }
+    .feed ul{
+      list-style:none; margin:0; padding:0; display:grid; gap:7px;
+      max-height:180px; overflow:auto;
+    }
+    .feed li{
+      font-family:"JetBrains Mono",monospace;
+      font-size:11px;
+      color:#a8c5f8;
+      background:rgba(10,16,28,.62);
+      border:1px solid rgba(96,165,250,.15);
+      border-radius:8px;
+      padding:7px 8px;
+    }
+
+    .sorting{
+      padding:14px;
+    }
+    .sorting-grid{
+      display:grid;
+      grid-template-columns:1fr 1.1fr;
+      gap:12px;
+    }
+    .deck{
+      background:rgba(11,18,34,.7);
+      border:1px solid rgba(96,165,250,.2);
+      border-radius:12px;
+      padding:10px;
+      display:grid;
+      gap:8px;
+      align-content:start;
+      min-height:270px;
+    }
+    .evidence-card{
+      border:1px solid rgba(167,139,250,.35);
+      background:rgba(15,23,42,.85);
+      border-radius:10px;
+      padding:9px;
+      font-size:12.6px;
+      line-height:1.35;
+      color:#deebff;
+      cursor:grab;
+      user-select:none;
+      transition:.15s;
+    }
+    .evidence-card:active{cursor:grabbing}
+    .evidence-card.selected{outline:2px solid rgba(132,204,22,.6)}
+    .evidence-card.correct{
+      border-color:rgba(132,204,22,.68);
+      box-shadow:0 0 0 1px rgba(132,204,22,.3) inset;
+    }
+    .evidence-card.wrong{
+      border-color:rgba(239,68,68,.7);
+      box-shadow:0 0 0 1px rgba(239,68,68,.24) inset;
+    }
+    .buckets{
+      display:grid;
+      gap:9px;
+    }
+    .bucket{
+      background:rgba(8,14,27,.78);
+      border:1px dashed rgba(96,165,250,.38);
+      border-radius:11px;
+      padding:8px;
+      min-height:84px;
+    }
+    .bucket h4{
+      margin:0 0 7px;
+      font-size:12px;
+      color:#c9dbfd;
+      display:flex; justify-content:space-between;
+    }
+    .bucket .body{
+      display:grid; gap:7px;
+      min-height:42px;
+    }
+    .bucket.active-drop{border-color:rgba(132,204,22,.8)}
+    .sorting-status{
+      margin-top:10px;
+      display:flex; justify-content:space-between; gap:10px;
+      font-size:12px;
+      color:#c2d7ff;
+      background:rgba(10,17,31,.7);
+      border:1px solid rgba(96,165,250,.2);
+      border-radius:10px;
+      padding:8px 10px;
+    }
+
+    .summary{
+      padding:14px;
+    }
+    .phases{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:8px;
+      margin-top:10px;
+    }
+    .phase{
+      border:1px solid rgba(96,165,250,.22);
+      border-radius:10px;
+      padding:8px;
+      font-size:12px;
+      background:rgba(10,16,30,.65);
+      color:#bfd3fa;
+    }
+    .phase.done{
+      border-color:rgba(132,204,22,.6);
+      color:#e4f6c9;
+      background:rgba(25,40,20,.35);
+    }
+    .progress{
+      margin-top:10px;
+      height:8px; border-radius:99px;
+      background:rgba(255,255,255,.08);
+      overflow:hidden;
+    }
+    .progress i{
+      display:block;height:100%;width:0%;
+      background:linear-gradient(90deg,var(--sky),var(--lime));
+      transition:width .3s ease;
+    }
+    .recommendation{
+      margin-top:10px;
+      border-radius:10px;
+      padding:10px;
+      border:1px solid rgba(132,204,22,.25);
+      background:rgba(15,23,42,.86);
+      font-size:13px;
+      line-height:1.4;
+    }
+    .lexicon{
+      margin-top:10px;
+      font-family:"JetBrains Mono",monospace;
+      font-size:11px;
+      color:#9cc3ff;
+      background:rgba(8,14,26,.7);
+      border:1px solid rgba(96,165,250,.18);
+      border-radius:9px;
+      padding:8px;
+      word-break:break-word;
+    }
+    .footer-nav{
+      display:flex;
+      gap:10px;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+    }
+
+    @media (max-width:1050px){
+      .layout{grid-template-columns:1fr}
+      .header{grid-template-columns:1fr}
+    }
+    @media (max-width:760px){
+      .sliders,.sandbox-metrics,.phases,.sorting-grid{grid-template-columns:1fr}
+      .footer-nav{justify-content:stretch}
+      .btn{flex:1}
+      .nav-links .btn{flex:1}
+    }
+  </style>
+</head>
+<body>
+<script src="/shared/book-catalog.js?v=1771754453141"></script>
+<script type="module" src="/shared/shell.js?v=1771754453141"></script>
+<reado-app-shell data-page="knowledge-map"></reado-app-shell>
+  <div class="app">
+    <section class="panel header">
+      <div class="title">
+        <div class="kicker">Transformer Depth Test · Module 1</div>
+        <h1>The Depth Decision — Research Theater</h1>
+        <div class="scene">War Room Alpha, 02:10. A wall of dashboards compares recurrent and convolutional lineages against a new attention-first proposal.</div>
+        <p class="objective"><strong>Mission objective:</strong> Choose an architecture and rollout narrative that reflects evidence strength without overreach. Your team waits for your call: preserve short-term calm with familiar designs, or commit to structural change for speed and quality while absorbing organizational shock.</p>
+      </div>
+      <div class="nav-top">
+        <div class="mission">
+          Intel states that the dominant sequence transduction models were recurrent or convolutional encoder-decoder systems, and the best models already used attention links between encoder and decoder. The proposed transformer is new, based solely on attention, and reported strong translation BLEU with reduced training time.
+        </div>
+        <div class="nav-links">
+          <a class="btn" href="/pages/gamified-learning-hub-dashboard-1.html">◀ Prev</a>
+          <a class="btn" href="/books/user-transformer-depth-test-wfghux-9ab5.html">Hub</a>
+          <a class="btn" href="/books/user-transformer-depth-test-wfghux-9ab5.html">Next ▶</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="layout">
+      <div class="left-stack">
+        <section class="panel stage">
+          <div class="panel-head">
+            <h2>Timeline Switch & Structural Consequences</h2>
+            <div class="timeline-switch" role="tablist" aria-label="Timeline switch">
+              <button class="timeline-btn active" data-timeline="before">Before Shift</button>
+              <button class="timeline-btn" data-timeline="after">After Shift</button>
+            </div>
+          </div>
+          <div class="diagram-wrap">
+            <svg id="archDiagram" data-mode="before" viewBox="0 0 860 290" aria-label="Architecture comparison diagram">
+              <defs>
+                <linearGradient id="gSky" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#60A5FA" stop-opacity="0.95"/>
+                  <stop offset="100%" stop-color="#A78BFA" stop-opacity="0.95"/>
+                </linearGradient>
+                <linearGradient id="gLime" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#84CC16"/>
+                  <stop offset="100%" stop-color="#60A5FA"/>
+                </linearGradient>
+                <filter id="softGlow" x="-40%" y="-40%" width="180%" height="180%">
+                  <feGaussianBlur stdDeviation="4" result="b"/>
+                  <feMerge>
+                    <feMergeNode in="b"/>
+                    <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
+                </filter>
+              </defs>
+
+              <rect x="16" y="20" width="828" height="248" rx="16" fill="rgba(12,19,36,.72)" stroke="rgba(96,165,250,.25)"/>
+
+              <g class="before-layer">
+                <text x="46" y="54" fill="#9cc4ff" font-size="14" font-family="JetBrains Mono">dominant models: recurrent or convolutional encoder-decoder</text>
+                <rect x="62" y="90" width="130" height="42" rx="9" fill="rgba(96,165,250,.2)" stroke="#60A5FA"/>
+                <text x="85" y="116" fill="#dceaff" font-size="13">Encoder RNN/CNN</text>
+
+                <rect x="254" y="90" width="125" height="42" rx="9" fill="rgba(96,165,250,.14)" stroke="#60A5FA"/>
+                <text x="285" y="116" fill="#dceaff" font-size="13">Attention Link</text>
+
+                <rect x="438" y="90" width="130" height="42" rx="9" fill="rgba(96,165,250,.2)" stroke="#60A5FA"/>
+                <text x="468" y="116" fill="#dceaff" font-size="13">Decoder RNN/CNN</text>
+
+                <path d="M194 111 C220 111, 230 111, 252 111" stroke="#60A5FA" stroke-width="2.8" fill="none"/>
+                <path d="M381 111 C410 111, 420 111, 436 111" stroke="#60A5FA" stroke-width="2.8" fill="none"/>
+
+                <path d="M120 148 C120 190, 155 193, 155 147" stroke="#A78BFA" stroke-width="2" fill="none" stroke-dasharray="4 4"/>
+                <text x="70" y="208" fill="#b3c9f3" font-size="12">recurrence/convolution retained</text>
+              </g>
+
+              <g class="after-layer">
+                <text x="46" y="54" fill="#c2f08a" font-size="14" font-family="JetBrains Mono">new transformer: based solely on attention mechanisms</text>
+                <rect x="68" y="176" width="168" height="44" rx="10" fill="rgba(132,204,22,.15)" stroke="#84CC16"/>
+                <text x="95" y="203" fill="#e8f9ce" font-size="13">Input Embeddings</text>
+
+                <rect x="290" y="166" width="135" height="56" rx="11" fill="rgba(132,204,22,.2)" stroke="#84CC16"/>
+                <text x="302" y="189" fill="#f2ffe0" font-size="13">Multi-Head</text>
+                <text x="324" y="207" fill="#f2ffe0" font-size="13">Attention</text>
+
+                <rect x="488" y="166" width="135" height="56" rx="11" fill="rgba(132,204,22,.2)" stroke="#84CC16"/>
+                <text x="501" y="189" fill="#f2ffe0" font-size="13">Feed-Forward</text>
+                <text x="514" y="207" fill="#f2ffe0" font-size="13">Blocks</text>
+
+                <rect x="675" y="176" width="120" height="44" rx="10" fill="rgba(132,204,22,.16)" stroke="#84CC16"/>
+                <text x="695" y="203" fill="#e8f9ce" font-size="13">Translation</text>
+
+                <path d="M238 198 C264 190, 276 184, 288 193" stroke="url(#gLime)" stroke-width="3" fill="none" filter="url(#softGlow)"/>
+                <path d="M428 193 C456 180, 468 181, 486 192" stroke="url(#gLime)" stroke-width="3" fill="none" filter="url(#softGlow)"/>
+                <path d="M626 194 C650 194, 662 194, 674 194" stroke="url(#gLime)" stroke-width="3" fill="none" filter="url(#softGlow)"/>
+              </g>
+            </svg>
+          </div>
+          <ul id="consequenceList" class="consequence-list"></ul>
+        </section>
+
+        <section class="panel sandbox">
+          <div class="panel-head">
+            <h2>Parameter Sandbox · Instant System Response</h2>
+            <span class="mono">calibrate decision pressure</span>
+          </div>
+          <div class="sliders">
+            <div class="slider-row">
+              <label>Attention ratio <span id="vAttention">82%</span></label>
+              <input id="attentionRange" type="range" min="40" max="100" value="82">
+            </div>
+            <div class="slider-row">
+              <label>Legacy recurrence share <span id="vRecurrence">10%</span></label>
+              <input id="recurrenceRange" type="range" min="0" max="60" value="10">
+            </div>
+            <div class="slider-row">
+              <label>Narrative breadth <span id="vNarrative">5/10</span></label>
+              <input id="narrativeRange" type="range" min="1" max="10" value="5">
+            </div>
+            <div class="slider-row">
+              <label>Compute allocation (GPUs) <span id="vGpus">8</span></label>
+              <input id="gpuRange" type="range" min="4" max="16" value="8">
+            </div>
+          </div>
+          <div class="sandbox-metrics">
+            <div class="metric">
+              <div class="label">WMT14 EN-DE BLEU</div>
+              <div class="value" id="mEnDe">28.4</div>
+              <div class="bar good"><i id="bEnDe"></i></div>
+            </div>
+            <div class="metric">
+              <div class="label">WMT14 EN-FR BLEU</div>
+              <div class="value" id="mEnFr">41.8</div>
+              <div class="bar good"><i id="bEnFr"></i></div>
+            </div>
+            <div class="metric">
+              <div class="label">Projected training days</div>
+              <div class="value" id="mDays">3.5</div>
+              <div class="bar"><i id="bDays"></i></div>
+            </div>
+            <div class="metric">
+              <div class="label">Overreach risk</div>
+              <div class="value" id="mRisk">26%</div>
+              <div class="bar warn"><i id="bRisk"></i></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel sorting">
+          <div class="panel-head">
+            <h2>Evidence Grouping · Drag or Tap-to-Assign</h2>
+            <span class="mono">anchor claims to evidence</span>
+          </div>
+          <div class="sorting-grid">
+            <div class="deck" id="deck">
+              <div class="evidence-card" id="card1" draggable="true" data-bucket="prior">
+                Dominant sequence transduction models were recurrent or convolutional in encoder-decoder form.
+              </div>
+              <div class="evidence-card" id="card2" draggable="true" data-bucket="prior">
+                The best performing models connected encoder and decoder through an attention mechanism.
+              </div>
+              <div class="evidence-card" id="card3" draggable="true" data-bucket="transformer">
+                The proposed transformer is a new architecture based only on attention, dispensing with recurrence and convolutions.
+              </div>
+              <div class="evidence-card" id="card4" draggable="true" data-bucket="transformer">
+                WMT 2014 English-to-German translation: 28.4 BLEU, improving over existing best results by more than 2 BLEU.
+              </div>
+              <div class="evidence-card" id="card5" draggable="true" data-bucket="transformer">
+                WMT 2014 English-to-French translation: 41.8 BLEU for a single model after 3.5 days of training on eight GPUs.
+              </div>
+              <div class="evidence-card" id="card6" draggable="true" data-bucket="scope">
+                Transformer generalized to other tasks, including English constituency parsing with large and limited training data.
+              </div>
+            </div>
+            <div class="buckets">
+              <div class="bucket" data-bucket="prior">
+                <h4>Prior Baseline Context <span id="countPrior">0</span></h4>
+                <div class="body"></div>
+              </div>
+              <div class="bucket" data-bucket="transformer">
+                <h4>Transformer Translation Evidence <span id="countTransformer">0</span></h4>
+                <div class="body"></div>
+              </div>
+              <div class="bucket" data-bucket="scope">
+                <h4>Scope and Boundary Signals <span id="countScope">0</span></h4>
+                <div class="body"></div>
+              </div>
+            </div>
+          </div>
+          <div class="sorting-status">
+            <div id="sortingPlaced">Placed: 0/6</div>
+            <div id="sortingAccuracy">Accuracy: 0%</div>
+          </div>
+        </section>
+      </div>
+
+      <div class="right-stack">
+        <section class="panel hypothesis">
+          <div class="panel-head">
+            <h2>Hypothesis Test Panel</h2>
+            <span class="mono">confidence calibration</span>
+          </div>
+          <div class="claim-grid">
+            <button class="claim" data-claim="shift">Adopt the transformer architecture for translation rollout, with claims tied to measured BLEU and training evidence.</button>
+            <button class="claim" data-claim="legacy">Keep recurrent or convolutional models as default and only increment encoder-decoder attention links.</button>
+            <button class="claim" data-claim="overreach">Announce broad superiority across all language tasks immediately, without limiting claims to tested contexts.</button>
+          </div>
+          <div class="confidence">
+            <div class="row">
+              <span>Confidence calibration</span>
+              <strong id="confidenceValue">72%</strong>
+            </div>
+            <input id="confidenceRange" type="range" min="45" max="95" value="72">
+          </div>
+          <button class="run" id="runHypothesis">Run Mission Hypothesis Test</button>
+          <div class="feedback" id="hypothesisFeedback">
+            Select a rollout hypothesis, tune confidence, and run the test. Feedback will reconcile architecture choice with translation BLEU and training evidence.
+          </div>
+          <div class="feed">
+            <div class="mono">real-time command feed</div>
+            <ul id="feedList"></ul>
+          </div>
+        </section>
+
+        <section class="panel summary">
+          <div class="panel-head">
+            <h2>Phase Summary</h2>
+            <span class="mono" id="scoreTag">mission score pending</span>
+          </div>
+          <div class="phases">
+            <div class="phase" id="phaseTimeline">1 · Timeline interpreted</div>
+            <div class="phase" id="phaseSandbox">2 · Parameters calibrated</div>
+            <div class="phase" id="phaseSorting">3 · Evidence grouped</div>
+            <div class="phase" id="phaseHypothesis">4 · Hypothesis executed</div>
+          </div>
+          <div class="progress"><i id="progressBar"></i></div>
+          <div class="recommendation" id="recommendation">
+            Waiting on your interventions. Your narrative should reference that the transformer is new and based on attention, acknowledge prior models and attention links, cite translation BLEU outcomes, and avoid claims beyond tested tasks.
+          </div>
+          <div class="lexicon">
+            source lexicon: the models and attention best translation bleu training based new transformer tasks
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <div class="footer-nav">
+      <a class="btn" href="/pages/gamified-learning-hub-dashboard-1.html">Previous Scene</a>
+      <a class="btn" href="/books/user-transformer-depth-test-wfghux-9ab5.html">Return to Hub</a>
+      <a class="btn" href="/books/user-transformer-depth-test-wfghux-9ab5.html">Next Scene</a>
+    </div>
+  </div>
+
+  <script>
+    const state = {
+      timeline: "before",
+      timelineTouched: false,
+      slidersTouched: false,
+      hypothesisRan: false,
+      selectedClaim: null,
+      selectedCard: null,
+      confidence: 72,
+      enDe: 28.4,
+      enFr: 41.8,
+      days: 3.5,
+      risk: 26,
+      alignment: 84,
+      sortingAccuracy: 0,
+      hypothesisQuality: 0
+    };
+
+    const consequenceMap = {
+      before: [
+        "Structural profile: recurrent and convolutional stacks dominate encoder-decoder pipelines.",
+        "Attention exists, but primarily as a connector between encoder and decoder within legacy depth.",
+        "Training economics and parallelization constraints stay heavier than attention-only design."
+      ],
+      after: [
+        "Structural profile: transformer is new and based solely on attention, recurrence and convolutions removed.",
+        "Parallelization rises, supporting significantly less training time versus best prior models.",
+        "Evidence-backed outcomes: 28.4 BLEU EN-DE and 41.8 BLEU EN-FR after 3.5 days on eight GPUs."
+      ]
+    };
+
+    const feedList = document.getElementById("feedList");
+    function logEvent(msg){
+      const t = new Date();
+      const stamp = `${String(t.getHours()).padStart(2,"0")}:${String(t.getMinutes()).padStart(2,"0")}:${String(t.getSeconds()).padStart(2,"0")}`;
+      const li = document.createElement("li");
+      li.textContent = `[${stamp}] ${msg}`;
+      feedList.prepend(li);
+      while(feedList.children.length > 8) feedList.removeChild(feedList.lastChild);
+    }
+
+    function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+
+    function setTimeline(mode, touched = true){
+      state.timeline = mode;
+      if(touched) state.timelineTouched = true;
+      document.querySelectorAll(".timeline-btn").forEach(btn => btn.classList.toggle("active", btn.dataset.timeline === mode));
+      document.getElementById("archDiagram").setAttribute("data-mode", mode);
+      const list = document.getElementById("consequenceList");
+      list.innerHTML = "";
+      consequenceMap[mode].forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = item;
+        list.appendChild(li);
+      });
+      if(touched) logEvent(`Timeline switched to ${mode === "before" ? "legacy baseline" : "attention-only transformer frame"}.`);
+      updateModel();
+      updateSummary();
+    }
+
+    document.querySelectorAll(".timeline-btn").forEach(btn=>{
+      btn.addEventListener("click", ()=>setTimeline(btn.dataset.timeline, true));
+    });
+
+    const sliders = {
+      attention: document.getElementById("attentionRange"),
+      recurrence: document.getElementById("recurrenceRange"),
+      narrative: document.getElementById("narrativeRange"),
+      gpus: document.getElementById("gpuRange")
+    };
+
+    function updateSliderLabels(){
+      document.getElementById("vAttention").textContent = `${sliders.attention.value}%`;
+      document.getElementById("vRecurrence").textContent = `${sliders.recurrence.value}%`;
+      document.getElementById("vNarrative").textContent = `${sliders.narrative.value}/10`;
+      document.getElementById("vGpus").textContent = sliders.gpus.value;
+    }
+
+    function updateModel(){
+      const a = Number(sliders.attention.value);
+      const r = Number(sliders.recurrence.value);
+      const n = Number(sliders.narrative.value);
+      const g = Number(sliders.gpus.value);
+      const timelineBoost = state.timeline === "after" ? 1.25 : -0.25;
+
+      const enDe = clamp(25.6 + timelineBoost + (a-70)*0.045 - (r-10)*0.055 + (g-8)*0.08, 24.2, 29.4);
+      const enFr = clamp(39.2 + timelineBoost + (a-70)*0.04 - (r-10)*0.03 + (g-8)*0.07, 37.6, 42.4);
+      const days = clamp(6.4 - (a-70)*0.05 + (r-10)*0.055 - (g-8)*0.33 - (state.timeline==="after"?0.9:0), 2.7, 9.6);
+
+      const bleuGap = Math.abs(enDe - 28.4) + Math.abs(enFr - 41.8);
+      const dayGap = Math.abs(days - 3.5);
+      const risk = clamp(18 + (n*5.3) + Math.max(0, state.confidence-82)*1.8 + (state.timeline==="before"?12:0) + (r*0.25) - (a*0.2), 8, 96);
+      const alignment = clamp(100 - bleuGap*11 - dayGap*9 - (state.timeline==="after"?0:10), 5, 99);
+
+      state.enDe = enDe;
+      state.enFr = enFr;
+      state.days = days;
+      state.risk = risk;
+      state.alignment = alignment;
+
+      document.getElementById("mEnDe").textContent = enDe.toFixed(1);
+      document.getElementById("mEnFr").textContent = enFr.toFixed(1);
+      document.getElementById("mDays").textContent = days.toFixed(1);
+      document.getElementById("mRisk").textContent = `${Math.round(risk)}%`;
+
+      document.getElementById("bEnDe").style.width = `${clamp((enDe-24)/5.4*100,0,100)}%`;
+      document.getElementById("bEnFr").style.width = `${clamp((enFr-37.5)/4.9*100,0,100)}%`;
+      document.getElementById("bDays").style.width = `${clamp((10-days)/7.3*100,0,100)}%`;
+      document.getElementById("bRisk").style.width = `${Math.round(risk)}%`;
+
+      updateSummary();
+    }
+
+    Object.values(sliders).forEach(slider=>{
+      slider.addEventListener("input", ()=>{
+        updateSliderLabels();
+        state.slidersTouched = true;
+        updateModel();
+      });
+    });
+
+    const claimButtons = document.querySelectorAll(".claim");
+    claimButtons.forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        claimButtons.forEach(b=>b.classList.remove("active"));
+        btn.classList.add("active");
+        state.selectedClaim = btn.dataset.claim;
+        logEvent(`Hypothesis selected: ${btn.textContent.slice(0,58)}...`);
+      });
+    });
+
+    const confidenceRange = document.getElementById("confidenceRange");
+    confidenceRange.addEventListener("input", ()=>{
+      state.confidence = Number(confidenceRange.value);
+      document.getElementById("confidenceValue").textContent = `${state.confidence}%`;
+      updateModel();
+    });
+
+    function computeSortingStats(){
+      const cards = [...document.querySelectorAll(".evidence-card")];
+      const placed = cards.filter(c => c.parentElement.classList.contains("body"));
+      const correct = placed.filter(c => c.dataset.bucket === c.parentElement.parentElement.dataset.bucket);
+
+      state.sortingAccuracy = placed.length ? Math.round((correct.length / placed.length)*100) : 0;
+
+      document.getElementById("sortingPlaced").textContent = `Placed: ${placed.length}/6`;
+      document.getElementById("sortingAccuracy").textContent = `Accuracy: ${state.sortingAccuracy}%`;
+      document.getElementById("countPrior").textContent = document.querySelector('.bucket[data-bucket="prior"] .body').children.length;
+      document.getElementById("countTransformer").textContent = document.querySelector('.bucket[data-bucket="transformer"] .body').children.length;
+      document.getElementById("countScope").textContent = document.querySelector('.bucket[data-bucket="scope"] .body').children.length;
+
+      cards.forEach(card=>{
+        if(card.parentElement.classList.contains("body")){
+          const ok = card.dataset.bucket === card.parentElement.parentElement.dataset.bucket;
+          card.classList.toggle("correct", ok);
+          card.classList.toggle("wrong", !ok);
+        } else {
+          card.classList.remove("correct","wrong");
+        }
+      });
+      updateSummary();
+    }
+
+    function placeCard(card, bucketEl){
+      const body = bucketEl.querySelector(".body");
+      body.appendChild(card);
+      const ok = card.dataset.bucket === bucketEl.dataset.bucket;
+      logEvent(`Evidence placed in ${bucketEl.querySelector("h4").childNodes[0].textContent.trim()} (${ok ? "aligned" : "misaligned"}).`);
+      if(state.selectedCard === card){
+        state.selectedCard = null;
+      }
+      card.classList.remove("selected");
+      computeSortingStats();
+    }
+
+    document.querySelectorAll(".evidence-card").forEach(card=>{
+      card.addEventListener("dragstart", e => {
+        e.dataTransfer.setData("text/plain", card.id);
+      });
+      card.addEventListener("click", ()=>{
+        document.querySelectorAll(".evidence-card").forEach(c=>c.classList.remove("selected"));
+        card.classList.add("selected");
+        state.selectedCard = card;
+      });
+    });
+
+    document.querySelectorAll(".bucket").forEach(bucket=>{
+      bucket.addEventListener("dragover", e=>{ e.preventDefault(); bucket.classList.add("active-drop"); });
+      bucket.addEventListener("dragleave", ()=> bucket.classList.remove("active-drop"));
+      bucket.addEventListener("drop", e=>{
+        e.preventDefault();
+        bucket.classList.remove("active-drop");
+        const id = e.dataTransfer.getData("text/plain");
+        const card = document.getElementById(id);
+        if(card) placeCard(card, bucket);
+      });
+      bucket.addEventListener("click", ()=>{
+        if(state.selectedCard) placeCard(state.selectedCard, bucket);
+      });
+    });
+
+    document.getElementById("runHypothesis").addEventListener("click", ()=>{
+      const output = document.getElementById("hypothesisFeedback");
+      if(!state.selectedClaim){
+        output.textContent = "No hypothesis selected. Choose a rollout narrative before running the mission test.";
+        output.style.borderColor = "rgba(239,68,68,.5)";
+        logEvent("Hypothesis run blocked: no claim selected.");
+        return;
+      }
+      state.hypothesisRan = true;
+      let score = 0;
+      let message = "";
+
+      if(state.selectedClaim === "shift"){
+        score = 58 + state.alignment*0.28 + state.sortingAccuracy*0.18 + (state.confidence >= 62 && state.confidence <= 86 ? 9 : -8) - state.risk*0.18;
+        if(score >= 72){
+          message = "Decision quality strong. You align with evidence: transformer is new and based on attention, with translation outcomes of 28.4 BLEU EN-DE and 41.8 BLEU EN-FR after 3.5 days of training on eight GPUs. Keep claims bounded to tested tasks while citing parsing generalization as supportive breadth.";
+          output.style.borderColor = "rgba(132,204,22,.65)";
+        } else {
+          message = "Direction is promising but calibration is noisy. Reduce narrative breadth or confidence inflation, and tighten evidence grouping so rollout language reflects translation results without overreach.";
+          output.style.borderColor = "rgba(245,158,11,.55)";
+        }
+      } else if(state.selectedClaim === "legacy"){
+        score = 46 + state.sortingAccuracy*0.12 - state.alignment*0.08 + (state.timeline==="before" ? 8 : -12);
+        message = "This stance underweights the reported shift. Source evidence states the transformer drops recurrence and convolutions entirely, while showing superior quality and faster training on translation tasks.";
+        output.style.borderColor = "rgba(245,158,11,.55)";
+      } else {
+        score = 31 + state.confidence*0.05 - state.risk*0.33;
+        message = "Overreach flagged. Evidence supports machine translation gains and parsing transfer, but not blanket dominance claims across all language tasks. Reframe scope before rollout.";
+        output.style.borderColor = "rgba(239,68,68,.6)";
+      }
+
+      state.hypothesisQuality = clamp(Math.round(score), 5, 99);
+      output.textContent = message;
+      logEvent(`Hypothesis executed. quality=${state.hypothesisQuality}, confidence=${state.confidence}%.`);
+      updateSummary();
+    });
+
+    function updateSummary(){
+      const phaseTimeline = state.timelineTouched;
+      const phaseSandbox = state.slidersTouched;
+      const placedCount = document.querySelectorAll(".bucket .body .evidence-card").length;
+      const phaseSorting = placedCount === 6;
+      const phaseHypothesis = state.hypothesisRan;
+
+      document.getElementById("phaseTimeline").classList.toggle("done", phaseTimeline);
+      document.getElementById("phaseSandbox").classList.toggle("done", phaseSandbox);
+      document.getElementById("phaseSorting").classList.toggle("done", phaseSorting);
+      document.getElementById("phaseHypothesis").classList.toggle("done", phaseHypothesis);
+
+      const complete = [phaseTimeline, phaseSandbox, phaseSorting, phaseHypothesis].filter(Boolean).length;
+      document.getElementById("progressBar").style.width = `${complete*25}%`;
+
+      const score = Math.round(clamp(
+        20 +
+        state.alignment*0.34 +
+        state.sortingAccuracy*0.28 +
+        (state.hypothesisRan ? state.hypothesisQuality*0.24 : 0) -
+        state.risk*0.14 +
+        (phaseTimeline ? 6 : 0) +
+        (phaseSandbox ? 6 : 0),
+      0,99));
+
+      document.getElementById("scoreTag").textContent = `mission score ${score}/99`;
+
+      let rec = "";
+      if(score >= 75 && phaseHypothesis){
+        rec = "Rollout recommendation: commit to the transformer for translation with measured language. Cite that prior best models used attention links, but this new architecture is based solely on attention and improves reported BLEU (28.4 EN-DE, over best by more than 2; 41.8 EN-FR) with lower training time (3.5 days on 8 GPUs). Note successful transfer to parsing as evidence of broader potential across tasks without universal claims.";
+      } else if(phaseHypothesis){
+        rec = "Rollout recommendation: hold narrative discipline. Re-anchor to translation benchmarks and training evidence, then rerun confidence so organizational shock stays proportional to demonstrated gains.";
+      } else {
+        rec = "Awaiting full verdict. Complete timeline interpretation, sandbox calibration, evidence grouping, and hypothesis execution to generate an evidence-bounded rollout narrative.";
+      }
+      document.getElementById("recommendation").textContent = rec;
+    }
+
+    setTimeline("before", false);
+    updateSliderLabels();
+    updateModel();
+    computeSortingStats();
+    logEvent("War Room Alpha live. Build an evidence-bound transformer decision.");
+  </script>
+
+
+<script>
+(() => {
+  
+  
+  
+})();
+</script>
+</body>
+</html>

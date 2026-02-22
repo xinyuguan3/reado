@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Economic War Table — White Rose Intake</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --coal:#111827;
+      --coal-2:#0b1220;
+      --amber:#F59E0B;
+      --blue:#3B82F6;
+      --rose:#FB7185;
+      --ink:#d9e1f2;
+      --muted:#8ea1c7;
+      --line:#23314f;
+      --panel:rgba(17,24,39,.84);
+      --ok:#34d399;
+      --warn:#fbbf24;
+      --bad:#fb7185;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:"Sora",system-ui,sans-serif;
+      color:var(--ink);
+      background:
+        radial-gradient(1200px 520px at 8% -10%, rgba(59,130,246,.22), transparent 70%),
+        radial-gradient(900px 500px at 100% 0%, rgba(251,113,133,.13), transparent 75%),
+        radial-gradient(700px 380px at 40% 110%, rgba(245,158,11,.13), transparent 68%),
+        linear-gradient(165deg,var(--coal-2),var(--coal));
+      overflow-x:hidden;
+    }
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background:
+        repeating-linear-gradient(0deg, rgba(142,161,199,.06) 0 1px, transparent 1px 44px),
+        repeating-linear-gradient(90deg, rgba(142,161,199,.05) 0 1px, transparent 1px 44px);
+      mask-image:radial-gradient(circle at center, black 32%, transparent 95%);
+    }
+    .shell{
+      width:min(1360px,95vw);
+      margin:18px auto 28px;
+      display:grid;
+      gap:14px;
+      position:relative;
+      z-index:2;
+    }
+    .panel{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:16px;
+      box-shadow:0 10px 34px rgba(0,0,0,.3), inset 0 1px rgba(255,255,255,.04);
+      backdrop-filter: blur(8px);
+    }
+    .top{
+      padding:16px 18px;
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:14px;
+      align-items:center;
+    }
+    .title{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      align-items:flex-end;
+    }
+    h1{
+      font-size:clamp(1.05rem,2.2vw,1.55rem);
+      margin:0;
+      letter-spacing:.2px;
+    }
+    .subtitle{
+      color:var(--muted);
+      font-size:.84rem;
+      margin-top:6px;
+    }
+    .chips{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+    }
+    .chip{
+      border:1px solid var(--line);
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:.73rem;
+      color:#d7e2fd;
+      background:linear-gradient(180deg, rgba(59,130,246,.14), rgba(59,130,246,.04));
+    }
+    .chip.rose{background:linear-gradient(180deg, rgba(251,113,133,.15), rgba(251,113,133,.05))}
+    .chip.amber{background:linear-gradient(180deg, rgba(245,158,11,.18), rgba(245,158,11,.07))}
+    .mono{
+      font-family:"IBM Plex Mono",ui-monospace,monospace;
+      letter-spacing:.15px;
+    }
+    .nav-mini{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .btn{
+      border:1px solid var(--line);
+      color:#e3ebff;
+      text-decoration:none;
+      padding:8px 12px;
+      border-radius:10px;
+      font-size:.8rem;
+      background:linear-gradient(180deg, rgba(59,130,246,.16), rgba(59,130,246,.05));
+      transition:.18s ease;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+      cursor:pointer;
+    }
+    .btn:hover{transform:translateY(-1px); border-color:#41639e}
+    .briefing{
+      padding:16px 18px;
+      display:grid;
+      grid-template-columns:1.2fr .8fr;
+      gap:12px;
+    }
+    .briefing h2{
+      margin:0 0 8px;
+      font-size:1rem;
+      color:#ffdb94;
+      font-weight:700;
+    }
+    .briefing p{
+      margin:0;
+      line-height:1.48;
+      color:#d4def2;
+      font-size:.93rem;
+    }
+    .timeline{
+      display:grid;
+      gap:8px;
+      margin:0;
+      padding:0;
+      list-style:none;
+    }
+    .timeline li{
+      border:1px solid #263a60;
+      border-left:3px solid var(--blue);
+      border-radius:10px;
+      padding:8px 10px;
+      font-size:.78rem;
+      color:#cad8f8;
+      background:rgba(21,35,59,.55);
+    }
+    .layout{
+      display:grid;
+      grid-template-columns:1.2fr 1.2fr .85fr;
+      gap:14px;
+      align-items:start;
+    }
+    .stack{
+      display:grid;
+      gap:14px;
+    }
+    .section{
+      padding:14px;
+    }
+    .section h3{
+      margin:0 0 10px;
+      font-size:.92rem;
+      color:#ffe0a6;
+      letter-spacing:.2px;
+    }
+    .section h4{
+      margin:0 0 8px;
+      font-size:.8rem;
+      color:#9ab3e4;
+      font-weight:600;
+      text-transform:uppercase;
+      letter-spacing:.7px;
+    }
+    .small{
+      font-size:.77rem;
+      color:var(--muted);
+      line-height:1.42;
+    }
+    .alloc-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:12px;
+      gap:8px;
+    }
+    .resource{
+      color:#ffd99a;
+      border:1px solid #6e4b15;
+      border-radius:10px;
+      padding:6px 8px;
+      font-size:.76rem;
+      background:rgba(245,158,11,.12);
+    }
+    .alloc-row{
+      border:1px solid #27385a;
+      border-radius:12px;
+      padding:10px;
+      margin-bottom:10px;
+      background:rgba(16,27,47,.65);
+    }
+    .alloc-line{
+      display:grid;
+      grid-template-columns:1fr auto;
+      align-items:center;
+      gap:8px;
+      margin-bottom:8px;
+    }
+    .alloc-controls{
+      display:flex;
+      gap:6px;
+      align-items:center;
+    }
+    .alloc-controls button{
+      width:28px;height:28px;border-radius:8px;border:1px solid #2e446d;background:#132341;color:#dbe6ff;cursor:pointer;
+    }
+    .alloc-controls button:disabled{opacity:.45;cursor:not-allowed}
+    .alloc-value{
+      min-width:28px;
+      text-align:center;
+      font-family:"IBM Plex Mono",monospace;
+      font-size:.84rem;
+      color:#ffe6b4;
+    }
+    .bar{
+      height:9px;
+      width:100%;
+      border-radius:99px;
+      background:#0f1a30;
+      border:1px solid #233456;
+      overflow:hidden;
+    }
+    .bar > i{
+      display:block;
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg,var(--blue),#7aa8ff);
+      transition:.2s ease;
+    }
+    .bar.amber > i{background:linear-gradient(90deg,#f59e0b,#ffd08a)}
+    .bar.rose > i{background:linear-gradient(90deg,#fb7185,#ffb1bf)}
+    .trade-grid{
+      margin-top:8px;
+      display:grid;
+      gap:8px;
+    }
+    .trade{
+      display:grid;
+      grid-template-columns:122px 1fr 38px;
+      gap:8px;
+      align-items:center;
+      font-size:.74rem;
+      color:#bdd0f5;
+    }
+    .trade .n{font-family:"IBM Plex Mono",monospace;color:#f8e2bf}
+    .hypo-tabs{
+      display:flex;
+      gap:7px;
+      flex-wrap:wrap;
+      margin-bottom:9px;
+    }
+    .hypo-tab{
+      border:1px solid #2e446d;
+      background:#132341;
+      color:#cddcff;
+      border-radius:10px;
+      padding:7px 9px;
+      font-size:.73rem;
+      cursor:pointer;
+    }
+    .hypo-tab.active{
+      border-color:#4f7fd1;
+      color:#fff;
+      background:linear-gradient(180deg,rgba(59,130,246,.33),rgba(59,130,246,.15));
+    }
+    .hypo-statement{
+      font-size:.84rem;
+      line-height:1.4;
+      color:#dbe8ff;
+      border:1px solid #28406a;
+      border-radius:11px;
+      padding:9px;
+      background:rgba(18,31,52,.7);
+      margin-bottom:10px;
+    }
+    .evidence-list{
+      display:grid;
+      gap:7px;
+      margin-bottom:10px;
+    }
+    .ev{
+      border:1px solid #25395e;
+      border-radius:10px;
+      padding:8px;
+      background:rgba(14,25,43,.7);
+      font-size:.75rem;
+      line-height:1.33;
+      display:grid;
+      gap:5px;
+    }
+    .ev label{display:flex;gap:8px;align-items:flex-start;cursor:pointer}
+    .ev input{margin-top:2px}
+    .confidence{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:10px;
+      align-items:center;
+      margin-bottom:10px;
+    }
+    .confidence input[type="range"]{width:100%}
+    .dial{
+      width:68px;height:68px;border-radius:50%;
+      display:grid;place-items:center;
+      border:1px solid #355184;
+      background:conic-gradient(var(--amber) 42%, #1b2c4a 42%);
+    }
+    .dial span{
+      width:50px;height:50px;border-radius:50%;
+      display:grid;place-items:center;background:#0e1930;
+      font-family:"IBM Plex Mono",monospace;font-size:.82rem;color:#ffe5bc;
+      border:1px solid #29426d;
+    }
+    .verdict{
+      border:1px solid #2a446f;
+      border-radius:10px;
+      padding:8px 10px;
+      font-size:.78rem;
+      color:#d8e5ff;
+      background:rgba(16,29,51,.7);
+    }
+    .verdict b{color:#ffe2a2}
+    .sandbox-grid{
+      display:grid;
+      gap:10px;
+    }
+    .slider-row{
+      border:1px solid #27406b;
+      border-radius:11px;
+      padding:8px 9px;
+      background:rgba(14,26,46,.68);
+    }
+    .slider-row .topline{
+      display:flex;justify-content:space-between;font-size:.74rem;color:#cad8fa;margin-bottom:5px;
+    }
+    .slider-row input[type="range"]{width:100%}
+    .metric-grid{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:8px;
+      margin-top:9px;
+    }
+    .metric{
+      border:1px solid #293e65;
+      border-radius:10px;
+      padding:8px;
+      background:rgba(18,31,52,.73);
+    }
+    .metric .k{font-size:.67rem;color:#95abd4;text-transform:uppercase;letter-spacing:.65px}
+    .metric .v{font-family:"IBM Plex Mono",monospace;font-size:1rem;color:#ffe3ac;margin-top:5px}
+    svg{width:100%;height:auto;border:1px solid #2a4066;border-radius:12px;background:rgba(11,19,35,.88);margin-top:10px}
+    .sort-head{
+      display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:9px;
+    }
+    .dock{
+      display:grid;
+      gap:8px;
+      margin-bottom:10px;
+      min-height:80px;
+    }
+    .card{
+      border:1px solid #2a426d;
+      border-radius:11px;
+      padding:8px 10px;
+      font-size:.75rem;
+      line-height:1.35;
+      background:linear-gradient(180deg, rgba(59,130,246,.12), rgba(59,130,246,.05));
+      cursor:grab;
+      user-select:none;
+    }
+    .card.selected{
+      outline:2px solid var(--amber);
+      border-color:#9d6d17;
+      background:linear-gradient(180deg, rgba(245,158,11,.24), rgba(245,158,11,.08));
+    }
+    .buckets{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:8px;
+    }
+    .bucket{
+      min-height:112px;
+      border:1px dashed #3a5489;
+      border-radius:12px;
+      padding:8px;
+      background:rgba(12,21,37,.65);
+      display:grid;
+      gap:7px;
+      align-content:start;
+      transition:.16s ease;
+    }
+    .bucket.over{border-color:#7eb1ff;background:rgba(35,64,108,.35)}
+    .bucket h5{
+      margin:0;
+      font-size:.68rem;
+      text-transform:uppercase;
+      letter-spacing:.75px;
+      color:#95b0e6;
+    }
+    .feedback{
+      border:1px solid #2a426b;
+      background:rgba(15,28,50,.72);
+      border-radius:11px;
+      padding:10px;
+      font-size:.78rem;
+      line-height:1.4;
+    }
+    .summary{
+      padding:14px;
+      position:sticky;
+      top:12px;
+      display:grid;
+      gap:10px;
+    }
+    .phase{
+      border:1px solid #2a4067;
+      border-radius:10px;
+      padding:8px 9px;
+      background:rgba(15,27,47,.72);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      font-size:.78rem;
+    }
+    .phase i{
+      width:10px;height:10px;border-radius:50%;display:inline-block;background:#475b86;
+    }
+    .phase.done i{background:var(--ok); box-shadow:0 0 0 4px rgba(52,211,153,.17)}
+    .readiness{
+      border:1px solid #2b426a;
+      border-radius:12px;
+      padding:10px;
+      background:rgba(16,31,54,.73);
+    }
+    .readiness .n{
+      font-size:1.35rem;
+      font-weight:700;
+      color:#ffe1a1;
+    }
+    .log{
+      border:1px solid #2a4066;
+      border-radius:12px;
+      padding:9px;
+      background:rgba(13,22,38,.7);
+      font-size:.72rem;
+      color:#afc0e6;
+      max-height:152px;
+      overflow:auto;
+      display:grid;
+      gap:6px;
+    }
+    .log .entry{
+      border-left:2px solid #3f65a6;
+      padding-left:8px;
+      line-height:1.32;
+    }
+    .brief-output{
+      border:1px solid #375686;
+      border-radius:12px;
+      padding:10px;
+      font-size:.78rem;
+      line-height:1.42;
+      background:rgba(23,42,72,.62);
+      color:#deebff;
+    }
+    .action-btn{
+      width:100%;
+      border:1px solid #7b551b;
+      background:linear-gradient(180deg,rgba(245,158,11,.35),rgba(245,158,11,.15));
+      color:#ffe7bd;
+      border-radius:10px;
+      padding:10px;
+      font-weight:600;
+      cursor:pointer;
+    }
+    .anchor{
+      font-size:.69rem;
+      color:#9cb2dc;
+      margin-top:8px;
+      border:1px solid #273c63;
+      border-radius:10px;
+      padding:6px 8px;
+      background:rgba(13,24,43,.7);
+    }
+    .nav-bottom{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      padding:8px 2px 0;
+    }
+    .nav-bottom .btn{
+      min-width:150px;
+      text-align:center;
+      font-weight:600;
+    }
+    @media (max-width:1120px){
+      .layout{grid-template-columns:1fr 1fr}
+      .summary{position:relative;top:auto}
+    }
+    @media (max-width:820px){
+      .briefing{grid-template-columns:1fr}
+      .layout{grid-template-columns:1fr}
+      .buckets{grid-template-columns:1fr}
+      .top{grid-template-columns:1fr}
+      .nav-mini{justify-content:flex-start}
+    }
+  </style>
+</head>
+<body>
+<script src="/shared/book-catalog.js?v=1771754453141"></script>
+<script type="module" src="/shared/shell.js?v=1771754453141"></script>
+<reado-app-shell data-page="knowledge-map"></reado-app-shell>
+  <div class="shell">
+    <header class="panel top">
+      <div>
+        <div class="title">
+          <h1>Economic War Table · Module 1: White Rose Intake</h1>
+          <span class="chip amber mono">Archive Operations Room · Dawn</span>
+          <span class="chip rose mono">Book: 论文2: Sonic Bodies Protocol</span>
+        </div>
+        <p class="subtitle">You swipe through the online record: Sonic Bodies, Kapsali, Performance Research. The board wants a one-page plan by noon.</p>
+      </div>
+      <nav class="nav-mini">
+        <a class="btn" href="/pages/gamified-learning-hub-dashboard-1.html">Prev</a>
+        <a class="btn" href="/books/user-2-wjtqrj-6b20.html">Hub</a>
+        <a class="btn" href="/experiences/u-2-02-c22713.html">Next</a>
+      </nav>
+    </header>
+
+    <section class="panel briefing">
+      <div>
+        <h2>Mission Objective</h2>
+        <p>Translate claims from the article into a defensible curatorial brief without overstating certainty. Keep every claim tied to the White Rose Research Online record and the published article in <span class="mono">Performance Research 25(4), pp.45–53</span>.</p>
+        <div class="chips" style="margin-top:10px">
+          <span class="chip">Intel: sonification and movement sonification used for engagement in galleries and museums</span>
+          <span class="chip">Visitor relations: sighted, partially sighted, non-sighted</span>
+          <span class="chip">Frame: Latour hybrids, artwork as relational blueprint</span>
+        </div>
+        <div class="anchor mono">anchor lexicon: the and sonification aesthetic experience online white rose sonic bodies hybridization article.</div>
+      </div>
+      <ul class="timeline">
+        <li><b>Accepted:</b> 24 September 2020</li>
+        <li><b>Published:</b> November 2020</li>
+        <li><b>Published online:</b> 30 November 2020</li>
+        <li><b>Deposited:</b> 27 Jan 2021 · White Rose Research Online record</li>
+        <li><b>Status:</b> Published article, author produced version listed</li>
+      </ul>
+    </section>
+
+    <div class="layout">
+      <div class="stack">
+        <section class="panel section" id="allocationPanel">
+          <h3>Phase 1 · Resource Allocation Board</h3>
+          <div class="alloc-head">
+            <div class="small">Allocate finite briefing bandwidth across competing priorities. Every +5 in one lane consumes remaining reserve.</div>
+            <div class="resource mono">Reserve: <span id="reserve">40</span> pts</div>
+          </div>
+
+          <div class="alloc-row">
+            <div class="alloc-line">
+              <strong>Evidence Fidelity</strong>
+              <div class="alloc-controls">
+                <button class="alloc-btn" data-cat="evidence" data-delta="-5">−</button>
+                <span class="alloc-value" id="v-evidence">30</span>
+                <button class="alloc-btn" data-cat="evidence" data-delta="5">+</button>
+              </div>
+            </div>
+            <div class="bar"><i id="b-evidence"></i></div>
+            <div class="small">Prioritize exact claims from abstract and metadata trail.</div>
+          </div>
+
+          <div class="alloc-row">
+            <div class="alloc-line">
+              <strong>Visitor Inclusion Coverage</strong>
+              <div class="alloc-controls">
+                <button class="alloc-btn" data-cat="inclusion" data-delta="-5">−</button>
+                <span class="alloc-value" id="v-inclusion">30</span>
+                <button class="alloc-btn" data-cat="inclusion" data-delta="5">+</button>
+              </div>
+            </div>
+            <div class="bar amber"><i id="b-inclusion"></i></div>
+            <div class="small">Weight sighted, partially sighted, and non-sighted relations.</div>
+          </div>
+
+          <div class="alloc-row">
+            <div class="alloc-line">
+              <strong>Curatorial Leap</strong>
+              <div class="alloc-controls">
+                <button class="alloc-btn" data-cat="leap" data-delta="-5">−</button>
+                <span class="alloc-value" id="v-leap">20</span>
+                <button class="alloc-btn" data-cat="leap" data-delta="5">+</button>
+              </div>
+            </div>
+            <div class="bar rose"><i id="b-leap"></i></div>
+            <div class="small">Push implications while avoiding unsupported certainty.</div>
+          </div>
+
+          <div class="trade-grid">
+            <div class="trade"><span>Overstatement Risk</span><div class="bar rose"><i id="m-risk"></i></div><span class="n" id="n-risk">0</span></div>
+            <div class="trade"><span>Inclusion Readiness</span><div class="bar amber"><i id="m-cover"></i></div><span class="n" id="n-cover">0</span></div>
+            <div class="trade"><span>Board Confidence</span><div class="bar"><i id="m-board"></i></div><span class="n" id="n-board">0</span></div>
+          </div>
+        </section>
+
+        <section class="panel section" id="sandboxPanel">
+          <h3>Phase 3 · Parameter Sandbox & Causal Map</h3>
+          <div class="small">Tune operational parameters and watch immediate system response across proximal, conceptual, and material relations.</div>
+          <div class="sandbox-grid">
+            <div class="slider-row">
+              <div class="topline"><span>Audio-centred Engagement</span><span class="mono" id="val-audio">58</span></div>
+              <input id="s-audio" type="range" min="0" max="100" value="58" />
+            </div>
+            <div class="slider-row">
+              <div class="topline"><span>Visitor Diversity Weight</span><span class="mono" id="val-diversity">64</span></div>
+              <input id="s-diversity" type="range" min="0" max="100" value="64" />
+            </div>
+            <div class="slider-row">
+              <div class="topline"><span>Hybridization Framing</span><span class="mono" id="val-hybrid">62</span></div>
+              <input id="s-hybrid" type="range" min="0" max="100" value="62" />
+            </div>
+          </div>
+
+          <div class="metric-grid">
+            <div class="metric"><div class="k">Proximal Index</div><div class="v" id="m-prox">0</div></div>
+            <div class="metric"><div class="k">Conceptual Shift</div><div class="v" id="m-concept">0</div></div>
+            <div class="metric"><div class="k">Material Relays</div><div class="v" id="m-material">0</div></div>
+          </div>
+
+          <svg id="causalMap" viewBox="0 0 580 250" aria-label="Causal map">
+            <defs>
+              <marker id="arr" markerWidth="10" markerHeight="10" refX="7" refY="3.5" orient="auto">
+                <polygon points="0 0, 8 3.5, 0 7" fill="#7baeff"></polygon>
+              </marker>
+            </defs>
+            <line id="edge-a" x1="85" y1="72" x2="268" y2="56" stroke="#56a0ff" stroke-width="3" opacity=".7" marker-end="url(#arr)"></line>
+            <line id="edge-b" x1="84" y1="172" x2="268" y2="126" stroke="#f8ba48" stroke-width="3" opacity=".7" marker-end="url(#arr)"></line>
+            <line id="edge-c" x1="283" y1="60" x2="496" y2="112" stroke="#ff9bb0" stroke-width="3" opacity=".72" marker-end="url(#arr)"></line>
+            <line id="edge-d" x1="280" y1="128" x2="495" y2="112" stroke="#80abff" stroke-width="3" opacity=".72" marker-end="url(#arr)"></line>
+            <line id="edge-e" x1="287" y1="195" x2="495" y2="112" stroke="#ffd189" stroke-width="3" opacity=".72" marker-end="url(#arr)"></line>
+
+            <circle cx="80" cy="72" r="34" fill="#173362" stroke="#4b7ed0"></circle>
+            <text x="80" y="76" text-anchor="middle" font-size="11" fill="#e8f2ff">sonification</text>
+
+            <circle cx="80" cy="172" r="34" fill="#3f2a16" stroke="#c78a2d"></circle>
+            <text x="80" y="171" text-anchor="middle" font-size="10" fill="#ffe6bc">visitor</text>
+            <text x="80" y="184" text-anchor="middle" font-size="9" fill="#ffe6bc">relations</text>
+
+            <circle cx="280" cy="58" r="30" fill="#3b1830" stroke="#db6c90"></circle>
+            <text x="280" y="63" text-anchor="middle" font-size="10" fill="#ffd7e3">hybridization</text>
+
+            <circle cx="280" cy="127" r="30" fill="#152f4f" stroke="#5f93e3"></circle>
+            <text x="280" y="131" text-anchor="middle" font-size="10" fill="#deebff">moving-listening</text>
+
+            <circle cx="280" cy="196" r="30" fill="#2d2716" stroke="#bda35b"></circle>
+            <text x="280" y="200" text-anchor="middle" font-size="10" fill="#ffe9be">aesthetic</text>
+
+            <rect x="452" y="78" width="96" height="66" rx="10" fill="#14233d" stroke="#5f8fd8"></rect>
+            <text x="500" y="105" text-anchor="middle" font-size="10.5" fill="#dce9ff">artwork as</text>
+            <text x="500" y="119" text-anchor="middle" font-size="10.5" fill="#dce9ff">relational blueprint</text>
+          </svg>
+          <div class="feedback" id="sandboxFeedback"></div>
+        </section>
+      </div>
+
+      <div class="stack">
+        <section class="panel section" id="hypothesisPanel">
+          <h3>Phase 2 · Hypothesis Test Panel</h3>
+          <div class="small">Select a claim, attach evidence, then calibrate confidence. The system flags over-claiming in real time.</div>
+          <div class="hypo-tabs">
+            <button class="hypo-tab active" data-h="h1">Claim A</button>
+            <button class="hypo-tab" data-h="h2">Claim B</button>
+            <button class="hypo-tab" data-h="h3">Claim C</button>
+          </div>
+          <div class="hypo-statement" id="hypoStatement"></div>
+
+          <div class="evidence-list">
+            <div class="ev">
+              <label><input type="checkbox" class="evcheck" data-tags="h1" data-weight="3">The abstract states sonification and movement sonification are used as a tool for engagement with artworks in galleries and museums.</label>
+            </div>
+            <div class="ev">
+              <label><input type="checkbox" class="evcheck" data-tags="h1,h2" data-weight="2">The text says sonification offers an audio-centred mode of engagement that complicates the aesthetic experience.</label>
+            </div>
+            <div class="ev">
+              <label><input type="checkbox" class="evcheck" data-tags="h2" data-weight="3">The article discusses relationships among sighted, partially sighted, and non-sighted visitors.</label>
+            </div>
+            <div class="ev">
+              <label><input type="checkbox" class="evcheck" data-tags="h3" data-weight="3">The argument references Latour hybrids and treats the artwork as relational rather than fully stable.</label>
+            </div>
+            <div class="ev">
+              <label><input type="checkbox" class="evcheck" data-tags="h3,h1" data-weight="2">Movement sonification is framed as having implications for how artworks are conceived and how aesthetic experience is configured.</label>
+            </div>
+            <div class="ev">
+              <label><input type="checkbox" class="evcheck" data-tags="h2,h3" data-weight="2">Source trail identifies White Rose Research Online and published article context in Performance Research.</label>
+            </div>
+          </div>
+
+          <div class="confidence">
+            <input id="confidenceRange" type="range" min="0" max="100" value="58" />
+            <div class="dial" id="confidenceDial"><span id="confidenceValue">58%</span></div>
+          </div>
+          <div class="verdict" id="hypothesisVerdict"></div>
+        </section>
+
+        <section class="panel section" id="sortingPanel">
+          <h3>Phase 4 · Evidence Card Sorting</h3>
+          <div class="sort-head">
+            <div class="small">Drag cards into buckets, or tap one card then tap a bucket on mobile.</div>
+            <div class="resource mono">Accuracy: <span id="sortScore">0%</span></div>
+          </div>
+
+          <div class="dock" id="dock">
+            <div class="card" draggable="true" data-card="c1">“This article examines the use of sonification, and movement sonification, as a tool for engagement with artworks in galleries and museums.”</div>
+            <div class="card" draggable="true" data-card="c2">“It focuses on the relationship between artwork and sighted, partially sighted and non-sighted visitors.”</div>
+            <div class="card" draggable="true" data-card="c3">“By drawing on Latour hybrids, movement sonification approaches artwork as relational blueprint.”</div>
+            <div class="card" draggable="true" data-card="c4">Published online date recorded as 30 November 2020 and status listed as published.</div>
+            <div class="card" draggable="true" data-card="c5">White Rose Research Online source trail includes an author produced version in Performance Research.</div>
+            <div class="card" draggable="true" data-card="c6">“The article proves every visitor prefers audio over vision in all museum contexts.”</div>
+          </div>
+
+          <div class="buckets">
+            <div class="bucket" data-bucket="direct">
+              <h5>Directly Claimed in Abstract</h5>
+            </div>
+            <div class="bucket" data-bucket="metadata">
+              <h5>Repository / Publication Metadata</h5>
+            </div>
+            <div class="bucket" data-bucket="avoid">
+              <h5>Do Not Claim in Brief</h5>
+            </div>
+          </div>
+          <div class="feedback" id="sortFeedback"></div>
+        </section>
+      </div>
+
+      <aside class="panel summary" id="summaryPanel">
+        <h3 style="margin:0">Phase Summary</h3>
+        <div class="phase" id="p1"><span>1. Allocate resources</span><i></i></div>
+        <div class="phase" id="p2"><span>2. Calibrate hypothesis</span><i></i></div>
+        <div class="phase" id="p3"><span>3. Tune parameter sandbox</span><i></i></div>
+        <div class="phase" id="p4"><span>4. Sort evidence cards</span><i></i></div>
+
+        <div class="readiness">
+          <div class="small">Noon Brief Readiness</div>
+          <div class="n mono" id="readinessValue">0%</div>
+          <div class="small" id="readinessText">Initialize the table and deploy evidence-grounded framing.</div>
+        </div>
+
+        <button class="action-btn" id="compileBtn">Compile One-Page Curatorial Brief</button>
+        <div class="brief-output" id="briefOutput">
+          Awaiting calibrated inputs from all four phases.
+        </div>
+
+        <div class="log" id="log"></div>
+      </aside>
+    </div>
+
+    <nav class="nav-bottom">
+      <a class="btn" href="/pages/gamified-learning-hub-dashboard-1.html">← Previous</a>
+      <a class="btn" href="/books/user-2-wjtqrj-6b20.html">Back to Hub</a>
+      <a class="btn" href="/experiences/u-2-02-c22713.html">Next Mission →</a>
+    </nav>
+  </div>
+
+  <script>
+    const clamp = (n,min,max)=>Math.min(max,Math.max(min,n));
+
+    const logEl = document.getElementById("log");
+    function pushLog(text){
+      const stamp = new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"});
+      const line = document.createElement("div");
+      line.className = "entry mono";
+      line.textContent = `[${stamp}] ${text}`;
+      logEl.prepend(line);
+      while(logEl.children.length > 7) logEl.removeChild(logEl.lastChild);
+    }
+
+    const totalBudget = 120;
+    const alloc = { evidence:30, inclusion:30, leap:20 };
+    const reserveEl = document.getElementById("reserve");
+    const ids = ["evidence","inclusion","leap"];
+    const meters = {
+      risk: document.getElementById("m-risk"),
+      cover: document.getElementById("m-cover"),
+      board: document.getElementById("m-board")
+    };
+
+    function renderAllocation(log=true){
+      const used = alloc.evidence + alloc.inclusion + alloc.leap;
+      const reserve = totalBudget - used;
+      reserveEl.textContent = reserve;
+      ids.forEach(k=>{
+        document.getElementById(`v-${k}`).textContent = alloc[k];
+        document.getElementById(`b-${k}`).style.width = `${(alloc[k]/totalBudget)*100}%`;
+      });
+
+      const risk = clamp(Math.round((alloc.leap*1.35) - (alloc.evidence*0.95) + ((30-alloc.inclusion)*0.8) + 32),0,100);
+      const cover = clamp(Math.round((alloc.inclusion/45)*100),0,100);
+      const board = clamp(Math.round((alloc.evidence*.55 + alloc.inclusion*.35) - risk*.16 + 20),0,100);
+
+      meters.risk.style.width = `${risk}%`;
+      meters.cover.style.width = `${cover}%`;
+      meters.board.style.width = `${board}%`;
+      document.getElementById("n-risk").textContent = risk;
+      document.getElementById("n-cover").textContent = cover;
+      document.getElementById("n-board").textContent = board;
+
+      document.querySelectorAll(".alloc-btn[data-delta='5']").forEach(b=>b.disabled = reserve < 5);
+      document.querySelectorAll(".alloc-btn[data-delta='-5']").forEach(b=>{
+        const cat = b.dataset.cat;
+        b.disabled = alloc[cat] < 5;
+      });
+
+      if(log) pushLog(`Resource board updated: reserve ${reserve}, risk ${risk}, board confidence ${board}.`);
+      updateSummary();
+    }
+
+    document.querySelectorAll(".alloc-btn").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const cat = btn.dataset.cat;
+        const delta = Number(btn.dataset.delta);
+        const used = alloc.evidence + alloc.inclusion + alloc.leap;
+        const reserve = totalBudget - used;
+        if(delta > 0 && reserve >= delta) alloc[cat] += delta;
+        if(delta < 0 && alloc[cat] >= Math.abs(delta)) alloc[cat] += delta;
+        renderAllocation();
+      });
+    });
+
+    const hypothesisData = {
+      h1:{
+        text:"Movement sonification can reconfigure the aesthetic experience in galleries and museums.",
+        cap:78
+      },
+      h2:{
+        text:"The article materially addresses relationships among sighted, partially sighted, and non-sighted visitors.",
+        cap:84
+      },
+      h3:{
+        text:"Using hybridization (Latour), the article frames artwork as relational blueprint rather than stable object.",
+        cap:80
+      }
+    };
+    let activeHypothesis = "h1";
+    const hypoStatement = document.getElementById("hypoStatement");
+    const confRange = document.getElementById("confidenceRange");
+    const confValue = document.getElementById("confidenceValue");
+    const confDial = document.getElementById("confidenceDial");
+    const verdictEl = document.getElementById("hypothesisVerdict");
+
+    function renderHypothesis(log=true){
+      hypoStatement.textContent = hypothesisData[activeHypothesis].text;
+      const conf = Number(confRange.value);
+      confValue.textContent = `${conf}%`;
+      confDial.style.background = `conic-gradient(var(--amber) ${conf}%, #1b2c4a ${conf}% 100%)`;
+
+      let support = 0;
+      document.querySelectorAll(".evcheck:checked").forEach(c=>{
+        const tags = c.dataset.tags.split(",");
+        if(tags.includes(activeHypothesis)) support += Number(c.dataset.weight);
+      });
+      const warranted = clamp(Math.round(20 + support*8.2),10,hypothesisData[activeHypothesis].cap);
+      let verdict = "Defensible";
+      let tone = "var(--ok)";
+      let note = "Confidence is calibrated to available evidence.";
+      if(conf > warranted + 8){
+        verdict = "Overstated";
+        tone = "var(--bad)";
+        note = "Confidence exceeds what selected evidence supports.";
+      } else if(conf < warranted - 18){
+        verdict = "Under-claimed";
+        tone = "var(--warn)";
+        note = "You can safely increase confidence without overreach.";
+      }
+
+      verdictEl.innerHTML = `<b style="color:${tone}">${verdict}</b> · Evidence support ${support.toFixed(0)} | warranted ceiling ${warranted}% · ${note}`;
+      if(log) pushLog(`Hypothesis ${activeHypothesis.toUpperCase()} evaluated: ${verdict} at ${conf}% confidence.`);
+      updateSummary();
+    }
+
+    document.querySelectorAll(".hypo-tab").forEach(tab=>{
+      tab.addEventListener("click", ()=>{
+        document.querySelectorAll(".hypo-tab").forEach(t=>t.classList.remove("active"));
+        tab.classList.add("active");
+        activeHypothesis = tab.dataset.h;
+        renderHypothesis();
+      });
+    });
+    confRange.addEventListener("input", ()=>renderHypothesis(false));
+    confRange.addEventListener("change", ()=>renderHypothesis(true));
+    document.querySelectorAll(".evcheck").forEach(c=>{
+      c.addEventListener("change", ()=>renderHypothesis());
+    });
+
+    const sliders = {
+      audio: document.getElementById("s-audio"),
+      diversity: document.getElementById("s-diversity"),
+      hybrid: document.getElementById("s-hybrid")
+    };
+    const touched = new Set();
+
+    function renderSandbox(log=true){
+      const audio = Number(sliders.audio.value);
+      const diversity = Number(sliders.diversity.value);
+      const hybrid = Number(sliders.hybrid.value);
+
+      document.getElementById("val-audio").textContent = audio;
+      document.getElementById("val-diversity").textContent = diversity;
+      document.getElementById("val-hybrid").textContent = hybrid;
+
+      const prox = Math.round(audio*.44 + diversity*.37 + hybrid*.19);
+      const concept = Math.round(hybrid*.48 + diversity*.31 + audio*.21);
+      const material = Math.round(audio*.4 + hybrid*.38 + diversity*.22);
+
+      document.getElementById("m-prox").textContent = prox;
+      document.getElementById("m-concept").textContent = concept;
+      document.getElementById("m-material").textContent = material;
+
+      const edgeA = document.getElementById("edge-a");
+      const edgeB = document.getElementById("edge-b");
+      const edgeC = document.getElementById("edge-c");
+      const edgeD = document.getElementById("edge-d");
+      const edgeE = document.getElementById("edge-e");
+
+      edgeA.style.strokeWidth = (1.4 + audio/22).toFixed(2);
+      edgeA.style.opacity = (0.28 + audio/145).toFixed(2);
+      edgeB.style.strokeWidth = (1.3 + diversity/24).toFixed(2);
+      edgeB.style.opacity = (0.28 + diversity/145).toFixed(2);
+      edgeC.style.strokeWidth = (1.2 + hybrid/24).toFixed(2);
+      edgeC.style.opacity = (0.30 + hybrid/150).toFixed(2);
+      edgeD.style.strokeWidth = (1.2 + prox/25).toFixed(2);
+      edgeD.style.opacity = (0.30 + prox/155).toFixed(2);
+      edgeE.style.strokeWidth = (1.2 + concept/25).toFixed(2);
+      edgeE.style.opacity = (0.30 + concept/155).toFixed(2);
+
+      let response = "Balanced relay: the moving-listening subject links sonification and relational artwork framing without overstatement.";
+      if(prox > 72 && concept > 70){
+        response = "High activation: hybridization and audio-centred engagement strongly animate the artwork as relational blueprint in the brief narrative.";
+      }else if(diversity < 40){
+        response = "Coverage warning: visitor relations are under-weighted; include sighted, partially sighted, and non-sighted interactions more explicitly.";
+      }else if(material < 45){
+        response = "Material channel thin: keep claims close to gallery/museum examples and repository evidence trail.";
+      }
+      document.getElementById("sandboxFeedback").textContent = response;
+
+      if(log) pushLog(`Sandbox tuned: proximal ${prox}, conceptual ${concept}, material ${material}.`);
+      updateSummary();
+    }
+
+    Object.entries(sliders).forEach(([k,s])=>{
+      s.addEventListener("input", ()=>{touched.add(k); renderSandbox(false);});
+      s.addEventListener("change", ()=>{touched.add(k); renderSandbox(true);});
+    });
+
+    const correctBucket = {
+      c1:"direct", c2:"direct", c3:"direct",
+      c4:"metadata", c5:"metadata",
+      c6:"avoid"
+    };
+    let selectedCard = null;
+
+    function activateCard(card){
+      document.querySelectorAll(".card").forEach(c=>c.classList.remove("selected"));
+      selectedCard = card;
+      if(card) card.classList.add("selected");
+    }
+
+    function evaluateSorting(log=true){
+      let total = Object.keys(correctBucket).length;
+      let placed = 0;
+      let correct = 0;
+      Object.entries(correctBucket).forEach(([cid,bucket])=>{
+        const card = document.querySelector(`.card[data-card="${cid}"]`);
+        const parent = card.parentElement;
+        if(parent.classList.contains("bucket") || parent.id === "dock"){
+          if(parent.classList.contains("bucket")){
+            placed++;
+            if(parent.dataset.bucket === bucket) correct++;
+          }
+        }
+      });
+      const score = Math.round((correct/total)*100);
+      document.getElementById("sortScore").textContent = `${score}%`;
+
+      let note = "Sort direct claims away from metadata and unsupported extrapolation.";
+      if(score === 100){
+        note = "Perfect sort: evidence boundaries are clean and defensible.";
+      }else if(score >= 67){
+        note = "Mostly solid: tighten any misplaced card before final brief.";
+      }else if(placed < total){
+        note = "Continue sorting all cards to lock claim discipline.";
+      }else{
+        note = "Several cards breach evidence boundaries; reassign before submission.";
+      }
+      document.getElementById("sortFeedback").textContent = `${correct}/${total} correctly placed. ${note}`;
+      if(log) pushLog(`Card sorting scored ${score}% with ${correct}/${total} correct.`);
+      updateSummary();
+    }
+
+    document.querySelectorAll(".card").forEach(card=>{
+      card.addEventListener("dragstart", e=>{
+        e.dataTransfer.setData("text/plain", card.dataset.card);
+        activateCard(card);
+      });
+      card.addEventListener("click", ()=>{
+        activateCard(selectedCard === card ? null : card);
+      });
+    });
+
+    document.querySelectorAll(".bucket, #dock").forEach(zone=>{
+      zone.addEventListener("dragover", e=>{e.preventDefault(); zone.classList.add("over");});
+      zone.addEventListener("dragleave", ()=>zone.classList.remove("over"));
+      zone.addEventListener("drop", e=>{
+        e.preventDefault();
+        zone.classList.remove("over");
+        const id = e.dataTransfer.getData("text/plain");
+        const card = document.querySelector(`.card[data-card="${id}"]`);
+        if(card){ zone.appendChild(card); activateCard(null); evaluateSorting(); }
+      });
+      zone.addEventListener("click", ()=>{
+        if(selectedCard){ zone.appendChild(selectedCard); activateCard(null); evaluateSorting(); }
+      });
+    });
+
+    const phaseEls = {
+      p1: document.getElementById("p1"),
+      p2: document.getElementById("p2"),
+      p3: document.getElementById("p3"),
+      p4: document.getElementById("p4")
+    };
+
+    function updateSummary(){
+      const reserve = totalBudget - (alloc.evidence + alloc.inclusion + alloc.leap);
+      const risk = Number(document.getElementById("n-risk").textContent);
+      const verdictText = verdictEl.textContent;
+      const p1done = reserve === 0 && risk <= 58;
+      const p2done = verdictText.includes("Defensible");
+      const p3done = touched.size === 3;
+      const score = Number(document.getElementById("sortScore").textContent.replace("%",""));
+      const p4done = score >= 84;
+
+      [["p1",p1done],["p2",p2done],["p3",p3done],["p4",p4done]].forEach(([id,ok])=>{
+        phaseEls[id].classList.toggle("done",ok);
+      });
+
+      const readiness = Math.round(
+        (p1done?26:12) +
+        (p2done?28:10) +
+        (p3done?22:9) +
+        (p4done?24:8)
+      );
+      document.getElementById("readinessValue").textContent = `${readiness}%`;
+      let text = "Build stronger alignment before issuing final brief.";
+      if(readiness >= 85) text = "Mission green: defensible, evidence-bounded brief is ready for board review.";
+      else if(readiness >= 70) text = "Nearly ready: tighten weakest phase to avoid overstatement.";
+      document.getElementById("readinessText").textContent = text;
+    }
+
+    document.getElementById("compileBtn").addEventListener("click", ()=>{
+      const conf = Number(confRange.value);
+      const verdict = verdictEl.textContent.includes("Overstated") ? "high-risk" :
+                      verdictEl.textContent.includes("Under-claimed") ? "conservative" : "defensible";
+      const reserve = totalBudget - (alloc.evidence + alloc.inclusion + alloc.leap);
+      const prox = document.getElementById("m-prox").textContent;
+      const concept = document.getElementById("m-concept").textContent;
+      const material = document.getElementById("m-material").textContent;
+      const sortScore = document.getElementById("sortScore").textContent;
+
+      const brief = `Noon brief: Cite the White Rose Research Online article record for Sonic Bodies and identify it as a published article in Performance Research. State that the abstract discusses sonification and movement sonification for engagement with artworks in galleries and museums, and that it addresses relations among sighted, partially sighted, and non-sighted visitors. Frame hybridization through Latour to describe the artwork as relational, animated by a moving-listening subject. Current calibration: confidence ${conf}% (${verdict}), reserve ${reserve} pts, map response P${prox}/C${concept}/M${material}, sort discipline ${sortScore}. Keep causal claims bounded to article and metadata evidence.`;
+      document.getElementById("briefOutput").textContent = brief;
+      pushLog("Compiled one-page brief draft from live war-table state.");
+    });
+
+    renderAllocation(false);
+    renderHypothesis(false);
+    renderSandbox(false);
+    evaluateSorting(false);
+    pushLog("Archive operations room online. Awaiting tactical adjustments.");
+  </script>
+
+
+<script>
+(() => {
+  
+  
+  
+})();
+</script>
+</body>
+</html>

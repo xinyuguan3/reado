@@ -34,6 +34,7 @@ const experiencePagesDir = path.join(appDir, "experiences");
 const experienceScreenDir = path.join(appDir, "assets", "experiences");
 const bookCoverSourceDir = path.join(rootDir, "book_covers");
 const remoteImageSourceDir = path.join(rootDir, "assets", "remote-images");
+const studioPagesSourceDir = path.join(rootDir, "scripts", "studio-pages");
 const bookCoverDir = path.join(appDir, "assets", "book-covers");
 const remoteImageDir = path.join(appDir, "assets", "remote-images");
 const sharedDir = path.join(appDir, "shared");
@@ -42,7 +43,7 @@ const CN_AD_PROVIDER = String(process.env.READO_CN_AD_PROVIDER || "none")
   .trim()
   .toLowerCase();
 const WWADS_SLOT_ID = String(process.env.READO_WWADS_SLOT_ID || "").trim();
-const DEFAULT_DEEPSEEK_API_KEY = String(process.env.READO_DEEPSEEK_API_KEY || "").trim();
+const DEFAULT_DEEPSEEK_API_KEY = "";
 const DEFAULT_DEEPSEEK_ENDPOINT = String(process.env.READO_DEEPSEEK_ENDPOINT || "https://api.deepseek.com/chat/completions").trim();
 let hasLoggedUnknownAdProvider = false;
 let hasLoggedMissingWwadsSlot = false;
@@ -53,7 +54,13 @@ const USER_STATE_KEY = "reado_user_state_v1";
 const DAILY_GEM_CLAIM_KEY = "reado_daily_gem_claim_v1";
 const BOOK_CATALOG_GLOBAL = "__READO_BOOK_CATALOG__";
 const BOOK_COVER_EXTENSIONS = new Set([".png", ".jpg", ".jpeg", ".webp", ".avif"]);
-const BACKEND_ENABLED_BOOK_IDS = new Set(["sapiens", "zero-to-one"]);
+const EXPERIENCE_MEDIA_EXTENSIONS = new Set([".png", ".jpg", ".jpeg", ".webp", ".avif", ".gif", ".svg"]);
+const BACKEND_ENABLED_BOOK_IDS = new Set([
+  "wanli-fifteen",
+  "sapiens",
+  "principles-for-navigating-big-debt-crises",
+  "zero-to-one"
+]);
 const CATEGORY_META = {
   "personal-growth": {
     label: "个人修炼",
@@ -410,6 +417,29 @@ function createTracker(bookId, moduleSlug) {
   };
 }
 
+function sendDuration(bookId, moduleSlug, durationMs, reason) {
+  const path = "/api/modules/" + encodeURIComponent(moduleSlug) + "/duration";
+  const payload = JSON.stringify({
+    bookId,
+    durationMs,
+    reason
+  });
+  if (typeof navigator !== "undefined" && typeof navigator.sendBeacon === "function") {
+    try {
+      const blob = new Blob([payload], { type: "application/json" });
+      if (navigator.sendBeacon(path, blob)) {
+        return;
+      }
+    } catch {}
+  }
+  fetch(path, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: payload,
+    keepalive: true
+  }).catch(() => {});
+}
+
 function init(config) {
   const bookId = typeof config?.bookId === "string" ? config.bookId.trim() : "";
   const moduleSlug = typeof config?.moduleSlug === "string" ? config.moduleSlug.trim() : "";
@@ -420,6 +450,15 @@ function init(config) {
   ensureStyle();
   markPseudoInteractive();
   const track = createTracker(bookId, moduleSlug);
+  const enteredAt = Date.now();
+  let durationReported = false;
+
+  const reportDuration = (reason) => {
+    if (durationReported) return;
+    durationReported = true;
+    const stayMs = Math.max(0, Date.now() - enteredAt);
+    sendDuration(bookId, moduleSlug, stayMs, reason || "leave");
+  };
 
   apiRequest("POST", "/api/modules/" + encodeURIComponent(moduleSlug) + "/visit", { bookId }).catch(() => {});
 
@@ -438,6 +477,14 @@ function init(config) {
     const value = "value" in target ? target.value : null;
     track("change", getNodeLabel(target), value);
   });
+
+  window.addEventListener("pagehide", () => reportDuration("pagehide"), { once: true });
+  window.addEventListener("beforeunload", () => reportDuration("beforeunload"), { once: true });
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") {
+      reportDuration("hidden");
+    }
+  }, { once: true });
 }
 
 window.ReadoExperienceRuntime = { init };
@@ -450,6 +497,7 @@ function getPageKeyBySlug(slug) {
     "simulator-library-level-selection-1": "knowledge-map",
     "simulator-library-level-selection-2": "mission",
     "global-scholar-leaderboard": "ranking",
+    "analytics-dashboard": "analytics",
     "gamified-learning-hub-dashboard-3": "market",
     "gamified-learning-hub-dashboard-2": "profile"
   };
@@ -539,7 +587,7 @@ function injectCnAds(html) {
 function rewireSidebarLinks(html) {
   const routes = [
     {
-      labels: ["知识版图", "世界地图"],
+      labels: ["个人书库", "知识版图", "世界地图"],
       href: "/pages/gamified-learning-hub-dashboard-1.html"
     },
     {
@@ -737,6 +785,7 @@ function injectMarketplaceBooks(html, books) {
 
 function injectKnowledgeMapBooks(html, books) {
   const staticReplacements = [
+    ["知识版图", "个人书库"],
     ["硅谷高地", "认知/硬核"],
     ["技术领域", "科学普及 · 历史 · 哲学 · 社会学"],
     ["思辨广场", "个人修炼"],
@@ -806,6 +855,7 @@ function injectKnowledgeMapBooks(html, books) {
       "#reado-shelf-view .reado-shelf-title { font-size: 28px; line-height: 1.2; font-weight: 900; color: #fff; letter-spacing: -0.02em; }",
       "#reado-shelf-view .reado-shelf-sub { margin-top: 6px; color: #93c5fd; font-size: 12px; letter-spacing: 0.14em; font-weight: 700; text-transform: uppercase; }",
       "#reado-shelf-view .reado-shelf-count { margin-top: 10px; color: #94a3b8; font-size: 12px; }",
+      "#reado-shelf-view .reado-shelf-status { margin-top: 6px; color: #67e8f9; font-size: 11px; min-height: 16px; }",
       "#reado-shelf-view .reado-shelf-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }",
       "#reado-shelf-view .reado-shelf-card { border: 1px solid rgba(148, 163, 184, 0.22); background: rgba(15, 23, 42, 0.78); border-radius: 18px; overflow: hidden; box-shadow: 0 12px 30px rgba(2, 6, 23, 0.35); transition: border-color .18s ease, transform .18s ease; display: flex; flex-direction: column; }",
       "#reado-shelf-view .reado-shelf-card:hover { border-color: rgba(59, 130, 246, 0.7); transform: translateY(-2px); }",
@@ -816,6 +866,13 @@ function injectKnowledgeMapBooks(html, books) {
       "#reado-shelf-view .reado-shelf-name { font-size: 15px; line-height: 1.35; color: #fff; font-weight: 800; min-height: 40px; }",
       "#reado-shelf-view .reado-shelf-meta { font-size: 11px; color: #94a3b8; }",
       "#reado-shelf-view .reado-shelf-hint { font-size: 11px; color: #cbd5e1; min-height: 32px; }",
+      "#reado-shelf-view .reado-shelf-admin { margin-top: 6px; display: flex; gap: 6px; }",
+      "#reado-shelf-view .reado-shelf-admin-btn { flex: 1; border: 1px solid rgba(148, 163, 184, 0.4); border-radius: 9px; padding: 7px; font-size: 11px; font-weight: 700; color: #e2e8f0; background: rgba(15, 23, 42, 0.6); cursor: pointer; transition: all .18s ease; }",
+      "#reado-shelf-view .reado-shelf-admin-btn:hover { border-color: rgba(125, 211, 252, 0.65); background: rgba(30, 41, 59, 0.9); }",
+      "#reado-shelf-view .reado-shelf-admin-btn[data-work-action='delete'] { border-color: rgba(248, 113, 113, 0.45); color: #fecaca; }",
+      "#reado-shelf-view .reado-shelf-admin-btn[data-work-action='delete']:hover { border-color: rgba(248, 113, 113, 0.75); background: rgba(69, 10, 10, 0.48); }",
+      "#reado-shelf-view .reado-shelf-admin-btn:disabled { opacity: .55; cursor: not-allowed; }",
+      "#reado-shelf-view .reado-shelf-visibility { font-size: 10px; color: #67e8f9; letter-spacing: .04em; }",
       "#reado-shelf-view .reado-shelf-cta { margin-top: auto; border: 1px solid rgba(59, 130, 246, 0.45); background: linear-gradient(135deg, rgba(37, 99, 235, 0.3), rgba(30, 64, 175, 0.4)); color: #fff; border-radius: 10px; font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; padding: 10px; cursor: pointer; transition: all .18s ease; }",
       "#reado-shelf-view .reado-shelf-cta:hover { border-color: rgba(96, 165, 250, 0.8); background: linear-gradient(135deg, rgba(59, 130, 246, 0.45), rgba(37, 99, 235, 0.5)); }",
       "#reado-shelf-view .reado-shelf-empty { border: 1px solid rgba(148, 163, 184, 0.2); border-radius: 12px; background: rgba(15, 23, 42, 0.68); padding: 18px; color: #cbd5e1; font-size: 13px; text-align: center; }",
@@ -934,9 +991,9 @@ function injectKnowledgeMapBooks(html, books) {
   toolbar.id = "reado-map-view-toggle";
   toolbar.innerHTML = \`
     <span class="reado-view-chip">学习入口</span>
-    <div class="reado-view-switch" role="tablist" aria-label="知识页视图切换">
+    <div class="reado-view-switch" role="tablist" aria-label="个人书库视图切换">
       <button type="button" class="reado-view-btn" data-view="shelf" role="tab" aria-selected="true">书架视图</button>
-      <button type="button" class="reado-view-btn" data-view="map" role="tab" aria-selected="false">知识版图</button>
+      <button type="button" class="reado-view-btn" data-view="map" role="tab" aria-selected="false">地图视图</button>
     </div>\`;
 
   const shelfPanel = document.createElement("section");
@@ -944,9 +1001,10 @@ function injectKnowledgeMapBooks(html, books) {
   shelfPanel.innerHTML = \`
     <div class="reado-shelf-wrap">
       <div class="reado-shelf-header">
-        <h2 class="reado-shelf-title">可体验书架</h2>
+        <h2 class="reado-shelf-title">个人书库</h2>
         <p class="reado-shelf-sub">默认视图 · 直接进入书籍体验</p>
         <p class="reado-shelf-count" data-shelf-count></p>
+        <p class="reado-shelf-status" data-shelf-status></p>
       </div>
       <div class="reado-shelf-grid" data-shelf-grid></div>
     </div>\`;
@@ -955,7 +1013,12 @@ function injectKnowledgeMapBooks(html, books) {
 
   const shelfGrid = shelfPanel.querySelector("[data-shelf-grid]");
   const shelfCount = shelfPanel.querySelector("[data-shelf-count]");
+  const shelfStatus = shelfPanel.querySelector("[data-shelf-status]");
   const viewButtons = Array.from(toolbar.querySelectorAll("[data-view]"));
+  const deletedBookIds = new Set();
+  let worksByBookId = new Map();
+  let worksLoaded = false;
+  let worksLoading = false;
 
   const getUnlocked = () => {
     try {
@@ -970,8 +1033,80 @@ function injectKnowledgeMapBooks(html, books) {
     localStorage.setItem(storageKey, JSON.stringify([...set]));
   };
 
+  const isUserBook = (bookId) => /^user-/i.test(String(bookId || "").trim());
+
+  const setShelfStatus = (message, isError = false) => {
+    if (!(shelfStatus instanceof HTMLElement)) return;
+    shelfStatus.textContent = message ? String(message) : "";
+    shelfStatus.style.color = isError ? "#fca5a5" : "#67e8f9";
+  };
+
+  const requestJson = async (method, href, payload) => {
+    const response = await fetch(href, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      credentials: "same-origin",
+      body: payload ? JSON.stringify(payload) : undefined
+    });
+    let data = {};
+    try {
+      data = await response.json();
+    } catch {}
+    if (!response.ok || data?.ok === false) {
+      throw new Error(data?.error || ("Request failed with " + response.status));
+    }
+    return data;
+  };
+
+  const loadMineWorks = async ({ force = false } = {}) => {
+    if (worksLoading) return;
+    if (worksLoaded && !force) return;
+    worksLoading = true;
+    try {
+      const data = await requestJson("GET", "/api/studio/works?scope=mine&limit=300");
+      const rows = Array.isArray(data?.works) ? data.works : [];
+      const next = new Map();
+      for (const row of rows) {
+        const bookId = String(row?.book_id || "").trim();
+        if (!bookId) continue;
+        next.set(bookId, row);
+      }
+      worksByBookId = next;
+      worksLoaded = true;
+      renderShelf();
+    } catch (error) {
+      setShelfStatus("书籍管理数据加载失败：" + (error?.message || "unknown error"), true);
+    } finally {
+      worksLoading = false;
+    }
+  };
+
   const createCard = (book, unlocked) => {
     const isUnlocked = unlocked.has(book.id);
+    const work = worksByBookId.get(book.id);
+    const canManage = isUserBook(book.id) && work && work.can_edit !== false;
+    const isPublic = Boolean(work?.is_public);
+    const manageHtml = canManage
+      ? \`
+          <div class="reado-shelf-visibility">\${isPublic ? "已上架到体验库" : "仅自己可见"}</div>
+          <div class="reado-shelf-admin">
+            <button
+              type="button"
+              class="reado-shelf-admin-btn"
+              data-work-action="publish"
+              data-work-id="\${work.id}"
+              data-book-id="\${book.id}"
+              data-next-public="\${isPublic ? "0" : "1"}"
+            >\${isPublic ? "下架" : "上架"}</button>
+            <button
+              type="button"
+              class="reado-shelf-admin-btn"
+              data-work-action="delete"
+              data-work-id="\${work.id}"
+              data-book-id="\${book.id}"
+            >删除</button>
+          </div>\`
+      : "";
     return \`
       <article class="reado-shelf-card">
         <div class="reado-shelf-cover">
@@ -982,6 +1117,7 @@ function injectKnowledgeMapBooks(html, books) {
           <div class="reado-shelf-name">\${book.title}</div>
           <div class="reado-shelf-meta">\${book.moduleCount || 0} 个体验模块</div>
           <div class="reado-shelf-hint">\${book.categoryHint || "点击进入，开始互动体验。"}</div>
+          \${manageHtml}
           <button type="button" class="reado-shelf-cta" data-book-id="\${book.id}">
             \${isUnlocked ? "继续体验" : "开始体验"}
           </button>
@@ -991,7 +1127,12 @@ function injectKnowledgeMapBooks(html, books) {
 
   const renderShelf = () => {
     if (!(shelfGrid instanceof HTMLElement)) return;
-    const available = books.filter((book) => book && book.id && (book.firstModuleHref || book.hubHref));
+    const available = books.filter((book) => (
+      book
+      && book.id
+      && !deletedBookIds.has(book.id)
+      && (book.firstModuleHref || book.hubHref)
+    ));
     const unlocked = getUnlocked();
     if (shelfCount instanceof HTMLElement) {
       shelfCount.textContent = \`当前可体验 \${available.length} 本书\`;
@@ -1004,9 +1145,58 @@ function injectKnowledgeMapBooks(html, books) {
   };
 
   if (shelfGrid instanceof HTMLElement) {
-    shelfGrid.addEventListener("click", (event) => {
+    shelfGrid.addEventListener("click", async (event) => {
       const target = event.target;
       if (!(target instanceof HTMLElement)) return;
+      const actionButton = target.closest("button[data-work-action]");
+      if (actionButton instanceof HTMLButtonElement) {
+        const workId = actionButton.getAttribute("data-work-id");
+        const bookId = actionButton.getAttribute("data-book-id");
+        const action = actionButton.getAttribute("data-work-action");
+        if (!workId || !bookId || !action) return;
+        if (action === "delete") {
+          const confirmed = window.confirm("确认删除这本可玩书籍？删除后不可恢复。");
+          if (!confirmed) return;
+        }
+        actionButton.disabled = true;
+        try {
+          if (action === "publish") {
+            const shouldPublic = actionButton.getAttribute("data-next-public") === "1";
+            const data = await requestJson("PATCH", "/api/studio/works/" + encodeURIComponent(workId), {
+              is_public: shouldPublic
+            });
+            const current = worksByBookId.get(bookId) || {};
+            worksByBookId.set(bookId, {
+              ...current,
+              ...(data?.work || {}),
+              is_public: shouldPublic
+            });
+            setShelfStatus(shouldPublic ? "已上架到体验库。" : "已从体验库下架。");
+            renderShelf();
+            return;
+          }
+
+          if (action === "delete") {
+            await requestJson("DELETE", "/api/studio/works/" + encodeURIComponent(workId));
+            deletedBookIds.add(bookId);
+            worksByBookId.delete(bookId);
+            const unlocked = getUnlocked();
+            if (unlocked.has(bookId)) {
+              unlocked.delete(bookId);
+              saveUnlocked(unlocked);
+            }
+            setShelfStatus("已删除该可玩书籍。");
+            renderShelf();
+            return;
+          }
+        } catch (error) {
+          setShelfStatus("操作失败：" + (error?.message || "unknown error"), true);
+        } finally {
+          actionButton.disabled = false;
+        }
+        return;
+      }
+
       const button = target.closest("button[data-book-id]");
       if (!(button instanceof HTMLElement)) return;
       const bookId = button.getAttribute("data-book-id");
@@ -1058,6 +1248,7 @@ function injectKnowledgeMapBooks(html, books) {
   });
 
   renderShelf();
+  loadMineWorks().catch(() => {});
   const savedView = localStorage.getItem(viewStorageKey);
   setView(savedView === "map" || savedView === "shelf" ? savedView : "shelf");
 })();
@@ -1106,7 +1297,8 @@ function injectExperienceQuickNav(html, book, moduleSlug) {
       if (target.closest(".reado-shell-wrap")) return;
       const candidate = target.closest("[data-next-scene],button,a[href],.concept-card,.item-card,[data-choice],[data-option]");
       if (!(candidate instanceof HTMLElement)) return;
-      if (!candidate.closest("main")) return;
+      const mainRoot = document.querySelector("main");
+      if (mainRoot instanceof HTMLElement && !mainRoot.contains(candidate)) return;
       if (candidate.hasAttribute("data-no-next")) return;
       if (candidate.matches("a[href]")) {
         const href = candidate.getAttribute("href") || "";
@@ -1701,7 +1893,7 @@ function injectMissionCenter(html) {
           progress: Math.min(s.categoriesCompleted.size, 2),
           rewardCoins: 820,
           rewardExp: 380,
-          actionLabel: "去知识版图",
+          actionLabel: "去个人书库",
           actionHref: knowledgeHref
         },
         {
@@ -2186,7 +2378,7 @@ function buildBookHubHtml(book) {
         <p class="sub">共 ${book.modules.length} 个模块，完成购买后可进入模块体验。</p>
       </div>
       <div class="back-links">
-        <a href="/pages/gamified-learning-hub-dashboard-1.html">知识版图</a>
+        <a href="/pages/gamified-learning-hub-dashboard-1.html">个人书库</a>
         <a href="/pages/gamified-learning-hub-dashboard-3.html">交易中心</a>
       </div>
     </header>
@@ -2326,6 +2518,303 @@ function buildGemCenterHtml() {
 </html>`;
 }
 
+function buildAnalyticsDashboardHtml() {
+  return `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>reado: 数据看板</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at top right, #1f3b66 0%, transparent 40%), #070d16;
+      color: #e4edf8;
+      font-family: "Noto Sans SC", sans-serif;
+    }
+    .analytics-main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+      display: grid;
+      gap: 16px;
+    }
+    .analytics-card {
+      border: 1px solid rgba(148, 163, 184, 0.24);
+      border-radius: 16px;
+      background: rgba(11, 19, 32, 0.75);
+      padding: 16px;
+    }
+    .analytics-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .analytics-kpi {
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.6);
+      padding: 12px;
+    }
+    .analytics-kpi-label {
+      font-size: 12px;
+      color: #94a3b8;
+    }
+    .analytics-kpi-value {
+      margin-top: 8px;
+      font-size: 24px;
+      font-weight: 800;
+      color: #e2e8f0;
+    }
+    .analytics-table-wrap {
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 640px;
+    }
+    th, td {
+      text-align: left;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+      padding: 10px 8px;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+    th {
+      color: #9fb2cc;
+      font-weight: 700;
+      font-size: 12px;
+    }
+    .actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      background: rgba(2, 132, 199, 0.18);
+      color: #dbeafe;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 10px;
+      padding: 7px 12px;
+      cursor: pointer;
+    }
+    .hint {
+      font-size: 12px;
+      color: #94a3b8;
+    }
+    .error {
+      display: none;
+      color: #fecaca;
+      border: 1px solid rgba(248, 113, 113, 0.5);
+      background: rgba(127, 29, 29, 0.28);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 12px;
+    }
+    @media (max-width: 960px) {
+      .analytics-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+    @media (max-width: 640px) {
+      .analytics-main {
+        padding: 16px;
+      }
+      .analytics-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="analytics-main">
+    <section class="analytics-card">
+      <h1 style="margin:0;font-size:30px;font-weight:900;">运营数据看板</h1>
+      <p style="margin:8px 0 0;color:#94a3b8;font-size:13px;">统计口径：总浏览量（页面 PV）、每本书游玩次数（进入任意模块次数）、每本书平均停留时长。</p>
+      <div class="actions" style="margin-top:14px;">
+        <p id="analytics-updated-at" class="hint">最后更新：--</p>
+        <button id="analytics-refresh" class="btn" type="button">刷新数据</button>
+      </div>
+    </section>
+
+    <section class="analytics-grid">
+      <article class="analytics-kpi">
+        <div class="analytics-kpi-label">总浏览量</div>
+        <div id="kpi-total-page-views" class="analytics-kpi-value">--</div>
+      </article>
+      <article class="analytics-kpi">
+        <div class="analytics-kpi-label">总游玩次数</div>
+        <div id="kpi-total-book-plays" class="analytics-kpi-value">--</div>
+      </article>
+      <article class="analytics-kpi">
+        <div class="analytics-kpi-label">平均停留时长</div>
+        <div id="kpi-average-stay" class="analytics-kpi-value">--</div>
+      </article>
+      <article class="analytics-kpi">
+        <div class="analytics-kpi-label">已跟踪会话数</div>
+        <div id="kpi-tracked-sessions" class="analytics-kpi-value">--</div>
+      </article>
+    </section>
+
+    <section class="analytics-card">
+      <h2 style="margin:0 0 10px;font-size:18px;font-weight:800;">每本书统计</h2>
+      <div class="analytics-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>书名</th>
+              <th>游玩次数</th>
+              <th>平均停留</th>
+              <th>累计停留</th>
+              <th>最近游玩</th>
+            </tr>
+          </thead>
+          <tbody id="analytics-books-body">
+            <tr><td colspan="5" class="hint">加载中...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="analytics-card">
+      <h2 style="margin:0 0 10px;font-size:18px;font-weight:800;">热门页面（Top 20）</h2>
+      <div class="analytics-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>路径</th>
+              <th>浏览次数</th>
+              <th>最近浏览</th>
+            </tr>
+          </thead>
+          <tbody id="analytics-pages-body">
+            <tr><td colspan="3" class="hint">加载中...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <p id="analytics-error" class="error"></p>
+  </main>
+  <script>
+    (() => {
+      const fmt = new Intl.NumberFormat("zh-CN");
+      const updatedAtEl = document.getElementById("analytics-updated-at");
+      const pageViewsEl = document.getElementById("kpi-total-page-views");
+      const bookPlaysEl = document.getElementById("kpi-total-book-plays");
+      const averageStayEl = document.getElementById("kpi-average-stay");
+      const trackedSessionsEl = document.getElementById("kpi-tracked-sessions");
+      const booksBodyEl = document.getElementById("analytics-books-body");
+      const pagesBodyEl = document.getElementById("analytics-pages-body");
+      const errorEl = document.getElementById("analytics-error");
+      const refreshBtnEl = document.getElementById("analytics-refresh");
+
+      function formatTime(isoText) {
+        if (!isoText) return "--";
+        const dt = new Date(isoText);
+        if (Number.isNaN(dt.getTime())) return "--";
+        return dt.toLocaleString("zh-CN", { hour12: false });
+      }
+
+      function formatDuration(ms) {
+        const safe = Number.isFinite(ms) ? Math.max(0, Math.floor(ms)) : 0;
+        if (safe < 1000) return safe + " ms";
+        const sec = safe / 1000;
+        if (sec < 60) return sec.toFixed(1) + " s";
+        const min = Math.floor(sec / 60);
+        const remSec = Math.round(sec % 60);
+        return min + "m " + remSec + "s";
+      }
+
+      function escapeHtml(value) {
+        return String(value || "")
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#39;");
+      }
+
+      function renderRows(summary) {
+        const books = Array.isArray(summary?.books) ? summary.books : [];
+        const pages = Array.isArray(summary?.pages) ? summary.pages : [];
+
+        if (books.length === 0) {
+          booksBodyEl.innerHTML = '<tr><td colspan="5" class="hint">暂无书籍游玩数据。</td></tr>';
+        } else {
+          booksBodyEl.innerHTML = books.map((book) => {
+            return '<tr>'
+              + '<td>' + escapeHtml(book.title || book.id || "--") + '</td>'
+              + '<td>' + fmt.format(Number(book.playCount) || 0) + '</td>'
+              + '<td>' + formatDuration(Number(book.averageStayMs) || 0) + '</td>'
+              + '<td>' + formatDuration(Number(book.durationMs) || 0) + '</td>'
+              + '<td>' + escapeHtml(formatTime(book.lastPlayedAt)) + '</td>'
+              + '</tr>';
+          }).join("");
+        }
+
+        if (pages.length === 0) {
+          pagesBodyEl.innerHTML = '<tr><td colspan="3" class="hint">暂无页面浏览数据。</td></tr>';
+        } else {
+          pagesBodyEl.innerHTML = pages.slice(0, 20).map((page) => {
+            return '<tr>'
+              + '<td>' + escapeHtml(page.path || "--") + '</td>'
+              + '<td>' + fmt.format(Number(page.viewCount) || 0) + '</td>'
+              + '<td>' + escapeHtml(formatTime(page.lastViewedAt)) + '</td>'
+              + '</tr>';
+          }).join("");
+        }
+      }
+
+      async function loadSummary() {
+        if (errorEl) {
+          errorEl.style.display = "none";
+          errorEl.textContent = "";
+        }
+        if (refreshBtnEl) refreshBtnEl.disabled = true;
+        try {
+          const response = await fetch("/api/analytics/summary", { cache: "no-store" });
+          const data = await response.json().catch(() => ({}));
+          if (!response.ok || data?.ok === false) {
+            throw new Error(data?.error || ("Request failed with " + response.status));
+          }
+          const summary = data?.summary || {};
+          pageViewsEl.textContent = fmt.format(Number(summary.totalPageViews) || 0);
+          bookPlaysEl.textContent = fmt.format(Number(summary.totalBookPlays) || 0);
+          averageStayEl.textContent = formatDuration(Number(summary.averageBookStayMs) || 0);
+          trackedSessionsEl.textContent = fmt.format(Number(summary.trackedSessions) || 0);
+          updatedAtEl.textContent = "最后更新：" + formatTime(summary.lastUpdatedAt);
+          renderRows(data);
+        } catch (error) {
+          if (errorEl) {
+            errorEl.textContent = "加载失败：" + (error?.message || "unknown error");
+            errorEl.style.display = "block";
+          }
+        } finally {
+          if (refreshBtnEl) refreshBtnEl.disabled = false;
+        }
+      }
+
+      if (refreshBtnEl) {
+        refreshBtnEl.addEventListener("click", () => {
+          loadSummary();
+        });
+      }
+
+      loadSummary();
+      window.setInterval(loadSummary, 30000);
+    })();
+  </script>
+</body>
+</html>`;
+}
+
 function buildIndexHtml(pages) {
   const home = pages.find((page) => page.slug === "gamified-learning-hub-dashboard-1");
   const homeHref = home ? `/pages/${home.slug}.html` : `/pages/${pages[0].slug}.html`;
@@ -2356,8 +2845,9 @@ function buildIndexHtml(pages) {
 
 function buildSharedShellScript() {
   return `const ROUTES = [
-  { id: "knowledge-map", icon: "map", label: "知识版图", href: "/pages/gamified-learning-hub-dashboard-1.html" },
+  { id: "knowledge-map", icon: "map", label: "个人书库", href: "/pages/gamified-learning-hub-dashboard-1.html" },
   { id: "mission", icon: "assignment", label: "任务中心", href: "/pages/simulator-library-level-selection-2.html" },
+  { id: "studio", icon: "auto_awesome", label: "创作工坊", href: "/pages/playable-studio.html" },
   { id: "ranking", icon: "leaderboard", label: "排行榜", href: "/pages/global-scholar-leaderboard.html" },
   { id: "market", icon: "storefront", label: "交易中心", href: "/pages/gamified-learning-hub-dashboard-3.html" },
   { id: "profile", icon: "person", label: "个人资料", href: "/pages/gamified-learning-hub-dashboard-2.html" }
@@ -2384,6 +2874,7 @@ const DEFAULT_DEEPSEEK_API_KEY = ${JSON.stringify(DEFAULT_DEEPSEEK_API_KEY)};
 const DEFAULT_DEEPSEEK_ENDPOINT = ${JSON.stringify(DEFAULT_DEEPSEEK_ENDPOINT)};
 const FALLBACK_AVATAR_DATA_URI = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23135bec'/%3E%3Cstop offset='100%25' stop-color='%2300eaff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='96' height='96' rx='48' fill='url(%23g)'/%3E%3Ccircle cx='48' cy='38' r='18' fill='rgba(255,255,255,0.92)'/%3E%3Cpath d='M18 84c4-16 16-24 30-24s26 8 30 24' fill='rgba(255,255,255,0.92)'/%3E%3C/svg%3E";
 const FALLBACK_IMAGE_DATA_URI = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 360'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%230f172a'/%3E%3Cstop offset='100%25' stop-color='%23135bec'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='640' height='360' fill='url(%23bg)'/%3E%3Ccircle cx='220' cy='140' r='50' fill='rgba(255,255,255,0.2)'/%3E%3Cpath d='M112 290c34-56 76-84 126-84s92 28 126 84' fill='rgba(255,255,255,0.22)'/%3E%3Cpath d='M438 128l44 44 78-78' stroke='rgba(255,255,255,0.65)' stroke-width='16' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ctext x='320' y='326' text-anchor='middle' fill='rgba(255,255,255,0.84)' font-family='Arial,sans-serif' font-size='24'%3EImage unavailable%3C/text%3E%3C/svg%3E";
+const BILLING_MODAL_ID = "reado-billing-modal";
 
 function formatNumber(value) {
   return new Intl.NumberFormat("zh-CN").format(value);
@@ -2423,6 +2914,233 @@ function ensureDeepSeekDefaults() {
   } catch {}
 }
 ensureDeepSeekDefaults();
+
+function trackPageView(pathname) {
+  const path = String(pathname || "").trim();
+  if (!path || !path.startsWith("/")) return;
+  const dedupeKey = "__readoTrackedPageView__" + path;
+  if (window[dedupeKey]) return;
+  window[dedupeKey] = true;
+  fetch("/api/analytics/page-view", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      path,
+      title: document.title || "",
+      referrer: document.referrer || ""
+    }),
+    keepalive: true
+  }).catch(() => {});
+}
+
+async function requestJson(method, path, payload) {
+  const response = await fetch(path, {
+    method: method || "GET",
+    headers: { "Content-Type": "application/json" },
+    body: payload ? JSON.stringify(payload) : undefined,
+    credentials: "same-origin"
+  });
+  let data = {};
+  try {
+    data = await response.json();
+  } catch {}
+  if (!response.ok || data?.ok === false) {
+    throw new Error(data?.error || ("Request failed with " + response.status));
+  }
+  return data;
+}
+
+function formatTimestamp(seconds) {
+  const ts = Number(seconds);
+  if (!Number.isFinite(ts) || ts <= 0) return "未设置";
+  return new Date(ts * 1000).toLocaleString("zh-CN", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+
+function createBillingModal(options = {}) {
+  const modal = document.createElement("div");
+  modal.id = BILLING_MODAL_ID;
+  modal.className = "reado-billing-modal";
+  modal.innerHTML = \`
+    <div class="reado-billing-overlay" data-billing-close></div>
+    <section class="reado-billing-panel" role="dialog" aria-modal="true" aria-labelledby="reado-billing-title">
+      <button class="reado-billing-close" type="button" aria-label="关闭订阅面板" data-billing-close>✕</button>
+      <header class="reado-billing-head">
+        <p class="reado-billing-kicker">RE ADO PRO</p>
+        <h3 id="reado-billing-title">升级到 Pro 订阅</h3>
+        <p class="reado-billing-sub">使用 Stripe 安全支付，可随时在门户取消或变更。</p>
+      </header>
+      <div class="reado-billing-grid">
+        <article class="reado-billing-card is-plan">
+          <p class="reado-billing-price">Pro Monthly / Annual</p>
+          <p class="reado-billing-copy">完整体验、持续更新、更多互动内容。</p>
+          <ul class="reado-billing-features">
+            <li>完整书籍模块与后续新内容</li>
+            <li>优先体验新功能</li>
+            <li>专属会员标识与成长权益</li>
+            <li>可在 Stripe 门户自助管理</li>
+          </ul>
+          <div class="reado-billing-actions">
+            <button class="reado-billing-btn is-primary" type="button" data-billing-checkout>立即订阅</button>
+            <button class="reado-billing-btn" type="button" data-billing-refresh>刷新状态</button>
+          </div>
+        </article>
+        <article class="reado-billing-card is-status">
+          <p class="reado-billing-label">当前订阅状态</p>
+          <p class="reado-billing-status" data-billing-status>读取中...</p>
+          <p class="reado-billing-meta" data-billing-period>--</p>
+          <p class="reado-billing-meta" data-billing-updated>--</p>
+          <button class="reado-billing-btn" type="button" data-billing-portal>管理订阅</button>
+          <p class="reado-billing-error" data-billing-error></p>
+        </article>
+      </div>
+    </section>\`;
+
+  let current = null;
+  let loading = "";
+  const checkoutBtn = modal.querySelector("[data-billing-checkout]");
+  const portalBtn = modal.querySelector("[data-billing-portal]");
+  const refreshBtn = modal.querySelector("[data-billing-refresh]");
+  const statusEl = modal.querySelector("[data-billing-status]");
+  const periodEl = modal.querySelector("[data-billing-period]");
+  const updatedEl = modal.querySelector("[data-billing-updated]");
+  const errorEl = modal.querySelector("[data-billing-error]");
+
+  const setError = (msg) => {
+    if (!errorEl) return;
+    errorEl.textContent = msg || "";
+  };
+
+  const setLoading = (key) => {
+    loading = key || "";
+    if (checkoutBtn) {
+      checkoutBtn.disabled = Boolean(loading);
+      checkoutBtn.textContent = loading === "checkout" ? "跳转中..." : "立即订阅";
+    }
+    if (portalBtn) {
+      portalBtn.disabled = Boolean(loading) || !current?.customerId;
+      portalBtn.textContent = loading === "portal" ? "打开中..." : "管理订阅";
+    }
+    if (refreshBtn) {
+      refreshBtn.disabled = Boolean(loading);
+      refreshBtn.textContent = loading === "refresh" ? "刷新中..." : "刷新状态";
+    }
+  };
+
+  const render = () => {
+    const status = current?.status || "none";
+    const isActive = Boolean(current?.subscriptionActive);
+    if (statusEl) {
+      statusEl.textContent = isActive ? "已开通 Pro" : (status === "none" ? "未订阅" : status);
+      statusEl.classList.toggle("is-active", isActive);
+    }
+    if (periodEl) {
+      periodEl.textContent = isActive
+        ? ("到期时间: " + formatTimestamp(current?.currentPeriodEnd))
+        : "未检测到可用订阅";
+    }
+    if (updatedEl) {
+      updatedEl.textContent = current?.updatedAt
+        ? ("状态更新时间: " + new Date(current.updatedAt).toLocaleString("zh-CN"))
+        : "";
+    }
+    setLoading(loading);
+    if (typeof options.onStatusChange === "function") {
+      options.onStatusChange(current || null);
+    }
+  };
+
+  const refreshStatus = async () => {
+    setError("");
+    setLoading("refresh");
+    try {
+      const payload = await requestJson("GET", "/api/billing/subscription");
+      current = payload?.billing || null;
+      render();
+    } catch (error) {
+      setError(error?.message || "读取订阅状态失败");
+    } finally {
+      setLoading("");
+    }
+  };
+
+  const startCheckout = async () => {
+    setError("");
+    setLoading("checkout");
+    try {
+      const payload = await requestJson("POST", "/api/billing/checkout", {});
+      const url = String(payload?.checkoutUrl || "").trim();
+      if (!url) {
+        throw new Error("Stripe checkout url is empty");
+      }
+      window.location.assign(url);
+    } catch (error) {
+      setError(error?.message || "创建订阅会话失败");
+      setLoading("");
+    }
+  };
+
+  const openPortal = async () => {
+    setError("");
+    setLoading("portal");
+    try {
+      const payload = await requestJson("POST", "/api/billing/portal", {});
+      const url = String(payload?.portalUrl || "").trim();
+      if (!url) {
+        throw new Error("Stripe portal url is empty");
+      }
+      window.location.assign(url);
+    } catch (error) {
+      setError(error?.message || "打开管理门户失败");
+      setLoading("");
+    }
+  };
+
+  const close = () => {
+    modal.classList.remove("open");
+    document.body.classList.remove("reado-modal-open");
+  };
+
+  const open = () => {
+    modal.classList.add("open");
+    document.body.classList.add("reado-modal-open");
+    refreshStatus();
+  };
+
+  modal.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+    if (target.closest("[data-billing-close]")) {
+      close();
+      return;
+    }
+    if (target.closest("[data-billing-checkout]")) {
+      startCheckout();
+      return;
+    }
+    if (target.closest("[data-billing-portal]")) {
+      openPortal();
+      return;
+    }
+    if (target.closest("[data-billing-refresh]")) {
+      refreshStatus();
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      close();
+    }
+  });
+
+  refreshStatus();
+  return { modal, open, close, refreshStatus, getCurrent: () => current };
+}
 
 function writeUserState(state) {
   localStorage.setItem(USER_STATE_KEY, JSON.stringify(state));
@@ -2615,6 +3333,21 @@ function ensureGlobalStyle() {
     }
     body.reado-shell-applied .reado-shell-pill.gems .reado-shell-pill-icon {
       color: #00eaff;
+    }
+    body.reado-shell-applied .reado-shell-pill.pro {
+      cursor: pointer;
+      color: #ffe9a8;
+      border-color: rgba(255, 214, 102, 0.42);
+      background: linear-gradient(135deg, rgba(255, 214, 102, 0.2), rgba(212, 139, 24, 0.2));
+      transition: transform 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+    }
+    body.reado-shell-applied .reado-shell-pill.pro .reado-shell-pill-icon {
+      color: #ffd666;
+    }
+    body.reado-shell-applied .reado-shell-pill.pro:hover {
+      transform: translateY(-1px);
+      border-color: rgba(255, 224, 148, 0.72);
+      box-shadow: 0 0 0 2px rgba(255, 214, 102, 0.18);
     }
     body.reado-shell-applied .reado-shell-pill.flash {
       animation: reado-shell-pop .45s ease;
@@ -3005,6 +3738,170 @@ function ensureGlobalStyle() {
       background: var(--reado-primary);
       cursor: pointer;
     }
+    body.reado-shell-applied.reado-modal-open {
+      overflow: hidden !important;
+    }
+    body.reado-shell-applied .reado-billing-modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10040;
+      padding: 20px;
+      pointer-events: auto;
+    }
+    body.reado-shell-applied .reado-billing-modal.open {
+      display: flex;
+    }
+    body.reado-shell-applied .reado-billing-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.62);
+      backdrop-filter: blur(6px);
+    }
+    body.reado-shell-applied .reado-billing-panel {
+      position: relative;
+      width: min(1000px, calc(100vw - 24px));
+      max-height: min(86vh, 860px);
+      overflow: auto;
+      border-radius: 20px;
+      border: 1px solid rgba(148, 163, 184, 0.26);
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.95), rgba(8, 14, 28, 0.97));
+      box-shadow: 0 24px 90px rgba(2, 8, 23, 0.62);
+      padding: 22px;
+    }
+    body.reado-shell-applied .reado-billing-close {
+      position: absolute;
+      right: 16px;
+      top: 12px;
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      color: #cbd5e1;
+      background: rgba(15, 23, 42, 0.65);
+      font-size: 16px;
+      cursor: pointer;
+    }
+    body.reado-shell-applied .reado-billing-head {
+      margin-bottom: 14px;
+      padding-right: 48px;
+    }
+    body.reado-shell-applied .reado-billing-kicker {
+      margin: 0;
+      color: #93c5fd;
+      font-weight: 800;
+      letter-spacing: .09em;
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+    body.reado-shell-applied .reado-billing-head h3 {
+      margin: 6px 0 8px;
+      font-size: clamp(28px, 4.6vw, 42px);
+      line-height: 1.06;
+      letter-spacing: -0.02em;
+      color: #eff6ff;
+    }
+    body.reado-shell-applied .reado-billing-sub {
+      margin: 0;
+      color: #94a3b8;
+      font-size: 13px;
+    }
+    body.reado-shell-applied .reado-billing-grid {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 14px;
+    }
+    body.reado-shell-applied .reado-billing-card {
+      border-radius: 16px;
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      background: rgba(15, 23, 42, 0.62);
+      padding: 16px;
+    }
+    body.reado-shell-applied .reado-billing-card.is-plan {
+      border-color: rgba(59, 130, 246, 0.42);
+      box-shadow: inset 0 0 0 1px rgba(59, 130, 246, 0.16);
+    }
+    body.reado-shell-applied .reado-billing-price {
+      margin: 0 0 6px;
+      color: #e2e8f0;
+      font-size: 23px;
+      font-weight: 900;
+      letter-spacing: -0.01em;
+    }
+    body.reado-shell-applied .reado-billing-copy {
+      margin: 0;
+      color: #94a3b8;
+      font-size: 13px;
+    }
+    body.reado-shell-applied .reado-billing-features {
+      margin: 12px 0 0;
+      padding-left: 18px;
+      color: #cbd5e1;
+      font-size: 14px;
+      line-height: 1.8;
+    }
+    body.reado-shell-applied .reado-billing-actions {
+      margin-top: 14px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    body.reado-shell-applied .reado-billing-btn {
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.74);
+      color: #e2e8f0;
+      font-size: 13px;
+      font-weight: 800;
+      padding: 10px 14px;
+      cursor: pointer;
+      min-height: 42px;
+    }
+    body.reado-shell-applied .reado-billing-btn:disabled {
+      opacity: 0.65;
+      cursor: default;
+    }
+    body.reado-shell-applied .reado-billing-btn.is-primary {
+      border-color: rgba(96, 165, 250, 0.55);
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #f8fafc;
+    }
+    body.reado-shell-applied .reado-billing-label {
+      margin: 0;
+      color: #93c5fd;
+      font-size: 11px;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+    body.reado-shell-applied .reado-billing-status {
+      margin: 8px 0 2px;
+      font-size: 28px;
+      line-height: 1.05;
+      font-weight: 900;
+      color: #f8fafc;
+    }
+    body.reado-shell-applied .reado-billing-status.is-active {
+      color: #86efac;
+    }
+    body.reado-shell-applied .reado-billing-meta {
+      margin: 6px 0 0;
+      color: #94a3b8;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+    body.reado-shell-applied .reado-billing-error {
+      margin: 10px 0 0;
+      color: #fda4af;
+      min-height: 18px;
+      font-size: 12px;
+    }
+    body.reado-shell-applied .reado-billing-card.is-status .reado-billing-btn {
+      margin-top: 10px;
+      width: 100%;
+    }
     @media (max-width: 1023px) {
       body.reado-shell-applied { padding-left: 0 !important; }
       body.reado-shell-applied .reado-shell-toggle { display: inline-flex; }
@@ -3163,6 +4060,18 @@ function ensureGlobalStyle() {
       body.reado-shell-applied.reado-experience-mode .reado-shell-gain-hint {
         right: 10px;
         top: 64px;
+      }
+      body.reado-shell-applied .reado-billing-modal {
+        padding: 10px;
+      }
+      body.reado-shell-applied .reado-billing-panel {
+        padding: 14px;
+      }
+      body.reado-shell-applied .reado-billing-grid {
+        grid-template-columns: 1fr;
+      }
+      body.reado-shell-applied .reado-billing-status {
+        font-size: 24px;
       }
       body.reado-shell-applied.reado-experience-mode.reado-mobile-proportional main {
         transform: scale(var(--reado-mobile-scale, 0.9));
@@ -3347,6 +4256,7 @@ class ReadoAppShell extends HTMLElement {
 
     const page = this.dataset.page || "other";
     const path = window.location.pathname;
+    trackPageView(path);
     const isExperiencePage = path.startsWith("/experiences/");
     const isBookHubPage = path.startsWith("/books/");
     const isLearningPage = isExperiencePage || isBookHubPage;
@@ -3370,6 +4280,9 @@ class ReadoAppShell extends HTMLElement {
     }
     if (path === "/pages/gamified-learning-hub-dashboard-2.html") {
       document.body.classList.add("reado-page-profile");
+    }
+    if (path === "/pages/analytics-dashboard.html") {
+      document.body.classList.add("reado-page-analytics");
     }
     enableMobileProportionalMode(isExperiencePage);
     if (isExperiencePage) {
@@ -3402,6 +4315,10 @@ class ReadoAppShell extends HTMLElement {
           <span class="reado-shell-pill-icon">diamond</span>
           <strong data-shell-gems>0</strong>
         </span>
+        <button class="reado-shell-pill pro" type="button" data-open-billing>
+          <span class="reado-shell-pill-icon">workspace_premium</span>
+          <strong data-shell-pro-label>订阅 Pro</strong>
+        </button>
         <div class="reado-shell-user">
           <div class="reado-shell-user-meta">
             <span class="reado-shell-user-name" data-shell-name></span>
@@ -3424,6 +4341,7 @@ class ReadoAppShell extends HTMLElement {
     const xpBarEl = top.querySelector("[data-shell-xp-bar]");
     const avatarEl = top.querySelector("[data-shell-avatar]");
     const gemsPillEl = top.querySelector(".reado-shell-pill.gems");
+    const proLabelEl = top.querySelector("[data-shell-pro-label]");
 
     const renderUser = (state, flash = false) => {
       const user = normalizeUserState(state);
@@ -3457,6 +4375,19 @@ class ReadoAppShell extends HTMLElement {
     }
 
     renderUser(readUserState(), false);
+
+    const syncProLabel = (billing) => {
+      if (!proLabelEl) return;
+      const active = Boolean(billing?.subscriptionActive);
+      proLabelEl.textContent = active ? "Pro 已开通" : "订阅 Pro";
+    };
+    syncProLabel(null);
+    const billingModalApi = createBillingModal({
+      onStatusChange: (billing) => {
+        syncProLabel(billing);
+      }
+    });
+    document.body.append(billingModalApi.modal);
 
     const showGainHint = (text, className) => {
       const node = document.createElement("div");
@@ -3495,6 +4426,12 @@ class ReadoAppShell extends HTMLElement {
     top.addEventListener("click", (event) => {
       const target = event.target;
       if (!(target instanceof HTMLElement)) return;
+      const billingTrigger = target.closest("[data-open-billing]");
+      if (billingTrigger) {
+        event.preventDefault();
+        billingModalApi.open();
+        return;
+      }
       const clickable = target.closest("[data-href]");
       if (!clickable) return;
       const href = clickable.getAttribute("data-href");
@@ -3522,7 +4459,8 @@ class ReadoAppShell extends HTMLElement {
       <h4>每周挑战</h4>
       <p>阅读 3 章节历史书</p>
       <div class="reado-shell-progress"><span></span></div>
-      <p style="margin-top:8px;font-size:11px;color:#9cc2ff;font-weight:700;">已完成 2/3</p>\`;
+      <p style="margin-top:8px;font-size:11px;color:#9cc2ff;font-weight:700;">已完成 2/3</p>
+      <button class="reado-task-btn" type="button" data-open-billing style="margin-top:10px;">解锁 Pro 订阅</button>\`;
     side.append(nav, weekly);
 
     const rightPanel = document.createElement("aside");
@@ -3571,6 +4509,27 @@ class ReadoAppShell extends HTMLElement {
       if (!button) return;
       const href = button.getAttribute("data-href");
       if (href) window.location.href = href;
+    });
+    side.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+      const billingTrigger = target.closest("[data-open-billing]");
+      if (!billingTrigger) return;
+      event.preventDefault();
+      side.classList.remove("open");
+      billingModalApi.open();
+    });
+    const searchParams = new URLSearchParams(window.location.search);
+    if (searchParams.get("subscribe") === "1" || searchParams.get("billing") === "1") {
+      setTimeout(() => billingModalApi.open(), 150);
+    }
+    window.addEventListener("pageshow", () => {
+      billingModalApi.refreshStatus();
+    });
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") {
+        billingModalApi.refreshStatus();
+      }
     });
     document.addEventListener("click", (event) => {
       if (!isLearningPage && window.innerWidth > 1023) return;
@@ -3635,6 +4594,9 @@ async function loadExperiencePages() {
     const moduleEntries = await fs.readdir(bookDir, { withFileTypes: true });
     const moduleDirs = moduleEntries.filter((entry) => entry.isDirectory()).map((entry) => entry.name).sort();
     for (const [moduleIndex, moduleDirName] of moduleDirs.entries()) {
+      if (/^reado:_/i.test(moduleDirName)) {
+        continue;
+      }
       const moduleDir = path.join(bookDir, moduleDirName);
       const htmlPath = path.join(moduleDir, "code.html");
       const imagePath = path.join(moduleDir, "screen.png");
@@ -3813,6 +4775,11 @@ async function writeGemCenterPage() {
   await fs.writeFile(path.join(pagesDir, "gem-center.html"), html, "utf8");
 }
 
+async function writeAnalyticsDashboardPage() {
+  const html = injectAppShell(buildAnalyticsDashboardHtml(), "analytics");
+  await fs.writeFile(path.join(pagesDir, "analytics-dashboard.html"), html, "utf8");
+}
+
 async function writeExperiencePages(experiences, moduleToBook) {
   for (const experience of experiences) {
     const book = moduleToBook.get(experience.slug);
@@ -3820,13 +4787,64 @@ async function writeExperiencePages(experiences, moduleToBook) {
     html = injectAppShell(html, "knowledge-map");
     await fs.writeFile(path.join(experiencePagesDir, `${experience.slug}.html`), html, "utf8");
     await fs.copyFile(experience.imagePath, path.join(experienceScreenDir, `${experience.slug}.png`));
+
+    const moduleDir = path.dirname(experience.htmlPath);
+    let extraEntries = [];
+    try {
+      extraEntries = await fs.readdir(moduleDir, { withFileTypes: true });
+    } catch {
+      extraEntries = [];
+    }
+    const mediaDir = path.join(experiencePagesDir, "media", experience.slug);
+    let mediaDirPrepared = false;
+    for (const entry of extraEntries) {
+      if (!entry.isFile()) continue;
+      const lower = entry.name.toLowerCase();
+      if (lower === "code.html" || lower === "screen.png" || lower === "module.json") continue;
+      const ext = path.extname(lower);
+      if (!EXPERIENCE_MEDIA_EXTENSIONS.has(ext)) continue;
+      if (!mediaDirPrepared) {
+        await fs.mkdir(mediaDir, { recursive: true });
+        mediaDirPrepared = true;
+      }
+      await fs.copyFile(path.join(moduleDir, entry.name), path.join(mediaDir, entry.name));
+    }
   }
 }
 
 async function writeSharedAssets(books) {
-  await fs.writeFile(path.join(sharedDir, "shell.js"), buildSharedShellScript(), "utf8");
+  const customShellSourcePath = path.join(rootDir, "scripts", "shared", "shell.js");
+  const customI18nSourcePath = path.join(rootDir, "scripts", "shared", "i18n.js");
+  let customShell = "";
+  try {
+    customShell = await fs.readFile(customShellSourcePath, "utf8");
+  } catch {
+    customShell = "";
+  }
+  await fs.writeFile(path.join(sharedDir, "shell.js"), customShell || buildSharedShellScript(), "utf8");
+  try {
+    await fs.copyFile(customI18nSourcePath, path.join(sharedDir, "i18n.js"));
+  } catch {
+    // optional file, only needed when i18n is enabled
+  }
   await fs.writeFile(path.join(sharedDir, "book-catalog.js"), buildSharedBookCatalogScript(books), "utf8");
   await fs.writeFile(path.join(sharedDir, "experience-runtime.js"), buildSharedExperienceRuntimeScript(), "utf8");
+}
+
+async function writeStudioCustomPages() {
+  try {
+    const entries = await fs.readdir(studioPagesSourceDir, { withFileTypes: true });
+    for (const entry of entries) {
+      if (!entry.isFile() || !entry.name.endsWith(".html")) continue;
+      await fs.copyFile(
+        path.join(studioPagesSourceDir, entry.name),
+        path.join(pagesDir, entry.name)
+      );
+    }
+  } catch (error) {
+    if (error && error.code === "ENOENT") return;
+    throw error;
+  }
 }
 
 async function writeRemoteImageAssets() {
@@ -3857,8 +4875,10 @@ async function main() {
   await writeRemoteImageAssets();
   await writeCustomBookCovers(customCovers);
   await writeSharedAssets(books);
+  await writeStudioCustomPages();
   await writePages(pages, books);
   await writeGemCenterPage();
+  await writeAnalyticsDashboardPage();
   await writeBookPages(books);
   await writeExperiencePages(experiences, moduleToBook);
   await fs.writeFile(path.join(appDir, "index.html"), buildIndexHtml(pages), "utf8");
