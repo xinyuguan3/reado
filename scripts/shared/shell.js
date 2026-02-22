@@ -37,6 +37,8 @@ const DEFAULT_DEEPSEEK_ENDPOINT = "https://api.deepseek.com/chat/completions";
 const FALLBACK_AVATAR_DATA_URI = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23135bec'/%3E%3Cstop offset='100%25' stop-color='%2300eaff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='96' height='96' rx='48' fill='url(%23g)'/%3E%3Ccircle cx='48' cy='38' r='18' fill='rgba(255,255,255,0.92)'/%3E%3Cpath d='M18 84c4-16 16-24 30-24s26 8 30 24' fill='rgba(255,255,255,0.92)'/%3E%3C/svg%3E";
 const FALLBACK_IMAGE_DATA_URI = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 360'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%230f172a'/%3E%3Cstop offset='100%25' stop-color='%23135bec'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='640' height='360' fill='url(%23bg)'/%3E%3Ccircle cx='220' cy='140' r='50' fill='rgba(255,255,255,0.2)'/%3E%3Cpath d='M112 290c34-56 76-84 126-84s92 28 126 84' fill='rgba(255,255,255,0.22)'/%3E%3Cpath d='M438 128l44 44 78-78' stroke='rgba(255,255,255,0.65)' stroke-width='16' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ctext x='320' y='326' text-anchor='middle' fill='rgba(255,255,255,0.84)' font-family='Arial,sans-serif' font-size='24'%3EImage unavailable%3C/text%3E%3C/svg%3E";
 const BILLING_MODAL_ID = "reado-billing-modal";
+const AUTH_STATE_KEY = "reado_auth_state_v1";
+const AUTH_PAGE_PATH = "/pages/auth.html";
 const BILLING_PLAN_ORDER = ["starter", "trial", "pro"];
 const BILLING_PLAN_COPY = {
   monthly: {
@@ -199,6 +201,39 @@ async function requestJson(method, path, payload) {
   return data;
 }
 
+function readAuthState() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(AUTH_STATE_KEY) || "null");
+    if (!raw || typeof raw !== "object") return null;
+    const userId = typeof raw.userId === "string" ? raw.userId.trim() : "";
+    const email = typeof raw.email === "string" ? raw.email.trim() : "";
+    const expiresAt = Number(raw.expiresAt);
+    if (Number.isFinite(expiresAt) && expiresAt > 0 && Date.now() > expiresAt) {
+      localStorage.removeItem(AUTH_STATE_KEY);
+      return null;
+    }
+    if (!userId && !email) return null;
+    return { userId, email, expiresAt };
+  } catch {
+    return null;
+  }
+}
+
+function isUserSignedIn() {
+  return Boolean(readAuthState());
+}
+
+function buildAuthRedirectUrl(priceId) {
+  const url = new URL(AUTH_PAGE_PATH, window.location.origin);
+  const next = window.location.pathname + window.location.search + window.location.hash;
+  url.searchParams.set("next", next || "/");
+  if (priceId) {
+    url.searchParams.set("intent", "checkout");
+    url.searchParams.set("priceId", priceId);
+  }
+  return url.toString();
+}
+
 function formatTimestamp(seconds) {
   const ts = Number(seconds);
   if (!Number.isFinite(ts) || ts <= 0) return t("billing.not_set", "Not set");
@@ -302,8 +337,33 @@ function createBillingModal(options = {}) {
     return cyclePrices && typeof cyclePrices === "object" ? cyclePrices : {};
   };
 
+  const getCheckoutConfigHint = () => {
+    const status = checkoutConfig?.configStatus;
+    if (!status || typeof status !== "object") return "";
+    const missing = [];
+    if (!status.hasSecretKey) missing.push("STRIPE_SECRET_KEY");
+    if (!status.hasSuccessUrl) missing.push("STRIPE_SUCCESS_URL");
+    if (!status.hasCancelUrl) missing.push("STRIPE_CANCEL_URL");
+    const monthly = status.monthly && typeof status.monthly === "object" ? status.monthly : {};
+    const annual = status.annual && typeof status.annual === "object" ? status.annual : {};
+    const hasAnyPrice = Boolean(
+      status.hasLegacyPrice
+      || monthly.starter
+      || monthly.trial
+      || monthly.pro
+      || annual.starter
+      || annual.trial
+      || annual.pro
+    );
+    if (!hasAnyPrice) {
+      missing.push("STRIPE_PRICE_MONTHLY_* / STRIPE_PRICE_ANNUAL_*");
+    }
+    return missing.length ? ("Missing: " + missing.join(", ")) : "";
+  };
+
   renderPlans = () => {
     if (!cardsEl) return;
+    const signedIn = isUserSignedIn();
     for (const btn of cycleBtnEls) {
       btn.classList.toggle("is-active", btn.getAttribute("data-billing-cycle-btn") === selectedCycle);
       btn.disabled = Boolean(loading);
@@ -319,6 +379,8 @@ function createBillingModal(options = {}) {
       let cta = copy.cta;
       if (isThisBusy) {
         cta = t("billing.cta_redirecting", "Redirecting...");
+      } else if (!signedIn && isReady) {
+        cta = t("billing.cta_signin", "Sign in to continue");
       } else if (isCurrentPlan) {
         cta = t("billing.current_plan", "Current plan");
       } else if (!isReady) {
@@ -341,7 +403,7 @@ function createBillingModal(options = {}) {
             type="button"
             data-billing-checkout
             data-billing-price-id="${priceId}"
-            ${!isReady || isBusy || isCurrentPlan ? "disabled" : ""}>${cta}</button>
+            ${!isReady || isBusy || (signedIn && isCurrentPlan) ? "disabled" : ""}>${cta}</button>
           ${badge}
           <ul class="reado-plan-features">${featureItems}</ul>
         </article>`;
@@ -400,11 +462,12 @@ function createBillingModal(options = {}) {
       const cycleAnnual = getCyclePrices("annual");
       const hasAnyPlan = BILLING_PLAN_ORDER.some((tier) => Boolean(cycleMonthly[tier] || cycleAnnual[tier]));
       if (!checkoutConfig?.enabled || !hasAnyPlan) {
+        const configHint = getCheckoutConfigHint();
         setPricingHint(
           t(
             "billing.pricing_missing",
             "Custom plans are not configured. Set STRIPE_PRICE_MONTHLY_* and STRIPE_PRICE_ANNUAL_* in server env."
-          ),
+          ) + (configHint ? " " + configHint : ""),
           true
         );
         renderPlans();
@@ -428,6 +491,10 @@ function createBillingModal(options = {}) {
     const selectedPriceId = String(priceId || "").trim();
     if (!selectedPriceId) {
       setError(t("billing.err_checkout_config", "This plan is not configured in Stripe."));
+      return;
+    }
+    if (!isUserSignedIn()) {
+      window.location.assign(buildAuthRedirectUrl(selectedPriceId));
       return;
     }
     setError("");

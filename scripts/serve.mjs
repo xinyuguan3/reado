@@ -54,6 +54,8 @@ const stripePriceAnnualPro = String(process.env.STRIPE_PRICE_ANNUAL_PRO || "").t
 const stripeSuccessUrl = String(process.env.STRIPE_SUCCESS_URL || "").trim();
 const stripeCancelUrl = String(process.env.STRIPE_CANCEL_URL || "").trim();
 const stripePortalReturnUrl = String(process.env.STRIPE_PORTAL_RETURN_URL || stripeSuccessUrl || "").trim();
+const supabasePublicUrl = String(process.env.READO_SUPABASE_URL || process.env.SUPABASE_URL || "").trim();
+const supabaseAnonKey = String(process.env.READO_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || "").trim();
 const stripeCheckoutPrices = {
   monthly: {
     starter: stripePriceMonthlyStarter,
@@ -85,6 +87,22 @@ const stripeCheckoutPriceIds = new Set(
     stripePriceAnnualPro
   ].filter(Boolean)
 );
+const stripeCheckoutConfigStatus = {
+  hasSecretKey: Boolean(stripeSecretKey),
+  hasSuccessUrl: Boolean(stripeSuccessUrl),
+  hasCancelUrl: Boolean(stripeCancelUrl),
+  hasLegacyPrice: Boolean(stripePriceId),
+  monthly: {
+    starter: Boolean(stripePriceMonthlyStarter),
+    trial: Boolean(stripePriceMonthlyTrial || stripePriceId),
+    pro: Boolean(stripePriceMonthlyPro)
+  },
+  annual: {
+    starter: Boolean(stripePriceAnnualStarter),
+    trial: Boolean(stripePriceAnnualTrial),
+    pro: Boolean(stripePriceAnnualPro)
+  }
+};
 const creditsDailyFree = toInt(process.env.READO_CREDITS_DAILY_FREE || 0);
 const creditsMonthlyFree = toInt(process.env.READO_CREDITS_MONTHLY_FREE || 0);
 const creditsDailySmall = toInt(process.env.READO_CREDITS_DAILY_SMALL || 120);
@@ -2772,6 +2790,18 @@ async function handleApi(req, res, url, providedSession = null) {
     return true;
   }
 
+  if (method === "GET" && pathname === "/api/auth/config") {
+    writeJson(res, 200, {
+      ok: true,
+      enabled: Boolean(supabasePublicUrl && supabaseAnonKey),
+      auth: {
+        supabaseUrl: supabasePublicUrl,
+        supabaseAnonKey: supabaseAnonKey
+      }
+    });
+    return true;
+  }
+
   if (method === "GET" && pathname === "/api/billing/subscription") {
     const record = getOrCreateBillingRecord(session.id);
     writeJson(res, 200, {
@@ -2821,7 +2851,8 @@ async function handleApi(req, res, url, providedSession = null) {
       checkout: {
         enabled: stripeCheckoutReady(),
         defaultPriceId: stripeDefaultCheckoutPriceId,
-        prices: stripeCheckoutPrices
+        prices: stripeCheckoutPrices,
+        configStatus: stripeCheckoutConfigStatus
       },
       pricingTable: {
         publishableKey: stripePricingTableReady() ? stripePublishableKey : "",
