@@ -18,15 +18,16 @@ const ROUTES = [
 const STYLE_ID = "reado-shared-shell-style";
 const ICON_FONT_ID = "reado-shell-material-icons";
 const USER_STATE_KEY = "reado_user_state_v1";
+const DAILY_GEM_CLAIM_LEGACY_KEY = "reado_daily_gem_claim_v1";
+const DAILY_GEM_CLAIM_STREAK_KEY = "reado_daily_gem_claim_streak_v2";
 const DEFAULT_USER_STATE = {
-  name: "亚历克斯·陈",
-  title: "资深学者",
-  level: 5,
-  xp: 2450,
-  gems: 1240,
-  streak: "连续 15 天",
-  avatar:
-    "/assets/remote-images/3ec2fbb52c0ab37789b9f619.png"
+  name: "Guest",
+  title: "Unregistered",
+  level: 1,
+  xp: 0,
+  gems: 0,
+  streak: "Sign in to save progress",
+  avatar: ""
 };
 const GEM_CENTER_HREF = "/pages/gem-center.html";
 const LAST_EXPERIENCE_KEY = "reado_last_experience_href";
@@ -131,6 +132,81 @@ function formatNumber(value) {
   return new Intl.NumberFormat(getCurrentLanguage()).format(value);
 }
 
+function getDayKey(source = new Date()) {
+  const y = source.getFullYear();
+  const m = String(source.getMonth() + 1).padStart(2, "0");
+  const d = String(source.getDate()).padStart(2, "0");
+  return y + "-" + m + "-" + d;
+}
+
+function parseDayKey(value) {
+  if (typeof value !== "string") return null;
+  const matched = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!matched) return null;
+  const y = Number(matched[1]);
+  const m = Number(matched[2]) - 1;
+  const d = Number(matched[3]);
+  const date = new Date(y, m, d);
+  if (
+    date.getFullYear() !== y
+    || date.getMonth() !== m
+    || date.getDate() !== d
+  ) {
+    return null;
+  }
+  return date;
+}
+
+function dayDiff(fromDay, toDay) {
+  const from = parseDayKey(fromDay);
+  const to = parseDayKey(toDay);
+  if (!from || !to) return NaN;
+  return Math.round((to.getTime() - from.getTime()) / 86400000);
+}
+
+function buildStreakLabel(days) {
+  const lang = String(getCurrentLanguage() || "").toLowerCase();
+  if (lang.startsWith("zh")) {
+    return "连续 " + formatNumber(Math.max(0, days)) + " 天";
+  }
+  return formatNumber(Math.max(0, days)) + "-day streak";
+}
+
+function readDailyGemStreakDays() {
+  let lastClaimDay = "";
+  let streak = 0;
+  try {
+    const raw = localStorage.getItem(DAILY_GEM_CLAIM_STREAK_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      lastClaimDay = typeof parsed?.lastClaimDay === "string" ? parsed.lastClaimDay : "";
+      streak = Number.isFinite(parsed?.streak) ? Math.max(0, Math.floor(parsed.streak)) : 0;
+    }
+    const legacyDay = localStorage.getItem(DAILY_GEM_CLAIM_LEGACY_KEY);
+    if (parseDayKey(legacyDay)) {
+      if (!parseDayKey(lastClaimDay) || legacyDay > lastClaimDay) {
+        lastClaimDay = legacyDay;
+        streak = Math.max(1, streak || 1);
+      }
+    }
+  } catch {
+    return 0;
+  }
+  if (!parseDayKey(lastClaimDay)) return 0;
+  const diff = dayDiff(lastClaimDay, getDayKey());
+  if (diff === 0 || diff === 1) return Math.max(1, streak || 1);
+  if (diff > 1) return 0;
+  return Math.max(0, streak || 0);
+}
+
+function resolveStreakText(user) {
+  const days = readDailyGemStreakDays();
+  if (days > 0) return buildStreakLabel(days);
+  const raw = typeof user?.streak === "string" ? user.streak.trim() : "";
+  if (/\d+/.test(raw)) return buildStreakLabel(0);
+  return raw || buildStreakLabel(0);
+}
+
 function getXpForNext(level) {
   return Math.max(1000, level * 600);
 }
@@ -143,6 +219,23 @@ function normalizeUserState(raw) {
     xp: Number.isFinite(merged.xp) ? Math.max(0, Math.floor(merged.xp)) : DEFAULT_USER_STATE.xp,
     gems: Number.isFinite(merged.gems) ? Math.max(0, Math.floor(merged.gems)) : DEFAULT_USER_STATE.gems
   };
+}
+
+function maybeMigrateLegacyMockUser() {
+  if (isUserSignedIn()) return;
+  try {
+    const parsed = JSON.parse(localStorage.getItem(USER_STATE_KEY) || "null");
+    if (!parsed || typeof parsed !== "object") return;
+    const legacyName = typeof parsed.name === "string" ? parsed.name.trim() : "";
+    const legacyLevel = Number(parsed.level);
+    const legacyXp = Number(parsed.xp);
+    const legacyGems = Number(parsed.gems);
+    const looksLegacy = legacyName === "亚历克斯·陈"
+      || (legacyLevel === 5 && legacyXp === 2450 && legacyGems === 1240);
+    if (looksLegacy) {
+      writeUserState(DEFAULT_USER_STATE);
+    }
+  } catch {}
 }
 
 function readUserState() {
@@ -766,7 +859,11 @@ function ensureGlobalStyle() {
     body.reado-shell-applied:not(.reado-experience-mode) > nav:first-of-type,
     body.reado-shell-applied:not(.reado-experience-mode) > aside:first-of-type,
     body.reado-shell-applied:not(.reado-experience-mode) > .flex > nav:first-of-type,
-    body.reado-shell-applied:not(.reado-experience-mode) > .flex > aside:first-of-type {
+    body.reado-shell-applied:not(.reado-experience-mode) > .flex > aside:first-of-type,
+    body.reado-shell-applied:not(.reado-experience-mode) > .flex-1 > nav:first-of-type,
+    body.reado-shell-applied:not(.reado-experience-mode) > .flex-1 > aside:first-of-type,
+    body.reado-shell-applied:not(.reado-experience-mode) > .flex > .flex-1 > nav:first-of-type,
+    body.reado-shell-applied:not(.reado-experience-mode) > .flex > .flex-1 > aside:first-of-type {
       display: none !important;
     }
     body.reado-shell-applied .reado-shell-wrap {
@@ -1947,6 +2044,38 @@ function enableImageFallbacks() {
   observer.observe(document.documentElement, { childList: true, subtree: true });
 }
 
+function hideLegacyAppChrome(isLearningPage) {
+  if (isLearningPage) return;
+  const navTokens = ["个人书库", "知识版图", "任务中心", "排行榜", "交易中心", "个人资料", "世界地图", "我的库存", "道具仓库", "交易市场", "个人主页"];
+  const hideNode = (node) => {
+    if (!(node instanceof HTMLElement)) return;
+    node.style.setProperty("display", "none", "important");
+  };
+  const looksLikeLegacySidebar = (node) => {
+    if (!(node instanceof HTMLElement)) return false;
+    const links = node.querySelectorAll("a[href]");
+    if (links.length < 4) return false;
+    const text = (node.textContent || "").replace(/\s+/g, "");
+    const tokenHits = navTokens.reduce((count, token) => count + (text.includes(token) ? 1 : 0), 0);
+    const cls = typeof node.className === "string" ? node.className : "";
+    const widthLike = /\bw-(20|60|64|72|80)\b/.test(cls);
+    return tokenHits >= 2 || widthLike;
+  };
+
+  hideNode(document.querySelector("body > header:first-of-type"));
+  const candidates = [
+    ...document.querySelectorAll("body > nav, body > aside"),
+    ...document.querySelectorAll("body > .flex > nav, body > .flex > aside"),
+    ...document.querySelectorAll("body > .flex-1 > nav, body > .flex-1 > aside"),
+    ...document.querySelectorAll("body > .flex > .flex-1 > nav, body > .flex > .flex-1 > aside")
+  ];
+  candidates.forEach((node) => {
+    if (looksLikeLegacySidebar(node)) {
+      hideNode(node);
+    }
+  });
+}
+
 class ReadoAppShell extends HTMLElement {
   connectedCallback() {
     if (this.dataset.ready === "1") return;
@@ -1955,9 +2084,7 @@ class ReadoAppShell extends HTMLElement {
     ensureGlobalStyle();
     enableImageFallbacks();
     document.body.classList.add("reado-shell-applied");
-    if (!localStorage.getItem(USER_STATE_KEY)) {
-      writeUserState(DEFAULT_USER_STATE);
-    }
+    maybeMigrateLegacyMockUser();
 
     const page = this.dataset.page || "other";
     const path = window.location.pathname;
@@ -1968,6 +2095,7 @@ class ReadoAppShell extends HTMLElement {
     if (isLearningPage) {
       document.body.classList.add("reado-experience-mode");
     }
+    hideLegacyAppChrome(isLearningPage);
     if (path === "/pages/simulator-library-level-selection-2.html") {
       document.body.classList.add("reado-page-mission");
     }
@@ -2056,13 +2184,13 @@ class ReadoAppShell extends HTMLElement {
     const renderUser = (state, flash = false) => {
       const user = normalizeUserState(state);
       const progress = getLevelProgress(user);
-      if (streakEl) streakEl.textContent = user.streak || DEFAULT_USER_STATE.streak;
+      if (streakEl) streakEl.textContent = resolveStreakText(user);
       if (gemsEl) gemsEl.textContent = formatNumber(user.gems);
       if (nameEl) nameEl.textContent = user.name;
       if (levelEl) levelEl.textContent = "Lv." + user.level + " " + (user.title || t("shell.learner", "学习者"));
       if (xpLabelEl) xpLabelEl.textContent = t("shell.xp_to_next", "距离下一级还差 {xp} EXP", { xp: formatNumber(progress.remain) });
       if (xpBarEl) xpBarEl.style.width = progress.percent + "%";
-      if (avatarEl) avatarEl.src = user.avatar;
+      if (avatarEl) avatarEl.src = user.avatar || FALLBACK_AVATAR_DATA_URI;
 
       if (flash) {
         if (gemsPillEl) {

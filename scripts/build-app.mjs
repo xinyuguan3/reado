@@ -52,6 +52,7 @@ const UNLOCK_STORAGE_KEY = "reado_unlocked_books_v1";
 const COMPLETED_STORAGE_KEY = "reado_completed_books_v1";
 const USER_STATE_KEY = "reado_user_state_v1";
 const DAILY_GEM_CLAIM_KEY = "reado_daily_gem_claim_v1";
+const DAILY_GEM_CLAIM_STREAK_KEY = "reado_daily_gem_claim_streak_v2";
 const BOOK_CATALOG_GLOBAL = "__READO_BOOK_CATALOG__";
 const BOOK_COVER_EXTENSIONS = new Set([".png", ".jpg", ".jpeg", ".webp", ".avif"]);
 const EXPERIENCE_MEDIA_EXTENSIONS = new Set([".png", ".jpg", ".jpeg", ".webp", ".avif", ".gif", ".svg"]);
@@ -2443,7 +2444,7 @@ function buildGemCenterHtml() {
   <main class="max-w-3xl mx-auto space-y-6">
     <header class="rounded-2xl border border-cyan-300/20 bg-slate-900/65 p-6">
       <h1 class="text-3xl md:text-4xl font-black text-white">宝石中心</h1>
-      <p class="mt-2 text-slate-300">每日可免费领取一次 <strong class="text-cyan-300">100 宝石</strong>。</p>
+      <p class="mt-2 text-slate-300">连续签到可提高奖励，第 1 天 <strong class="text-cyan-300">20 宝石</strong>，阶段日奖励更高。</p>
       <div class="mt-5 inline-flex items-center gap-2 px-4 py-2 rounded-full border border-cyan-300/35 bg-cyan-400/10">
         <span class="material-icons text-cyan-300 text-base">diamond</span>
         <span class="text-cyan-200 font-bold">当前宝石：<span id="reado-gem-total">--</span></span>
@@ -2452,7 +2453,9 @@ function buildGemCenterHtml() {
     <section class="rounded-2xl border border-white/10 bg-slate-900/55 p-6">
       <h2 class="text-xl font-black text-white">每日补给</h2>
       <p id="reado-gem-tip" class="mt-2 text-sm text-slate-300">正在读取领取状态...</p>
-      <button id="reado-gem-claim-btn" class="mt-4 px-5 py-2 rounded-lg font-bold text-sm transition-all bg-blue-600 text-white hover:brightness-110">免费领取 100 宝石</button>
+      <p id="reado-gem-streak" class="mt-2 text-xs text-cyan-200">连续签到：--</p>
+      <div id="reado-gem-milestones" class="mt-3 flex flex-wrap gap-2 text-xs"></div>
+      <button id="reado-gem-claim-btn" class="mt-4 px-5 py-2 rounded-lg font-bold text-sm transition-all bg-blue-600 text-white hover:brightness-110">今日签到领取 -- 宝石</button>
     </section>
     <section class="rounded-2xl border border-white/10 bg-slate-900/40 p-6">
       <h3 class="text-lg font-black text-white">快速入口</h3>
@@ -2465,26 +2468,147 @@ function buildGemCenterHtml() {
   </main>
   <script>
     (() => {
-      const claimKey = ${JSON.stringify(DAILY_GEM_CLAIM_KEY)};
+      const legacyClaimKey = ${JSON.stringify(DAILY_GEM_CLAIM_KEY)};
+      const claimKey = ${JSON.stringify(DAILY_GEM_CLAIM_STREAK_KEY)};
+      const cycleDays = 30;
+      const milestoneDays = [3, 7, 10, 14, 18, 21, 25, 30];
+      const milestoneBonus = {
+        3: 16,
+        7: 24,
+        10: 32,
+        14: 40,
+        18: 50,
+        21: 60,
+        25: 80,
+        30: 110
+      };
       const totalEl = document.getElementById("reado-gem-total");
       const tipEl = document.getElementById("reado-gem-tip");
+      const streakEl = document.getElementById("reado-gem-streak");
+      const milestonesEl = document.getElementById("reado-gem-milestones");
       const btnEl = document.getElementById("reado-gem-claim-btn");
-      if (!totalEl || !tipEl || !btnEl) return;
+      if (!totalEl || !tipEl || !btnEl || !streakEl || !milestonesEl) return;
 
-      const dayKey = () => {
-        const now = new Date();
-        const y = now.getFullYear();
-        const m = String(now.getMonth() + 1).padStart(2, "0");
-        const d = String(now.getDate()).padStart(2, "0");
+      const dayKey = (source = new Date()) => {
+        const y = source.getFullYear();
+        const m = String(source.getMonth() + 1).padStart(2, "0");
+        const d = String(source.getDate()).padStart(2, "0");
         return y + "-" + m + "-" + d;
+      };
+
+      const parseDayKey = (value) => {
+        if (typeof value !== "string") return null;
+        const matched = value.match(/^(\\d{4})-(\\d{2})-(\\d{2})$/);
+        if (!matched) return null;
+        const y = Number(matched[1]);
+        const m = Number(matched[2]) - 1;
+        const d = Number(matched[3]);
+        const date = new Date(y, m, d);
+        if (
+          date.getFullYear() !== y
+          || date.getMonth() !== m
+          || date.getDate() !== d
+        ) {
+          return null;
+        }
+        return date;
+      };
+
+      const dayDiff = (fromDay, toDay) => {
+        const from = parseDayKey(fromDay);
+        const to = parseDayKey(toDay);
+        if (!from || !to) return NaN;
+        return Math.round((to.getTime() - from.getTime()) / 86400000);
+      };
+
+      const getCycleDay = (streak) => {
+        const safe = Math.max(1, Math.floor(Number(streak) || 1));
+        return ((safe - 1) % cycleDays) + 1;
+      };
+
+      const getDailyReward = (cycleDay) => {
+        const base = 20 + Math.min(28, Math.floor((cycleDay - 1) / 2) * 2);
+        return base + (milestoneBonus[cycleDay] || 0);
+      };
+
+      const getNextStreak = (state, today) => {
+        if (!state.lastClaimDay) return 1;
+        const diff = dayDiff(state.lastClaimDay, today);
+        if (diff === 1) return state.streak + 1;
+        return 1;
+      };
+
+      const loadClaimState = () => {
+        let state = { lastClaimDay: "", streak: 0 };
+        try {
+          const raw = localStorage.getItem(claimKey);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            const parsedDay = typeof parsed?.lastClaimDay === "string" ? parsed.lastClaimDay : "";
+            const parsedStreak = Number.isFinite(parsed?.streak) ? Math.max(0, Math.floor(parsed.streak)) : 0;
+            state = { lastClaimDay: parsedDay, streak: parsedStreak };
+          }
+        } catch {
+          state = { lastClaimDay: "", streak: 0 };
+        }
+        const legacyDay = localStorage.getItem(legacyClaimKey);
+        if (parseDayKey(legacyDay)) {
+          if (!parseDayKey(state.lastClaimDay) || legacyDay > state.lastClaimDay) {
+            state = { lastClaimDay: legacyDay, streak: Math.max(1, state.streak || 1) };
+          }
+        }
+        return state;
+      };
+
+      const saveClaimState = (state) => {
+        localStorage.setItem(claimKey, JSON.stringify({
+          lastClaimDay: state.lastClaimDay,
+          streak: Math.max(0, Math.floor(Number(state.streak) || 0))
+        }));
+      };
+
+      const renderMilestones = (currentCycleDay) => {
+        milestonesEl.innerHTML = milestoneDays.map((day) => {
+          const reward = getDailyReward(day);
+          const active = day === currentCycleDay;
+          const reached = day < currentCycleDay;
+          const cls = active
+            ? "border-cyan-300/70 bg-cyan-400/20 text-cyan-100"
+            : reached
+              ? "border-emerald-300/50 bg-emerald-400/15 text-emerald-100"
+              : "border-white/15 bg-white/5 text-slate-300";
+          return '<span class="px-2 py-1 rounded-md border ' + cls + '">第' + day + '天 +' + reward + "</span>";
+        }).join("");
       };
 
       const render = () => {
         const user = window.ReadoUser?.getState?.();
         if (user) totalEl.textContent = new Intl.NumberFormat("zh-CN").format(user.gems || 0);
+
+        const state = loadClaimState();
         const today = dayKey();
-        const claimed = localStorage.getItem(claimKey) === today;
-        tipEl.textContent = claimed ? "今日免费宝石已领取，明天再来。" : "今日尚未领取，点击下方按钮即可获得 100 宝石。";
+        const claimed = state.lastClaimDay === today;
+        const nextStreak = claimed ? state.streak : getNextStreak(state, today);
+        const cycleDay = getCycleDay(nextStreak);
+        const todayReward = getDailyReward(cycleDay);
+        const lastDiff = state.lastClaimDay ? dayDiff(state.lastClaimDay, today) : NaN;
+        const stableStreak = claimed
+          ? state.streak
+          : (lastDiff === 1 ? state.streak : 0);
+
+        if (claimed) {
+          tipEl.textContent = "今日已领取 " + todayReward + " 宝石，明天继续签到可获得更多。";
+        } else if (stableStreak > 0) {
+          tipEl.textContent = "连续签到第 " + nextStreak + " 天可领取 " + todayReward + " 宝石。";
+        } else if (state.streak > 0) {
+          tipEl.textContent = "签到已中断，今日重新开始可领取 " + todayReward + " 宝石。";
+        } else {
+          tipEl.textContent = "今日尚未领取，签到第 1 天可领取 " + todayReward + " 宝石。";
+        }
+
+        streakEl.textContent = "连续签到：" + stableStreak + " 天";
+        renderMilestones(cycleDay);
+        btnEl.textContent = claimed ? "今日已领取" : ("今日签到领取 " + todayReward + " 宝石");
         btnEl.disabled = claimed;
         btnEl.className = claimed
           ? "mt-4 px-5 py-2 rounded-lg font-bold text-sm transition-all bg-white/10 text-slate-500 cursor-not-allowed"
@@ -2501,13 +2625,19 @@ function buildGemCenterHtml() {
       waitUser();
 
       btnEl.addEventListener("click", () => {
+        const state = loadClaimState();
         const today = dayKey();
-        if (localStorage.getItem(claimKey) === today) {
+        if (state.lastClaimDay === today) {
           render();
           return;
         }
-        window.ReadoUser?.grantRewards?.({ gems: 100, xp: 0, reason: "daily-free-gems" });
-        localStorage.setItem(claimKey, today);
+
+        const nextStreak = getNextStreak(state, today);
+        const cycleDay = getCycleDay(nextStreak);
+        const reward = getDailyReward(cycleDay);
+        saveClaimState({ lastClaimDay: today, streak: nextStreak });
+        localStorage.setItem(legacyClaimKey, today);
+        window.ReadoUser?.grantRewards?.({ gems: reward, xp: 0, reason: "daily-streak-gems-day-" + cycleDay });
         render();
       });
 
