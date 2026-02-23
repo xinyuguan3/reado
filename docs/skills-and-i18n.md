@@ -70,8 +70,24 @@ Priority order for PDF parsing:
 
 1. NotebookLM bridge (`READO_NOTEBOOKLM_BRIDGE_ENDPOINT`)
 2. PDF Reader MCP bridge (`READO_PDF_READER_MCP_ENDPOINT`)
-3. Local anthropic PDF skill (`studio_skills/anthropic-pdf-reader.mjs`)
-4. Generic parser webhook (`READO_PARSER_WEBHOOK_URL`)
+3. OpenAI direct PDF parsing (`READO_PDF_OPENAI_DIRECT=on` + `/responses` endpoint)
+4. Local anthropic PDF skill (`studio_skills/anthropic-pdf-reader.mjs`)
+5. Generic parser webhook (`READO_PARSER_WEBHOOK_URL`)
+
+### Optional OpenAI direct PDF parsing (no extra bridge)
+
+If your `READO_CODEX_ENDPOINT` (or resolved LLM endpoint) is an OpenAI-compatible `/responses` endpoint, Reado can parse PDFs directly via `input_file`.
+
+```bash
+READO_PDF_OPENAI_DIRECT=on
+READO_PDF_OPENAI_MAX_OUTPUT_TOKENS=7000
+```
+
+Notes:
+
+- Uses existing LLM credentials (`READO_CODEX_API_KEY` / `READO_LLM_API_KEY`).
+- Only enabled when endpoint contains `/responses`.
+- For very long PDFs, output can still be token-limited; keep NotebookLM/MCP bridge as high-quality fallback.
 
 ### Optional PDF Reader MCP bridge (`pdf-reader-mcp`)
 
@@ -99,6 +115,7 @@ Health fields in `/api/studio/health`:
 
 - `notebooklmBridgeConfigured`
 - `pdfReaderMcpConfigured`
+- `openaiPdfDirectConfigured`
 - `maxContextChars`
 - `maxUploadBytes`
 

@@ -638,8 +638,8 @@ body.reado-shell-ready > .reado-shell-boot-mask {
   }, 4000);
 })();
 </script>
-<script src="/shared/book-catalog.js"></script>
-<script type="module" src="/shared/shell.js"></script>
+<script src="/shared/book-catalog.js?v=skill-think-shell-v2"></script>
+<script type="module" src="/shared/shell.js?v=skill-think-shell-v2"></script>
 <reado-app-shell data-page="think-tank"></reado-app-shell>
 
 <main class="page">
@@ -705,6 +705,61 @@ body.reado-shell-ready > .reado-shell-boot-mask {
 
 <script>
 (() => {
+  const ensureUnifiedSidebarLinks = () => {
+    const nav = document.querySelector(".reado-shell-nav");
+    if (!(nav instanceof HTMLElement)) return false;
+    const hasSkillTree = nav.querySelector('a.reado-shell-link[href="/pages/skill-tree"]');
+    const hasThinkTank = nav.querySelector('a.reado-shell-link[href="/pages/think-tank"]');
+    if (hasSkillTree && hasThinkTank) return true;
+
+    const firstGroup = nav.querySelector(".reado-shell-nav-group");
+    if (!(firstGroup instanceof HTMLElement)) return false;
+    const title = firstGroup.querySelector(".reado-shell-nav-title");
+    const titleHtml = title ? title.outerHTML : "";
+    const links = Array.from(firstGroup.querySelectorAll("a.reado-shell-link"));
+    const linkByHref = new Map(links.map((link) => [link.getAttribute("href") || "", link.outerHTML]));
+    if (!linkByHref.has("/pages/skill-tree")) {
+      linkByHref.set(
+        "/pages/skill-tree",
+        '<a class="reado-shell-link" href="/pages/skill-tree"><span class="reado-shell-link-icon">device_hub</span><span>技能树</span></a>'
+      );
+    }
+    if (!linkByHref.has("/pages/think-tank")) {
+      linkByHref.set(
+        "/pages/think-tank",
+        '<a class="reado-shell-link active" href="/pages/think-tank"><span class="reado-shell-link-icon">hub</span><span>智库</span></a>'
+      );
+    }
+    const ordered = [
+      "/pages/gamified-learning-hub-dashboard-1",
+      "/pages/skill-tree",
+      "/pages/think-tank",
+      "/pages/simulator-library-level-selection-2",
+      "/pages/public-library",
+      "/pages/playable-studio",
+      "/pages/gamified-learning-hub-dashboard-3",
+      "/pages/global-scholar-leaderboard",
+      "/pages/gamified-learning-hub-dashboard-2"
+    ];
+    const mergedLinks = ordered
+      .map((href) => linkByHref.get(href))
+      .filter(Boolean)
+      .join("");
+    firstGroup.innerHTML = `${titleHtml}${mergedLinks}`;
+    return true;
+  };
+
+  const syncSidebar = () => {
+    if (ensureUnifiedSidebarLinks()) return;
+    const observer = new MutationObserver(() => {
+      if (ensureUnifiedSidebarLinks()) observer.disconnect();
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+    window.setTimeout(() => observer.disconnect(), 4000);
+  };
+
+  syncSidebar();
+
   const tabsEl = document.getElementById("book-tabs");
   const statusEl = document.getElementById("status");
   const metricsEl = document.getElementById("metrics");
@@ -735,12 +790,69 @@ body.reado-shell-ready > .reado-shell-boot-mask {
   };
 
   const palette = ["#2dd4bf", "#60a5fa", "#f59e0b", "#fb7185", "#a78bfa", "#34d399", "#f97316", "#22d3ee"];
+  const FEATURED_BOOK_ORDER = [
+    "zero-to-one",
+    "sapiens",
+    "wanli-fifteen",
+    "principles-for-navigating-big-debt-crises"
+  ];
+  const FEATURED_BOOK_TITLE = {
+    "zero-to-one": "《从零到一》",
+    "sapiens": "《人类简史》",
+    "wanli-fifteen": "《万历十五年》",
+    "principles-for-navigating-big-debt-crises": "《置身事内》"
+  };
 
   const asArray = (v) => Array.isArray(v) ? v : [];
   const toText = (v, fallback = "") => typeof v === "string" && v.trim() ? v.trim() : fallback;
   const toNumber = (v, fallback = 0) => Number.isFinite(Number(v)) ? Number(v) : fallback;
   const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
   const formatNumber = (n) => new Intl.NumberFormat("zh-CN").format(Math.round(toNumber(n, 0)));
+  const isLikelyUserBook = (book) => {
+    const id = toText(book?.id).toLowerCase();
+    const title = toText(book?.rawTitle || book?.title).toLowerCase();
+    return id.startsWith("u-")
+      || title.startsWith("user ")
+      || /untitled|custom sources|arxiv|eprints|essay/i.test(title);
+  };
+  const normalizeBookTitle = (book) => {
+    const id = toText(book?.id);
+    if (FEATURED_BOOK_TITLE[id]) return FEATURED_BOOK_TITLE[id];
+    if (isLikelyUserBook(book)) {
+      const suffix = id ? id.slice(-6).toUpperCase() : "LAB";
+      return `我的实验书 ${suffix}`;
+    }
+    return toText(book?.title, toText(book?.rawTitle, id || "未命名书籍"));
+  };
+  const pickThinkTankBooks = (rows) => {
+    const normalized = asArray(rows)
+      .filter((book) => book && toText(book.id))
+      .map((book) => ({
+        ...book,
+        id: toText(book.id),
+        rawTitle: toText(book.title),
+        title: normalizeBookTitle(book),
+        thinkTankEntryCount: toNumber(book.thinkTankEntryCount, 0)
+      }));
+    const map = new Map(normalized.map((book) => [book.id, book]));
+    const featured = FEATURED_BOOK_ORDER
+      .map((id) => map.get(id))
+      .filter((book) => book && book.thinkTankEntryCount > 0);
+    const featuredIds = new Set(featured.map((book) => book.id));
+    const others = normalized.filter((book) => !featuredIds.has(book.id) && book.thinkTankEntryCount > 0);
+    const cleanOthers = others
+      .filter((book) => !isLikelyUserBook(book))
+      .sort((a, b) => b.thinkTankEntryCount - a.thinkTankEntryCount || a.title.localeCompare(b.title, "zh-Hans-CN"));
+    const userOthers = others
+      .filter((book) => isLikelyUserBook(book))
+      .sort((a, b) => b.thinkTankEntryCount - a.thinkTankEntryCount)
+      .slice(0, 2);
+    const merged = [...featured, ...cleanOthers, ...userOthers];
+    if (merged.length) return merged;
+    return normalized
+      .sort((a, b) => b.thinkTankEntryCount - a.thinkTankEntryCount || a.title.localeCompare(b.title, "zh-Hans-CN"))
+      .slice(0, 6);
+  };
 
   const escapeHtml = (value) => toText(value)
     .replaceAll("&", "&amp;")
@@ -1303,15 +1415,16 @@ body.reado-shell-ready > .reado-shell-boot-mask {
     setStatus("正在载入智库...");
     try {
       const payload = await fetchJson("/api/content/books");
-      state.books = asArray(payload?.books).filter((book) => book && book.id);
+      state.books = pickThinkTankBooks(payload?.books);
       if (!state.books.length) {
         setStatus("暂无书籍数据", "error");
-        detailEl.innerHTML = "<article class='empty'>暂无可用书籍。</article>";
+        detailEl.innerHTML = "<article class='empty'>当前没有已生成智库词条的书籍。请先为书籍完成摘要/回填。</article>";
         return;
       }
       state.activeBookId = state.books[0].id;
       renderTabs();
       renderMode();
+      setStatus(`已筛选 ${state.books.length} 本高质量书籍`);
       await refreshEntries();
     } catch (error) {
       setStatus(toText(error?.message, "加载失败"), "error");

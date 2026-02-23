@@ -11,6 +11,7 @@ const THINK_TANK_STATE_FILE = "reado-think-tank.json";
 const MAX_TEXT_LEN = 120_000;
 const MAX_CONTEXT_TEXT_LEN = Math.max(60_000, Number(process.env.READO_MAX_CONTEXT_CHARS || 180_000));
 const MAX_UPLOAD_BYTES = Math.max(1, Number(process.env.READO_UPLOAD_MAX_MB || 25)) * 1024 * 1024;
+const OPENAI_PDF_MAX_OUTPUT_TOKENS = Math.max(1200, Math.min(12000, Number(process.env.READO_PDF_OPENAI_MAX_OUTPUT_TOKENS || 7000)));
 const PLACEHOLDER_PNG_BASE64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO8B6xkAAAAASUVORK5CYII=";
 const CODEX_CONFIG_PATH = path.join(process.env.HOME || "", ".codex", "config.toml");
 const CODEX_AUTH_PATH = path.join(process.env.HOME || "", ".codex", "auth.json");
@@ -441,6 +442,100 @@ async function parsePdfViaBridgeEndpoint({
   return {
     text: clamp(text.replace(/\s+/g, " ").trim(), MAX_CONTEXT_TEXT_LEN),
     provider: toText(payload?.provider, toText(provider, "external_parser"))
+  };
+}
+
+async function parsePdfViaOpenAiResponses({
+  endpoint,
+  apiKey,
+  model,
+  name,
+  mimeType,
+  contentBase64,
+  timeoutMs = 180000
+}) {
+  const normalizedEndpoint = toText(endpoint);
+  if (!normalizedEndpoint) {
+    throw new Error("OpenAI PDF parser endpoint is missing");
+  }
+  if (!/\/responses(?:\?|$)/i.test(normalizedEndpoint)) {
+    throw new Error("OpenAI direct PDF parsing requires a /responses endpoint");
+  }
+  const safeApiKey = toText(apiKey);
+  if (!safeApiKey) {
+    throw new Error("OpenAI direct PDF parsing requires an API key");
+  }
+  const safeMimeType = toText(mimeType, "application/pdf");
+  const safeName = toText(name, "source.pdf");
+  const safeBase64 = toText(contentBase64);
+  if (!safeBase64) {
+    throw new Error("OpenAI direct PDF parsing content is empty");
+  }
+  const prompt = [
+    "Extract readable text from this PDF in page order.",
+    "Keep it plain text only.",
+    "Include OCR-style labels from charts/images only when they affect understanding.",
+    "Do not add summary or commentary."
+  ].join(" ");
+  const body = {
+    model: toText(model, "gpt-5-mini"),
+    input: [
+      {
+        role: "user",
+        content: [
+          { type: "input_text", text: prompt },
+          {
+            type: "input_file",
+            filename: safeName,
+            file_data: `data:${safeMimeType};base64,${safeBase64}`
+          }
+        ]
+      }
+    ],
+    text: { format: { type: "text" } },
+    max_output_tokens: OPENAI_PDF_MAX_OUTPUT_TOKENS
+  };
+
+  const { response, text: rawBody } = await fetchTextWithTimeout(
+    normalizedEndpoint,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${safeApiKey}`
+      },
+      body: JSON.stringify(body)
+    },
+    timeoutMs
+  );
+
+  let data = {};
+  try {
+    data = JSON.parse(rawBody);
+  } catch {
+    const sse = parseSsePayload(rawBody);
+    data = sse.response || {};
+    if (sse.outputText) {
+      data.output_text = sse.outputText;
+    }
+    if (sse.error && !data.error) {
+      data.error = { message: sse.error };
+    }
+  }
+
+  const content = extractLlmTextFromPayload(data);
+  if (!response.ok || !content) {
+    const preview = toText(rawBody).slice(0, 220);
+    const error = toText(
+      data?.error?.message,
+      `OpenAI PDF parsing failed (${response.status})${preview ? `: ${preview}` : ""}`
+    );
+    throw new Error(error);
+  }
+
+  return {
+    text: clamp(content.replace(/\s+/g, " ").trim(), MAX_CONTEXT_TEXT_LEN),
+    provider: "openai_responses_pdf"
   };
 }
 
@@ -1683,9 +1778,9 @@ function compileModuleHtml({ bookId, blueprint, module, moduleIndex, moduleCount
         <p>${escapedTakeaway}</p>
       </div>
       <div id="end-actions" class="end-actions">
-        ${nextHref ? `<a class="btn primary" href="${nextHref}">Next Scene</a>` : `<a class="btn primary" href="/books/${hubBookSlug}">Back to Book Hub</a>`}
-        ${prevHref ? `<a class="btn" href="${prevHref}">Previous Scene</a>` : ""}
-        <button id="retry-btn" class="btn" type="button">Restart Module</button>
+        ${nextHref ? `<a class="btn primary" data-next-scene href="${nextHref}">Next Scene</a>` : `<a class="btn primary" data-no-next href="/books/${hubBookSlug}">Back to Book Hub</a>`}
+        ${prevHref ? `<a class="btn" data-no-next href="${prevHref}">Previous Scene</a>` : ""}
+        <button id="retry-btn" class="btn" data-no-next type="button">Restart Module</button>
       </div>
     </section>
   </main>
@@ -1693,7 +1788,10 @@ function compileModuleHtml({ bookId, blueprint, module, moduleIndex, moduleCount
   <script>
     (() => {
       const rounds = ${roundsJson};
+      const readoNextHref = ${JSON.stringify(nextHref || "")};
       const state = { i: 0, stability: 50, treasury: 50, reform: 50 };
+      let autoAdvanceTimer = 0;
+      let autoAdvanceTick = 0;
       const titleEl = document.getElementById("round-title");
       const situationEl = document.getElementById("round-situation");
       const promptEl = document.getElementById("round-prompt");
@@ -1763,6 +1861,19 @@ function compileModuleHtml({ bookId, blueprint, module, moduleIndex, moduleCount
         optB.style.display = "none";
         debriefEl.classList.add("show");
         endActionsEl.classList.add("show");
+        if (readoNextHref && !autoAdvanceTimer) {
+          let secondsLeft = 3;
+          reportEl.textContent = "Mission complete. Auto-entering next scene in " + secondsLeft + "...";
+          autoAdvanceTick = window.setInterval(() => {
+            secondsLeft -= 1;
+            if (secondsLeft > 0) {
+              reportEl.textContent = "Mission complete. Auto-entering next scene in " + secondsLeft + "...";
+            }
+          }, 1000);
+          autoAdvanceTimer = window.setTimeout(() => {
+            window.location.href = readoNextHref;
+          }, 3200);
+        }
       }
 
       function paintRound() {
@@ -1813,7 +1924,11 @@ function compileModuleHtml({ bookId, blueprint, module, moduleIndex, moduleCount
         applyChoice(round?.optionB || {});
       });
       if (retryBtn) {
-        retryBtn.addEventListener("click", () => window.location.reload());
+        retryBtn.addEventListener("click", () => {
+          if (autoAdvanceTimer) window.clearTimeout(autoAdvanceTimer);
+          if (autoAdvanceTick) window.clearInterval(autoAdvanceTick);
+          window.location.reload();
+        });
       }
 
       pushLog("Entered scene: ${escapedScene}");
@@ -2103,6 +2218,11 @@ async function generateModuleHtmlWithStitchBridge({
     "- Information density must be high: include at least 10 substantive content blocks with non-trivial text.",
     "- Include at least 8 evidence bullets grounded in the provided digest/context.",
     "- Each interaction zone must include explanatory copy of why changes happen, not only numeric display.",
+    "- Must include visible game rules/objectives and measurable completion conditions.",
+    "- When completion conditions are met, auto-transition to NEXT_HREF (short countdown is allowed).",
+    "- Add one primary progression CTA with attribute data-next-scene and target NEXT_HREF.",
+    "- Mark non-progression controls (sliders/tabs/sorters/modal open-close/local toggles) with data-no-next.",
+    "- Add inline JS so clicking [data-next-scene] reliably navigates to NEXT_HREF.",
     "- Native HTML/CSS/JS only (no external JS library).",
     "- Include inline SVG diagram/illustration.",
     "- No placeholder boxes/TODO/TBD.",
@@ -2278,6 +2398,11 @@ async function generateModuleHtmlWithLlm({
     "- Include at least 8 grounded evidence bullets/notes from the provided digest/context.",
     "- Each interaction zone must explain why the system responds, not only show raw values.",
     "- Navigation buttons required with exact hrefs below.",
+    "- Must include visible game rules/objectives and measurable completion conditions.",
+    "- When completion conditions are met, auto-transition to NEXT_HREF (short countdown is allowed).",
+    "- Add one primary progression CTA with attribute data-next-scene and target NEXT_HREF.",
+    "- Mark non-progression controls (sliders/tabs/sorters/modal open-close/local toggles) with data-no-next.",
+    "- Add inline JS so clicking [data-next-scene] reliably navigates to NEXT_HREF.",
     "- No placeholders: do not output '-', 'TBD', 'TODO', or empty chips/cards.",
     "",
     "Navigation hrefs:",
@@ -2847,6 +2972,7 @@ export class PlayableContentEngine {
     this.notebooklmBridgeApiKey = toText(process.env.READO_NOTEBOOKLM_BRIDGE_API_KEY);
     this.pdfReaderMcpEndpoint = toText(process.env.READO_PDF_READER_MCP_ENDPOINT);
     this.pdfReaderMcpApiKey = toText(process.env.READO_PDF_READER_MCP_API_KEY);
+    this.openaiPdfDirectEnabled = toText(process.env.READO_PDF_OPENAI_DIRECT, "on").toLowerCase() !== "off";
     this.maxContextChars = MAX_CONTEXT_TEXT_LEN;
     this.maxUploadBytes = MAX_UPLOAD_BYTES;
     this.skills = [];
@@ -3029,6 +3155,30 @@ export class PlayableContentEngine {
           mimeType: mimeType || "application/pdf",
           contentBase64,
           timeoutMs: 90000
+        });
+        return { text: parsed.text };
+      }
+    });
+    this.registerSkill({
+      id: "ingest.pdf.openai-direct",
+      kind: "ingest",
+      label: "PDF via OpenAI Responses",
+      description: "Extract PDF text directly with OpenAI Responses API input_file",
+      enabled: Boolean(this.openaiPdfDirectEnabled && this.llmApiKey && /\/responses(?:\?|$)/i.test(this.llmEndpoint)),
+      priority: 30,
+      source: "builtin",
+      supports: ({ mimeType, lowerName }) => (
+        String(mimeType || "") === "application/pdf" || String(lowerName || "").endsWith(".pdf")
+      ),
+      run: async ({ name, mimeType, contentBase64 }) => {
+        const parsed = await parsePdfViaOpenAiResponses({
+          endpoint: this.llmEndpoint,
+          apiKey: this.llmApiKey,
+          model: this.llmModel,
+          name,
+          mimeType: mimeType || "application/pdf",
+          contentBase64,
+          timeoutMs: 180000
         });
         return { text: parsed.text };
       }
@@ -3656,7 +3806,7 @@ export class PlayableContentEngine {
         throw new Error(errors[errors.length - 1]);
       }
       throw new Error(
-        "unsupported file type. use txt/md/csv/json/html/epub or pdf(with notebooklm bridge / pdf mcp bridge / parser webhook / local pdf skill)"
+        "unsupported file type. use txt/md/csv/json/html/epub or pdf(with notebooklm bridge / pdf mcp bridge / openai direct / parser webhook / local pdf skill)"
       );
     }
 

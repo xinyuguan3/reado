@@ -1621,6 +1621,11 @@ async function handleStudioApi(req, res, url, session) {
         mcpFetchConfigured: Boolean(playableContentEngine.mcpFetchEndpoint),
         notebooklmBridgeConfigured: Boolean(playableContentEngine.notebooklmBridgeEndpoint),
         pdfReaderMcpConfigured: Boolean(playableContentEngine.pdfReaderMcpEndpoint),
+        openaiPdfDirectConfigured: Boolean(
+          playableContentEngine.openaiPdfDirectEnabled
+          && playableContentEngine.llmApiKey
+          && /\/responses(?:\?|$)/i.test(playableContentEngine.llmEndpoint || "")
+        ),
         maxContextChars: toInt(playableContentEngine.maxContextChars),
         maxUploadBytes: toInt(playableContentEngine.maxUploadBytes),
         skillCount: playableContentEngine.listSkills().length
@@ -2797,10 +2802,10 @@ function buildDynamicExperienceHtml(html, module, book) {
   }
 </style>
 <nav class="reado-module-nav" aria-label="Module navigation">
-  ${prevHref ? `<a href="${prevHref}" rel="prev">Prev</a>` : ""}
-  <a href="${hubHref}">Book</a>
+  ${prevHref ? `<a data-no-next href="${prevHref}" rel="prev">Prev</a>` : ""}
+  <a data-no-next href="${hubHref}">Book</a>
   <span class="idx">${escapeHtml(String(module?.index || 1))}/${escapeHtml(String(book?.moduleCount || 1))}</span>
-  ${nextHref ? `<a href="${nextHref}" rel="next">Next</a>` : ""}
+  ${nextHref ? `<a data-next-scene href="${nextHref}" rel="next">Next</a>` : ""}
 </nav>`;
 
   const completionSnippet = `
@@ -2817,6 +2822,275 @@ function buildDynamicExperienceHtml(html, module, book) {
       localStorage.setItem(key, JSON.stringify([...next]));
     }
   } catch {}
+  const readoNextHref = ${toInlineJson(nextHref)};
+  if (readoNextHref) {
+    let isNavigating = false;
+    let missionCompleted = false;
+    const commitKeywords = ["submit", "confirm", "finish", "complete", "compile", "deploy", "launch", "确认", "提交", "完成", "结算", "生成", "编译", "发布"];
+    const optionSelector = ".concept-card,.item-card,.module-card,[data-choice],[data-option],[data-action],[data-clickable]";
+    const normalize = (value) => String(value || "").replace(/\\s+/g, " ").trim().toLowerCase();
+    const hasAny = (text, words) => words.some((word) => text.includes(word));
+    const samePathAsNext = (href) => {
+      if (!href) return false;
+      try {
+        const target = new URL(href, window.location.href);
+        const nextUrl = new URL(readoNextHref, window.location.href);
+        return target.origin === nextUrl.origin && target.pathname === nextUrl.pathname;
+      } catch {
+        return false;
+      }
+    };
+    const isEligibleNode = (node) => {
+      if (!(node instanceof HTMLElement)) return false;
+      if (node.closest(".reado-shell-wrap")) return false;
+      if (node.closest("[data-no-next]")) return false;
+      if (node.closest(".reado-mission-core")) return false;
+      if (node.matches("input,select,textarea,option")) return false;
+      return true;
+    };
+    const goNext = (delay = 180) => {
+      if (isNavigating) return;
+      isNavigating = true;
+      window.setTimeout(() => {
+        window.location.href = readoNextHref;
+      }, delay);
+    };
+    const root = document.querySelector("main") || document.body;
+    if (!(root instanceof HTMLElement)) return;
+    const getControlNodes = () =>
+      Array.from(root.querySelectorAll("button,a,[role='button'],input,select,textarea,[onclick]," + optionSelector))
+        .filter((node) => node instanceof HTMLElement && isEligibleNode(node));
+    const zoneKey = (node) => {
+      const zone = node.closest("[data-phase],[data-zone],[data-panel],section,article,.panel,.card,.scenario,.module-card");
+      if (!(zone instanceof HTMLElement)) return "root";
+      const phase = zone.getAttribute("data-phase") || zone.getAttribute("data-zone") || zone.getAttribute("data-panel");
+      if (phase) return "phase:" + phase;
+      if (zone.id) return "id:" + zone.id;
+      const title = zone.querySelector("h1,h2,h3,h4");
+      const titleText = normalize(title ? title.textContent : "");
+      return titleText ? "title:" + titleText.slice(0, 48) : "zone";
+    };
+    const controlNodes = getControlNodes();
+    const availableZones = new Set(controlNodes.map((node) => zoneKey(node)));
+    const requirement = {
+      interactions: controlNodes.length >= 24 ? 9 : (controlNodes.length >= 12 ? 7 : 5),
+      zones: Math.min(3, Math.max(1, availableZones.size || 1)),
+      inputs: root.querySelector("input,select,textarea") ? 2 : 0,
+      decisions: root.querySelector(optionSelector) ? 1 : 0,
+      commits: 0
+    };
+    const mission = {
+      uniqueInteractions: new Set(),
+      zones: new Set(),
+      inputs: 0,
+      decisions: 0,
+      commits: 0
+    };
+    const nodeKey = (node) => {
+      const id = node.id || node.getAttribute("name") || node.getAttribute("data-choice") || node.getAttribute("data-option") || node.getAttribute("data-action") || node.getAttribute("aria-label") || "";
+      const text = normalize(node.textContent).slice(0, 36);
+      return [node.tagName, id, text].filter(Boolean).join("|");
+    };
+    const isDecisionNode = (node) => {
+      if (!(node instanceof HTMLElement)) return false;
+      if (node.matches(optionSelector)) return true;
+      const parent = node.parentElement;
+      if (!parent) return false;
+      const siblings = Array.from(parent.children).filter((child) => child instanceof HTMLElement && child.matches("button,[role='button']"));
+      return siblings.length >= 2 && node.matches("button,[role='button']");
+    };
+    const isCommitNode = (node) => {
+      if (!(node instanceof HTMLElement)) return false;
+      if (node.hasAttribute("data-next-scene")) return true;
+      if (node.getAttribute("rel") === "next") return true;
+      const text = normalize(node.getAttribute("aria-label") || node.textContent || "");
+      return hasAny(text, commitKeywords);
+    };
+    const ratio = (value, target) => {
+      if (!target) return 1;
+      return Math.max(0, Math.min(1, value / target));
+    };
+    const hud = document.createElement("aside");
+    hud.className = "reado-mission-core";
+    hud.setAttribute("data-no-next", "");
+    hud.style.cssText = [
+      "position:fixed",
+      "left:14px",
+      "bottom:14px",
+      "z-index:89",
+      "width:min(92vw,320px)",
+      "padding:10px",
+      "border:1px solid rgba(148,163,184,.36)",
+      "border-radius:12px",
+      "background:rgba(2,8,23,.9)",
+      "color:#e2e8f0",
+      "font:12px/1.5 'Noto Sans SC','PingFang SC',sans-serif",
+      "box-shadow:0 14px 34px rgba(2,8,20,.48)",
+      "backdrop-filter:blur(6px)"
+    ].join(";");
+    hud.innerHTML = \`
+      <div style="display:flex;justify-content:space-between;gap:8px;align-items:center;">
+        <strong style="font-size:12px;">Mission Rules</strong>
+        <span data-mission-state style="font-size:11px;color:#93c5fd;">In Progress</span>
+      </div>
+      <div style="height:7px;margin-top:8px;border-radius:999px;background:rgba(148,163,184,.2);overflow:hidden;">
+        <i data-mission-bar style="display:block;height:100%;width:0;background:linear-gradient(90deg,#22d3ee,#34d399);"></i>
+      </div>
+      <div style="margin-top:8px;display:grid;gap:4px;">
+        <div data-mission-i>Interactions 0/\${requirement.interactions}</div>
+        <div data-mission-z>Zones 0/\${requirement.zones}</div>
+        \${requirement.inputs ? '<div data-mission-in>Inputs 0/' + requirement.inputs + '</div>' : ''}
+        \${requirement.decisions ? '<div data-mission-d>Decisions 0/' + requirement.decisions + '</div>' : ''}
+        \${requirement.commits ? '<div data-mission-c>Commit 0/' + requirement.commits + '</div>' : ''}
+      </div>
+      <div data-mission-hint style="margin-top:8px;color:#cbd5e1;">Complete rules, then auto-enter next scene.</div>
+    \`;
+    document.body.append(hud);
+    const missionStateEl = hud.querySelector("[data-mission-state]");
+    const missionBarEl = hud.querySelector("[data-mission-bar]");
+    const missionIEl = hud.querySelector("[data-mission-i]");
+    const missionZEl = hud.querySelector("[data-mission-z]");
+    const missionInEl = hud.querySelector("[data-mission-in]");
+    const missionDEl = hud.querySelector("[data-mission-d]");
+    const missionCEl = hud.querySelector("[data-mission-c]");
+    const missionHintEl = hud.querySelector("[data-mission-hint]");
+    const updateHud = () => {
+      const progress = [
+        ratio(mission.uniqueInteractions.size, requirement.interactions),
+        ratio(mission.zones.size, requirement.zones),
+        requirement.inputs ? ratio(mission.inputs, requirement.inputs) : 1,
+        requirement.decisions ? ratio(mission.decisions, requirement.decisions) : 1,
+        ratio(mission.commits, requirement.commits)
+      ];
+      const pct = Math.round((progress.reduce((sum, v) => sum + v, 0) / progress.length) * 100);
+      if (missionBarEl) missionBarEl.style.width = pct + "%";
+      if (missionIEl) missionIEl.textContent = "Interactions " + mission.uniqueInteractions.size + "/" + requirement.interactions;
+      if (missionZEl) missionZEl.textContent = "Zones " + mission.zones.size + "/" + requirement.zones;
+      if (missionInEl) missionInEl.textContent = "Inputs " + mission.inputs + "/" + requirement.inputs;
+      if (missionDEl) missionDEl.textContent = "Decisions " + mission.decisions + "/" + requirement.decisions;
+      if (missionCEl) missionCEl.textContent = "Commit " + mission.commits + "/" + requirement.commits;
+      if (missionStateEl) missionStateEl.textContent = missionCompleted ? "Completed" : "In Progress";
+    };
+    const canComplete = () =>
+      mission.uniqueInteractions.size >= requirement.interactions
+      && mission.zones.size >= requirement.zones
+      && mission.inputs >= requirement.inputs
+      && mission.decisions >= requirement.decisions
+      && mission.commits >= requirement.commits;
+    const completeMission = (reason) => {
+      if (missionCompleted) return;
+      missionCompleted = true;
+      if (missionHintEl) missionHintEl.textContent = "Mission complete (" + reason + "). Auto-entering next scene...";
+      updateHud();
+      try {
+        window.dispatchEvent(new CustomEvent("reado:mission-complete", { detail: { nextHref: readoNextHref, reason } }));
+      } catch {}
+      goNext(920);
+    };
+    const touchMission = (node, kind) => {
+      if (!(node instanceof HTMLElement) || !isEligibleNode(node)) return;
+      mission.uniqueInteractions.add(nodeKey(node));
+      mission.zones.add(zoneKey(node));
+      if (kind === "input") mission.inputs += 1;
+      if (kind === "decision") mission.decisions += 1;
+      if (kind === "commit") mission.commits += 1;
+      updateHud();
+      if (canComplete()) completeMission("rules_met");
+    };
+    const markAsNext = (node, mode = "auto") => {
+      if (!isEligibleNode(node)) return false;
+      if (node.hasAttribute("data-next-scene")) return true;
+      if (node.hasAttribute("data-reado-next")) {
+        node.setAttribute("data-next-scene", mode);
+        return true;
+      }
+      if (node.getAttribute("rel") === "next") {
+        node.setAttribute("data-next-scene", mode);
+        return true;
+      }
+      if (node.matches("a[href],a[rel='next']")) {
+        const href = node.getAttribute("href") || "";
+        if (samePathAsNext(href)) {
+          node.setAttribute("data-next-scene", mode);
+          return true;
+        }
+      }
+      return false;
+    };
+    const wireNextTargets = () => {
+      const root = document.querySelector("main") || document.body;
+      if (!(root instanceof HTMLElement)) return;
+      const candidates = root.querySelectorAll("a,button,[role='button']");
+      candidates.forEach((node) => {
+        if (!(node instanceof HTMLElement)) return;
+        markAsNext(node, "scan");
+      });
+    };
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", wireNextTargets, { once: true });
+    } else {
+      wireNextTargets();
+    }
+    updateHud();
+    document.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+      const explicit = target.closest("[data-next-scene],[data-reado-next],a[rel='next'],button[rel='next']");
+      if (explicit instanceof HTMLElement && isEligibleNode(explicit)) {
+        markAsNext(explicit, "explicit");
+        const href = explicit.getAttribute("href") || "";
+        if (href && href !== "#" && !href.startsWith("javascript:") && !samePathAsNext(href)) return;
+        touchMission(explicit, isCommitNode(explicit) ? "commit" : "interaction");
+        if (!missionCompleted) {
+          event.preventDefault();
+          if (missionHintEl) missionHintEl.textContent = "Finish mission rules first; then auto-enter next scene.";
+          return;
+        }
+        event.preventDefault();
+        goNext(explicit.hasAttribute("data-next-fast") ? 90 : 160);
+        return;
+      }
+      const semantic = target.closest("a[href]");
+      if (semantic instanceof HTMLElement && isEligibleNode(semantic) && markAsNext(semantic, "click")) {
+        touchMission(semantic, isCommitNode(semantic) ? "commit" : "interaction");
+        event.preventDefault();
+        if (missionCompleted) {
+          goNext(200);
+        } else if (missionHintEl) {
+          missionHintEl.textContent = "Keep playing to unlock auto-transition.";
+        }
+        return;
+      }
+      const fallback = target.closest(".concept-card,.item-card,.module-card,[data-choice],[data-option],[data-action],[data-clickable],[onclick]");
+      if (!(fallback instanceof HTMLElement)) return;
+      if (!isEligibleNode(fallback)) return;
+      if (fallback.matches("button,a,[role='button'],input,select,textarea")) return;
+      touchMission(fallback, isDecisionNode(fallback) ? "decision" : "interaction");
+    }, true);
+    document.addEventListener("change", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+      if (!target.matches("input,select,textarea")) return;
+      if (!isEligibleNode(target)) return;
+      touchMission(target, "input");
+    }, true);
+    document.addEventListener("drop", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+      const node = target.closest("[data-dropzone],[data-bucket],.bucket,.slot,.dropzone");
+      if (!(node instanceof HTMLElement)) return;
+      if (!isEligibleNode(node)) return;
+      touchMission(node, "decision");
+    }, true);
+    window.setTimeout(() => {
+      if (missionCompleted) return;
+      if (mission.uniqueInteractions.size >= Math.max(3, requirement.interactions - 1)
+        && mission.zones.size >= Math.max(1, requirement.zones - 1)
+        && mission.commits >= requirement.commits) {
+        completeMission("soft_complete");
+      }
+    }, 18000);
+  }
 
   if (window.ReadoExperienceRuntime && typeof window.ReadoExperienceRuntime.init === "function") {
     window.ReadoExperienceRuntime.init({
