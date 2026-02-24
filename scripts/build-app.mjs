@@ -62,6 +62,11 @@ const BACKEND_ENABLED_BOOK_IDS = new Set([
   "principles-for-navigating-big-debt-crises",
   "zero-to-one"
 ]);
+const CHAPTER_DECISION_BOOK_IDS = new Set([
+  "sapiens",
+  "principles-for-navigating-big-debt-crises",
+  "zero-to-one"
+]);
 const CATEGORY_META = {
   "personal-growth": {
     label: "个人修炼",
@@ -1648,6 +1653,126 @@ function injectKnowledgeMapBooks(html, books) {
   return injectBeforeBody(nextHtml, snippet);
 }
 
+function buildThreeDecisionCampaignSnippet({ progressionHref, book, moduleSlug }) {
+  if (!book || !progressionHref) return "";
+  return `
+  const readoNextHref = ${JSON.stringify(progressionHref)};
+  (() => {
+    if (!readoNextHref) return;
+    let isNavigating = false;
+    let completed = false;
+    const requiredDecisions = 3;
+    const decisionProgress = { count: 0, lastKey: "", lastAt: 0 };
+    const decisionSelector = "[data-choice],[data-option],[data-action],[data-clickable],.concept-card,.item-card,.module-card,button,[role='button'],input[type='range'],input[type='radio'],input[type='checkbox'],select,textarea";
+
+    const samePathAsNext = (href) => {
+      if (!href) return false;
+      try {
+        const target = new URL(href, window.location.href);
+        const nextUrl = new URL(readoNextHref, window.location.href);
+        return target.origin === nextUrl.origin && target.pathname === nextUrl.pathname;
+      } catch {
+        return false;
+      }
+    };
+    const isEligibleNode = (node) => {
+      if (!(node instanceof HTMLElement)) return false;
+      if (node.closest(".reado-shell-wrap")) return false;
+      if (node.closest("[data-no-next]")) return false;
+      if (node.matches("option")) return false;
+      return true;
+    };
+    const isNextNode = (node) => {
+      if (!(node instanceof HTMLElement)) return false;
+      if (node.hasAttribute("data-next-scene")) return true;
+      if (node.hasAttribute("data-reado-next")) return true;
+      if (node.getAttribute("rel") === "next") return true;
+      if (node.matches("a[href]")) {
+        return samePathAsNext(node.getAttribute("href") || "");
+      }
+      return false;
+    };
+    const nodeKey = (node) => {
+      const id = node.id || node.getAttribute("name") || node.getAttribute("data-choice") || node.getAttribute("data-option") || node.getAttribute("data-action") || "";
+      const text = String(node.textContent || "").replace(/\\s+/g, " ").trim().toLowerCase().slice(0, 48);
+      return [node.tagName, id, text].filter(Boolean).join("|");
+    };
+    const goNext = (delay = 120) => {
+      if (isNavigating) return;
+      isNavigating = true;
+      window.setTimeout(() => {
+        window.location.href = readoNextHref;
+      }, delay);
+    };
+    const complete = (reason) => {
+      if (completed) return;
+      completed = true;
+      try {
+        window.dispatchEvent(new CustomEvent("reado:mission-complete", { detail: { nextHref: readoNextHref, reason } }));
+      } catch {}
+      goNext(420);
+    };
+    const recordDecision = (node) => {
+      if (!isEligibleNode(node)) return;
+      if (isNextNode(node)) return;
+      const key = nodeKey(node);
+      const now = Date.now();
+      if (key && decisionProgress.lastKey === key && now - decisionProgress.lastAt < 250) return;
+      decisionProgress.lastKey = key;
+      decisionProgress.lastAt = now;
+      decisionProgress.count += 1;
+      if (decisionProgress.count >= requiredDecisions) {
+        complete("chapter_3_decisions_inline");
+      }
+    };
+
+    document.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+
+      const nextNode = target.closest("[data-next-scene],[data-reado-next],a[rel='next'],button[rel='next'],a[href]");
+      if (nextNode instanceof HTMLElement && isEligibleNode(nextNode) && isNextNode(nextNode)) {
+        if (!completed && decisionProgress.count < requiredDecisions) {
+          event.preventDefault();
+          return;
+        }
+        event.preventDefault();
+        goNext(40);
+        return;
+      }
+
+      const decisionNode = target.closest(decisionSelector);
+      if (!(decisionNode instanceof HTMLElement)) return;
+      if (!isEligibleNode(decisionNode)) return;
+      recordDecision(decisionNode);
+    }, true);
+
+    document.addEventListener("change", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+      if (!target.matches("input,select,textarea")) return;
+      if (!isEligibleNode(target)) return;
+      recordDecision(target);
+    }, true);
+
+    document.addEventListener("drop", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+      const node = target.closest("[data-dropzone],[data-bucket],.bucket,.slot,.dropzone");
+      if (!(node instanceof HTMLElement)) return;
+      if (!isEligibleNode(node)) return;
+      recordDecision(node);
+    }, true);
+
+    window.setTimeout(() => {
+      if (completed) return;
+      if (decisionProgress.count >= 2) {
+        complete("soft_three_decisions_inline");
+      }
+    }, 18000);
+  })();`;
+}
+
 function injectExperienceQuickNav(html, book, moduleSlug) {
   const enableBackendRuntime = Boolean(book && BACKEND_ENABLED_BOOK_IDS.has(book.id));
   const backendInclude = enableBackendRuntime
@@ -1657,8 +1782,14 @@ function injectExperienceQuickNav(html, book, moduleSlug) {
     ? (book.modules.find((module) => module.slug === moduleSlug) ? book.modules[book.modules.findIndex((module) => module.slug === moduleSlug) + 1]?.slug : "")
     : "";
   const disableAutoNext = Boolean(book && book.id === "wanli-fifteen");
-  const autoNextSnippet = book && nextModuleSlug && !disableAutoNext
-    ? `
+  const progressionHref = nextModuleSlug
+    ? `/experiences/${nextModuleSlug}`
+    : (book ? `/books/${book.id}` : "");
+  const useChapterDecisionCampaign = Boolean(book && CHAPTER_DECISION_BOOK_IDS.has(book.id) && !disableAutoNext);
+  const autoNextSnippet = useChapterDecisionCampaign && progressionHref
+    ? buildThreeDecisionCampaignSnippet({ progressionHref, book, moduleSlug })
+    : (book && nextModuleSlug && !disableAutoNext
+      ? `
   const readoNextHref = ${JSON.stringify(`/experiences/${nextModuleSlug}`)};
   (() => {
     if (!readoNextHref) return;
@@ -1929,7 +2060,7 @@ function injectExperienceQuickNav(html, book, moduleSlug) {
       }
     }, 18000);
   })();`
-    : "";
+      : "");
   const backendInitSnippet = enableBackendRuntime
     ? `
   if (window.ReadoExperienceRuntime && typeof window.ReadoExperienceRuntime.init === "function") {

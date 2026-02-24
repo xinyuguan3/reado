@@ -5,6 +5,7 @@ import fsSync from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { promisify } from "node:util";
+import { brotliCompressSync, constants as zlibConstants, gzipSync } from "node:zlib";
 import { PlayableContentEngine } from "./playable-content-engine.mjs";
 import { RuntimeBookCatalog } from "./runtime-book-catalog.mjs";
 
@@ -2110,12 +2111,71 @@ function getStaticCacheControl(url, payload) {
   return "public, max-age=600";
 }
 
+const COMPRESSIBLE_EXTENSIONS = new Set([
+  ".html",
+  ".css",
+  ".js",
+  ".json",
+  ".svg",
+  ".txt"
+]);
+
+function getEncodingQuality(header, encoding) {
+  const source = String(header || "");
+  if (!source) return 0;
+  let wildcardQ = -1;
+  for (const rawPart of source.split(",")) {
+    const part = rawPart.trim();
+    if (!part) continue;
+    const segments = part.split(";").map((item) => item.trim());
+    const token = (segments[0] || "").toLowerCase();
+    let q = 1;
+    for (let i = 1; i < segments.length; i += 1) {
+      const seg = segments[i];
+      if (!seg) continue;
+      const [k, v] = seg.split("=");
+      if (String(k || "").trim().toLowerCase() !== "q") continue;
+      const parsed = Number(v);
+      q = Number.isFinite(parsed) ? Math.max(0, Math.min(1, parsed)) : 1;
+    }
+    if (token === encoding) return q;
+    if (token === "*") wildcardQ = q;
+  }
+  return wildcardQ > -1 ? wildcardQ : 0;
+}
+
+function chooseResponseEncoding(req, payload) {
+  const ext = String(payload?.ext || "").toLowerCase();
+  if (!COMPRESSIBLE_EXTENSIONS.has(ext)) return "";
+  const raw = payload?.buffer;
+  if (!Buffer.isBuffer(raw) || raw.length < 1024) return "";
+  const header = req?.headers?.["accept-encoding"] || "";
+  const brQ = getEncodingQuality(header, "br");
+  const gzipQ = getEncodingQuality(header, "gzip");
+  if (brQ <= 0 && gzipQ <= 0) return "";
+  return brQ >= gzipQ ? "br" : "gzip";
+}
+
+function compressPayload(buffer, encoding) {
+  try {
+    if (!Buffer.isBuffer(buffer)) return buffer;
+    if (encoding === "br") {
+      return brotliCompressSync(buffer, {
+        params: {
+          [zlibConstants.BROTLI_PARAM_QUALITY]: 5
+        }
+      });
+    }
+    if (encoding === "gzip") {
+      return gzipSync(buffer, { level: 6 });
+    }
+  } catch {}
+  return buffer;
+}
+
 function resolveCanonicalRedirectPath(pathname) {
   const normalized = normalizeIncomingPath(pathname);
   if (normalized === "/index" || normalized === "/index.html") return "/";
-  if (/^\/(?:pages|books|experiences)\/[^/]+\.html$/i.test(normalized)) {
-    return normalized.replace(/\.html$/i, "");
-  }
   if (/^\/(?:pages|books|experiences)\/[^/]+\/$/i.test(pathname || "")) {
     return normalized;
   }
@@ -3191,9 +3251,12 @@ async function readDynamicPayloadForRequest(pathname, sessionId) {
 
 function getOrCreateSession(req, res) {
   const cookies = parseCookies(req.headers.cookie || "");
-  let sessionId = cookies.get(sessionCookieName) || "";
+  const cookieSessionId = cookies.get(sessionCookieName) || "";
+  let sessionId = cookieSessionId;
+  let shouldSetCookie = false;
   if (!isValidSessionId(sessionId)) {
     sessionId = crypto.randomBytes(24).toString("base64url");
+    shouldSetCookie = true;
   }
 
   const sessions = state.sessions || {};
@@ -3211,12 +3274,17 @@ function getOrCreateSession(req, res) {
     };
     sessions[sessionId] = session;
     state.sessions = sessions;
+    if (!cookieSessionId || cookieSessionId !== sessionId) {
+      shouldSetCookie = true;
+    }
   } else {
     session.lastSeenAt = nowIso();
   }
 
-  const cookie = `${sessionCookieName}=${encodeURIComponent(sessionId)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=2592000`;
-  res.setHeader("Set-Cookie", cookie);
+  if (shouldSetCookie) {
+    const cookie = `${sessionCookieName}=${encodeURIComponent(sessionId)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=2592000`;
+    res.setHeader("Set-Cookie", cookie);
+  }
   return session;
 }
 
@@ -4309,7 +4377,10 @@ async function handleApi(req, res, url, providedSession = null) {
 const server = http.createServer(async (req, res) => {
   const method = req.method || "GET";
   const url = new URL(req.url || "/", `http://${req.headers.host || "localhost"}`);
-  const session = getOrCreateSession(req, res);
+  const needsSession = url.pathname.startsWith("/api/")
+    || url.pathname.startsWith("/books/")
+    || url.pathname.startsWith("/experiences/");
+  const session = needsSession ? getOrCreateSession(req, res) : null;
 
   try {
     if (url.pathname.startsWith("/api/")) {
@@ -4333,7 +4404,7 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    let payload = await readDynamicPayloadForRequest(url.pathname, session.id);
+    let payload = await readDynamicPayloadForRequest(url.pathname, session?.id || "");
     if (!payload) {
       payload = await readFileForRequest(req.url || "/");
     }
@@ -4343,15 +4414,29 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    res.writeHead(200, {
+    const headers = {
       "Content-Type": contentTypes[payload.ext] || "application/octet-stream",
       "Cache-Control": getStaticCacheControl(url, payload)
-    });
+    };
+    let responseBuffer = payload.buffer;
+    const encoding = method === "HEAD" ? "" : chooseResponseEncoding(req, payload);
+    if (encoding) {
+      const compressed = compressPayload(responseBuffer, encoding);
+      if (Buffer.isBuffer(compressed) && compressed.length + 64 < responseBuffer.length) {
+        responseBuffer = compressed;
+        headers["Content-Encoding"] = encoding;
+        headers.Vary = "Accept-Encoding";
+      }
+    }
+    if (Buffer.isBuffer(responseBuffer)) {
+      headers["Content-Length"] = String(responseBuffer.length);
+    }
+    res.writeHead(200, headers);
     if (method === "HEAD") {
       res.end();
       return;
     }
-    res.end(payload.buffer);
+    res.end(responseBuffer);
   } catch (error) {
     console.error("[serve] Unexpected error:", error);
     writeJson(res, 500, { ok: false, error: "Internal server error" });
