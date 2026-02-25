@@ -35,6 +35,7 @@ const experienceScreenDir = path.join(appDir, "assets", "experiences");
 const bookCoverSourceDir = path.join(rootDir, "book_covers");
 const remoteImageSourceDir = path.join(rootDir, "assets", "remote-images");
 const studioPagesSourceDir = path.join(rootDir, "scripts", "studio-pages");
+const dynamicLegacyAppDir = path.join(rootDir, "reado-v2", "public", "legacy-app");
 const bookCoverDir = path.join(appDir, "assets", "book-covers");
 const remoteImageDir = path.join(appDir, "assets", "remote-images");
 const sharedDir = path.join(appDir, "shared");
@@ -113,7 +114,12 @@ const BOOK_COVER_NAME_TO_ID = new Map([
   ["zero-to-one", "zero-to-one"],
   ["zero-to-one-addon", "zero-to-one"],
   ["从零到一", "zero-to-one"],
-  ["《从零到一》", "zero-to-one"]
+  ["《从零到一》", "zero-to-one"],
+  ["social-dilemma-lab", "social-dilemma-lab"],
+  ["social-dilemma", "social-dilemma-lab"],
+  ["user-social-dilemma-lab", "social-dilemma-lab"],
+  ["社交困境", "social-dilemma-lab"],
+  ["《社交困境》", "social-dilemma-lab"]
 ]);
 const BOOK_DEFAULT_MODULE_ORDER = {
   sapiens: [
@@ -198,6 +204,21 @@ const BOOK_BLUEPRINTS = [
       "真正的创新是从 0 到 1，而不是在存量市场里复制竞争。",
       "优质创业目标是构建小而深的垄断，而非价格战。",
       "长期价值来自技术壁垒、产品差异与组织执行力协同。"
+    ]
+  },
+  {
+    id: "social-dilemma-lab",
+    title: "《社交困境》",
+    price: 460,
+    category: "science-knowledge",
+    tier: "简餐级",
+    rewardTags: ["避坑指南", "大脑健身房"],
+    badgeTitle: "算法调停者",
+    badgeIcon: "neurology",
+    highlights: [
+      "推荐系统追求短期停留时，会自然放大情绪与极化内容。",
+      "广告变现并非越多越好，关键在于内容与用户动机匹配。",
+      "平台治理的核心不是单一指标最优，而是长期可持续的平衡。"
     ]
   }
 ];
@@ -325,6 +346,27 @@ const BOOK_PRESET_I18N = {
         "장기 가치는 기술 장벽, 제품 차별화, 조직 실행력이 결합될 때 만들어집니다."
       ]
     }
+  },
+  "social-dilemma-lab": {
+    title: { "zh-CN": "《社交困境》", "en-US": "The Social Dilemma Lab", "ko-KR": "소셜 딜레마 랩" },
+    badgeTitle: { "zh-CN": "算法调停者", "en-US": "Algorithm Moderator", "ko-KR": "알고리즘 조정자" },
+    highlights: {
+      "zh-CN": [
+        "推荐系统追求短期停留时，会自然放大情绪与极化内容。",
+        "广告变现并非越多越好，关键在于内容与用户动机匹配。",
+        "平台治理的核心不是单一指标最优，而是长期可持续的平衡。"
+      ],
+      "en-US": [
+        "When recommendation systems optimize short-term engagement, they tend to amplify emotional and polarizing content.",
+        "Ad monetization is not about volume; the key is matching content, ads, and user intent.",
+        "Platform governance is not one-metric optimization but long-term sustainable balance."
+      ],
+      "ko-KR": [
+        "추천 시스템이 단기 체류를 최적화하면 감정적·극화된 콘텐츠를 증폭하기 쉽습니다.",
+        "광고 수익화의 핵심은 양이 아니라 콘텐츠·광고·사용자 의도의 정합성입니다.",
+        "플랫폼 거버넌스의 핵심은 단일 지표 최적화가 아니라 장기적 균형입니다."
+      ]
+    }
   }
 };
 
@@ -356,7 +398,8 @@ const BOOK_MODULE_TITLE_I18N = {
   "zero-to-one-the-monopolist-s-choice-4": { "en-US": "Startup Seven Questions", "ko-KR": "창업 7문 진단" },
   "zero-to-one-the-monopolist-s-choice-5": { "en-US": "Business Secret Explorer", "ko-KR": "비즈니스 시크릿 탐색" },
   "zero-to-one-the-monopolist-s-choice-6": { "en-US": "Evolution Path Simulator", "ko-KR": "진화 경로 시뮬레이션" },
-  "zero-to-one-the-monopolist-s-choice-7": { "en-US": "Monopoly Final Choice", "ko-KR": "독점 최종 선택" }
+  "zero-to-one-the-monopolist-s-choice-7": { "en-US": "Monopoly Final Choice", "ko-KR": "독점 최종 선택" },
+  "social-dilemma-feed-architect": { "en-US": "Social Dilemma: Feed Architect", "ko-KR": "소셜 딜레마: 피드 아키텍트" }
 };
 
 function slugify(value) {
@@ -846,6 +889,7 @@ function getPageKeyBySlug(slug) {
   const map = {
     "gamified-learning-hub-dashboard-1": "knowledge-map",
     "simulator-library-level-selection-1": "knowledge-map",
+    "public-library": "public-library",
     "simulator-library-level-selection-2": "mission",
     "global-scholar-leaderboard": "ranking",
     "analytics-dashboard": "analytics",
@@ -1732,10 +1776,6 @@ function buildThreeDecisionCampaignSnippet({ progressionHref, book, moduleSlug }
 
       const nextNode = target.closest("[data-next-scene],[data-reado-next],a[rel='next'],button[rel='next'],a[href]");
       if (nextNode instanceof HTMLElement && isEligibleNode(nextNode) && isNextNode(nextNode)) {
-        if (!completed && decisionProgress.count < requiredDecisions) {
-          event.preventDefault();
-          return;
-        }
         event.preventDefault();
         goNext(40);
         return;
@@ -5880,6 +5920,25 @@ async function writeRemoteImageAssets() {
   }
 }
 
+async function syncDynamicLegacyApp() {
+  let stat;
+  try {
+    stat = await fs.stat(dynamicLegacyAppDir);
+  } catch {
+    return;
+  }
+  if (!stat.isDirectory()) return;
+
+  const mirrorDirs = ["pages", "books", "experiences", "shared", "assets"];
+  for (const dirName of mirrorDirs) {
+    const from = path.join(appDir, dirName);
+    const to = path.join(dynamicLegacyAppDir, dirName);
+    await fs.rm(to, { recursive: true, force: true });
+    await fs.cp(from, to, { recursive: true });
+  }
+  await fs.copyFile(path.join(appDir, "index.html"), path.join(dynamicLegacyAppDir, "index.html"));
+}
+
 async function main() {
   const pages = await loadSourcePages();
   const experiences = await loadExperiencePages();
@@ -5899,6 +5958,7 @@ async function main() {
   await writeBookPages(books);
   await writeExperiencePages(experiences, moduleToBook);
   await fs.writeFile(path.join(appDir, "index.html"), buildIndexHtml(pages), "utf8");
+  await syncDynamicLegacyApp();
   console.log(
     `Built ${pages.length} app pages, ${books.length} books, ${experiences.length} module experiences, and ${customCovers.length} custom covers into ${path.relative(rootDir, appDir)}`
   );

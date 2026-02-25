@@ -6,10 +6,10 @@ import {
 } from "/shared/i18n.js";
 
 const ROUTES = [
-  { id: "knowledge-map", section: "learn", icon: "map", labelKey: "route.knowledge_map", label: "个人书库", href: "/workspace" },
+  { id: "knowledge-map", section: "learn", icon: "map", labelKey: "route.knowledge_map", label: "个人书库", href: "/library" },
   { id: "skill-tree", section: "learn", icon: "hub", labelKey: "route.knowledge_core", label: "Knowledge Core", href: "/skill-tree" },
   { id: "mission", section: "learn", icon: "assignment", labelKey: "route.mission", label: "任务中心", href: "/missions" },
-  { id: "library", section: "learn", icon: "auto_stories", labelKey: "route.library", label: "体验库", href: "/library" },
+  { id: "public-library", section: "learn", icon: "auto_stories", labelKey: "route.public_library", label: "公共阅读库", href: "/public-library" },
   { id: "studio", section: "build", icon: "auto_awesome", labelKey: "route.studio", label: "创作工坊", href: "/studio" },
   { id: "market", section: "build", icon: "storefront", labelKey: "route.market", label: "交易中心", href: "/marketplace" },
   { id: "ranking", section: "social", icon: "leaderboard", labelKey: "route.ranking", label: "排行榜", href: "/leaderboard" },
@@ -2647,7 +2647,12 @@ class ReadoAppShell extends HTMLElement {
     if (path === "/missions" || path === "/pages/simulator-library-level-selection-2") {
       document.body.classList.add("reado-page-mission");
     }
-    if (path === "/library" || path === "/pages/simulator-library-level-selection-1") {
+    if (
+      path === "/library"
+      || path === "/public-library"
+      || path === "/pages/simulator-library-level-selection-1"
+      || path === "/pages/public-library"
+    ) {
       document.body.classList.add("reado-page-warehouse");
     }
     if (path === "/" || path === "/workspace" || path === "/pages/gamified-learning-hub-dashboard-1") {

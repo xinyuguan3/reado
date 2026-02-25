@@ -1,5 +1,5 @@
-import { renderLegacyPage } from "@/lib/render-legacy-page"
+import { redirect } from "next/navigation"
 
 export default async function WorkspacePage() {
-  return renderLegacyPage("gamified-learning-hub-dashboard-1")
+  redirect("/library")
 }

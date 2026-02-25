@@ -5,7 +5,7 @@ export function normalizeLegacySlug(input: string) {
 }
 
 const LEGACY_PAGE_REDIRECTS: Record<string, string> = {
-  "gamified-learning-hub-dashboard-1": "/workspace",
+  "gamified-learning-hub-dashboard-1": "/library",
   "gamified-learning-hub-dashboard-2": "/profile",
   "gamified-learning-hub-dashboard-3": "/marketplace",
   "simulator-library-level-selection-1": "/library",
@@ -14,14 +14,14 @@ const LEGACY_PAGE_REDIRECTS: Record<string, string> = {
   "analytics-dashboard": "/workspace",
   "skill-tree": "/skill-tree",
   "playable-studio": "/studio",
-  "public-library": "/library",
+  "public-library": "/public-library",
   "gem-center": "/gem-center",
   "think-tank": "/think-tank",
   "cinematic-level-up-talent-fusion": "/skill-tree",
   "bilingual-talent-assessment-report": "/skill-tree",
-  auth: "/workspace",
-  "billing-success": "/gem-center",
-  "billing-cancel": "/gem-center",
+  auth: "/library",
+  "billing-success": "/billing-success",
+  "billing-cancel": "/billing-cancel",
 }
 
 export function resolveLegacyPageRedirect(slug: string) {

@@ -1,4 +1,4 @@
-import { injectLegacyBase, readLegacyPageHtml } from "@/lib/legacy-pages"
+import { injectLegacyBase, readLegacyHtmlAny } from "@/lib/legacy-pages"
 import { normalizeLegacySlug } from "@/lib/legacy-routes"
 
 type Params = {
@@ -14,7 +14,7 @@ export async function GET(_: Request, { params }: Params) {
     return new Response("Not found", { status: 404 })
   }
 
-  const legacyHtml = await readLegacyPageHtml(safeSlug)
+  const legacyHtml = await readLegacyHtmlAny(safeSlug)
   if (!legacyHtml) {
     return new Response("Not found", { status: 404 })
   }

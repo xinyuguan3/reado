@@ -1,0 +1,2431 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>reado · Knowledge Core</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #060b13;
+      --panel: rgba(8, 16, 29, 0.84);
+      --panel-2: rgba(6, 13, 24, 0.93);
+      --line: rgba(130, 168, 211, 0.28);
+      --text: #eaf3ff;
+      --muted: #93afd1;
+      --accent: #34d399;
+      --accent-2: #60a5fa;
+      --accent-3: #f59e0b;
+      --danger: #fb7185;
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      font-family: "Noto Sans SC", sans-serif;
+      background:
+        radial-gradient(1000px 480px at 8% -8%, rgba(52, 211, 153, 0.2), transparent 58%),
+        radial-gradient(920px 420px at 98% 106%, rgba(96, 165, 250, 0.18), transparent 60%),
+        linear-gradient(125deg, #060b13, #061224 46%, #07162a);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: -1;
+      background-image:
+        linear-gradient(rgba(130, 168, 211, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(130, 168, 211, 0.045) 1px, transparent 1px);
+      background-size: 24px 24px;
+      mask-image: radial-gradient(circle at 50% 32%, rgba(0, 0, 0, 0.88), transparent 80%);
+    }
+
+    .page {
+      width: min(1480px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 96px 0 28px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 16px 44px rgba(3, 10, 24, 0.44);
+    }
+
+    .hero {
+      padding: 20px;
+      display: grid;
+      gap: 14px;
+      background:
+        radial-gradient(560px 220px at 96% 0%, rgba(96, 165, 250, 0.16), transparent 60%),
+        radial-gradient(620px 260px at 4% 100%, rgba(52, 211, 153, 0.16), transparent 60%),
+        var(--panel);
+    }
+
+    .hero-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-family: "Space Grotesk", "Noto Sans SC", sans-serif;
+      font-size: clamp(34px, 5vw, 56px);
+      line-height: 1;
+      letter-spacing: -0.03em;
+      color: #f8fcff;
+    }
+
+    .hero p {
+      margin: 10px 0 0;
+      max-width: 840px;
+      color: #b7cae2;
+      font-size: 14px;
+      line-height: 1.75;
+    }
+
+    .status {
+      font-size: 12px;
+      color: #9ec3eb;
+    }
+
+    .status.error { color: #ffb19b; }
+
+    .book-bar {
+      display: grid;
+      gap: 10px;
+    }
+
+    .book-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .book-tab {
+      border: 1px solid rgba(130, 168, 211, 0.42);
+      border-radius: 999px;
+      background: rgba(5, 13, 24, 0.78);
+      color: #bedfff;
+      padding: 8px 13px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .book-tab:hover {
+      transform: translateY(-1px);
+      border-color: rgba(52, 211, 153, 0.76);
+    }
+
+    .book-tab.active {
+      color: #05231d;
+      border-color: rgba(52, 211, 153, 0.86);
+      background: linear-gradient(135deg, #34d399, #86efac);
+    }
+
+    .mode-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .mode-toggle {
+      display: inline-flex;
+      gap: 6px;
+      padding: 4px;
+      border: 1px solid rgba(130, 168, 211, 0.28);
+      border-radius: 999px;
+      background: rgba(5, 13, 23, 0.82);
+    }
+
+    .mode-btn {
+      border: none;
+      border-radius: 999px;
+      background: transparent;
+      color: #9ec2e8;
+      padding: 7px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .mode-btn.active {
+      color: #042919;
+      background: linear-gradient(135deg, #34d399, #86efac);
+    }
+
+    .tiny-btn {
+      border: 1px solid rgba(130, 168, 211, 0.34);
+      border-radius: 999px;
+      background: rgba(4, 11, 21, 0.68);
+      color: #c8e3ff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 6px 10px;
+      cursor: pointer;
+    }
+
+    .tiny-btn:hover { border-color: rgba(96, 165, 250, 0.78); }
+
+    .metrics {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    }
+
+    .metric {
+      border: 1px solid rgba(130, 168, 211, 0.24);
+      border-radius: 14px;
+      background: rgba(5, 12, 22, 0.68);
+      padding: 12px;
+      min-height: 86px;
+      animation: reveal .35s ease both;
+    }
+
+    .metric .label {
+      font-size: 11px;
+      color: #88a6ca;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .metric .value {
+      margin-top: 5px;
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 28px;
+      line-height: 1;
+      color: #f2faff;
+    }
+
+    .metric .hint {
+      margin-top: 5px;
+      color: #a5c0de;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .control {
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+      grid-template-columns: 1.2fr 1fr 1fr;
+      align-items: end;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .field label {
+      font-size: 11px;
+      color: #92afcf;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .control input,
+    .control select {
+      width: 100%;
+      border: 1px solid rgba(130, 168, 211, 0.32);
+      border-radius: 11px;
+      background: rgba(4, 10, 20, 0.74);
+      color: #deeeff;
+      font-size: 13px;
+      padding: 10px 12px;
+      outline: none;
+    }
+
+    .control input:focus,
+    .control select:focus {
+      border-color: rgba(52, 211, 153, 0.76);
+      box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.12);
+    }
+
+    .workspace {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: minmax(0, 1.55fr) minmax(320px, 1fr);
+    }
+
+    .stream {
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+      align-content: start;
+      min-height: 620px;
+    }
+
+    .stream-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .stream-title {
+      margin: 0;
+      font-size: 14px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #9cc8f2;
+      font-weight: 800;
+    }
+
+    .stream-tip {
+      font-size: 12px;
+      color: #8faecc;
+    }
+
+    .cards {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    }
+
+    .item-card {
+      border: 1px solid rgba(130, 168, 211, 0.26);
+      border-radius: 14px;
+      background: rgba(5, 12, 23, 0.72);
+      padding: 12px;
+      display: grid;
+      gap: 8px;
+      cursor: pointer;
+      transition: transform .2s ease, border-color .2s ease, background .2s ease;
+      animation: reveal .35s ease both;
+    }
+
+    .item-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(96, 165, 250, 0.72);
+      background: rgba(6, 15, 28, 0.9);
+    }
+
+    .item-card.active {
+      border-color: rgba(52, 211, 153, 0.84);
+      box-shadow: 0 0 0 2px rgba(52, 211, 153, 0.16);
+      background: rgba(7, 18, 31, 0.94);
+    }
+
+    .kicker {
+      margin: 0;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: #8fb5dc;
+    }
+
+    .item-title {
+      margin: 0;
+      font-size: 17px;
+      color: #ecf6ff;
+      line-height: 1.35;
+      font-weight: 800;
+    }
+
+    .item-text {
+      margin: 0;
+      color: #b6cee9;
+      font-size: 13px;
+      line-height: 1.68;
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tags span {
+      border: 1px solid rgba(130, 168, 211, 0.26);
+      border-radius: 999px;
+      background: rgba(4, 10, 18, 0.76);
+      color: #9fc2e7;
+      font-size: 11px;
+      padding: 4px 8px;
+    }
+
+    .split {
+      display: grid;
+      gap: 6px;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .split .pill {
+      border: 1px solid rgba(130, 168, 211, 0.24);
+      border-radius: 10px;
+      background: rgba(4, 10, 19, 0.66);
+      padding: 7px;
+      font-size: 11px;
+      color: #aac6e4;
+    }
+
+    .side {
+      padding: 14px;
+      min-height: 620px;
+      display: grid;
+      gap: 10px;
+      align-content: start;
+      background:
+        linear-gradient(160deg, rgba(96, 165, 250, 0.09), rgba(52, 211, 153, 0.06)),
+        var(--panel-2);
+    }
+
+    .empty {
+      border: 1px dashed rgba(130, 168, 211, 0.34);
+      border-radius: 12px;
+      padding: 14px;
+      background: rgba(4, 10, 19, 0.56);
+      color: #9cb8d8;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .detail-title {
+      margin: 0;
+      font-family: "Space Grotesk", "Noto Sans SC", sans-serif;
+      font-size: 30px;
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+      color: #f7fdff;
+    }
+
+    .detail-sub {
+      margin: 0;
+      color: #9bc0e6;
+      font-size: 12px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .detail-p {
+      margin: 0;
+      color: #c2d9ef;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .meter {
+      display: grid;
+      gap: 5px;
+    }
+
+    .meter-head {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #9bc0e6;
+    }
+
+    .meter-track {
+      height: 8px;
+      border: 1px solid rgba(130, 168, 211, 0.2);
+      border-radius: 999px;
+      background: rgba(5, 12, 22, 0.82);
+      overflow: hidden;
+    }
+
+    .meter-fill {
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #34d399, #60a5fa);
+    }
+
+    .row-btns {
+      display: grid;
+      gap: 8px;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .btn {
+      border: 1px solid rgba(130, 168, 211, 0.32);
+      border-radius: 11px;
+      background: rgba(5, 12, 22, 0.74);
+      color: #d6e9ff;
+      font-size: 12px;
+      font-weight: 700;
+      text-decoration: none;
+      text-align: center;
+      padding: 10px;
+      cursor: pointer;
+    }
+
+    .btn.primary {
+      color: #032217;
+      border-color: rgba(52, 211, 153, 0.88);
+      background: linear-gradient(135deg, #34d399, #86efac);
+    }
+
+    .btn:hover { border-color: rgba(96, 165, 250, 0.78); }
+
+    .map {
+      padding: 14px;
+      display: none;
+      gap: 10px;
+    }
+
+    .map.show { display: grid; }
+
+    .map-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .map-tools {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .map-tools button {
+      border: 1px solid rgba(130, 168, 211, 0.34);
+      border-radius: 10px;
+      background: rgba(5, 12, 22, 0.72);
+      color: #cde5ff;
+      font-weight: 700;
+      font-size: 12px;
+      min-width: 34px;
+      padding: 7px 8px;
+      cursor: pointer;
+    }
+
+    .map-wrap {
+      border: 1px solid rgba(130, 168, 211, 0.22);
+      border-radius: 14px;
+      background: radial-gradient(circle at 50% 45%, rgba(11, 25, 42, 0.74), rgba(3, 8, 15, 0.96));
+      overflow: auto;
+      min-height: 360px;
+    }
+
+    #core-map {
+      width: 100%;
+      min-height: 360px;
+      display: block;
+      transition: transform .2s ease;
+      transform-origin: center;
+    }
+
+    .link {
+      stroke: rgba(130, 168, 211, 0.24);
+      stroke-width: 1.2;
+    }
+
+    .node {
+      cursor: pointer;
+    }
+
+    .node circle {
+      fill: rgba(96, 165, 250, 0.2);
+      stroke: rgba(147, 197, 253, 0.82);
+      stroke-width: 1.4;
+    }
+
+    .node.active circle {
+      fill: rgba(52, 211, 153, 0.24);
+      stroke: rgba(110, 231, 183, 0.95);
+    }
+
+    .node text {
+      fill: #e7f5ff;
+      font-size: 10px;
+      font-weight: 700;
+      pointer-events: none;
+    }
+
+    .map-empty {
+      fill: #94b4d6;
+      font-size: 16px;
+      font-family: "Space Grotesk", "Noto Sans SC", sans-serif;
+    }
+
+    .public {
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .public-controls {
+      display: grid;
+      gap: 8px;
+      grid-template-columns: 1fr 1fr 1fr;
+      align-items: center;
+    }
+
+    .public-segment {
+      display: inline-flex;
+      border: 1px solid rgba(130, 168, 211, 0.26);
+      border-radius: 999px;
+      background: rgba(4, 9, 17, 0.84);
+      padding: 3px;
+      gap: 4px;
+    }
+
+    .public-segment button {
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: #95b9dc;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 7px 12px;
+      cursor: pointer;
+    }
+
+    .public-segment button.active {
+      background: linear-gradient(135deg, rgba(52, 211, 153, 0.22), rgba(96, 165, 250, 0.26));
+      color: #e6f8ff;
+    }
+
+    .public-search {
+      border: 1px solid rgba(130, 168, 211, 0.24);
+      border-radius: 999px;
+      background: rgba(4, 10, 18, 0.82);
+      color: #d4ebff;
+      padding: 10px 14px;
+      font-size: 12px;
+    }
+
+    .public-search::placeholder {
+      color: #7ea5cc;
+    }
+
+    .public-group-select {
+      border: 1px solid rgba(130, 168, 211, 0.24);
+      border-radius: 999px;
+      background: rgba(4, 10, 18, 0.82);
+      color: #d4ebff;
+      padding: 10px 14px;
+      font-size: 12px;
+    }
+
+    .public-groups {
+      display: grid;
+      gap: 12px;
+    }
+
+    .public-group {
+      border: 1px solid rgba(130, 168, 211, 0.2);
+      border-radius: 14px;
+      background: rgba(4, 9, 17, 0.66);
+      padding: 10px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .public-group h4 {
+      margin: 0;
+      color: #d7ebff;
+      font-size: 12px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .public-list {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    }
+
+    .public-list--deck {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(280px, 320px);
+      gap: 10px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scrollbar-width: thin;
+      scroll-snap-type: x mandatory;
+      cursor: grab;
+      padding-bottom: 2px;
+    }
+
+    .public-list--deck.grabbing {
+      cursor: grabbing;
+    }
+
+    .public-card {
+      border: 1px solid rgba(130, 168, 211, 0.26);
+      border-radius: 13px;
+      background:
+        radial-gradient(200px 120px at 110% -20%, rgba(52, 211, 153, 0.18), transparent 60%),
+        radial-gradient(200px 120px at -10% 110%, rgba(96, 165, 250, 0.16), transparent 62%),
+        rgba(5, 12, 22, 0.86);
+      padding: 12px;
+      display: grid;
+      gap: 8px;
+      scroll-snap-align: start;
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+    }
+
+    .public-list--deck .public-card:hover {
+      transform: translateY(-3px) scale(1.01);
+    }
+
+    .public-card.is-related {
+      border-color: rgba(52, 211, 153, 0.75);
+      box-shadow: 0 0 0 1px rgba(52, 211, 153, 0.24) inset;
+    }
+
+    .public-card.is-crossbook {
+      border-color: rgba(96, 165, 250, 0.78);
+    }
+
+    .public-card.is-current {
+      border-color: rgba(250, 204, 21, 0.88);
+      box-shadow: 0 0 0 1px rgba(250, 204, 21, 0.3) inset;
+    }
+
+    .public-card h4 {
+      margin: 0;
+      font-size: 14px;
+      color: #e8f6ff;
+      line-height: 1.45;
+    }
+
+    .public-card p {
+      margin: 0;
+      font-size: 12px;
+      color: #acc8e6;
+      line-height: 1.62;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
+      overflow: hidden;
+    }
+
+    .public-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .public-meta span {
+      border: 1px solid rgba(130, 168, 211, 0.24);
+      border-radius: 999px;
+      background: rgba(4, 10, 18, 0.7);
+      color: #9fc2e7;
+      font-size: 10px;
+      padding: 3px 8px;
+    }
+
+    .public-actions {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .public-actions button,
+    .public-actions a {
+      border: 1px solid rgba(130, 168, 211, 0.3);
+      border-radius: 9px;
+      background: rgba(5, 12, 22, 0.78);
+      color: #d0e7ff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 7px;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .public-actions button:hover,
+    .public-actions a:hover {
+      border-color: rgba(96, 165, 250, 0.78);
+    }
+
+    @keyframes reveal {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 1240px) {
+      .workspace { grid-template-columns: 1fr; }
+      .side { min-height: 0; }
+    }
+
+    @media (max-width: 920px) {
+      .page { width: calc(100% - 16px); padding-top: 88px; }
+      .hero { padding: 14px; }
+      .control { grid-template-columns: 1fr; }
+      .row-btns { grid-template-columns: 1fr; }
+      .cards { grid-template-columns: 1fr; }
+      .public-controls { grid-template-columns: 1fr; }
+      .public-actions { grid-template-columns: 1fr 1fr; }
+      .public-list--deck { grid-auto-columns: minmax(240px, 88vw); }
+    }
+  </style>
+</head>
+<body>
+<style id="reado-shell-boot-style">
+body.reado-shell-pending {
+  background: #0b1220;
+}
+body.reado-shell-pending > :not(script):not(reado-app-shell):not(.reado-shell-boot-mask) {
+  visibility: hidden !important;
+}
+body > .reado-shell-boot-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    radial-gradient(1200px 420px at 20% -10%, rgba(47, 123, 255, 0.22), transparent 60%),
+    radial-gradient(900px 360px at 92% 112%, rgba(0, 234, 255, 0.14), transparent 58%),
+    #0b1220;
+  transition: opacity 180ms ease;
+}
+body.reado-shell-pending > .reado-shell-boot-mask {
+  opacity: 1;
+}
+body.reado-shell-ready > .reado-shell-boot-mask {
+  opacity: 0;
+}
+</style>
+<script>
+(function () {
+  var body = document.body;
+  if (!body) return;
+  body.classList.add("reado-shell-pending");
+  var mask = body.querySelector(".reado-shell-boot-mask");
+  if (!mask) {
+    mask = document.createElement("div");
+    mask.className = "reado-shell-boot-mask";
+    mask.setAttribute("aria-hidden", "true");
+    body.appendChild(mask);
+  }
+  window.setTimeout(function () {
+    if (!body.classList.contains("reado-shell-applied")) body.classList.remove("reado-shell-pending");
+  }, 4000);
+})();
+</script>
+<script src="/shared/book-catalog.js?v=knowledge-core-v2"></script>
+<script type="module" src="/shared/shell.js?v=knowledge-core-v2"></script>
+<reado-app-shell data-page="skill-tree"></reado-app-shell>
+
+<main class="page">
+  <section class="card hero">
+    <div class="hero-head">
+      <div>
+        <h1>Knowledge Core</h1>
+        <p>智库与技能树合并为一个知识核心系统。先看可共享的知识块，再把它封装成可与他人交互的技能载体。知识是本体，技能是交互包装。</p>
+      </div>
+      <div id="status" class="status">正在加载官方知识库...</div>
+    </div>
+
+    <div class="book-bar">
+      <div id="book-tabs" class="book-tabs"></div>
+      <div class="mode-row">
+        <div class="mode-toggle">
+          <button id="mode-block" class="mode-btn" type="button">知识块（智库）</button>
+          <button id="mode-skill" class="mode-btn" type="button">技能封装（交互）</button>
+        </div>
+        <button id="map-toggle" class="tiny-btn" type="button">显示关系地图</button>
+      </div>
+    </div>
+
+    <div id="metrics" class="metrics"></div>
+  </section>
+
+  <section class="card control">
+    <div class="field">
+      <label for="search-input">搜索</label>
+      <input id="search-input" type="search" placeholder="输入概念、机制、场景、技能名" />
+    </div>
+    <div class="field">
+      <label for="tag-filter">标签过滤</label>
+      <select id="tag-filter"></select>
+    </div>
+    <div class="field">
+      <label for="sort-select">排序策略</label>
+      <select id="sort-select">
+        <option value="importance">按重要性</option>
+        <option value="share">按共享性</option>
+        <option value="name">按名称</option>
+      </select>
+    </div>
+  </section>
+
+  <section class="workspace">
+    <article class="card stream">
+      <header class="stream-head">
+        <h2 id="stream-title" class="stream-title">知识块流</h2>
+        <span id="stream-tip" class="stream-tip">每张卡片都应回答：这条知识为什么值钱？</span>
+      </header>
+      <div id="cards" class="cards"></div>
+    </article>
+
+    <aside id="detail" class="card side"></aside>
+  </section>
+
+  <section id="map-section" class="card map">
+    <header class="map-head">
+      <h2 class="stream-title">关系地图（可选）</h2>
+      <div class="map-tools">
+        <button id="zoom-out" type="button">-</button>
+        <button id="zoom-reset" type="button">1x</button>
+        <button id="zoom-in" type="button">+</button>
+      </div>
+    </header>
+    <div class="map-wrap">
+      <svg id="core-map" viewBox="0 0 1200 560" role="img" aria-label="Knowledge map"></svg>
+    </div>
+  </section>
+
+  <section class="card public">
+    <header class="stream-head">
+      <h2 class="stream-title">公共知识卡片</h2>
+      <span id="public-tip" class="stream-tip">把高价值知识发布为可共享卡片，供其他玩家引用与对战复盘。</span>
+    </header>
+    <div class="public-controls">
+      <div class="public-segment" id="public-view-segment">
+        <button type="button" data-public-view="deck" class="active">沉浸卡堆</button>
+        <button type="button" data-public-view="grid">网格总览</button>
+        <button type="button" data-public-highlight="1" class="active">跨书高亮</button>
+      </div>
+      <select id="public-group-select" class="public-group-select">
+        <option value="book">按书籍分组</option>
+        <option value="tag">按标签分组</option>
+        <option value="none">不分组</option>
+      </select>
+      <input id="public-search-input" class="public-search" type="search" placeholder="检索公共卡片（机制/价值/标签）" />
+    </div>
+    <div id="public-list" class="public-groups"></div>
+  </section>
+</main>
+
+<script>
+(() => {
+  const INITIAL_FACET = "blocks";
+  const OFFICIAL_BOOK_IDS = [
+    "zero-to-one",
+    "sapiens",
+    "wanli-fifteen",
+    "principles-for-navigating-big-debt-crises"
+  ];
+
+  const CURATED_CORES = {
+    "zero-to-one": {
+      title: "《从零到一》",
+      blocks: [
+        {
+          id: "zto-monopoly",
+          title: "从竞争到垄断",
+          mechanism: "竞争会把利润压到接近零，真正可持续的创新公司会主动构建小范围垄断。",
+          why: "它决定公司是否只是忙碌，还是拥有长期定价权与研发反哺能力。",
+          evidence: "彼得·蒂尔提出“竞争是失败者的游戏”，强调差异化而非同质化竞速。",
+          transfer: "做产品路线时，优先验证“独特价值+渠道壁垒”，而不是盲目卷同赛道。",
+          tags: ["战略", "护城河", "商业模式"],
+          importance: 95,
+          share: 88,
+          moduleIndex: 1,
+          relations: ["zto-secret", "zto-distribution"]
+        },
+        {
+          id: "zto-secret",
+          title: "秘密洞察",
+          mechanism: "创业机会往往来自“多数人忽略但真实存在”的秘密。",
+          why: "没有非共识洞察，产品只会复制现有供给，无法形成非线性回报。",
+          evidence: "核心问题是：有哪些重要真相，别人还没看到？",
+          transfer: "团队做选题会时，把“非共识假设”写成可检验实验，而不是观点口号。",
+          tags: ["洞察", "反共识", "创新"],
+          importance: 90,
+          share: 81,
+          moduleIndex: 2,
+          relations: ["zto-monopoly", "zto-definite"]
+        },
+        {
+          id: "zto-distribution",
+          title: "分发先于增长",
+          mechanism: "再好的产品也需要匹配的分发引擎，销售与渠道不是后补动作。",
+          why: "多数产品失败不是“做不出来”，而是“传不出去、卖不动”。",
+          evidence: "《从零到一》把分发能力视为技术同级核心资产。",
+          transfer: "上线前就定义首批种子用户路径和复用渠道，不把增长外包给“运气”。",
+          tags: ["增长", "渠道", "销售"],
+          importance: 88,
+          share: 83,
+          moduleIndex: 3,
+          relations: ["zto-monopoly", "zto-power"]
+        },
+        {
+          id: "zto-power",
+          title: "幂律分布",
+          mechanism: "结果常由少数关键决策主导，回报不是线性均匀分布。",
+          why: "它决定资源配置方式：应该把子弹集中在少数高杠杆动作上。",
+          evidence: "投资与创业回报都呈幂律，平均主义会稀释优势。",
+          transfer: "季度计划中只保留 1-2 个真正的“赢面最大动作”。",
+          tags: ["决策", "资源配置", "风险"],
+          importance: 86,
+          share: 79,
+          moduleIndex: 4,
+          relations: ["zto-definite", "zto-distribution"]
+        },
+        {
+          id: "zto-definite",
+          title: "确定性乐观",
+          mechanism: "相信未来会更好，但更关键的是为未来写出可执行路径。",
+          why: "没有确定性的目标管理，团队会在短期噪声中反复摇摆。",
+          evidence: "“确定性计划”是组织协同与长期复利的基础。",
+          transfer: "把年度战略拆成可追踪里程碑，减少“忙但不前进”的幻觉。",
+          tags: ["组织", "目标", "执行"],
+          importance: 84,
+          share: 77,
+          moduleIndex: 5,
+          relations: ["zto-secret", "zto-power"]
+        }
+      ]
+    },
+    "sapiens": {
+      title: "《人类简史》",
+      blocks: [
+        {
+          id: "sap-imagined-order",
+          title: "想象共同体",
+          mechanism: "大规模协作依赖共同叙事（国家、公司、货币、法律），而非血缘本能。",
+          why: "解释了组织、制度与文化为何能跨陌生人运行。",
+          evidence: "尤瓦尔指出“虚构秩序”是智人超大规模协作能力的底层。",
+          transfer: "做团队管理时，先统一叙事与规则，效率才会稳定。",
+          tags: ["制度", "协作", "文化"],
+          importance: 94,
+          share: 89,
+          moduleIndex: 1,
+          relations: ["sap-money", "sap-empire"]
+        },
+        {
+          id: "sap-agri-trap",
+          title: "农业革命的双刃效应",
+          mechanism: "农业提升了总产出，却降低了个体生活弹性并加剧等级结构。",
+          why: "提醒我们区分“系统效率提升”和“个体福祉改善”。",
+          evidence: "“是小麦驯化了人类”体现了路径依赖与制度锁定。",
+          transfer: "评估政策/产品时，同时追踪宏观产出和微观幸福指标。",
+          tags: ["系统", "福祉", "路径依赖"],
+          importance: 90,
+          share: 85,
+          moduleIndex: 2,
+          relations: ["sap-imagined-order", "sap-science"]
+        },
+        {
+          id: "sap-money",
+          title: "货币即信任协议",
+          mechanism: "货币本质是可转移的社会信任接口，不是金属本身。",
+          why: "它解释了交易网络为何可扩展，以及信用危机为何会传导。",
+          evidence: "不同文明可通过货币协议建立跨文化协作。",
+          transfer: "构建平台时，把“信任机制”作为产品核心而非附属功能。",
+          tags: ["金融", "信任", "网络"],
+          importance: 87,
+          share: 86,
+          moduleIndex: 3,
+          relations: ["sap-imagined-order", "sap-empire"]
+        },
+        {
+          id: "sap-empire",
+          title: "帝国与统一化",
+          mechanism: "帝国通过标准化制度整合异质群体，降低跨区域协作成本。",
+          why: "它是现代治理、法治和基础设施扩张的重要前身。",
+          evidence: "统一规则通常伴随压迫与整合并存的历史张力。",
+          transfer: "组织扩张时要同步“标准化协议”和“本地适配”。",
+          tags: ["治理", "标准化", "组织扩张"],
+          importance: 83,
+          share: 78,
+          moduleIndex: 4,
+          relations: ["sap-imagined-order", "sap-money"]
+        },
+        {
+          id: "sap-science",
+          title: "科学革命的增长回路",
+          mechanism: "承认无知 -> 投入研究 -> 技术突破 -> 资本回流，形成正反馈循环。",
+          why: "解释现代社会为何持续加速，并伴随伦理/风险外溢。",
+          evidence: "科学与资本、政治权力形成互相强化结构。",
+          transfer: "做创新组织时建立“学习-试验-复盘-再投资”闭环。",
+          tags: ["创新", "学习系统", "复利"],
+          importance: 88,
+          share: 84,
+          moduleIndex: 5,
+          relations: ["sap-agri-trap", "sap-imagined-order"]
+        }
+      ]
+    },
+    "wanli-fifteen": {
+      title: "《万历十五年》",
+      blocks: [
+        {
+          id: "wl-bureaucracy",
+          title: "官僚系统的稳定优先",
+          mechanism: "大一统官僚体系天然偏好“可控稳定”，对激进改革有内生阻力。",
+          why: "解释了“知道问题却难改”的制度摩擦。",
+          evidence: "张居正改革成效与反噬并存，反映结构性阻力而非个人能力不足。",
+          transfer: "推动改革时必须同步设计利益补偿与执行联盟。",
+          tags: ["制度摩擦", "改革", "组织政治"],
+          importance: 93,
+          share: 86,
+          moduleIndex: 1,
+          relations: ["wl-fiscal", "wl-emperor"]
+        },
+        {
+          id: "wl-fiscal",
+          title: "财政与治理耦合",
+          mechanism: "财政安排决定治理边界，税制改革本质是权力与责任再分配。",
+          why: "只讨论财政数字，不触及治理结构，改革会很快回弹。",
+          evidence: "一条鞭法推进时，地方执行与中央目标存在持续拉扯。",
+          transfer: "做政策设计要同时定义“谁负责、谁受益、谁承担成本”。",
+          tags: ["财政", "责任", "政策"],
+          importance: 90,
+          share: 82,
+          moduleIndex: 2,
+          relations: ["wl-bureaucracy", "wl-information"]
+        },
+        {
+          id: "wl-emperor",
+          title: "皇权并非无限",
+          mechanism: "皇帝在程序、礼制与官僚网络中也受强约束，不是自由决策者。",
+          why: "帮助理解“名义权力”和“实际执行力”的差异。",
+          evidence: "万历朝后期政务停摆，正反映制度协同失灵。",
+          transfer: "现代组织里也要区分“拍板权”与“落地能力”。",
+          tags: ["权力结构", "执行", "协同"],
+          importance: 86,
+          share: 79,
+          moduleIndex: 3,
+          relations: ["wl-bureaucracy", "wl-information"]
+        },
+        {
+          id: "wl-moral-system",
+          title: "道德话语与技术治理错位",
+          mechanism: "当道德评价替代技术治理时，问题会被归因为人而非机制。",
+          why: "它会让系统失去纠错能力，形成“人人表态、无人负责”。",
+          evidence: "史书叙事常聚焦人物德行，掩盖制度条件。",
+          transfer: "管理复盘要优先问“机制怎么设计”，再问“谁犯错”。",
+          tags: ["复盘", "机制设计", "治理"],
+          importance: 84,
+          share: 76,
+          moduleIndex: 4,
+          relations: ["wl-bureaucracy", "wl-fiscal"]
+        },
+        {
+          id: "wl-information",
+          title: "信息链失真",
+          mechanism: "层级越多、激励越扭曲，决策层越难获得真实一线信息。",
+          why: "信息质量是治理质量的上限。",
+          evidence: "奏章体系在政治博弈中逐渐偏离事实反馈功能。",
+          transfer: "组织需要反向校验机制，避免“只报喜不报忧”。",
+          tags: ["信息", "激励", "决策质量"],
+          importance: 88,
+          share: 83,
+          moduleIndex: 5,
+          relations: ["wl-fiscal", "wl-emperor"]
+        }
+      ]
+    },
+    "principles-for-navigating-big-debt-crises": {
+      title: "《置身事内》",
+      blocks: [
+        {
+          id: "zn-fiscal-decentralization",
+          title: "财权事权错配",
+          mechanism: "地方承担大量公共事务，但财力来源不稳定，导致持续财政张力。",
+          why: "这是理解地方债务、平台融资与土地财政的入口问题。",
+          evidence: "分税制后地方在发展与偿付间持续寻找替代资金来源。",
+          transfer: "评估地方项目时要看长期现金流，不只看短期开工率。",
+          tags: ["财政体制", "地方治理", "债务"],
+          importance: 94,
+          share: 88,
+          moduleIndex: 1,
+          relations: ["zn-land-finance", "zn-platform"]
+        },
+        {
+          id: "zn-land-finance",
+          title: "土地财政机制",
+          mechanism: "土地出让收入成为地方资金主引擎，也放大了地产周期依赖。",
+          why: "它决定了城市扩张速度，也带来对未来需求透支风险。",
+          evidence: "地价、融资、投资形成联动回路，繁荣与收缩都很剧烈。",
+          transfer: "看城市发展质量时，加入“非土地收入占比”指标。",
+          tags: ["土地", "周期", "城市发展"],
+          importance: 90,
+          share: 84,
+          moduleIndex: 2,
+          relations: ["zn-fiscal-decentralization", "zn-platform"]
+        },
+        {
+          id: "zn-platform",
+          title: "城投平台的杠杆逻辑",
+          mechanism: "城投平台把未来财政预期提前货币化，以换取当期投资能力。",
+          why: "它解释了基建扩张与债务滚续并存的结构特征。",
+          evidence: "融资平台在“增长目标”和“偿债约束”之间长期平衡。",
+          transfer: "项目上马前要先做“最差情景偿债测试”。",
+          tags: ["杠杆", "融资", "风险管理"],
+          importance: 91,
+          share: 86,
+          moduleIndex: 3,
+          relations: ["zn-land-finance", "zn-cycle"]
+        },
+        {
+          id: "zn-transfer-payment",
+          title: "转移支付与激励结构",
+          mechanism: "转移支付是再平衡工具，但也会改变地方行为激励。",
+          why: "设计不当会造成“等补贴”而非“提效率”。",
+          evidence: "中央-地方博弈并非一次性结算，而是动态激励协商。",
+          transfer: "制定激励政策时，把“结果指标+过程约束”一起绑定。",
+          tags: ["激励", "政策工具", "再分配"],
+          importance: 84,
+          share: 78,
+          moduleIndex: 4,
+          relations: ["zn-fiscal-decentralization", "zn-platform"]
+        },
+        {
+          id: "zn-cycle",
+          title: "政策与周期共振",
+          mechanism: "宏观政策会放大或平滑经济周期，关键在节奏和传导链。",
+          why: "理解周期，才能判断短期刺激与长期可持续之间的边界。",
+          evidence: "财政、金融、地产多变量耦合，单点政策难以独立奏效。",
+          transfer: "做经营决策时建立“顺周期/逆周期”两套预案。",
+          tags: ["周期", "宏观", "决策预案"],
+          importance: 87,
+          share: 82,
+          moduleIndex: 5,
+          relations: ["zn-platform", "zn-land-finance"]
+        }
+      ]
+    }
+  };
+
+  const BAD_TERMS = new Set([
+    "reado", "entry", "button", "radio", "unchecked", "arrow", "trending", "experiences", "history", "circle", "science", "gavel", "dna"
+  ]);
+  const FAVORITES_KEY = "reado_knowledge_core_favorites_v1";
+
+  const state = {
+    books: [],
+    activeBookId: "",
+    mode: INITIAL_FACET === "skills" ? "skill" : "block",
+    search: "",
+    tag: "all",
+    sort: "importance",
+    mapVisible: false,
+    mapScale: 1,
+    blocks: [],
+    skills: [],
+    activeId: "",
+    focusBlockId: "",
+    favorites: {},
+    publicCards: [],
+    publicView: "deck",
+    publicGroup: "book",
+    publicSearch: "",
+    publicHighlight: true,
+    cache: new Map()
+  };
+
+  const tabsEl = document.getElementById("book-tabs");
+  const statusEl = document.getElementById("status");
+  const modeBlockEl = document.getElementById("mode-block");
+  const modeSkillEl = document.getElementById("mode-skill");
+  const mapToggleEl = document.getElementById("map-toggle");
+  const mapSectionEl = document.getElementById("map-section");
+  const metricsEl = document.getElementById("metrics");
+  const searchEl = document.getElementById("search-input");
+  const tagFilterEl = document.getElementById("tag-filter");
+  const sortEl = document.getElementById("sort-select");
+  const streamTitleEl = document.getElementById("stream-title");
+  const streamTipEl = document.getElementById("stream-tip");
+  const cardsEl = document.getElementById("cards");
+  const detailEl = document.getElementById("detail");
+  const mapSvgEl = document.getElementById("core-map");
+  const zoomInEl = document.getElementById("zoom-in");
+  const zoomOutEl = document.getElementById("zoom-out");
+  const zoomResetEl = document.getElementById("zoom-reset");
+  const publicListEl = document.getElementById("public-list");
+  const publicTipEl = document.getElementById("public-tip");
+  const publicViewSegmentEl = document.getElementById("public-view-segment");
+  const publicGroupSelectEl = document.getElementById("public-group-select");
+  const publicSearchInputEl = document.getElementById("public-search-input");
+
+  const asArray = (v) => Array.isArray(v) ? v : [];
+  const toText = (v, fallback = "") => typeof v === "string" && v.trim() ? v.trim() : fallback;
+  const toNumber = (v, fallback = 0) => Number.isFinite(Number(v)) ? Number(v) : fallback;
+  const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+  const escapeHtml = (value) => toText(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+
+  const fetchJson = async (url, options = {}) => {
+    const response = await fetch(url, {
+      credentials: "same-origin",
+      ...options
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok || data?.ok === false) {
+      throw new Error(data?.error || ("Request failed: " + response.status));
+    }
+    return data;
+  };
+  const postJson = (url, payload = {}) => fetchJson(url, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+
+  const formatNum = (v) => new Intl.NumberFormat("zh-CN").format(Math.round(toNumber(v, 0)));
+
+  const setStatus = (text, type = "") => {
+    statusEl.classList.toggle("error", type === "error");
+    statusEl.textContent = text;
+  };
+
+  const loadFavorites = () => {
+    try {
+      const raw = localStorage.getItem(FAVORITES_KEY);
+      const parsed = JSON.parse(raw || "{}");
+      if (!parsed || typeof parsed !== "object") return {};
+      return Object.fromEntries(
+        Object.entries(parsed).filter(([key, value]) => toText(key) && value === true)
+      );
+    } catch {
+      return {};
+    }
+  };
+
+  const persistFavorites = () => {
+    try {
+      localStorage.setItem(FAVORITES_KEY, JSON.stringify(state.favorites));
+    } catch {}
+  };
+
+  const isFavorited = (id) => Boolean(state.favorites[toText(id)]);
+
+  const setFavorited = (id, value) => {
+    const key = toText(id);
+    if (!key) return;
+    if (value) state.favorites[key] = true;
+    else delete state.favorites[key];
+    persistFavorites();
+  };
+
+  const copyText = async (text) => {
+    const value = toText(text);
+    if (!value) return false;
+    try {
+      if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+        await navigator.clipboard.writeText(value);
+        return true;
+      }
+    } catch {}
+    try {
+      const input = document.createElement("textarea");
+      input.value = value;
+      input.setAttribute("readonly", "true");
+      input.style.position = "fixed";
+      input.style.opacity = "0";
+      document.body.appendChild(input);
+      input.select();
+      const ok = document.execCommand("copy");
+      input.remove();
+      return Boolean(ok);
+    } catch {
+      return false;
+    }
+  };
+
+  const toAbsoluteHref = (href) => {
+    const raw = toText(href);
+    if (!raw) return "";
+    try {
+      return new URL(raw, window.location.origin).toString();
+    } catch {
+      return "";
+    }
+  };
+
+  const getCurrentBook = () => state.books.find((book) => book.id === state.activeBookId) || null;
+  const getCurrentBookTitle = () => toText(getCurrentBook()?.title, "未命名书籍");
+  const getModeLabel = (mode) => mode === "skill" ? "技能封装" : "知识块";
+  const rowMode = () => (state.mode === "skill" ? "skill" : "block");
+  const rowTitle = (row, mode = rowMode()) => toText(mode === "skill" ? row?.name : row?.title, "未命名条目");
+  const rowFavoriteKey = (row, mode = rowMode()) => `${mode}:${toText(row?.id)}`;
+
+  const getPrimaryModuleHrefFromBlock = (blockId) => {
+    const wrapper = state.skills.find((skill) => skill.fromBlockId === blockId);
+    return toText(wrapper?.moduleHref, "/missions");
+  };
+
+  const buildBattleHref = (row, mode = rowMode()) => {
+    if (!row) return "";
+    if (mode === "skill") return toText(row.moduleHref, "/missions");
+    return getPrimaryModuleHrefFromBlock(row.id);
+  };
+
+  const buildReviewHref = (row, mode = rowMode()) => {
+    const base = buildBattleHref(row, mode) || "/missions";
+    try {
+      const url = new URL(base, window.location.origin);
+      url.searchParams.set("review", "1");
+      url.searchParams.set("bookId", state.activeBookId);
+      url.searchParams.set("mode", mode);
+      url.searchParams.set("itemId", toText(row?.id));
+      return `${url.pathname}${url.search}${url.hash}`;
+    } catch {
+      return "";
+    }
+  };
+
+  const buildCitation = (row, mode = rowMode()) => {
+    const title = rowTitle(row, mode);
+    const mechanism = toText(row?.mechanism, "暂无机制描述");
+    const why = toText(row?.why, "暂无价值说明");
+    const transfer = toText(row?.transfer, "暂无迁移场景");
+    return [
+      `【${getCurrentBookTitle()}｜${getModeLabel(mode)}】${title}`,
+      `机制：${mechanism}`,
+      `价值：${why}`,
+      `迁移：${transfer}`
+    ].join("\n");
+  };
+
+  const buildCardCitation = (card) => {
+    const mode = toText(card?.mode) === "skill" ? "skill" : "block";
+    const title = toText(card?.title, "未命名条目");
+    const mechanism = toText(card?.mechanism, "暂无机制描述");
+    const why = toText(card?.why, "暂无价值说明");
+    const transfer = toText(card?.transfer, "暂无迁移场景");
+    const book = toText(card?.bookTitle, toText(card?.bookId, "未命名书籍"));
+    return [
+      `【${book}｜${getModeLabel(mode)}】${title}`,
+      `机制：${mechanism}`,
+      `价值：${why}`,
+      `迁移：${transfer}`
+    ].join("\n");
+  };
+
+  const toPublishPayload = (row, mode = rowMode()) => {
+    const title = rowTitle(row, mode);
+    return {
+      bookId: state.activeBookId,
+      bookTitle: getCurrentBookTitle(),
+      mode,
+      itemId: toText(row?.id),
+      title,
+      mechanism: toText(row?.mechanism),
+      why: toText(row?.why),
+      evidence: toText(row?.evidence),
+      transfer: toText(row?.transfer),
+      tags: asArray(row?.tags).filter(Boolean).slice(0, 10),
+      sourceHref: `${window.location.pathname}?bookId=${encodeURIComponent(state.activeBookId)}&mode=${mode}&itemId=${encodeURIComponent(toText(row?.id))}`,
+      battleHref: buildBattleHref(row, mode),
+      reviewHref: buildReviewHref(row, mode)
+    };
+  };
+
+  const findPublicCard = (cardId) => state.publicCards.find((card) => card.id === cardId) || null;
+
+  const tagSetFrom = (rows) => new Set(asArray(rows).map((tag) => toText(tag)).filter(Boolean));
+  const hasTagOverlap = (leftTags, rightTags) => {
+    if (!leftTags.size || !rightTags.size) return false;
+    for (const tag of leftTags) {
+      if (rightTags.has(tag)) return true;
+    }
+    return false;
+  };
+
+  const cardSearchHay = (row) => [
+    toText(row?.title),
+    toText(row?.mechanism),
+    toText(row?.why),
+    toText(row?.evidence),
+    toText(row?.transfer),
+    toText(row?.bookTitle),
+    ...asArray(row?.tags)
+  ].join(" ").toLowerCase();
+
+  const groupPublicRows = (rows) => {
+    if (state.publicGroup === "none") {
+      return [{ key: "all", title: "全部公共卡片", rows }];
+    }
+    if (state.publicGroup === "tag") {
+      const map = new Map();
+      rows.forEach((row) => {
+        const tags = asArray(row.tags).map((tag) => toText(tag)).filter(Boolean);
+        const key = tags[0] || "未标注";
+        const group = map.get(key) || [];
+        group.push(row);
+        map.set(key, group);
+      });
+      return Array.from(map.entries())
+        .sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0], "zh-Hans-CN"))
+        .map(([key, groupRows]) => ({ key: `tag:${key}`, title: `标签 · ${key}`, rows: groupRows }));
+    }
+    const map = new Map();
+    rows.forEach((row) => {
+      const key = toText(row.bookTitle, toText(row.bookId, "未知书籍"));
+      const group = map.get(key) || [];
+      group.push(row);
+      map.set(key, group);
+    });
+    return Array.from(map.entries())
+      .sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0], "zh-Hans-CN"))
+      .map(([key, groupRows]) => ({ key: `book:${key}`, title: key, rows: groupRows }));
+  };
+
+  const bindDeckDrag = (container) => {
+    if (!(container instanceof HTMLElement)) return;
+    if (container.dataset.dragBound === "1") return;
+    container.dataset.dragBound = "1";
+    let pointerId = null;
+    let startX = 0;
+    let startScroll = 0;
+    let moved = false;
+
+    container.addEventListener("pointerdown", (event) => {
+      if (event.pointerType === "mouse" && event.button !== 0) return;
+      pointerId = event.pointerId;
+      startX = event.clientX;
+      startScroll = container.scrollLeft;
+      moved = false;
+      container.classList.add("grabbing");
+      try {
+        container.setPointerCapture(event.pointerId);
+      } catch {}
+    });
+
+    container.addEventListener("pointermove", (event) => {
+      if (pointerId === null || event.pointerId !== pointerId) return;
+      const delta = event.clientX - startX;
+      if (Math.abs(delta) > 4) moved = true;
+      container.scrollLeft = startScroll - delta;
+      if (moved) event.preventDefault();
+    });
+
+    const stopDrag = (event) => {
+      if (pointerId === null || event.pointerId !== pointerId) return;
+      pointerId = null;
+      container.classList.remove("grabbing");
+    };
+    container.addEventListener("pointerup", stopDrag);
+    container.addEventListener("pointercancel", stopDrag);
+    container.addEventListener("pointerleave", stopDrag);
+    container.addEventListener("dragstart", (event) => event.preventDefault());
+    container.addEventListener("click", (event) => {
+      if (!moved) return;
+      moved = false;
+      event.preventDefault();
+      event.stopPropagation();
+    }, true);
+  };
+
+  const setupPublicDeckInteractions = () => {
+    if (state.publicView !== "deck") return;
+    const decks = publicListEl.querySelectorAll(".public-list--deck");
+    decks.forEach((deck) => bindDeckDrag(deck));
+  };
+
+  const refreshPublicCards = async () => {
+    try {
+      const payload = await fetchJson("/api/knowledge-core/cards?limit=180");
+      state.publicCards = asArray(payload?.cards);
+      return true;
+    } catch (error) {
+      publicTipEl.textContent = `公共卡片加载失败：${toText(error?.message, "未知错误")}`;
+      return false;
+    }
+  };
+
+  const renderPublicCards = (activeRow) => {
+    const mode = rowMode();
+    const keyword = state.publicSearch.trim().toLowerCase();
+    const activeTags = tagSetFrom(asArray(activeRow?.tags));
+    const activeId = toText(activeRow?.id);
+    const activeKey = activeId ? `${mode}:${activeId}` : "";
+    const rows = asArray(state.publicCards)
+      .filter((row) => toText(row?.mode) === mode)
+      .filter((row) => !keyword || cardSearchHay(row).includes(keyword))
+      .sort((a, b) => {
+        const aMine = a.bookId === state.activeBookId ? 1 : 0;
+        const bMine = b.bookId === state.activeBookId ? 1 : 0;
+        if (aMine !== bMine) return bMine - aMine;
+        const starDiff = toNumber(b.starCount, 0) - toNumber(a.starCount, 0);
+        if (starDiff !== 0) return starDiff;
+        const aTs = Date.parse(toText(a.updatedAt, a.createdAt)) || 0;
+        const bTs = Date.parse(toText(b.updatedAt, b.createdAt)) || 0;
+        return bTs - aTs;
+      })
+      .slice(0, 36)
+      .map((row) => {
+        const modeKey = toText(row.mode) === "skill" ? "skill" : "block";
+        const cardTags = tagSetFrom(asArray(row.tags));
+        const overlap = hasTagOverlap(activeTags, cardTags);
+        const isCurrent = activeKey && row.itemId && `${modeKey}:${row.itemId}` === activeKey;
+        const isCrossbook = toText(row.bookId) && row.bookId !== state.activeBookId;
+        const isRelated = state.publicHighlight && overlap && isCrossbook;
+        return { ...row, modeKey, isRelated, isCrossbook, isCurrent };
+      });
+
+    if (!rows.length) {
+      publicTipEl.textContent = "还没有共享卡片。先在右侧详情发布第一张高价值卡片。";
+      publicListEl.innerHTML = `<article class="empty">当前模式下暂无公共卡片。</article>`;
+      return;
+    }
+
+    const starredTotal = rows.reduce((sum, row) => sum + toNumber(row.starCount, 0), 0);
+    const relatedCount = rows.filter((row) => row.isRelated).length;
+    publicTipEl.textContent = `已展示 ${rows.length} 张公共卡片，累计 ${formatNum(starredTotal)} 次点赞，跨书关联 ${formatNum(relatedCount)} 张。`;
+
+    const groups = groupPublicRows(rows);
+    const listClass = state.publicView === "deck" ? "public-list public-list--deck" : "public-list";
+    publicListEl.innerHTML = groups.map((group) => `
+      <section class="public-group" data-group-key="${escapeHtml(group.key)}">
+        <h4>${escapeHtml(group.title)} · ${formatNum(group.rows.length)}</h4>
+        <div class="${listClass}">
+          ${group.rows.map((row) => {
+      const title = toText(row.title, "未命名条目");
+      const reviewHref = toAbsoluteHref(row.reviewHref);
+      const battleHref = toAbsoluteHref(row.battleHref);
+      const citation = escapeHtml(buildCardCitation(row));
+      const summary = toText(row.mechanism, toText(row.why, "暂无摘要"));
+      const classes = [
+        "public-card",
+        row.isRelated ? "is-related" : "",
+        row.isCrossbook ? "is-crossbook" : "",
+        row.isCurrent ? "is-current" : ""
+      ].filter(Boolean).join(" ");
+      return `
+        <article class="${classes}" data-public-id="${escapeHtml(row.id)}">
+          <h4>${escapeHtml(title)}</h4>
+          <p>${escapeHtml(summary)}</p>
+          <div class="public-meta">
+            <span>${escapeHtml(toText(row.bookTitle, toText(row.bookId, "未知书籍")))}</span>
+            <span>${escapeHtml(getModeLabel(toText(row.mode) === "skill" ? "skill" : "block"))}</span>
+            <span>点赞 ${formatNum(row.starCount)}</span>
+            ${row.isCurrent ? "<span>当前焦点</span>" : ""}
+            ${row.isRelated ? "<span>跨书关联</span>" : ""}
+          </div>
+          <div class="public-actions">
+            <button type="button" data-public-star="${row.starredByMe ? "0" : "1"}" data-public-id="${escapeHtml(row.id)}">${row.starredByMe ? "取消点赞" : "点赞"}</button>
+            <button type="button" data-public-copy-citation="1" data-public-id="${escapeHtml(row.id)}" data-public-citation="${citation}">复制引用</button>
+            <button type="button" data-public-copy-review="1" data-public-id="${escapeHtml(row.id)}" data-public-review="${escapeHtml(reviewHref)}">复制复盘链接</button>
+            <a href="${escapeHtml(battleHref || "/missions")}" target="_self">快速对战</a>
+            <a href="${escapeHtml(reviewHref || battleHref || "/missions")}" target="_self">进入复盘</a>
+          </div>
+        </article>
+      `;
+          }).join("")}
+        </div>
+      </section>
+    `).join("");
+    setupPublicDeckInteractions();
+  };
+
+  const togglePublicStar = async (cardId, starred) => {
+    if (!toText(cardId)) return;
+    await postJson(`/api/knowledge-core/cards/${encodeURIComponent(cardId)}/star`, { starred });
+    await refreshPublicCards();
+    rerender();
+  };
+
+  const publishActiveRow = async (row) => {
+    if (!row) return;
+    const mode = rowMode();
+    const payload = toPublishPayload(row, mode);
+    if (!payload.bookId || !payload.itemId || !payload.title) {
+      setStatus("发布失败：缺少必要字段", "error");
+      return;
+    }
+    await postJson("/api/knowledge-core/cards", payload);
+    setFavorited(rowFavoriteKey(row, mode), true);
+    await refreshPublicCards();
+    setStatus(`已发布共享卡片：${payload.title}`);
+    rerender();
+  };
+
+  const ensureUnifiedSidebarLinks = () => {
+    const nav = document.querySelector(".reado-shell-nav");
+    if (!(nav instanceof HTMLElement)) return false;
+    const hasCore = nav.querySelector('a.reado-shell-link[href="/skill-tree"]');
+    if (hasCore && !nav.querySelector('a.reado-shell-link[href="/think-tank"]')) return true;
+
+    const firstGroup = nav.querySelector(".reado-shell-nav-group");
+    if (!(firstGroup instanceof HTMLElement)) return false;
+    const title = firstGroup.querySelector(".reado-shell-nav-title");
+    const titleHtml = title ? title.outerHTML : "";
+    const links = Array.from(firstGroup.querySelectorAll("a.reado-shell-link"));
+    const linkByHref = new Map(links.map((link) => [link.getAttribute("href") || "", link.outerHTML]));
+    linkByHref.delete("/think-tank");
+    const activeCore = "active";
+    if (!linkByHref.has("/skill-tree")) {
+      linkByHref.set("/skill-tree", `<a class="reado-shell-link ${activeCore}" href="/skill-tree"><span class="reado-shell-link-icon">hub</span><span>Knowledge Core</span></a>`);
+    } else {
+      linkByHref.set("/skill-tree", `<a class="reado-shell-link ${activeCore}" href="/skill-tree"><span class="reado-shell-link-icon">hub</span><span>Knowledge Core</span></a>`);
+    }
+    const ordered = [
+      "/workspace",
+      "/skill-tree",
+      "/missions",
+      "/library",
+      "/studio",
+      "/marketplace",
+      "/leaderboard",
+      "/profile"
+    ];
+    firstGroup.innerHTML = `${titleHtml}${ordered.map((href) => linkByHref.get(href)).filter(Boolean).join("")}`;
+    return true;
+  };
+
+  const syncSidebar = () => {
+    if (ensureUnifiedSidebarLinks()) return;
+    const observer = new MutationObserver(() => {
+      if (ensureUnifiedSidebarLinks()) observer.disconnect();
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+    window.setTimeout(() => observer.disconnect(), 4000);
+  };
+
+  const normalizeBookTitle = (book) => {
+    const id = toText(book?.id);
+    if (CURATED_CORES[id]?.title) return CURATED_CORES[id].title;
+    return toText(book?.title, id || "未命名书籍");
+  };
+
+  const cleanText = (raw) => {
+    const text = toText(raw)
+      .replace(/[A-Za-z_]{2,}(?=\s|$)/g, " ")
+      .replace(/\d{2,}/g, " ")
+      .replace(/[\uE000-\uF8FF]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+    return text;
+  };
+
+  const guessFallbackBlocks = (book, entries) => {
+    const rows = asArray(entries)
+      .filter((entry) => {
+        const term = toText(entry?.term).toLowerCase();
+        const title = toText(entry?.title).toLowerCase();
+        return term && !BAD_TERMS.has(term) && title && !BAD_TERMS.has(title);
+      })
+      .slice(0, 6)
+      .map((entry, idx) => {
+        const title = toText(entry.title, `知识块 ${idx + 1}`);
+        const summary = cleanText(entry.summary);
+        return {
+          id: toText(entry.id, `${book.id}-fallback-${idx + 1}`),
+          title,
+          mechanism: summary || "该知识块揭示了系统中的关键因果关系。",
+          why: toText(entry.insight, "这条知识能够帮助你在复杂场景中做出更稳健决策。"),
+          evidence: toText(entry.sourceCue, `来源于 ${book.title} 的互动模块摘要。`),
+          transfer: "可迁移到策略制定、资源分配与风险评估等实际决策场景。",
+          tags: asArray(entry.tags).map((tag) => toText(tag)).filter(Boolean).slice(0, 3),
+          importance: 72 - idx * 3,
+          share: 66 - idx * 2,
+          moduleIndex: idx + 1,
+          relations: []
+        };
+      });
+    return rows;
+  };
+
+  const buildSkillWrappers = (blocks, modules) => {
+    const moduleRows = asArray(modules);
+    return asArray(blocks).map((block, idx) => {
+      const module = moduleRows[Math.max(0, Math.min(moduleRows.length - 1, toNumber(block.moduleIndex, 1) - 1))] || {};
+      const difficulty = clamp(Math.round((toNumber(block.importance, 70) + toNumber(block.share, 70)) / 22), 2, 9);
+      const rewardXp = 60 + Math.round(toNumber(block.importance, 70) * 1.2);
+      const rewardGem = 8 + Math.round(toNumber(block.share, 60) / 12);
+      return {
+        id: `skill-wrap-${block.id}`,
+        name: `交互技 · ${block.title}`,
+        fromBlockId: block.id,
+        fromBlockTitle: block.title,
+        interaction: difficulty >= 7 ? "多人情境辩论" : "1v1 快速对抗",
+        winCondition: difficulty >= 7
+          ? "在 3 轮论证中保持论点一致并压制对手反例"
+          : "在限时内完成 3 题判断，得分达到通关线",
+        packaging: `把“${block.title}”转化成可对战、可评分、可复盘的能力单元。`,
+        mechanism: block.mechanism,
+        why: block.why,
+        evidence: block.evidence,
+        transfer: block.transfer,
+        tags: block.tags,
+        importance: block.importance,
+        share: block.share,
+        difficulty,
+        rewardXp,
+        rewardGem,
+        moduleHref: toText(module.href, "/workspace"),
+        moduleTitle: toText(module.title, "进入互动模块")
+      };
+    });
+  };
+
+  const loadBookCore = async (bookId) => {
+    if (state.cache.has(bookId)) return state.cache.get(bookId);
+    const [bookPayload, tankPayload] = await Promise.all([
+      fetchJson("/api/content/books/" + encodeURIComponent(bookId)),
+      fetchJson("/api/think-tank/books/" + encodeURIComponent(bookId)).catch(() => ({ book: {}, entries: [] }))
+    ]);
+
+    const book = bookPayload?.book || { id: bookId, title: bookId, modules: [] };
+    const modules = asArray(book.modules);
+    const curated = CURATED_CORES[bookId];
+    const blocks = curated
+      ? asArray(curated.blocks)
+      : guessFallbackBlocks(book, tankPayload?.entries);
+    const skills = buildSkillWrappers(blocks, modules);
+
+    const core = {
+      id: toText(book.id, bookId),
+      title: normalizeBookTitle(book),
+      summary: toText(book.knowledgeSummary),
+      modules,
+      blocks,
+      skills
+    };
+    state.cache.set(bookId, core);
+    return core;
+  };
+
+  const pickBooks = (rows) => {
+    const map = new Map(asArray(rows).map((book) => [toText(book.id), book]));
+    return OFFICIAL_BOOK_IDS
+      .map((id) => map.get(id))
+      .filter(Boolean)
+      .map((book) => ({
+        ...book,
+        id: toText(book.id),
+        title: normalizeBookTitle(book)
+      }));
+  };
+
+  const renderTabs = () => {
+    tabsEl.innerHTML = state.books.map((book) => `
+      <button class="book-tab ${book.id === state.activeBookId ? "active" : ""}" type="button" data-book-id="${book.id}">${escapeHtml(book.title)}</button>
+    `).join("");
+  };
+
+  const getCurrentRows = () => {
+    const list = state.mode === "block" ? state.blocks : state.skills;
+    const keyword = state.search.trim().toLowerCase();
+    const tag = state.tag;
+    const rows = list.filter((row) => {
+      const tags = asArray(row.tags);
+      if (tag !== "all" && !tags.includes(tag)) return false;
+      if (state.mode === "skill" && state.focusBlockId && row.fromBlockId !== state.focusBlockId) return false;
+      if (!keyword) return true;
+      const hay = [row.title, row.name, row.mechanism, row.why, row.packaging, row.transfer, ...tags].join(" ").toLowerCase();
+      return hay.includes(keyword);
+    });
+
+    rows.sort((a, b) => {
+      if (state.sort === "name") {
+        const aName = toText(a.title || a.name);
+        const bName = toText(b.title || b.name);
+        return aName.localeCompare(bName, "zh-Hans-CN");
+      }
+      if (state.sort === "share") {
+        return toNumber(b.share, 0) - toNumber(a.share, 0) || toNumber(b.importance, 0) - toNumber(a.importance, 0);
+      }
+      return toNumber(b.importance, 0) - toNumber(a.importance, 0) || toNumber(b.share, 0) - toNumber(a.share, 0);
+    });
+    return rows;
+  };
+
+  const getTags = () => {
+    const pool = state.mode === "block" ? state.blocks : state.skills;
+    const map = new Map();
+    pool.forEach((row) => {
+      asArray(row.tags).forEach((tag) => {
+        map.set(tag, (map.get(tag) || 0) + 1);
+      });
+    });
+    return Array.from(map.entries())
+      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "zh-Hans-CN"))
+      .slice(0, 12);
+  };
+
+  const renderTagFilter = () => {
+    const tags = getTags();
+    tagFilterEl.innerHTML = [
+      `<option value="all">全部标签</option>`,
+      ...tags.map(([tag, count]) => `<option value="${escapeHtml(tag)}">${escapeHtml(tag)} (${count})</option>`)
+    ].join("");
+    if (!tags.find(([tag]) => tag === state.tag)) {
+      state.tag = "all";
+    }
+    tagFilterEl.value = state.tag;
+  };
+
+  const renderMetrics = (rows) => {
+    const total = rows.length;
+    const avgImportance = total ? rows.reduce((sum, row) => sum + toNumber(row.importance, 0), 0) / total : 0;
+    const avgShare = total ? rows.reduce((sum, row) => sum + toNumber(row.share, 0), 0) / total : 0;
+    const skillCount = state.skills.length;
+    const blockCount = state.blocks.length;
+
+    metricsEl.innerHTML = [
+      {
+        label: "知识块",
+        value: formatNum(blockCount),
+        hint: "每本书的精华知识浓缩"
+      },
+      {
+        label: "技能封装",
+        value: formatNum(skillCount),
+        hint: "可对战、可评分、可复盘"
+      },
+      {
+        label: state.mode === "block" ? "平均价值" : "平均交互度",
+        value: Math.round(avgImportance),
+        hint: "重要性衡量可迁移价值"
+      },
+      {
+        label: "共享指数",
+        value: Math.round(avgShare),
+        hint: "越高越适合跨人群共享"
+      }
+    ].map((item, idx) => `
+      <article class="metric" style="animation-delay:${idx * 50}ms">
+        <div class="label">${item.label}</div>
+        <div class="value">${item.value}</div>
+        <div class="hint">${item.hint}</div>
+      </article>
+    `).join("");
+  };
+
+  const renderCards = (rows) => {
+    if (!rows.length) {
+      cardsEl.innerHTML = `<article class="empty">当前条件下没有匹配内容。可以清空搜索、恢复“全部标签”，或切换到另一种视图。</article>`;
+      return;
+    }
+    cardsEl.innerHTML = rows.map((row, idx) => {
+      if (state.mode === "block") {
+        const relatedSkills = state.skills.filter((skill) => skill.fromBlockId === row.id).length;
+        const favored = isFavorited(rowFavoriteKey(row, "block"));
+        return `
+          <article class="item-card ${state.activeId === row.id ? "active" : ""}" data-id="${row.id}" style="animation-delay:${idx * 22}ms">
+            <p class="kicker">共享知识块 · 价值 ${Math.round(row.importance)}${favored ? " · 已收藏" : ""}</p>
+            <h3 class="item-title">${escapeHtml(row.title)}</h3>
+            <p class="item-text"><strong>机制：</strong>${escapeHtml(row.mechanism)}</p>
+            <p class="item-text"><strong>意义：</strong>${escapeHtml(row.why)}</p>
+            <div class="tags">${asArray(row.tags).map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}</div>
+            <div class="split">
+              <div class="pill">共享指数 ${Math.round(row.share)}</div>
+              <div class="pill">技能封装 ${relatedSkills} 个</div>
+            </div>
+          </article>
+        `;
+      }
+      const favored = isFavorited(rowFavoriteKey(row, "skill"));
+      return `
+        <article class="item-card ${state.activeId === row.id ? "active" : ""}" data-id="${row.id}" style="animation-delay:${idx * 22}ms">
+          <p class="kicker">技能封装 · 难度 ${row.difficulty}${favored ? " · 已收藏" : ""}</p>
+          <h3 class="item-title">${escapeHtml(row.name)}</h3>
+          <p class="item-text"><strong>来源知识：</strong>${escapeHtml(row.fromBlockTitle)}</p>
+          <p class="item-text"><strong>交互方式：</strong>${escapeHtml(row.interaction)}</p>
+          <div class="tags">${asArray(row.tags).map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}</div>
+          <div class="split">
+            <div class="pill">+${formatNum(row.rewardXp)} XP</div>
+            <div class="pill">+${formatNum(row.rewardGem)} GEM</div>
+          </div>
+        </article>
+      `;
+    }).join("");
+  };
+
+  const pickActiveRow = (rows) => {
+    if (!rows.length) return null;
+    const found = rows.find((row) => row.id === state.activeId);
+    return found || rows[0];
+  };
+
+  const renderDetail = (row) => {
+    if (!row) {
+      detailEl.innerHTML = `<article class="empty">请选择一条知识块或技能封装，查看其价值结构与交互方式。</article>`;
+      return;
+    }
+
+    if (state.mode === "block") {
+      const wrappers = state.skills.filter((skill) => skill.fromBlockId === row.id);
+      const favored = isFavorited(rowFavoriteKey(row, "block"));
+      const battleHref = buildBattleHref(row, "block");
+      detailEl.innerHTML = `
+        <p class="detail-sub">知识块详情</p>
+        <h3 class="detail-title">${escapeHtml(row.title)}</h3>
+        <p class="detail-p"><strong>机制：</strong>${escapeHtml(row.mechanism)}</p>
+        <p class="detail-p"><strong>为什么重要：</strong>${escapeHtml(row.why)}</p>
+        <p class="detail-p"><strong>证据：</strong>${escapeHtml(row.evidence)}</p>
+        <p class="detail-p"><strong>迁移场景：</strong>${escapeHtml(row.transfer)}</p>
+
+        <div class="meter">
+          <div class="meter-head"><span>价值强度</span><strong>${Math.round(row.importance)}</strong></div>
+          <div class="meter-track"><div class="meter-fill" style="width:${clamp(Math.round(row.importance), 0, 100)}%"></div></div>
+        </div>
+        <div class="meter">
+          <div class="meter-head"><span>共享指数</span><strong>${Math.round(row.share)}</strong></div>
+          <div class="meter-track"><div class="meter-fill" style="width:${clamp(Math.round(row.share), 0, 100)}%"></div></div>
+        </div>
+
+        <div class="tags">${asArray(row.tags).map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}</div>
+
+        <div class="row-btns">
+          <button class="btn primary" type="button" data-action="wrap-skill" data-block-id="${row.id}">查看技能封装</button>
+          <a class="btn" href="${escapeHtml(battleHref)}">进入互动模块</a>
+          <button class="btn" type="button" data-action="toggle-favorite" data-row-id="${row.id}">${favored ? "取消收藏" : "收藏知识块"}</button>
+          <button class="btn" type="button" data-action="publish-active">发布共享</button>
+          <button class="btn" type="button" data-action="copy-citation">复制引用</button>
+          <button class="btn" type="button" data-action="copy-review">复制复盘链接</button>
+        </div>
+
+        <div class="empty">该知识块已生成 <strong>${wrappers.length}</strong> 个技能包装。技能不是知识本体，而是知识在人机互动中的可执行外壳。</div>
+      `;
+      return;
+    }
+
+    const favored = isFavorited(rowFavoriteKey(row, "skill"));
+    detailEl.innerHTML = `
+      <p class="detail-sub">技能封装详情</p>
+      <h3 class="detail-title">${escapeHtml(row.name)}</h3>
+      <p class="detail-p"><strong>来源知识块：</strong>${escapeHtml(row.fromBlockTitle)}</p>
+      <p class="detail-p"><strong>包装说明：</strong>${escapeHtml(row.packaging)}</p>
+      <p class="detail-p"><strong>交互方式：</strong>${escapeHtml(row.interaction)}</p>
+      <p class="detail-p"><strong>胜利条件：</strong>${escapeHtml(row.winCondition)}</p>
+      <p class="detail-p"><strong>可迁移价值：</strong>${escapeHtml(row.transfer)}</p>
+
+      <div class="meter">
+        <div class="meter-head"><span>技能难度</span><strong>${Math.round(row.difficulty)} / 10</strong></div>
+        <div class="meter-track"><div class="meter-fill" style="width:${clamp(Math.round(row.difficulty * 10), 0, 100)}%"></div></div>
+      </div>
+      <div class="meter">
+        <div class="meter-head"><span>知识价值保真度</span><strong>${Math.round(row.importance)}</strong></div>
+        <div class="meter-track"><div class="meter-fill" style="width:${clamp(Math.round(row.importance), 0, 100)}%"></div></div>
+      </div>
+
+      <div class="tags">${asArray(row.tags).map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}</div>
+
+      <div class="row-btns">
+        <a class="btn primary" href="${escapeHtml(row.moduleHref)}">进入互动模块</a>
+        <button class="btn" type="button" data-action="open-block" data-block-id="${row.fromBlockId}">返回知识本体</button>
+        <button class="btn" type="button" data-action="toggle-favorite" data-row-id="${row.id}">${favored ? "取消收藏" : "收藏技能"}</button>
+        <button class="btn" type="button" data-action="publish-active">发布共享</button>
+        <button class="btn" type="button" data-action="copy-citation">复制引用</button>
+        <button class="btn" type="button" data-action="copy-review">复制复盘链接</button>
+      </div>
+
+      <div class="empty">奖励：<strong>+${formatNum(row.rewardXp)} XP</strong> / <strong>+${formatNum(row.rewardGem)} GEM</strong>。建议先理解知识块，再进行对战。</div>
+    `;
+  };
+
+  const renderMap = (rows, activeRow) => {
+    if (!rows.length) {
+      mapSvgEl.innerHTML = '<text class="map-empty" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle">暂无可视化内容</text>';
+      return;
+    }
+
+    const maxNodes = Math.min(40, rows.length);
+    const clipped = rows.slice(0, maxNodes);
+    const nodes = [];
+    const links = [];
+    const centerX = 580;
+    const centerY = 280;
+    const radius = 180;
+
+    clipped.forEach((row, idx) => {
+      const angle = ((idx / Math.max(1, clipped.length)) * Math.PI * 2) - Math.PI / 2;
+      const x = centerX + Math.cos(angle) * radius;
+      const y = centerY + Math.sin(angle) * radius;
+      nodes.push({
+        id: row.id,
+        label: toText(row.title || row.name).slice(0, 10),
+        x,
+        y,
+        r: 10 + Math.round(clamp(toNumber(row.importance, 70), 1, 100) / 20)
+      });
+    });
+
+    const nodeMap = new Map(nodes.map((node) => [node.id, node]));
+    clipped.forEach((row) => {
+      const rel = state.mode === "block"
+        ? asArray(row.relations)
+        : [toText(row.fromBlockId)].filter(Boolean);
+      rel.forEach((targetId) => {
+        const source = nodeMap.get(row.id);
+        const target = nodeMap.get(targetId);
+        if (!source || !target || source.id === target.id) return;
+        links.push({ source, target });
+      });
+    });
+
+    mapSvgEl.innerHTML = `
+      <g>
+        ${links.map((link) => `<line class="link" x1="${link.source.x.toFixed(1)}" y1="${link.source.y.toFixed(1)}" x2="${link.target.x.toFixed(1)}" y2="${link.target.y.toFixed(1)}" />`).join("")}
+        ${nodes.map((node) => `
+          <g class="node ${activeRow && activeRow.id === node.id ? "active" : ""}" data-map-id="${node.id}">
+            <circle cx="${node.x.toFixed(1)}" cy="${node.y.toFixed(1)}" r="${node.r}" />
+            <text x="${node.x.toFixed(1)}" y="${(node.y + node.r + 12).toFixed(1)}" text-anchor="middle">${escapeHtml(node.label)}</text>
+          </g>
+        `).join("")}
+      </g>
+    `;
+    mapSvgEl.style.transform = `scale(${state.mapScale.toFixed(2)})`;
+  };
+
+  const rerender = () => {
+    const rows = getCurrentRows();
+    renderMetrics(rows);
+    renderTagFilter();
+
+    streamTitleEl.textContent = state.mode === "block" ? "知识块流" : "技能封装流";
+    streamTipEl.textContent = state.mode === "block"
+      ? "先理解知识价值，再进入交互。"
+      : "技能是知识的交互外壳，不替代知识本体。";
+
+    const activeRow = pickActiveRow(rows);
+    state.activeId = activeRow ? activeRow.id : "";
+
+    renderCards(rows);
+    renderDetail(activeRow);
+    renderMap(rows, activeRow);
+    renderPublicCards(activeRow);
+
+    if (publicGroupSelectEl) publicGroupSelectEl.value = state.publicGroup;
+    if (publicSearchInputEl && publicSearchInputEl.value !== state.publicSearch) {
+      publicSearchInputEl.value = state.publicSearch;
+    }
+    if (publicViewSegmentEl) {
+      publicViewSegmentEl.querySelectorAll("[data-public-view]").forEach((btn) => {
+        const button = btn;
+        if (!(button instanceof HTMLElement)) return;
+        button.classList.toggle("active", toText(button.getAttribute("data-public-view")) === state.publicView);
+      });
+      publicViewSegmentEl.querySelectorAll("[data-public-highlight]").forEach((btn) => {
+        const button = btn;
+        if (!(button instanceof HTMLElement)) return;
+        button.classList.toggle("active", state.publicHighlight);
+      });
+    }
+
+    modeBlockEl.classList.toggle("active", state.mode === "block");
+    modeSkillEl.classList.toggle("active", state.mode === "skill");
+    mapSectionEl.classList.toggle("show", state.mapVisible);
+    mapToggleEl.textContent = state.mapVisible ? "隐藏关系地图" : "显示关系地图";
+  };
+
+  const selectBook = async (bookId) => {
+    if (!bookId) return;
+    state.activeBookId = bookId;
+    state.search = "";
+    state.tag = "all";
+    state.sort = "importance";
+    state.focusBlockId = "";
+    state.activeId = "";
+    searchEl.value = "";
+    sortEl.value = "importance";
+
+    renderTabs();
+    setStatus("正在装载该书知识核心...");
+    try {
+      const core = await loadBookCore(bookId);
+      state.blocks = asArray(core.blocks);
+      state.skills = asArray(core.skills);
+      await refreshPublicCards();
+      setStatus(`已加载 ${core.title} · ${state.blocks.length} 个知识块 / ${state.skills.length} 个技能封装`);
+      rerender();
+    } catch (error) {
+      state.blocks = [];
+      state.skills = [];
+      setStatus(toText(error?.message, "加载失败"), "error");
+      rerender();
+    }
+  };
+
+  tabsEl.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+    const btn = target.closest("[data-book-id]");
+    if (!(btn instanceof HTMLElement)) return;
+    const id = toText(btn.getAttribute("data-book-id"));
+    if (!id || id === state.activeBookId) return;
+    selectBook(id);
+  });
+
+  modeBlockEl.addEventListener("click", () => {
+    if (state.mode === "block") return;
+    state.mode = "block";
+    state.focusBlockId = "";
+    state.activeId = "";
+    rerender();
+  });
+
+  modeSkillEl.addEventListener("click", () => {
+    if (state.mode === "skill") return;
+    state.mode = "skill";
+    state.activeId = "";
+    rerender();
+  });
+
+  mapToggleEl.addEventListener("click", () => {
+    state.mapVisible = !state.mapVisible;
+    rerender();
+  });
+
+  searchEl.addEventListener("input", () => {
+    state.search = toText(searchEl.value);
+    state.activeId = "";
+    rerender();
+  });
+
+  tagFilterEl.addEventListener("change", () => {
+    state.tag = toText(tagFilterEl.value, "all");
+    state.activeId = "";
+    rerender();
+  });
+
+  sortEl.addEventListener("change", () => {
+    state.sort = toText(sortEl.value, "importance");
+    state.activeId = "";
+    rerender();
+  });
+
+  cardsEl.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+    const card = target.closest("[data-id]");
+    if (!(card instanceof HTMLElement)) return;
+    const id = toText(card.getAttribute("data-id"));
+    if (!id) return;
+    state.activeId = id;
+    rerender();
+  });
+
+  detailEl.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+
+    const wrapBtn = target.closest("[data-action='wrap-skill']");
+    if (wrapBtn instanceof HTMLElement) {
+      const blockId = toText(wrapBtn.getAttribute("data-block-id"));
+      state.mode = "skill";
+      state.focusBlockId = blockId;
+      state.activeId = "";
+      rerender();
+      return;
+    }
+
+    const blockBtn = target.closest("[data-action='open-block']");
+    if (blockBtn instanceof HTMLElement) {
+      const blockId = toText(blockBtn.getAttribute("data-block-id"));
+      state.mode = "block";
+      state.focusBlockId = "";
+      state.activeId = blockId;
+      rerender();
+      return;
+    }
+
+    const activeRow = pickActiveRow(getCurrentRows());
+
+    const favoriteBtn = target.closest("[data-action='toggle-favorite']");
+    if (favoriteBtn instanceof HTMLElement) {
+      if (!activeRow) return;
+      const key = rowFavoriteKey(activeRow);
+      const next = !isFavorited(key);
+      setFavorited(key, next);
+      setStatus(next ? "已收藏当前条目" : "已取消收藏");
+      rerender();
+      return;
+    }
+
+    const publishBtn = target.closest("[data-action='publish-active']");
+    if (publishBtn instanceof HTMLElement) {
+      if (!activeRow) return;
+      publishActiveRow(activeRow).catch((error) => {
+        setStatus(`发布失败：${toText(error?.message, "未知错误")}`, "error");
+      });
+      return;
+    }
+
+    const citationBtn = target.closest("[data-action='copy-citation']");
+    if (citationBtn instanceof HTMLElement) {
+      if (!activeRow) return;
+      copyText(buildCitation(activeRow)).then((ok) => {
+        setStatus(ok ? "引用文案已复制" : "复制失败，请检查浏览器权限", ok ? "" : "error");
+      });
+      return;
+    }
+
+    const reviewBtn = target.closest("[data-action='copy-review']");
+    if (reviewBtn instanceof HTMLElement) {
+      if (!activeRow) return;
+      const url = toAbsoluteHref(buildReviewHref(activeRow));
+      copyText(url).then((ok) => {
+        setStatus(ok ? "复盘链接已复制" : "复制失败，请检查浏览器权限", ok ? "" : "error");
+      });
+    }
+  });
+
+  publicListEl.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+
+    const starBtn = target.closest("[data-public-star]");
+    if (starBtn instanceof HTMLElement) {
+      const cardId = toText(starBtn.getAttribute("data-public-id"));
+      const starred = toText(starBtn.getAttribute("data-public-star")) !== "0";
+      togglePublicStar(cardId, starred).catch((error) => {
+        setStatus(`点赞失败：${toText(error?.message, "未知错误")}`, "error");
+      });
+      return;
+    }
+
+    const citationBtn = target.closest("[data-public-copy-citation]");
+    if (citationBtn instanceof HTMLElement) {
+      const text = toText(citationBtn.getAttribute("data-public-citation"));
+      copyText(text).then((ok) => {
+        setStatus(ok ? "引用文案已复制" : "复制失败，请检查浏览器权限", ok ? "" : "error");
+      });
+      return;
+    }
+
+    const reviewBtn = target.closest("[data-public-copy-review]");
+    if (reviewBtn instanceof HTMLElement) {
+      const href = toText(reviewBtn.getAttribute("data-public-review"));
+      copyText(href).then((ok) => {
+        setStatus(ok ? "复盘链接已复制" : "复制失败，请检查浏览器权限", ok ? "" : "error");
+      });
+      return;
+    }
+
+    const cardItem = target.closest("[data-public-id]");
+    if (cardItem instanceof HTMLElement) {
+      const card = findPublicCard(toText(cardItem.getAttribute("data-public-id")));
+      if (!card) return;
+      const activate = () => {
+        state.mode = toText(card.mode) === "skill" ? "skill" : "block";
+        state.activeId = toText(card.itemId);
+        state.focusBlockId = "";
+        rerender();
+      };
+      if (toText(card.bookId) && card.bookId !== state.activeBookId) {
+        selectBook(card.bookId).then(() => {
+          activate();
+          setStatus(`已切换到 ${toText(card.bookTitle, card.bookId)} 的共享卡片`);
+        }).catch((error) => {
+          setStatus(`切换书籍失败：${toText(error?.message, "未知错误")}`, "error");
+        });
+        return;
+      }
+      activate();
+    }
+  });
+
+  if (publicViewSegmentEl) {
+    publicViewSegmentEl.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+      const viewBtn = target.closest("[data-public-view]");
+      if (viewBtn instanceof HTMLElement) {
+        const view = toText(viewBtn.getAttribute("data-public-view"), "deck");
+        state.publicView = view === "grid" ? "grid" : "deck";
+        rerender();
+        return;
+      }
+      const highlightBtn = target.closest("[data-public-highlight]");
+      if (highlightBtn instanceof HTMLElement) {
+        state.publicHighlight = !state.publicHighlight;
+        rerender();
+      }
+    });
+  }
+
+  if (publicGroupSelectEl) {
+    publicGroupSelectEl.addEventListener("change", () => {
+      const value = toText(publicGroupSelectEl.value, "book");
+      state.publicGroup = value === "none" || value === "tag" ? value : "book";
+      rerender();
+    });
+  }
+
+  if (publicSearchInputEl) {
+    publicSearchInputEl.addEventListener("input", () => {
+      state.publicSearch = toText(publicSearchInputEl.value);
+      rerender();
+    });
+  }
+
+  mapSvgEl.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+    const node = target.closest("[data-map-id]");
+    if (!(node instanceof HTMLElement)) return;
+    const id = toText(node.getAttribute("data-map-id"));
+    if (!id) return;
+    state.activeId = id;
+    rerender();
+  });
+
+  zoomInEl.addEventListener("click", () => {
+    state.mapScale = clamp(state.mapScale + 0.15, 0.6, 2.4);
+    rerender();
+  });
+
+  zoomOutEl.addEventListener("click", () => {
+    state.mapScale = clamp(state.mapScale - 0.15, 0.6, 2.4);
+    rerender();
+  });
+
+  zoomResetEl.addEventListener("click", () => {
+    state.mapScale = 1;
+    rerender();
+  });
+
+  const init = async () => {
+    syncSidebar();
+    state.mode = INITIAL_FACET === "skills" ? "skill" : "block";
+    state.favorites = loadFavorites();
+    setStatus("正在加载官方知识库...");
+    try {
+      const payload = await fetchJson("/api/content/books");
+      state.books = pickBooks(payload?.books);
+      if (!state.books.length) {
+        setStatus("官方书籍未就绪", "error");
+        detailEl.innerHTML = "<article class='empty'>未找到官方书籍数据，请先完成构建。</article>";
+        return;
+      }
+      renderTabs();
+      await selectBook(state.books[0].id);
+    } catch (error) {
+      setStatus(toText(error?.message, "加载失败"), "error");
+      detailEl.innerHTML = `<article class='empty'>${escapeHtml(toText(error?.message, "加载失败"))}</article>`;
+    }
+  };
+
+  init();
+})();
+</script>
+</body>
+</html>

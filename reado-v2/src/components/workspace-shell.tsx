@@ -47,7 +47,7 @@ const mainNav: NavItem[] = [
   { label: "排行榜", href: "/leaderboard", icon: <Trophy className="size-4" /> },
   { label: "Gem Center", href: "/gem-center", icon: <Gem className="size-4" /> },
   { label: "Knowledge Core", href: "/skill-tree", icon: <TreePine className="size-4" /> },
-  { label: "Experience Library", href: "/library", icon: <LibraryBig className="size-4" /> },
+  { label: "Experience Library", href: "/public-library", icon: <LibraryBig className="size-4" /> },
 ]
 
 type Props = {

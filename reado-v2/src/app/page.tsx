@@ -1,7 +1,7 @@
-import { renderLegacyPage } from "@/lib/render-legacy-page"
+import { redirect } from "next/navigation"
 
 export const revalidate = 30
 
 export default async function HomePage() {
-  return renderLegacyPage("gamified-learning-hub-dashboard-1")
+  redirect("/library")
 }

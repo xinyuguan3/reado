@@ -3,24 +3,27 @@ import fsSync from "node:fs"
 import path from "node:path"
 import { normalizeLegacySlug } from "@/lib/legacy-routes"
 
-function resolveLegacyAppDir() {
-  const candidates = [
-    path.resolve(process.cwd(), "../app"),
-    path.resolve(process.cwd(), "app"),
-    path.resolve(process.cwd(), "../../app"),
-  ]
-  for (const candidate of candidates) {
-    if (fsSync.existsSync(path.join(candidate, "pages"))) {
+const LEGACY_ROOT_CANDIDATES = [
+  path.resolve(process.cwd(), "public/legacy-app"),
+  path.resolve(process.cwd(), "../app"),
+  path.resolve(process.cwd(), "app"),
+  path.resolve(process.cwd(), "../../app"),
+]
+
+function resolveLegacyDir(dirName: string) {
+  for (const root of LEGACY_ROOT_CANDIDATES) {
+    const candidate = path.join(root, dirName)
+    if (fsSync.existsSync(candidate)) {
       return candidate
     }
   }
-  return candidates[0]
+  return path.join(LEGACY_ROOT_CANDIDATES[0], dirName)
 }
 
-const LEGACY_APP_DIR = resolveLegacyAppDir()
-const LEGACY_PAGES_DIR = path.join(LEGACY_APP_DIR, "pages")
-const LEGACY_SHARED_DIR = path.join(LEGACY_APP_DIR, "shared")
-const LEGACY_ASSETS_DIR = path.join(LEGACY_APP_DIR, "assets")
+const LEGACY_PAGES_DIR = resolveLegacyDir("pages")
+const LEGACY_EXPERIENCES_DIR = resolveLegacyDir("experiences")
+const LEGACY_SHARED_DIR = resolveLegacyDir("shared")
+const LEGACY_ASSETS_DIR = resolveLegacyDir("assets")
 
 export function getLegacySharedDir() {
   return LEGACY_SHARED_DIR
@@ -46,19 +49,41 @@ export function toSafeFileFromParts(rootDir: string, parts: string[]) {
   return resolved
 }
 
-export async function readLegacyPageHtml(slugInput: string) {
+function sanitizeLegacySlug(slugInput: string) {
   const slug = normalizeLegacySlug(slugInput)
-  if (!slug) return null
+  if (!slug) return ""
   const safeSlug = slug.replace(/[^a-z0-9-]/gi, "")
-  if (!safeSlug) return null
+  if (!safeSlug) return ""
+  return safeSlug
+}
 
-  const pagePath = path.join(LEGACY_PAGES_DIR, `${safeSlug}.html`)
+async function readLegacyHtmlFromDir(dir: string, safeSlug: string) {
+  const pagePath = path.join(dir, `${safeSlug}.html`)
   try {
-    const html = await fs.readFile(pagePath, "utf8")
-    return html
+    return await fs.readFile(pagePath, "utf8")
   } catch {
     return null
   }
+}
+
+export async function readLegacyPageHtml(slugInput: string) {
+  const safeSlug = sanitizeLegacySlug(slugInput)
+  if (!safeSlug) return null
+  return readLegacyHtmlFromDir(LEGACY_PAGES_DIR, safeSlug)
+}
+
+export async function readLegacyExperienceHtml(slugInput: string) {
+  const safeSlug = sanitizeLegacySlug(slugInput)
+  if (!safeSlug) return null
+  return readLegacyHtmlFromDir(LEGACY_EXPERIENCES_DIR, safeSlug)
+}
+
+export async function readLegacyHtmlAny(slugInput: string) {
+  const safeSlug = sanitizeLegacySlug(slugInput)
+  if (!safeSlug) return null
+  const pageHtml = await readLegacyHtmlFromDir(LEGACY_PAGES_DIR, safeSlug)
+  if (pageHtml) return pageHtml
+  return readLegacyHtmlFromDir(LEGACY_EXPERIENCES_DIR, safeSlug)
 }
 
 export function injectLegacyBase(html: string) {
