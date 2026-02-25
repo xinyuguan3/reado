@@ -64,8 +64,8 @@
     </style>
 </head>
 <body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-white h-screen overflow-hidden flex flex-col selection:bg-primary selection:text-white">
-<script src="/shared/book-catalog.js?v=1772015080593"></script>
-<script type="module" src="/shared/shell.js?v=1772015080593"></script>
+<script src="/shared/book-catalog.js?v=1771767926839"></script>
+<script type="module" src="/shared/shell.js?v=1771767926839"></script>
 <reado-app-shell data-page="knowledge-map"></reado-app-shell>
 <header class="h-20 flex-none z-50 px-6 py-4 flex items-center justify-between glass-panel sticky top-0">
 <div class="flex items-center gap-4">
@@ -299,11 +299,28 @@
 
 <script id="reado-map-category-script">
 (() => {
-  const fallbackBooks = [{"id":"wanli-fifteen","title":"《万历十五年》","cover":"/assets/book-covers/wanli-fifteen.jpg","category":"science-knowledge","categoryLabel":"认知/硬核","categoryHint":"开拓世界地图，解锁迷雾","moduleCount":5,"hubHref":"/books/wanli-fifteen.html","firstModuleHref":"/experiences/tax-reform-dilemma-1.html","moduleSlugs":["tax-reform-dilemma-1","tax-reform-dilemma-2","tax-reform-dilemma-3","tax-reform-dilemma-4","tax-reform-dilemma-5"]},{"id":"sapiens","title":"《人类简史》","cover":"/assets/book-covers/sapiens.jpg","category":"science-knowledge","categoryLabel":"认知/硬核","categoryHint":"开拓世界地图，解锁迷雾","moduleCount":8,"hubHref":"/books/sapiens.html","firstModuleHref":"/experiences/the-wheat-conquest-simulator.html","moduleSlugs":["the-wheat-conquest-simulator","human-domestication-dilemma-1","human-domestication-dilemma-2","bilingual-human-domestication-dilemma","bilingual-human-domestication-dilemma-4","bilingual-human-domestication-dilemma-1","bilingual-human-domestication-dilemma-2","bilingual-human-domestication-dilemma-3"]},{"id":"principles-for-navigating-big-debt-crises","title":"《置身事外》","cover":"/assets/book-covers/principles-for-navigating-big-debt-crises.jpg","category":"career-wealth","categoryLabel":"事业/财富","categoryHint":"获取金币和装备，通关职场副本","moduleCount":7,"hubHref":"/books/principles-for-navigating-big-debt-crises.html","firstModuleHref":"/experiences/the-beautiful-deleveraging-challenge.html","moduleSlugs":["the-beautiful-deleveraging-challenge","the-subway-dilemma","debt-cycle-impact-analysis","1994","experience-63","experience-64","experience-65"]},{"id":"zero-to-one","title":"《从零到一》","cover":"/assets/book-covers/zero-to-one.jpg","category":"career-wealth","categoryLabel":"事业/财富","categoryHint":"获取金币和装备，通关职场副本","moduleCount":8,"hubHref":"/books/zero-to-one.html","firstModuleHref":"/experiences/zero-to-one-the-monopolist-s-choice.html","moduleSlugs":["zero-to-one-the-monopolist-s-choice","zero-to-one-the-monopolist-s-choice-1","zero-to-one-the-monopolist-s-choice-2","zero-to-one-the-monopolist-s-choice-3","zero-to-one-the-monopolist-s-choice-4","zero-to-one-the-monopolist-s-choice-5","zero-to-one-the-monopolist-s-choice-6","zero-to-one-the-monopolist-s-choice-7"]}];
+  const fallbackBooks = [{"id":"wanli-fifteen","title":"《万历十五年》","cover":"/assets/book-covers/wanli-fifteen.jpg","category":"science-knowledge","categoryLabel":"认知/硬核","categoryHint":"开拓世界地图，解锁迷雾","moduleCount":5,"hubHref":"/books/wanli-fifteen.html","firstModuleHref":"/experiences/tax-reform-dilemma-1.html","moduleSlugs":["tax-reform-dilemma-1","tax-reform-dilemma-2","tax-reform-dilemma-3","tax-reform-dilemma-4","tax-reform-dilemma-5"]},{"id":"sapiens","title":"《人类简史》","cover":"/assets/book-covers/sapiens.jpg","category":"science-knowledge","categoryLabel":"认知/硬核","categoryHint":"开拓世界地图，解锁迷雾","moduleCount":8,"hubHref":"/books/sapiens.html","firstModuleHref":"/experiences/the-wheat-conquest-simulator.html","moduleSlugs":["the-wheat-conquest-simulator","human-domestication-dilemma-1","human-domestication-dilemma-2","bilingual-human-domestication-dilemma","bilingual-human-domestication-dilemma-4","bilingual-human-domestication-dilemma-1","bilingual-human-domestication-dilemma-2","bilingual-human-domestication-dilemma-3"]},{"id":"principles-for-navigating-big-debt-crises","title":"《置身事外》","cover":"/assets/book-covers/principles-for-navigating-big-debt-crises.jpg","category":"career-wealth","categoryLabel":"事业/财富","categoryHint":"获取金币和装备，通关职场副本","moduleCount":7,"hubHref":"/books/principles-for-navigating-big-debt-crises.html","firstModuleHref":"/experiences/the-beautiful-deleveraging-challenge.html","moduleSlugs":["the-beautiful-deleveraging-challenge","the-subway-dilemma","debt-cycle-impact-analysis","1994","experience-75","experience-76","experience-77"]},{"id":"zero-to-one","title":"《从零到一》","cover":"/assets/book-covers/zero-to-one.jpg","category":"career-wealth","categoryLabel":"事业/财富","categoryHint":"获取金币和装备，通关职场副本","moduleCount":8,"hubHref":"/books/zero-to-one.html","firstModuleHref":"/experiences/zero-to-one-the-monopolist-s-choice.html","moduleSlugs":["zero-to-one-the-monopolist-s-choice","zero-to-one-the-monopolist-s-choice-1","zero-to-one-the-monopolist-s-choice-2","zero-to-one-the-monopolist-s-choice-3","zero-to-one-the-monopolist-s-choice-4","zero-to-one-the-monopolist-s-choice-5","zero-to-one-the-monopolist-s-choice-6","zero-to-one-the-monopolist-s-choice-7"]}];
   const catalog = window.__READO_BOOK_CATALOG__;
   const books = Array.isArray(catalog?.books) && catalog.books.length > 0 ? catalog.books : fallbackBooks;
   const storageKey = catalog?.storage?.unlockKey || "reado_unlocked_books_v1";
   const viewStorageKey = "reado_knowledge_map_view_v1";
+  const i18n = window.ReadoI18n || {};
+
+  const interpolateText = (template, params) => {
+    let out = String(template || "");
+    const entries = params && typeof params === "object" ? Object.entries(params) : [];
+    for (const [key, value] of entries) {
+      out = out.replaceAll(`{${key}}`, String(value));
+    }
+    return out;
+  };
+
+  const tr = (key, fallback, params = null) => {
+    if (typeof i18n.t === "function") {
+      return i18n.t(key, fallback, params);
+    }
+    return interpolateText(fallback, params);
+  };
 
   const main = document.querySelector("main");
   if (!(main instanceof HTMLElement)) return;
@@ -388,36 +405,78 @@
     {
       id: "science-knowledge",
       icon: "memory",
-      title: "🧩 认知/硬核",
-      subtitle: "科学普及 · 历史 · 哲学 · 社会学",
+      titleKey: "map.category.science.title",
+      titleFallback: "认知/硬核",
+      subtitleKey: "map.category.science.subtitle",
+      subtitleFallback: "科学普及 · 历史 · 哲学 · 社会学",
       titleClass: "text-cyan-100 font-bold text-sm",
       subtitleClass: "text-[10px] text-cyan-300 tracking-wider"
     },
     {
       id: "personal-growth",
       icon: "psychology",
-      title: "个人修炼",
-      subtitle: "心理学 · 自我提升 · 时间管理 · 思维模型",
+      titleKey: "map.category.personal.title",
+      titleFallback: "个人修炼",
+      subtitleKey: "map.category.personal.subtitle",
+      subtitleFallback: "心理学 · 自我提升 · 时间管理 · 思维模型",
       titleClass: "text-emerald-100 font-bold text-sm",
       subtitleClass: "text-[10px] text-emerald-300 tracking-wider"
     },
     {
       id: "career-wealth",
       icon: "rocket_launch",
-      title: "事业/财富",
-      subtitle: "经济金融 · 商业管理 · 职场技能 · 创业",
+      titleKey: "map.category.career.title",
+      titleFallback: "事业/财富",
+      subtitleKey: "map.category.career.subtitle",
+      subtitleFallback: "经济金融 · 商业管理 · 职场技能 · 创业",
       titleClass: "text-indigo-100 font-bold text-sm",
       subtitleClass: "text-[10px] text-indigo-300 tracking-wider"
     },
     {
       id: "lifestyle-creativity",
       icon: "account_balance",
-      title: "灵感/生活",
-      subtitle: "艺术设计 · 传记 · 文学虚构 · 生活美学",
+      titleKey: "map.category.lifestyle.title",
+      titleFallback: "灵感/生活",
+      subtitleKey: "map.category.lifestyle.subtitle",
+      subtitleFallback: "艺术设计 · 传记 · 文学虚构 · 生活美学",
       titleClass: "text-amber-100 font-bold text-sm",
       subtitleClass: "text-[10px] text-amber-300 tracking-wider"
     }
   ];
+
+  const localizedBookTitleById = {
+    "wanli-fifteen": { key: "map.book.wanli-fifteen", fallback: "《万历十五年》" },
+    "sapiens": { key: "map.book.sapiens", fallback: "《人类简史》" },
+    "principles-for-navigating-big-debt-crises": { key: "map.book.principles-for-navigating-big-debt-crises", fallback: "《置身事外》" },
+    "zero-to-one": { key: "map.book.zero-to-one", fallback: "《从零到一》" }
+  };
+
+  const localizedCategoryById = {
+    "science-knowledge": {
+      labelKey: "map.category.science.title",
+      labelFallback: "认知/硬核",
+      hintKey: "map.category.science.subtitle",
+      hintFallback: "科学普及 · 历史 · 哲学 · 社会学"
+    },
+    "personal-growth": {
+      labelKey: "map.category.personal.title",
+      labelFallback: "个人修炼",
+      hintKey: "map.category.personal.subtitle",
+      hintFallback: "心理学 · 自我提升 · 时间管理 · 思维模型"
+    },
+    "career-wealth": {
+      labelKey: "map.category.career.title",
+      labelFallback: "事业/财富",
+      hintKey: "map.category.career.subtitle",
+      hintFallback: "经济金融 · 商业管理 · 职场技能 · 创业"
+    },
+    "lifestyle-creativity": {
+      labelKey: "map.category.lifestyle.title",
+      labelFallback: "灵感/生活",
+      hintKey: "map.category.lifestyle.subtitle",
+      hintFallback: "艺术设计 · 传记 · 文学虚构 · 生活美学"
+    }
+  };
 
   const findNodeByIcon = (iconName) => {
     const icon = Array.from(mapScene.querySelectorAll("span.material-icons"))
@@ -427,19 +486,23 @@
     return node instanceof HTMLElement ? node : null;
   };
 
+  const applyCategoryMeta = (category, node) => {
+    if (!(node instanceof HTMLElement)) return;
+    const childDivs = Array.from(node.children).filter((child) => child.tagName === "DIV");
+    const metaBox = childDivs[childDivs.length - 1];
+    if (!metaBox) return;
+    metaBox.classList.add("bg-background-dark/80", "px-3", "py-1.5", "rounded-lg", "border", "border-white/10", "backdrop-blur", "text-center");
+    metaBox.innerHTML = `
+      <div class="${category.titleClass}">${tr(category.titleKey, category.titleFallback)}</div>
+      <div class="${category.subtitleClass}">${tr(category.subtitleKey, category.subtitleFallback)}</div>`;
+  };
+
   categories.forEach((category) => {
     const node = findNodeByIcon(category.icon);
     if (!node) return;
     const childDivs = Array.from(node.children).filter((child) => child.tagName === "DIV");
     const iconBox = childDivs[0];
-    const metaBox = childDivs[childDivs.length - 1];
-
-    if (metaBox) {
-      metaBox.classList.add("bg-background-dark/80", "px-3", "py-1.5", "rounded-lg", "border", "border-white/10", "backdrop-blur", "text-center");
-      metaBox.innerHTML = `
-        <div class="${category.titleClass}">${category.title}</div>
-        <div class="${category.subtitleClass}">${category.subtitle}</div>`;
-    }
+    applyCategoryMeta(category, node);
 
     node.classList.remove("opacity-60", "z-10");
     node.classList.add("cursor-pointer", "z-20");
@@ -467,10 +530,10 @@
   const toolbar = document.createElement("div");
   toolbar.id = "reado-map-view-toggle";
   toolbar.innerHTML = `
-    <span class="reado-view-chip">学习入口</span>
-    <div class="reado-view-switch" role="tablist" aria-label="个人书库视图切换">
-      <button type="button" class="reado-view-btn" data-view="shelf" role="tab" aria-selected="true">书架视图</button>
-      <button type="button" class="reado-view-btn" data-view="map" role="tab" aria-selected="false">地图视图</button>
+    <span class="reado-view-chip" data-map-chip></span>
+    <div class="reado-view-switch" role="tablist" data-map-view-switch>
+      <button type="button" class="reado-view-btn" data-view="shelf" role="tab" aria-selected="true" data-map-view-label="shelf"></button>
+      <button type="button" class="reado-view-btn" data-view="map" role="tab" aria-selected="false" data-map-view-label="map"></button>
     </div>`;
 
   const shelfPanel = document.createElement("section");
@@ -478,8 +541,8 @@
   shelfPanel.innerHTML = `
     <div class="reado-shelf-wrap">
       <div class="reado-shelf-header">
-        <h2 class="reado-shelf-title">个人书库</h2>
-        <p class="reado-shelf-sub">默认视图 · 直接进入书籍体验</p>
+        <h2 class="reado-shelf-title" data-map-shelf-title></h2>
+        <p class="reado-shelf-sub" data-map-shelf-subtitle></p>
         <p class="reado-shelf-count" data-shelf-count></p>
         <p class="reado-shelf-status" data-shelf-status></p>
       </div>
@@ -491,11 +554,69 @@
   const shelfGrid = shelfPanel.querySelector("[data-shelf-grid]");
   const shelfCount = shelfPanel.querySelector("[data-shelf-count]");
   const shelfStatus = shelfPanel.querySelector("[data-shelf-status]");
+  const mapChipEl = toolbar.querySelector("[data-map-chip]");
+  const mapViewSwitchEl = toolbar.querySelector("[data-map-view-switch]");
+  const mapShelfTitleEl = shelfPanel.querySelector("[data-map-shelf-title]");
+  const mapShelfSubtitleEl = shelfPanel.querySelector("[data-map-shelf-subtitle]");
   const viewButtons = Array.from(toolbar.querySelectorAll("[data-view]"));
   const deletedBookIds = new Set();
   let worksByBookId = new Map();
   let worksLoaded = false;
   let worksLoading = false;
+
+  const getLocalizedBookTitle = (book) => {
+    if (!book || typeof book !== "object") return "";
+    const copy = localizedBookTitleById[String(book.id || "").trim()];
+    if (copy) {
+      return tr(copy.key, copy.fallback) || String(book.title || "");
+    }
+    return String(book.title || "");
+  };
+
+  const getLocalizedCategoryLabel = (book) => {
+    const categoryId = String(book?.category || "").trim();
+    const localized = localizedCategoryById[categoryId];
+    if (localized) {
+      return tr(localized.labelKey, localized.labelFallback);
+    }
+    return String(book?.categoryLabel || tr("map.category_default", "Book Module"));
+  };
+
+  const getLocalizedCategoryHint = (book) => {
+    const categoryId = String(book?.category || "").trim();
+    const localized = localizedCategoryById[categoryId];
+    if (localized) {
+      return tr(localized.hintKey, localized.hintFallback);
+    }
+    return String(book?.categoryHint || tr("map.hint_default", "Tap to enter and start the interactive journey."));
+  };
+
+  const syncStaticCopy = () => {
+    if (mapChipEl) {
+      mapChipEl.textContent = tr("map.entry", "Learning Hub");
+    }
+    if (mapViewSwitchEl) {
+      mapViewSwitchEl.setAttribute("aria-label", tr("map.view_switch", "Personal library view switch"));
+    }
+    viewButtons.forEach((button) => {
+      const view = button.getAttribute("data-view");
+      if (view === "map") {
+        button.textContent = tr("map.view_map", "Map View");
+        return;
+      }
+      button.textContent = tr("map.view_shelf", "Shelf View");
+    });
+    if (mapShelfTitleEl) {
+      mapShelfTitleEl.textContent = tr("map.shelf_title", "Personal Library");
+    }
+    if (mapShelfSubtitleEl) {
+      mapShelfSubtitleEl.textContent = tr("map.shelf_subtitle", "Default view · Jump directly into book experiences");
+    }
+    categories.forEach((category) => {
+      const node = findNodeByIcon(category.icon);
+      if (node) applyCategoryMeta(category, node);
+    });
+  };
 
   const getUnlocked = () => {
     try {
@@ -552,7 +673,12 @@
       worksLoaded = true;
       renderShelf();
     } catch (error) {
-      setShelfStatus("书籍管理数据加载失败：" + (error?.message || "unknown error"), true);
+      setShelfStatus(
+        tr("map.manage_load_failed", "Failed to load book management data: {error}", {
+          error: error?.message || "unknown error"
+        }),
+        true
+      );
     } finally {
       worksLoading = false;
     }
@@ -563,9 +689,13 @@
     const work = worksByBookId.get(book.id);
     const canManage = isUserBook(book.id) && work && work.can_edit !== false;
     const isPublic = Boolean(work?.is_public);
+    const bookTitle = getLocalizedBookTitle(book);
+    const categoryLabel = getLocalizedCategoryLabel(book);
+    const categoryHint = getLocalizedCategoryHint(book);
+    const moduleCount = Number(book?.moduleCount) || 0;
     const manageHtml = canManage
       ? `
-          <div class="reado-shelf-visibility">${isPublic ? "已上架到体验库" : "仅自己可见"}</div>
+          <div class="reado-shelf-visibility">${isPublic ? tr("map.manage_visible_public", "Published to Experience Library") : tr("map.manage_visible_private", "Private only")}</div>
           <div class="reado-shelf-admin">
             <button
               type="button"
@@ -574,29 +704,29 @@
               data-work-id="${work.id}"
               data-book-id="${book.id}"
               data-next-public="${isPublic ? "0" : "1"}"
-            >${isPublic ? "下架" : "上架"}</button>
+            >${isPublic ? tr("map.manage_unpublish", "Unpublish") : tr("map.manage_publish", "Publish")}</button>
             <button
               type="button"
               class="reado-shelf-admin-btn"
               data-work-action="delete"
               data-work-id="${work.id}"
               data-book-id="${book.id}"
-            >删除</button>
+            >${tr("map.manage_delete", "Delete")}</button>
           </div>`
       : "";
     return `
       <article class="reado-shelf-card">
         <div class="reado-shelf-cover">
-          <img src="${book.cover}" alt="${book.title}" loading="lazy" />
+          <img src="${book.cover}" alt="${bookTitle}" loading="lazy" />
         </div>
         <div class="reado-shelf-body">
-          <div class="reado-shelf-cat">${book.categoryLabel || "书籍模块"}</div>
-          <div class="reado-shelf-name">${book.title}</div>
-          <div class="reado-shelf-meta">${book.moduleCount || 0} 个体验模块</div>
-          <div class="reado-shelf-hint">${book.categoryHint || "点击进入，开始互动体验。"}</div>
+          <div class="reado-shelf-cat">${categoryLabel || tr("map.category_default", "Book Module")}</div>
+          <div class="reado-shelf-name">${bookTitle}</div>
+          <div class="reado-shelf-meta">${tr("map.module_count", "{count} experience modules", { count: moduleCount })}</div>
+          <div class="reado-shelf-hint">${categoryHint || tr("map.hint_default", "Tap to enter and start the interactive journey.")}</div>
           ${manageHtml}
           <button type="button" class="reado-shelf-cta" data-book-id="${book.id}">
-            ${isUnlocked ? "继续体验" : "开始体验"}
+            ${isUnlocked ? tr("map.cta_continue", "Continue") : tr("map.cta_start", "Start")}
           </button>
         </div>
       </article>`;
@@ -612,10 +742,10 @@
     ));
     const unlocked = getUnlocked();
     if (shelfCount instanceof HTMLElement) {
-      shelfCount.textContent = `当前可体验 ${available.length} 本书`;
+      shelfCount.textContent = tr("map.shelf_count", "{count} books available", { count: available.length });
     }
     if (available.length === 0) {
-      shelfGrid.innerHTML = '<div class="reado-shelf-empty">暂无可用书籍，请先配置 book_experiences 模块。</div>';
+      shelfGrid.innerHTML = `<div class="reado-shelf-empty">${tr("map.shelf_empty", "No books available yet. Please configure book_experiences modules first.")}</div>`;
       return;
     }
     shelfGrid.innerHTML = available.map((book) => createCard(book, unlocked)).join("");
@@ -632,7 +762,7 @@
         const action = actionButton.getAttribute("data-work-action");
         if (!workId || !bookId || !action) return;
         if (action === "delete") {
-          const confirmed = window.confirm("确认删除这本可玩书籍？删除后不可恢复。");
+          const confirmed = window.confirm(tr("map.confirm_delete", "Delete this playable book? This action cannot be undone."));
           if (!confirmed) return;
         }
         actionButton.disabled = true;
@@ -648,7 +778,11 @@
               ...(data?.work || {}),
               is_public: shouldPublic
             });
-            setShelfStatus(shouldPublic ? "已上架到体验库。" : "已从体验库下架。");
+            setShelfStatus(
+              shouldPublic
+                ? tr("map.status_published", "Published to Experience Library.")
+                : tr("map.status_unpublished", "Unpublished from Experience Library.")
+            );
             renderShelf();
             return;
           }
@@ -662,12 +796,17 @@
               unlocked.delete(bookId);
               saveUnlocked(unlocked);
             }
-            setShelfStatus("已删除该可玩书籍。");
+            setShelfStatus(tr("map.status_deleted", "Playable book deleted."));
             renderShelf();
             return;
           }
         } catch (error) {
-          setShelfStatus("操作失败：" + (error?.message || "unknown error"), true);
+          setShelfStatus(
+            tr("map.action_failed", "Action failed: {error}", {
+              error: error?.message || "unknown error"
+            }),
+            true
+          );
         } finally {
           actionButton.disabled = false;
         }
@@ -723,6 +862,14 @@
       setView(view);
     });
   });
+
+  syncStaticCopy();
+  if (typeof i18n.onLanguageChange === "function") {
+    i18n.onLanguageChange(() => {
+      syncStaticCopy();
+      renderShelf();
+    });
+  }
 
   renderShelf();
   loadMineWorks().catch(() => {});

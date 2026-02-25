@@ -143,7 +143,48 @@ const ZH = {
   "studio.log_refund": "生成失败，已退回 {value} 宝石。",
   "studio.modal_cancel": "取消",
   "studio.modal_confirm": "确认",
-  "studio.modal_add_source": "加入来源"
+  "studio.modal_add_source": "加入来源",
+  "shell.task_empty_sub": "还没有任务领取记录，完成一个任务后开始追踪。",
+  "shell.task_claimed": "已领取 {count} 次 · {updated}",
+  "shell.recently": "最近",
+  "shell.rank_top": "前 {value}%",
+  "shell.rank_top_unknown": "前 --",
+  "map.entry": "学习入口",
+  "map.view_switch": "个人书库视图切换",
+  "map.view_shelf": "书架视图",
+  "map.view_map": "地图视图",
+  "map.shelf_title": "个人书库",
+  "map.shelf_subtitle": "默认视图 · 直接进入书籍体验",
+  "map.shelf_count": "当前可体验 {count} 本书",
+  "map.shelf_empty": "暂无可用书籍，请先配置 book_experiences 模块。",
+  "map.manage_load_failed": "书籍管理数据加载失败：{error}",
+  "map.manage_visible_public": "已上架到体验库",
+  "map.manage_visible_private": "仅自己可见",
+  "map.manage_unpublish": "下架",
+  "map.manage_publish": "上架",
+  "map.manage_delete": "删除",
+  "map.category_default": "书籍模块",
+  "map.module_count": "{count} 个体验模块",
+  "map.hint_default": "点击进入，开始互动体验。",
+  "map.cta_continue": "继续体验",
+  "map.cta_start": "开始体验",
+  "map.confirm_delete": "确认删除这本可玩书籍？删除后不可恢复。",
+  "map.status_published": "已上架到体验库。",
+  "map.status_unpublished": "已从体验库下架。",
+  "map.status_deleted": "已删除该可玩书籍。",
+  "map.action_failed": "操作失败：{error}",
+  "map.category.science.title": "认知/硬核",
+  "map.category.science.subtitle": "科学普及 · 历史 · 哲学 · 社会学",
+  "map.category.personal.title": "个人修炼",
+  "map.category.personal.subtitle": "心理学 · 自我提升 · 时间管理 · 思维模型",
+  "map.category.career.title": "事业/财富",
+  "map.category.career.subtitle": "经济金融 · 商业管理 · 职场技能 · 创业",
+  "map.category.lifestyle.title": "灵感/生活",
+  "map.category.lifestyle.subtitle": "艺术设计 · 传记 · 文学虚构 · 生活美学",
+  "map.book.wanli-fifteen": "《万历十五年》",
+  "map.book.sapiens": "《人类简史》",
+  "map.book.principles-for-navigating-big-debt-crises": "《置身事外》",
+  "map.book.zero-to-one": "《从零到一》"
 };
 
 const EN = {
@@ -272,7 +313,48 @@ const EN = {
   "studio.log_refund": "Generation failed; refunded {value} gems.",
   "studio.modal_cancel": "Cancel",
   "studio.modal_confirm": "Confirm",
-  "studio.modal_add_source": "Add Source"
+  "studio.modal_add_source": "Add Source",
+  "shell.task_empty_sub": "No mission claim yet. Complete one mission to start tracking.",
+  "shell.task_claimed": "Claimed {count} time(s) · {updated}",
+  "shell.recently": "Recently",
+  "shell.rank_top": "Top {value}%",
+  "shell.rank_top_unknown": "Top --",
+  "map.entry": "Learning Hub",
+  "map.view_switch": "Personal library view switch",
+  "map.view_shelf": "Shelf View",
+  "map.view_map": "Map View",
+  "map.shelf_title": "Personal Library",
+  "map.shelf_subtitle": "Default view · Jump directly into book experiences",
+  "map.shelf_count": "{count} books available",
+  "map.shelf_empty": "No books available yet. Please configure book_experiences modules first.",
+  "map.manage_load_failed": "Failed to load book management data: {error}",
+  "map.manage_visible_public": "Published to Experience Library",
+  "map.manage_visible_private": "Private only",
+  "map.manage_unpublish": "Unpublish",
+  "map.manage_publish": "Publish",
+  "map.manage_delete": "Delete",
+  "map.category_default": "Book Module",
+  "map.module_count": "{count} experience modules",
+  "map.hint_default": "Tap to enter and start the interactive journey.",
+  "map.cta_continue": "Continue",
+  "map.cta_start": "Start",
+  "map.confirm_delete": "Delete this playable book? This action cannot be undone.",
+  "map.status_published": "Published to Experience Library.",
+  "map.status_unpublished": "Unpublished from Experience Library.",
+  "map.status_deleted": "Playable book deleted.",
+  "map.action_failed": "Action failed: {error}",
+  "map.category.science.title": "Science & Knowledge",
+  "map.category.science.subtitle": "Popular Science · History · Philosophy · Sociology",
+  "map.category.personal.title": "Personal Growth",
+  "map.category.personal.subtitle": "Psychology · Self-Improvement · Time Management · Mental Models",
+  "map.category.career.title": "Career & Wealth",
+  "map.category.career.subtitle": "Economics · Business · Workplace Skills · Entrepreneurship",
+  "map.category.lifestyle.title": "Lifestyle & Creativity",
+  "map.category.lifestyle.subtitle": "Art & Design · Biography · Fiction · Everyday Aesthetics",
+  "map.book.wanli-fifteen": "1587, A Year of No Significance",
+  "map.book.sapiens": "Sapiens",
+  "map.book.principles-for-navigating-big-debt-crises": "Principles for Navigating Big Debt Crises",
+  "map.book.zero-to-one": "Zero to One"
 };
 
 const JA = {
@@ -686,6 +768,16 @@ function detectLanguage() {
     if (explicit) {
       const fromStorage = normalizeLanguage(localStorage.getItem(LANGUAGE_STORAGE_KEY) || "");
       if (fromStorage) return fromStorage;
+    }
+  } catch {}
+
+  try {
+    const browserCandidates = Array.isArray(navigator.languages)
+      ? navigator.languages
+      : [navigator.language];
+    for (const candidate of browserCandidates) {
+      const normalized = normalizeLanguage(candidate || "");
+      if (normalized) return normalized;
     }
   } catch {}
 

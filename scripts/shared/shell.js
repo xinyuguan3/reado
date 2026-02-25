@@ -2301,14 +2301,14 @@ class ReadoAppShell extends HTMLElement {
         <div class="reado-rank-num" data-rank-number>#--</div>
         <div class="reado-rank-up" data-rank-total>--</div>
         <div class="reado-rank-progress"><span></span></div>
-        <p style="margin:8px 0 0;text-align:right;font-size:10px;color:#94a3b8;" data-rank-percent>Top --</p>
+        <p style="margin:8px 0 0;text-align:right;font-size:10px;color:#94a3b8;" data-rank-percent>${t("shell.rank_top_unknown", "Top --")}</p>
       </section>
       <section>
         <h3 class="reado-panel-title">${t("shell.current_tasks", "进行中的任务")}</h3>
         <div class="reado-tasks" data-task-history-list>
           <article class="reado-task active">
             <p class="reado-task-title">${t("shell.current_tasks", "进行中的任务")}</p>
-            <p class="reado-task-sub">Sign in to sync your mission history.</p>
+            <p class="reado-task-sub">${t("shell.task_empty_sub", "No mission claim yet. Complete one mission to start tracking.")}</p>
             <div class="reado-task-line"><span style="width:8%"></span></div>
             <button class="reado-task-btn" data-href="/pages/simulator-library-level-selection-2.html">${t("shell.continue_learning", "继续学习")}</button>
           </article>
@@ -2320,33 +2320,44 @@ class ReadoAppShell extends HTMLElement {
     const rankPercentEl = rightPanel.querySelector("[data-rank-percent]");
     const taskHistoryListEl = rightPanel.querySelector("[data-task-history-list]");
 
+    let latestTaskHistory = [];
+    let latestRank = { me: null, totalPlayers: 0 };
+
     const renderTaskHistory = (items = []) => {
       if (!taskHistoryListEl) return;
-      if (!Array.isArray(items) || !items.length) {
+      const rows = Array.isArray(items) ? items : [];
+      latestTaskHistory = rows;
+      if (!rows.length) {
         taskHistoryListEl.innerHTML = `
           <article class="reado-task active">
             <p class="reado-task-title">${t("shell.current_tasks", "进行中的任务")}</p>
-            <p class="reado-task-sub">No mission claim yet. Complete one mission to start tracking.</p>
+            <p class="reado-task-sub">${t("shell.task_empty_sub", "No mission claim yet. Complete one mission to start tracking.")}</p>
             <div class="reado-task-line"><span style="width:6%"></span></div>
             <button class="reado-task-btn" data-href="/pages/simulator-library-level-selection-2.html">${t("shell.continue_learning", "继续学习")}</button>
           </article>`;
         return;
       }
-      taskHistoryListEl.innerHTML = items.slice(0, 3).map((item, index) => {
+      taskHistoryListEl.innerHTML = rows.slice(0, 3).map((item, index) => {
         const taskId = String(item?.taskId || "").trim() || "mission";
         const count = Math.max(1, Number(item?.count) || 0);
-        const updatedText = item?.lastClaimAt ? new Date(item.lastClaimAt).toLocaleString(getCurrentLanguage()) : "Recently";
+        const updatedText = item?.lastClaimAt
+          ? new Date(item.lastClaimAt).toLocaleString(getCurrentLanguage())
+          : t("shell.recently", "Recently");
         const percent = Math.max(10, 90 - index * 18);
         return `
           <article class="reado-task${index === 0 ? " active" : ""}">
             <p class="reado-task-title">${taskId.replace(/[-_]+/g, " ").slice(0, 42)}</p>
-            <p class="reado-task-sub">Claimed ${count} time(s) · ${updatedText}</p>
+            <p class="reado-task-sub">${t("shell.task_claimed", "Claimed {count} time(s) · {updated}", { count: formatNumber(count), updated: updatedText })}</p>
             <div class="reado-task-line"><span style="width:${percent}%"></span></div>
           </article>`;
       }).join("");
     };
 
     const renderRank = (me, totalPlayers) => {
+      latestRank = {
+        me: me || null,
+        totalPlayers: Number(totalPlayers) || 0
+      };
       if (rankNumEl) {
         rankNumEl.textContent = me?.rank ? "#" + formatNumber(me.rank) : "#--";
       }
@@ -2356,9 +2367,9 @@ class ReadoAppShell extends HTMLElement {
       if (rankPercentEl) {
         if (me?.rank && totalPlayers) {
           const percentile = Math.max(1, Math.round((me.rank / Math.max(totalPlayers, 1)) * 100));
-          rankPercentEl.textContent = "Top " + percentile + "%";
+          rankPercentEl.textContent = t("shell.rank_top", "Top {value}%", { value: formatNumber(percentile) });
         } else {
-          rankPercentEl.textContent = "Top --";
+          rankPercentEl.textContent = t("shell.rank_top_unknown", "Top --");
         }
       }
     };
@@ -2450,8 +2461,8 @@ class ReadoAppShell extends HTMLElement {
       if (rankLabel) rankLabel.textContent = t("shell.current_rank", "当前排名");
       const taskTitle = rightPanel.querySelector(".reado-panel-title");
       if (taskTitle) taskTitle.textContent = t("shell.current_tasks", "进行中的任务");
-      const taskBtn = rightPanel.querySelector(".reado-task-btn");
-      if (taskBtn) taskBtn.textContent = t("shell.continue_learning", "继续学习");
+      renderRank(latestRank.me, latestRank.totalPlayers);
+      renderTaskHistory(latestTaskHistory);
       const exitBtn = top.querySelector(".reado-shell-exit");
       if (exitBtn) exitBtn.textContent = t("shell.exit_experience", "退出体验");
       const toggleBtn = top.querySelector(".reado-shell-toggle");
