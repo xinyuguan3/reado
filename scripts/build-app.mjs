@@ -5106,6 +5106,8 @@ async function writeExperiencePages(experiences, moduleToBook) {
 async function writeSharedAssets(books) {
   const customShellSourcePath = path.join(rootDir, "scripts", "shared", "shell.js");
   const customI18nSourcePath = path.join(rootDir, "scripts", "shared", "i18n.js");
+  const customAutoTranslateSourcePath = path.join(rootDir, "scripts", "shared", "auto-translate.js");
+  const customAutoTranslateDictSourcePath = path.join(rootDir, "scripts", "shared", "auto-translate-dict.js");
   let customShell = "";
   try {
     customShell = await fs.readFile(customShellSourcePath, "utf8");
@@ -5117,6 +5119,16 @@ async function writeSharedAssets(books) {
     await fs.copyFile(customI18nSourcePath, path.join(sharedDir, "i18n.js"));
   } catch {
     // optional file, only needed when i18n is enabled
+  }
+  try {
+    await fs.copyFile(customAutoTranslateSourcePath, path.join(sharedDir, "auto-translate.js"));
+  } catch {
+    // optional file, used to auto-localize legacy Chinese pages in English mode
+  }
+  try {
+    await fs.copyFile(customAutoTranslateDictSourcePath, path.join(sharedDir, "auto-translate-dict.js"));
+  } catch {
+    // optional file, prebuilt dictionary for zh->en auto-translation cache
   }
   await fs.writeFile(path.join(sharedDir, "book-catalog.js"), buildSharedBookCatalogScript(books), "utf8");
   await fs.writeFile(path.join(sharedDir, "experience-runtime.js"), buildSharedExperienceRuntimeScript(), "utf8");

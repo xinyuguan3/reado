@@ -4,6 +4,7 @@ import {
   onLanguageChange,
   t
 } from "/shared/i18n.js";
+import { initReadoAutoTranslate } from "/shared/auto-translate.js";
 
 const ROUTES = [
   { id: "knowledge-map", icon: "map", labelKey: "route.knowledge_map", label: "个人书库", href: "/pages/gamified-learning-hub-dashboard-1.html" },
@@ -2080,6 +2081,7 @@ class ReadoAppShell extends HTMLElement {
     this.dataset.ready = "1";
     ensureIconFont();
     ensureGlobalStyle();
+    initReadoAutoTranslate();
     enableImageFallbacks();
     document.body.classList.add("reado-shell-applied");
     maybeMigrateLegacyMockUser();
