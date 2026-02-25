@@ -98,7 +98,7 @@
 </div>
 <div class="h-4 w-px bg-white/10"></div>
 <div class="text-xs font-medium text-slate-300">
-                    债务/GDP比率: <span class="text-white font-bold">345%</span>
+                    债务/GDP比率: <span id="deleveraging-debt-ratio" class="text-white font-bold">345%</span>
 </div>
 </div>
 <div class="flex items-center gap-4">
@@ -111,7 +111,7 @@
 <main class="relative z-10 flex-1 flex flex-col p-4 md:p-6 lg:p-8 max-w-[1600px] mx-auto w-full gap-6">
 <div class="text-center mb-2">
 <h2 class="text-3xl md:text-4xl font-black text-white mb-2 tracking-tight">绝妙的去杠杆挑战</h2>
-<p class="text-slate-400 max-w-2xl mx-auto text-sm md:text-base font-medium">
+<p id="deleveraging-event-desc" class="text-slate-400 max-w-2xl mx-auto text-sm md:text-base font-medium">
                 在减少债务规模的同时，通过政策组合避免经济出现剧烈收缩，实现债务/收入比率的良性下降。
             </p>
 </div>
@@ -129,7 +129,7 @@
 </div>
 <p class="text-xs text-slate-400 mb-6 h-10 leading-relaxed">通过削减政府和私人支出减少债务负担，但通常会引发经济衰退和社会痛苦。</p>
 <div class="relative pt-2">
-<input class="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer" max="100" min="0" type="range" value="75"/>
+<input id="deleveraging-austerity" class="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer" max="100" min="0" type="range" value="75"/>
 <div class="flex justify-between mt-2 text-[10px] font-bold text-slate-500">
 <span>最低</span>
 <span class="text-blue-400">极高强度</span>
@@ -148,7 +148,7 @@
 </div>
 <p class="text-xs text-slate-400 mb-6 h-10 leading-relaxed">减记资产账面价值。虽能消灭债务，但会直接冲击金融系统与银行资本充足率。</p>
 <div class="relative pt-2">
-<input class="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer" max="100" min="0" type="range" value="40"/>
+<input id="deleveraging-restructuring" class="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer" max="100" min="0" type="range" value="40"/>
 <div class="flex justify-between mt-2 text-[10px] font-bold text-slate-500">
 <span>可控范围</span>
 <span class="text-purple-400">全面危机</span>
@@ -166,7 +166,7 @@
 <div class="absolute bottom-0 left-1/2 w-24 h-24 bg-surface-dark rounded-full transform -translate-x-1/2 translate-y-1/2 border-4 border-surface-dark"></div>
 </div>
 <div class="text-center z-10">
-<div class="text-2xl font-black text-white tracking-tighter">42%</div>
+<div id="deleveraging-social-value" class="text-2xl font-black text-white tracking-tighter">42%</div>
 <div class="text-[12px] text-slate-300 font-bold mt-1">社会稳定</div>
 </div>
 </div>
@@ -177,7 +177,7 @@
 <div class="absolute bottom-0 left-1/2 w-24 h-24 bg-surface-dark rounded-full transform -translate-x-1/2 translate-y-1/2 border-4 border-surface-dark"></div>
 </div>
 <div class="text-center z-10">
-<div class="text-2xl font-black text-primary tracking-tighter">8.4%</div>
+<div id="deleveraging-inflation-value" class="text-2xl font-black text-primary tracking-tighter">8.4%</div>
 <div class="text-[12px] text-slate-300 font-bold mt-1">通货膨胀率</div>
 </div>
 </div>
@@ -203,9 +203,9 @@
 <div class="mt-4 flex justify-between items-center bg-black/30 p-3 rounded-lg border border-white/5">
 <div class="flex items-center gap-2">
 <span class="material-icons text-yellow-500 text-sm">warning</span>
-<span class="text-xs text-yellow-500 font-bold">警告：通缩螺旋风险加剧</span>
+<span id="deleveraging-alert" class="text-xs text-yellow-500 font-bold">警告：通缩螺旋风险加剧</span>
 </div>
-<div class="text-[10px] text-slate-500 font-bold">
+<div id="deleveraging-time" class="text-[10px] text-slate-500 font-bold">
                             当前时间：危机第3年，第2季度
                         </div>
 </div>
@@ -224,7 +224,7 @@
 </div>
 <p class="text-xs text-slate-400 mb-6 h-10 leading-relaxed text-right">通过税收等手段将财富从持有者转向非持有者。若过度会引发资本外逃。</p>
 <div class="relative pt-2" dir="rtl">
-<input class="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer" max="100" min="0" type="range" value="30"/>
+<input id="deleveraging-redistribution" class="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer" max="100" min="0" type="range" value="30"/>
 <div class="flex justify-between mt-2 text-[10px] font-bold text-slate-500" dir="ltr">
 <span class="text-yellow-400">高强度</span>
 <span>保守</span>
@@ -244,16 +244,20 @@
 </div>
 <p class="text-xs text-slate-400 mb-6 h-10 leading-relaxed text-right relative z-10">中央银行通过购买政府债券提供流动性，以抵消通缩压力并刺激名义增长。</p>
 <div class="relative pt-2 z-10" dir="rtl">
-<input class="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-primary" max="100" min="0" type="range" value="65"/>
+<input id="deleveraging-printing" class="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-primary" max="100" min="0" type="range" value="65"/>
 <div class="flex justify-between mt-2 text-[10px] font-bold text-slate-500" dir="ltr">
 <span class="text-primary">高通胀风险</span>
 <span>审慎</span>
 </div>
 </div>
 </div>
-<button class="mt-auto w-full py-4 bg-primary hover:bg-red-600 active:bg-red-700 text-white font-black rounded-xl shadow-[0_0_20px_rgba(236,19,30,0.3)] transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2 group">
+<button id="deleveraging-execute-btn" class="mt-auto w-full py-4 bg-primary hover:bg-red-600 active:bg-red-700 text-white font-black rounded-xl shadow-[0_0_20px_rgba(236,19,30,0.3)] transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2 group">
 <span class="tracking-widest">执行政策组合</span>
 <span class="material-icons text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+<p id="deleveraging-feedback" class="mt-3 text-xs text-slate-400 border-t border-white/10 pt-3">调节四类政策强度后点击“执行政策组合”，完成 3 轮危机推演。</p>
+<button id="deleveraging-next-scene" class="mt-3 hidden w-full py-3 rounded-xl bg-gold text-black font-black tracking-[0.08em] hover:brightness-105 transition-colors">
+进入下一幕
 </button>
 </div>
 </div>
@@ -271,5 +275,267 @@
 </div>
 </div>
 </footer>
+
+<div id="deleveraging-onboarding-modal" class="fixed inset-0 z-[130] bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+<div class="w-full max-w-3xl rounded-2xl border border-primary/35 bg-background-dark/95 shadow-[0_20px_70px_rgba(0,0,0,0.65)] overflow-hidden">
+<div class="px-6 py-4 border-b border-primary/25 bg-gradient-to-r from-primary/20 to-transparent">
+<p class="text-xs uppercase tracking-[0.22em] text-primary font-bold">开场引导 · 债务危机</p>
+</div>
+<section id="deleveraging-onboarding-background" class="px-6 py-5 space-y-4 text-sm text-slate-300 leading-relaxed">
+<h2 class="text-2xl font-black text-white">背景知识：什么是“美丽去杠杆”</h2>
+<p>核心目标不是单纯减债，而是在控制通缩与社会冲击的同时，让名义收入增速逐步高于债务成本，令债务比率平稳下降。</p>
+<div class="grid md:grid-cols-3 gap-3 text-xs">
+<div class="rounded-lg border border-white/10 bg-black/25 p-3">
+<p class="text-primary font-bold mb-1">两难约束</p>
+<p class="text-slate-300">去杠杆太快会触发衰退，太慢会累积更大金融风险。</p>
+</div>
+<div class="rounded-lg border border-white/10 bg-black/25 p-3">
+<p class="text-primary font-bold mb-1">四大工具</p>
+<p class="text-slate-300">紧缩、重组、再分配、印钱需要动态组合而不是单押一边。</p>
+</div>
+<div class="rounded-lg border border-white/10 bg-black/25 p-3">
+<p class="text-primary font-bold mb-1">本幕目标</p>
+<p class="text-slate-300">在 3 轮冲击中兼顾社会稳定、通胀风险和债务路径。</p>
+</div>
+</div>
+<div class="pt-2 flex justify-end">
+<button id="deleveraging-onboarding-to-gameplay" data-no-next="" class="px-5 py-2.5 rounded-lg bg-primary text-white text-sm font-black hover:bg-red-600 transition-colors">继续看玩法</button>
+</div>
+</section>
+<section id="deleveraging-onboarding-gameplay" class="hidden px-6 py-5 space-y-4 text-sm text-slate-300 leading-relaxed">
+<h2 class="text-2xl font-black text-white">玩法说明：政策组合推演</h2>
+<div class="space-y-2">
+<p>1. 通过四个滑杆配置政策强度，再点击“执行政策组合”。</p>
+<p>2. 系统会结合本轮冲击结算“社会稳定 / 通胀 / 债务比率”。</p>
+<p>3. 完成 3 轮后将自动解锁“进入下一幕”。</p>
+</div>
+<div class="rounded-lg border border-gold/30 bg-gold/10 p-3 text-xs text-amber-100">建议避免单一极端政策，优先追求“债务下降 + 社会可承受 + 通胀可控”的平衡。</div>
+<div class="pt-2 flex justify-between gap-2">
+<button id="deleveraging-onboarding-back" data-no-next="" class="px-4 py-2 rounded-lg border border-white/15 text-slate-300 text-sm font-bold hover:bg-white/5 transition-colors">返回背景</button>
+<button id="deleveraging-onboarding-start" data-no-next="" class="px-5 py-2.5 rounded-lg bg-primary text-white text-sm font-black hover:bg-red-600 transition-colors">开始模拟</button>
+</div>
+</section>
+</div>
+</div>
+
+<script>
+(() => {
+  const eventDesc = document.getElementById("deleveraging-event-desc");
+  const debtRatio = document.getElementById("deleveraging-debt-ratio");
+  const socialValue = document.getElementById("deleveraging-social-value");
+  const inflationValue = document.getElementById("deleveraging-inflation-value");
+  const alertText = document.getElementById("deleveraging-alert");
+  const timeText = document.getElementById("deleveraging-time");
+  const executeBtn = document.getElementById("deleveraging-execute-btn");
+  const feedback = document.getElementById("deleveraging-feedback");
+  const nextSceneBtn = document.getElementById("deleveraging-next-scene");
+  const austeritySlider = document.getElementById("deleveraging-austerity");
+  const restructuringSlider = document.getElementById("deleveraging-restructuring");
+  const redistributionSlider = document.getElementById("deleveraging-redistribution");
+  const printingSlider = document.getElementById("deleveraging-printing");
+  const onboardingModal = document.getElementById("deleveraging-onboarding-modal");
+  const onboardingBackground = document.getElementById("deleveraging-onboarding-background");
+  const onboardingGameplay = document.getElementById("deleveraging-onboarding-gameplay");
+  const onboardingToGameplay = document.getElementById("deleveraging-onboarding-to-gameplay");
+  const onboardingBack = document.getElementById("deleveraging-onboarding-back");
+  const onboardingStart = document.getElementById("deleveraging-onboarding-start");
+  if (
+    !executeBtn || !nextSceneBtn || !feedback
+    || !austeritySlider || !restructuringSlider || !redistributionSlider || !printingSlider
+  ) {
+    return;
+  }
+
+  const setOnboardingStep = (step) => {
+    if (!onboardingBackground || !onboardingGameplay) return;
+    const showBackground = step === "background";
+    onboardingBackground.classList.toggle("hidden", !showBackground);
+    onboardingGameplay.classList.toggle("hidden", showBackground);
+  };
+
+  if (onboardingToGameplay) {
+    onboardingToGameplay.addEventListener("click", (event) => {
+      event.preventDefault();
+      setOnboardingStep("gameplay");
+    });
+  }
+  if (onboardingBack) {
+    onboardingBack.addEventListener("click", (event) => {
+      event.preventDefault();
+      setOnboardingStep("background");
+    });
+  }
+  if (onboardingStart && onboardingModal) {
+    onboardingStart.addEventListener("click", (event) => {
+      event.preventDefault();
+      onboardingModal.classList.add("hidden");
+    });
+  }
+
+  const resolveNextHref = (fallback) => {
+    try {
+      const match = window.location.pathname.match(/\/experiences\/([^/?#]+)\.html/i);
+      const slug = match && match[1] ? decodeURIComponent(match[1]) : "";
+      const books = Array.isArray(window.__READO_BOOK_CATALOG__?.books) ? window.__READO_BOOK_CATALOG__.books : [];
+      for (const book of books) {
+        const modules = Array.isArray(book?.moduleSlugs) ? book.moduleSlugs : [];
+        const index = modules.indexOf(slug);
+        if (index >= 0) {
+          const nextSlug = modules[index + 1];
+          return nextSlug ? `/experiences/${encodeURIComponent(nextSlug)}.html` : (book.hubHref || fallback);
+        }
+      }
+    } catch {}
+    return fallback;
+  };
+
+  const nextHref = resolveNextHref("/experiences/the-subway-dilemma.html");
+  const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+  const roundTotal = 3;
+  let roundIndex = 0;
+  let quarter = 2;
+  let year = 3;
+  const state = {
+    social: 42,
+    inflation: 8.4,
+    debt: 345
+  };
+
+  const eventPool = [
+    { title: "银行挤兑升级", desc: "中小银行出现连续提款潮，信用收缩开始向实体部门扩散。", debt: 6, social: -4, inflation: -0.3 },
+    { title: "出口需求骤降", desc: "外需收缩导致产能闲置，失业压力在制造业链条上升。", debt: 4, social: -3, inflation: -0.2 },
+    { title: "资本外流加速", desc: "风险偏好下降，本币承压并推高输入型通胀。", debt: 3, social: -2, inflation: 0.9 },
+    { title: "地产信用震荡", desc: "地产链违约增加，居民和地方资产负债表同时恶化。", debt: 7, social: -5, inflation: -0.4 },
+    { title: "财政收入回落", desc: "税基收缩削弱财政腾挪空间，政策执行难度上行。", debt: 5, social: -3, inflation: -0.1 }
+  ];
+
+  const shuffle = (input) => {
+    const next = [...input];
+    for (let i = next.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const tmp = next[i];
+      next[i] = next[j];
+      next[j] = tmp;
+    }
+    return next;
+  };
+  const rounds = shuffle(eventPool).slice(0, roundTotal);
+
+  const getCurrentEvent = () => rounds[Math.min(roundIndex, roundTotal - 1)];
+  const updateHeader = () => {
+    const event = getCurrentEvent();
+    if (eventDesc && roundIndex < roundTotal) {
+      eventDesc.textContent = `第 ${roundIndex + 1}/${roundTotal} 轮冲击：${event.title}。${event.desc}`;
+    }
+    if (timeText) timeText.textContent = `当前时间：危机第${year}年，第${quarter}季度`;
+  };
+
+  const updateMetrics = () => {
+    if (socialValue) socialValue.textContent = `${Math.round(state.social)}%`;
+    if (inflationValue) inflationValue.textContent = `${state.inflation.toFixed(1)}%`;
+    if (debtRatio) debtRatio.textContent = `${Math.round(state.debt)}%`;
+  };
+
+  const updateAlert = () => {
+    if (!alertText) return;
+    if (state.social < 35) {
+      alertText.textContent = "警告：社会稳定度过低，政策执行阻力正在放大";
+      alertText.className = "text-xs text-red-400 font-bold";
+      return;
+    }
+    if (state.inflation > 10) {
+      alertText.textContent = "警告：通胀风险偏高，货币政策需要降温";
+      alertText.className = "text-xs text-orange-400 font-bold";
+      return;
+    }
+    if (state.debt > 360) {
+      alertText.textContent = "警告：债务率仍处高位，去杠杆进展不足";
+      alertText.className = "text-xs text-yellow-400 font-bold";
+      return;
+    }
+    alertText.textContent = "状态：去杠杆路径可控，继续保持政策平衡";
+    alertText.className = "text-xs text-emerald-400 font-bold";
+  };
+
+  const summarizeDelta = (delta) => {
+    const signed = (value) => `${value >= 0 ? "+" : ""}${value}`;
+    return `社会稳定 ${signed(delta.social)} | 通胀 ${signed(delta.inflation.toFixed(1))} | 债务率 ${signed(delta.debt)}`;
+  };
+
+  const settleRound = () => {
+    if (roundIndex >= roundTotal) return;
+    const event = rounds[roundIndex];
+    const austerity = Number(austeritySlider.value);
+    const restructuring = Number(restructuringSlider.value);
+    const redistribution = Number(redistributionSlider.value);
+    const printing = Number(printingSlider.value);
+
+    const contraction = (austerity + restructuring) / 2;
+    const stimulus = (redistribution + printing) / 2;
+    const balanceGap = stimulus - contraction;
+
+    const delta = { social: 0, inflation: 0, debt: 0 };
+    delta.social += Math.round((stimulus - 50) / 14) - Math.round((austerity - 55) / 13) - Math.round((restructuring - 50) / 16);
+    delta.social += event.social;
+    delta.inflation += ((printing - 55) / 38) + ((redistribution - 45) / 62) - ((austerity - 45) / 90);
+    delta.inflation += event.inflation;
+    delta.debt += Math.round((printing + redistribution) / 26) - Math.round((austerity + restructuring) / 20) + event.debt;
+    if (balanceGap < -20) delta.debt += 2;
+    if (balanceGap > 20) delta.inflation += 0.5;
+
+    state.social = clamp(state.social + delta.social, 12, 92);
+    state.inflation = clamp(state.inflation + delta.inflation, -1.5, 16);
+    state.debt = clamp(state.debt + delta.debt, 240, 430);
+
+    roundIndex += 1;
+    quarter += 1;
+    if (quarter > 4) {
+      quarter = 1;
+      year += 1;
+    }
+
+    feedback.className = "mt-3 text-xs border-t border-white/10 pt-3 text-slate-300";
+    feedback.textContent = `第 ${roundIndex} 轮结算：${event.title}。${summarizeDelta(delta)}。`;
+
+    updateMetrics();
+    updateAlert();
+
+    if (roundIndex >= roundTotal) {
+      const success = state.debt <= 350 && state.social >= 38 && state.inflation >= 1.0 && state.inflation <= 8.5;
+      feedback.className = `mt-3 text-xs border-t border-white/10 pt-3 ${success ? "text-emerald-300" : "text-amber-300"}`;
+      feedback.textContent = success
+        ? `结算完成：你实现了“温和去杠杆”，债务率下降同时避免了深度衰退。最终指标：社会稳定 ${Math.round(state.social)}%、通胀 ${state.inflation.toFixed(1)}%、债务率 ${Math.round(state.debt)}%。`
+        : `结算完成：政策组合仍有失衡，去杠杆伴随较高代价。最终指标：社会稳定 ${Math.round(state.social)}%、通胀 ${state.inflation.toFixed(1)}%、债务率 ${Math.round(state.debt)}%。`;
+      executeBtn.disabled = true;
+      executeBtn.classList.add("opacity-60", "cursor-not-allowed");
+      if (eventDesc) {
+        eventDesc.textContent = "本幕推演结束。你已看到不同政策组合如何在增长、通胀与稳定之间产生权衡。";
+      }
+      nextSceneBtn.classList.remove("hidden");
+      return;
+    }
+
+    updateHeader();
+    const executeText = executeBtn.querySelector("span.tracking-widest");
+    if (executeText) executeText.textContent = `执行政策组合（第 ${roundIndex + 1} 轮）`;
+  };
+
+  executeBtn.addEventListener("click", (event) => {
+    event.preventDefault();
+    settleRound();
+  });
+
+  nextSceneBtn.addEventListener("click", (event) => {
+    event.preventDefault();
+    window.location.href = nextHref;
+  });
+
+  updateHeader();
+  updateMetrics();
+  updateAlert();
+  const executeText = executeBtn.querySelector("span.tracking-widest");
+  if (executeText) executeText.textContent = "执行政策组合（第 1 轮）";
+})();
+</script>
 
 </body></html>

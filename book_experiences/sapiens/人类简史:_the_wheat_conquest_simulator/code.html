@@ -126,21 +126,21 @@
 <div class="text-xs text-slate-400 mb-1">已驯化人数</div>
 <div class="text-xl font-mono text-secondary font-bold flex justify-center items-center gap-1">
 <span class="material-icons-outlined text-sm">accessibility_new</span>
-                        14,205
+<span id="wheat-population-value">14,205</span>
                     </div>
 </div>
 <div class="glass-panel bg-panel-dark rounded-lg p-3 text-center min-w-[120px]">
 <div class="text-xs text-slate-400 mb-1">占领土地面积</div>
 <div class="text-xl font-mono text-primary font-bold flex justify-center items-center gap-1">
 <span class="material-icons-outlined text-sm">map</span>
-                        840 km²
+<span id="wheat-land-value">840</span> km²
                     </div>
 </div>
 <div class="glass-panel bg-panel-dark rounded-lg p-3 text-center min-w-[120px]">
 <div class="text-xs text-slate-400 mb-1">可用 DNA 点数</div>
 <div class="text-xl font-mono text-primary font-bold flex justify-center items-center gap-1">
 <span class="material-icons-outlined text-sm">all_inclusive</span>
-                        45
+<span id="wheat-dna-value">45</span>
                     </div>
 </div>
 <button id="open-guide-tip" data-no-next="" class="tip-float glass-panel bg-slate-900/80 rounded-lg p-3 text-center min-w-[120px] hover:bg-slate-800 transition">
@@ -158,7 +158,7 @@
 <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
 <h3 class="font-bold text-sm text-slate-200">世界简报</h3>
 </div>
-<div class="space-y-4 max-h-[300px] overflow-y-auto custom-scrollbar">
+<div id="wheat-brief-list" class="space-y-4 max-h-[300px] overflow-y-auto custom-scrollbar">
 <div class="text-sm text-secondary">
 <div class="text-xs text-slate-500 mb-1">RANGE 1</div>
 <p>美索不达米亚的智人正在为扇出永久性背部问题。</p>
@@ -184,28 +184,28 @@
 <span class="material-icons-outlined text-3xl">warning</span>
 </div>
 <div>
-<h2 class="text-2xl font-bold text-white">严重干旱</h2>
-<p class="text-red-400 text-sm">环境危机事件</p>
+<h2 id="wheat-event-title" class="text-2xl font-bold text-white">严重干旱</h2>
+<p id="wheat-event-type" class="text-red-400 text-sm">环境危机事件</p>
 </div>
 </div>
 </div>
-<p class="text-slate-300 mb-8 leading-relaxed">
+<p id="wheat-event-desc" class="text-slate-300 mb-8 leading-relaxed">
                     地中海东部地区降水量骤减，刚被驯化的小麦面临枯萎风险。智人部落正在考虑放弃耕种回归采集生活。
                 </p>
 <div class="grid grid-cols-2 gap-4">
 <button id="drought-option-evolve" data-no-next="" class="group relative flex flex-col items-start p-4 bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-primary rounded-xl transition-all duration-300">
-<div class="text-primary font-bold mb-1 flex items-center gap-2">
+<div id="wheat-option-a-title" class="text-primary font-bold mb-1 flex items-center gap-2">
 <span class="material-icons-outlined text-sm">water_drop</span>
                             演化耐旱根系
                         </div>
-<div class="text-xs text-slate-400 text-left">消耗 <span class="text-primary font-bold">15 DNA</span> 点数，提高存活率。</div>
+<div id="wheat-option-a-desc" class="text-xs text-slate-400 text-left">消耗 <span class="text-primary font-bold">15 DNA</span> 点数，提高存活率。</div>
 </button>
 <button id="drought-option-ignore" data-no-next="" class="group relative flex flex-col items-start p-4 bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-slate-500 rounded-xl transition-all duration-300">
-<div class="text-slate-300 font-bold mb-1 flex items-center gap-2">
+<div id="wheat-option-b-title" class="text-slate-300 font-bold mb-1 flex items-center gap-2">
 <span class="material-icons-outlined text-sm">close</span>
                             无视风险
                         </div>
-<div class="text-xs text-slate-400 text-left">可能会损失 <span class="text-red-400 font-bold">15%</span> 的传播区域。</div>
+<div id="wheat-option-b-desc" class="text-xs text-slate-400 text-left">可能会损失 <span class="text-red-400 font-bold">15%</span> 的传播区域。</div>
 </button>
 </div>
 <p id="drought-feedback" class="mt-4 text-xs text-slate-300 border-t border-slate-700 pt-3">请先选择一个策略，系统将即时反馈后果。</p>
@@ -276,8 +276,8 @@
 </div>
 </div>
 <div class="mt-4 flex justify-end">
-<button id="go-next-scene" data-next-scene="wheat-next" class="px-6 py-3 rounded-xl bg-primary text-black font-black tracking-[0.08em] hover:bg-amber-400 transition shadow-[0_0_18px_rgba(245,158,11,0.45)]">
-完成本幕，进入下一幕
+<button id="go-next-scene" data-no-next="" class="px-6 py-3 rounded-xl bg-slate-700 text-slate-300 font-black tracking-[0.08em] transition cursor-not-allowed">
+完成 3 轮事件后解锁下一幕
 </button>
 </div>
 </div>
@@ -287,28 +287,49 @@
 <div class="w-full max-w-2xl rounded-2xl border border-secondary/40 bg-slate-950/95 shadow-[0_20px_60px_rgba(0,0,0,0.65)] overflow-hidden">
 <div class="px-6 py-4 border-b border-secondary/25 bg-gradient-to-r from-secondary/20 to-transparent">
 <p class="text-xs uppercase tracking-[0.22em] text-secondary font-bold">导览卡</p>
-<h2 class="text-2xl font-black text-white mt-2">小麦全球征服模拟：玩法说明</h2>
+<h2 class="text-2xl font-black text-white mt-2">小麦全球征服模拟：背景与玩法</h2>
 </div>
-<div class="px-6 py-5 space-y-4 text-sm text-slate-300 leading-relaxed">
-<p>你将扮演小麦，用“基因进化 + 人类劳作”扩张势力。请重点看右侧事件、下方策略与地图势力区。</p>
+<section id="wheat-onboarding-background" class="px-6 py-5 space-y-4 text-sm text-slate-300 leading-relaxed">
+<p>背景知识：在人类农业革命中，小麦并不是被动“作物”，它通过高产与可储存性反向塑造了智人的劳动方式、聚落结构和社会组织。</p>
 <div class="grid md:grid-cols-3 gap-3">
 <div class="rounded-lg border border-white/10 bg-slate-900/60 p-3">
-<p class="text-xs text-amber-300 font-bold uppercase tracking-wide mb-1">1. 看事件</p>
-<p class="text-xs text-slate-300">每次危机会给出抉择，选择会改变传播结果。</p>
+<p class="text-xs text-amber-300 font-bold uppercase tracking-wide mb-1">历史视角</p>
+<p class="text-xs text-slate-300">“驯化”并非单向行为，人类与小麦是相互绑定关系。</p>
 </div>
 <div class="rounded-lg border border-white/10 bg-slate-900/60 p-3">
-<p class="text-xs text-amber-300 font-bold uppercase tracking-wide mb-1">2. 点地图</p>
-<p class="text-xs text-slate-300">点击地图上的脉冲节点，可查看当前势力区解释。</p>
+<p class="text-xs text-amber-300 font-bold uppercase tracking-wide mb-1">核心矛盾</p>
+<p class="text-xs text-slate-300">产量提高带来人口增长，也会加重劳动负担和生态脆弱性。</p>
 </div>
 <div class="rounded-lg border border-white/10 bg-slate-900/60 p-3">
-<p class="text-xs text-amber-300 font-bold uppercase tracking-wide mb-1">3. 进下一幕</p>
-<p class="text-xs text-slate-300">完成本幕后点击“进入下一幕”，继续后续剧情。</p>
+<p class="text-xs text-amber-300 font-bold uppercase tracking-wide mb-1">本幕目标</p>
+<p class="text-xs text-slate-300">在危机中平衡生存率与扩张速度，观察农业系统如何反向“驯化”人类。</p>
 </div>
 </div>
+<div class="pt-1 flex justify-end">
+<button id="wheat-onboarding-to-gameplay" data-no-next="" class="px-5 py-2.5 rounded-lg bg-primary text-black text-sm font-black hover:bg-amber-400 transition-colors">继续看玩法</button>
 </div>
-<div class="px-6 py-4 border-t border-white/10 flex justify-end">
+</section>
+<section id="wheat-onboarding-gameplay" class="hidden px-6 py-5 space-y-4 text-sm text-slate-300 leading-relaxed">
+<p>玩法说明：你将处理 3 轮随机危机。每次从两种策略里选择其一，系统会实时结算人口、土地、DNA 与生存率变化。</p>
+<div class="grid md:grid-cols-3 gap-3">
+<div class="rounded-lg border border-white/10 bg-slate-900/60 p-3">
+<p class="text-xs text-sky-300 font-bold uppercase tracking-wide mb-1">1. 看事件</p>
+<p class="text-xs text-slate-300">优先判断危机对“生存率”和“扩散面积”的冲击。</p>
+</div>
+<div class="rounded-lg border border-white/10 bg-slate-900/60 p-3">
+<p class="text-xs text-sky-300 font-bold uppercase tracking-wide mb-1">2. 选策略</p>
+<p class="text-xs text-slate-300">高收益策略常消耗 DNA，DNA 不足会触发失败惩罚。</p>
+</div>
+<div class="rounded-lg border border-white/10 bg-slate-900/60 p-3">
+<p class="text-xs text-sky-300 font-bold uppercase tracking-wide mb-1">3. 继续链路</p>
+<p class="text-xs text-slate-300">完成 3 轮后解锁“进入下一幕”，自然推进书籍体验。</p>
+</div>
+</div>
+<div class="px-0 pt-2 flex justify-between gap-2">
+<button id="wheat-onboarding-back" data-no-next="" class="px-4 py-2 rounded-lg border border-white/10 text-slate-300 text-sm font-bold hover:bg-white/5 transition-colors">返回背景</button>
 <button id="close-wheat-onboarding" data-no-next="" class="px-5 py-2.5 rounded-lg bg-primary text-black text-sm font-black hover:bg-amber-400 transition-colors">我已了解，开始模拟</button>
 </div>
+</section>
 </div>
 </div>
 
@@ -335,6 +356,10 @@
 (() => {
   const onboarding = document.getElementById("wheat-onboarding-modal");
   const closeOnboarding = document.getElementById("close-wheat-onboarding");
+  const onboardingBackground = document.getElementById("wheat-onboarding-background");
+  const onboardingGameplay = document.getElementById("wheat-onboarding-gameplay");
+  const onboardingToGameplay = document.getElementById("wheat-onboarding-to-gameplay");
+  const onboardingBack = document.getElementById("wheat-onboarding-back");
   const openGuide = document.getElementById("open-guide-tip");
   const guideModal = document.getElementById("guide-tip-modal");
   const closeGuide = document.getElementById("close-guide-tip");
@@ -342,7 +367,148 @@
   const regionToast = document.getElementById("region-tip-toast");
   const droughtEvolve = document.getElementById("drought-option-evolve");
   const droughtIgnore = document.getElementById("drought-option-ignore");
+  const eventTitle = document.getElementById("wheat-event-title");
+  const eventType = document.getElementById("wheat-event-type");
+  const eventDesc = document.getElementById("wheat-event-desc");
+  const optionATitle = document.getElementById("wheat-option-a-title");
+  const optionADesc = document.getElementById("wheat-option-a-desc");
+  const optionBTitle = document.getElementById("wheat-option-b-title");
+  const optionBDesc = document.getElementById("wheat-option-b-desc");
+  const populationValue = document.getElementById("wheat-population-value");
+  const landValue = document.getElementById("wheat-land-value");
+  const dnaValue = document.getElementById("wheat-dna-value");
+  const briefList = document.getElementById("wheat-brief-list");
+  const goNextScene = document.getElementById("go-next-scene");
   const droughtFeedback = document.getElementById("drought-feedback");
+  if (!droughtEvolve || !droughtIgnore || !droughtFeedback || !goNextScene) return;
+
+  const resolveNextHref = (fallback) => {
+    try {
+      const match = window.location.pathname.match(/\/experiences\/([^/?#]+)\.html/i);
+      const slug = match && match[1] ? decodeURIComponent(match[1]) : "";
+      const books = Array.isArray(window.__READO_BOOK_CATALOG__?.books) ? window.__READO_BOOK_CATALOG__.books : [];
+      for (const book of books) {
+        const modules = Array.isArray(book?.moduleSlugs) ? book.moduleSlugs : [];
+        const index = modules.indexOf(slug);
+        if (index >= 0) {
+          const nextSlug = modules[index + 1];
+          return nextSlug ? `/experiences/${encodeURIComponent(nextSlug)}.html` : (book.hubHref || fallback);
+        }
+      }
+    } catch {}
+    return fallback;
+  };
+
+  const nextHref = resolveNextHref("/experiences/human-domestication-dilemma-1.html");
+  const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+  const shuffle = (input) => {
+    const next = [...input];
+    for (let i = next.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const tmp = next[i];
+      next[i] = next[j];
+      next[j] = tmp;
+    }
+    return next;
+  };
+
+  const eventPool = [
+    {
+      title: "严重干旱",
+      type: "环境危机事件",
+      desc: "地中海东部降水骤减，小麦幼苗存活率快速下滑，传播网络正在收缩。",
+      a: {
+        title: "演化耐旱根系",
+        desc: "消耗 15 DNA，提升抗旱能力并稳住核心产区。",
+        costDna: 15,
+        effect: { dna: -15, population: 860, land: 38, survival: 7 },
+        feedback: "耐旱根系生效，核心产区恢复，智人对灌溉系统依赖进一步加深。"
+      },
+      b: {
+        title: "强制迁徙灌溉",
+        desc: "不消耗 DNA，要求更多人力修渠保产。",
+        effect: { dna: 0, population: -520, land: -25, survival: -5 },
+        feedback: "短期撑住了耕种，但劳作负担提升，区域扩张明显放缓。"
+      }
+    },
+    {
+      title: "病虫害爆发",
+      type: "生物风险事件",
+      desc: "新出现的真菌病害正在侵蚀谷粒，多个聚落出现减产预警。",
+      a: {
+        title: "改良抗病表皮",
+        desc: "消耗 12 DNA，提升谷壳抗病性。",
+        costDna: 12,
+        effect: { dna: -12, population: 740, land: 26, survival: 6 },
+        feedback: "抗病特征扩散后，粮食损失下降，扩张节奏恢复。"
+      },
+      b: {
+        title: "放任自然筛选",
+        desc: "保留 DNA，等待弱势种群被动淘汰。",
+        effect: { dna: 0, population: -680, land: -30, survival: -6 },
+        feedback: "你保住了 DNA 储备，但病害造成的区域损失持续扩大。"
+      }
+    },
+    {
+      title: "贸易路线打开",
+      type: "扩散窗口事件",
+      desc: "迁徙人群打通了新的商路，小麦有机会进入陌生生态带。",
+      a: {
+        title: "定向进化运输性状",
+        desc: "消耗 10 DNA，提升储运稳定性，跨区域扩散加速。",
+        costDna: 10,
+        effect: { dna: -10, population: 980, land: 62, survival: 4 },
+        feedback: "小麦跟随贸易队快速扩散，传播面积显著增加。"
+      },
+      b: {
+        title: "维持本地扩张",
+        desc: "避免远距离传播风险，继续深耕核心区域。",
+        effect: { dna: 0, population: 260, land: 12, survival: 2 },
+        feedback: "你选择稳健推进，风险较低但错过了大规模扩散窗口。"
+      }
+    },
+    {
+      title: "劳作反弹",
+      type: "社会摩擦事件",
+      desc: "长期高强度农作导致部分部落回归采集，定居秩序出现波动。",
+      a: {
+        title: "提高单位产出",
+        desc: "消耗 14 DNA，改良穗粒密度，缓解人力压力。",
+        costDna: 14,
+        effect: { dna: -14, population: 620, land: 24, survival: 5 },
+        feedback: "单位产出提升后，部落回流耕种，定居网络趋稳。"
+      },
+      b: {
+        title: "维持高压劳作",
+        desc: "继续用人力硬撑生产，不做基因升级。",
+        effect: { dna: 0, population: -740, land: -18, survival: -7 },
+        feedback: "高压劳作短期有效，但社会摩擦加剧，扩张质量下降。"
+      }
+    },
+    {
+      title: "河谷洪涝",
+      type: "极端气候事件",
+      desc: "连续洪涝冲毁低地农田，原有聚落面临迁移与减产双重压力。",
+      a: {
+        title: "进化耐涝结构",
+        desc: "消耗 13 DNA，降低洪涝季减产幅度。",
+        costDna: 13,
+        effect: { dna: -13, population: 700, land: 28, survival: 6 },
+        feedback: "耐涝特性让你守住了关键耕地，损失被控制在可恢复范围。"
+      },
+      b: {
+        title: "放弃低地农田",
+        desc: "保留 DNA，直接撤出受灾地带。",
+        effect: { dna: 0, population: -620, land: -34, survival: -5 },
+        feedback: "你避免了持续投入，但扩张版图出现明显回撤。"
+      }
+    }
+  ];
+
+  const rounds = shuffle(eventPool).slice(0, 3);
+  const state = { dna: 45, population: 14205, land: 840, survival: 72 };
+  let roundIndex = 0;
+  let locked = false;
 
   const hideGuide = () => {
     if (!guideModal) return;
@@ -355,9 +521,28 @@
     guideModal.classList.add("flex");
   };
 
+  const setOnboardingStep = (step) => {
+    if (!onboardingBackground || !onboardingGameplay) return;
+    const showBackground = step === "background";
+    onboardingBackground.classList.toggle("hidden", !showBackground);
+    onboardingGameplay.classList.toggle("hidden", showBackground);
+  };
+
   if (closeOnboarding && onboarding) {
     closeOnboarding.addEventListener("click", () => {
       onboarding.classList.add("hidden");
+    });
+  }
+  if (onboardingToGameplay) {
+    onboardingToGameplay.addEventListener("click", (event) => {
+      event.preventDefault();
+      setOnboardingStep("gameplay");
+    });
+  }
+  if (onboardingBack) {
+    onboardingBack.addEventListener("click", (event) => {
+      event.preventDefault();
+      setOnboardingStep("background");
     });
   }
 
@@ -375,6 +560,112 @@
     });
   }
 
+  const renderStats = () => {
+    if (populationValue) populationValue.textContent = state.population.toLocaleString("en-US");
+    if (landValue) landValue.textContent = String(state.land);
+    if (dnaValue) dnaValue.textContent = String(state.dna);
+  };
+
+  const pushBrief = (tag, message, tone) => {
+    if (!briefList) return;
+    const color = tone === "bad" ? "text-red-400" : tone === "good" ? "text-secondary" : "text-slate-300";
+    const node = document.createElement("div");
+    node.className = `text-sm ${color}`;
+    node.innerHTML = `<div class="text-xs text-slate-500 mb-1">${tag}</div><p>${message}</p>`;
+    briefList.prepend(node);
+    while (briefList.children.length > 6) {
+      briefList.removeChild(briefList.lastElementChild);
+    }
+  };
+
+  const setNextButtonState = (ready) => {
+    goNextScene.disabled = !ready;
+    if (ready) {
+      goNextScene.className = "px-6 py-3 rounded-xl bg-primary text-black font-black tracking-[0.08em] hover:bg-amber-400 transition shadow-[0_0_18px_rgba(245,158,11,0.45)]";
+      goNextScene.textContent = "完成本幕，进入下一幕";
+    } else {
+      goNextScene.className = "px-6 py-3 rounded-xl bg-slate-700 text-slate-300 font-black tracking-[0.08em] transition cursor-not-allowed";
+      goNextScene.textContent = `完成 3 轮事件后解锁下一幕（${roundIndex}/3）`;
+    }
+  };
+
+  const renderRound = () => {
+    const round = rounds[roundIndex];
+    if (!round) return;
+    if (eventTitle) eventTitle.textContent = `${round.title}（第 ${roundIndex + 1} / ${rounds.length} 轮）`;
+    if (eventType) eventType.textContent = round.type;
+    if (eventDesc) eventDesc.textContent = round.desc;
+    if (optionATitle) optionATitle.innerHTML = `<span class="material-icons-outlined text-sm">water_drop</span>${round.a.title}`;
+    if (optionADesc) optionADesc.textContent = round.a.desc;
+    if (optionBTitle) optionBTitle.innerHTML = `<span class="material-icons-outlined text-sm">close</span>${round.b.title}`;
+    if (optionBDesc) optionBDesc.textContent = round.b.desc;
+    droughtFeedback.className = "mt-4 text-xs text-slate-300 border-t border-slate-700 pt-3";
+    droughtFeedback.textContent = "请选择策略，系统会根据本轮事件给出实时后果。";
+  };
+
+  const applyChoice = (choiceKey) => {
+    if (locked) return;
+    const round = rounds[roundIndex];
+    if (!round) return;
+    locked = true;
+
+    const option = choiceKey === "a" ? round.a : round.b;
+    let effect = option.effect;
+    let note = option.feedback;
+    let tone = "good";
+
+    if (option.costDna && state.dna < option.costDna) {
+      effect = { dna: 0, population: -760, land: -36, survival: -8 };
+      note = "DNA 不足，升级失败。你错过了主动修复窗口，传播网络受损。";
+      tone = "bad";
+    } else if ((effect.population || 0) < 0 || (effect.land || 0) < 0 || (effect.survival || 0) < 0) {
+      tone = "bad";
+    }
+
+    state.dna = clamp(state.dna + (effect.dna || 0), 0, 180);
+    state.population = clamp(state.population + (effect.population || 0), 5000, 60000);
+    state.land = clamp(state.land + (effect.land || 0), 200, 3200);
+    state.survival = clamp(state.survival + (effect.survival || 0), 0, 100);
+    renderStats();
+
+    const delta = [
+      `人口 ${effect.population >= 0 ? "+" : ""}${effect.population || 0}`,
+      `土地 ${effect.land >= 0 ? "+" : ""}${effect.land || 0}`,
+      `DNA ${effect.dna >= 0 ? "+" : ""}${effect.dna || 0}`,
+      `生存率 ${effect.survival >= 0 ? "+" : ""}${effect.survival || 0}`
+    ].join(" | ");
+    droughtFeedback.className = `mt-4 text-xs border-t border-slate-700 pt-3 ${tone === "bad" ? "text-red-300" : "text-emerald-300"}`;
+    droughtFeedback.textContent = `${note}（${delta}）`;
+    pushBrief(`ROUND ${roundIndex + 1}`, `${round.title}：${note}`, tone);
+
+    roundIndex += 1;
+    setNextButtonState(false);
+
+    if (roundIndex >= rounds.length) {
+      droughtEvolve.disabled = true;
+      droughtIgnore.disabled = true;
+      droughtEvolve.style.opacity = "0.6";
+      droughtIgnore.style.opacity = "0.6";
+      droughtEvolve.style.cursor = "not-allowed";
+      droughtIgnore.style.cursor = "not-allowed";
+      if (eventTitle) eventTitle.textContent = "阶段结算";
+      if (eventType) eventType.textContent = "扩散结果";
+      if (eventDesc) {
+        eventDesc.textContent = state.land >= 940 && state.survival >= 74
+          ? "你在多次危机中保持了生存率与扩散面积，小麦成功把智人更深地绑定到农业系统。"
+          : "你完成了本幕，但传播质量偏弱。建议下一幕优先稳住生存率，再追求扩张速度。";
+      }
+      setNextButtonState(true);
+      locked = false;
+      return;
+    }
+
+    window.setTimeout(() => {
+      renderRound();
+      locked = false;
+    }, 320);
+  };
+
   document.querySelectorAll("[data-region-tip]").forEach((node) => {
     node.addEventListener("click", () => {
       if (!regionToast) return;
@@ -388,20 +679,24 @@
     });
   });
 
-  if (droughtEvolve && droughtFeedback) {
-    droughtEvolve.addEventListener("click", (event) => {
-      event.preventDefault();
-      droughtFeedback.textContent = "已执行：耐旱根系进化。小麦存活率提升，DNA 点数 -15。";
-      droughtFeedback.className = "mt-4 text-xs text-emerald-300 border-t border-slate-700 pt-3";
-    });
-  }
-  if (droughtIgnore && droughtFeedback) {
-    droughtIgnore.addEventListener("click", (event) => {
-      event.preventDefault();
-      droughtFeedback.textContent = "已执行：无视风险。传播区域衰减，后续扩张将更困难。";
-      droughtFeedback.className = "mt-4 text-xs text-red-300 border-t border-slate-700 pt-3";
-    });
-  }
+  droughtEvolve.addEventListener("click", (event) => {
+    event.preventDefault();
+    applyChoice("a");
+  });
+  droughtIgnore.addEventListener("click", (event) => {
+    event.preventDefault();
+    applyChoice("b");
+  });
+
+  goNextScene.addEventListener("click", (event) => {
+    event.preventDefault();
+    if (goNextScene.disabled) return;
+    window.location.href = nextHref;
+  });
+
+  renderStats();
+  renderRound();
+  setNextButtonState(false);
 })();
 </script>
 

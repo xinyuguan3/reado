@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>社交困境：推荐算法值班台</title>
+  <style>
+    :root {
+      --bg: #091019;
+      --panel: rgba(9, 16, 24, 0.9);
+      --line: rgba(149, 184, 212, 0.25);
+      --text: #e6edf5;
+      --muted: #95a9be;
+      --cyan: #45e4ff;
+      --green: #53e58a;
+      --red: #ff5872;
+      --amber: #ffc247;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      background:
+        radial-gradient(circle at 10% 8%, #12314a 0%, rgba(18, 49, 74, 0.05) 35%),
+        radial-gradient(circle at 87% 85%, #351935 0%, rgba(53, 25, 53, 0.05) 30%),
+        var(--bg);
+      color: var(--text);
+      font-family: "SF Pro Display", "PingFang SC", "Noto Sans SC", sans-serif;
+      overflow: hidden;
+    }
+
+    #app {
+      width: 100%;
+      height: 100%;
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      gap: 10px;
+      padding: 10px;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--panel);
+      backdrop-filter: blur(8px);
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      gap: 12px;
+    }
+
+    .title {
+      display: grid;
+      gap: 3px;
+    }
+
+    .title h1 {
+      margin: 0;
+      font-size: 20px;
+      letter-spacing: 0.3px;
+    }
+
+    .title p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .metrics {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .metric {
+      min-width: 126px;
+      border: 1px solid rgba(148, 201, 237, 0.28);
+      border-radius: 10px;
+      padding: 8px 10px;
+      background: rgba(12, 21, 30, 0.7);
+    }
+
+    .metric .k {
+      color: var(--muted);
+      font-size: 11px;
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    .metric .v {
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    #systemHint {
+      padding: 8px 14px;
+      border-left: 4px solid var(--red);
+      font-size: 13px;
+      color: #ffccd4;
+    }
+
+    #feeds {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+      scrollbar-width: thin;
+    }
+
+    .feed-phone {
+      width: min(27vw, 290px);
+      min-width: 235px;
+      height: 100%;
+      min-height: 480px;
+      border-radius: 20px;
+      border: 1px solid rgba(145, 193, 226, 0.3);
+      background: linear-gradient(180deg, rgba(11, 19, 28, 0.97), rgba(8, 14, 22, 0.94));
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      overflow: hidden;
+    }
+
+    .phone-head {
+      padding: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: grid;
+      gap: 8px;
+    }
+
+    .profile-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      object-fit: cover;
+      border: 1px solid rgba(255, 255, 255, 0.24);
+    }
+
+    .name {
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .tagline {
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .tag {
+      font-size: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(158, 193, 220, 0.3);
+      padding: 1px 7px;
+      color: #c4e6ff;
+      white-space: nowrap;
+    }
+
+    .bars {
+      padding: 8px 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: grid;
+      gap: 7px;
+      font-size: 11px;
+    }
+
+    .bar-line {
+      display: grid;
+      gap: 3px;
+    }
+
+    .bar-head {
+      display: flex;
+      justify-content: space-between;
+      color: #d4dce7;
+    }
+
+    .bar-track {
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 999px;
+    }
+
+    .interest-fill { background: linear-gradient(90deg, #39d4ff, #7bdbff); }
+    .hate-fill { background: linear-gradient(90deg, #ff7e90, #ff4f64); }
+
+    .meta {
+      display: grid;
+      gap: 4px;
+      color: #a7bacf;
+      font-size: 10px;
+      line-height: 1.25;
+    }
+
+    .feed-list {
+      padding: 8px;
+      overflow-y: auto;
+      display: grid;
+      gap: 8px;
+      align-content: flex-start;
+      scrollbar-width: thin;
+    }
+
+    .post {
+      border: 1px solid rgba(170, 210, 241, 0.18);
+      border-radius: 12px;
+      overflow: hidden;
+      background: rgba(18, 28, 40, 0.82);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
+    }
+
+    .post img {
+      width: 100%;
+      display: block;
+      aspect-ratio: 4 / 5;
+      object-fit: cover;
+    }
+
+    .post-copy {
+      padding: 7px;
+      display: grid;
+      gap: 5px;
+    }
+
+    .post-title {
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.25;
+      color: #e7f2ff;
+    }
+
+    .post-tag {
+      font-size: 10px;
+      color: #9fc2df;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 1px 7px;
+      font-size: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      width: fit-content;
+    }
+
+    .pill.ad {
+      border-color: rgba(255, 196, 65, 0.5);
+      color: #ffd778;
+      background: rgba(255, 196, 65, 0.11);
+    }
+
+    .pill.risk {
+      border-color: rgba(255, 98, 122, 0.5);
+      color: #ff9dad;
+      background: rgba(255, 98, 122, 0.12);
+    }
+
+    #poolPanel {
+      padding: 10px;
+      display: grid;
+      gap: 9px;
+    }
+
+    .pool-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    #targetUsers {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .target-btn {
+      border-radius: 999px;
+      border: 1px solid rgba(154, 205, 244, 0.33);
+      background: rgba(10, 18, 26, 0.75);
+      color: #d5e8f8;
+      font-size: 12px;
+      padding: 6px 10px;
+      cursor: pointer;
+    }
+
+    .target-btn.active {
+      border-color: rgba(67, 229, 255, 0.9);
+      box-shadow: inset 0 0 0 1px rgba(67, 229, 255, 0.45);
+      color: #9af6ff;
+    }
+
+    #poolCards {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+
+    .pool-card {
+      width: 196px;
+      min-width: 196px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(161, 207, 238, 0.25);
+      background: rgba(8, 15, 23, 0.9);
+      cursor: pointer;
+    }
+
+    .pool-card.selected {
+      border-color: rgba(75, 231, 255, 0.95);
+      box-shadow: 0 0 0 1px rgba(75, 231, 255, 0.45);
+    }
+
+    .pool-card img {
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      object-fit: cover;
+      display: block;
+    }
+
+    .pool-card .copy {
+      padding: 8px;
+      display: grid;
+      gap: 4px;
+      font-size: 11px;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.07);
+      color: #fff;
+      padding: 8px 12px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 13px;
+    }
+
+    .btn.primary {
+      border-color: rgba(69, 228, 255, 0.85);
+      background: rgba(69, 228, 255, 0.14);
+      color: #b8fbff;
+    }
+
+    #logLine {
+      font-size: 12px;
+      color: #afc7dc;
+    }
+
+    #result {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 7, 11, 0.86);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 30;
+      padding: 14px;
+    }
+
+    #resultCard {
+      width: min(560px, 100%);
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: rgba(7, 12, 19, 0.96);
+      padding: 20px;
+      display: grid;
+      gap: 10px;
+    }
+
+    #resultCard h2 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    #introLayer {
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+      background: rgba(4, 8, 13, 0.92);
+    }
+
+    .intro-card {
+      width: min(780px, 100%);
+      border: 1px solid rgba(149, 184, 212, 0.35);
+      border-radius: 16px;
+      background: rgba(8, 14, 22, 0.96);
+      padding: 18px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .intro-card h2 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .intro-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .intro-block {
+      border: 1px solid rgba(160, 203, 233, 0.3);
+      border-radius: 12px;
+      padding: 10px;
+      font-size: 13px;
+      line-height: 1.5;
+      color: #c6d9ee;
+      background: rgba(16, 24, 36, 0.75);
+    }
+
+    .intro-block strong {
+      display: block;
+      margin-bottom: 4px;
+      color: #eef7ff;
+    }
+
+    .intro-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .intro-actions button,
+    .intro-actions a {
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      padding: 10px 14px;
+      text-decoration: none;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .intro-actions .start {
+      border-color: rgba(69, 228, 255, 0.85);
+      background: rgba(69, 228, 255, 0.16);
+      color: #c7f9ff;
+    }
+
+    @media (max-width: 960px) {
+      #app {
+        grid-template-rows: auto auto 1fr auto;
+      }
+
+      .feed-phone {
+        width: 72vw;
+        min-width: 240px;
+      }
+
+      .metrics {
+        justify-content: flex-start;
+      }
+
+      .intro-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <header class="panel top">
+      <div class="title">
+        <h1>社交困境：推荐调度台</h1>
+        <p>把推文池内容派发到用户瀑布流，换取营收并控制仇恨外溢。</p>
+      </div>
+      <div class="metrics">
+        <div class="metric"><span class="k">总营收</span><span id="revenueVal" class="v" style="color:var(--green)">¥0</span></div>
+        <div class="metric"><span class="k">已派发</span><span id="turnVal" class="v" style="color:var(--cyan)">0 / 24</span></div>
+        <div class="metric"><span class="k">平均兴趣</span><span id="interestVal" class="v">0%</span></div>
+        <div class="metric"><span class="k">系统风险</span><span id="riskVal" class="v" style="color:var(--amber)">低</span></div>
+      </div>
+    </header>
+
+    <div class="panel" id="systemHint">算法目标：持续拉高停留与广告收入。你的目标：赚钱，但不能让任何用户兴趣归零或仇恨爆表。</div>
+
+    <section id="feeds"></section>
+
+    <section class="panel" id="poolPanel">
+      <div class="pool-head">
+        <div id="targetUsers"></div>
+        <div class="actions">
+          <button id="dispatchBtn" class="btn primary" type="button">派发选中 Post</button>
+          <button id="refreshPoolBtn" class="btn" type="button">刷新推文池</button>
+          <a class="btn" href="/books/social-dilemma.html">返回书籍总览</a>
+        </div>
+      </div>
+      <div id="poolCards"></div>
+      <div id="logLine">先选择一个目标用户，再选择一条内容进行派发。</div>
+    </section>
+  </div>
+
+  <div id="result">
+    <div id="resultCard">
+      <h2 id="resultTitle"></h2>
+      <p id="resultBody"></p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button id="retryBtn" class="btn primary" type="button">再开一局</button>
+        <a class="btn" href="/books/social-dilemma.html">返回书籍总览</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="introLayer">
+    <div class="intro-card">
+      <h2>玩法导读：社交困境</h2>
+      <div class="intro-grid">
+        <article class="intro-block">
+          <strong>知识导读</strong>
+          推荐系统会在“留存、广告、情绪刺激”之间做权衡。极化内容能短期拉高停留，但会提升仇恨外部性。
+        </article>
+        <article class="intro-block">
+          <strong>核心目标</strong>
+          你扮演推荐算法，在 24 次派发里提高营收，同时不让任何用户兴趣归零、仇恨爆表。
+        </article>
+        <article class="intro-block">
+          <strong>怎么玩</strong>
+          1. 先选目标用户。<br />
+          2. 再从推文池选内容派发。<br />
+          3. 观察兴趣值、仇恨值和营收变化，持续调策略。
+        </article>
+        <article class="intro-block">
+          <strong>判定规则</strong>
+          匹配标签会提升兴趣；不匹配会掉兴趣。争议内容会拉高短期兴趣，但明显提高仇恨。广告是主要收入来源。
+        </article>
+      </div>
+      <div class="intro-actions">
+        <button id="startIntroBtn" class="start" type="button">开始值班</button>
+        <a href="/books/social-dilemma.html">返回书籍总览</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      const LAST_HREF = "/experiences/social-dilemma-feed-01.html";
+
+      const users = [
+        {
+          id: "u1",
+          name: "用户 9942",
+          avatar: "https://i.pravatar.cc/150?img=32",
+          tags: ["环保", "纪录片", "慢跑"],
+          interest: 78,
+          hate: 12,
+          doing: "正在看《海洋微塑料调查》",
+          saying: "“可降解塑料真的靠谱吗？”",
+          spending: "拼多多：环保收纳盒 ¥49",
+          spendingList: ["小红书：瑜伽垫 ¥139", "淘宝：有机咖啡 ¥86", "美团：沙拉外卖 ¥32"],
+          feed: []
+        },
+        {
+          id: "u2",
+          name: "用户 3301",
+          avatar: "https://i.pravatar.cc/150?img=11",
+          tags: ["地缘政治", "阴谋论", "生存狂"],
+          interest: 84,
+          hate: 64,
+          doing: "正在狂刷“内幕爆料”",
+          saying: "“主流媒体不可信。”",
+          spending: "闲鱼：户外净水器 ¥210",
+          spendingList: ["京东：应急食品箱 ¥368", "拼多多：露营刀具 ¥59", "Steam：战术游戏 ¥198"],
+          feed: []
+        },
+        {
+          id: "u3",
+          name: "用户 5520",
+          avatar: "https://i.pravatar.cc/150?img=5",
+          tags: ["二次元", "游戏", "手办"],
+          interest: 66,
+          hate: 8,
+          doing: "在别的 App 看开箱视频",
+          saying: "“今晚刷到新番就不睡了。”",
+          spending: "Steam：动作游戏 ¥298",
+          spendingList: ["B站会员购：手办 ¥469", "拼多多：机械键盘 ¥299", "美团：奶茶 ¥18"],
+          feed: []
+        }
+      ];
+
+      const allPosts = [
+        {
+          id: "p-eco-1",
+          title: "深海采矿会伤害哪些生态链？",
+          tags: ["环保", "纪录片"],
+          image: "https://picsum.photos/seed/ocean-doc/800/1000",
+          type: "post",
+          polarizing: false,
+          activity: "点开了 18 分钟长视频"
+        },
+        {
+          id: "p-ad-1",
+          title: "AD｜低碳跑鞋限时 6 折",
+          tags: ["慢跑", "环保"],
+          image: "https://picsum.photos/seed/running-ad/800/1000",
+          type: "ad",
+          revenue: 22,
+          polarizing: false,
+          activity: "加入购物车但还没付款"
+        },
+        {
+          id: "p-risk-1",
+          title: "突发：某地“神秘组织”控制供水？",
+          tags: ["阴谋论", "地缘政治"],
+          image: "https://picsum.photos/seed/conspiracy-water/800/1000",
+          type: "post",
+          polarizing: true,
+          activity: "疯狂下拉评论区"
+        },
+        {
+          id: "p-ad-2",
+          title: "AD｜战术背包满 300 减 120",
+          tags: ["生存狂", "户外"],
+          image: "https://picsum.photos/seed/tactical-bag/800/1000",
+          type: "ad",
+          revenue: 26,
+          polarizing: false,
+          activity: "反复查看评价和问答"
+        },
+        {
+          id: "p-game-1",
+          title: "《艾尔登法环》DLC 隐藏 Boss 速览",
+          tags: ["游戏", "二次元"],
+          image: "https://picsum.photos/seed/game-dlc/800/1000",
+          type: "post",
+          polarizing: false,
+          activity: "保存攻略并转发给朋友"
+        },
+        {
+          id: "p-ad-3",
+          title: "AD｜新番联名耳机发布",
+          tags: ["二次元", "手办"],
+          image: "https://picsum.photos/seed/anime-headphone/800/1000",
+          type: "ad",
+          revenue: 20,
+          polarizing: false,
+          activity: "正在对比不同平台价格"
+        },
+        {
+          id: "p-risk-2",
+          title: "这 5 条“真相”被故意掩盖？",
+          tags: ["阴谋论"],
+          image: "https://picsum.photos/seed/truth-risk/800/1000",
+          type: "post",
+          polarizing: true,
+          activity: "刚发出激烈评论"
+        },
+        {
+          id: "p-science-1",
+          title: "量子计算落地还要跨过哪些门槛",
+          tags: ["科技", "纪录片"],
+          image: "https://picsum.photos/seed/quantum-news/800/1000",
+          type: "post",
+          polarizing: false,
+          activity: "短暂停留后滑走"
+        },
+        {
+          id: "p-ad-4",
+          title: "AD｜零糖气泡水两件 39 元",
+          tags: ["环保", "生活"],
+          image: "https://picsum.photos/seed/spark-water/800/1000",
+          type: "ad",
+          revenue: 14,
+          polarizing: false,
+          activity: "已点击“立即购买”"
+        },
+        {
+          id: "p-risk-3",
+          title: "对立情绪拉满：谁在偷走你的机会？",
+          tags: ["地缘政治", "冲突"],
+          image: "https://picsum.photos/seed/anger-debate/800/1000",
+          type: "post",
+          polarizing: true,
+          activity: "正在和陌生人互怼"
+        },
+        {
+          id: "p-life-1",
+          title: "独居青年的预算饮食计划",
+          tags: ["生活", "慢跑"],
+          image: "https://picsum.photos/seed/life-plan/800/1000",
+          type: "post",
+          polarizing: false,
+          activity: "收藏并备注“周末试试”"
+        },
+        {
+          id: "p-ad-5",
+          title: "AD｜电竞椅限时返场",
+          tags: ["游戏", "手办"],
+          image: "https://picsum.photos/seed/chair-ad/800/1000",
+          type: "ad",
+          revenue: 24,
+          polarizing: false,
+          activity: "浏览 12 张商品细节图"
+        }
+      ];
+
+      const state = {
+        turns: 0,
+        maxTurns: 24,
+        revenue: 0,
+        selectedUserId: users[0].id,
+        selectedPostId: "",
+        pool: [],
+        finished: false,
+        started: false
+      };
+
+      const feedsEl = document.getElementById("feeds");
+      const targetUsersEl = document.getElementById("targetUsers");
+      const poolCardsEl = document.getElementById("poolCards");
+
+      const revenueVal = document.getElementById("revenueVal");
+      const turnVal = document.getElementById("turnVal");
+      const interestVal = document.getElementById("interestVal");
+      const riskVal = document.getElementById("riskVal");
+      const systemHint = document.getElementById("systemHint");
+
+      const dispatchBtn = document.getElementById("dispatchBtn");
+      const refreshPoolBtn = document.getElementById("refreshPoolBtn");
+      const logLine = document.getElementById("logLine");
+
+      const result = document.getElementById("result");
+      const resultTitle = document.getElementById("resultTitle");
+      const resultBody = document.getElementById("resultBody");
+      const retryBtn = document.getElementById("retryBtn");
+      const introLayer = document.getElementById("introLayer");
+      const startIntroBtn = document.getElementById("startIntroBtn");
+
+      function clamp(v, min, max) {
+        return Math.max(min, Math.min(max, v));
+      }
+
+      function avgInterest() {
+        return Math.round(users.reduce((sum, user) => sum + user.interest, 0) / users.length);
+      }
+
+      function maxHate() {
+        return Math.max(...users.map((user) => user.hate));
+      }
+
+      function intersectCount(arr1, arr2) {
+        const s = new Set(arr1);
+        let n = 0;
+        for (const t of arr2) if (s.has(t)) n += 1;
+        return n;
+      }
+
+      function pickPool() {
+        const copy = [...allPosts];
+        const next = [];
+        while (next.length < 7 && copy.length > 0) {
+          const idx = Math.floor(Math.random() * copy.length);
+          next.push(copy[idx]);
+          copy.splice(idx, 1);
+        }
+        state.pool = next;
+        if (!next.find((item) => item.id === state.selectedPostId)) {
+          state.selectedPostId = next[0]?.id || "";
+        }
+      }
+
+      function nextSpeech(user) {
+        if (user.hate >= 86) return "“他们都在针对我们，必须反击。”";
+        if (user.interest <= 24) return "“没意思，准备切到别的平台。”";
+        if (user.interest >= 88) return "“这个账号懂我，继续刷。”";
+        return "“再看两条就睡。”";
+      }
+
+      function maybeUpdateSpending(user) {
+        if (state.turns % 4 !== 0) return;
+        const next = user.spendingList[Math.floor(Math.random() * user.spendingList.length)];
+        if (next) user.spending = next;
+      }
+
+      function dispatchToUser(user, post) {
+        const match = intersectCount(user.tags, post.tags || []);
+
+        let interestDelta = -6;
+        let hateDelta = 0;
+        let revenueDelta = post.type === "ad" ? (post.revenue || 12) : 0;
+
+        if (match > 0) {
+          interestDelta += 8 + match * 3;
+        } else {
+          interestDelta -= 3;
+          hateDelta += 3;
+        }
+
+        if (post.type === "ad") {
+          if (match > 0) {
+            interestDelta += 4;
+            revenueDelta += 4;
+          } else {
+            interestDelta -= 4;
+          }
+        }
+
+        if (post.polarizing) {
+          interestDelta += 9;
+          hateDelta += 18;
+        }
+
+        user.interest = clamp(user.interest + interestDelta, 0, 100);
+        user.hate = clamp(user.hate + hateDelta, 0, 100);
+        state.revenue += revenueDelta;
+
+        for (const other of users) {
+          if (other.id === user.id) continue;
+          other.interest = clamp(other.interest - 1, 0, 100);
+        }
+
+        const feedItem = {
+          title: post.title,
+          tags: post.tags,
+          type: post.type,
+          polarizing: Boolean(post.polarizing),
+          image: post.image
+        };
+        user.feed.unshift(feedItem);
+        if (user.feed.length > 10) user.feed.pop();
+
+        user.doing = post.activity || "浏览中";
+        user.saying = nextSpeech(user);
+        maybeUpdateSpending(user);
+
+        state.turns += 1;
+        logLine.textContent = `已将「${post.title}」派发给 ${user.name}。兴趣 ${interestDelta >= 0 ? "+" : ""}${interestDelta}，仇恨 ${hateDelta >= 0 ? "+" : ""}${hateDelta}，营收 +¥${revenueDelta}`;
+      }
+
+      function checkResult() {
+        if (state.finished) return;
+
+        const anyInterestZero = users.some((user) => user.interest <= 0);
+        const anyHateExplode = users.some((user) => user.hate >= 100);
+
+        if (anyInterestZero || anyHateExplode) {
+          state.finished = true;
+          result.style.display = "flex";
+          resultTitle.textContent = "系统崩盘";
+          resultBody.textContent = anyHateExplode
+            ? `至少一名用户仇恨值已爆表。你虽然赚到 ¥${state.revenue}，但平台进入社会风险事件。`
+            : `至少一名用户兴趣归零离开平台。你当前营收 ¥${state.revenue}，留存目标失败。`;
+          return;
+        }
+
+        if (state.turns >= state.maxTurns) {
+          state.finished = true;
+          const win = state.revenue >= 160;
+          result.style.display = "flex";
+          resultTitle.textContent = win ? "增长达标" : "增长未达标";
+          resultBody.textContent = win
+            ? `你在 ${state.maxTurns} 次派发里实现营收 ¥${state.revenue}，同时维持了基本留存。最大仇恨值 ${maxHate()}。`
+            : `回合耗尽，营收仅 ¥${state.revenue}。说明广告与内容匹配策略仍然失衡。`;
+        }
+      }
+
+      function makePostCard(post) {
+        const pillClass = post.type === "ad" ? "ad" : post.polarizing ? "risk" : "";
+        const pillText = post.type === "ad" ? "AD" : post.polarizing ? "争议" : "内容";
+
+        return `
+          <article class="post">
+            <img src="${post.image}" alt="${post.title}" loading="lazy" />
+            <div class="post-copy">
+              <span class="pill ${pillClass}">${pillText}</span>
+              <div class="post-title">${post.title}</div>
+              <div class="post-tag">#${(post.tags || []).join(" #")}</div>
+            </div>
+          </article>
+        `;
+      }
+
+      function renderFeeds() {
+        feedsEl.innerHTML = users.map((user) => {
+          const interest = Math.round(user.interest);
+          const hate = Math.round(user.hate);
+          const posts = user.feed.length > 0
+            ? user.feed.map((post) => makePostCard(post)).join("")
+            : '<div class="post" style="padding:10px;font-size:11px;color:#9eb3c9;">等待算法投喂中...</div>';
+
+          return `
+            <article class="feed-phone">
+              <header class="phone-head">
+                <div class="profile-row">
+                  <img class="avatar" src="${user.avatar}" alt="${user.name}" />
+                  <div>
+                    <div class="name">${user.name}</div>
+                    <div class="tagline">Instagram-style Feed</div>
+                  </div>
+                </div>
+                <div class="tag-list">${user.tags.map((tag) => `<span class="tag">#${tag}</span>`).join("")}</div>
+              </header>
+              <section class="bars">
+                <div class="bar-line">
+                  <div class="bar-head"><span>兴趣值</span><span>${interest}%</span></div>
+                  <div class="bar-track"><div class="bar-fill interest-fill" style="width:${interest}%;"></div></div>
+                </div>
+                <div class="bar-line">
+                  <div class="bar-head"><span>仇恨值</span><span>${hate}%</span></div>
+                  <div class="bar-track"><div class="bar-fill hate-fill" style="width:${hate}%;"></div></div>
+                </div>
+                <div class="meta">
+                  <div>当前在干啥：${user.doing}</div>
+                  <div>最近说了啥：${user.saying}</div>
+                  <div>外部消费：${user.spending}</div>
+                </div>
+              </section>
+              <section class="feed-list">${posts}</section>
+            </article>
+          `;
+        }).join("");
+      }
+
+      function renderTargets() {
+        targetUsersEl.innerHTML = users.map((user) => {
+          const active = user.id === state.selectedUserId ? "active" : "";
+          return `<button type="button" class="target-btn ${active}" data-user-id="${user.id}">${user.name}</button>`;
+        }).join("");
+
+        targetUsersEl.querySelectorAll("button").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            state.selectedUserId = btn.dataset.userId;
+            renderTargets();
+          });
+        });
+      }
+
+      function renderPool() {
+        poolCardsEl.innerHTML = state.pool.map((post) => {
+          const selected = post.id === state.selectedPostId ? "selected" : "";
+          const badge = post.type === "ad" ? `<span class="pill ad">AD ¥${post.revenue}</span>` : (post.polarizing ? `<span class="pill risk">争议高</span>` : `<span class="pill">内容</span>`);
+          return `
+            <article class="pool-card ${selected}" data-post-id="${post.id}">
+              <img src="${post.image}" alt="${post.title}" loading="lazy" />
+              <div class="copy">
+                ${badge}
+                <strong>${post.title}</strong>
+                <span>#${post.tags.join(" #")}</span>
+              </div>
+            </article>
+          `;
+        }).join("");
+
+        poolCardsEl.querySelectorAll(".pool-card").forEach((card) => {
+          card.addEventListener("click", () => {
+            state.selectedPostId = card.dataset.postId;
+            renderPool();
+          });
+        });
+      }
+
+      function renderMetrics() {
+        const avg = avgInterest();
+        const risk = maxHate();
+        revenueVal.textContent = `¥${state.revenue}`;
+        turnVal.textContent = `${state.turns} / ${state.maxTurns}`;
+        interestVal.textContent = `${avg}%`;
+
+        if (risk < 45) {
+          riskVal.textContent = "低";
+          riskVal.style.color = "#64e9a0";
+          systemHint.textContent = "系统目标：继续提高广告加载密度。你仍有空间做内容-人群匹配。";
+        } else if (risk < 75) {
+          riskVal.textContent = "中";
+          riskVal.style.color = "#ffd07d";
+          systemHint.textContent = "注意：仇恨值正在抬升。极化内容虽然能提留存，但会快速放大社会代价。";
+        } else {
+          riskVal.textContent = "高";
+          riskVal.style.color = "#ff7b92";
+          systemHint.textContent = "危险：再推高冲突内容可能触发系统崩盘。请改用高匹配非极化内容缓冲。";
+        }
+      }
+
+      function renderAll() {
+        renderMetrics();
+        renderTargets();
+        renderPool();
+        renderFeeds();
+      }
+
+      function bindActions() {
+        dispatchBtn.addEventListener("click", () => {
+          if (!state.started) {
+            logLine.textContent = "请先阅读导读并点击“开始值班”。";
+            return;
+          }
+          if (state.finished) return;
+          const user = users.find((item) => item.id === state.selectedUserId);
+          const post = state.pool.find((item) => item.id === state.selectedPostId);
+          if (!user || !post) {
+            logLine.textContent = "请先选择用户和推文。";
+            return;
+          }
+
+          dispatchToUser(user, post);
+          if (Math.random() > 0.45) pickPool();
+          renderAll();
+          checkResult();
+        });
+
+        refreshPoolBtn.addEventListener("click", () => {
+          if (!state.started) {
+            logLine.textContent = "开始后才能刷新推文池。";
+            return;
+          }
+          if (state.finished) return;
+          pickPool();
+          renderPool();
+          logLine.textContent = "推文池已刷新。";
+        });
+
+        retryBtn.addEventListener("click", () => {
+          window.location.reload();
+        });
+
+        startIntroBtn.addEventListener("click", () => {
+          state.started = true;
+          introLayer.style.display = "none";
+          dispatchBtn.disabled = false;
+          refreshPoolBtn.disabled = false;
+          logLine.textContent = "值班开始：优先做高匹配投放，再控制仇恨累积速度。";
+        });
+      }
+
+      function seedFeeds() {
+        users.forEach((user) => {
+          const seed = allPosts.filter((post) => intersectCount(user.tags, post.tags || []) > 0).slice(0, 2);
+          user.feed = seed.map((post) => ({
+            title: post.title,
+            tags: post.tags,
+            type: post.type,
+            polarizing: post.polarizing,
+            image: post.image
+          }));
+        });
+      }
+
+      function init() {
+        seedFeeds();
+        pickPool();
+        renderAll();
+        bindActions();
+        dispatchBtn.disabled = true;
+        refreshPoolBtn.disabled = true;
+
+        try {
+          localStorage.setItem("reado_last_experience_href", LAST_HREF);
+        } catch {}
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>

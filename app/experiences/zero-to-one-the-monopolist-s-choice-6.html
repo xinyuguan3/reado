@@ -64,8 +64,8 @@
     </style>
 </head>
 <body class="bg-obsidian min-h-screen flex flex-col overflow-hidden relative selection:bg-neon-blue selection:text-obsidian">
-<script src="/shared/book-catalog.js?v=1771767926839"></script>
-<script type="module" src="/shared/shell.js?v=1771767926839"></script>
+<script src="/shared/book-catalog.js?v=1772015080593"></script>
+<script type="module" src="/shared/shell.js?v=1772015080593"></script>
 <reado-app-shell data-page="knowledge-map"></reado-app-shell>
 <div class="fixed inset-0 bg-grid-pattern bg-tech-grid pointer-events-none z-0 opacity-40"></div>
 <div class="fixed inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(5,5,5,0.9)_100%)] pointer-events-none z-0"></div>
@@ -158,16 +158,16 @@
 <div class="space-y-1">
 <div class="flex justify-between gap-8">
 <span class="text-[10px] text-gray-400">市场饱和度</span>
-<span class="text-[10px] text-red-500 font-mono">98.2%</span>
+<span id="zero-saturation-value" class="text-[10px] text-red-500 font-mono">98.2%</span>
 </div>
 <div class="flex justify-between gap-8">
 <span class="text-[10px] text-gray-400">创新边际收益</span>
-<span class="text-[10px] text-digital-green font-mono">∞ MAX</span>
+<span id="zero-edge-value" class="text-[10px] text-digital-green font-mono">∞ MAX</span>
 </div>
 </div>
 </div>
 <div class="flex flex-col items-end gap-2 font-mono">
-<div class="text-[10px] text-neon-blue animate-pulse">AWAITING_CRITICAL_DECISION...</div>
+<div id="zero-system-status" class="text-[10px] text-neon-blue animate-pulse">AWAITING_CRITICAL_DECISION...</div>
 <div class="text-[8px] text-gray-600">INPUT_REQUIRED: ALPHA_LEVEL_01</div>
 </div>
 </div>
@@ -175,7 +175,7 @@
 </div>
 <div class="mt-8 flex flex-col items-center">
 <div class="flex gap-8 w-full max-w-6xl">
-<button class="flex-1 group relative overflow-hidden border border-gray-800 bg-obsidian-light/20 hover:bg-gray-900 transition-all p-8 text-left rounded-lg hover:border-red-500/40">
+<button id="zero-option-a" class="flex-1 group relative overflow-hidden border border-gray-800 bg-obsidian-light/20 hover:bg-gray-900 transition-all p-8 text-left rounded-lg hover:border-red-500/40">
 <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-30 transition-opacity">
 <span class="material-symbols-outlined text-6xl">public</span>
 </div>
@@ -183,19 +183,19 @@
 <div class="flex items-center gap-4 mb-4">
 <div class="w-1.5 h-10 bg-gray-700 group-hover:bg-red-500 transition-colors"></div>
 <div>
-<h3 class="text-2xl font-black text-gray-300 group-hover:text-white transition-colors">全球化复制</h3>
-<span class="text-[10px] font-mono text-gray-500 tracking-widest uppercase">Horizontal Copying</span>
+<h3 id="zero-option-a-title" class="text-2xl font-black text-gray-300 group-hover:text-white transition-colors">全球化复制</h3>
+<span id="zero-option-a-tag" class="text-[10px] font-mono text-gray-500 tracking-widest uppercase">Horizontal Copying</span>
 </div>
 </div>
-<p class="text-sm text-gray-500 group-hover:text-gray-300 leading-relaxed mb-6">
+<p id="zero-option-a-desc" class="text-sm text-gray-500 group-hover:text-gray-300 leading-relaxed mb-6">
                                 将已有的成功模式扩展到更多地区 (1 → N)。属于水平进步，执行门槛低，但会迅速陷入红海竞争。
                             </p>
-<div class="mt-auto flex items-center text-[10px] font-mono text-red-500/70 group-hover:text-red-500">
-<span class="material-symbols-outlined text-sm mr-1">warning</span> 风险提示: 利润趋零
+<div id="zero-option-a-impact" class="mt-auto flex items-center text-[10px] font-mono text-red-500/70 group-hover:text-red-500">
+<span class="material-symbols-outlined text-sm mr-1">warning</span> 待评估后果
                             </div>
 </div>
 </button>
-<button class="flex-1 group relative overflow-hidden border border-neon-blue/30 bg-neon-blue/5 hover:bg-neon-blue/10 transition-all p-8 text-left rounded-lg hover:shadow-[0_0_30px_rgba(0,243,255,0.15)] hover:border-neon-blue">
+<button id="zero-option-b" class="flex-1 group relative overflow-hidden border border-neon-blue/30 bg-neon-blue/5 hover:bg-neon-blue/10 transition-all p-8 text-left rounded-lg hover:shadow-[0_0_30px_rgba(0,243,255,0.15)] hover:border-neon-blue">
 <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-30 transition-opacity">
 <span class="material-symbols-outlined text-6xl text-neon-blue">rocket_launch</span>
 </div>
@@ -203,18 +203,31 @@
 <div class="flex items-center gap-4 mb-4">
 <div class="w-1.5 h-10 bg-neon-blue shadow-[0_0_10px_rgba(0,243,255,0.5)]"></div>
 <div>
-<h3 class="text-2xl font-black text-white group-hover:text-neon-blue transition-colors">科技创新</h3>
-<span class="text-[10px] font-mono text-neon-blue/60 tracking-widest uppercase">Vertical Invention</span>
+<h3 id="zero-option-b-title" class="text-2xl font-black text-white group-hover:text-neon-blue transition-colors">科技创新</h3>
+<span id="zero-option-b-tag" class="text-[10px] font-mono text-neon-blue/60 tracking-widest uppercase">Vertical Invention</span>
 </div>
 </div>
-<p class="text-sm text-gray-400 group-hover:text-gray-200 leading-relaxed mb-6">
+<p id="zero-option-b-desc" class="text-sm text-gray-400 group-hover:text-gray-200 leading-relaxed mb-6">
                                 创造前所未有的新事物 (0 → 1)。属于垂直进步，极难执行，但能够建立稳固的垄断壁垒，改变未来。
                             </p>
-<div class="mt-auto flex items-center text-[10px] font-mono text-neon-blue">
-<span class="material-symbols-outlined text-sm mr-1">verified</span> 核心收益: 建立垄断
+<div id="zero-option-b-impact" class="mt-auto flex items-center text-[10px] font-mono text-neon-blue">
+<span class="material-symbols-outlined text-sm mr-1">verified</span> 待评估后果
                             </div>
 </div>
 </button>
+</div>
+<div class="w-full max-w-6xl mt-5 border border-glass-border bg-obsidian-light/35 rounded-lg p-4">
+<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+<p id="zero-round-label" class="text-xs text-neon-blue font-mono tracking-[0.14em] uppercase">Round 1 / 3</p>
+<p id="zero-scoreboard" class="text-xs text-gray-300 font-mono tracking-[0.08em]">壁垒 58 | 现金流 62 | 确定性 55</p>
+</div>
+<p id="zero-event-brief" class="mt-2 text-sm text-gray-300 leading-relaxed">选择任一策略，开始随机事件推演。</p>
+<p id="zero-feedback" class="mt-3 text-xs text-gray-400 border-t border-glass-border pt-3">系统提示：你每次选择都会影响“市场饱和度”与“创新边际收益”。</p>
+<div class="mt-4 flex justify-end">
+<button id="zero-next-btn" class="hidden px-5 py-2.5 rounded-md bg-neon-blue text-obsidian text-sm font-black tracking-wider hover:bg-cyan-300 transition-colors">
+进入下一幕
+</button>
+</div>
 </div>
 </div>
 </main>
@@ -222,8 +235,344 @@
 <div class="fixed top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-neon-blue/20 to-transparent z-50"></div>
 <div class="fixed bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-neon-blue/20 to-transparent z-50"></div>
 
+<div id="zero-onboarding-modal" class="fixed inset-0 z-[130] bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+<div class="w-full max-w-3xl rounded-2xl border border-neon-blue/35 bg-obsidian/95 shadow-[0_20px_70px_rgba(0,0,0,0.65)] overflow-hidden">
+<div class="px-6 py-4 border-b border-neon-blue/20 bg-gradient-to-r from-neon-blue/15 to-transparent">
+<p class="text-xs uppercase tracking-[0.24em] text-neon-blue font-black">开场引导 · 0到1</p>
+</div>
+<section id="zero-onboarding-background" class="px-6 py-5 space-y-4">
+<h2 class="text-2xl font-black text-white">背景知识：为什么要追求 0 → 1</h2>
+<p class="text-sm text-gray-300 leading-relaxed">这幕核心问题来自《从0到1》：复制成熟模式是 1→N，创造不可替代能力是 0→1。你要在增长速度、现金压力与护城河之间做取舍。</p>
+<div class="grid md:grid-cols-3 gap-3 text-xs">
+<div class="rounded-lg border border-white/10 bg-obsidian-light/60 p-3">
+<p class="text-neon-blue font-bold mb-1">核心概念</p>
+<p class="text-gray-300">垂直创新会更慢，但更可能形成垄断位势。</p>
+</div>
+<div class="rounded-lg border border-white/10 bg-obsidian-light/60 p-3">
+<p class="text-neon-blue font-bold mb-1">结构矛盾</p>
+<p class="text-gray-300">短期利润和长期壁垒经常冲突，决策不能只看当下增长。</p>
+</div>
+<div class="rounded-lg border border-white/10 bg-obsidian-light/60 p-3">
+<p class="text-neon-blue font-bold mb-1">本幕目标</p>
+<p class="text-gray-300">在不确定环境里，尽量提高“壁垒 + 确定性”的组合质量。</p>
+</div>
+</div>
+<div class="pt-2 flex justify-end">
+<button id="zero-onboarding-to-gameplay" data-no-next="" class="px-5 py-2.5 rounded-lg bg-neon-blue text-obsidian text-sm font-black hover:bg-cyan-300 transition-colors">继续看玩法</button>
+</div>
+</section>
+<section id="zero-onboarding-gameplay" class="hidden px-6 py-5 space-y-4">
+<h2 class="text-2xl font-black text-white">玩法说明：3 轮随机冲击决策</h2>
+<div class="space-y-2 text-sm text-gray-300 leading-relaxed">
+<p>1. 每轮会出现一个随机商业冲击，并给出两种策略。</p>
+<p>2. 你的选择会实时改变“壁垒 / 现金流 / 确定性”。</p>
+<p>3. 完成 3 轮后会触发阶段结算，并解锁“进入下一幕”。</p>
+</div>
+<div class="rounded-lg border border-neon-blue/20 bg-neon-blue/10 p-3 text-xs text-cyan-100">建议优先看“不可复制能力”的长期收益，而不是只追求短期曲线修复。</div>
+<div class="pt-2 flex justify-between gap-2">
+<button id="zero-onboarding-back" data-no-next="" class="px-4 py-2 rounded-lg border border-white/15 text-gray-300 text-sm font-bold hover:bg-white/5 transition-colors">返回背景</button>
+<button id="zero-onboarding-start" data-no-next="" class="px-5 py-2.5 rounded-lg bg-neon-blue text-obsidian text-sm font-black hover:bg-cyan-300 transition-colors">开始模拟</button>
+</div>
+</section>
+</div>
+</div>
 
-<script src="/shared/experience-runtime.js?v=1771767926839"></script>
+<script>
+(() => {
+  const optionAButton = document.getElementById("zero-option-a");
+  const optionBButton = document.getElementById("zero-option-b");
+  const optionATitle = document.getElementById("zero-option-a-title");
+  const optionBTitle = document.getElementById("zero-option-b-title");
+  const optionATag = document.getElementById("zero-option-a-tag");
+  const optionBTag = document.getElementById("zero-option-b-tag");
+  const optionADesc = document.getElementById("zero-option-a-desc");
+  const optionBDesc = document.getElementById("zero-option-b-desc");
+  const optionAImpact = document.getElementById("zero-option-a-impact");
+  const optionBImpact = document.getElementById("zero-option-b-impact");
+  const roundLabel = document.getElementById("zero-round-label");
+  const scoreboard = document.getElementById("zero-scoreboard");
+  const eventBrief = document.getElementById("zero-event-brief");
+  const feedback = document.getElementById("zero-feedback");
+  const saturationValue = document.getElementById("zero-saturation-value");
+  const edgeValue = document.getElementById("zero-edge-value");
+  const systemStatus = document.getElementById("zero-system-status");
+  const nextButton = document.getElementById("zero-next-btn");
+  const onboardingModal = document.getElementById("zero-onboarding-modal");
+  const onboardingBackground = document.getElementById("zero-onboarding-background");
+  const onboardingGameplay = document.getElementById("zero-onboarding-gameplay");
+  const onboardingToGameplay = document.getElementById("zero-onboarding-to-gameplay");
+  const onboardingBack = document.getElementById("zero-onboarding-back");
+  const onboardingStart = document.getElementById("zero-onboarding-start");
+  if (!optionAButton || !optionBButton || !nextButton) return;
+
+  const setOnboardingStep = (step) => {
+    if (!onboardingBackground || !onboardingGameplay) return;
+    const showBackground = step === "background";
+    onboardingBackground.classList.toggle("hidden", !showBackground);
+    onboardingGameplay.classList.toggle("hidden", showBackground);
+  };
+
+  if (onboardingToGameplay) {
+    onboardingToGameplay.addEventListener("click", (event) => {
+      event.preventDefault();
+      setOnboardingStep("gameplay");
+    });
+  }
+  if (onboardingBack) {
+    onboardingBack.addEventListener("click", (event) => {
+      event.preventDefault();
+      setOnboardingStep("background");
+    });
+  }
+  if (onboardingStart && onboardingModal) {
+    onboardingStart.addEventListener("click", (event) => {
+      event.preventDefault();
+      onboardingModal.classList.add("hidden");
+    });
+  }
+
+  const resolveNextHref = (fallback) => {
+    try {
+      const match = window.location.pathname.match(/\/experiences\/([^/?#]+)\.html/i);
+      const slug = match && match[1] ? decodeURIComponent(match[1]) : "";
+      const books = Array.isArray(window.__READO_BOOK_CATALOG__?.books) ? window.__READO_BOOK_CATALOG__.books : [];
+      for (const book of books) {
+        const modules = Array.isArray(book?.moduleSlugs) ? book.moduleSlugs : [];
+        const index = modules.indexOf(slug);
+        if (index >= 0) {
+          const nextSlug = modules[index + 1];
+          return nextSlug ? `/experiences/${encodeURIComponent(nextSlug)}.html` : (book.hubHref || fallback);
+        }
+      }
+    } catch {}
+    return fallback;
+  };
+
+  const nextHref = resolveNextHref("/experiences/zero-to-one-the-monopolist-s-choice-7.html");
+  const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+  const shuffle = (input) => {
+    const next = [...input];
+    for (let i = next.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const tmp = next[i];
+      next[i] = next[j];
+      next[j] = tmp;
+    }
+    return next;
+  };
+  const formatDelta = (value, key) => {
+    const labelMap = { moat: "壁垒", cash: "现金流", certainty: "确定性" };
+    const sign = value >= 0 ? "+" : "";
+    return `${labelMap[key]} ${sign}${value}`;
+  };
+
+  const eventPool = [
+    {
+      title: "巨头复制突袭",
+      brief: "一家平台型巨头准备复制你的产品功能，并用补贴争夺首批用户。",
+      a: {
+        title: "立刻扩量抢占",
+        tag: "Scale First",
+        desc: "优先铺渠道和投放，用速度换市场覆盖。",
+        hint: "现金压力上升，壁垒不一定增强。",
+        effect: { moat: -4, cash: -9, certainty: 4 },
+        feedback: "你赢得了声量，但因同质化竞争，护城河并未同步拉开。"
+      },
+      b: {
+        title: "深挖核心技术",
+        tag: "Build Moat",
+        desc: "延后扩张，聚焦不可替代能力，做小而深的垄断。",
+        hint: "短期增长变慢，但边际收益更稳。",
+        effect: { moat: 9, cash: -3, certainty: 6 },
+        feedback: "你选择了 0→1 的路径：速度慢，但可复制性显著下降。"
+      }
+    },
+    {
+      title: "关键人才流失",
+      brief: "核心工程师收到高薪挖角，团队对未来路线出现分歧。",
+      a: {
+        title: "提高现金激励",
+        tag: "Retention Bonus",
+        desc: "快速发放期权和签约金，优先稳住现有战力。",
+        hint: "团队稳定，但财务缓冲被侵蚀。",
+        effect: { moat: 3, cash: -8, certainty: 5 },
+        feedback: "短期阵线稳住了，但你为组织韧性支付了高现金成本。"
+      },
+      b: {
+        title: "重构产品使命",
+        tag: "Mission Reset",
+        desc: "公开技术路线图和长期愿景，用共同目标绑定人才。",
+        hint: "执行难度高，但长期确定性提升。",
+        effect: { moat: 6, cash: -2, certainty: 8 },
+        feedback: "共同愿景提高了留存质量，组织执行更接近长期主义。"
+      }
+    },
+    {
+      title: "监管窗口变化",
+      brief: "新规即将落地，合规要求将抬高行业门槛。",
+      a: {
+        title: "最低合规通过",
+        tag: "Compliance Lite",
+        desc: "仅满足底线，尽量减少流程成本。",
+        hint: "短期省钱，但未来政策不确定性增大。",
+        effect: { moat: -2, cash: 5, certainty: -6 },
+        feedback: "你保住了现金，但下一次监管变化会放大波动。"
+      },
+      b: {
+        title: "提前布局合规系统",
+        tag: "Policy Lead",
+        desc: "把合规当作产品能力提前建设，形成制度壁垒。",
+        hint: "短期投入更高，长期稳定性增强。",
+        effect: { moat: 7, cash: -4, certainty: 7 },
+        feedback: "你把规则成本转成了结构优势，竞争者更难追赶。"
+      }
+    },
+    {
+      title: "客户增长失速",
+      brief: "新增用户连续两月下滑，团队在“促销拉新”与“产品重做”之间争论。",
+      a: {
+        title: "促销换增长",
+        tag: "Promo Push",
+        desc: "用大额折扣换短期曲线修复。",
+        hint: "可能带来低质量用户。",
+        effect: { moat: -5, cash: -7, certainty: 3 },
+        feedback: "数据回暖但粘性不足，你更接近 1→N 的竞争局面。"
+      },
+      b: {
+        title: "重做核心流程",
+        tag: "Product Rebuild",
+        desc: "暂停投放，解决核心场景中的关键痛点。",
+        hint: "短期承压，长期价值更高。",
+        effect: { moat: 8, cash: -3, certainty: 6 },
+        feedback: "你用产品差异化回应增速压力，长期复利空间更大。"
+      }
+    },
+    {
+      title: "资本市场降温",
+      brief: "融资环境骤冷，下一轮估值和现金储备都面临挑战。",
+      a: {
+        title: "压缩研发续命",
+        tag: "Runway First",
+        desc: "削减高风险研发，优先延长现金跑道。",
+        hint: "稳定性上升，但创新动能下降。",
+        effect: { moat: -6, cash: 8, certainty: 4 },
+        feedback: "你换来了生存时间，但核心壁垒开始松动。"
+      },
+      b: {
+        title: "聚焦单点突破",
+        tag: "Focused 0→1",
+        desc: "砍掉非核心线，把资源集中到一项决定性创新。",
+        hint: "短期现金吃紧，若成功将显著提高定价权。",
+        effect: { moat: 10, cash: -5, certainty: 5 },
+        feedback: "你押注深度创新，若穿越不确定期可获得真正垄断位势。"
+      }
+    }
+  ];
+
+  const events = shuffle(eventPool).slice(0, 3);
+  const stats = { moat: 58, cash: 62, certainty: 55 };
+  let roundIndex = 0;
+  let isTransitioning = false;
+
+  const setScoreboard = () => {
+    if (scoreboard) {
+      scoreboard.textContent = `壁垒 ${stats.moat} | 现金流 ${stats.cash} | 确定性 ${stats.certainty}`;
+    }
+    const saturation = clamp(100 - (stats.moat * 0.65 + stats.certainty * 0.2), 10, 99.9);
+    const edge = clamp(Math.round((stats.moat * 0.55 + stats.certainty * 0.45)), 0, 100);
+    if (saturationValue) saturationValue.textContent = `${saturation.toFixed(1)}%`;
+    if (edgeValue) edgeValue.textContent = `${edge} / 100`;
+  };
+
+  const renderRound = () => {
+    const event = events[roundIndex];
+    if (!event) return;
+    if (roundLabel) roundLabel.textContent = `Round ${roundIndex + 1} / ${events.length}`;
+    if (eventBrief) eventBrief.textContent = `${event.title}：${event.brief}`;
+
+    if (optionATitle) optionATitle.textContent = event.a.title;
+    if (optionATag) optionATag.textContent = event.a.tag;
+    if (optionADesc) optionADesc.textContent = event.a.desc;
+    if (optionAImpact) optionAImpact.innerHTML = `<span class="material-symbols-outlined text-sm mr-1">warning</span>${event.a.hint}`;
+
+    if (optionBTitle) optionBTitle.textContent = event.b.title;
+    if (optionBTag) optionBTag.textContent = event.b.tag;
+    if (optionBDesc) optionBDesc.textContent = event.b.desc;
+    if (optionBImpact) optionBImpact.innerHTML = `<span class="material-symbols-outlined text-sm mr-1">verified</span>${event.b.hint}`;
+  };
+
+  const setActionDisabled = (disabled) => {
+    [optionAButton, optionBButton].forEach((button) => {
+      button.disabled = disabled;
+      button.style.opacity = disabled ? "0.62" : "1";
+      button.style.cursor = disabled ? "not-allowed" : "pointer";
+    });
+  };
+
+  const applyDecision = (pick) => {
+    if (isTransitioning) return;
+    const event = events[roundIndex];
+    if (!event) return;
+    const selected = pick === "a" ? event.a : event.b;
+    isTransitioning = true;
+
+    stats.moat = clamp(stats.moat + selected.effect.moat, 0, 100);
+    stats.cash = clamp(stats.cash + selected.effect.cash, 0, 100);
+    stats.certainty = clamp(stats.certainty + selected.effect.certainty, 0, 100);
+    setScoreboard();
+
+    const deltaSummary = [
+      formatDelta(selected.effect.moat, "moat"),
+      formatDelta(selected.effect.cash, "cash"),
+      formatDelta(selected.effect.certainty, "certainty")
+    ].join(" | ");
+    if (feedback) feedback.textContent = `${selected.feedback}（${deltaSummary}）`;
+
+    roundIndex += 1;
+    if (systemStatus) {
+      systemStatus.textContent = roundIndex >= events.length
+        ? "SIMULATION_COMPLETE"
+        : `ROUND_${roundIndex + 1}_READY`;
+    }
+
+    if (roundIndex >= events.length) {
+      setActionDisabled(true);
+      const quality = (stats.moat + stats.certainty) / 2;
+      const summary = quality >= 70
+        ? "结算：你构建了更强的小而深壁垒，接近“从 0 到 1”的高确定性路径。"
+        : "结算：你保住了阶段生存，但护城河不足，后续仍可能陷入同质竞争。";
+      if (eventBrief) eventBrief.textContent = summary;
+      if (nextButton) nextButton.classList.remove("hidden");
+      isTransitioning = false;
+      return;
+    }
+
+    window.setTimeout(() => {
+      renderRound();
+      isTransitioning = false;
+    }, 320);
+  };
+
+  optionAButton.addEventListener("click", (event) => {
+    event.preventDefault();
+    applyDecision("a");
+  });
+  optionBButton.addEventListener("click", (event) => {
+    event.preventDefault();
+    applyDecision("b");
+  });
+
+  nextButton.addEventListener("click", (event) => {
+    event.preventDefault();
+    window.location.href = nextHref;
+  });
+
+  setScoreboard();
+  renderRound();
+})();
+</script>
+
+<script src="/shared/experience-runtime.js?v=1772015080593"></script>
 <script>
 (() => {
   

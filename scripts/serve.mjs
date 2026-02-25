@@ -2419,9 +2419,6 @@ function buildDynamicExperienceHtml(html, module, book) {
 <script type="module" src="/shared/shell.js"></script>
 <script src="/shared/experience-runtime.js"></script>
 <reado-app-shell data-page="knowledge-map"></reado-app-shell>`;
-  const nextHref = cleanText(module?.nextSlug) ? `/experiences/${encodeURIComponent(module.nextSlug)}.html` : "";
-  const prevHref = cleanText(module?.prevSlug) ? `/experiences/${encodeURIComponent(module.prevSlug)}.html` : "";
-  const hubHref = `/books/${encodeURIComponent(book.id)}.html`;
   const modulePagerSnippet = `
 <style>
   .reado-module-nav {
@@ -2438,29 +2435,22 @@ function buildDynamicExperienceHtml(html, module, book) {
     background: rgba(8, 15, 32, 0.86);
     box-shadow: 0 14px 32px rgba(2, 8, 20, 0.35);
     backdrop-filter: blur(6px);
+    pointer-events: none;
   }
-  .reado-module-nav a {
-    text-decoration: none;
-    border: 1px solid rgba(148, 163, 184, 0.4);
-    border-radius: 999px;
-    padding: 7px 12px;
-    color: #e2e8f0;
-    font-size: 12px;
+  .reado-module-nav .book {
+    color: #cbd5e1;
+    font-size: 11px;
     font-weight: 700;
-    line-height: 1;
-    background: rgba(15, 23, 42, 0.84);
-    transition: border-color 120ms ease, transform 120ms ease;
-  }
-  .reado-module-nav a:hover {
-    border-color: rgba(96, 165, 250, 0.88);
-    transform: translateY(-1px);
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    opacity: 0.92;
   }
   .reado-module-nav .idx {
     color: #93c5fd;
-    font-size: 11px;
+    font-size: 12px;
     letter-spacing: 0.02em;
-    font-weight: 700;
-    margin: 0 2px;
+    font-weight: 800;
+    margin: 0 0 0 2px;
     white-space: nowrap;
   }
   @media (max-width: 900px) {
@@ -2468,20 +2458,13 @@ function buildDynamicExperienceHtml(html, module, book) {
       top: auto;
       bottom: 12px;
       right: 12px;
-      left: 12px;
-      justify-content: space-between;
       border-radius: 14px;
-    }
-    .reado-module-nav .idx {
-      display: none;
     }
   }
 </style>
-<nav class="reado-module-nav" aria-label="Module navigation">
-  ${prevHref ? `<a href="${prevHref}" rel="prev">Prev</a>` : ""}
-  <a href="${hubHref}">Book</a>
+<nav class="reado-module-nav" aria-label="Module progress">
+  <span class="book">${escapeHtml(book?.title || "Book")}</span>
   <span class="idx">${escapeHtml(String(module?.index || 1))}/${escapeHtml(String(book?.moduleCount || 1))}</span>
-  ${nextHref ? `<a href="${nextHref}" rel="next">Next</a>` : ""}
 </nav>`;
 
   const completionSnippet = `

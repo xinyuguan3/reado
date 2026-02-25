@@ -61,6 +61,7 @@ const BOOK_META = {
     title: "《万历十五年》",
     price: 680,
     category: "science-knowledge",
+    categoryHint: "在财政与权力冲突中做抉择，理解制度为何会“卡死”个体。",
     tier: "大餐级",
     tags: ["谈资盲盒", "大脑健身房"],
     badgeTitle: "制度解码者",
@@ -75,6 +76,7 @@ const BOOK_META = {
     title: "《人类简史》",
     price: 620,
     category: "science-knowledge",
+    categoryHint: "用互动推演理解农业、神话与协作如何塑造人类文明。",
     tier: "简餐级",
     tags: ["谈资盲盒", "大脑健身房"],
     badgeTitle: "文明叙事官",
@@ -89,6 +91,7 @@ const BOOK_META = {
     title: "《置身事外》",
     price: 720,
     category: "career-wealth",
+    categoryHint: "在债务周期情景里练习宏观判断与风险管理思维。",
     tier: "大餐级",
     tags: ["避坑指南", "大脑健身房"],
     badgeTitle: "周期掌舵手",
@@ -103,6 +106,7 @@ const BOOK_META = {
     title: "《从零到一》",
     price: 360,
     category: "career-wealth",
+    categoryHint: "通过创业决策回合，学习如何构建不可替代的产品与护城河。",
     tier: "简餐级",
     tags: ["避坑指南", "谈资盲盒"],
     badgeTitle: "创业破局者",
@@ -111,6 +115,51 @@ const BOOK_META = {
       "真正的创新是从 0 到 1，而不是在存量市场里复制竞争。",
       "优质创业目标是构建小而深的垄断，而非价格战。",
       "长期价值来自技术壁垒、产品差异与组织执行力协同。"
+    ]
+  },
+  "delivery-rider-dilemma": {
+    title: "《外卖骑手的困境》",
+    price: 360,
+    category: "science-knowledge",
+    categoryHint: "在限时派单与评分压力中生存，直观看到算法效率与人身风险冲突。",
+    tier: "简餐级",
+    tags: ["社会观察", "决策博弈"],
+    badgeTitle: "算法夹层行者",
+    badgeIcon: "delivery_dining",
+    highlights: [
+      "评分系统会把高绩效转化为更苛刻的任务约束。",
+      "平台效率目标与个体安全目标经常发生冲突。",
+      "微观操作失误会被即时量化并转化为收入惩罚。"
+    ]
+  },
+  "social-dilemma": {
+    title: "《社交困境》",
+    price: 420,
+    category: "science-knowledge",
+    categoryHint: "扮演推荐算法拉营收，体会留存增长与社会仇恨之间的系统张力。",
+    tier: "简餐级",
+    tags: ["算法伦理", "策略模拟"],
+    badgeTitle: "流量操盘手",
+    badgeIcon: "smart_toy",
+    highlights: [
+      "内容匹配与广告收益可以短期协同，但边际上会冲突。",
+      "极化内容能提升停留，却会持续抬升社会风险。",
+      "留存、营收与公共价值往往不是同一最优解。"
+    ]
+  },
+  "story-circle-theory": {
+    title: "《故事圈理论》",
+    price: 500,
+    category: "lifestyle-creativity",
+    categoryHint: "在编剧大会中组合主题、演员与结构，学习叙事设计如何影响票房与口碑。",
+    tier: "大餐级",
+    tags: ["创作方法", "叙事设计"],
+    badgeTitle: "叙事锻造师",
+    badgeIcon: "auto_stories",
+    highlights: [
+      "通过鸿沟制造、代价选择与节拍调度搭建故事结构。",
+      "同一结构可在不同题材皮肤下迁移并保持张力。",
+      "市场反馈来自结构强度，而不是单一风格偏好。"
     ]
   }
 };
@@ -137,6 +186,9 @@ const DEFAULT_MODULE_ORDER = {
     "zero-to-one-the-monopolist-s-choice-5",
     "zero-to-one-the-monopolist-s-choice-6",
     "zero-to-one-the-monopolist-s-choice-7"
+  ],
+  "story-circle-theory": [
+    "story-writers-room-01"
   ]
 };
 
@@ -156,7 +208,14 @@ const BOOK_NAME_TO_ID = new Map([
   ["zero-to-one", "zero-to-one"],
   ["zero-to-one-addon", "zero-to-one"],
   ["从零到一", "zero-to-one"],
-  ["《从零到一》", "zero-to-one"]
+  ["《从零到一》", "zero-to-one"],
+  ["delivery-rider-dilemma", "delivery-rider-dilemma"],
+  ["外卖骑手的困境", "delivery-rider-dilemma"],
+  ["《外卖骑手的困境》", "delivery-rider-dilemma"],
+  ["social-dilemma", "social-dilemma"],
+  ["社交困境", "social-dilemma"],
+  ["《社交困境》", "social-dilemma"],
+  ["story-circle-theory", "story-circle-theory"]
 ]);
 
 function slugify(value) {
@@ -253,6 +312,8 @@ export class RuntimeBookCatalog {
       const bookMeta = BOOK_META[bookId] || {};
       const category = toText(bookMeta.category, categoryFromBookId(bookId));
       const categoryMeta = CATEGORY_META[category] || CATEGORY_META["science-knowledge"];
+      const highlightHint = Array.isArray(bookMeta.highlights) ? toText(bookMeta.highlights[0]) : "";
+      const categoryHint = toText(bookMeta.categoryHint, highlightHint || categoryMeta.hint);
       const preferredOrder = new Map(
         (DEFAULT_MODULE_ORDER[bookId] || []).map((slug, index) => [slug, index + 1])
       );
@@ -292,7 +353,7 @@ export class RuntimeBookCatalog {
         category,
         categoryLabel: categoryMeta.label,
         categoryIncludes: categoryMeta.includes,
-        categoryHint: categoryMeta.hint,
+        categoryHint,
         categoryIcon: categoryMeta.icon,
         axis: categoryMeta.axis,
         tier: toText(bookMeta.tier, "简餐级"),

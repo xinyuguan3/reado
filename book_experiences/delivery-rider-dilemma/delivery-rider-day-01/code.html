@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>外卖骑手的困境：算法压单生存局</title>
+  <style>
+    :root {
+      --bg: #111417;
+      --panel: rgba(16, 20, 27, 0.9);
+      --line: rgba(255, 255, 255, 0.12);
+      --text: #e8edf3;
+      --muted: #9aa8ba;
+      --accent: #ffdf44;
+      --danger: #ff5252;
+      --ok: #3ee38f;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      font-family: "SF Pro Display", "PingFang SC", "Noto Sans SC", sans-serif;
+      color: var(--text);
+      background: radial-gradient(circle at 20% 10%, #1f2732 0%, #0f1217 55%, #0a0d12 100%);
+      overflow: hidden;
+    }
+
+    #app {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    #mapCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background:
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        #0f1218;
+      background-size: 42px 42px, 42px 42px, auto;
+    }
+
+    #dangerVignette {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      box-shadow: inset 0 0 160px rgba(255, 34, 34, 0.02);
+      transition: box-shadow 120ms ease;
+    }
+
+    .hud {
+      position: absolute;
+      z-index: 5;
+      backdrop-filter: blur(8px);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+    }
+
+    #phoneHUD {
+      left: 14px;
+      top: 14px;
+      width: min(340px, calc(100% - 28px));
+      overflow: hidden;
+    }
+
+    .phone-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      background: #f7d835;
+      color: #171515;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .phone-body {
+      padding: 12px 14px 14px;
+      display: grid;
+      gap: 10px;
+      font-size: 13px;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .kpi {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    .danger {
+      color: var(--danger);
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    #topGoal {
+      position: absolute;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 5;
+      display: flex;
+      gap: 16px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(8, 11, 16, 0.72);
+      font-size: 13px;
+      align-items: center;
+    }
+
+    #orderBanner {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 6;
+      padding: 12px 18px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 80, 80, 0.35);
+      background: rgba(255, 61, 61, 0.16);
+      font-size: 15px;
+      font-weight: 700;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 220ms ease;
+    }
+
+    #balanceHUD {
+      position: absolute;
+      left: 50%;
+      top: 54%;
+      transform: translate(-50%, -50%);
+      z-index: 5;
+      width: min(360px, 90vw);
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: rgba(7, 10, 14, 0.72);
+      text-align: center;
+    }
+
+    .balance-track {
+      margin-top: 8px;
+      height: 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .balance-center {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: rgba(255, 255, 255, 0.45);
+      transform: translateX(-50%);
+    }
+
+    .liquid {
+      position: absolute;
+      top: 2px;
+      width: 52px;
+      height: 10px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #ff9169, #ff375f);
+      transform: translateX(-50%);
+      left: 50%;
+      transition: left 100ms linear;
+    }
+
+    #controls {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 12px;
+      z-index: 7;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      padding: 0 14px;
+      pointer-events: none;
+    }
+
+    .pad,
+    .actions {
+      pointer-events: auto;
+      display: grid;
+      gap: 8px;
+    }
+
+    .pad {
+      grid-template-columns: 56px 56px 56px;
+      grid-template-rows: 56px 56px 56px;
+      grid-template-areas:
+        ". up ."
+        "left down right"
+        ". brake .";
+    }
+
+    .actions {
+      grid-template-columns: 78px;
+      grid-template-rows: 78px 52px;
+    }
+
+    .ctrl-btn {
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #ecf2ff;
+      background: rgba(10, 14, 21, 0.86);
+      border-radius: 14px;
+      font-weight: 700;
+      font-size: 15px;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      letter-spacing: 0.5px;
+    }
+
+    .ctrl-btn.active {
+      border-color: rgba(255, 230, 130, 0.8);
+      background: rgba(255, 204, 0, 0.24);
+      color: #fffbe8;
+    }
+
+    .ctrl-up { grid-area: up; }
+    .ctrl-left { grid-area: left; }
+    .ctrl-right { grid-area: right; }
+    .ctrl-down { grid-area: down; }
+    .ctrl-brake { grid-area: brake; }
+    .ctrl-boost {
+      border-radius: 20px;
+      background: rgba(255, 82, 82, 0.24);
+      border-color: rgba(255, 82, 82, 0.5);
+    }
+
+    #resultLayer {
+      position: absolute;
+      inset: 0;
+      z-index: 8;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(3, 5, 9, 0.82);
+      padding: 20px;
+    }
+
+    .result-card {
+      width: min(520px, 100%);
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: rgba(8, 12, 18, 0.95);
+      padding: 22px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .result-card h2 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .result-card button,
+    .result-card a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      background: rgba(255, 255, 255, 0.07);
+      color: #fff;
+      padding: 10px 14px;
+      text-decoration: none;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .cta-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    #introLayer {
+      position: absolute;
+      inset: 0;
+      z-index: 12;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(2, 4, 8, 0.9);
+      padding: 20px;
+    }
+
+    .intro-card {
+      width: min(760px, 100%);
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(8, 13, 20, 0.95);
+      padding: 20px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .intro-card h2 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .intro-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      font-size: 13px;
+      color: #c7d8ea;
+    }
+
+    .intro-block {
+      border: 1px solid rgba(145, 177, 206, 0.3);
+      border-radius: 12px;
+      padding: 10px;
+      background: rgba(14, 24, 36, 0.76);
+      line-height: 1.5;
+    }
+
+    .intro-block strong {
+      display: block;
+      margin-bottom: 4px;
+      color: #eaf3ff;
+    }
+
+    .intro-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .intro-actions button,
+    .intro-actions a {
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      padding: 10px 14px;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .intro-actions .start {
+      border-color: rgba(255, 223, 68, 0.82);
+      background: rgba(255, 223, 68, 0.2);
+      color: #fff8d4;
+    }
+
+    @media (max-width: 900px) {
+      #topGoal {
+        top: auto;
+        bottom: 170px;
+        width: calc(100% - 28px);
+        justify-content: space-between;
+        transform: translateX(-50%);
+      }
+
+      #balanceHUD {
+        top: auto;
+        bottom: 240px;
+      }
+
+      #phoneHUD {
+        max-width: 100%;
+      }
+
+      .intro-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <canvas id="mapCanvas"></canvas>
+    <div id="dangerVignette"></div>
+
+    <section id="phoneHUD" class="hud">
+      <div class="phone-head">
+        <span>众包派单中</span>
+        <span id="algoState">算法监控激活</span>
+      </div>
+      <div class="phone-body">
+        <div class="row">
+          <span class="muted">当前单阶段</span>
+          <strong id="phaseText">前往取餐</strong>
+        </div>
+        <div class="row">
+          <span class="muted">剩余时间</span>
+          <span id="timerText" class="kpi danger">00:00</span>
+        </div>
+        <div class="row">
+          <span class="muted">本单预计收入</span>
+          <strong><span id="orderPay">0.0</span> 元</strong>
+        </div>
+        <div class="row">
+          <span class="muted">骑手评价</span>
+          <strong id="ratingText">4.60 ★</strong>
+        </div>
+        <div class="row">
+          <span class="muted">算法提示</span>
+          <span id="algoHint">评分越高，派单越远、倒计时越短。</span>
+        </div>
+      </div>
+    </section>
+
+    <div id="topGoal">
+      <div>订单：<strong id="orderText">1 / 7</strong></div>
+      <div>余额：<strong id="moneyText">0.0 元</strong></div>
+      <div>投诉：<strong id="complaintText">0</strong></div>
+      <div>目标：7 单内赚 <strong>20 元</strong></div>
+    </div>
+
+    <div id="balanceHUD" class="hud">
+      <div class="row" style="margin-bottom:4px;">
+        <strong>餐盒平衡计</strong>
+        <span id="riskText" class="muted">平稳</span>
+      </div>
+      <div class="balance-track">
+        <div class="balance-center"></div>
+        <div id="liquid" class="liquid"></div>
+      </div>
+      <div id="riskDesc" class="muted" style="margin-top:7px;">超速或急转超过 2 秒会洒餐并扣钱降分。</div>
+    </div>
+
+    <div id="orderBanner">算法监测到最优路线，请加速！</div>
+
+    <div id="controls">
+      <div class="pad">
+        <button class="ctrl-btn ctrl-up" data-ctrl="up">↑</button>
+        <button class="ctrl-btn ctrl-left" data-ctrl="left">←</button>
+        <button class="ctrl-btn ctrl-right" data-ctrl="right">→</button>
+        <button class="ctrl-btn ctrl-down" data-ctrl="down">↓</button>
+        <button class="ctrl-btn ctrl-brake" data-ctrl="brake">刹车</button>
+      </div>
+      <div class="actions">
+        <button class="ctrl-btn ctrl-boost" data-ctrl="boost">冲刺</button>
+        <button class="ctrl-btn" id="pauseBtn">暂停</button>
+      </div>
+    </div>
+
+    <div id="resultLayer">
+      <div class="result-card">
+        <h2 id="resultTitle">结算</h2>
+        <p id="resultSummary"></p>
+        <div class="cta-row">
+          <button id="restartBtn" type="button">重开今天</button>
+          <a href="/books/delivery-rider-dilemma.html">返回书籍总览</a>
+        </div>
+      </div>
+    </div>
+
+    <div id="introLayer">
+      <div class="intro-card">
+        <h2>玩法导读：外卖骑手的困境</h2>
+        <div class="intro-grid">
+          <article class="intro-block">
+            <strong>知识导读</strong>
+            平台会根据评分动态派单。评分越高，单价通常更高，但配送距离更远、时限更短，骑手更容易被迫做高风险操作。
+          </article>
+          <article class="intro-block">
+            <strong>核心规则</strong>
+            1. 每天共 7 单，目标是净赚 20 元。<br />
+            2. 超速累计 2 秒、急转累计 2 秒、或撞车会触发洒餐投诉。<br />
+            3. 洒餐会扣钱并降评分，后续派单也会变化。
+          </article>
+          <article class="intro-block">
+            <strong>操作方式（支持 App）</strong>
+            屏幕左下方向键控制转向与前进，右下“冲刺/刹车”控制速度。桌面端也支持 WASD 与方向键。
+          </article>
+          <article class="intro-block">
+            <strong>胜负条件</strong>
+            完成第 7 单后若余额 ≥ 20 元即达标，否则失败。你要在效率与安全之间持续博弈。
+          </article>
+        </div>
+        <div class="intro-actions">
+          <button id="startIntroBtn" class="start" type="button">开始送单</button>
+          <a href="/books/delivery-rider-dilemma.html">返回书籍总览</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      const BOOK_HREF = "/books/delivery-rider-dilemma.html";
+      const LAST_HREF = "/experiences/delivery-rider-day-01.html";
+
+      const canvas = document.getElementById("mapCanvas");
+      const ctx = canvas.getContext("2d");
+      const dangerVignette = document.getElementById("dangerVignette");
+      const orderBanner = document.getElementById("orderBanner");
+
+      const timerText = document.getElementById("timerText");
+      const orderPay = document.getElementById("orderPay");
+      const ratingText = document.getElementById("ratingText");
+      const algoHint = document.getElementById("algoHint");
+      const phaseText = document.getElementById("phaseText");
+      const orderText = document.getElementById("orderText");
+      const moneyText = document.getElementById("moneyText");
+      const complaintText = document.getElementById("complaintText");
+      const liquid = document.getElementById("liquid");
+      const riskText = document.getElementById("riskText");
+      const riskDesc = document.getElementById("riskDesc");
+      const algoState = document.getElementById("algoState");
+
+      const resultLayer = document.getElementById("resultLayer");
+      const resultTitle = document.getElementById("resultTitle");
+      const resultSummary = document.getElementById("resultSummary");
+      const restartBtn = document.getElementById("restartBtn");
+      const pauseBtn = document.getElementById("pauseBtn");
+      const introLayer = document.getElementById("introLayer");
+      const startIntroBtn = document.getElementById("startIntroBtn");
+
+      const controls = {
+        up: false,
+        down: false,
+        left: false,
+        right: false,
+        brake: false,
+        boost: false
+      };
+
+      const state = {
+        totalOrders: 7,
+        currentOrder: 1,
+        money: 0,
+        rating: 4.6,
+        complaints: 0,
+        gameOver: false,
+        paused: true,
+        started: false,
+        phase: "pickup",
+        timer: 28,
+        orderPay: 3.2,
+        maxMoneyTarget: 20,
+        redViolations: 0,
+        spillCountOrder: 0,
+        bannerTimer: 0,
+        routeDistance: 0
+      };
+
+      const rider = {
+        x: 220,
+        y: 220,
+        angle: -Math.PI / 2,
+        speed: 0,
+        radius: 10,
+        overspeedTime: 0,
+        hardTurnTime: 0,
+        wobble: 0,
+        collisionTimer: 0
+      };
+
+      let pickup = { x: 420, y: 320 };
+      let destination = { x: 680, y: 160 };
+      let lastTurnAbs = 0;
+      let redFlash = 0;
+
+      const lights = [];
+      const cars = [];
+
+      function rnd(min, max) {
+        return Math.random() * (max - min) + min;
+      }
+
+      function pickRoadPoint() {
+        const step = 84;
+        const margin = 80;
+        const xSlots = Math.max(2, Math.floor((canvas.width - margin * 2) / step));
+        const ySlots = Math.max(2, Math.floor((canvas.height - margin * 2) / step));
+        const x = margin + Math.floor(rnd(0, xSlots)) * step;
+        const y = margin + Math.floor(rnd(0, ySlots)) * step;
+        return { x, y };
+      }
+
+      function formatTime(seconds) {
+        const s = Math.max(0, Math.floor(seconds));
+        const m = Math.floor(s / 60).toString().padStart(2, "0");
+        const ss = (s % 60).toString().padStart(2, "0");
+        return `${m}:${ss}`;
+      }
+
+      function clamp(v, min, max) {
+        return Math.max(min, Math.min(max, v));
+      }
+
+      function updateHUD() {
+        timerText.textContent = formatTime(state.timer);
+        orderPay.textContent = state.orderPay.toFixed(1);
+        ratingText.textContent = `${state.rating.toFixed(2)} ★`;
+        orderText.textContent = `${state.currentOrder} / ${state.totalOrders}`;
+        moneyText.textContent = `${state.money.toFixed(1)} 元`;
+        complaintText.textContent = String(state.complaints);
+        phaseText.textContent = state.phase === "pickup" ? "前往取餐点" : "配送中";
+
+        const pressure = clamp((5.1 - state.rating) * 0.8 + (state.timer < 10 ? 0.5 : 0), 0, 1);
+        algoState.textContent = state.rating >= 4.85 ? "高星骑手追踪" : "算法监控激活";
+        algoHint.textContent = state.rating >= 4.85
+          ? "高评分触发远距高价单，限时急剧收紧。"
+          : "评分越高，派单越远、单价越高，时限更短。";
+
+        const shake = Math.max(rider.overspeedTime, rider.hardTurnTime);
+        const wobbleLevel = clamp((shake / 2) * 100 + rider.wobble * 28, 0, 100);
+        liquid.style.left = `${50 + (wobbleLevel - 50) * 0.8}%`;
+
+        if (wobbleLevel < 45) {
+          riskText.textContent = "平稳";
+          riskText.style.color = "#9aa8ba";
+          riskDesc.textContent = "保持稳定，投诉概率较低。";
+        } else if (wobbleLevel < 80) {
+          riskText.textContent = "晃动";
+          riskText.style.color = "#ffbd4a";
+          riskDesc.textContent = "继续这样操作会引发汤汁外溢。";
+        } else {
+          riskText.textContent = "危险";
+          riskText.style.color = "#ff5b5b";
+          riskDesc.textContent = "系统预警：2 秒极限操作后将触发投诉。";
+        }
+
+        const edge = clamp((wobbleLevel / 100) * 0.85 + redFlash * 0.45 + pressure * 0.4, 0, 1);
+        dangerVignette.style.boxShadow = `inset 0 0 ${120 + edge * 120}px rgba(255, 40, 40, ${0.05 + edge * 0.3})`;
+      }
+
+      function createTraffic() {
+        cars.length = 0;
+        const roadStep = 84;
+        const yRoads = [];
+        const xRoads = [];
+        for (let y = 84; y < canvas.height - 50; y += roadStep) yRoads.push(y);
+        for (let x = 84; x < canvas.width - 50; x += roadStep) xRoads.push(x);
+
+        for (let i = 0; i < 18; i += 1) {
+          const horizontal = Math.random() > 0.45;
+          cars.push({
+            horizontal,
+            x: horizontal ? rnd(0, canvas.width) : xRoads[Math.floor(rnd(0, xRoads.length))],
+            y: horizontal ? yRoads[Math.floor(rnd(0, yRoads.length))] : rnd(0, canvas.height),
+            speed: rnd(48, 95) * (Math.random() > 0.5 ? 1 : -1),
+            size: rnd(16, 22)
+          });
+        }
+      }
+
+      function createLights() {
+        lights.length = 0;
+        const step = 84;
+        for (let y = 84; y < canvas.height - 64; y += step) {
+          for (let x = 84; x < canvas.width - 64; x += step) {
+            if (Math.random() > 0.72) {
+              lights.push({ x, y, offset: rnd(0, 6), tagged: false });
+            }
+          }
+        }
+      }
+
+      function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        createTraffic();
+        createLights();
+      }
+
+      function distance(a, b) {
+        const dx = a.x - b.x;
+        const dy = a.y - b.y;
+        return Math.sqrt(dx * dx + dy * dy);
+      }
+
+      function setupOrder() {
+        state.phase = "pickup";
+        state.redViolations = 0;
+        state.spillCountOrder = 0;
+        rider.overspeedTime = 0;
+        rider.hardTurnTime = 0;
+        rider.wobble = 0;
+
+        pickup = pickRoadPoint();
+        destination = pickRoadPoint();
+        while (distance(pickup, destination) < Math.min(canvas.width, canvas.height) * 0.35) {
+          destination = pickRoadPoint();
+        }
+
+        rider.x = pickRoadPoint().x;
+        rider.y = pickRoadPoint().y;
+        rider.speed = 0;
+
+        state.routeDistance = distance(pickup, destination);
+        const difficulty = 1 + (state.currentOrder - 1) * 0.12 + Math.max(0, state.rating - 4.4) * 1.05;
+        state.timer = clamp(39 - difficulty * 4.5 + state.routeDistance / 140, 16, 42);
+        state.orderPay = clamp(2.2 + state.routeDistance / 240 + (state.rating - 4.2) * 1.4, 1.8, 6.5);
+
+        lights.forEach((light) => {
+          light.tagged = false;
+        });
+      }
+
+      function applySpill(reason) {
+        state.complaints += 1;
+        state.spillCountOrder += 1;
+        state.money = clamp(state.money - 1.4, -99, 999);
+        state.rating = clamp(state.rating - 0.22, 3.2, 5);
+        rider.overspeedTime = 0;
+        rider.hardTurnTime = 0;
+        rider.wobble = 0;
+        state.bannerTimer = 1.3;
+        orderBanner.textContent = `${reason}：餐盒外溢，扣款 -1.4 元`;
+        orderBanner.style.opacity = "1";
+      }
+
+      function finishOrder(success) {
+        if (success) {
+          state.money += state.orderPay;
+          state.rating = clamp(state.rating + Math.max(0.02, 0.07 - state.spillCountOrder * 0.03 - state.redViolations * 0.01), 3.2, 5);
+          state.bannerTimer = 1.2;
+          orderBanner.textContent = `第 ${state.currentOrder} 单完成 +${state.orderPay.toFixed(1)} 元`;
+        } else {
+          state.money -= 1.2;
+          state.rating = clamp(state.rating - 0.16, 3.2, 5);
+          state.bannerTimer = 1.4;
+          orderBanner.textContent = `第 ${state.currentOrder} 单超时，扣款 -1.2 元`;
+        }
+
+        orderBanner.style.opacity = "1";
+
+        if (state.currentOrder >= state.totalOrders) {
+          concludeGame();
+          return;
+        }
+
+        state.currentOrder += 1;
+        setupOrder();
+      }
+
+      function concludeGame() {
+        state.gameOver = true;
+        const pass = state.money >= state.maxMoneyTarget;
+        resultLayer.style.display = "flex";
+        resultTitle.textContent = pass ? "今日生存达标" : "今日未达标";
+        resultSummary.textContent = pass
+          ? `你在 ${state.totalOrders} 单内净赚 ${state.money.toFixed(1)} 元，最终评分 ${state.rating.toFixed(2)}★。算法继续加压，但你活下来了。`
+          : `你在 ${state.totalOrders} 单后仅剩 ${state.money.toFixed(1)} 元，未达 20 元目标。评分 ${state.rating.toFixed(2)}★，投诉 ${state.complaints} 次。`;
+      }
+
+      function drawRoadMap() {
+        const step = 84;
+        ctx.strokeStyle = "rgba(140, 155, 185, 0.2)";
+        ctx.lineWidth = 2;
+
+        for (let y = 84; y < canvas.height - 20; y += step) {
+          ctx.beginPath();
+          ctx.moveTo(40, y);
+          ctx.lineTo(canvas.width - 40, y);
+          ctx.stroke();
+        }
+
+        for (let x = 84; x < canvas.width - 20; x += step) {
+          ctx.beginPath();
+          ctx.moveTo(x, 40);
+          ctx.lineTo(x, canvas.height - 40);
+          ctx.stroke();
+        }
+      }
+
+      function drawLights(timeSec) {
+        for (const light of lights) {
+          const t = (timeSec + light.offset) % 6;
+          const redForHorizontal = t < 3;
+          ctx.fillStyle = redForHorizontal ? "#ff4b4b" : "#42e695";
+          ctx.beginPath();
+          ctx.arc(light.x - 8, light.y - 8, 4, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = redForHorizontal ? "#42e695" : "#ff4b4b";
+          ctx.beginPath();
+          ctx.arc(light.x + 8, light.y + 8, 4, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      function drawTarget(point, label, color) {
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, 16, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, 6, 0, Math.PI * 2);
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.fillStyle = "rgba(255,255,255,0.88)";
+        ctx.font = "12px sans-serif";
+        ctx.fillText(label, point.x + 20, point.y - 12);
+      }
+
+      function drawCars() {
+        for (const car of cars) {
+          ctx.fillStyle = "rgba(235, 244, 255, 0.85)";
+          const w = car.horizontal ? car.size * 1.4 : car.size * 0.9;
+          const h = car.horizontal ? car.size * 0.9 : car.size * 1.4;
+          ctx.fillRect(car.x - w / 2, car.y - h / 2, w, h);
+        }
+      }
+
+      function drawRider() {
+        ctx.save();
+        ctx.translate(rider.x, rider.y);
+        ctx.rotate(rider.angle);
+
+        ctx.fillStyle = "rgba(255, 223, 68, 0.22)";
+        ctx.beginPath();
+        ctx.arc(0, 0, 22, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "#ffdf44";
+        ctx.beginPath();
+        ctx.moveTo(14, 0);
+        ctx.lineTo(-8, -9);
+        ctx.lineTo(-8, 9);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = "#0f1318";
+        ctx.beginPath();
+        ctx.arc(-2, 0, 4, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+      }
+
+      function updateTraffic(dt) {
+        for (const car of cars) {
+          if (car.horizontal) {
+            car.x += car.speed * dt;
+            if (car.x < -40) car.x = canvas.width + 40;
+            if (car.x > canvas.width + 40) car.x = -40;
+          } else {
+            car.y += car.speed * dt;
+            if (car.y < -40) car.y = canvas.height + 40;
+            if (car.y > canvas.height + 40) car.y = -40;
+          }
+
+          const d = Math.hypot(car.x - rider.x, car.y - rider.y);
+          if (d < car.size * 0.8 + rider.radius && rider.collisionTimer <= 0) {
+            rider.collisionTimer = 0.8;
+            rider.speed *= 0.2;
+            applySpill("发生碰撞");
+          }
+        }
+
+        rider.collisionTimer -= dt;
+      }
+
+      function updateLights(timeSec) {
+        redFlash = 0;
+        for (const light of lights) {
+          const d = Math.hypot(light.x - rider.x, light.y - rider.y);
+          if (d > 18) continue;
+
+          const t = (timeSec + light.offset) % 6;
+          const redForHorizontal = t < 3;
+          const movingMostlyHorizontal = Math.abs(Math.cos(rider.angle)) > Math.abs(Math.sin(rider.angle));
+          const playerRed = movingMostlyHorizontal ? redForHorizontal : !redForHorizontal;
+
+          if (playerRed) {
+            redFlash = Math.max(redFlash, 1);
+            if (!light.tagged && Math.abs(rider.speed) > 56) {
+              light.tagged = true;
+              state.redViolations += 1;
+              state.rating = clamp(state.rating - 0.03, 3.2, 5);
+              state.bannerTimer = 0.8;
+              orderBanner.style.opacity = "1";
+              orderBanner.textContent = "逆行/闯灯被监测，评分下降";
+            }
+          }
+        }
+      }
+
+      function updateRider(dt) {
+        const accel = controls.up ? 190 : 0;
+        const reverse = controls.down ? -140 : 0;
+        const boost = controls.boost ? 85 : 0;
+        const brake = controls.brake ? 220 : 0;
+
+        rider.speed += (accel + reverse + boost) * dt;
+        rider.speed -= brake * dt * Math.sign(rider.speed || 1);
+        rider.speed *= 0.985;
+        rider.speed = clamp(rider.speed, -90, 240);
+
+        const turnInput = (controls.left ? -1 : 0) + (controls.right ? 1 : 0);
+        const turnRate = turnInput * (0.8 + Math.abs(rider.speed) / 140) * 2.2;
+        rider.angle += turnRate * dt;
+
+        rider.x += Math.cos(rider.angle) * rider.speed * dt;
+        rider.y += Math.sin(rider.angle) * rider.speed * dt;
+
+        rider.x = clamp(rider.x, 22, canvas.width - 22);
+        rider.y = clamp(rider.y, 22, canvas.height - 22);
+
+        const absSpeed = Math.abs(rider.speed);
+        if (absSpeed > 154) {
+          rider.overspeedTime += dt;
+        } else {
+          rider.overspeedTime = Math.max(0, rider.overspeedTime - dt * 1.6);
+        }
+
+        const turnAbs = Math.abs(turnInput) * absSpeed;
+        if (turnAbs > 90) {
+          rider.hardTurnTime += dt;
+        } else {
+          rider.hardTurnTime = Math.max(0, rider.hardTurnTime - dt * 1.4);
+        }
+
+        lastTurnAbs = turnAbs;
+        rider.wobble = clamp((rider.overspeedTime + rider.hardTurnTime) * 0.6 + redFlash * 0.22 + Math.abs(lastTurnAbs) / 460, 0, 1.8);
+
+        if (rider.overspeedTime > 2 || rider.hardTurnTime > 2) {
+          applySpill("操作过猛");
+        }
+      }
+
+      function checkPhaseProgress() {
+        const target = state.phase === "pickup" ? pickup : destination;
+        if (distance(rider, target) < 18) {
+          if (state.phase === "pickup") {
+            state.phase = "delivery";
+            state.bannerTimer = 1;
+            orderBanner.textContent = "已取餐，立即配送";
+            orderBanner.style.opacity = "1";
+          } else {
+            finishOrder(true);
+          }
+        }
+      }
+
+      function drawFrame(now, dt) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawRoadMap();
+        drawLights(now / 1000);
+        drawCars();
+
+        drawTarget(pickup, "取餐", "#7be4ff");
+        drawTarget(destination, "送达", "#ff6767");
+        if (state.phase === "delivery") {
+          ctx.globalAlpha = 0.3;
+          drawTarget(pickup, "已取", "#7be4ff");
+          ctx.globalAlpha = 1;
+        }
+
+        drawRider();
+
+        if (state.bannerTimer > 0) {
+          state.bannerTimer -= dt;
+          if (state.bannerTimer <= 0) orderBanner.style.opacity = "0";
+        }
+
+        if (state.timer < 8 && !state.gameOver) {
+          orderBanner.style.opacity = "1";
+          orderBanner.textContent = "请按最优路径加速，倒计时紧急";
+        }
+      }
+
+      function setControl(key, pressed) {
+        if (!state.started) return;
+        if (!(key in controls)) return;
+        controls[key] = pressed;
+        document.querySelectorAll(`[data-ctrl="${key}"]`).forEach((btn) => {
+          btn.classList.toggle("active", pressed);
+        });
+      }
+
+      function bindInput() {
+        const keyMap = {
+          ArrowUp: "up",
+          KeyW: "up",
+          ArrowDown: "down",
+          KeyS: "down",
+          ArrowLeft: "left",
+          KeyA: "left",
+          ArrowRight: "right",
+          KeyD: "right",
+          Space: "boost",
+          ShiftLeft: "brake",
+          ShiftRight: "brake"
+        };
+
+        window.addEventListener("keydown", (event) => {
+          const ctrl = keyMap[event.code];
+          if (!ctrl) return;
+          if (!state.started) return;
+          event.preventDefault();
+          setControl(ctrl, true);
+        }, { passive: false });
+
+        window.addEventListener("keyup", (event) => {
+          const ctrl = keyMap[event.code];
+          if (!ctrl) return;
+          if (!state.started) return;
+          event.preventDefault();
+          setControl(ctrl, false);
+        }, { passive: false });
+
+        document.querySelectorAll("[data-ctrl]").forEach((btn) => {
+          const ctrl = btn.dataset.ctrl;
+          const down = (event) => {
+            if (!state.started) return;
+            event.preventDefault();
+            setControl(ctrl, true);
+          };
+          const up = (event) => {
+            if (!state.started) return;
+            event.preventDefault();
+            setControl(ctrl, false);
+          };
+          btn.addEventListener("pointerdown", down);
+          btn.addEventListener("pointerup", up);
+          btn.addEventListener("pointercancel", up);
+          btn.addEventListener("pointerleave", up);
+        });
+
+        pauseBtn.addEventListener("click", () => {
+          if (!state.started) return;
+          state.paused = !state.paused;
+          pauseBtn.textContent = state.paused ? "继续" : "暂停";
+        });
+
+        restartBtn.addEventListener("click", () => {
+          window.location.reload();
+        });
+
+        startIntroBtn.addEventListener("click", () => {
+          state.started = true;
+          state.paused = false;
+          introLayer.style.display = "none";
+          pauseBtn.textContent = "暂停";
+          state.bannerTimer = 1.1;
+          orderBanner.textContent = "开始接单：先去取餐点";
+          orderBanner.style.opacity = "1";
+        });
+      }
+
+      function step(now) {
+        if (!step.last) step.last = now;
+        const dt = clamp((now - step.last) / 1000, 0, 0.045);
+        step.last = now;
+
+        if (!state.gameOver && !state.paused) {
+          state.timer -= dt;
+          if (state.timer <= 0) {
+            finishOrder(false);
+          }
+
+          updateRider(dt);
+          updateTraffic(dt);
+          updateLights(now / 1000);
+          checkPhaseProgress();
+        }
+
+        drawFrame(now, dt);
+        updateHUD();
+
+        window.requestAnimationFrame(step);
+      }
+
+      function init() {
+        resizeCanvas();
+        setupOrder();
+        updateHUD();
+        bindInput();
+        pauseBtn.textContent = "开始前";
+
+        try {
+          localStorage.setItem("reado_last_experience_href", LAST_HREF);
+        } catch {}
+
+        window.addEventListener("resize", resizeCanvas);
+        window.requestAnimationFrame(step);
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>

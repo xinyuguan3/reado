@@ -38,6 +38,9 @@ const DEFAULT_DEEPSEEK_ENDPOINT = "https://api.deepseek.com/chat/completions";
 const FALLBACK_AVATAR_DATA_URI = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23135bec'/%3E%3Cstop offset='100%25' stop-color='%2300eaff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='96' height='96' rx='48' fill='url(%23g)'/%3E%3Ccircle cx='48' cy='38' r='18' fill='rgba(255,255,255,0.92)'/%3E%3Cpath d='M18 84c4-16 16-24 30-24s26 8 30 24' fill='rgba(255,255,255,0.92)'/%3E%3C/svg%3E";
 const FALLBACK_IMAGE_DATA_URI = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 360'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%230f172a'/%3E%3Cstop offset='100%25' stop-color='%23135bec'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='640' height='360' fill='url(%23bg)'/%3E%3Ccircle cx='220' cy='140' r='50' fill='rgba(255,255,255,0.2)'/%3E%3Cpath d='M112 290c34-56 76-84 126-84s92 28 126 84' fill='rgba(255,255,255,0.22)'/%3E%3Cpath d='M438 128l44 44 78-78' stroke='rgba(255,255,255,0.65)' stroke-width='16' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ctext x='320' y='326' text-anchor='middle' fill='rgba(255,255,255,0.84)' font-family='Arial,sans-serif' font-size='24'%3EImage unavailable%3C/text%3E%3C/svg%3E";
 const BILLING_MODAL_ID = "reado-billing-modal";
+const ACCESS_WAITLIST_EMAIL_KEY = "reado_waitlist_email_v1";
+const ACCESS_INVITE_CODE_KEY = "reado_invite_code_v1";
+const ACCESS_SLOT_UNLOCKED_KEY = "reado_generation_slot_unlocked_v1";
 const AUTH_STATE_KEY = "reado_auth_state_v1";
 const AUTH_PAGE_PATH = "/pages/auth.html";
 const BILLING_PLAN_ORDER = ["starter", "trial", "pro"];
@@ -410,276 +413,105 @@ function createBillingModal(options = {}) {
   modal.className = "reado-billing-modal";
   modal.innerHTML = `
     <div class="reado-billing-overlay" data-billing-close></div>
-    <section class="reado-billing-panel" role="dialog" aria-modal="true" aria-labelledby="reado-billing-title">
+    <section class="reado-billing-panel reado-access-panel" role="dialog" aria-modal="true" aria-labelledby="reado-billing-title">
       <button class="reado-billing-close" type="button" aria-label="${t("billing.close", "Close")}" data-billing-close>✕</button>
       <header class="reado-billing-head">
-        <h3 id="reado-billing-title">${t("billing.title", "Upgrade to Reado Pro")}</h3>
-        <p class="reado-billing-sub">${t("billing.subtitle", "Choose Monthly or Annual, then continue in Stripe Checkout.")}</p>
+        <h3 id="reado-billing-title">Limited Book Generation Access</h3>
+        <p class="reado-billing-sub">We are currently facing a token shortage. Only a limited number of users can access book generation right now. Join the waitlist with your email and we will notify you as soon as a slot opens. If you have an invite code, you can unlock a slot immediately.</p>
       </header>
-      <div class="reado-billing-main">
-        <div class="reado-billing-cycle" role="tablist" aria-label="Billing cycle">
-          <button class="reado-billing-cycle-btn is-active" type="button" data-billing-cycle-btn="monthly">${t("billing.cycle_monthly", "Monthly")}</button>
-          <button class="reado-billing-cycle-btn" type="button" data-billing-cycle-btn="annual">${t("billing.cycle_annual", "Annually · Save 17%")}</button>
-        </div>
-        <div class="reado-billing-cards" data-billing-cards></div>
-        <p class="reado-billing-hint" data-billing-pricing-hint>${t("billing.loading", "Loading...")}</p>
+      <div class="reado-billing-main reado-access-main">
+        <section class="reado-access-section">
+          <h4>Join the Waitlist</h4>
+          <p class="reado-access-copy">Leave your email to reserve a spot in the queue.</p>
+          <div class="reado-access-row">
+            <input class="reado-access-input" type="email" placeholder="you@example.com" autocomplete="email" data-waitlist-email />
+            <button class="reado-billing-btn is-dark reado-access-btn" type="button" data-waitlist-submit>Register Waitlist</button>
+          </div>
+          <p class="reado-access-feedback" data-waitlist-feedback aria-live="polite"></p>
+        </section>
+        <section class="reado-access-section">
+          <label class="reado-access-toggle" for="reado-invite-toggle">
+            <input id="reado-invite-toggle" type="checkbox" data-invite-toggle />
+            <span>I have an invite code</span>
+          </label>
+          <div class="reado-access-invite" data-invite-panel hidden>
+            <div class="reado-access-row">
+              <input class="reado-access-input" type="text" placeholder="Enter invite code" autocomplete="off" data-invite-code />
+              <button class="reado-billing-btn is-dark reado-access-btn" type="button" data-invite-submit>Join with Code</button>
+            </div>
+          </div>
+          <p class="reado-access-feedback" data-invite-feedback aria-live="polite"></p>
+        </section>
       </div>
-      <footer class="reado-billing-foot">
+      <footer class="reado-billing-foot reado-access-foot">
         <div class="reado-billing-status-wrap">
-          <p class="reado-billing-label">${t("billing.current_status", "Current Subscription Status")}</p>
-          <p class="reado-billing-status" data-billing-status>${t("billing.loading", "Loading...")}</p>
-          <p class="reado-billing-meta" data-billing-period>--</p>
-          <p class="reado-billing-meta" data-billing-updated>--</p>
+          <p class="reado-billing-label">Access Status</p>
+          <p class="reado-billing-status" data-billing-status>Waitlist Open</p>
+          <p class="reado-billing-meta" data-billing-period>Invite code users can unlock instantly.</p>
+          <p class="reado-billing-meta" data-billing-updated>We will notify waitlist users by email when capacity opens.</p>
         </div>
-        <div class="reado-billing-actions">
-          <button class="reado-billing-btn" type="button" data-billing-refresh>${t("billing.cta_refresh", "Refresh")}</button>
-          <button class="reado-billing-btn is-dark" type="button" data-billing-portal>${t("billing.cta_manage", "Manage Billing")}</button>
-        </div>
-        <p class="reado-billing-error" data-billing-error></p>
       </footer>
     </section>`;
 
-  let current = null;
-  let checkoutConfig = null;
-  let selectedCycle = "monthly";
-  let loading = "";
-  let renderPlans = () => {};
-  const portalBtn = modal.querySelector("[data-billing-portal]");
-  const refreshBtn = modal.querySelector("[data-billing-refresh]");
+  const waitlistEmailInput = modal.querySelector("[data-waitlist-email]");
+  const waitlistFeedbackEl = modal.querySelector("[data-waitlist-feedback]");
+  const waitlistSubmitBtn = modal.querySelector("[data-waitlist-submit]");
+  const inviteToggle = modal.querySelector("[data-invite-toggle]");
+  const invitePanel = modal.querySelector("[data-invite-panel]");
+  const inviteCodeInput = modal.querySelector("[data-invite-code]");
+  const inviteSubmitBtn = modal.querySelector("[data-invite-submit]");
+  const inviteFeedbackEl = modal.querySelector("[data-invite-feedback]");
   const statusEl = modal.querySelector("[data-billing-status]");
-  const periodEl = modal.querySelector("[data-billing-period]");
-  const updatedEl = modal.querySelector("[data-billing-updated]");
-  const errorEl = modal.querySelector("[data-billing-error]");
-  const cardsEl = modal.querySelector("[data-billing-cards]");
-  const pricingHintEl = modal.querySelector("[data-billing-pricing-hint]");
-  const cycleBtnEls = Array.from(modal.querySelectorAll("[data-billing-cycle-btn]"));
+  const current = { subscriptionActive: false };
 
-  const setError = (msg) => {
-    if (!errorEl) return;
-    errorEl.textContent = msg || "";
+  const setFeedback = (el, message, isError) => {
+    if (!el) return;
+    el.textContent = message || "";
+    el.classList.toggle("is-error", Boolean(isError));
+    el.classList.toggle("is-success", Boolean(message) && !isError);
   };
 
-  const setPricingHint = (msg, isError = false) => {
-    if (!pricingHintEl) return;
-    pricingHintEl.textContent = msg || "";
-    pricingHintEl.classList.toggle("is-error", Boolean(isError));
+  const isValidEmail = (value) => {
+    const trimmed = String(value || "").trim();
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed);
   };
 
-  const setLoading = (key) => {
-    loading = key || "";
-    if (portalBtn) {
-      portalBtn.disabled = Boolean(loading) || !current?.customerId;
-      portalBtn.textContent = loading === "portal"
-        ? t("billing.cta_opening", "Opening...")
-        : t("billing.cta_manage", "Manage Billing");
-    }
-    if (refreshBtn) {
-      refreshBtn.disabled = Boolean(loading);
-      refreshBtn.textContent = loading === "refresh"
-        ? t("billing.cta_refreshing", "Refreshing...")
-        : t("billing.cta_refresh", "Refresh Status");
-    }
-    renderPlans();
+  const setInvitePanelVisibility = (show) => {
+    if (!invitePanel) return;
+    invitePanel.hidden = !show;
   };
 
-  const getPlanCopy = (cycle, tier) => {
-    const safeCycle = cycle === "annual" ? "annual" : "monthly";
-    const source = BILLING_PLAN_COPY[safeCycle] || BILLING_PLAN_COPY.monthly;
-    return source[tier] || source.starter;
+  const updateStatus = (text, active = false) => {
+    if (!statusEl) return;
+    statusEl.textContent = text;
+    statusEl.classList.toggle("is-active", active);
   };
 
-  const getCyclePrices = (cycle) => {
-    const safeCycle = cycle === "annual" ? "annual" : "monthly";
-    const prices = checkoutConfig?.prices && typeof checkoutConfig.prices === "object" ? checkoutConfig.prices : {};
-    const cyclePrices = prices[safeCycle];
-    return cyclePrices && typeof cyclePrices === "object" ? cyclePrices : {};
-  };
-
-  const getCheckoutConfigHint = () => {
-    const status = checkoutConfig?.configStatus;
-    if (!status || typeof status !== "object") return "";
-    const missing = [];
-    if (!status.hasSecretKey) missing.push("STRIPE_SECRET_KEY");
-    if (!status.hasSuccessUrl) missing.push("STRIPE_SUCCESS_URL");
-    if (!status.hasCancelUrl) missing.push("STRIPE_CANCEL_URL");
-    const monthly = status.monthly && typeof status.monthly === "object" ? status.monthly : {};
-    const annual = status.annual && typeof status.annual === "object" ? status.annual : {};
-    const hasAnyPrice = Boolean(
-      status.hasLegacyPrice
-      || monthly.starter
-      || monthly.trial
-      || monthly.pro
-      || annual.starter
-      || annual.trial
-      || annual.pro
-    );
-    if (!hasAnyPrice) {
-      missing.push("STRIPE_PRICE_MONTHLY_* / STRIPE_PRICE_ANNUAL_*");
-    }
-    return missing.length ? ("Missing: " + missing.join(", ")) : "";
-  };
-
-  renderPlans = () => {
-    if (!cardsEl) return;
-    const signedIn = isUserSignedIn();
-    for (const btn of cycleBtnEls) {
-      btn.classList.toggle("is-active", btn.getAttribute("data-billing-cycle-btn") === selectedCycle);
-      btn.disabled = Boolean(loading);
-    }
-    const cyclePrices = getCyclePrices(selectedCycle);
-    cardsEl.innerHTML = BILLING_PLAN_ORDER.map((tier) => {
-      const copy = getPlanCopy(selectedCycle, tier);
-      const priceId = String(cyclePrices[tier] || "").trim();
-      const isReady = Boolean(checkoutConfig?.enabled && priceId);
-      const isCurrentPlan = Boolean(current?.subscriptionActive && current?.priceId && current.priceId === priceId);
-      const isBusy = loading.startsWith("checkout:");
-      const isThisBusy = loading === ("checkout:" + priceId);
-      let cta = copy.cta;
-      if (isThisBusy) {
-        cta = t("billing.cta_redirecting", "Redirecting...");
-      } else if (!signedIn && isReady) {
-        cta = t("billing.cta_signin", "Sign in to continue");
-      } else if (isCurrentPlan) {
-        cta = t("billing.current_plan", "Current plan");
-      } else if (!isReady) {
-        cta = t("billing.plan_unavailable", "Not configured");
-      }
-      const badge = copy.badge
-        ? `<span class="reado-plan-badge">${copy.badge}</span>`
-        : "";
-      const features = Array.isArray(copy.features) ? copy.features : [];
-      const featureItems = features.map((item) => `<li>${item}</li>`).join("");
-      return `
-        <article class="reado-plan-card${copy.featured ? " is-featured" : ""}${isCurrentPlan ? " is-current" : ""}">
-          <div class="reado-plan-price-row">
-            <strong class="reado-plan-price">${copy.price}</strong>
-            ${copy.unit ? `<span class="reado-plan-unit">${copy.unit}</span>` : ""}
-          </div>
-          <p class="reado-plan-subtitle">${copy.subtitle}</p>
-          <button
-            class="reado-plan-cta${copy.featured ? " is-featured" : ""}"
-            type="button"
-            data-billing-checkout
-            data-billing-price-id="${priceId}"
-            ${!isReady || isBusy || (signedIn && isCurrentPlan) ? "disabled" : ""}>${cta}</button>
-          ${badge}
-          <ul class="reado-plan-features">${featureItems}</ul>
-        </article>`;
-    }).join("");
-  };
-
-  const render = () => {
-    const status = current?.status || "none";
-    const isActive = Boolean(current?.subscriptionActive);
-    if (statusEl) {
-      statusEl.textContent = isActive
-        ? t("billing.status_active", "Pro Active")
-        : (status === "none" ? t("billing.status_none", "Not Subscribed") : status);
-      statusEl.classList.toggle("is-active", isActive);
-    }
-    if (periodEl) {
-      periodEl.textContent = isActive
-        ? t("billing.period_end", "Renews at {value}", { value: formatTimestamp(current?.currentPeriodEnd) })
-        : t("billing.period_none", "No active subscription found");
-    }
-    if (updatedEl) {
-      updatedEl.textContent = current?.updatedAt
-        ? t("billing.updated_at", "Updated at {value}", { value: new Date(current.updatedAt).toLocaleString(getCurrentLanguage()) })
-        : "";
-    }
-    renderPlans();
-    if (typeof options.onStatusChange === "function") {
-      options.onStatusChange(current || null);
-    }
-  };
-
-  const refreshStatus = async () => {
-    setError("");
-    setLoading("refresh");
-    try {
-      const payload = await requestJson("GET", "/api/billing/subscription");
-      current = payload?.billing || null;
-      render();
-    } catch (error) {
-      setError(error?.message || t("billing.err_load", "Failed to load subscription"));
-    } finally {
-      setLoading("");
-    }
-  };
-
-  const loadCheckoutConfig = async () => {
-    setPricingHint(t("billing.loading", "Loading..."));
-    try {
-      const payload = await requestJson("GET", "/api/billing/pricing-table");
-      checkoutConfig = payload?.checkout || null;
-      if (payload?.billing) {
-        current = payload.billing;
-        render();
-      }
-      const cycleMonthly = getCyclePrices("monthly");
-      const cycleAnnual = getCyclePrices("annual");
-      const hasAnyPlan = BILLING_PLAN_ORDER.some((tier) => Boolean(cycleMonthly[tier] || cycleAnnual[tier]));
-      if (!checkoutConfig?.enabled || !hasAnyPlan) {
-        const configHint = getCheckoutConfigHint();
-        setPricingHint(
-          t(
-            "billing.pricing_missing",
-            "Custom plans are not configured. Set STRIPE_PRICE_MONTHLY_* and STRIPE_PRICE_ANNUAL_* in server env."
-          ) + (configHint ? " " + configHint : ""),
-          true
-        );
-        renderPlans();
-        return;
-      }
-      renderPlans();
-      setPricingHint(
-        t(
-          "billing.pricing_ready",
-          "Pick a plan and continue with Stripe Checkout."
-        )
-      );
-    } catch (error) {
-      checkoutConfig = null;
-      renderPlans();
-      setPricingHint(error?.message || t("billing.err_pricing", "Failed to load billing plans"), true);
-    }
-  };
-
-  const startCheckout = async (priceId) => {
-    const selectedPriceId = String(priceId || "").trim();
-    if (!selectedPriceId) {
-      setError(t("billing.err_checkout_config", "This plan is not configured in Stripe."));
+  const handleWaitlistSubmit = () => {
+    const email = String(waitlistEmailInput?.value || "").trim();
+    if (!isValidEmail(email)) {
+      setFeedback(waitlistFeedbackEl, "Please enter a valid email address.", true);
       return;
     }
-    if (!isUserSignedIn()) {
-      window.location.assign(buildAuthRedirectUrl(selectedPriceId));
-      return;
-    }
-    setError("");
-    setLoading("checkout:" + selectedPriceId);
-    try {
-      const payload = await requestJson("POST", "/api/billing/checkout", { priceId: selectedPriceId });
-      const url = String(payload?.checkoutUrl || "").trim();
-      if (!url) throw new Error("Stripe checkout url is empty");
-      window.location.assign(url);
-    } catch (error) {
-      setError(error?.message || t("billing.err_checkout", "Failed to start checkout"));
-      setLoading("");
-    }
+    localStorage.setItem(ACCESS_WAITLIST_EMAIL_KEY, email);
+    setFeedback(waitlistFeedbackEl, "You are on the waitlist. We will notify you as soon as a slot opens.", false);
+    updateStatus("Waitlist Confirmed", false);
   };
 
-  const openPortal = async () => {
-    setError("");
-    setLoading("portal");
-    try {
-      const payload = await requestJson("POST", "/api/billing/portal", {});
-      const url = String(payload?.portalUrl || "").trim();
-      if (!url) throw new Error("Stripe portal url is empty");
-      window.location.assign(url);
-    } catch (error) {
-      setError(error?.message || t("billing.err_portal", "Failed to open billing portal"));
-      setLoading("");
+  const handleInviteSubmit = () => {
+    const inviteCode = String(inviteCodeInput?.value || "").trim();
+    if (!inviteCode) {
+      setFeedback(inviteFeedbackEl, "Please enter an invite code.", true);
+      return;
     }
+    if (inviteCode.length < 4) {
+      setFeedback(inviteFeedbackEl, "Invite code looks too short. Please check and try again.", true);
+      return;
+    }
+    localStorage.setItem(ACCESS_INVITE_CODE_KEY, inviteCode);
+    localStorage.setItem(ACCESS_SLOT_UNLOCKED_KEY, "1");
+    setFeedback(inviteFeedbackEl, "Invite code accepted. Your generation slot is now unlocked.", false);
+    updateStatus("Slot Unlocked", true);
   };
 
   const close = () => {
@@ -690,8 +522,6 @@ function createBillingModal(options = {}) {
   const open = () => {
     modal.classList.add("open");
     document.body.classList.add("reado-modal-open");
-    refreshStatus();
-    loadCheckoutConfig();
   };
 
   modal.addEventListener("click", (event) => {
@@ -701,30 +531,61 @@ function createBillingModal(options = {}) {
       close();
       return;
     }
-    if (target.closest("[data-billing-portal]")) {
-      openPortal();
+    if (target.closest("[data-waitlist-submit]")) {
+      handleWaitlistSubmit();
       return;
     }
-    if (target.closest("[data-billing-refresh]")) {
-      refreshStatus();
-      loadCheckoutConfig();
+    if (target.closest("[data-invite-submit]")) {
+      handleInviteSubmit();
       return;
-    }
-    const cycleBtn = target.closest("[data-billing-cycle-btn]");
-    if (cycleBtn instanceof HTMLElement) {
-      const nextCycle = cycleBtn.getAttribute("data-billing-cycle-btn") === "annual" ? "annual" : "monthly";
-      if (nextCycle !== selectedCycle) {
-        selectedCycle = nextCycle;
-        renderPlans();
-      }
-      return;
-    }
-    const checkoutBtn = target.closest("[data-billing-checkout]");
-    if (checkoutBtn instanceof HTMLElement) {
-      const selectedPriceId = checkoutBtn.getAttribute("data-billing-price-id") || "";
-      startCheckout(selectedPriceId);
     }
   });
+
+  if (waitlistSubmitBtn) {
+    waitlistSubmitBtn.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        handleWaitlistSubmit();
+      }
+    });
+  }
+
+  if (waitlistEmailInput) {
+    waitlistEmailInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        handleWaitlistSubmit();
+      }
+    });
+  }
+
+  if (inviteSubmitBtn) {
+    inviteSubmitBtn.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        handleInviteSubmit();
+      }
+    });
+  }
+
+  if (inviteCodeInput) {
+    inviteCodeInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        handleInviteSubmit();
+      }
+    });
+  }
+
+  if (inviteToggle) {
+    inviteToggle.addEventListener("change", () => {
+      const checked = Boolean(inviteToggle.checked);
+      setInvitePanelVisibility(checked);
+      if (checked && inviteCodeInput) {
+        inviteCodeInput.focus();
+      }
+    });
+  }
 
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
@@ -732,20 +593,35 @@ function createBillingModal(options = {}) {
     }
   });
 
-  onLanguageChange(() => {
-    modal.querySelector("#reado-billing-title").textContent = t("billing.title", "Upgrade to Reado Pro");
-    modal.querySelector(".reado-billing-sub").textContent = t("billing.subtitle", "Choose Monthly or Annual, then continue in Stripe Checkout.");
-    const monthlyBtn = modal.querySelector('[data-billing-cycle-btn="monthly"]');
-    const annualBtn = modal.querySelector('[data-billing-cycle-btn="annual"]');
-    if (monthlyBtn) monthlyBtn.textContent = t("billing.cycle_monthly", "Monthly");
-    if (annualBtn) annualBtn.textContent = t("billing.cycle_annual", "Annually · Save 17%");
-    modal.querySelector(".reado-billing-label").textContent = t("billing.current_status", "Current Subscription Status");
-    render();
-    loadCheckoutConfig();
-  });
+  const savedEmail = String(localStorage.getItem(ACCESS_WAITLIST_EMAIL_KEY) || "").trim();
+  if (savedEmail && waitlistEmailInput) {
+    waitlistEmailInput.value = savedEmail;
+  }
+
+  const savedInviteCode = String(localStorage.getItem(ACCESS_INVITE_CODE_KEY) || "").trim();
+  if (savedInviteCode) {
+    if (inviteToggle instanceof HTMLInputElement) {
+      inviteToggle.checked = true;
+    }
+    setInvitePanelVisibility(true);
+    if (inviteCodeInput) inviteCodeInput.value = savedInviteCode;
+  }
+
+  if (localStorage.getItem(ACCESS_SLOT_UNLOCKED_KEY) === "1") {
+    updateStatus("Slot Unlocked", true);
+    setFeedback(inviteFeedbackEl, "Invite code accepted. Your generation slot is now unlocked.", false);
+  } else if (savedEmail) {
+    updateStatus("Waitlist Confirmed", false);
+    setFeedback(waitlistFeedbackEl, "You are on the waitlist. We will notify you as soon as a slot opens.", false);
+  }
+
+  const refreshStatus = () => {
+    if (typeof options.onStatusChange === "function") {
+      options.onStatusChange(current);
+    }
+  };
 
   refreshStatus();
-  loadCheckoutConfig();
   return { modal, open, close, refreshStatus, getCurrent: () => current };
 }
 
@@ -1676,6 +1552,100 @@ function ensureGlobalStyle() {
       min-height: 18px;
       font-size: 12px;
     }
+    body.reado-shell-applied .reado-access-panel {
+      width: min(760px, calc(100vw - 24px));
+    }
+    body.reado-shell-applied .reado-access-main {
+      display: grid;
+      gap: 14px;
+      padding: 14px;
+      background: #f8fafc;
+    }
+    body.reado-shell-applied .reado-access-section {
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      background: #ffffff;
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+    }
+    body.reado-shell-applied .reado-access-section h4 {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.2;
+      color: #111827;
+      font-weight: 800;
+    }
+    body.reado-shell-applied .reado-access-copy {
+      margin: 0;
+      font-size: 13px;
+      color: #475569;
+      line-height: 1.45;
+    }
+    body.reado-shell-applied .reado-access-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    body.reado-shell-applied .reado-access-input {
+      flex: 1 1 0;
+      min-width: 0;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 14px;
+      line-height: 1.2;
+      color: #0f172a;
+      background: #ffffff;
+    }
+    body.reado-shell-applied .reado-access-input:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+    }
+    body.reado-shell-applied .reado-access-btn {
+      min-width: 168px;
+      white-space: nowrap;
+      padding: 10px 14px;
+    }
+    body.reado-shell-applied .reado-access-feedback {
+      margin: 0;
+      font-size: 12px;
+      line-height: 1.4;
+      min-height: 18px;
+      color: #475569;
+    }
+    body.reado-shell-applied .reado-access-feedback.is-error {
+      color: #dc2626;
+    }
+    body.reado-shell-applied .reado-access-feedback.is-success {
+      color: #047857;
+    }
+    body.reado-shell-applied .reado-access-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #0f172a;
+      cursor: pointer;
+      user-select: none;
+    }
+    body.reado-shell-applied .reado-access-toggle input {
+      width: 16px;
+      height: 16px;
+      margin: 0;
+      accent-color: #2563eb;
+    }
+    body.reado-shell-applied .reado-access-invite[hidden] {
+      display: none !important;
+    }
+    body.reado-shell-applied .reado-access-foot {
+      padding: 12px 14px;
+    }
+    body.reado-shell-applied .reado-access-foot .reado-billing-status {
+      font-size: 26px;
+    }
     @media (max-width: 1023px) {
       body.reado-shell-applied { padding-left: 0 !important; }
       body.reado-shell-applied .reado-shell-toggle { display: inline-flex; }
@@ -1874,6 +1844,14 @@ function ensureGlobalStyle() {
       }
       body.reado-shell-applied .reado-billing-btn {
         width: 100%;
+      }
+      body.reado-shell-applied .reado-access-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      body.reado-shell-applied .reado-access-btn {
+        width: 100%;
+        min-width: 0;
       }
       body.reado-shell-applied.reado-experience-mode.reado-mobile-proportional main {
         transform: scale(var(--reado-mobile-scale, 0.9));

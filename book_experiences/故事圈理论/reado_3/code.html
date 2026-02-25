@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>reado Story Lab - McKee Skeleton View</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#25c0f4",
+                        secondary: "#ff4d4d", 
+                        "background-light": "#f5f8f8",
+                        "background-dark": "#101e23",
+                        "surface-dark": "#18282e",
+                        "border-dark": "#223f49",
+                        "text-main": "#e2e8f0",
+                        "text-muted": "#94a3b8",
+                    },
+                    fontFamily: {
+                        display: ['Inter', '"Noto Sans SC"', 'sans-serif'],
+                        sans: ['Inter', '"Noto Sans SC"', 'sans-serif'],
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', 'Noto Sans SC', sans-serif;
+            background-color: #101e23;
+            color: #e2e8f0;
+        }
+        .gap-gradient {
+            background: linear-gradient(180deg, rgba(37, 192, 244, 0.1) 0%, rgba(37, 192, 244, 0) 100%);
+        }
+        .conflict-gradient {
+             background: linear-gradient(180deg, rgba(255, 77, 77, 0.15) 0%, rgba(255, 77, 77, 0) 100%);
+        }
+    </style>
+</head>
+<body class="bg-background-dark text-text-main h-screen flex flex-col overflow-hidden">
+<!-- Top Navigation -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-border-dark px-6 py-3 bg-surface-dark/50 backdrop-blur-sm z-20">
+<div class="flex items-center gap-4">
+<div class="size-8 rounded-lg bg-primary/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">science</span>
+</div>
+<div>
+<h2 class="text-white text-lg font-bold leading-tight tracking-tight">reado Story Lab</h2>
+<p class="text-text-muted text-xs">McKee Framework v2.4</p>
+</div>
+</div>
+<!-- Central Progress Indicator (Audience Heart Rate) -->
+<div class="flex items-center gap-6 bg-background-dark px-4 py-2 rounded-xl border border-border-dark hidden md:flex">
+<div class="flex flex-col">
+<span class="text-xs text-text-muted font-medium uppercase tracking-wider">Audience Heart Rate</span>
+<div class="flex items-baseline gap-2">
+<span class="text-2xl font-bold text-white">120</span>
+<span class="text-sm text-primary font-medium">BPM</span>
+</div>
+</div>
+<div class="h-8 w-px bg-border-dark"></div>
+<div class="w-32 h-8 flex items-center">
+<!-- Simple SVG waveform for heart rate -->
+<svg class="w-full h-full stroke-secondary fill-none stroke-2" viewbox="0 0 100 20">
+<path d="M0 10 L10 10 L15 2 L20 18 L25 10 L35 10 L40 5 L45 15 L50 10 L60 10 L65 0 L70 20 L75 10 L100 10" vector-effect="non-scaling-stroke"></path>
+</svg>
+</div>
+<div class="flex items-center gap-1 text-secondary bg-secondary/10 px-2 py-0.5 rounded text-xs font-bold">
+<span class="material-symbols-outlined text-[14px]">arrow_upward</span>
+                +45%
+            </div>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-6 mr-4 hidden lg:flex">
+<a class="text-text-muted hover:text-white text-sm font-medium transition-colors" href="#">Projects</a>
+<a class="text-text-muted hover:text-white text-sm font-medium transition-colors" href="#">Theory</a>
+<a class="text-text-muted hover:text-white text-sm font-medium transition-colors" href="#">Community</a>
+</div>
+<div class="flex gap-2">
+<button class="flex items-center justify-center rounded-lg h-9 px-4 bg-primary text-background-dark text-sm font-bold hover:bg-primary/90 transition-colors">
+                    Save
+                </button>
+<button class="flex items-center justify-center rounded-lg h-9 w-9 bg-surface-dark border border-border-dark text-white hover:bg-border-dark transition-colors">
+<span class="material-symbols-outlined text-sm">close</span>
+</button>
+</div>
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-9 border border-border-dark cursor-pointer" data-alt="User profile picture" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCspn9iQeLcMEmjRKx2ZMJBbI0NRPgqx5cQS3aFIhoieRONDYzkeyK36lGnHXKCSiSK0KsU7o8Q-3tGwcLtLqsiCGdEsLReCuYjttt6g__p_lldw6v-oyK5sLCdtaQC4tssBrAnPINJIdVXdmxlcvyNdAh-45cDRq1z2bXAwAF-Fve99NPkF8TvMBN7Ya_28HgylRk54pKk1v16SETJvgaeKSNxliIZpCHlkXsWGnO3Rul5Z26Bcsqigy8P47kgPcDmw8fuRQmI5do');"></div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 flex overflow-hidden relative">
+<!-- Left Sidebar: Context -->
+<aside class="w-64 border-r border-border-dark bg-surface-dark/30 flex flex-col z-10 hidden xl:flex">
+<div class="p-5 border-b border-border-dark">
+<h1 class="text-white text-base font-bold mb-1">Project: The Abyss</h1>
+<p class="text-primary text-sm font-medium">Act 2, Scene 4</p>
+<div class="mt-4 flex flex-col gap-2">
+<div class="flex justify-between text-xs text-text-muted">
+<span>Duration</span>
+<span>45m / 120m</span>
+</div>
+<div class="w-full bg-border-dark h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[35%]"></div>
+</div>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-4 space-y-4">
+<div class="bg-surface-dark rounded-xl p-4 border border-border-dark">
+<div class="flex items-center gap-2 mb-3 text-text-muted">
+<span class="material-symbols-outlined text-sm">info</span>
+<span class="text-xs uppercase font-bold tracking-wider">Current Beat</span>
+</div>
+<p class="text-sm leading-relaxed text-gray-300">
+                        Protagonist attempts to confess love but is interrupted by a shocking revelation from the antagonist.
+                    </p>
+</div>
+<div class="bg-surface-dark rounded-xl p-4 border border-border-dark/50">
+<div class="flex items-center gap-2 mb-3 text-text-muted">
+<span class="material-symbols-outlined text-sm">psychology</span>
+<span class="text-xs uppercase font-bold tracking-wider">Subtext</span>
+</div>
+<p class="text-sm leading-relaxed text-gray-400 italic">
+                        "I love you" actually means "Save me from myself."
+                    </p>
+</div>
+</div>
+</aside>
+<!-- Center Stage: Narrative Architecture -->
+<section class="flex-1 flex flex-col relative bg-background-dark bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#1a2c35] to-background-dark">
+<!-- Grid Background Pattern -->
+<div class="absolute inset-0 z-0 opacity-10 pointer-events-none" style="background-image: linear-gradient(#223f49 1px, transparent 1px), linear-gradient(90deg, #223f49 1px, transparent 1px); background-size: 40px 40px;">
+</div>
+<!-- Header of the graph area -->
+<div class="relative z-10 px-8 py-6 flex justify-between items-end">
+<div>
+<h2 class="text-2xl font-bold text-white tracking-tight">The Gap: Expectation vs Reality</h2>
+<p class="text-text-muted text-sm mt-1">Visualize the chasm between what the character expects and what actually happens.</p>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-md bg-surface-dark border border-border-dark hover:bg-border-dark text-xs font-medium text-text-muted transition-colors">
+<span class="material-symbols-outlined text-sm">zoom_in</span> Zoom
+                    </button>
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-md bg-surface-dark border border-border-dark hover:bg-border-dark text-xs font-medium text-text-muted transition-colors">
+<span class="material-symbols-outlined text-sm">settings</span> Settings
+                    </button>
+</div>
+</div>
+<!-- Main Interactive Graph Area -->
+<div class="flex-1 relative mx-8 mb-8 border border-border-dark/50 rounded-2xl bg-surface-dark/20 backdrop-blur-sm overflow-hidden flex flex-col">
+<!-- Central Interaction Node -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 flex flex-col items-center group">
+<!-- Connector Line Top -->
+<div class="h-16 w-0.5 bg-gradient-to-b from-transparent to-primary/50 absolute -top-16"></div>
+<!-- Card -->
+<div class="bg-background-dark border border-primary/30 shadow-[0_0_30px_rgba(37,192,244,0.15)] rounded-xl p-5 w-80 text-center relative overflow-hidden transition-transform hover:scale-105 duration-300">
+<div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent"></div>
+<div class="flex justify-between items-center mb-4 text-xs font-bold tracking-widest text-primary uppercase">
+<span>Expectation</span>
+<span class="material-symbols-outlined text-sm">arrow_forward</span>
+<span>Reality</span>
+</div>
+<div class="flex flex-col gap-2">
+<div class="bg-primary/10 rounded px-3 py-2 text-sm text-primary border border-primary/20">
+                                Confession Success
+                            </div>
+<div class="h-4 flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary text-lg animate-pulse">bolt</span>
+</div>
+<div class="bg-secondary/10 rounded px-3 py-2 text-sm text-secondary border border-secondary/20">
+                                Truth Revealed
+                            </div>
+</div>
+<button class="mt-4 w-full py-2 bg-gradient-to-r from-secondary/80 to-secondary hover:from-secondary hover:to-secondary/90 text-white text-xs font-bold rounded shadow-lg uppercase tracking-wide flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">add_circle</span>
+                            Inject Conflict Gap
+                        </button>
+</div>
+<!-- Connector Line Bottom -->
+<div class="h-24 w-0.5 bg-gradient-to-b from-primary/50 to-transparent absolute -bottom-24"></div>
+</div>
+<!-- Background Wave/Graph Visuals -->
+<div class="absolute inset-0 flex items-center justify-center opacity-30 pointer-events-none">
+<svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 800 400">
+<!-- Positive Curve (Expectation) -->
+<path d="M0 200 C 200 200, 300 100, 400 100" fill="none" stroke="#25c0f4" stroke-dasharray="5,5" stroke-width="2"></path>
+<!-- Negative Curve (Reality) -->
+<path d="M400 100 C 500 100, 600 300, 800 300" fill="none" stroke="#ff4d4d" stroke-width="3"></path>
+<!-- The Gap Area -->
+<path d="M400 100 L 400 300" opacity="0.5" stroke="white" stroke-dasharray="2,2" stroke-width="1"></path>
+</svg>
+</div>
+<!-- Labels -->
+<div class="absolute left-4 top-4 text-xs text-primary font-bold uppercase">Positive Charge (+)</div>
+<div class="absolute left-4 bottom-4 text-xs text-secondary font-bold uppercase">Negative Charge (-)</div>
+<!-- Polarity Indicator (Bottom Left of graph) -->
+<div class="absolute bottom-6 left-6 z-20 bg-surface-dark border border-border-dark p-3 rounded-lg w-64 shadow-xl">
+<div class="flex justify-between items-center mb-2">
+<span class="text-xs text-text-muted font-bold uppercase">Value Polarity</span>
+<span class="text-xs text-white font-mono">-75</span>
+</div>
+<div class="flex items-center gap-2 text-[10px] text-text-muted mb-1 justify-between px-1">
+<span>Disillusionment</span>
+<span>Success</span>
+</div>
+<div class="relative h-2 bg-surface-dark rounded-full overflow-hidden border border-border-dark flex">
+<!-- Negative side -->
+<div class="w-1/2 bg-surface-dark border-r border-border-dark relative">
+<div class="absolute right-0 top-0 bottom-0 bg-secondary w-[75%] opacity-80 rounded-l-sm"></div>
+</div>
+<!-- Positive side -->
+<div class="w-1/2 bg-surface-dark relative">
+<!-- Indicator marker -->
+</div>
+<!-- Center Line -->
+<div class="absolute left-1/2 top-0 bottom-0 w-0.5 bg-white z-10 -translate-x-1/2"></div>
+</div>
+</div>
+</div>
+<!-- Bottom: 5 Act Structure Timeline -->
+<div class="h-16 border-t border-border-dark bg-surface-dark flex divide-x divide-border-dark">
+<div class="flex-1 flex flex-col justify-center items-center px-2 cursor-pointer hover:bg-white/5 transition-colors group">
+<span class="text-[10px] uppercase font-bold text-text-muted group-hover:text-primary transition-colors">Act 1</span>
+<span class="text-xs font-medium text-text-main">Inciting Incident</span>
+<div class="w-full h-1 bg-border-dark mt-1 rounded-full overflow-hidden">
+<div class="w-full h-full bg-primary/50"></div>
+</div>
+</div>
+<div class="flex-1 flex flex-col justify-center items-center px-2 cursor-pointer hover:bg-white/5 transition-colors group">
+<span class="text-[10px] uppercase font-bold text-text-muted group-hover:text-primary transition-colors">Act 2a</span>
+<span class="text-xs font-medium text-text-main">Progressions</span>
+<div class="w-full h-1 bg-border-dark mt-1 rounded-full overflow-hidden">
+<div class="w-full h-full bg-primary/50"></div>
+</div>
+</div>
+<div class="flex-[1.5] flex flex-col justify-center items-center px-2 cursor-pointer bg-primary/5 border-b-2 border-primary relative">
+<div class="absolute -top-1.5 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-primary rotate-180"></div>
+<span class="text-[10px] uppercase font-bold text-primary">Act 2b</span>
+<span class="text-xs font-bold text-white">Crisis / Gap</span>
+<div class="w-full h-1 bg-border-dark mt-1 rounded-full overflow-hidden">
+<div class="w-[40%] h-full bg-primary"></div>
+</div>
+</div>
+<div class="flex-1 flex flex-col justify-center items-center px-2 cursor-pointer hover:bg-white/5 transition-colors group">
+<span class="text-[10px] uppercase font-bold text-text-muted group-hover:text-primary transition-colors">Act 3</span>
+<span class="text-xs font-medium text-text-main">Climax</span>
+<div class="w-full h-1 bg-border-dark mt-1 rounded-full overflow-hidden"></div>
+</div>
+<div class="flex-1 flex flex-col justify-center items-center px-2 cursor-pointer hover:bg-white/5 transition-colors group">
+<span class="text-[10px] uppercase font-bold text-text-muted group-hover:text-primary transition-colors">Resolution</span>
+<span class="text-xs font-medium text-text-main">Ending</span>
+<div class="w-full h-1 bg-border-dark mt-1 rounded-full overflow-hidden"></div>
+</div>
+</div>
+</section>
+<!-- Right Toolbar: View Switcher -->
+<aside class="w-20 border-l border-border-dark bg-surface-dark flex flex-col items-center py-6 gap-6 z-20 shadow-[-5px_0_15px_rgba(0,0,0,0.2)]">
+<div class="flex flex-col gap-4 w-full px-2">
+<!-- Skeleton View (Active) -->
+<button class="group flex flex-col items-center gap-1.5 w-full">
+<div class="size-10 rounded-xl bg-primary text-background-dark flex items-center justify-center shadow-[0_0_15px_rgba(37,192,244,0.3)] transition-all">
+<span class="material-symbols-outlined">grid_view</span>
+</div>
+<span class="text-[10px] font-bold text-primary">Skeleton</span>
+</button>
+<!-- Soul View -->
+<button class="group flex flex-col items-center gap-1.5 w-full">
+<div class="size-10 rounded-xl bg-surface-dark border border-border-dark text-text-muted flex items-center justify-center group-hover:bg-border-dark group-hover:text-white transition-all">
+<span class="material-symbols-outlined">favorite</span>
+</div>
+<span class="text-[10px] font-medium text-text-muted group-hover:text-white">Soul</span>
+</button>
+<!-- Beat View -->
+<button class="group flex flex-col items-center gap-1.5 w-full">
+<div class="size-10 rounded-xl bg-surface-dark border border-border-dark text-text-muted flex items-center justify-center group-hover:bg-border-dark group-hover:text-white transition-all">
+<span class="material-symbols-outlined">graphic_eq</span>
+</div>
+<span class="text-[10px] font-medium text-text-muted group-hover:text-white">Beats</span>
+</button>
+</div>
+<div class="w-8 h-px bg-border-dark my-2"></div>
+<div class="flex flex-col gap-4 w-full px-2">
+<button class="size-10 rounded-full bg-surface-dark border border-border-dark text-text-muted flex items-center justify-center hover:bg-border-dark hover:text-white transition-all" title="Notes">
+<span class="material-symbols-outlined text-lg">edit_note</span>
+</button>
+<button class="size-10 rounded-full bg-surface-dark border border-border-dark text-text-muted flex items-center justify-center hover:bg-border-dark hover:text-white transition-all" title="Help">
+<span class="material-symbols-outlined text-lg">help</span>
+</button>
+</div>
+</aside>
+</main>
+</body></html>

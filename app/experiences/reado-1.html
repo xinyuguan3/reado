@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>reado: Story Laboratory - Campbell Soul View</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#0db9f2",
+              "primary-dark": "#0a9acb",
+              "background-light": "#f5f8f8",
+              "background-dark": "#0b1416", // Even darker for deep contrast
+              "surface-dark": "#101e23",
+              "surface-highlight": "#1a2c32",
+              "accent-green": "#0bda57",
+              "accent-purple": "#8b5cf6",
+              "glow-teal": "#2dd4bf",
+            },
+            fontFamily: {
+              display: ["Space Grotesk", "sans-serif"],
+              sans: ["Space Grotesk", "sans-serif"],
+            },
+            backgroundImage: {
+              'soul-gradient': 'radial-gradient(circle at center, rgba(13,185,242,0.15) 0%, rgba(11,20,22,0) 70%)',
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .glow-text {
+            text-shadow: 0 0 10px rgba(13, 185, 242, 0.5);
+        }
+        .glow-box {
+            box-shadow: 0 0 20px rgba(13, 185, 242, 0.1);
+        }
+        .path-line {
+            stroke-dasharray: 10;
+            animation: dash 30s linear infinite;
+        }
+        @keyframes dash {
+            to {
+                stroke-dashoffset: 1000;
+            }
+        }
+        /* Custom scrollbar for webkit */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #101e23; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #223f49; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0db9f2; 
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex flex-col overflow-hidden">
+<script src="/shared/book-catalog.js?v=1772015080593"></script>
+<script type="module" src="/shared/shell.js?v=1772015080593"></script>
+<reado-app-shell data-page="knowledge-map"></reado-app-shell>
+<!-- Top Navigation -->
+<header class="flex items-center justify-between border-b border-surface-highlight bg-surface-dark px-6 py-4 z-20 shadow-lg">
+<div class="flex items-center gap-4 text-white">
+<div class="w-8 h-8 flex items-center justify-center rounded-lg bg-primary/20 text-primary">
+<span class="material-symbols-outlined">science</span>
+</div>
+<div>
+<h2 class="text-white text-lg font-bold leading-tight tracking-tight">Story Laboratory</h2>
+<p class="text-xs text-slate-400">Campbell Soul View // Phase: The Ordeal</p>
+</div>
+</div>
+<!-- Center Status / Heart Rate -->
+<div class="hidden md:flex items-center gap-6 bg-surface-highlight/50 px-6 py-2 rounded-full border border-surface-highlight">
+<div class="flex items-center gap-3">
+<div class="relative">
+<span class="material-symbols-outlined text-accent-green animate-pulse">monitor_heart</span>
+<div class="absolute inset-0 bg-accent-green blur-md opacity-20 rounded-full animate-pulse"></div>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Audience Heart Rate</span>
+<span class="text-white font-bold leading-none flex items-center gap-2">
+                        125 BPM 
+                        <span class="text-[10px] bg-accent-green/20 text-accent-green px-1.5 py-0.5 rounded border border-accent-green/30">EMPATHY BURST</span>
+</span>
+</div>
+</div>
+<div class="h-8 w-px bg-surface-highlight"></div>
+<div class="flex flex-col">
+<span class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Resonance</span>
+<span class="text-primary font-bold leading-none">+15%</span>
+</div>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center justify-center gap-2 h-10 px-4 bg-surface-highlight hover:bg-surface-highlight/80 text-white text-sm font-bold rounded-xl transition-colors">
+<span class="material-symbols-outlined text-sm">logout</span>
+<span class="hidden sm:inline">Exit Lab</span>
+</button>
+<button class="flex items-center justify-center h-10 w-10 bg-primary text-surface-dark rounded-xl hover:bg-primary/90 transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 flex overflow-hidden relative">
+<!-- Background decorative elements -->
+<div class="absolute inset-0 bg-soul-gradient z-0 pointer-events-none"></div>
+<div class="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
+<div class="absolute bottom-1/4 right-1/4 w-64 h-64 bg-accent-purple/5 rounded-full blur-3xl pointer-events-none"></div>
+<!-- Left Interactive Area: Transformation Choice -->
+<div class="w-full md:w-1/3 xl:w-1/4 flex flex-col justify-center p-8 z-10 relative">
+<div class="mb-8">
+<h1 class="text-3xl md:text-4xl font-bold text-white mb-2 glow-text">Hero's Soul: <br/><span class="text-primary">The Abyss</span></h1>
+<p class="text-slate-400 text-sm leading-relaxed">The hero stands in the deepest cave. To trigger the transformation, a price must be paid. What does the hero sacrifice?</p>
+</div>
+<div class="flex flex-col gap-4">
+<!-- Option 1 -->
+<button class="group relative flex items-center gap-4 p-4 rounded-xl border border-surface-highlight bg-surface-dark hover:border-primary/50 hover:bg-surface-highlight/50 transition-all text-left">
+<div class="w-10 h-10 rounded-full bg-surface-highlight flex items-center justify-center group-hover:bg-primary group-hover:text-surface-dark transition-colors border border-white/5">
+<span class="material-symbols-outlined text-lg">child_care</span>
+</div>
+<div>
+<h3 class="text-white font-bold text-sm">Sacrifice Innocence</h3>
+<p class="text-xs text-slate-500 group-hover:text-slate-300">Gain wisdom through pain.</p>
+</div>
+<div class="absolute inset-0 border border-primary/0 rounded-xl group-hover:border-primary/30 pointer-events-none transition-all"></div>
+</button>
+<!-- Option 2 -->
+<button class="group relative flex items-center gap-4 p-4 rounded-xl border border-surface-highlight bg-surface-dark hover:border-primary/50 hover:bg-surface-highlight/50 transition-all text-left ring-1 ring-primary/20 shadow-[0_0_15px_rgba(13,185,242,0.15)]">
+<div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-surface-dark transition-colors shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-lg">group_remove</span>
+</div>
+<div>
+<h3 class="text-white font-bold text-sm">Lose a Best Friend</h3>
+<p class="text-xs text-slate-500 group-hover:text-slate-300">The burden of survival.</p>
+</div>
+<div class="absolute right-4 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-primary animate-ping"></div>
+</button>
+<!-- Option 3 -->
+<button class="group relative flex items-center gap-4 p-4 rounded-xl border border-surface-highlight bg-surface-dark hover:border-primary/50 hover:bg-surface-highlight/50 transition-all text-left">
+<div class="w-10 h-10 rounded-full bg-surface-highlight flex items-center justify-center group-hover:bg-primary group-hover:text-surface-dark transition-colors border border-white/5">
+<span class="material-symbols-outlined text-lg">person_cancel</span>
+</div>
+<div>
+<h3 class="text-white font-bold text-sm">Abandon Old Self</h3>
+<p class="text-xs text-slate-500 group-hover:text-slate-300">Reborn as something new.</p>
+</div>
+</button>
+</div>
+<div class="mt-8 p-4 bg-surface-dark/50 rounded-lg border border-dashed border-surface-highlight">
+<p class="text-[10px] uppercase text-slate-500 font-bold mb-2">Simulated Consequence</p>
+<div class="flex items-center gap-2 text-xs text-accent-green">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+<span>Depth +25%</span>
+</div>
+<div class="flex items-center gap-2 text-xs text-accent-purple mt-1">
+<span class="material-symbols-outlined text-sm">psychology</span>
+<span>Archetype Shift: Warrior</span>
+</div>
+</div>
+</div>
+<!-- Center Visualization: Psychological Topography -->
+<div class="flex-1 relative flex items-center justify-center z-0">
+<!-- Topography Map SVG Background -->
+<svg class="absolute inset-0 w-full h-full opacity-30 pointer-events-none" preserveaspectratio="xMidYMid slice" viewbox="0 0 800 600">
+<defs>
+<lineargradient id="grid-grad" x1="0%" x2="100%" y1="0%" y2="100%">
+<stop offset="0%" stop-color="#101e23" stop-opacity="0"></stop>
+<stop offset="50%" stop-color="#0db9f2" stop-opacity="0.1"></stop>
+<stop offset="100%" stop-color="#101e23" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+<!-- Abstract contour lines -->
+<path d="M100,300 C150,200 250,200 300,300 S450,400 500,300 S650,200 700,300" fill="none" stroke="#223f49" stroke-width="1"></path>
+<path d="M50,300 C100,150 200,150 250,300 S400,450 450,300 S600,150 650,300" fill="none" opacity="0.5" stroke="#223f49" stroke-width="1"></path>
+<path d="M150,300 C200,250 300,250 350,300 S500,350 550,300 S700,250 750,300" fill="none" opacity="0.3" stroke="#223f49" stroke-width="1"></path>
+<!-- Archetype Paths -->
+<text fill="#223f49" font-family="Space Grotesk" font-size="12" x="100" y="100">SEPARATION</text>
+<text fill="#223f49" font-family="Space Grotesk" font-size="12" x="600" y="100">RETURN</text>
+<text fill="#0db9f2" font-family="Space Grotesk" font-size="12" opacity="0.8" x="350" y="500">INITIATION (Current)</text>
+<circle cx="400" cy="300" fill="none" r="150" stroke="url(#grid-grad)" stroke-dasharray="4 4" stroke-width="1"></circle>
+<circle cx="400" cy="300" fill="none" r="220" stroke="#223f49" stroke-width="0.5"></circle>
+</svg>
+<!-- Central Soul Silhouette -->
+<div class="relative w-64 h-64 md:w-80 md:h-80 flex items-center justify-center">
+<!-- Glowing Aura Layers -->
+<div class="absolute inset-0 bg-primary/20 rounded-full blur-[60px] animate-pulse"></div>
+<div class="absolute inset-10 bg-accent-purple/20 rounded-full blur-[40px] animate-pulse delay-75"></div>
+<!-- Silhouette Image -->
+<div class="relative z-10 w-full h-full flex items-center justify-center">
+<!-- Using a material icon as a stand-in for the silhouette to ensure no external image dependencies -->
+<span class="material-symbols-outlined text-[180px] md:text-[220px] text-white opacity-90 drop-shadow-[0_0_15px_rgba(13,185,242,0.8)]" style="font-variation-settings: 'FILL' 1;">
+                        accessibility_new
+                    </span>
+<!-- Overlay gradient for the "transformation" effect (multi-color) -->
+<div class="absolute inset-0 mix-blend-overlay bg-gradient-to-tr from-primary via-transparent to-accent-purple rounded-full opacity-60"></div>
+</div>
+<!-- Floating Labels around silhouette -->
+<div class="absolute -top-4 bg-surface-dark border border-surface-highlight px-3 py-1 rounded-full text-xs text-primary shadow-lg">
+                    Super Ego
+                </div>
+<div class="absolute -bottom-4 bg-surface-dark border border-surface-highlight px-3 py-1 rounded-full text-xs text-accent-purple shadow-lg">
+                    The Shadow
+                </div>
+<div class="absolute -right-8 top-1/2 -translate-y-1/2 bg-surface-dark border border-surface-highlight px-3 py-1 rounded-full text-xs text-slate-300 shadow-lg">
+                    Anima
+                </div>
+</div>
+</div>
+<!-- Right Toolbar: View Switcher -->
+<div class="w-16 md:w-64 border-l border-surface-highlight bg-surface-dark z-20 flex flex-col">
+<div class="p-4 border-b border-surface-highlight hidden md:block">
+<h3 class="text-white text-sm font-medium">View Switcher</h3>
+<p class="text-slate-500 text-xs">Perspectives</p>
+</div>
+<nav class="flex-1 flex flex-col gap-1 p-2">
+<button class="flex items-center gap-3 p-3 rounded-xl text-slate-400 hover:bg-surface-highlight hover:text-white transition-colors group">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">menu_book</span>
+<span class="hidden md:block text-sm font-medium">Narrative Structure</span>
+</button>
+<button class="flex items-center gap-3 p-3 rounded-xl text-slate-400 hover:bg-surface-highlight hover:text-white transition-colors group">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">face</span>
+<span class="hidden md:block text-sm font-medium">Character Arc</span>
+</button>
+<button class="flex items-center gap-3 p-3 rounded-xl bg-primary/10 text-primary border border-primary/20 shadow-glow-sm">
+<span class="material-symbols-outlined fill-current">visibility</span>
+<span class="hidden md:block text-sm font-bold">Soul View</span>
+</button>
+<div class="my-2 border-t border-surface-highlight mx-2"></div>
+<div class="px-3 py-2 hidden md:block">
+<p class="text-[10px] uppercase text-slate-600 font-bold mb-2">Analysis Tools</p>
+</div>
+<button class="flex items-center gap-3 p-3 rounded-xl text-slate-400 hover:bg-surface-highlight hover:text-white transition-colors group">
+<span class="material-symbols-outlined group-hover:text-accent-green transition-colors">timeline</span>
+<span class="hidden md:block text-sm font-medium">Pacing Graph</span>
+</button>
+<button class="flex items-center gap-3 p-3 rounded-xl text-slate-400 hover:bg-surface-highlight hover:text-white transition-colors group">
+<span class="material-symbols-outlined group-hover:text-accent-purple transition-colors">psychology_alt</span>
+<span class="hidden md:block text-sm font-medium">Archetype Map</span>
+</button>
+</nav>
+<div class="p-4 border-t border-surface-highlight mt-auto hidden md:block">
+<div class="bg-surface-highlight/30 rounded-lg p-3">
+<div class="flex items-center gap-2 text-xs text-white mb-1">
+<span class="material-symbols-outlined text-sm text-primary">auto_awesome</span>
+<span>AI Suggestion</span>
+</div>
+<p class="text-[11px] text-slate-400 leading-tight">
+                        Increasing the stakes here aligns with the "Refusal of the Return" stage later.
+                    </p>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Footer: 12 Stages Progress -->
+<footer class="bg-surface-dark border-t border-surface-highlight p-0 z-20">
+<div class="flex items-center justify-between px-6 py-2 border-b border-surface-highlight bg-surface-highlight/20">
+<div class="text-xs text-slate-400 font-medium">Hero's Journey (Campbell)</div>
+<div class="text-xs text-primary font-bold">Stage 8/12</div>
+</div>
+<div class="w-full overflow-x-auto">
+<div class="flex min-w-[1000px] items-center justify-between px-6 py-4 relative">
+<!-- Progress Line Background -->
+<div class="absolute left-6 right-6 top-1/2 h-0.5 bg-surface-highlight -z-10"></div>
+<!-- Active Progress Line -->
+<div class="absolute left-6 w-[62%] top-1/2 h-0.5 bg-gradient-to-r from-primary/50 to-primary -z-10 shadow-[0_0_10px_rgba(13,185,242,0.5)]"></div>
+<!-- Stage 1: Call to Adventure -->
+<div class="flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-3 h-3 rounded-full bg-primary ring-4 ring-surface-dark"></div>
+<span class="text-[10px] text-slate-500 font-medium opacity-50 group-hover:opacity-100 transition-opacity">The Call</span>
+</div>
+<!-- Stage 2 -->
+<div class="flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-3 h-3 rounded-full bg-primary ring-4 ring-surface-dark"></div>
+<span class="text-[10px] text-slate-500 font-medium opacity-50 group-hover:opacity-100 transition-opacity">Refusal</span>
+</div>
+<!-- Stage 3 -->
+<div class="flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-3 h-3 rounded-full bg-primary ring-4 ring-surface-dark"></div>
+<span class="text-[10px] text-slate-500 font-medium opacity-50 group-hover:opacity-100 transition-opacity">Mentor</span>
+</div>
+<!-- Stage 4 -->
+<div class="flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-3 h-3 rounded-full bg-primary ring-4 ring-surface-dark"></div>
+<span class="text-[10px] text-slate-500 font-medium opacity-50 group-hover:opacity-100 transition-opacity">Threshold</span>
+</div>
+<!-- Stage 5 -->
+<div class="flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-3 h-3 rounded-full bg-primary ring-4 ring-surface-dark"></div>
+<span class="text-[10px] text-slate-500 font-medium opacity-50 group-hover:opacity-100 transition-opacity">Belly of Whale</span>
+</div>
+<!-- Stage 6 -->
+<div class="flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-3 h-3 rounded-full bg-primary ring-4 ring-surface-dark"></div>
+<span class="text-[10px] text-slate-500 font-medium opacity-50 group-hover:opacity-100 transition-opacity">Road of Trials</span>
+</div>
+<!-- Stage 7 -->
+<div class="flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-3 h-3 rounded-full bg-primary ring-4 ring-surface-dark"></div>
+<span class="text-[10px] text-slate-500 font-medium opacity-50 group-hover:opacity-100 transition-opacity">Meeting Goddess</span>
+</div>
+<!-- Stage 8: The Ordeal (Active) -->
+<div class="flex flex-col items-center gap-2 relative">
+<div class="absolute -top-10 bg-primary text-surface-dark text-[10px] font-bold px-2 py-1 rounded shadow-lg animate-bounce">
+                        Current
+                    </div>
+<div class="w-5 h-5 rounded-full bg-primary border-4 border-surface-dark shadow-[0_0_15px_rgba(13,185,242,0.8)] z-10"></div>
+<span class="text-[10px] text-primary font-bold">The Ordeal</span>
+</div>
+<!-- Stage 9 -->
+<div class="flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-3 h-3 rounded-full bg-surface-highlight ring-4 ring-surface-dark"></div>
+<span class="text-[10px] text-slate-600 font-medium group-hover:text-slate-400 transition-colors">Reward</span>
+</div>
+<!-- Stage 10 -->
+<div class="flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-3 h-3 rounded-full bg-surface-highlight ring-4 ring-surface-dark"></div>
+<span class="text-[10px] text-slate-600 font-medium group-hover:text-slate-400 transition-colors">Road Back</span>
+</div>
+<!-- Stage 11 -->
+<div class="flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-3 h-3 rounded-full bg-surface-highlight ring-4 ring-surface-dark"></div>
+<span class="text-[10px] text-slate-600 font-medium group-hover:text-slate-400 transition-colors">Resurrection</span>
+</div>
+<!-- Stage 12 -->
+<div class="flex flex-col items-center gap-2 group cursor-pointer">
+<div class="w-3 h-3 rounded-full bg-surface-highlight ring-4 ring-surface-dark"></div>
+<span class="text-[10px] text-slate-600 font-medium group-hover:text-slate-400 transition-colors">Elixir</span>
+</div>
+</div>
+</div>
+</footer>
+
+
+<script>
+(() => {
+  
+  
+  
+})();
+</script>
+</body></html>
