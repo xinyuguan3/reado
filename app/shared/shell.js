@@ -43,6 +43,9 @@ const ACCESS_INVITE_CODE_KEY = "reado_invite_code_v1";
 const ACCESS_SLOT_UNLOCKED_KEY = "reado_generation_slot_unlocked_v1";
 const AUTH_STATE_KEY = "reado_auth_state_v1";
 const AUTH_PAGE_PATH = "/pages/auth.html";
+const UMAMI_SCRIPT_ID = "reado-umami-script";
+const UMAMI_SCRIPT_SRC = "https://umami-production-9f03.up.railway.app/script.js";
+const UMAMI_WEBSITE_ID = "a7e6844a-97e6-4878-bf40-5a18520d1310";
 const BILLING_PLAN_ORDER = ["starter", "trial", "pro"];
 const BILLING_PLAN_COPY = {
   monthly: {
@@ -130,6 +133,23 @@ const BILLING_PLAN_COPY = {
     }
   }
 };
+
+function ensureUmamiTrackingScript() {
+  if (typeof document === "undefined" || !document.head) return;
+  if (document.getElementById(UMAMI_SCRIPT_ID)) return;
+  const existing = document.querySelector(
+    `script[src="${UMAMI_SCRIPT_SRC}"][data-website-id="${UMAMI_WEBSITE_ID}"]`
+  );
+  if (existing) return;
+  const script = document.createElement("script");
+  script.id = UMAMI_SCRIPT_ID;
+  script.defer = true;
+  script.src = UMAMI_SCRIPT_SRC;
+  script.setAttribute("data-website-id", UMAMI_WEBSITE_ID);
+  document.head.append(script);
+}
+
+ensureUmamiTrackingScript();
 
 function formatNumber(value) {
   return new Intl.NumberFormat(getCurrentLanguage()).format(value);
