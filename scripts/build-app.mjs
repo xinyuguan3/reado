@@ -134,6 +134,11 @@ const BOOK_DEFAULT_MODULE_ORDER = {
     "zero-to-one-the-monopolist-s-choice-7"
   ]
 };
+const PERSONAL_SHELF_HIDDEN_BOOK_IDS = new Set([
+  "sapiens",
+  "zero-to-one",
+  "principles-for-navigating-big-debt-crises"
+]);
 const BOOK_BLUEPRINTS = [
   {
     id: "wanli-fifteen",
@@ -785,6 +790,7 @@ function injectMarketplaceBooks(html, books) {
 }
 
 function injectKnowledgeMapBooks(html, books) {
+  const shelfHiddenBookIds = [...PERSONAL_SHELF_HIDDEN_BOOK_IDS];
   const staticReplacements = [
     ["知识版图", "个人书库"],
     ["硅谷高地", "认知/硬核"],
@@ -807,7 +813,9 @@ function injectKnowledgeMapBooks(html, books) {
     ""
   );
 
-  const fallbackBooks = books.map((book) => ({
+  const fallbackBooks = books
+    .filter((book) => !PERSONAL_SHELF_HIDDEN_BOOK_IDS.has(String(book?.id || "").trim()))
+    .map((book) => ({
     id: book.id,
     title: book.title,
     cover: book.cover,
@@ -826,7 +834,12 @@ function injectKnowledgeMapBooks(html, books) {
 (() => {
   const fallbackBooks = [{"id":"wanli-fifteen","title":"《万历十五年》","cover":"/assets/book-covers/wanli-fifteen.jpg","category":"science-knowledge","categoryLabel":"认知/硬核","categoryHint":"开拓世界地图，解锁迷雾","moduleCount":5,"hubHref":"/books/wanli-fifteen.html","firstModuleHref":"/experiences/tax-reform-dilemma-1.html","moduleSlugs":["tax-reform-dilemma-1","tax-reform-dilemma-2","tax-reform-dilemma-3","tax-reform-dilemma-4","tax-reform-dilemma-5"]},{"id":"sapiens","title":"《人类简史》","cover":"/assets/book-covers/sapiens.jpg","category":"science-knowledge","categoryLabel":"认知/硬核","categoryHint":"开拓世界地图，解锁迷雾","moduleCount":8,"hubHref":"/books/sapiens.html","firstModuleHref":"/experiences/the-wheat-conquest-simulator.html","moduleSlugs":["the-wheat-conquest-simulator","human-domestication-dilemma-1","human-domestication-dilemma-2","bilingual-human-domestication-dilemma","bilingual-human-domestication-dilemma-4","bilingual-human-domestication-dilemma-1","bilingual-human-domestication-dilemma-2","bilingual-human-domestication-dilemma-3"]},{"id":"principles-for-navigating-big-debt-crises","title":"《置身事外》","cover":"/assets/book-covers/principles-for-navigating-big-debt-crises.jpg","category":"career-wealth","categoryLabel":"事业/财富","categoryHint":"获取金币和装备，通关职场副本","moduleCount":7,"hubHref":"/books/principles-for-navigating-big-debt-crises.html","firstModuleHref":"/experiences/the-beautiful-deleveraging-challenge.html","moduleSlugs":["the-beautiful-deleveraging-challenge","the-subway-dilemma","debt-cycle-impact-analysis","1994","experience-75","experience-76","experience-77"]},{"id":"zero-to-one","title":"《从零到一》","cover":"/assets/book-covers/zero-to-one.jpg","category":"career-wealth","categoryLabel":"事业/财富","categoryHint":"获取金币和装备，通关职场副本","moduleCount":8,"hubHref":"/books/zero-to-one.html","firstModuleHref":"/experiences/zero-to-one-the-monopolist-s-choice.html","moduleSlugs":["zero-to-one-the-monopolist-s-choice","zero-to-one-the-monopolist-s-choice-1","zero-to-one-the-monopolist-s-choice-2","zero-to-one-the-monopolist-s-choice-3","zero-to-one-the-monopolist-s-choice-4","zero-to-one-the-monopolist-s-choice-5","zero-to-one-the-monopolist-s-choice-6","zero-to-one-the-monopolist-s-choice-7"]}];
   const catalog = window.__READO_BOOK_CATALOG__;
-  const books = Array.isArray(catalog?.books) && catalog.books.length > 0 ? catalog.books : fallbackBooks;
+  const hiddenBookIds = new Set(${JSON.stringify(shelfHiddenBookIds)});
+  const sourceBooks = Array.isArray(catalog?.books) && catalog.books.length > 0 ? catalog.books : fallbackBooks;
+  const books = sourceBooks.filter((book) => {
+    const bookId = String(book?.id || "").trim();
+    return bookId && !hiddenBookIds.has(bookId);
+  });
   const storageKey = catalog?.storage?.unlockKey || "reado_unlocked_books_v1";
   const viewStorageKey = "reado_knowledge_map_view_v1";
   const i18n = window.ReadoI18n || {};
