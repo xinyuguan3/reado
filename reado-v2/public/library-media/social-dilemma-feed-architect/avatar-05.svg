@@ -1,0 +1,8 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'>
+  <defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='#be123c'/><stop offset='100%' stop-color='#f97316'/></linearGradient></defs>
+  <rect width='120' height='120' rx='60' fill='url(#g)'/>
+  <circle cx='60' cy='44' r='20' fill='rgba(255,255,255,0.92)'/>
+  <path d='M18 104c8-23 23-34 42-34s34 11 42 34' fill='rgba(255,255,255,0.92)'/>
+  <text x='10' y='18' fill='rgba(255,255,255,0.75)' font-family='Arial,sans-serif' font-size='10' font-weight='700'>U1170</text>
+  <text x='60' y='114' text-anchor='middle' fill='rgba(255,255,255,0.78)' font-family='Arial,sans-serif' font-size='9'>Family</text>
+  </svg>

@@ -1,15 +1,16 @@
 import type { Metadata } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
+import { JetBrains_Mono, Noto_Sans_SC } from "next/font/google"
 import { TopNav } from "@/components/top-nav"
 import "./globals.css"
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const notoSans = Noto_Sans_SC({
+  variable: "--font-reado-sans",
   subsets: ["latin"],
+  weight: ["400", "500", "700", "900"],
 })
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const jetMono = JetBrains_Mono({
+  variable: "--font-reado-mono",
   subsets: ["latin"],
 })
 
@@ -24,8 +25,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="zh-CN">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+    <html lang="zh-CN" className="dark">
+      <body className={`${notoSans.variable} ${jetMono.variable} antialiased`}>
         <TopNav />
         {children}
       </body>

@@ -31,7 +31,11 @@ export function LanguageDropdown() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-2 rounded-full">
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-2 rounded-full border-[#4d6fbe66] bg-[#122038cc] text-slate-100 hover:bg-[#1f365bb8]"
+        >
           <Languages className="size-4" />
           <span>{currentLabel}</span>
           <ChevronDown className="size-4" />

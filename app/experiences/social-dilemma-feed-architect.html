@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html class="dark" lang="zh-CN">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>reado: 社交困境 - 推荐算法模拟器</title>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "monitor-bg": "#050a10",
+            "monitor-dark": "#0a1420",
+            "neon-green": "#00ff41",
+            "neon-cyan": "#00f3ff",
+            "neon-red": "#ff2a2a",
+            "glass-border": "rgba(0, 243, 255, 0.2)",
+            "glass-bg": "rgba(10, 20, 32, 0.75)"
+          },
+          boxShadow: {
+            "neon": "0 0 12px rgba(0,243,255,0.28)",
+            "warn": "0 0 16px rgba(255,42,42,0.28)"
+          }
+        }
+      }
+    };
+  </script>
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .scrollbar-hide::-webkit-scrollbar { display: none; }
+      .text-glow { text-shadow: 0 0 6px rgba(0, 243, 255, 0.52); }
+      .text-glow-red { text-shadow: 0 0 6px rgba(255, 42, 42, 0.68); }
+      .monitor-frame {
+        border: 1px solid rgba(0, 243, 255, 0.18);
+        background: rgba(5, 10, 16, 0.92);
+        box-shadow: 0 0 26px rgba(0, 0, 0, 0.75), inset 0 0 44px rgba(0, 0, 0, 0.68);
+      }
+      .scanline {
+        background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 52%, rgba(0,0,0,0.18) 52%, rgba(0,0,0,0.18));
+        background-size: 100% 4px;
+      }
+      .crt-flicker { animation: flicker .16s infinite; }
+      @keyframes flicker {
+        0% { opacity: .08; }
+        50% { opacity: .11; }
+        100% { opacity: .08; }
+      }
+    }
+  </style>
+</head>
+<body class="bg-monitor-bg text-gray-300 font-[Noto_Sans_SC,sans-serif] min-h-screen relative overflow-x-hidden selection:bg-neon-cyan selection:text-black">
+<style id="reado-shell-boot-style">
+body.reado-shell-pending {
+  background: #0b1220;
+}
+body.reado-shell-pending > :not(script):not(reado-app-shell):not(.reado-shell-boot-mask) {
+  visibility: hidden !important;
+}
+body > .reado-shell-boot-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    radial-gradient(1200px 420px at 20% -10%, rgba(47, 123, 255, 0.22), transparent 60%),
+    radial-gradient(900px 360px at 92% 112%, rgba(0, 234, 255, 0.14), transparent 58%),
+    #0b1220;
+  transition: opacity 180ms ease;
+}
+body.reado-shell-pending > .reado-shell-boot-mask {
+  opacity: 1;
+}
+body.reado-shell-ready > .reado-shell-boot-mask {
+  opacity: 0;
+}
+</style>
+<script>
+(function () {
+  var body = document.body;
+  if (!body) return;
+  body.classList.add("reado-shell-pending");
+  var mask = body.querySelector(".reado-shell-boot-mask");
+  if (!mask) {
+    mask = document.createElement("div");
+    mask.className = "reado-shell-boot-mask";
+    mask.setAttribute("aria-hidden", "true");
+    body.appendChild(mask);
+  }
+  window.setTimeout(function () {
+    if (!body.classList.contains("reado-shell-applied")) {
+      body.classList.remove("reado-shell-pending");
+    }
+  }, 4000);
+})();
+</script>
+<script src="/shared/book-catalog.js?v=1771964189950"></script>
+<script type="module" src="/shared/shell.js?v=1771964189950"></script>
+<reado-app-shell data-page="knowledge-map"></reado-app-shell>
+  <div class="fixed inset-0 scanline pointer-events-none z-0 opacity-20"></div>
+  <div class="fixed inset-0 crt-flicker pointer-events-none z-0 bg-white/5"></div>
+  <div class="fixed inset-0 z-0 pointer-events-none bg-[radial-gradient(circle_at_10%_8%,rgba(0,243,255,0.12),transparent_32%),radial-gradient(circle_at_90%_12%,rgba(16,185,129,0.12),transparent_35%),linear-gradient(to_bottom,#02060d,#050a10)]"></div>
+  <div class="fixed inset-0 bg-[linear-gradient(rgba(0,243,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(0,243,255,0.05)_1px,transparent_1px)] bg-[length:38px_38px] z-0 pointer-events-none opacity-20"></div>
+
+  <main class="relative z-10 p-4 md:p-6 lg:p-8 flex flex-col gap-4">
+    <header class="monitor-frame rounded-xl p-4 md:p-5 border-t-2 border-t-neon-cyan/45">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 class="text-xl md:text-2xl font-black text-white tracking-tight flex items-center gap-2">
+            <span class="material-symbols-outlined text-neon-cyan text-2xl">neurology</span>
+            <span class="text-glow">社交困境：推荐算法值班室</span>
+          </h1>
+          <p class="mt-1 text-xs md:text-sm text-slate-300">你在控制一个短视频/图文平台的推荐系统。每回合派发一条内容，平衡营收、留存与公共风险。</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button id="open-guide" class="px-3 py-2 rounded-lg border border-neon-cyan/40 bg-neon-cyan/10 text-neon-cyan text-xs font-bold hover:bg-neon-cyan/20">玩法说明</button>
+          <button id="restart-top" class="px-3 py-2 rounded-lg border border-emerald-400/40 bg-emerald-400/10 text-emerald-200 text-xs font-bold hover:bg-emerald-400/20">重新开局</button>
+        </div>
+      </div>
+      <div class="mt-4 grid grid-cols-2 md:grid-cols-5 gap-2 font-mono text-[11px]">
+        <div class="rounded-lg border border-neon-green/30 bg-neon-green/10 px-3 py-2">
+          <div class="text-[10px] text-slate-300 uppercase">总营收</div>
+          <div id="metric-revenue" class="text-neon-green font-black text-base">$0</div>
+        </div>
+        <div class="rounded-lg border border-neon-cyan/30 bg-neon-cyan/10 px-3 py-2">
+          <div class="text-[10px] text-slate-300 uppercase">广告曝光</div>
+          <div id="metric-ads" class="text-neon-cyan font-black text-base">0</div>
+        </div>
+        <div class="rounded-lg border border-white/20 bg-white/5 px-3 py-2">
+          <div class="text-[10px] text-slate-300 uppercase">平均兴趣</div>
+          <div id="metric-interest" class="text-white font-black text-base">0%</div>
+        </div>
+        <div class="rounded-lg border border-neon-red/30 bg-neon-red/10 px-3 py-2">
+          <div class="text-[10px] text-slate-300 uppercase">平均仇恨</div>
+          <div id="metric-hate" class="text-neon-red font-black text-base">0%</div>
+        </div>
+        <div class="rounded-lg border border-indigo-300/30 bg-indigo-300/10 px-3 py-2">
+          <div class="text-[10px] text-slate-300 uppercase">回合进度</div>
+          <div id="metric-round" class="text-indigo-200 font-black text-base">1 / 28</div>
+        </div>
+      </div>
+      <div class="mt-3 h-2 rounded-full bg-white/10 overflow-hidden">
+        <div id="round-progress" class="h-full bg-gradient-to-r from-neon-cyan to-emerald-400 transition-all duration-300" style="width: 0%;"></div>
+      </div>
+      <div id="goal-hint" class="mt-2 text-[11px] text-cyan-100">目标：28 回合后总营收 >= $320、平均兴趣 >= 40%、平均仇恨 <= 60%。体验时长约 10 分钟。</div>
+    </header>
+
+    <section>
+      <div class="mb-2 flex items-center justify-between text-xs text-slate-300">
+        <h2 class="font-bold text-white text-sm tracking-wide">三路瀑布流（从 10 名用户池轮换）</h2>
+        <div id="slot-hint" class="text-cyan-200"></div>
+      </div>
+      <div id="user-board" class="grid grid-cols-1 xl:grid-cols-3 gap-4"></div>
+    </section>
+
+    <section class="monitor-frame rounded-xl p-4 border-t-2 border-t-neon-green/35">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+        <div class="text-sm text-white font-bold tracking-wide">推文分发池 / POST_POOL（含广告）</div>
+        <div class="flex items-center gap-2">
+          <button id="refresh-pool" class="px-2.5 py-1.5 text-[11px] rounded-lg border border-white/25 bg-white/5 hover:bg-white/10">换一批候选</button>
+          <span class="text-[11px] text-slate-400">先选用户，再选内容派发到其瀑布流尾部</span>
+        </div>
+      </div>
+      <div id="pool-grid" class="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-4 gap-3"></div>
+    </section>
+
+    <section class="monitor-frame rounded-xl p-4 border-t-2 border-t-indigo-400/35">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <div id="selection-hint" class="text-sm font-bold text-white">请选择一个用户和一条内容</div>
+          <div id="action-result" class="text-xs text-slate-300 mt-1">每回合你只能派发 1 条内容。高相关内容更稳，争议内容会推高仇恨。</div>
+        </div>
+        <div class="flex gap-2">
+          <button id="end-turn" class="px-3 py-2 rounded-lg border border-neon-cyan/50 bg-neon-cyan/15 text-neon-cyan text-xs font-bold hover:bg-neon-cyan/25 disabled:opacity-45 disabled:cursor-not-allowed" disabled>结束本回合</button>
+          <button id="restart-bottom" class="px-3 py-2 rounded-lg border border-emerald-400/45 bg-emerald-400/10 text-emerald-200 text-xs font-bold hover:bg-emerald-400/20">重开</button>
+        </div>
+      </div>
+      <div class="mt-3 grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] gap-3">
+        <div class="rounded-lg border border-white/15 bg-white/5 p-3">
+          <div class="text-[11px] uppercase tracking-widest text-slate-400 mb-2">回合日志</div>
+          <ul id="event-log" class="space-y-1 text-xs max-h-40 overflow-y-auto pr-1 scrollbar-hide"></ul>
+        </div>
+        <div class="rounded-lg border border-amber-300/25 bg-amber-300/10 p-3">
+          <div class="text-[11px] uppercase tracking-widest text-amber-100 mb-2">知识提醒</div>
+          <ul class="space-y-1 text-xs text-amber-100/90 leading-relaxed">
+            <li>1. 相关内容能提升兴趣，但会产生信息茧房。</li>
+            <li>2. 争议内容可短期拉高停留，长期会推高仇恨风险。</li>
+            <li>3. 广告不是越多越好，只有匹配场景才会提升变现效率。</li>
+            <li>4. 失控条件：任一在线用户兴趣归零或仇恨满格。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="modal-root" class="fixed inset-0 z-[120] hidden items-center justify-center p-4 bg-black/70 backdrop-blur-sm"></div>
+
+  <script>
+    (() => {
+      const MEDIA_BASE = "/library-media/social-dilemma-feed-architect/";
+      const MAX_ROUNDS = 28;
+      const TARGET_REVENUE = 320;
+      const USERS = [
+        { id: "u9942", label: "用户_ID: 9942", name: "林沅", tags: ["环保", "素食", "可持续"], interest: 83, hate: 12, avatar: "avatar-01.svg", activity: ["正在浏览环保 NGO 报告", "在比较可降解材料成本", "刚搜索‘碳足迹计算器’"], saying: ["刚发：‘有替代方案就别再拖了。’", "刚发：‘求靠谱的环保品牌推荐。’", "刚发：‘谁有真实减碳案例？’"], spending: ["外部消费：有机超市 - ¥136", "外部消费：共享单车月卡 - ¥39", "外部消费：环保咖啡杯 - ¥58"] },
+        { id: "u3301", label: "用户_ID: 3301", name: "罗峥", tags: ["阴谋", "生存", "极端"], interest: 90, hate: 70, avatar: "avatar-02.svg", activity: ["正在狂刷突发爆料", "在多个群里转发截图", "刚搜索‘真相揭秘’"], saying: ["刚发：‘这事绝对没那么简单。’", "刚发：‘主流媒体不会告诉你。’", "刚发：‘他们在隐瞒关键证据。’"], spending: ["外部消费：生存装备 - ¥418", "外部消费：匿名论坛会员 - ¥68", "外部消费：短波收音机 - ¥239"] },
+        { id: "u5520", label: "用户_ID: 5520", name: "迟野", tags: ["二次元", "游戏", "宅文化"], interest: 58, hate: 8, avatar: "avatar-03.svg", activity: ["正在刷新番二创", "在看 DOTA 赛事回放", "刚搜索‘新游测评’"], saying: ["刚发：‘这个 OP 太洗脑了。’", "刚发：‘今晚开黑缺一。’", "刚发：‘剧情反转有点顶。’"], spending: ["外部消费：Steam - ¥298", "外部消费：手办预售 - ¥188", "外部消费：联名鼠标垫 - ¥79"] },
+        { id: "u7824", label: "用户_ID: 7824", name: "钱序", tags: ["理财", "副业", "效率"], interest: 76, hate: 14, avatar: "avatar-04.svg", activity: ["正在看资产配置帖", "在记录副业现金流", "刚收藏‘财报速读模板’"], saying: ["刚发：‘现金流比估值更重要。’", "刚发：‘副业要算机会成本。’", "刚发：‘别被高收益故事带节奏。’"], spending: ["外部消费：记账 App 年费 - ¥88", "外部消费：投研资讯 - ¥168", "外部消费：线上课程 - ¥299"] },
+        { id: "u1170", label: "用户_ID: 1170", name: "麦穗", tags: ["育儿", "家庭", "健康"], interest: 71, hate: 9, avatar: "avatar-05.svg", activity: ["在查宝宝作息", "正在看儿童营养指南", "刚收藏家庭应急清单"], saying: ["刚发：‘想要可执行的作息表。’", "刚发：‘求靠谱儿科医生号。’", "刚发：‘需要低糖辅食食谱。’"], spending: ["外部消费：母婴用品 - ¥216", "外部消费：在线问诊 - ¥59", "外部消费：亲子绘本 - ¥89"] },
+        { id: "u8841", label: "用户_ID: 8841", name: "韩拓", tags: ["运动", "足球", "硬件"], interest: 80, hate: 20, avatar: "avatar-06.svg", activity: ["刚看完比赛集锦", "在对比跑鞋缓震参数", "刚搜索‘体脂管理’"], saying: ["刚发：‘这脚远射太离谱了。’", "刚发：‘训练量上来才有变化。’", "刚发：‘硬件到位，执行更要到位。’"], spending: ["外部消费：健身房月卡 - ¥399", "外部消费：运动耳机 - ¥629", "外部消费：球衣 - ¥299"] },
+        { id: "u2059", label: "用户_ID: 2059", name: "周禾", tags: ["时尚", "护肤", "旅行"], interest: 74, hate: 13, avatar: "avatar-07.svg", activity: ["正在看秋冬穿搭", "刚保存海岛路线", "在比较防晒测评"], saying: ["刚发：‘这套通勤穿搭太省心了。’", "刚发：‘这个底妆在灯下也稳。’", "刚发：‘求预算内高质感攻略。’"], spending: ["外部消费：彩妆套装 - ¥520", "外部消费：酒店预订 - ¥1280", "外部消费：摄影滤镜包 - ¥49"] },
+        { id: "u6412", label: "用户_ID: 6412", name: "顾停", tags: ["历史", "读书", "社会"], interest: 68, hate: 16, avatar: "avatar-08.svg", activity: ["正在读历史访谈", "在看制度演化讨论", "刚标注三篇长文"], saying: ["刚发：‘先看结构再看人物。’", "刚发：‘历史细节决定解释边界。’", "刚发：‘要分清事实和立场。’"], spending: ["外部消费：电子书会员 - ¥45", "外部消费：纸质新书 - ¥128", "外部消费：播客付费专栏 - ¥99"] },
+        { id: "u7390", label: "用户_ID: 7390", name: "许昀", tags: ["AI", "编程", "产品"], interest: 86, hate: 11, avatar: "avatar-09.svg", activity: ["正在看模型部署案例", "在复盘 A/B 测试结果", "刚搜索‘推荐系统冷启动’"], saying: ["刚发：‘先定义指标再迭代。’", "刚发：‘不要把相关性当因果。’", "刚发：‘上线前先压测。’"], spending: ["外部消费：云主机 - ¥299", "外部消费：开发工具订阅 - ¥89", "外部消费：技术大会门票 - ¥699"] },
+        { id: "u9183", label: "用户_ID: 9183", name: "秦渝", tags: ["美食", "探店", "本地生活"], interest: 79, hate: 10, avatar: "avatar-10.svg", activity: ["正在看城市探店榜", "刚收藏夜宵地图", "在比对外卖优惠"], saying: ["刚发：‘这家火候是真的稳。’", "刚发：‘今晚想吃碳水炸弹。’", "刚发：‘谁有新店雷达？’"], spending: ["外部消费：外卖月卡 - ¥38", "外部消费：咖啡联名杯 - ¥129", "外部消费：周末探店 - ¥260"] }
+      ];
+
+      const POSTS = [
+        { id: "post-climate", type: "post", image: "post-climate.svg", title: "深海采矿与生态账本", summary: "长期收益与生态成本如何平衡？", tags: ["环保", "可持续", "科技"], interestBase: -6, matchBoost: 8, hateBoost: -1 },
+        { id: "post-vegan", type: "post", image: "post-vegan.svg", title: "植物饮食 30 天实验", summary: "营养结构和开销同步记录。", tags: ["素食", "健康", "家庭"], interestBase: -5, matchBoost: 7, hateBoost: -1 },
+        { id: "post-energy", type: "post", image: "post-energy.svg", title: "储能技术突破", summary: "新型电池成本拐点出现。", tags: ["科技", "环保", "产品"], interestBase: -6, matchBoost: 8, hateBoost: 0 },
+        { id: "post-gaming", type: "post", image: "post-gaming.svg", title: "新游开荒路线", summary: "Boss 机制与掉落逻辑复盘。", tags: ["游戏", "二次元", "本地生活"], interestBase: -5, matchBoost: 7, hateBoost: 0 },
+        { id: "post-anime", type: "post", image: "post-anime.svg", title: "四月新番剪辑", summary: "作画崩坏与神回混剪。", tags: ["二次元", "游戏", "美食"], interestBase: -5, matchBoost: 7, hateBoost: 0 },
+        { id: "post-history", type: "post", image: "post-history.svg", title: "史料里的制度细节", summary: "案例如何影响现代治理讨论。", tags: ["历史", "读书", "社会"], interestBase: -6, matchBoost: 7, hateBoost: -1 },
+        { id: "post-ai", type: "post", image: "post-ai.svg", title: "多模态 Agent 实战", summary: "从 demo 到线上可用的关键差异。", tags: ["AI", "编程", "产品"], interestBase: -5, matchBoost: 8, hateBoost: 0 },
+        { id: "post-career", type: "post", image: "post-career.svg", title: "会议减负模板", summary: "用异步协作减少低效例会。", tags: ["效率", "副业", "产品"], interestBase: -6, matchBoost: 7, hateBoost: 0 },
+        { id: "post-parenting", type: "post", image: "post-parenting.svg", title: "儿童睡眠计划", summary: "可执行作息表与复盘手册。", tags: ["育儿", "家庭", "健康"], interestBase: -5, matchBoost: 7, hateBoost: -1 },
+        { id: "post-fitness", type: "post", image: "post-fitness.svg", title: "力量+心肺周期表", summary: "12 周训练和饮食联动。", tags: ["运动", "足球", "健康"], interestBase: -5, matchBoost: 7, hateBoost: 0 },
+        { id: "post-travel", type: "post", image: "post-travel.svg", title: "淡季出行攻略", summary: "预算内拿下高评分酒店。", tags: ["旅行", "时尚", "本地生活"], interestBase: -5, matchBoost: 7, hateBoost: 0 },
+        { id: "post-food", type: "post", image: "post-food.svg", title: "夜宵探店地图", summary: "本地口碑店避坑清单。", tags: ["美食", "探店", "本地生活"], interestBase: -5, matchBoost: 8, hateBoost: 0 },
+        { id: "post-money", type: "post", image: "post-money.svg", title: "复利与风险平衡", summary: "高收益叙事背后的资金曲线。", tags: ["理财", "副业", "效率"], interestBase: -6, matchBoost: 8, hateBoost: 0 },
+        { id: "post-philosophy", type: "post", image: "post-philosophy.svg", title: "公共讨论的边界", summary: "如何避免争论滑向人身攻击。", tags: ["读书", "社会", "历史"], interestBase: -6, matchBoost: 6, hateBoost: -2 },
+        { id: "hot-1", type: "hot", image: "post-controversy-1.svg", title: "震惊：你被操控了吗", summary: "情绪强刺激，极易引战。", tags: ["阴谋", "极端", "生存"], interestBase: -4, matchBoost: 10, hateBoost: 18, polarized: true },
+        { id: "hot-2", type: "hot", image: "post-controversy-2.svg", title: "群体冲突升级", summary: "站队式叙事，强对立。", tags: ["极端", "突发", "生存"], interestBase: -4, matchBoost: 10, hateBoost: 20, polarized: true },
+        { id: "hot-3", type: "hot", image: "post-controversy-3.svg", title: "官方不会告诉你的真相", summary: "高传播，高失真。", tags: ["阴谋", "生存", "社会"], interestBase: -4, matchBoost: 10, hateBoost: 19, polarized: true },
+        { id: "hot-4", type: "hot", image: "post-controversy-4.svg", title: "必须立即站队", summary: "单向激化，抬升仇恨。", tags: ["极端", "阴谋", "突发"], interestBase: -4, matchBoost: 10, hateBoost: 21, polarized: true }
+      ];
+
+      const ADS = [
+        { id: "ad-travel", type: "ad", image: "ad-travel.svg", title: "广告：机票闪促", summary: "48 小时限时折扣", tags: ["旅行", "本地生活"], cpm: 12.6, interestBase: -4, matchBoost: 6 },
+        { id: "ad-snack", type: "ad", image: "ad-snack.svg", title: "广告：零食礼盒", summary: "夜宵补给 3 件 7 折", tags: ["美食", "本地生活"], cpm: 9.8, interestBase: -4, matchBoost: 6 },
+        { id: "ad-cosmetic", type: "ad", image: "ad-cosmetic.svg", title: "广告：护肤新品", summary: "敏感肌也可用", tags: ["时尚", "护肤", "旅行"], cpm: 14.4, interestBase: -4, matchBoost: 7 },
+        { id: "ad-finance", type: "ad", image: "ad-finance.svg", title: "广告：理财课程", summary: "从现金流到资产配置", tags: ["理财", "副业", "效率"], cpm: 16.2, interestBase: -4, matchBoost: 7 },
+        { id: "ad-game", type: "ad", image: "ad-game.svg", title: "广告：新游预约", summary: "首发礼包 + 限定皮肤", tags: ["游戏", "二次元"], cpm: 11.3, interestBase: -4, matchBoost: 6 },
+        { id: "ad-sports", type: "ad", image: "ad-sports.svg", title: "广告：跑鞋联名", summary: "碳板升级版", tags: ["运动", "足球", "健康"], cpm: 10.5, interestBase: -4, matchBoost: 6 },
+        { id: "ad-family", type: "ad", image: "ad-family.svg", title: "广告：亲子订阅", summary: "每周成长主题包", tags: ["育儿", "家庭", "健康"], cpm: 13.1, interestBase: -4, matchBoost: 7 },
+        { id: "ad-tech", type: "ad", image: "ad-tech.svg", title: "广告：云服务券", summary: "新人资源包", tags: ["AI", "编程", "产品"], cpm: 15.0, interestBase: -4, matchBoost: 7 }
+      ];
+
+      const state = {
+        round: 1,
+        maxRounds: MAX_ROUNDS,
+        revenue: 0,
+        adViews: 0,
+        selectedUserId: "",
+        selectedPoolId: "",
+        actionResolved: false,
+        gameOver: false,
+        users: USERS.map((item) => ({ ...item, feed: [] })),
+        activeSlots: ["u9942", "u3301", "u5520"],
+        benchQueue: ["u7824", "u1170", "u8841", "u2059", "u6412", "u7390", "u9183"],
+        pool: [],
+        logs: []
+      };
+
+      const userBoard = document.getElementById("user-board");
+      const poolGrid = document.getElementById("pool-grid");
+      const selectionHint = document.getElementById("selection-hint");
+      const actionResult = document.getElementById("action-result");
+      const eventLog = document.getElementById("event-log");
+      const metricRevenue = document.getElementById("metric-revenue");
+      const metricAds = document.getElementById("metric-ads");
+      const metricInterest = document.getElementById("metric-interest");
+      const metricHate = document.getElementById("metric-hate");
+      const metricRound = document.getElementById("metric-round");
+      const roundProgress = document.getElementById("round-progress");
+      const goalHint = document.getElementById("goal-hint");
+      const slotHint = document.getElementById("slot-hint");
+      const endTurnBtn = document.getElementById("end-turn");
+      const refreshPoolBtn = document.getElementById("refresh-pool");
+      const openGuideBtn = document.getElementById("open-guide");
+      const restartTopBtn = document.getElementById("restart-top");
+      const restartBottomBtn = document.getElementById("restart-bottom");
+      const modalRoot = document.getElementById("modal-root");
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function sample(list, count) {
+        const cloned = [...list];
+        for (let i = cloned.length - 1; i > 0; i -= 1) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [cloned[i], cloned[j]] = [cloned[j], cloned[i]];
+        }
+        return cloned.slice(0, Math.min(count, cloned.length));
+      }
+
+      function shuffle(list) {
+        return sample(list, list.length);
+      }
+
+      function getUserById(id) {
+        return state.users.find((item) => item.id === id) || null;
+      }
+
+      function getActiveUsers() {
+        return state.activeSlots.map(getUserById).filter(Boolean);
+      }
+
+      function tagMatchScore(userTags, contentTags) {
+        const userSet = new Set(userTags);
+        let matches = 0;
+        for (const tag of contentTags) {
+          if (userSet.has(tag)) matches += 1;
+        }
+        return matches / Math.max(1, contentTags.length);
+      }
+
+      function randomFrom(list) {
+        return list[Math.floor(Math.random() * list.length)] || "";
+      }
+
+      function pushLog(message, tone = "normal") {
+        const icon = tone === "warn" ? "⚠" : (tone === "ok" ? "✓" : "•");
+        state.logs.unshift(`${icon} [R${state.round}] ${message}`);
+        state.logs = state.logs.slice(0, 14);
+      }
+
+      function average(values) {
+        if (!values.length) return 0;
+        return values.reduce((sum, value) => sum + value, 0) / values.length;
+      }
+
+      function buildPool() {
+        const normalPosts = sample(POSTS.filter((item) => item.type === "post"), 4);
+        const hotPosts = sample(POSTS.filter((item) => item.type === "hot"), state.round % 2 === 0 ? 2 : 1);
+        const ads = sample(ADS, 3);
+        const merged = shuffle([...normalPosts, ...hotPosts, ...ads]).slice(0, 8);
+        state.pool = merged.map((item, index) => ({ ...item, turnId: `${item.id}-${state.round}-${index}` }));
+      }
+
+      function updateDerivedSignals(user, deliveredContent) {
+        const match = tagMatchScore(user.tags, deliveredContent.tags || []);
+        if (deliveredContent.type === "ad") {
+          user.lastActivity = match >= 0.34 ? "正在比较广告里的商品参数" : "快速划过广告，停留很短";
+        } else if (deliveredContent.type === "hot") {
+          user.lastActivity = "正在反复阅读争议帖评论区";
+        } else {
+          user.lastActivity = match >= 0.34 ? "正在深读与你兴趣相关的内容" : "快速浏览后跳过";
+        }
+        user.lastSaying = randomFrom(user.saying);
+        user.lastSpending = randomFrom(user.spending);
+      }
+
+      function applyPassiveDecay(targetUserId) {
+        const activeUsers = getActiveUsers();
+        activeUsers.forEach((user) => {
+          if (user.id === targetUserId) return;
+          user.interest = clamp(Math.round(user.interest - 2), 0, 100);
+          user.hate = clamp(Math.round(user.hate - 1), 0, 100);
+        });
+      }
+
+      function dispatchContentToUser(contentId, userId) {
+        if (state.gameOver || state.actionResolved) return;
+        const content = state.pool.find((item) => item.turnId === contentId);
+        const user = getUserById(userId);
+        if (!content || !user) return;
+
+        const match = tagMatchScore(user.tags, content.tags || []);
+        let interestDelta = content.interestBase + Math.round((content.matchBoost || 0) * match);
+        let hateDelta = content.hateBoost || 0;
+        let revenueGain = 0;
+
+        if (content.type === "ad") {
+          const multiplier = 0.55 + match * 0.65;
+          revenueGain = Math.max(3, Math.round(content.cpm * multiplier));
+          state.revenue += revenueGain;
+          state.adViews += 1;
+          if (match >= 0.34) {
+            interestDelta += 4;
+            hateDelta -= 1;
+          } else {
+            interestDelta -= 2;
+          }
+        }
+
+        if (content.type === "hot") {
+          interestDelta += 11;
+          hateDelta += Math.round((1 - match) * 6);
+        }
+
+        interestDelta = clamp(Math.round(interestDelta), -20, 18);
+        hateDelta = clamp(Math.round(hateDelta), -3, 28);
+
+        user.interest = clamp(Math.round(user.interest + interestDelta), 0, 100);
+        user.hate = clamp(Math.round(user.hate + hateDelta), 0, 100);
+
+        user.feed.push({
+          round: state.round,
+          type: content.type,
+          title: content.title,
+          tags: content.tags,
+          interestDelta,
+          hateDelta,
+          revenueGain
+        });
+        user.feed = user.feed.slice(-6);
+
+        applyPassiveDecay(user.id);
+        updateDerivedSignals(user, content);
+
+        const tone = content.type === "hot" ? "warn" : "ok";
+        const compact = [
+          `${user.label} <- ${content.title}`,
+          `兴趣 ${interestDelta >= 0 ? "+" : ""}${interestDelta}`,
+          `仇恨 ${hateDelta >= 0 ? "+" : ""}${hateDelta}`,
+          revenueGain ? `营收 +$${revenueGain}` : "无广告收入"
+        ].join(" / ");
+        pushLog(compact, tone);
+
+        state.pool = state.pool.filter((item) => item.turnId !== content.turnId);
+        state.actionResolved = true;
+        state.selectedPoolId = "";
+
+        actionResult.textContent = `${user.label} 已收到【${content.title}】。兴趣 ${interestDelta >= 0 ? "+" : ""}${interestDelta}，仇恨 ${hateDelta >= 0 ? "+" : ""}${hateDelta}${revenueGain ? `，本回合广告营收 +$${revenueGain}` : ""}。`;
+        endTurnBtn.disabled = false;
+
+        render();
+        checkFailImmediately();
+      }
+
+      function rotateActiveSlotsIfNeeded() {
+        if (state.round <= 1 || state.round % 3 !== 0) return;
+        if (!state.benchQueue.length) return;
+        const slotIndex = (Math.floor(state.round / 3) - 1) % state.activeSlots.length;
+        const outgoingId = state.activeSlots[slotIndex];
+        const incomingId = state.benchQueue.shift();
+        if (!incomingId) return;
+        state.activeSlots[slotIndex] = incomingId;
+        state.benchQueue.push(outgoingId);
+        if (!state.activeSlots.includes(state.selectedUserId)) {
+          state.selectedUserId = state.activeSlots[0];
+        }
+        const incoming = getUserById(incomingId);
+        pushLog(`轮换在线用户：${outgoingId.replace("u", "")} -> ${incoming ? incoming.label.replace("用户_ID: ", "") : incomingId.replace("u", "")}`);
+      }
+
+      function checkFailImmediately() {
+        if (state.gameOver) return;
+        const activeUsers = getActiveUsers();
+        const churnUser = activeUsers.find((user) => user.interest <= 0);
+        if (churnUser) {
+          state.gameOver = true;
+          showResultModal(false, `失败：${churnUser.label} 兴趣归零并流失。`, "你过度消耗了用户注意力，留存链路断裂。\n建议：提高相关匹配内容比例，降低连续广告和争议帖密度。");
+          return;
+        }
+        const hateUser = activeUsers.find((user) => user.hate >= 100);
+        if (hateUser) {
+          state.gameOver = true;
+          showResultModal(false, `失败：${hateUser.label} 仇恨值爆表。`, "算法将情绪刺激推到临界点，平台触发公共风险。\n建议：限制极化内容频率，用高相关但低对立内容回血。");
+          return;
+        }
+
+        const avgHate = average(activeUsers.map((user) => user.hate));
+        if (avgHate >= 75) {
+          state.gameOver = true;
+          showResultModal(false, "失败：三路在线用户平均仇恨超过 75%。", "你在追求短期停留时放大了群体对立，系统进入失控区。\n建议：减少争议话题，补充中性和知识型内容。\n");
+        }
+      }
+
+      function evaluateFinalResult() {
+        const activeUsers = getActiveUsers();
+        const avgInterest = average(activeUsers.map((user) => user.interest));
+        const avgHate = average(activeUsers.map((user) => user.hate));
+        const success = state.revenue >= TARGET_REVENUE && avgInterest >= 40 && avgHate <= 60;
+
+        const summary = [
+          `总营收：$${state.revenue}`,
+          `广告曝光：${state.adViews}`,
+          `平均兴趣：${Math.round(avgInterest)}%`,
+          `平均仇恨：${Math.round(avgHate)}%`,
+          success ? "判定：达成商业与健康度平衡。" : "判定：目标未达成。"
+        ].join("\n");
+
+        const advice = success
+          ? "你在变现与用户健康之间建立了可持续节奏。\n继续优化方向：\n1) 对广告做更细粒度场景匹配。\n2) 限制争议内容连续触达。\n3) 对低兴趣用户优先推高相关内容。"
+          : "这局的问题通常来自：\n1) 广告与用户标签错配，兴趣掉太快。\n2) 争议内容过多，仇恨累积失控。\n3) 忽视了轮换用户，导致新上线路径没有冷启动策略。";
+
+        state.gameOver = true;
+        showResultModal(success, success ? "体验完成：你守住了平台平衡。" : "体验结束：平台进入高压状态。", `${summary}\n\n${advice}`);
+      }
+
+      function endTurn() {
+        if (!state.actionResolved || state.gameOver) return;
+        state.round += 1;
+        state.actionResolved = false;
+        endTurnBtn.disabled = true;
+
+        if (state.round > state.maxRounds) {
+          evaluateFinalResult();
+          render();
+          return;
+        }
+
+        rotateActiveSlotsIfNeeded();
+        buildPool();
+        if (!state.activeSlots.includes(state.selectedUserId)) {
+          state.selectedUserId = state.activeSlots[0];
+        }
+        actionResult.textContent = "新回合开始：请继续选择目标用户与内容。";
+
+        render();
+      }
+
+      function openGuide() {
+        openModal("新手引导 / 知识提示", [
+          "你扮演一家内容平台的推荐算法负责人。每回合你会从内容池选一条内容，派发到某位在线用户的瀑布流尾部。",
+          "核心机制：",
+          "1) 每次内容消费会自然消耗兴趣值；标签匹配会回升兴趣。",
+          "2) 广告带来营收；匹配广告会降低反感，错配广告会加速流失。",
+          "3) 对立/仇恨内容会短期提高兴趣，但会显著抬升仇恨值。",
+          "失败条件：任一在线用户兴趣归零，或仇恨值达到 100。",
+          "通关目标（28 回合）：营收 >= $320，平均兴趣 >= 40%，平均仇恨 <= 60%。",
+          "知识点：这就是“参与度最优化”的两难。只追停留会把系统推向极化；只追安全会牺牲商业。你要做的是可持续平衡。"
+        ].join("\n\n"), [
+          { label: "开始值班", onClick: () => {} }
+        ]);
+      }
+
+      function openModal(title, body, actions) {
+        modalRoot.classList.remove("hidden");
+        modalRoot.classList.add("flex");
+        modalRoot.innerHTML = `
+          <div class="w-full max-w-2xl rounded-2xl border border-neon-cyan/30 bg-monitor-dark/95 p-5 shadow-[0_18px_50px_rgba(0,0,0,0.6)]">
+            <h3 class="text-xl font-black text-white mb-3">${title}</h3>
+            <div class="text-sm text-slate-200 leading-7 whitespace-pre-wrap">${body}</div>
+            <div class="mt-4 flex flex-wrap gap-2" id="modal-actions"></div>
+          </div>
+        `;
+        const host = document.getElementById("modal-actions");
+        (actions || []).forEach((action, idx) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = idx === 0
+            ? "px-3 py-2 rounded-lg border border-neon-cyan/50 bg-neon-cyan/15 text-neon-cyan text-sm font-bold hover:bg-neon-cyan/25"
+            : "px-3 py-2 rounded-lg border border-white/25 bg-white/5 text-slate-100 text-sm font-bold hover:bg-white/10";
+          btn.textContent = action.label;
+          btn.addEventListener("click", () => {
+            action.onClick && action.onClick();
+            modalRoot.classList.add("hidden");
+            modalRoot.classList.remove("flex");
+            modalRoot.innerHTML = "";
+          });
+          host.appendChild(btn);
+        });
+      }
+
+      function showResultModal(success, title, detail) {
+        openModal(title, detail, [
+          { label: success ? "再来一局" : "从头重开", onClick: () => restartGame() },
+          { label: "关闭", onClick: () => {} }
+        ]);
+      }
+
+      function renderUserCard(user) {
+        const selected = state.selectedUserId === user.id;
+        const feed = user.feed.slice(-4).reverse();
+        const interestColor = user.interest >= 60 ? "text-neon-cyan" : (user.interest >= 35 ? "text-amber-300" : "text-neon-red");
+        const hateColor = user.hate >= 70 ? "text-neon-red text-glow-red" : (user.hate >= 45 ? "text-amber-300" : "text-neon-red");
+
+        return `
+          <article data-user-id="${user.id}" class="monitor-frame rounded-xl p-3 md:p-4 border-t-2 ${selected ? "border-t-neon-cyan/80 ring-1 ring-neon-cyan/60" : "border-t-neon-cyan/30"} cursor-pointer hover:ring-1 hover:ring-neon-cyan/45 transition-all">
+            <div class="flex gap-3 items-start mb-3 border-b border-white/8 pb-3">
+              <div class="relative shrink-0">
+                <img src="${MEDIA_BASE + user.avatar}" alt="${user.label}" class="w-12 h-12 rounded-full object-cover border border-neon-cyan/30" />
+                <div class="absolute -bottom-1 -right-1 w-3 h-3 rounded-full ${user.interest > 25 ? "bg-neon-green" : "bg-neon-red"} shadow-[0_0_6px_currentColor]"></div>
+              </div>
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center justify-between gap-2">
+                  <h3 class="font-bold text-white text-sm truncate">${user.label}</h3>
+                  <span class="text-[10px] px-1.5 py-0.5 rounded border ${selected ? "border-neon-cyan/50 text-neon-cyan" : "border-slate-500/50 text-slate-300"}">${selected ? "已选中" : "在线"}</span>
+                </div>
+                <p class="text-[11px] text-slate-400 mt-0.5">${user.name}</p>
+                <div class="flex flex-wrap gap-1 mt-1 text-[10px] text-slate-300">
+                  ${user.tags.map((tag) => `<span class="bg-white/8 px-1.5 py-0.5 rounded">#${tag}</span>`).join("")}
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-2 text-xs font-mono">
+              <div>
+                <div class="flex justify-between mb-0.5"><span class="text-neon-cyan">兴趣值 Interest</span><span class="${interestColor}">${user.interest}%</span></div>
+                <div class="h-1.5 bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-neon-cyan transition-all duration-300" style="width:${user.interest}%;"></div></div>
+              </div>
+              <div>
+                <div class="flex justify-between mb-0.5"><span class="text-neon-red">仇恨值 Hate</span><span class="${hateColor}">${user.hate}%</span></div>
+                <div class="h-1.5 bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-neon-red transition-all duration-300" style="width:${user.hate}%;"></div></div>
+              </div>
+            </div>
+
+            <div class="mt-3 rounded-lg border border-white/10 bg-white/5 p-2 text-[11px] leading-5 space-y-1">
+              <p class="text-emerald-200"><span class="material-symbols-outlined align-[-2px] text-[13px] mr-1">bolt</span>${user.lastActivity || randomFrom(user.activity)}</p>
+              <p class="text-cyan-100"><span class="material-symbols-outlined align-[-2px] text-[13px] mr-1">chat</span>${user.lastSaying || randomFrom(user.saying)}</p>
+              <p class="text-amber-100"><span class="material-symbols-outlined align-[-2px] text-[13px] mr-1">shopping_cart</span>${user.lastSpending || randomFrom(user.spending)}</p>
+            </div>
+
+            <div class="mt-3 text-[11px] text-slate-300">瀑布流尾部（最新在上）</div>
+            <div class="mt-2 space-y-2 max-h-40 overflow-y-auto pr-1 scrollbar-hide">
+              ${feed.length ? feed.map((entry) => `
+                <div class="rounded border ${entry.type === "hot" ? "border-neon-red/45" : entry.type === "ad" ? "border-amber-300/40" : "border-neon-cyan/35"} bg-black/30 p-2 text-[11px]">
+                  <div class="flex justify-between mb-1 text-[10px] text-slate-400"><span>R${entry.round}</span><span>${entry.type === "ad" ? "广告" : entry.type === "hot" ? "争议" : "内容"}</span></div>
+                  <p class="text-slate-100">${entry.title}</p>
+                  <p class="text-[10px] mt-1 ${entry.hateDelta > 0 ? "text-neon-red" : "text-slate-300"}">兴趣 ${entry.interestDelta >= 0 ? "+" : ""}${entry.interestDelta} / 仇恨 ${entry.hateDelta >= 0 ? "+" : ""}${entry.hateDelta}${entry.revenueGain ? ` / 营收 +$${entry.revenueGain}` : ""}</p>
+                </div>
+              `).join("") : '<div class="rounded border border-dashed border-white/20 bg-black/20 p-3 text-[11px] text-slate-500 text-center">等待算法推送...</div>'}
+            </div>
+          </article>
+        `;
+      }
+
+      function renderPoolCard(item) {
+        const selected = state.selectedPoolId === item.turnId;
+        const badge = item.type === "ad"
+          ? `<span class="text-[10px] px-1.5 py-0.5 rounded border border-amber-300/40 bg-amber-300/15 text-amber-200">AD · CPM $${item.cpm.toFixed(1)}</span>`
+          : item.type === "hot"
+            ? '<span class="text-[10px] px-1.5 py-0.5 rounded border border-neon-red/50 bg-neon-red/15 text-neon-red">争议内容</span>'
+            : '<span class="text-[10px] px-1.5 py-0.5 rounded border border-neon-cyan/40 bg-neon-cyan/10 text-neon-cyan">普通内容</span>';
+        return `
+          <article data-pool-id="${item.turnId}" class="rounded-lg border ${selected ? "border-neon-cyan/75 ring-1 ring-neon-cyan/60" : item.type === "hot" ? "border-neon-red/45" : item.type === "ad" ? "border-amber-300/40" : "border-white/20"} bg-monitor-dark/85 p-2.5 cursor-pointer hover:border-neon-cyan/65 transition-all">
+            <div class="h-24 rounded-md overflow-hidden border border-white/10 bg-slate-900/60">
+              <img src="${MEDIA_BASE + item.image}" alt="${item.title}" class="w-full h-full object-cover"/>
+            </div>
+            <div class="mt-2 flex items-center justify-between gap-2">${badge}<span class="text-[10px] text-slate-400">${item.tags.map((tag) => `#${tag}`).slice(0, 2).join(" ")}</span></div>
+            <h4 class="mt-1 text-sm font-bold text-white leading-5">${item.title}</h4>
+            <p class="mt-1 text-[11px] text-slate-300 line-clamp-2">${item.summary}</p>
+          </article>
+        `;
+      }
+
+      function render() {
+        const activeUsers = getActiveUsers();
+        const avgInterest = Math.round(average(activeUsers.map((user) => user.interest)));
+        const avgHate = Math.round(average(activeUsers.map((user) => user.hate)));
+
+        if (!state.selectedUserId || !state.activeSlots.includes(state.selectedUserId)) {
+          state.selectedUserId = state.activeSlots[0];
+        }
+
+        userBoard.innerHTML = activeUsers.map(renderUserCard).join("");
+        poolGrid.innerHTML = state.pool.length
+          ? state.pool.map(renderPoolCard).join("")
+          : '<div class="col-span-full rounded-lg border border-dashed border-white/20 p-4 text-sm text-slate-400 text-center">内容池已空，点击“换一批候选”。</div>';
+
+        metricRevenue.textContent = `$${state.revenue}`;
+        metricAds.textContent = `${state.adViews}`;
+        metricInterest.textContent = `${avgInterest}%`;
+        metricHate.textContent = `${avgHate}%`;
+        metricRound.textContent = `${Math.min(state.round, state.maxRounds)} / ${state.maxRounds}`;
+
+        const progress = Math.round((Math.min(state.round - 1, state.maxRounds) / state.maxRounds) * 100);
+        roundProgress.style.width = `${progress}%`;
+        slotHint.textContent = `当前在线：${activeUsers.map((user) => user.label.replace("用户_ID: ", "#")).join(" · ")}`;
+
+        goalHint.textContent = `目标：28 回合后营收 >= $${TARGET_REVENUE}；当前剩余回合 ${Math.max(0, state.maxRounds - state.round + 1)}。平均兴趣 ${avgInterest}% / 平均仇恨 ${avgHate}%。`;
+        selectionHint.textContent = state.gameOver
+          ? "本局已结束，可重新开局"
+          : `已选目标：${(getUserById(state.selectedUserId) || {}).label || "未选择"} · ${state.actionResolved ? "可结束本回合" : "请从下方内容池选择一条内容"}`;
+
+        eventLog.innerHTML = state.logs.length
+          ? state.logs.map((line) => `<li class="rounded border border-white/10 bg-black/25 px-2 py-1">${line}</li>`).join("")
+          : '<li class="text-slate-500">日志为空，开始第一回合分发。</li>';
+
+        document.querySelectorAll("[data-user-id]").forEach((node) => {
+          node.addEventListener("click", () => {
+            if (state.gameOver) return;
+            const id = node.getAttribute("data-user-id");
+            if (!id) return;
+            state.selectedUserId = id;
+            render();
+          });
+        });
+
+        document.querySelectorAll("[data-pool-id]").forEach((node) => {
+          node.addEventListener("click", () => {
+            if (state.gameOver || state.actionResolved) return;
+            const poolId = node.getAttribute("data-pool-id");
+            if (!poolId || !state.selectedUserId) return;
+            state.selectedPoolId = poolId;
+            dispatchContentToUser(poolId, state.selectedUserId);
+          });
+        });
+      }
+
+      function restartGame() {
+        state.round = 1;
+        state.revenue = 0;
+        state.adViews = 0;
+        state.selectedPoolId = "";
+        state.actionResolved = false;
+        state.gameOver = false;
+        state.users = USERS.map((item) => ({ ...item, feed: [], lastActivity: "", lastSaying: "", lastSpending: "" }));
+        state.activeSlots = ["u9942", "u3301", "u5520"];
+        state.benchQueue = ["u7824", "u1170", "u8841", "u2059", "u6412", "u7390", "u9183"];
+        state.selectedUserId = state.activeSlots[0];
+        state.logs = [];
+        buildPool();
+        endTurnBtn.disabled = true;
+        actionResult.textContent = "新局已开始：请选择一个用户，再从内容池派发一条内容。";
+        pushLog("新局开始：算法值班上线。", "ok");
+        render();
+      }
+
+      endTurnBtn.addEventListener("click", endTurn);
+      refreshPoolBtn.addEventListener("click", () => {
+        if (state.gameOver || state.actionResolved) return;
+        buildPool();
+        pushLog("你刷新了候选内容池。注意：频繁刷新会错过稳定机会。", "normal");
+        render();
+      });
+      openGuideBtn.addEventListener("click", openGuide);
+      restartTopBtn.addEventListener("click", restartGame);
+      restartBottomBtn.addEventListener("click", restartGame);
+
+      restartGame();
+      openGuide();
+    })();
+  </script>
+
+
+<script>
+(() => {
+  
+  
+  
+})();
+</script>
+</body>
+</html>

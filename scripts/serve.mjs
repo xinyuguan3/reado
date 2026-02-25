@@ -259,6 +259,10 @@ function createDefaultState() {
       sessions: {},
       customers: {},
       processedEvents: {}
+    },
+    knowledgeCore: {
+      cards: {},
+      order: []
     }
   };
 }
@@ -510,8 +514,190 @@ function normalizeAnalyticsState(nextState) {
   totals.lastUpdatedAt = typeof totals.lastUpdatedAt === "string" ? totals.lastUpdatedAt : "";
   candidate.players = normalizePlayersState(candidate.players);
   candidate.billing = normalizeBillingState(candidate.billing);
+  candidate.knowledgeCore = normalizeKnowledgeCoreState(candidate.knowledgeCore);
 
   return candidate;
+}
+
+function sanitizeKnowledgeCoreMode(value) {
+  const mode = cleanText(value).toLowerCase();
+  return mode === "skill" ? "skill" : "block";
+}
+
+function sanitizeKnowledgeCoreCardId(value) {
+  return clampText(cleanText(value).replace(/[^a-zA-Z0-9:_-]/g, ""), 80);
+}
+
+function normalizeKnowledgeCoreCard(raw) {
+  const row = raw && typeof raw === "object" ? raw : {};
+  const id = sanitizeKnowledgeCoreCardId(row.id);
+  if (!id) return null;
+  const starSessionIds = asArray(row.starSessionIds).filter((item) => isValidSessionId(item)).slice(0, 5000);
+  const starSet = new Set(starSessionIds);
+  return {
+    id,
+    key: clampText(cleanText(row.key), 220),
+    bookId: clampText(cleanText(row.bookId), 120),
+    bookTitle: clampText(cleanText(row.bookTitle), 160),
+    mode: sanitizeKnowledgeCoreMode(row.mode),
+    itemId: clampText(cleanText(row.itemId), 160),
+    title: clampText(cleanText(row.title), 180),
+    mechanism: clampText(cleanText(row.mechanism), 420),
+    why: clampText(cleanText(row.why), 420),
+    evidence: clampText(cleanText(row.evidence), 420),
+    transfer: clampText(cleanText(row.transfer), 420),
+    tags: uniqueTexts(row.tags, 20, 36),
+    sourceHref: clampText(cleanText(row.sourceHref), 280),
+    battleHref: clampText(cleanText(row.battleHref), 280),
+    reviewHref: clampText(cleanText(row.reviewHref), 280),
+    authorSessionId: cleanText(row.authorSessionId),
+    starCount: Math.max(toInt(row.starCount), starSet.size),
+    starSessionIds: Array.from(starSet),
+    createdAt: cleanText(row.createdAt),
+    updatedAt: cleanText(row.updatedAt)
+  };
+}
+
+function normalizeKnowledgeCoreState(raw) {
+  const value = raw && typeof raw === "object" ? raw : {};
+  const cardsRaw = value.cards && typeof value.cards === "object" ? value.cards : {};
+  const cards = {};
+  for (const [key, cardRaw] of Object.entries(cardsRaw)) {
+    const card = normalizeKnowledgeCoreCard({ ...cardRaw, id: cleanText(cardRaw?.id, key) });
+    if (!card) continue;
+    cards[card.id] = card;
+  }
+  const order = asArray(value.order)
+    .map((id) => sanitizeKnowledgeCoreCardId(id))
+    .filter((id) => id && cards[id]);
+  for (const id of Object.keys(cards)) {
+    if (!order.includes(id)) order.push(id);
+  }
+  return { cards, order };
+}
+
+function getKnowledgeCoreState() {
+  if (!state.knowledgeCore || typeof state.knowledgeCore !== "object") {
+    state.knowledgeCore = normalizeKnowledgeCoreState(null);
+  }
+  state.knowledgeCore = normalizeKnowledgeCoreState(state.knowledgeCore);
+  return state.knowledgeCore;
+}
+
+function toPublicKnowledgeCoreCard(card, sessionId = "") {
+  const row = normalizeKnowledgeCoreCard(card);
+  if (!row) return null;
+  const starredByMe = Boolean(sessionId && asArray(row.starSessionIds).includes(sessionId));
+  return {
+    id: row.id,
+    key: row.key,
+    bookId: row.bookId,
+    bookTitle: row.bookTitle,
+    mode: row.mode,
+    itemId: row.itemId,
+    title: row.title,
+    mechanism: row.mechanism,
+    why: row.why,
+    evidence: row.evidence,
+    transfer: row.transfer,
+    tags: row.tags,
+    sourceHref: row.sourceHref,
+    battleHref: row.battleHref,
+    reviewHref: row.reviewHref,
+    authorSessionId: row.authorSessionId,
+    starCount: row.starCount,
+    starredByMe,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt
+  };
+}
+
+function upsertKnowledgeCoreCard(sessionId, payload = {}) {
+  const bookId = clampText(cleanText(payload.bookId), 120);
+  const itemId = clampText(cleanText(payload.itemId), 160);
+  const title = clampText(cleanText(payload.title), 180);
+  if (!bookId) throw new Error("bookId is required");
+  if (!itemId) throw new Error("itemId is required");
+  if (!title) throw new Error("title is required");
+
+  const mode = sanitizeKnowledgeCoreMode(payload.mode);
+  const key = `${bookId}::${mode}::${itemId}`;
+  const id = sanitizeKnowledgeCoreCardId(`kc-${crypto.createHash("sha1").update(key).digest("hex").slice(0, 14)}`);
+  const now = nowIso();
+  const store = getKnowledgeCoreState();
+  const prev = normalizeKnowledgeCoreCard(store.cards[id]);
+
+  const next = normalizeKnowledgeCoreCard({
+    id,
+    key,
+    bookId,
+    bookTitle: clampText(cleanText(payload.bookTitle), 160),
+    mode,
+    itemId,
+    title,
+    mechanism: clampText(cleanText(payload.mechanism), 420),
+    why: clampText(cleanText(payload.why), 420),
+    evidence: clampText(cleanText(payload.evidence), 420),
+    transfer: clampText(cleanText(payload.transfer), 420),
+    tags: uniqueTexts(payload.tags, 20, 36),
+    sourceHref: clampText(cleanText(payload.sourceHref), 280),
+    battleHref: clampText(cleanText(payload.battleHref), 280),
+    reviewHref: clampText(cleanText(payload.reviewHref), 280),
+    authorSessionId: cleanText(prev?.authorSessionId, cleanText(sessionId)),
+    starCount: toInt(prev?.starCount),
+    starSessionIds: asArray(prev?.starSessionIds),
+    createdAt: cleanText(prev?.createdAt, now),
+    updatedAt: now
+  });
+  if (!next) throw new Error("failed to build shared card");
+  store.cards[next.id] = next;
+  store.order = [next.id, ...asArray(store.order).filter((value) => value !== next.id)].slice(0, 1200);
+  return next;
+}
+
+function setKnowledgeCoreCardStar(cardId, sessionId, starred = true) {
+  const id = sanitizeKnowledgeCoreCardId(cardId);
+  const sid = cleanText(sessionId);
+  if (!id || !sid) return null;
+  const store = getKnowledgeCoreState();
+  const row = normalizeKnowledgeCoreCard(store.cards[id]);
+  if (!row) return null;
+  const set = new Set(asArray(row.starSessionIds).filter((value) => isValidSessionId(value)));
+  if (starred) set.add(sid);
+  else set.delete(sid);
+  row.starSessionIds = Array.from(set).slice(0, 5000);
+  row.starCount = row.starSessionIds.length;
+  row.updatedAt = nowIso();
+  store.cards[id] = row;
+  store.order = [id, ...asArray(store.order).filter((value) => value !== id)].slice(0, 1200);
+  return row;
+}
+
+function listKnowledgeCoreCards({ bookId = "", mode = "", limit = 80, sessionId = "" } = {}) {
+  const safeBookId = clampText(cleanText(bookId), 120);
+  const safeMode = cleanText(mode);
+  const maxLimit = Math.max(1, Math.min(300, toInt(limit) || 80));
+  const store = getKnowledgeCoreState();
+  const rows = asArray(store.order)
+    .map((id) => normalizeKnowledgeCoreCard(store.cards[id]))
+    .filter(Boolean)
+    .filter((card) => {
+      if (safeBookId && card.bookId !== safeBookId) return false;
+      if (safeMode && sanitizeKnowledgeCoreMode(card.mode) !== sanitizeKnowledgeCoreMode(safeMode)) return false;
+      return true;
+    })
+    .sort((a, b) => {
+      const starDiff = toInt(b.starCount) - toInt(a.starCount);
+      if (starDiff !== 0) return starDiff;
+      const bTs = Date.parse(cleanText(b.updatedAt, b.createdAt)) || 0;
+      const aTs = Date.parse(cleanText(a.updatedAt, a.createdAt)) || 0;
+      return bTs - aTs;
+    })
+    .slice(0, maxLimit);
+
+  return rows
+    .map((card) => toPublicKnowledgeCoreCard(card, sessionId))
+    .filter(Boolean);
 }
 
 function normalizeBillingRecord(sessionId, rawRecord) {
@@ -4027,6 +4213,85 @@ async function handleApi(req, res, url, providedSession = null) {
       },
       metrics: session.metrics || { visits: 0, interactions: 0 },
       books
+    });
+    return true;
+  }
+
+  if (method === "GET" && pathname === "/api/knowledge-core/cards") {
+    const cards = listKnowledgeCoreCards({
+      bookId: url.searchParams.get("bookId") || "",
+      mode: url.searchParams.get("mode") || "",
+      limit: toInt(url.searchParams.get("limit")) || 80,
+      sessionId: session.id
+    });
+    writeJson(res, 200, {
+      ok: true,
+      cards,
+      total: cards.length,
+      updatedAt: nowIso()
+    });
+    return true;
+  }
+
+  if (method === "POST" && pathname === "/api/knowledge-core/cards") {
+    const body = await parseJsonBody(req, 96 * 1024).catch((error) => ({ __error: error?.message || "Invalid body" }));
+    if (body.__error) {
+      writeJson(res, 400, { ok: false, error: body.__error });
+      return true;
+    }
+    try {
+      const card = upsertKnowledgeCoreCard(session.id, body);
+      schedulePersist();
+      writeJson(res, 200, {
+        ok: true,
+        card: toPublicKnowledgeCoreCard(card, session.id)
+      });
+      return true;
+    } catch (error) {
+      writeJson(res, 400, { ok: false, error: error?.message || "Failed to publish card" });
+      return true;
+    }
+  }
+
+  const knowledgeCardMatch = pathname.match(/^\/api\/knowledge-core\/cards\/([^/]+)$/);
+  if (method === "GET" && knowledgeCardMatch) {
+    const cardId = sanitizeKnowledgeCoreCardId(decodeURIComponent(knowledgeCardMatch[1] || ""));
+    if (!cardId) {
+      writeJson(res, 400, { ok: false, error: "cardId is required" });
+      return true;
+    }
+    const store = getKnowledgeCoreState();
+    const card = toPublicKnowledgeCoreCard(store.cards[cardId], session.id);
+    if (!card) {
+      writeJson(res, 404, { ok: false, error: "Card not found" });
+      return true;
+    }
+    writeJson(res, 200, { ok: true, card });
+    return true;
+  }
+
+  const knowledgeCardStarMatch = pathname.match(/^\/api\/knowledge-core\/cards\/([^/]+)\/star$/);
+  if (method === "POST" && knowledgeCardStarMatch) {
+    const cardId = sanitizeKnowledgeCoreCardId(decodeURIComponent(knowledgeCardStarMatch[1] || ""));
+    if (!cardId) {
+      writeJson(res, 400, { ok: false, error: "cardId is required" });
+      return true;
+    }
+    const body = await parseJsonBody(req, 24 * 1024).catch((error) => ({ __error: error?.message || "Invalid body" }));
+    if (body.__error) {
+      writeJson(res, 400, { ok: false, error: body.__error });
+      return true;
+    }
+    const starred = body?.starred !== false;
+    const updated = setKnowledgeCoreCardStar(cardId, session.id, starred);
+    if (!updated) {
+      writeJson(res, 404, { ok: false, error: "Card not found" });
+      return true;
+    }
+    schedulePersist();
+    writeJson(res, 200, {
+      ok: true,
+      card: toPublicKnowledgeCoreCard(updated, session.id)
     });
     return true;
   }

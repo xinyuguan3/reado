@@ -18,7 +18,7 @@
         #050b16;
     }
     .page {
-      width: min(1220px, calc(100% - 28px));
+      width: min(1520px, calc(100% - 22px));
       margin: 0 auto;
       padding: 98px 0 32px;
     }
@@ -74,10 +74,35 @@
       border-color: rgba(56, 189, 248, 0.75);
       background: rgba(8, 145, 178, 0.34);
     }
+    .scope-toggle {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      background: rgba(10, 16, 30, 0.7);
+      border: 1px solid rgba(148, 163, 184, 0.34);
+      border-radius: 999px;
+      padding: 4px;
+    }
+    .scope-btn {
+      border: 1px solid transparent;
+      border-radius: 999px;
+      padding: 8px 12px;
+      background: transparent;
+      color: #cbd5e1;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 140ms ease;
+    }
+    .scope-btn.active {
+      border-color: rgba(56, 189, 248, 0.72);
+      background: rgba(8, 145, 178, 0.28);
+      color: #e0f2fe;
+    }
     .grid {
       margin-top: 12px;
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
       gap: 12px;
     }
     .card {
@@ -85,36 +110,66 @@
       border-radius: 14px;
       overflow: hidden;
       background: rgba(15, 23, 42, 0.78);
-      display: grid;
-      grid-template-rows: auto 1fr;
+      display: flex;
+      flex-direction: column;
+    }
+    .cover-wrap {
+      width: 100%;
+      height: 190px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      background: rgba(2, 6, 23, 0.62);
+      border-bottom: 1px solid rgba(148, 163, 184, 0.2);
     }
     .card img {
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      object-fit: cover;
+      width: auto;
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
       display: block;
-      background: rgba(30, 41, 59, 0.7);
     }
     .content {
-      padding: 12px;
-      display: grid;
-      gap: 7px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      flex: 1;
+    }
+    .cat {
+      font-size: 11px;
+      color: #7dd3fc;
+      font-weight: 700;
+      letter-spacing: 0.02em;
     }
     .title {
       margin: 0;
-      font-size: 16px;
-      line-height: 1.4;
+      font-size: 14px;
+      line-height: 1.35;
       color: #e2e8f0;
     }
     .sub {
       margin: 0;
       color: #9fb3cc;
-      font-size: 13px;
-      line-height: 1.55;
-      min-height: 40px;
+      font-size: 12px;
+      line-height: 1.45;
+      min-height: 32px;
+    }
+    .hint {
+      margin: 0;
+      color: #67e8f9;
+      font-size: 11px;
+      line-height: 1.45;
+    }
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      min-height: 20px;
     }
     .ops {
-      margin-top: 4px;
+      margin-top: auto;
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
@@ -148,6 +203,17 @@
       padding: 14px;
       display: grid;
       gap: 12px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid rgba(148, 163, 184, 0.34);
+      border-radius: 999px;
+      padding: 3px 8px;
+      font-size: 10px;
+      color: #cbd5e1;
+      background: rgba(15, 23, 42, 0.72);
+      width: fit-content;
     }
     .dialog-head {
       display: flex;
@@ -261,9 +327,15 @@
   <main class="page">
     <section class="hero">
       <h1>Public Experience Library</h1>
-      <p>Explore community-published playable books and papers. Open details in-place, download packages, and build longer mod versions from existing works.</p>
+      <p>Personal shelf and public library share the same unit: one book = one experience package. Manage visibility from your shelf and publish selected books to the public library.</p>
       <div class="top">
-        <p id="meta" class="meta">Loading...</p>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <p id="meta" class="meta">Loading...</p>
+          <div class="scope-toggle" role="tablist" aria-label="library scope">
+            <button id="scope-mine" class="scope-btn active" type="button">My Shelf</button>
+            <button id="scope-public" class="scope-btn" type="button">Public Library</button>
+          </div>
+        </div>
         <button id="refresh-btn" class="btn" type="button">Refresh</button>
       </div>
     </section>
@@ -284,6 +356,7 @@
             <a id="detail-open-book" class="btn" href="#" target="_blank" rel="noreferrer">Open Book</a>
             <a id="detail-start" class="btn primary" href="#" target="_blank" rel="noreferrer">Start</a>
             <a id="detail-download" class="btn" href="#">Download</a>
+            <button id="detail-toggle-public" class="btn" type="button" hidden>Publish</button>
           </div>
           <p id="detail-meta" class="muted"></p>
         </article>
@@ -333,16 +406,20 @@
     const detailOpenBookEl = document.getElementById("detail-open-book");
     const detailStartEl = document.getElementById("detail-start");
     const detailDownloadEl = document.getElementById("detail-download");
+    const detailTogglePublicEl = document.getElementById("detail-toggle-public");
     const modifyInputEl = document.getElementById("modify-input");
     const modifyBtn = document.getElementById("modify-btn");
     const modifyStatusEl = document.getElementById("modify-status");
+    const scopeMineBtn = document.getElementById("scope-mine");
+    const scopePublicBtn = document.getElementById("scope-public");
 
     const state = {
       items: [],
       currentWorkId: "",
       currentWork: null,
       activeJobId: "",
-      pollTimer: null
+      pollTimer: null,
+      scope: "mine"
     };
 
     function esc(value) {
@@ -363,6 +440,26 @@
       return data;
     }
 
+    function refreshScopeUi() {
+      scopeMineBtn.classList.toggle("active", state.scope === "mine");
+      scopePublicBtn.classList.toggle("active", state.scope === "public");
+    }
+
+    function normalizeWork(raw) {
+      const item = raw && typeof raw === "object" ? raw : {};
+      const moduleCountRaw = item.module_count ?? item.moduleCount ?? 0;
+      const moduleCount = Number.isFinite(Number(moduleCountRaw)) ? Math.max(0, Math.floor(Number(moduleCountRaw))) : 0;
+      const tags = Array.isArray(item.tags) ? item.tags.slice(0, 3).map((tag) => String(tag || "").trim()).filter(Boolean) : [];
+      return {
+        ...item,
+        module_count: moduleCount,
+        categoryLabel: String(item.categoryLabel || "").trim(),
+        categoryHint: String(item.categoryHint || "").trim(),
+        knowledgeSummary: String(item.knowledgeSummary || "").trim(),
+        tags
+      };
+    }
+
     function setModifyStatus(text) {
       modifyStatusEl.textContent = text || "";
     }
@@ -380,8 +477,8 @@
     }
 
     function render(items) {
-      const rows = Array.isArray(items) ? items : [];
-      metaEl.textContent = rows.length + " published experiences";
+      const rows = Array.isArray(items) ? items.map((item) => normalizeWork(item)) : [];
+      metaEl.textContent = `${rows.length} books · ${state.scope === "mine" ? "My Shelf" : "Public Library"}`;
       if (!rows.length) {
         gridEl.innerHTML = "";
         emptyEl.hidden = false;
@@ -390,14 +487,25 @@
       emptyEl.hidden = true;
       gridEl.innerHTML = rows.map((item) => `
         <article class="card">
-          <img src="${esc(item.cover || "")}" alt="${esc(item.title || "cover")}" loading="lazy" />
+          <div class="cover-wrap">
+            <img src="${esc(item.cover || "")}" alt="${esc(item.title || "cover")}" loading="lazy" />
+          </div>
           <div class="content">
+            <span class="cat">${esc(item.categoryLabel || "书籍模块")}</span>
+            <span class="badge">${item.is_public ? "Public" : "Private"}</span>
             <h3 class="title">${esc(item.title || "Untitled")}</h3>
-            <p class="sub">${esc(item.subtitle || item.hook || "")}</p>
-            <p class="meta">${esc((item.module_count || 0) + " modules")}</p>
+            <p class="sub">${esc(item.knowledgeSummary || item.subtitle || item.hook || "")}</p>
+            <p class="hint">${esc(item.categoryHint || "点击进入，开始互动体验。")}</p>
+            <div class="tag-row">
+              ${item.tags.map((tag) => `<span class="badge">${esc(tag)}</span>`).join("")}
+            </div>
+            <p class="meta">${esc((item.module_count || 0) + " 个体验模块")}</p>
             <div class="ops">
               ${item.first_module_href ? `<a class="btn primary" href="${esc(item.first_module_href)}" target="_blank" rel="noreferrer">Start</a>` : ""}
               <button class="btn" type="button" data-act="detail" data-id="${esc(item.id)}">Details</button>
+              ${state.scope === "mine" && item.can_edit
+                ? `<button class="btn" type="button" data-act="toggle-public" data-id="${esc(item.id)}" data-next="${item.is_public ? "0" : "1"}">${item.is_public ? "Unpublish" : "Publish"}</button>`
+                : ""}
             </div>
           </div>
         </article>
@@ -411,28 +519,59 @@
           });
         });
       });
+      gridEl.querySelectorAll('button[data-act="toggle-public"]').forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const id = btn.getAttribute("data-id") || "";
+          const nextRaw = btn.getAttribute("data-next") || "0";
+          if (!id) return;
+          btn.disabled = true;
+          try {
+            await request("/api/studio/works/" + encodeURIComponent(id), {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ is_public: nextRaw === "1" })
+            });
+            await load();
+          } catch (error) {
+            metaEl.textContent = "Visibility update failed: " + (error?.message || "unknown");
+          } finally {
+            btn.disabled = false;
+          }
+        });
+      });
     }
 
     function renderDetail(work) {
-      state.currentWork = work || null;
-      if (!work) return;
-      detailTitleEl.textContent = work.title || "Untitled";
-      detailCoverEl.src = work.cover || "";
-      detailCoverEl.alt = work.title || "cover";
+      const normalized = normalizeWork(work || {});
+      state.currentWork = normalized;
+      if (!normalized || typeof normalized !== "object") return;
+      const workEntry = normalized;
+      detailTitleEl.textContent = workEntry.title || "Untitled";
+      detailCoverEl.src = workEntry.cover || "";
+      detailCoverEl.alt = workEntry.title || "cover";
       detailSummaryEl.textContent = [
-        work.subtitle || "",
-        work.hook ? ("Hook: " + work.hook) : ""
+        workEntry.knowledgeSummary || "",
+        workEntry.subtitle || "",
+        workEntry.categoryLabel ? ("Category: " + workEntry.categoryLabel) : "",
+        workEntry.categoryHint ? ("Value: " + workEntry.categoryHint) : "",
+        workEntry.hook ? ("Hook: " + workEntry.hook) : ""
       ].filter(Boolean).join("\n");
       detailMetaEl.textContent = [
-        "Modules: " + (work.module_count || 0),
-        "Mode: " + (work.html_generation_mode || "unknown"),
-        work.created_at ? ("Created: " + work.created_at) : ""
+        "Modules: " + (workEntry.module_count || 0),
+        "Mode: " + (workEntry.html_generation_mode || "unknown"),
+        workEntry.created_at ? ("Created: " + workEntry.created_at) : "",
+        "Visibility: " + (workEntry.is_public ? "Public" : "Private")
       ].filter(Boolean).join("\n");
-      detailOpenBookEl.href = work.book_href || "#";
-      detailStartEl.href = work.first_module_href || work.book_href || "#";
-      detailDownloadEl.href = "/api/studio/works/" + encodeURIComponent(work.id || "") + "/download";
+      detailOpenBookEl.href = workEntry.book_href || "#";
+      detailStartEl.href = workEntry.first_module_href || workEntry.book_href || "#";
+      detailDownloadEl.href = "/api/studio/works/" + encodeURIComponent(workEntry.id || "") + "/download";
+      if (detailTogglePublicEl) {
+        const editable = Boolean(workEntry.can_edit);
+        detailTogglePublicEl.hidden = !editable;
+        detailTogglePublicEl.textContent = workEntry.is_public ? "Unpublish" : "Publish";
+      }
 
-      const modules = Array.isArray(work.modules) ? work.modules : [];
+      const modules = Array.isArray(workEntry.modules) ? workEntry.modules : [];
       detailModulesEl.innerHTML = modules.length
         ? modules.map((item) => `
             <article class="line">
@@ -444,7 +583,7 @@
           `).join("")
         : `<article class="line"><p>No modules found.</p></article>`;
 
-      const sources = Array.isArray(work.sources) ? work.sources : [];
+      const sources = Array.isArray(workEntry.sources) ? workEntry.sources : [];
       detailSourcesEl.innerHTML = sources.length
         ? sources.map((item, index) => `
             <article class="line">
@@ -457,7 +596,7 @@
           `).join("")
         : `<article class="line"><p>No source metadata.</p></article>`;
 
-      const mods = Array.isArray(work.mods) ? work.mods : [];
+      const mods = Array.isArray(workEntry.mods) ? workEntry.mods : [];
       detailModsEl.innerHTML = mods.length
         ? mods.map((item) => `
             <article class="line">
@@ -490,8 +629,12 @@
     async function load() {
       metaEl.textContent = "Loading...";
       try {
-        const data = await request("/api/studio/library/public?limit=200");
+        const queryScope = state.scope === "mine" ? "all" : "public";
+        const data = await request("/api/studio/works?scope=" + encodeURIComponent(queryScope) + "&limit=200");
         state.items = Array.isArray(data.items) ? data.items : [];
+        if (!state.items.length && Array.isArray(data.works)) {
+          state.items = data.works;
+        }
         render(state.items);
       } catch (error) {
         metaEl.textContent = "Load failed: " + (error?.message || "unknown");
@@ -564,8 +707,39 @@
     modalEl.addEventListener("click", (event) => {
       if (event.target === modalEl) closeDetailModal();
     });
+    if (detailTogglePublicEl) {
+      detailTogglePublicEl.addEventListener("click", async () => {
+        const work = state.currentWork;
+        if (!work || !work.id || !work.can_edit) return;
+        detailTogglePublicEl.disabled = true;
+        try {
+          await request("/api/studio/works/" + encodeURIComponent(work.id), {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ is_public: !work.is_public })
+          });
+          await openDetail(work.id);
+          await load();
+        } catch (error) {
+          setModifyStatus("Visibility update failed: " + (error?.message || "unknown"));
+        } finally {
+          detailTogglePublicEl.disabled = false;
+        }
+      });
+    }
     closeDetailBtn.addEventListener("click", closeDetailModal);
     refreshBtn.addEventListener("click", load);
+    scopeMineBtn.addEventListener("click", async () => {
+      state.scope = "mine";
+      refreshScopeUi();
+      await load();
+    });
+    scopePublicBtn.addEventListener("click", async () => {
+      state.scope = "public";
+      refreshScopeUi();
+      await load();
+    });
+    refreshScopeUi();
     load();
   </script>
 </body>

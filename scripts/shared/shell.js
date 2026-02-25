@@ -6,15 +6,14 @@ import {
 } from "/shared/i18n.js";
 
 const ROUTES = [
-  { id: "knowledge-map", section: "learn", icon: "map", labelKey: "route.knowledge_map", label: "个人书库", href: "/pages/gamified-learning-hub-dashboard-1" },
-  { id: "skill-tree", section: "learn", icon: "device_hub", labelKey: "route.skill_tree", label: "技能树", href: "/pages/skill-tree" },
-  { id: "think-tank", section: "learn", icon: "hub", labelKey: "route.think_tank", label: "智库", href: "/pages/think-tank" },
-  { id: "mission", section: "learn", icon: "assignment", labelKey: "route.mission", label: "任务中心", href: "/pages/simulator-library-level-selection-2" },
-  { id: "library", section: "learn", icon: "auto_stories", labelKey: "route.library", label: "体验库", href: "/pages/public-library" },
-  { id: "studio", section: "build", icon: "auto_awesome", labelKey: "route.studio", label: "创作工坊", href: "/pages/playable-studio" },
-  { id: "market", section: "build", icon: "storefront", labelKey: "route.market", label: "交易中心", href: "/pages/gamified-learning-hub-dashboard-3" },
-  { id: "ranking", section: "social", icon: "leaderboard", labelKey: "route.ranking", label: "排行榜", href: "/pages/global-scholar-leaderboard" },
-  { id: "profile", section: "social", icon: "person", labelKey: "route.profile", label: "个人资料", href: "/pages/gamified-learning-hub-dashboard-2" }
+  { id: "knowledge-map", section: "learn", icon: "map", labelKey: "route.knowledge_map", label: "个人书库", href: "/workspace" },
+  { id: "skill-tree", section: "learn", icon: "hub", labelKey: "route.knowledge_core", label: "Knowledge Core", href: "/skill-tree" },
+  { id: "mission", section: "learn", icon: "assignment", labelKey: "route.mission", label: "任务中心", href: "/missions" },
+  { id: "library", section: "learn", icon: "auto_stories", labelKey: "route.library", label: "体验库", href: "/library" },
+  { id: "studio", section: "build", icon: "auto_awesome", labelKey: "route.studio", label: "创作工坊", href: "/studio" },
+  { id: "market", section: "build", icon: "storefront", labelKey: "route.market", label: "交易中心", href: "/marketplace" },
+  { id: "ranking", section: "social", icon: "leaderboard", labelKey: "route.ranking", label: "排行榜", href: "/leaderboard" },
+  { id: "profile", section: "social", icon: "person", labelKey: "route.profile", label: "个人资料", href: "/profile" }
 ];
 const ROUTE_SECTIONS = [
   { id: "learn", labelKey: "shell.nav.learn", label: "学习" },
@@ -36,7 +35,7 @@ const DEFAULT_USER_STATE = {
   streak: "Sign in to save progress",
   avatar: ""
 };
-const GEM_CENTER_HREF = "/pages/gem-center";
+const GEM_CENTER_HREF = "/gem-center";
 const LAST_EXPERIENCE_KEY = "reado_last_experience_href";
 const DEEPSEEK_KEY_STORAGE = "reado_deepseek_api_key";
 const DEEPSEEK_ENDPOINT_STORAGE = "reado_deepseek_endpoint";
@@ -2645,31 +2644,31 @@ class ReadoAppShell extends HTMLElement {
       document.body.classList.add("reado-experience-mode");
     }
     hideLegacyAppChrome(isLearningPage);
-    if (path === "/pages/simulator-library-level-selection-2") {
+    if (path === "/missions" || path === "/pages/simulator-library-level-selection-2") {
       document.body.classList.add("reado-page-mission");
     }
-    if (path === "/pages/simulator-library-level-selection-1") {
+    if (path === "/library" || path === "/pages/simulator-library-level-selection-1") {
       document.body.classList.add("reado-page-warehouse");
     }
-    if (path === "/pages/gamified-learning-hub-dashboard-1") {
+    if (path === "/" || path === "/workspace" || path === "/pages/gamified-learning-hub-dashboard-1") {
       document.body.classList.add("reado-page-map");
     }
-    if (path === "/pages/gamified-learning-hub-dashboard-3") {
+    if (path === "/marketplace" || path === "/pages/gamified-learning-hub-dashboard-3") {
       document.body.classList.add("reado-page-market");
     }
-    if (path === "/pages/global-scholar-leaderboard") {
+    if (path === "/leaderboard" || path === "/pages/global-scholar-leaderboard") {
       document.body.classList.add("reado-page-ranking");
     }
-    if (path === "/pages/gamified-learning-hub-dashboard-2") {
+    if (path === "/profile" || path === "/pages/gamified-learning-hub-dashboard-2") {
       document.body.classList.add("reado-page-profile");
     }
-    if (path === "/pages/analytics-dashboard") {
+    if (path === "/workspace" || path === "/pages/analytics-dashboard") {
       document.body.classList.add("reado-page-analytics");
     }
-    if (path === "/pages/skill-tree") {
+    if (path === "/skill-tree" || path === "/pages/skill-tree") {
       document.body.classList.add("reado-page-skill-tree");
     }
-    if (path === "/pages/think-tank") {
+    if (path === "/think-tank" || path === "/pages/think-tank") {
       document.body.classList.add("reado-page-think-tank");
     }
     enableMobileProportionalMode(isExperiencePage);
@@ -2706,7 +2705,7 @@ class ReadoAppShell extends HTMLElement {
       }
     })();
     top.innerHTML = `
-      <a class="reado-shell-brand" href="/pages/gamified-learning-hub-dashboard-1">
+      <a class="reado-shell-brand" href="/workspace">
         <span class="reado-shell-brand-icon">📘</span>
         <span>reado</span>
       </a>
@@ -2739,9 +2738,9 @@ class ReadoAppShell extends HTMLElement {
             <span class="reado-shell-xp-label" data-shell-xp-label></span>
             <span class="reado-shell-xp-track" data-shell-xp-track><span data-shell-xp-bar></span></span>
           </div>
-          <span class="reado-shell-avatar" data-href="/pages/gamified-learning-hub-dashboard-2"><img data-shell-avatar src="" alt="avatar" /></span>
+          <span class="reado-shell-avatar" data-href="/profile"><img data-shell-avatar src="" alt="avatar" /></span>
         </div>
-        ${isLearningPage ? `<button class="reado-shell-exit" type="button" data-href="/pages/gamified-learning-hub-dashboard-1">${t("shell.exit_experience", "退出体验")}</button>` : ""}
+        ${isLearningPage ? `<button class="reado-shell-exit" type="button" data-href="/workspace">${t("shell.exit_experience", "退出体验")}</button>` : ""}
         <button class="reado-shell-toggle" type="button" aria-label="${t("shell.toggle_menu", "Toggle menu")}">☰</button>
       </div>`;
 
@@ -2945,7 +2944,7 @@ class ReadoAppShell extends HTMLElement {
             <p class="reado-task-title">${t("shell.current_tasks", "进行中的任务")}</p>
             <p class="reado-task-sub">${t("shell.task_signin_sync", "Sign in to sync your mission history.")}</p>
             <div class="reado-task-line"><span style="width:8%"></span></div>
-            <button class="reado-task-btn" data-href="/pages/simulator-library-level-selection-2">${t("shell.continue_learning", "继续学习")}</button>
+            <button class="reado-task-btn" data-href="/missions">${t("shell.continue_learning", "继续学习")}</button>
           </article>
         </div>
       </section>`;
@@ -2963,7 +2962,7 @@ class ReadoAppShell extends HTMLElement {
             <p class="reado-task-title">${t("shell.current_tasks", "进行中的任务")}</p>
             <p class="reado-task-sub">${t("shell.task_no_claim", "No mission claim yet. Complete one mission to start tracking.")}</p>
             <div class="reado-task-line"><span style="width:6%"></span></div>
-            <button class="reado-task-btn" data-href="/pages/simulator-library-level-selection-2">${t("shell.continue_learning", "继续学习")}</button>
+            <button class="reado-task-btn" data-href="/missions">${t("shell.continue_learning", "继续学习")}</button>
           </article>`;
         return;
       }
@@ -3001,7 +3000,7 @@ class ReadoAppShell extends HTMLElement {
     };
 
     const renderLeaderboardPage = (leaders = [], me = null) => {
-      if (window.location.pathname !== "/pages/global-scholar-leaderboard") return;
+      if (window.location.pathname !== "/leaderboard" && window.location.pathname !== "/pages/global-scholar-leaderboard") return;
       const host = document.querySelector("main .flex-1.h-full.overflow-y-auto");
       if (!host) return;
       let box = host.querySelector("[data-live-leaderboard]");
@@ -3222,6 +3221,7 @@ class ReadoAppShell extends HTMLElement {
     const warmTargets = Array.from(new Set([
       ...ROUTES.map((route) => route.href),
       GEM_CENTER_HREF,
+      "/workspace",
       "/pages/analytics-dashboard"
     ]));
     const warmPages = () => {

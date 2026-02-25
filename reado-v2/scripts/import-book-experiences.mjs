@@ -6,7 +6,22 @@ const projectRoot = process.cwd()
 const sourceRoot = path.resolve(projectRoot, "../book_experiences")
 const outputSqlPath = path.resolve(projectRoot, "supabase/import-content-pages.sql")
 const outputScreensDir = path.resolve(projectRoot, "public/library-screens")
+const outputMediaDir = path.resolve(projectRoot, "public/library-media")
 const outputSeedPath = path.resolve(projectRoot, "src/data/content-pages.seed.json")
+const MODULE_MEDIA_EXTENSIONS = new Set([
+  ".png",
+  ".jpg",
+  ".jpeg",
+  ".webp",
+  ".gif",
+  ".svg",
+  ".avif",
+  ".mp4",
+  ".webm",
+  ".mp3",
+  ".wav",
+  ".ogg",
+])
 
 const shouldApply = process.argv.includes("--apply")
 
@@ -126,11 +141,37 @@ async function readModule(modulePath) {
     } catch {}
   }
 
+  let mediaFiles = []
+  try {
+    const entries = await fs.readdir(moduleDir, { withFileTypes: true })
+    const copied = []
+    for (const entry of entries) {
+      if (!entry.isFile()) continue
+      const lowerName = entry.name.toLowerCase()
+      if (lowerName === "module.json" || lowerName === "code.html") continue
+      if (candidateCovers.includes(lowerName)) continue
+      const ext = path.extname(lowerName)
+      if (!MODULE_MEDIA_EXTENSIONS.has(ext)) continue
+      copied.push(entry.name)
+    }
+    if (copied.length > 0) {
+      const moduleMediaDir = path.join(outputMediaDir, slug)
+      await fs.rm(moduleMediaDir, { recursive: true, force: true })
+      await fs.mkdir(moduleMediaDir, { recursive: true })
+      for (const fileName of copied) {
+        await fs.copyFile(path.join(moduleDir, fileName), path.join(moduleMediaDir, fileName))
+      }
+      mediaFiles = copied.sort((a, b) => a.localeCompare(b))
+    }
+  } catch {}
+
   const metadata = {
     generatedAt,
     generatedBy,
     sourcePath: relative,
     hasCodeHtml: Boolean(body),
+    mediaBaseUrl: mediaFiles.length ? `/library-media/${slug}/` : "",
+    mediaFiles,
     thinkTankCount: Array.isArray(moduleJson?.thinkTankEntries) ? moduleJson.thinkTankEntries.length : 0,
     questionCount: Array.isArray(moduleJson?.knowledgeBattle?.questions)
       ? moduleJson.knowledgeBattle.questions.length
@@ -223,6 +264,7 @@ async function applyToSupabase(rows) {
 
 async function main() {
   await fs.mkdir(outputScreensDir, { recursive: true })
+  await fs.mkdir(outputMediaDir, { recursive: true })
   await fs.mkdir(path.dirname(outputSeedPath), { recursive: true })
 
   const moduleFiles = await walk(sourceRoot)
