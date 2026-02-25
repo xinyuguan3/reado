@@ -896,7 +896,7 @@ function injectKnowledgeMapBooks(html, books) {
       "#reado-shelf-view .reado-shelf-cta:hover { border-color: rgba(96, 165, 250, 0.8); background: linear-gradient(135deg, rgba(59, 130, 246, 0.45), rgba(37, 99, 235, 0.5)); }",
       "#reado-shelf-view .reado-shelf-empty { border: 1px solid rgba(148, 163, 184, 0.2); border-radius: 12px; background: rgba(15, 23, 42, 0.68); padding: 18px; color: #cbd5e1; font-size: 13px; text-align: center; }",
       "@media (max-width: 900px) { #reado-map-view-toggle { top: 10px; left: 10px; right: 10px; } #reado-map-view-toggle .reado-view-chip { display: none; } #reado-shelf-view .reado-shelf-wrap { padding-top: 64px; } #reado-shelf-view .reado-shelf-title { font-size: 22px; } }"
-    ].join("\n");
+    ].join("\\n");
     document.head.append(style);
   };
   ensureStyle();
@@ -911,14 +911,14 @@ function injectKnowledgeMapBooks(html, books) {
     }
     const fallbackNode = Array.from(mapScene.querySelectorAll(".absolute"))
       .find((node) => {
-        const text = (node.textContent || "").replace(/\s+/g, " ").trim();
+        const text = (node.textContent || "").replace(/\\s+/g, " ").trim();
         return text.includes("中央档案馆") || text.includes("中央档案部") || text.includes("基地总部");
       });
     if (fallbackNode instanceof HTMLElement) {
       fallbackNode.remove();
     }
     mapScene.querySelectorAll("svg path").forEach((pathEl) => {
-      const d = (pathEl.getAttribute("d") || "").replace(/\s+/g, " ").trim();
+      const d = (pathEl.getAttribute("d") || "").replace(/\\s+/g, " ").trim();
       if (d.startsWith("M50% 50%")) {
         pathEl.remove();
       }
