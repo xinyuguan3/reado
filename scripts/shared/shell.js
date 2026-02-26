@@ -800,12 +800,7 @@ function resolveFallbackIconGlyph(iconName) {
 
 function applyIconFallback(root = document) {
   const host = root && typeof root.querySelectorAll === "function" ? root : document;
-  const mobileExperience = Boolean(
-    document.body
-    && document.body.classList.contains("reado-experience-mode")
-    && window.matchMedia("(max-width: 900px)").matches
-  );
-  const useFallback = mobileExperience || !Boolean(window.__readoIconFontReady);
+  const useFallback = true;
   if (document.body) {
     document.body.classList.toggle("reado-shell-icons-fallback", useFallback);
   }
@@ -957,6 +952,12 @@ function ensureGlobalStyle() {
       font-family: "Material Icons";
       font-size: 16px;
       line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 16px;
+      overflow: hidden;
+      white-space: nowrap;
     }
     body.reado-shell-applied .reado-shell-pill.streak { color: #ffb35a; }
     body.reado-shell-applied .reado-shell-pill.gems {
@@ -1214,6 +1215,8 @@ function ensureGlobalStyle() {
     }
     body.reado-shell-applied .reado-shell-link-icon {
       width: 22px;
+      min-width: 22px;
+      max-width: 22px;
       text-align: center;
       color: #9ca9bf;
       font-size: 21px;
@@ -1228,7 +1231,9 @@ function ensureGlobalStyle() {
       word-wrap: normal;
       direction: ltr;
       -webkit-font-feature-settings: "liga";
+      font-feature-settings: "liga";
       -webkit-font-smoothing: antialiased;
+      overflow: hidden;
     }
     body.reado-shell-applied .reado-shell-link.active .reado-shell-link-icon {
       color: #1e78ff;
@@ -2383,16 +2388,16 @@ class ReadoAppShell extends HTMLElement {
       </a>
       <div class="reado-shell-right">
         <label class="reado-shell-lang">
-          <span class="reado-shell-pill-icon" data-icon-name="language">language</span>
+          <span class="reado-shell-pill-icon" data-icon-name="language">${resolveFallbackIconGlyph("language")}</span>
           <select data-shell-lang></select>
         </label>
         <span class="reado-shell-pill streak">🔥 <strong data-shell-streak></strong></span>
         <span class="reado-shell-pill gems" data-href="${GEM_CENTER_HREF}">
-          <span class="reado-shell-pill-icon" data-icon-name="diamond">diamond</span>
+          <span class="reado-shell-pill-icon" data-icon-name="diamond">${resolveFallbackIconGlyph("diamond")}</span>
           <strong data-shell-gems>0</strong>
         </span>
         <button class="reado-shell-pill pro" type="button" data-open-billing>
-          <span class="reado-shell-pill-icon" data-icon-name="workspace_premium">workspace_premium</span>
+          <span class="reado-shell-pill-icon" data-icon-name="workspace_premium">${resolveFallbackIconGlyph("workspace_premium")}</span>
           <strong data-shell-pro-label>${t("billing.subscribe_short", "Subscribe Pro")}</strong>
         </button>
         <div class="reado-shell-user">
@@ -2539,7 +2544,7 @@ class ReadoAppShell extends HTMLElement {
       const active = route.id === page ? "active" : "";
       const resolvedHref = route.href;
       return `<a class="reado-shell-link ${active}" href="${resolvedHref}">
-        <span class="reado-shell-link-icon" data-icon-name="${route.icon}">${route.icon}</span>
+        <span class="reado-shell-link-icon" data-icon-name="${route.icon}">${resolveFallbackIconGlyph(route.icon)}</span>
         <span>${t(route.labelKey, route.label)}</span>
       </a>`;
     }).join("");
@@ -2778,7 +2783,7 @@ class ReadoAppShell extends HTMLElement {
       nav.innerHTML = ROUTES.map((route) => {
         const active = route.id === page ? "active" : "";
         return `<a class="reado-shell-link ${active}" href="${route.href}">
-          <span class="reado-shell-link-icon" data-icon-name="${route.icon}">${route.icon}</span>
+          <span class="reado-shell-link-icon" data-icon-name="${route.icon}">${resolveFallbackIconGlyph(route.icon)}</span>
           <span>${t(route.labelKey, route.label)}</span>
         </a>`;
       }).join("");
