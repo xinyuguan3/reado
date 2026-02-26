@@ -315,6 +315,14 @@ function buildBookCatalog(books) {
 function buildSharedBookCatalogScript(books) {
   const catalog = buildBookCatalog(books);
   return `${buildLanguageBootstrapScript()}
+(function(){
+  if (typeof document === "undefined") return;
+  if (document.getElementById("reado-shell-bootstrap-style")) return;
+  var style = document.createElement("style");
+  style.id = "reado-shell-bootstrap-style";
+  style.textContent = "body:not(.reado-shell-applied)>header:first-of-type,body:not(.reado-shell-applied)>nav:first-of-type,body:not(.reado-shell-applied)>aside:first-of-type,body:not(.reado-shell-applied)>.flex>nav:first-of-type,body:not(.reado-shell-applied)>.flex>aside:first-of-type,body:not(.reado-shell-applied)>.flex-1>nav:first-of-type,body:not(.reado-shell-applied)>.flex-1>aside:first-of-type,body:not(.reado-shell-applied)>.flex>.flex-1>nav:first-of-type,body:not(.reado-shell-applied)>.flex>.flex-1>aside:first-of-type{visibility:hidden!important;}";
+  (document.head || document.documentElement).appendChild(style);
+})();
 window.${BOOK_CATALOG_GLOBAL} = ${JSON.stringify(catalog)};`;
 }
 

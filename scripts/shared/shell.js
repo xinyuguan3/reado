@@ -30,6 +30,7 @@ const ICON_FALLBACK_MAP = {
 
 const STYLE_ID = "reado-shared-shell-style";
 const ICON_FONT_ID = "reado-shell-material-icons";
+const ICON_FONT_SYMBOLS_ID = "reado-shell-material-symbols";
 const USER_STATE_KEY = "reado_user_state_v1";
 const DAILY_GEM_CLAIM_LEGACY_KEY = "reado_daily_gem_claim_v1";
 const DAILY_GEM_CLAIM_STREAK_KEY = "reado_daily_gem_claim_streak_v2";
@@ -724,8 +725,35 @@ window.ReadoUser = {
 };
 
 function ensureIconFont() {
-  // Pages already include icon font links. Skip runtime Google fetch to reduce cross-border latency.
-  return;
+  const markReady = () => {
+    window.__readoIconFontReady = true;
+    applyIconFallback(document);
+  };
+
+  try {
+    if (document.fonts && typeof document.fonts.check === "function" && document.fonts.check('16px "Material Icons"')) {
+      markReady();
+      return;
+    }
+  } catch {}
+
+  const bindLink = (id, href) => {
+    let link = document.getElementById(id);
+    if (link instanceof HTMLLinkElement) {
+      if (window.__readoIconFontReady) return;
+      link.addEventListener("load", markReady, { once: true });
+      return;
+    }
+    link = document.createElement("link");
+    link.id = id;
+    link.rel = "stylesheet";
+    link.href = href;
+    link.addEventListener("load", markReady, { once: true });
+    (document.head || document.documentElement).appendChild(link);
+  };
+
+  bindLink(ICON_FONT_ID, "https://fonts.googleapis.com/icon?family=Material+Icons");
+  bindLink(ICON_FONT_SYMBOLS_ID, "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap");
 }
 
 function resolveFallbackIconGlyph(iconName) {
@@ -735,8 +763,7 @@ function resolveFallbackIconGlyph(iconName) {
 
 function applyIconFallback(root = document) {
   const host = root && typeof root.querySelectorAll === "function" ? root : document;
-  // Always use built-in icon glyphs to avoid cross-region font loading issues.
-  const useFallback = true;
+  const useFallback = !Boolean(window.__readoIconFontReady);
   if (document.body) {
     document.body.classList.toggle("reado-shell-icons-fallback", useFallback);
   }

@@ -2257,7 +2257,15 @@ function buildCatalogForSession(sessionId) {
 
 function buildCatalogScript(sessionId) {
   const scopedCatalog = buildCatalogForSession(sessionId);
-  return `window.__READO_BOOK_CATALOG__ = ${JSON.stringify(scopedCatalog)};`;
+  return `(function(){
+  if (typeof document === "undefined") return;
+  if (document.getElementById("reado-shell-bootstrap-style")) return;
+  var style = document.createElement("style");
+  style.id = "reado-shell-bootstrap-style";
+  style.textContent = "body:not(.reado-shell-applied)>header:first-of-type,body:not(.reado-shell-applied)>nav:first-of-type,body:not(.reado-shell-applied)>aside:first-of-type,body:not(.reado-shell-applied)>.flex>nav:first-of-type,body:not(.reado-shell-applied)>.flex>aside:first-of-type,body:not(.reado-shell-applied)>.flex-1>nav:first-of-type,body:not(.reado-shell-applied)>.flex-1>aside:first-of-type,body:not(.reado-shell-applied)>.flex>.flex-1>nav:first-of-type,body:not(.reado-shell-applied)>.flex>.flex-1>aside:first-of-type{visibility:hidden!important;}";
+  (document.head || document.documentElement).appendChild(style);
+})();
+window.__READO_BOOK_CATALOG__ = ${JSON.stringify(scopedCatalog)};`;
 }
 
 async function ensurePublicSampleWorks() {
