@@ -161,11 +161,27 @@ const BOOK_META = {
       "同一结构可在不同题材皮肤下迁移并保持张力。",
       "市场反馈来自结构强度，而不是单一风格偏好。"
     ]
+  },
+  "ming-dynasty-chronicles": {
+    title: "《明朝那些事儿》",
+    price: 560,
+    category: "science-knowledge",
+    categoryHint: "通过卡牌放置和剧情事件推进，体验明朝制度演化与王朝危机。",
+    tier: "大餐级",
+    tags: ["历史推演", "卡牌叙事"],
+    badgeTitle: "大明执局人",
+    badgeIcon: "style",
+    highlights: [
+      "从洪武到崇祯，连续五章推演制度、财政、边防与民心的联动。",
+      "前期章节会解锁永久强化，直接影响后期可用策略上限。",
+      "通过史料札记与事件文本增强历史知识密度和代入感。"
+    ]
   }
 };
 
 const DEFAULT_MODULE_ORDER = {
   sapiens: [
+    "sapiens-wheat-civilization-simulator",
     "the-wheat-conquest-simulator",
     "human-domestication-dilemma-1",
     "human-domestication-dilemma-2",
@@ -178,6 +194,7 @@ const DEFAULT_MODULE_ORDER = {
     "bilingual-human-domestication-dilemma-3"
   ],
   "zero-to-one": [
+    "zero-to-one-founder-decision-lab",
     "zero-to-one-the-monopolist-s-choice",
     "zero-to-one-the-monopolist-s-choice-1",
     "zero-to-one-the-monopolist-s-choice-2",
@@ -186,6 +203,9 @@ const DEFAULT_MODULE_ORDER = {
     "zero-to-one-the-monopolist-s-choice-5",
     "zero-to-one-the-monopolist-s-choice-6",
     "zero-to-one-the-monopolist-s-choice-7"
+  ],
+  "principles-for-navigating-big-debt-crises": [
+    "inside-china-land-debt-policy-sandbox"
   ],
   "story-circle-theory": [
     "story-writers-room-01"
@@ -215,7 +235,11 @@ const BOOK_NAME_TO_ID = new Map([
   ["social-dilemma", "social-dilemma"],
   ["社交困境", "social-dilemma"],
   ["《社交困境》", "social-dilemma"],
-  ["story-circle-theory", "story-circle-theory"]
+  ["story-circle-theory", "story-circle-theory"],
+  ["ming-dynasty-chronicles", "ming-dynasty-chronicles"],
+  ["明朝那些事", "ming-dynasty-chronicles"],
+  ["明朝那些事儿", "ming-dynasty-chronicles"],
+  ["《明朝那些事儿》", "ming-dynasty-chronicles"]
 ]);
 
 function slugify(value) {
@@ -284,6 +308,7 @@ export class RuntimeBookCatalog {
     this.rootDir = rootDir;
     this.bookExperiencesDir = path.join(rootDir, "book_experiences");
     this.bookCoversDir = path.join(rootDir, "book_covers");
+    this.coversDir = path.join(rootDir, "covers");
     this.minRefreshMs = Math.max(250, Number(minRefreshMs) || 2000);
     this.snapshot = null;
     this.lastLoadedAt = 0;
@@ -421,28 +446,32 @@ export class RuntimeBookCatalog {
   async scanBookCovers() {
     const coverByBookId = new Map();
     const coverAssetByPublicName = new Map();
-    let entries = [];
-    try {
-      entries = await fs.readdir(this.bookCoversDir, { withFileTypes: true });
-    } catch {
-      return { coverByBookId, coverAssetByPublicName };
-    }
-    const files = entries
-      .filter((entry) => entry.isFile())
-      .map((entry) => entry.name)
-      .sort((a, b) => a.localeCompare(b));
+    const sourceDirs = [this.coversDir, this.bookCoversDir];
 
-    for (const name of files) {
-      const ext = path.extname(name).toLowerCase();
-      if (!BOOK_COVER_EXTENSIONS.has(ext)) continue;
-      const base = path.basename(name, ext);
-      const bookId = resolveBookId(base);
-      if (!bookId) continue;
-      if (coverByBookId.has(bookId)) continue;
-      const publicName = `${bookId}${ext}`;
-      const publicPath = `/assets/book-covers/${publicName}`;
-      coverByBookId.set(bookId, publicPath);
-      coverAssetByPublicName.set(publicName, path.join(this.bookCoversDir, name));
+    for (const sourceDir of sourceDirs) {
+      let entries = [];
+      try {
+        entries = await fs.readdir(sourceDir, { withFileTypes: true });
+      } catch {
+        continue;
+      }
+      const files = entries
+        .filter((entry) => entry.isFile())
+        .map((entry) => entry.name)
+        .sort((a, b) => a.localeCompare(b));
+
+      for (const name of files) {
+        const ext = path.extname(name).toLowerCase();
+        if (!BOOK_COVER_EXTENSIONS.has(ext)) continue;
+        const base = path.basename(name, ext);
+        const bookId = resolveBookId(base);
+        if (!bookId) continue;
+        if (coverByBookId.has(bookId)) continue;
+        const publicName = `${bookId}${ext}`;
+        const publicPath = `/assets/book-covers/${publicName}`;
+        coverByBookId.set(bookId, publicPath);
+        coverAssetByPublicName.set(publicName, path.join(sourceDir, name));
+      }
     }
 
     return { coverByBookId, coverAssetByPublicName };

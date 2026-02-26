@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>reado: 明朝那些事儿 - 第三章 中晚明裂缝</title>
+</head>
+<body>
+  <div id="ming-engine-root"></div>
+  <script src="/experiences/media/ming-dynasty-fate-tableau-01/engine.js"></script>
+  <script>
+    window.MingDynastyEngine.mount({
+      rootId: "ming-engine-root",
+      moduleSlug: "ming-dynasty-mid-late-fracture-03",
+      requiresCompletion: "ming-dynasty-yongle-grand-strategy-02",
+      moduleTitle: "明朝那些事儿：第三章 中晚明裂缝",
+      eraLabel: "1521-1582 · 大礼议到张居正改革",
+      intro:
+        "这一章重点不在外敌，而在国家内部组织能力。你需要在文官共识、财政重构与社会承压之间做长期决策，形成真正的发育曲线。",
+      chapterGuide: {
+        title: "第三章引导：内部治理才是主战场",
+        background:
+          "中晚明的关键矛盾是组织效率下降与财政错配，不是单纯“有没有钱”。大礼议、考成法、一条鞭法都在重塑执行链。",
+        bullets: [
+          "本章建议至少保住两项：国库>45、朝局>45。",
+          "改革牌收益大，但容易拖累民心，记得留赈济缓冲。",
+          "如果要冲高分，尽量让“税改+文治”形成协同。"
+        ]
+      },
+      bonds: [
+        {
+          id: "bond-zhangjuzheng",
+          name: "张居正",
+          role: "改革中枢",
+          desc: "擅长把抽象法令变成可执行指标，压低改革摩擦。",
+          effectText: "首回合前：国库 +4、朝局 +2；改革标签每次额外 +2 国库。",
+          effects: {
+            once: { treasury: 4, military: 0, support: -1, court: 2 },
+            tagBonus: { tag: "reform", stat: "treasury", value: 2 }
+          }
+        },
+        {
+          id: "bond-hairui",
+          name: "海瑞",
+          role: "清议标杆",
+          desc: "强调廉政与基层公信，能缓和高压治理副作用。",
+          effectText: "首回合前：民心 +4；高压牌导致的民心损耗减 2。",
+          effects: {
+            once: { treasury: 0, military: 0, support: 4, court: 0 },
+            controlShield: 2
+          }
+        },
+        {
+          id: "bond-qi-jiguang",
+          name: "戚继光",
+          role: "纪律化军改",
+          desc: "提升军政组织效率，适合处理中后段边防压力。",
+          effectText: "首回合前：边防 +4；军事标签每次额外 +1 边防。",
+          effects: {
+            once: { treasury: -1, military: 4, support: 0, court: 0 },
+            tagBonus: { tag: "military", stat: "military", value: 1 }
+          }
+        }
+      ],
+      baseStats: { treasury: 50, military: 48, support: 48, court: 52 },
+      nextModuleSlug: "ming-dynasty-wanli-tianqi-transition-04",
+      prevModuleSlug: "ming-dynasty-yongle-grand-strategy-02",
+      rewardChoices: ["single_whip", "survey_registry", "cabinet_process"],
+      moduleCards: [
+        {
+          id: "grand-ritual-debate",
+          name: "礼制调和",
+          type: "文治",
+          tags: ["scholar", "support"],
+          summary: "降低党争烈度，保留议政空间。",
+          lore: "礼制争论实质上是统治合法性语言的争夺。",
+          delta: { treasury: 0, military: 0, support: 6, court: 3 }
+        },
+        {
+          id: "zhang-kaocheng",
+          name: "考成法督责",
+          type: "改革",
+          tags: ["reform", "scholar", "tax"],
+          summary: "用绩效机制压实行政链。",
+          lore: "张居正改革关键在把抽象法令变成可量化责任。",
+          delta: { treasury: 7, military: 0, support: -1, court: 4 }
+        },
+        {
+          id: "coast-defense",
+          name: "东南海防联动",
+          type: "军政",
+          tags: ["military", "border", "trade"],
+          summary: "兼顾倭患与海贸秩序。",
+          lore: "海禁与开海之间并非二选一，更像一个弹性调节区间。",
+          delta: { treasury: 2, military: 8, support: 1, court: 1 }
+        }
+      ],
+      events: [
+        {
+          year: "1521",
+          title: "大礼议：名分与秩序",
+          story: "皇权、士林与制度语言发生冲突。处理方式将决定官僚系统是否继续合作。",
+          tags: ["power"],
+          focus: "support",
+          goodTags: ["scholar", "support", "reform"],
+          badTags: ["control"],
+          baseDelta: { treasury: 0, military: 0, support: -5, court: -2 },
+          knowledge: {
+            id: "k-great-rites",
+            title: "大礼议本质",
+            text: "大礼议不是礼仪细节之争，而是皇权与文官共同定义政治秩序的话语战争。"
+          }
+        },
+        {
+          year: "1555",
+          title: "东南倭患：海禁失灵",
+          story: "海上走私、地方武装与边防协同出现断层。你要全面封堵，还是制度化疏导？",
+          tags: ["border", "trade"],
+          focus: "military",
+          goodTags: ["military", "trade", "reform"],
+          badTags: ["eunuch"],
+          baseDelta: { treasury: -2, military: -4, support: -2, court: -1 },
+          knowledge: {
+            id: "k-wokou",
+            title: "倭患与海禁",
+            text: "倭患高峰期的主体并非单一外敌，而是海上灰色贸易链中的跨区域利益网络。"
+          }
+        },
+        {
+          year: "1567",
+          title: "隆庆开关：有限开海",
+          story: "海贸松动带来税收与活力，但也需要新的监管能力。",
+          tags: ["trade", "fiscal"],
+          focus: "treasury",
+          goodTags: ["trade", "tax", "scholar"],
+          badTags: ["control"],
+          baseDelta: { treasury: 3, military: 0, support: 1, court: 0 },
+          knowledge: {
+            id: "k-longqing-open",
+            title: "隆庆开关",
+            text: "隆庆开关是明代海贸政策从极端收缩转向有限开放的关键拐点。"
+          }
+        },
+        {
+          year: "1572",
+          title: "张居正当国：财政再造",
+          story: "改革窗口出现，但阻力同样集中。你要不要在高阻力下继续推进？",
+          tags: ["reform", "fiscal"],
+          focus: "treasury",
+          goodTags: ["reform", "tax", "scholar"],
+          badTags: ["eunuch"],
+          baseDelta: { treasury: 2, military: 0, support: -1, court: 1 },
+          knowledge: {
+            id: "k-zhang-reform",
+            title: "张居正改革机制",
+            text: "考成法与一条鞭的组合，核心是把财政与行政绩效纳入同一执行框架。"
+          }
+        },
+        {
+          year: "1582",
+          title: "夺情争议与改革清算",
+          story: "关键改革者去世后，原有反弹力量集中回潮。你如何守住改革遗产？",
+          tags: ["power", "disaster"],
+          focus: "court",
+          goodTags: ["control", "scholar", "reform"],
+          badTags: ["eunuch", "tax"],
+          baseDelta: { treasury: -2, military: 0, support: -2, court: -4 },
+          knowledge: {
+            id: "k-reform-backlash",
+            title: "改革反弹规律",
+            text: "强改革通常伴随强反弹，改革者离场后若无制度托底，回摆几乎必然发生。"
+          }
+        }
+      ]
+    });
+  </script>
+</body>
+</html>

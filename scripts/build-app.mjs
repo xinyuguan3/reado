@@ -112,6 +112,7 @@ const BOOK_COVER_NAME_TO_ID = new Map([
 ]);
 const BOOK_DEFAULT_MODULE_ORDER = {
   sapiens: [
+    "sapiens-wheat-civilization-simulator",
     "the-wheat-conquest-simulator",
     "human-domestication-dilemma-1",
     "human-domestication-dilemma-2",
@@ -124,6 +125,7 @@ const BOOK_DEFAULT_MODULE_ORDER = {
     "bilingual-human-domestication-dilemma-3"
   ],
   "zero-to-one": [
+    "zero-to-one-founder-decision-lab",
     "zero-to-one-the-monopolist-s-choice",
     "zero-to-one-the-monopolist-s-choice-1",
     "zero-to-one-the-monopolist-s-choice-2",
@@ -132,13 +134,12 @@ const BOOK_DEFAULT_MODULE_ORDER = {
     "zero-to-one-the-monopolist-s-choice-5",
     "zero-to-one-the-monopolist-s-choice-6",
     "zero-to-one-the-monopolist-s-choice-7"
+  ],
+  "principles-for-navigating-big-debt-crises": [
+    "inside-china-land-debt-policy-sandbox"
   ]
 };
-const PERSONAL_SHELF_HIDDEN_BOOK_IDS = new Set([
-  "sapiens",
-  "zero-to-one",
-  "principles-for-navigating-big-debt-crises"
-]);
+const PERSONAL_SHELF_HIDDEN_BOOK_IDS = new Set();
 const BOOK_BLUEPRINTS = [
   {
     id: "wanli-fifteen",
@@ -888,7 +889,7 @@ function injectMarketplaceBooks(html, books) {
     const unlocked = getUnlocked();
     if (unlocked.has(id)) {
       const book = books.find((item) => item.id === id);
-      const forceFirst = book?.id === "wanli-fifteen";
+      const forceFirst = ["wanli-fifteen","sapiens","zero-to-one","principles-for-navigating-big-debt-crises"].includes(id);
       if (forceFirst) {
         localStorage.removeItem("reado_book_last_" + id);
         window.location.href = first;
@@ -1487,7 +1488,7 @@ function injectKnowledgeMapBooks(html, books) {
         saveUnlocked(unlocked);
       }
 
-      const forceFirst = book.id === "wanli-fifteen";
+      const forceFirst = ["wanli-fifteen","sapiens","zero-to-one","principles-for-navigating-big-debt-crises"].includes(book.id);
       if (forceFirst) {
         localStorage.removeItem("reado_book_last_" + bookId);
       }
@@ -1550,7 +1551,7 @@ function injectExperienceQuickNav(html, book, moduleSlug) {
   const nextModuleSlug = book
     ? (book.modules.find((module) => module.slug === moduleSlug) ? book.modules[book.modules.findIndex((module) => module.slug === moduleSlug) + 1]?.slug : "")
     : "";
-  const disableAutoNext = Boolean(book && book.id === "wanli-fifteen");
+  const disableAutoNext = Boolean(book && ["wanli-fifteen","sapiens","zero-to-one","principles-for-navigating-big-debt-crises"].includes(book.id));
   const autoNextSnippet = book && nextModuleSlug && !disableAutoNext
     ? `
   const readoNextHref = ${JSON.stringify(`/experiences/${nextModuleSlug}.html`)};
@@ -1833,7 +1834,7 @@ function injectSimulatorCategoryBooks(html, books) {
     const nowUnlocked = getUnlocked();
     if (nowUnlocked.has(bookId)) {
       const book = books.find((item) => item.id === bookId);
-      const forceFirst = book?.id === "wanli-fifteen";
+      const forceFirst = ["wanli-fifteen","sapiens","zero-to-one","principles-for-navigating-big-debt-crises"].includes(bookId);
       if (forceFirst) {
         localStorage.removeItem("reado_book_last_" + bookId);
         window.location.href = first;
@@ -1935,7 +1936,7 @@ function injectProfileTalents(html) {
     }
     const points = (book.highlights || []).map((item) => \`<li class="leading-relaxed">\${item}</li>\`).join("");
     const last = localStorage.getItem("reado_book_last_" + book.id);
-    const forceFirst = book.id === "wanli-fifteen";
+    const forceFirst = ["wanli-fifteen","sapiens","zero-to-one","principles-for-navigating-big-debt-crises"].includes(book.id);
     const canResume = !forceFirst && Boolean(last && Array.isArray(book.moduleSlugs) && book.moduleSlugs.includes(last));
     const continueHref = canResume ? "/experiences/" + last + ".html" : book.firstModuleHref;
     review.innerHTML = \`

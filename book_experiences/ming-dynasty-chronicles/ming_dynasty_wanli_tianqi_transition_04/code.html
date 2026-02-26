@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>reado: 明朝那些事儿 - 第四章 万历到天启</title>
+</head>
+<body>
+  <div id="ming-engine-root"></div>
+  <script src="/experiences/media/ming-dynasty-fate-tableau-01/engine.js"></script>
+  <script>
+    window.MingDynastyEngine.mount({
+      rootId: "ming-engine-root",
+      moduleSlug: "ming-dynasty-wanli-tianqi-transition-04",
+      requiresCompletion: "ming-dynasty-mid-late-fracture-03",
+      moduleTitle: "明朝那些事儿：第四章 万历到天启",
+      eraLabel: "1592-1627 · 战争透支与阉党上升",
+      intro:
+        "前线战争与财政透支叠加，国家开始靠非常规手段维持运转。你在这一章拿到的强化，会决定最终崇祯终局是否还有操作空间。",
+      chapterGuide: {
+        title: "第四章引导：透支期的止损策略",
+        background:
+          "援朝、辽东、矿税、阉党并发意味着你要在“活下来”与“不透支未来”之间持续取舍。前几章发育成果将在这章被彻底检验。",
+        bullets: [
+          "本章很吃边防与国库双线平衡，单项冲高会导致另一项断裂。",
+          "高压征发可以救急，但若连续使用，民心会雪崩。",
+          "建议中段保留至少 1 张赈济或文治牌作为应急刹车。"
+        ]
+      },
+      bonds: [
+        {
+          id: "bond-yuanchonghuan",
+          name: "袁崇焕",
+          role: "辽东防线",
+          desc: "擅长边防止损与火器防御体系建设。",
+          effectText: "首回合前：边防 +5；边防事件额外 +2 边防。",
+          effects: {
+            once: { treasury: -1, military: 5, support: 0, court: 0 },
+            eventTagBonus: { eventTag: "border", stat: "military", value: 2 }
+          }
+        },
+        {
+          id: "bond-shenyiguan",
+          name: "申时行（文官系）",
+          role: "内阁平衡",
+          desc: "偏重中枢协调，降低多线政策互相打架的概率。",
+          effectText: "首回合前：朝局 +4；双牌以上回合额外 +1 朝局。",
+          effects: {
+            once: { treasury: 0, military: 0, support: 0, court: 4 },
+            comboBonus: { minCards: 2, stat: "court", value: 1 }
+          }
+        },
+        {
+          id: "bond-commercial-clan",
+          name: "东南商帮",
+          role: "白银输血",
+          desc: "强化贸易与税源补血，但社会波动也会被放大。",
+          effectText: "首回合前：国库 +5；贸易标签每次额外 +2 国库。",
+          effects: {
+            once: { treasury: 5, military: 0, support: -1, court: 0 },
+            tagBonus: { tag: "trade", stat: "treasury", value: 2 }
+          }
+        }
+      ],
+      baseStats: { treasury: 46, military: 49, support: 44, court: 46 },
+      nextModuleSlug: "ming-dynasty-chongzhen-endgame-05",
+      prevModuleSlug: "ming-dynasty-mid-late-fracture-03",
+      rewardChoices: ["new_army", "frontier_fort", "silver_dispatch"],
+      moduleCards: [
+        {
+          id: "aid-korea",
+          name: "援朝军务",
+          type: "军政",
+          tags: ["military", "border", "tax"],
+          summary: "维持外线信誉与战略缓冲。",
+          lore: "援朝战争消耗了明朝大量机动财政空间。",
+          delta: { treasury: -9, military: 11, support: -1, court: 1 }
+        },
+        {
+          id: "mining-tax-bureau",
+          name: "矿监税使",
+          type: "权谋",
+          tags: ["tax", "control", "eunuch"],
+          summary: "高压汲取，迅速补库。",
+          lore: "矿税是明末财政应急工具，也是一条社会摩擦放大器。",
+          delta: { treasury: 12, military: 0, support: -9, court: 1 }
+        },
+        {
+          id: "ningyuan-defense",
+          name: "宁远体系",
+          type: "军政",
+          tags: ["military", "border", "reform"],
+          summary: "以防御工事与火器组织止损。",
+          lore: "宁远经验显示，组织与火力结构可在劣势中创造局部优势。",
+          delta: { treasury: -5, military: 10, support: 0, court: 1 }
+        }
+      ],
+      events: [
+        {
+          year: "1592",
+          title: "援朝战争：双线财政",
+          story: "战场不在本土，但代价全部回到本土财政账本。要保外线，内线就必须再压缩。",
+          tags: ["war", "border"],
+          focus: "treasury",
+          goodTags: ["military", "border", "tax"],
+          badTags: ["trade"],
+          baseDelta: { treasury: -8, military: -1, support: -2, court: 0 },
+          knowledge: {
+            id: "k-korea-war-cost",
+            title: "万历援朝成本",
+            text: "援朝战争直接放大了明朝财政脆弱性，为后续矿税与辽饷争议埋下导火索。"
+          }
+        },
+        {
+          year: "1601",
+          title: "矿税争议：财政应急还是系统透支",
+          story: "短期现金流改善明显，但地方与士绅反弹快速累积。",
+          tags: ["fiscal", "disaster"],
+          focus: "support",
+          goodTags: ["tax", "control"],
+          badTags: ["support", "scholar"],
+          baseDelta: { treasury: 3, military: 0, support: -5, court: -1 },
+          knowledge: {
+            id: "k-mining-tax",
+            title: "矿税的两面性",
+            text: "矿税可短期补库，但会把中枢与地方合作关系快速推向对抗。"
+          }
+        },
+        {
+          year: "1619",
+          title: "萨尔浒失利：辽东防线松动",
+          story: "前线失利后，朝廷在补兵、补饷、补信心三件事上同时吃紧。",
+          tags: ["border", "disaster"],
+          focus: "military",
+          goodTags: ["military", "border", "reform"],
+          badTags: ["eunuch"],
+          baseDelta: { treasury: -4, military: -8, support: -3, court: -2 },
+          knowledge: {
+            id: "k-sarhu",
+            title: "萨尔浒教训",
+            text: "战略判断与兵力组织失配，会让局部失利迅速转为体系性被动。"
+          }
+        },
+        {
+          year: "1626",
+          title: "宁远防线：技术与组织窗口",
+          story: "战场出现逆转机会，但持续投入要求更高财政纪律与组织能力。",
+          tags: ["border", "war"],
+          focus: "military",
+          goodTags: ["military", "reform", "border"],
+          badTags: ["tax"],
+          baseDelta: { treasury: -3, military: 3, support: 0, court: 0 },
+          knowledge: {
+            id: "k-ningyuan",
+            title: "宁远经验",
+            text: "宁远的关键不是奇迹，而是火器、工事、指挥链配合后的组织收益。"
+          }
+        },
+        {
+          year: "1627",
+          title: "天启末局：阉党与信息堵塞",
+          story: "政治高压让中枢短期可控，却让真实信息更难进入决策层。",
+          tags: ["power", "disaster"],
+          focus: "court",
+          goodTags: ["control"],
+          badTags: ["eunuch", "scholar", "support"],
+          baseDelta: { treasury: 0, military: -1, support: -4, court: -3 },
+          knowledge: {
+            id: "k-tianqi-faction",
+            title: "阉党与信息成本",
+            text: "高压政治会降低短期反对声量，但也会显著抬高真实信息进入中枢的成本。"
+          }
+        }
+      ]
+    });
+  </script>
+</body>
+</html>

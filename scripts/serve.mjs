@@ -135,12 +135,31 @@ const DEFAULT_PUBLIC_SAMPLE_BOOK_IDS = [
   "user-https-eprints-whiterose-ac-uk-id-eprint-170300-vvyqxw-f83d",
   "user-https-eprints-whiterose-ac-uk-id-eprint-170300-vwuj2e-6f75"
 ];
+const DEFAULT_PUBLIC_SAMPLE_BOOK_META = {
+  "user-book-aae53b-vvu77k-5077": {
+    title: "《大空头》：泡沫迷宫中的逆向推演",
+    subtitle: "Understand the logic of the subprime mortgage crisis in the narrative, and use decision-making to experience \"it's hard to win even if it's right\".",
+    hook: "Rehearsing amid uncertainty, choosing in public spaces"
+  },
+  "user-https-eprints-whiterose-ac-uk-id-eprint-170300-vvyqxw-f83d": {
+    title: "证据迷雾：170300号档案",
+    subtitle: "Turn a piece of academic research into actionable public action",
+    hook: "A narrative decision simulation on sonification, movement, and hybrid aesthetic experience"
+  },
+  "user-https-eprints-whiterose-ac-uk-id-eprint-170300-vwuj2e-6f75": {
+    title: "幕起之前：表演艺术决策推演",
+    subtitle: "在叙事中读懂欠负危机逻辑，用决策体验“看对却难赢”",
+    hook: "Rehearsing amid uncertainty, choosing in public spaces"
+  }
+};
+const configuredPublicSampleBookIds = process.env.READO_PUBLIC_SAMPLE_BOOK_IDS;
+const resolvedPublicSampleBookIds = (
+  configuredPublicSampleBookIds === undefined || !String(configuredPublicSampleBookIds).trim()
+)
+  ? DEFAULT_PUBLIC_SAMPLE_BOOK_IDS
+  : parseCsvList(configuredPublicSampleBookIds);
 const publicSampleBookIds = new Set(
-  (
-    process.env.READO_PUBLIC_SAMPLE_BOOK_IDS === undefined
-      ? DEFAULT_PUBLIC_SAMPLE_BOOK_IDS
-      : parseCsvList(process.env.READO_PUBLIC_SAMPLE_BOOK_IDS)
-  )
+  resolvedPublicSampleBookIds
     .map((item) => String(item || "").trim())
     .filter(Boolean)
 );
@@ -2334,11 +2353,14 @@ async function ensurePublicSampleWorks() {
   if (!publicSampleBookIds.size && !publicSampleWorkIds.size) return;
   const result = await playableContentEngine.ensurePublicWorks({
     bookIds: [...publicSampleBookIds],
-    workIds: [...publicSampleWorkIds]
+    workIds: [...publicSampleWorkIds],
+    createMissing: true,
+    ownerSessionId: "reado-public-library",
+    bookMetaById: DEFAULT_PUBLIC_SAMPLE_BOOK_META
   });
-  if (result?.updated || result?.skipped) {
+  if (result?.updated || result?.skipped || result?.created || result?.missing) {
     console.log(
-      `[studio] sample public works updated=${Number(result.updated) || 0}, skipped=${Number(result.skipped) || 0}`
+      `[studio] sample public works created=${Number(result.created) || 0}, updated=${Number(result.updated) || 0}, missing=${Number(result.missing) || 0}, skipped=${Number(result.skipped) || 0}`
     );
   }
 }

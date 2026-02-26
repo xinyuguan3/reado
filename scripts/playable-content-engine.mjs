@@ -43,6 +43,15 @@ function isUserGeneratedBookId(bookId) {
   return /^user-/i.test(String(bookId || "").trim());
 }
 
+function titleFromBookId(bookId) {
+  const raw = String(bookId || "")
+    .replace(/^user-/i, "")
+    .replace(/[-_]+/g, " ")
+    .trim();
+  if (!raw) return "Sample Playable Book";
+  return raw.replace(/\b\w/g, (ch) => ch.toUpperCase());
+}
+
 function shortId() {
   return crypto.randomUUID().slice(0, 8);
 }
@@ -2558,6 +2567,79 @@ export class PlayableContentEngine {
     await fs.writeFile(this.statePath, JSON.stringify(this.state, null, 2), "utf8");
   }
 
+  async createSeedWorkFromBook(bookId, options = {}) {
+    const targetBookId = toText(bookId);
+    if (!targetBookId || !isUserGeneratedBookId(targetBookId)) return null;
+
+    const bookDir = path.join(this.bookExperiencesDir, targetBookId);
+    const stat = await fs.stat(bookDir).catch(() => null);
+    if (!stat || !stat.isDirectory()) return null;
+
+    const entries = await fs.readdir(bookDir, { withFileTypes: true }).catch(() => []);
+    const modules = [];
+    for (const entry of entries) {
+      if (!entry?.isDirectory?.()) continue;
+      const moduleDir = path.join(bookDir, entry.name);
+      const codePath = path.join(moduleDir, "code.html");
+      const codeStat = await fs.stat(codePath).catch(() => null);
+      if (!codeStat || !codeStat.isFile()) continue;
+
+      const moduleJsonPath = path.join(moduleDir, "module.json");
+      let moduleMeta = {};
+      try {
+        moduleMeta = JSON.parse(await fs.readFile(moduleJsonPath, "utf8")) || {};
+      } catch {}
+      const slug = toText(moduleMeta.slug, toText(entry.name));
+      if (!slug) continue;
+      const orderValue = Number(moduleMeta.order);
+      const order = Number.isFinite(orderValue) ? orderValue : Number.MAX_SAFE_INTEGER;
+      modules.push({
+        slug,
+        order,
+        title: toText(moduleMeta.title)
+      });
+    }
+
+    const moduleSlugs = modules
+      .sort((a, b) => {
+        if (a.order !== b.order) return a.order - b.order;
+        return String(a.slug || "").localeCompare(String(b.slug || ""));
+      })
+      .map((item) => toText(item.slug))
+      .filter(Boolean);
+    if (!moduleSlugs.length) return null;
+
+    const createdAt = nowIso();
+    const work = {
+      id: crypto.randomUUID(),
+      owner_session_id: toText(options.ownerSessionId, "reado-public-library"),
+      book_id: targetBookId,
+      title: clamp(toText(options.title, titleFromBookId(targetBookId)), 140),
+      subtitle: clamp(toText(options.subtitle), 280),
+      hook: clamp(toText(options.hook), 500),
+      mode: "seed",
+      input: "seeded-from-existing-book",
+      module_count: moduleSlugs.length,
+      module_slugs: moduleSlugs,
+      sources: [],
+      generation_mode: "seed",
+      llm_error: "",
+      html_generation_mode: "seed",
+      html_generation_error: "",
+      llm_html_required: Boolean(this.requireLlmHtml),
+      parent_work_id: "",
+      root_work_id: "",
+      modification_prompt: "",
+      is_public: Boolean(options.isPublic),
+      public_at: Boolean(options.isPublic) ? createdAt : "",
+      grounding: null,
+      created_at: createdAt,
+      updated_at: createdAt
+    };
+    work.root_work_id = work.id;
+    return work;
+  }
+
   async listWorks(limit = 60) {
     const options = typeof limit === "object" && limit ? limit : { limit };
     const safeLimit = Math.max(1, Math.min(200, Number(options.limit) || 60));
@@ -2587,12 +2669,41 @@ export class PlayableContentEngine {
         .filter(Boolean)
     );
     if (!bookIds.size && !workIds.size) {
-      return { updated: 0, skipped: 0 };
+      return { updated: 0, skipped: 0, created: 0, missing: 0 };
     }
 
+    const createMissing = options.createMissing === true;
+    const ownerSessionId = toText(options.ownerSessionId, "reado-public-library");
+    const bookMetaById = options.bookMetaById && typeof options.bookMetaById === "object"
+      ? options.bookMetaById
+      : {};
+    let created = 0;
+    let missing = 0;
     let updated = 0;
     let skipped = 0;
     const updatedAt = nowIso();
+    if (createMissing && bookIds.size) {
+      for (const bookId of bookIds) {
+        const exists = toArray(this.state?.works).some((item) => !item?.deleted_at && toText(item?.book_id) === bookId);
+        if (exists) continue;
+        const meta = bookMetaById[bookId] && typeof bookMetaById[bookId] === "object"
+          ? bookMetaById[bookId]
+          : {};
+        const seeded = await this.createSeedWorkFromBook(bookId, {
+          ownerSessionId,
+          title: toText(meta.title),
+          subtitle: toText(meta.subtitle),
+          hook: toText(meta.hook),
+          isPublic: true
+        });
+        if (!seeded) {
+          missing += 1;
+          continue;
+        }
+        this.state.works.push(seeded);
+        created += 1;
+      }
+    }
     for (const row of toArray(this.state?.works)) {
       if (!row || row.deleted_at) continue;
       const workId = toText(row.id);
@@ -2609,10 +2720,10 @@ export class PlayableContentEngine {
       row.updated_at = updatedAt;
       updated += 1;
     }
-    if (updated > 0) {
+    if (updated > 0 || created > 0) {
       await this.persist();
     }
-    return { updated, skipped };
+    return { updated, skipped, created, missing };
   }
 
   findWorkByBookId(bookId) {

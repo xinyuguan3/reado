@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>reado: 人类简史 - 小麦文明扩张推演台</title>
+  <script src="/shared/vendor/tailwindcss-cdn.js?plugins=forms"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'"/>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            bg: "#0a1015",
+            panel: "rgba(15, 23, 42, 0.82)",
+            line: "rgba(148, 163, 184, 0.28)",
+            primary: "#fbbf24",
+            sky: "#22d3ee",
+            good: "#84cc16"
+          },
+          fontFamily: {
+            display: ["Space Grotesk", "Noto Sans SC", "sans-serif"],
+            body: ["Noto Sans SC", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body {
+      background:
+        radial-gradient(circle at 15% 10%, rgba(251, 191, 36, 0.2), transparent 45%),
+        radial-gradient(circle at 85% 10%, rgba(34, 211, 238, 0.15), transparent 45%),
+        linear-gradient(165deg, #070d12 0%, #0f172a 52%, #0a1117 100%);
+    }
+    .glass { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(148, 163, 184, 0.24); backdrop-filter: blur(9px); }
+    .option:hover { transform: translateY(-2px); border-color: rgba(251, 191, 36, 0.72); }
+  </style>
+</head>
+<body class="text-slate-100 font-body min-h-screen selection:bg-primary selection:text-black">
+<script src="/shared/book-catalog.js?v=1772083919839"></script>
+<script type="module" src="/shared/shell.js?v=1772083919839"></script>
+<reado-app-shell data-page="knowledge-map"></reado-app-shell>
+  <main class="max-w-6xl mx-auto px-4 py-6 md:py-8">
+    <header class="glass rounded-2xl p-4 md:p-5">
+      <div class="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p class="text-[11px] uppercase tracking-[0.18em] text-primary font-bold">文明推演台</p>
+          <h1 class="text-2xl md:text-3xl font-black font-display">《人类简史》小麦文明扩张推演台</h1>
+          <p class="text-sm text-slate-300 mt-2">身份：小麦扩张策略制定者。目标：让小麦扩散到更广区域，同时管理生态代价并维持社会协作。</p>
+        </div>
+        <div class="glass rounded-xl px-3 py-2 text-xs text-slate-300 min-w-[190px]">
+          <p class="font-bold text-primary" id="round-label">第 1 / 5 回合</p>
+          <p class="mt-1">你在每回合选择一条“文明演化路径”</p>
+        </div>
+      </div>
+      <div class="mt-4 h-2 rounded-full bg-slate-800 overflow-hidden">
+        <div id="progress" class="h-full bg-gradient-to-r from-primary to-sky" style="width: 20%"></div>
+      </div>
+    </header>
+
+    <section class="mt-4 grid md:grid-cols-5 gap-3">
+      <article class="glass rounded-xl p-3"><p class="text-xs text-slate-400">人类绑定度</p><p id="stat-bind" class="text-3xl font-black text-primary font-display">38</p></article>
+      <article class="glass rounded-xl p-3"><p class="text-xs text-slate-400">传播范围</p><p id="stat-spread" class="text-3xl font-black text-sky font-display">22</p></article>
+      <article class="glass rounded-xl p-3"><p class="text-xs text-slate-400">生态压力</p><p id="stat-eco" class="text-3xl font-black text-rose-300 font-display">35</p></article>
+      <article class="glass rounded-xl p-3"><p class="text-xs text-slate-400">协作叙事强度</p><p id="stat-coop" class="text-3xl font-black text-emerald-300 font-display">28</p></article>
+      <article class="glass rounded-xl p-3"><p class="text-xs text-slate-400">文明稳定度</p><p id="stat-stability" class="text-3xl font-black text-violet-300 font-display">52</p></article>
+    </section>
+
+    <section class="glass rounded-2xl p-4 md:p-6 mt-4">
+      <h2 id="event-title" class="text-2xl font-black font-display">事件标题</h2>
+      <p id="event-brief" class="text-slate-300 mt-2 leading-relaxed">事件描述</p>
+
+      <div class="grid md:grid-cols-2 gap-4 mt-4">
+        <button id="choice-a" class="option text-left glass rounded-xl p-4 transition-all duration-200">
+          <p id="choice-a-tag" class="text-xs uppercase tracking-[0.16em] text-amber-300">路径 A</p>
+          <h3 id="choice-a-title" class="text-xl font-bold mt-1">方案 A</h3>
+          <p id="choice-a-desc" class="mt-2 text-sm text-slate-300">说明</p>
+          <p id="choice-a-risk" class="mt-3 text-xs text-amber-300">演化代价</p>
+        </button>
+        <button id="choice-b" class="option text-left glass rounded-xl p-4 transition-all duration-200 border border-primary/40">
+          <p id="choice-b-tag" class="text-xs uppercase tracking-[0.16em] text-sky">路径 B</p>
+          <h3 id="choice-b-title" class="text-xl font-bold mt-1">方案 B</h3>
+          <p id="choice-b-desc" class="mt-2 text-sm text-slate-300">说明</p>
+          <p id="choice-b-risk" class="mt-3 text-xs text-sky">演化代价</p>
+        </button>
+      </div>
+
+      <p id="feedback" class="mt-4 text-sm text-slate-300 border-t border-line pt-3">请选择一条路径继续推演。</p>
+    </section>
+
+    <section class="glass rounded-2xl p-4 md:p-6 mt-4">
+      <h2 class="text-lg font-black">文明日志</h2>
+      <ul id="log-list" class="mt-3 space-y-2 text-sm text-slate-300"></ul>
+    </section>
+
+    <section id="result" class="hidden glass rounded-2xl p-4 md:p-6 mt-4">
+      <h2 class="text-2xl font-black font-display">文明结算</h2>
+      <p id="ending-title" class="text-xl text-primary font-bold mt-2">结局</p>
+      <p id="ending-summary" class="text-slate-300 mt-2 leading-relaxed">总结</p>
+      <div class="mt-3 grid md:grid-cols-3 gap-3 text-sm">
+        <div class="glass rounded-lg p-3"><p class="text-xs text-slate-400">模型映射 1</p><p class="mt-1">农业革命提升产能，也抬高劳动与生态代价。</p></div>
+        <div class="glass rounded-lg p-3"><p class="text-xs text-slate-400">模型映射 2</p><p class="mt-1">虚构秩序能扩大协作规模，是文明扩张关键。</p></div>
+        <div class="glass rounded-lg p-3"><p class="text-xs text-slate-400">模型映射 3</p><p class="mt-1">系统规模越大，越依赖信任网络与制度稳定。</p></div>
+      </div>
+      <div class="mt-4 flex justify-end gap-2">
+        <button id="restart" class="px-4 py-2 rounded-lg border border-line hover:border-primary/70">重新开局</button>
+        <button id="next" class="px-4 py-2 rounded-lg bg-primary text-black font-bold hover:bg-amber-300">进入下一模块</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const events = [
+        {
+          title: "新月沃土出现持续干旱",
+          brief: "早期定居点面临减产危机，部落讨论是否继续押注小麦。",
+          a: {
+            tag: "生物改造",
+            title: "演化耐旱根系",
+            desc: "提高小麦在干旱条件下的存活率。",
+            risk: "代价：生态压力上升。",
+            effect: { bind: +4, spread: +6, eco: +5, coop: +1, stability: +2 },
+            delayed: [{ after: 2, effect: { eco: +4 }, text: "灌溉扩张带来生态负担累积。" }],
+            note: "小麦幸存下来，人类进一步绑定农作节律。"
+          },
+          b: {
+            tag: "退回采集",
+            title: "部分地区放弃耕作",
+            desc: "减少农业依赖，缓冲生态压力。",
+            risk: "代价：传播速度下降。",
+            effect: { bind: -5, spread: -2, eco: -6, coop: -2, stability: -1 },
+            delayed: [{ after: 2, effect: { spread: -3 }, text: "定居网络扩张中断。" }],
+            note: "生态压力减轻，但农业文明推进放缓。"
+          }
+        },
+        {
+          title: "丰收后出现协作分配冲突",
+          brief: "粮仓盈余引发争夺，部落需要新的共同规则。",
+          a: {
+            tag: "叙事组织",
+            title: "建立祭祀与公共仪式",
+            desc: "通过共同信念维持大规模协作。",
+            risk: "代价：管理结构更复杂。",
+            effect: { bind: +3, spread: +2, eco: +1, coop: +10, stability: +6 },
+            delayed: [{ after: 1, effect: { coop: +4 }, text: "共同仪式提升跨部落协调效率。" }],
+            note: "你用“想象秩序”扩大了群体协作边界。"
+          },
+          b: {
+            tag: "部落自治",
+            title: "各聚落独立分配",
+            desc: "减少统一规则，维持地方自主。",
+            risk: "代价：协作半径受限。",
+            effect: { bind: -2, spread: +1, eco: -1, coop: -3, stability: -3 },
+            delayed: [{ after: 1, effect: { coop: -2 }, text: "跨聚落协作成本抬升。" }],
+            note: "冲突暂时缓和，但系统整合力下降。"
+          }
+        },
+        {
+          title: "长途交换网络萌芽",
+          brief: "多个区域出现谷物贸易机会，小麦可借迁徙与交易跨区扩张。",
+          a: {
+            tag: "标准化",
+            title: "建立统一计量与契约",
+            desc: "降低交易摩擦，加速传播。",
+            risk: "代价：生态消耗同步增加。",
+            effect: { bind: +2, spread: +8, eco: +3, coop: +5, stability: +4 },
+            delayed: [{ after: 2, effect: { eco: +4 }, text: "跨区扩张带来更高生态开销。" }],
+            note: "你把协作网络升级成跨区域系统。"
+          },
+          b: {
+            tag: "区域保护",
+            title: "限制外部交换",
+            desc: "优先守住本地系统稳定。",
+            risk: "代价：扩张机会流失。",
+            effect: { bind: +1, spread: +1, eco: -2, coop: -1, stability: +1 },
+            delayed: [{ after: 2, effect: { spread: -3 }, text: "扩散速度被后来者反超。" }],
+            note: "系统更稳，但文明规模增长偏慢。"
+          }
+        },
+        {
+          title: "疫病在密集聚落传播",
+          brief: "人口集中后，公共卫生问题成为新约束。",
+          a: {
+            tag: "公共治理",
+            title: "建立跨聚落防疫协作",
+            desc: "投入组织成本，降低系统性崩溃风险。",
+            risk: "代价：短期传播暂缓。",
+            effect: { bind: +1, spread: -2, eco: -1, coop: +4, stability: +7 },
+            delayed: [{ after: 1, effect: { spread: +4 }, text: "系统恢复后，扩张能力回升。" }],
+            note: "你用制度协调对冲了规模化副作用。"
+          },
+          b: {
+            tag: "封闭隔离",
+            title: "各地自保，切断互通",
+            desc: "降低短期感染风险。",
+            risk: "代价：协作网络受损。",
+            effect: { bind: -1, spread: -4, eco: -2, coop: -5, stability: -1 },
+            delayed: [{ after: 1, effect: { coop: -3 }, text: "互信网络破裂，协作效率下降。" }],
+            note: "风险短期降低，但文明连接度下降。"
+          }
+        },
+        {
+          title: "信用与储备体系出现",
+          brief: "粮仓开始承担“跨季信贷”功能，社会在效率与公平间摇摆。",
+          a: {
+            tag: "信用扩张",
+            title: "发展粮仓信用制度",
+            desc: "扩大协作规模，提高远期调配能力。",
+            risk: "代价：生态与复杂度继续增加。",
+            effect: { bind: +3, spread: +5, eco: +2, coop: +7, stability: +4 },
+            delayed: [],
+            note: "你推动了更大规模的社会协作与交换。"
+          },
+          b: {
+            tag: "拒绝抽象信用",
+            title: "只做实物交换",
+            desc: "压低系统复杂度，保持局部可控。",
+            risk: "代价：文明扩张上限受限。",
+            effect: { bind: -1, spread: 0, eco: -1, coop: -2, stability: +1 },
+            delayed: [],
+            note: "系统负担下降，但规模化能力不足。"
+          }
+        }
+      ];
+
+      const ranges = {
+        bind: [0, 100],
+        spread: [0, 100],
+        eco: [0, 100],
+        coop: [0, 100],
+        stability: [0, 100]
+      };
+
+      const ui = {
+        roundLabel: document.getElementById("round-label"),
+        progress: document.getElementById("progress"),
+        statBind: document.getElementById("stat-bind"),
+        statSpread: document.getElementById("stat-spread"),
+        statEco: document.getElementById("stat-eco"),
+        statCoop: document.getElementById("stat-coop"),
+        statStability: document.getElementById("stat-stability"),
+        eventTitle: document.getElementById("event-title"),
+        eventBrief: document.getElementById("event-brief"),
+        choiceA: document.getElementById("choice-a"),
+        choiceB: document.getElementById("choice-b"),
+        choiceATag: document.getElementById("choice-a-tag"),
+        choiceBTag: document.getElementById("choice-b-tag"),
+        choiceATitle: document.getElementById("choice-a-title"),
+        choiceBTitle: document.getElementById("choice-b-title"),
+        choiceADesc: document.getElementById("choice-a-desc"),
+        choiceBDesc: document.getElementById("choice-b-desc"),
+        choiceARisk: document.getElementById("choice-a-risk"),
+        choiceBRisk: document.getElementById("choice-b-risk"),
+        feedback: document.getElementById("feedback"),
+        logList: document.getElementById("log-list"),
+        result: document.getElementById("result"),
+        endingTitle: document.getElementById("ending-title"),
+        endingSummary: document.getElementById("ending-summary"),
+        restart: document.getElementById("restart"),
+        next: document.getElementById("next")
+      };
+
+      const state = {
+        roundIndex: 0,
+        stats: { bind: 38, spread: 22, eco: 35, coop: 28, stability: 52 },
+        delayed: [],
+        locked: false,
+        logs: []
+      };
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function applyEffect(effect) {
+        Object.keys(effect).forEach((key) => {
+          const range = ranges[key];
+          if (!range) return;
+          state.stats[key] = clamp(state.stats[key] + effect[key], range[0], range[1]);
+        });
+      }
+
+      function renderStats() {
+        ui.statBind.textContent = String(state.stats.bind);
+        ui.statSpread.textContent = String(state.stats.spread);
+        ui.statEco.textContent = String(state.stats.eco);
+        ui.statCoop.textContent = String(state.stats.coop);
+        ui.statStability.textContent = String(state.stats.stability);
+      }
+
+      function pushLog(text) {
+        state.logs.unshift(text);
+        ui.logList.innerHTML = state.logs.slice(0, 8).map((line) => `<li class="border-l-2 border-primary/45 pl-3 py-1">${line}</li>`).join("");
+      }
+
+      function applyDueDelayed(roundNo) {
+        const due = state.delayed.filter((item) => item.triggerRound === roundNo);
+        if (!due.length) return [];
+        state.delayed = state.delayed.filter((item) => item.triggerRound !== roundNo);
+        const notes = [];
+        due.forEach((item) => {
+          applyEffect(item.effect);
+          notes.push(item.text);
+          pushLog(`后续演化：${item.text}`);
+        });
+        return notes;
+      }
+
+      function setChoicesDisabled(disabled) {
+        [ui.choiceA, ui.choiceB].forEach((btn) => {
+          btn.disabled = disabled;
+          btn.style.opacity = disabled ? "0.62" : "1";
+          btn.style.cursor = disabled ? "not-allowed" : "pointer";
+        });
+      }
+
+      function renderRound() {
+        if (state.roundIndex >= events.length) {
+          finishGame();
+          return;
+        }
+        const roundNo = state.roundIndex + 1;
+        const current = events[state.roundIndex];
+        ui.roundLabel.textContent = `第 ${roundNo} / ${events.length} 回合`;
+        ui.progress.style.width = `${(roundNo / events.length) * 100}%`;
+        ui.eventTitle.textContent = current.title;
+        ui.eventBrief.textContent = current.brief;
+
+        ui.choiceATag.textContent = current.a.tag;
+        ui.choiceATitle.textContent = current.a.title;
+        ui.choiceADesc.textContent = current.a.desc;
+        ui.choiceARisk.textContent = current.a.risk;
+
+        ui.choiceBTag.textContent = current.b.tag;
+        ui.choiceBTitle.textContent = current.b.title;
+        ui.choiceBDesc.textContent = current.b.desc;
+        ui.choiceBRisk.textContent = current.b.risk;
+      }
+
+      function choose(which) {
+        if (state.locked || state.roundIndex >= events.length) return;
+        state.locked = true;
+        setChoicesDisabled(true);
+
+        const roundNo = state.roundIndex + 1;
+        const current = events[state.roundIndex];
+        const selected = which === "a" ? current.a : current.b;
+
+        applyEffect(selected.effect);
+        selected.delayed.forEach((item) => {
+          state.delayed.push({ triggerRound: roundNo + item.after, effect: item.effect, text: item.text });
+        });
+
+        renderStats();
+        pushLog(`第 ${roundNo} 回合：${selected.title}`);
+
+        state.roundIndex += 1;
+        const delayedNotes = applyDueDelayed(state.roundIndex + 1);
+        ui.feedback.textContent = delayedNotes.length
+          ? `${selected.note} 后续演化触发：${delayedNotes.join("；")}`
+          : selected.note;
+
+        window.setTimeout(() => {
+          state.locked = false;
+          if (state.roundIndex < events.length) {
+            setChoicesDisabled(false);
+            renderRound();
+            renderStats();
+          } else {
+            finishGame();
+          }
+        }, 520);
+      }
+
+      function finishGame() {
+        setChoicesDisabled(true);
+        ui.progress.style.width = "100%";
+        const tail = applyDueDelayed(events.length + 2);
+        if (tail.length) {
+          ui.feedback.textContent = `收尾触发：${tail.join("；")}`;
+          renderStats();
+        }
+
+        let ending = "低速扩张文明";
+        let summary = "你维持了系统推进，但文明规模和协作强度仍有提升空间。";
+
+        if (state.stats.eco >= 78 && state.stats.stability <= 45) {
+          ending = "生态过载危机";
+          summary = "小麦扩张太快，生态压力与系统脆弱性同时上升，文明进入高风险区。";
+        } else if (state.stats.spread >= 60 && state.stats.coop >= 60 && state.stats.stability >= 60) {
+          ending = "大规模协作文明";
+          summary = "你兼顾了扩张与秩序，形成了可持续的跨区域协作网络。";
+        } else if (state.stats.coop < 35) {
+          ending = "碎片化停滞";
+          summary = "缺乏共同叙事与信任机制，系统无法支撑更高复杂度。";
+        }
+
+        ui.endingTitle.textContent = ending;
+        ui.endingSummary.textContent = summary;
+        ui.result.classList.remove("hidden");
+      }
+
+      function resolveNextHref(fallback) {
+        try {
+          const match = window.location.pathname.match(/\/experiences\/([^/?#]+)\.html/i);
+          const slug = match && match[1] ? decodeURIComponent(match[1]) : "";
+          const books = Array.isArray(window.__READO_BOOK_CATALOG__?.books) ? window.__READO_BOOK_CATALOG__.books : [];
+          for (const book of books) {
+            const modules = Array.isArray(book?.moduleSlugs) ? book.moduleSlugs : [];
+            const index = modules.indexOf(slug);
+            if (index >= 0) {
+              const nextSlug = modules[index + 1];
+              return nextSlug ? `/experiences/${encodeURIComponent(nextSlug)}.html` : (book.hubHref || fallback);
+            }
+          }
+        } catch {}
+        return fallback;
+      }
+
+      ui.choiceA.addEventListener("click", () => choose("a"));
+      ui.choiceB.addEventListener("click", () => choose("b"));
+      ui.restart.addEventListener("click", () => window.location.reload());
+      ui.next.addEventListener("click", () => {
+        window.location.href = "/books/sapiens.html";
+      });
+
+      renderStats();
+      renderRound();
+      pushLog("开局：公元前 9500 年，小麦开始绑定人类劳动与定居网络。你的目标是推进文明，同时不让系统崩盘。");
+    })();
+  </script>
+
+<script src="/shared/experience-runtime.js?v=1772083919839"></script>
+<script>
+(() => {
+  
+  localStorage.setItem("reado_book_last_sapiens", "sapiens-wheat-civilization-simulator");
+  if ("sapiens-wheat-civilization-simulator" === "bilingual-human-domestication-dilemma-3") {
+    try {
+      const completedRaw = localStorage.getItem("reado_completed_books_v1") || "[]";
+      const completedSet = new Set(JSON.parse(completedRaw));
+      completedSet.add("sapiens");
+      localStorage.setItem("reado_completed_books_v1", JSON.stringify([...completedSet]));
+    } catch {}
+  }
+  
+  
+  if (window.ReadoExperienceRuntime && typeof window.ReadoExperienceRuntime.init === "function") {
+    window.ReadoExperienceRuntime.init({
+      bookId: "sapiens",
+      moduleSlug: "sapiens-wheat-civilization-simulator",
+      moduleSlugs: ["sapiens-wheat-civilization-simulator","the-wheat-conquest-simulator","human-domestication-dilemma-1","human-domestication-dilemma-2","bilingual-human-domestication-dilemma","bilingual-human-domestication-dilemma-4","bilingual-human-domestication-dilemma-1","bilingual-human-domestication-dilemma-2","bilingual-human-domestication-dilemma-3"]
+    });
+  }
+})();
+</script>
+</body>
+</html>

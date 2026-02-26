@@ -64,8 +64,8 @@
     </style>
 </head>
 <body class="bg-obsidian min-h-screen flex flex-col overflow-hidden relative selection:bg-neon-blue selection:text-obsidian">
-<script src="/shared/book-catalog.js?v=1772076489391"></script>
-<script type="module" src="/shared/shell.js?v=1772076489391"></script>
+<script src="/shared/book-catalog.js?v=1772083919839"></script>
+<script type="module" src="/shared/shell.js?v=1772083919839"></script>
 <reado-app-shell data-page="knowledge-map"></reado-app-shell>
 <div class="fixed inset-0 bg-grid-pattern bg-tech-grid pointer-events-none z-0 opacity-40"></div>
 <div class="fixed inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(5,5,5,0.9)_100%)] pointer-events-none z-0"></div>
@@ -572,12 +572,12 @@
 })();
 </script>
 
-<script src="/shared/experience-runtime.js?v=1772076489391"></script>
+<script src="/shared/experience-runtime.js?v=1772083919839"></script>
 <script>
 (() => {
   
   localStorage.setItem("reado_book_last_zero-to-one", "zero-to-one-the-monopolist-s-choice-6");
-  if ("zero-to-one-the-monopolist-s-choice-6" === "zero-to-one-focus-reading-rhythm-demo") {
+  if ("zero-to-one-the-monopolist-s-choice-6" === "zero-to-one-the-monopolist-s-choice-7") {
     try {
       const completedRaw = localStorage.getItem("reado_completed_books_v1") || "[]";
       const completedSet = new Set(JSON.parse(completedRaw));
@@ -586,66 +586,12 @@
     } catch {}
   }
   
-  const readoNextHref = "/experiences/zero-to-one-the-monopolist-s-choice-7.html";
-  (() => {
-    let isNavigating = false;
-    const keywordList = ["开始", "继续", "下一", "进入", "模拟", "抉择", "选择", "确认", "提交", "挑战", "完成", "start", "next", "continue"];
-    const blacklist = ["EN", "ZH", "返回", "back", "帮助", "求助", "笔记", "术语", "设置", "菜单", "关闭", "取消"];
-    const normalize = (value) => String(value || "").replace(/\s+/g, " ").trim();
-    const hasKeyword = (text) => keywordList.some((keyword) => text.toLowerCase().includes(keyword.toLowerCase()));
-    const isBlocked = (text) => blacklist.some((word) => text === word || text.toLowerCase().includes(word.toLowerCase()));
-    const isOptionGroupButton = (node) => {
-      const parent = node.parentElement;
-      if (!parent) return false;
-      const peers = Array.from(parent.children).filter(
-        (child) => child instanceof HTMLElement && child.matches("button,[role='button'],.concept-card,.item-card,[data-choice],[data-option]")
-      );
-      return peers.length >= 2;
-    };
-    const goNext = (delay = 180) => {
-      if (isNavigating) return;
-      isNavigating = true;
-      window.setTimeout(() => {
-        window.location.href = readoNextHref;
-      }, delay);
-    };
-    document.addEventListener("click", (event) => {
-      const target = event.target;
-      if (!(target instanceof HTMLElement)) return;
-      if (target.closest(".reado-shell-wrap")) return;
-      const candidate = target.closest("[data-next-scene],button,a[href],.concept-card,.item-card,[data-choice],[data-option]");
-      if (!(candidate instanceof HTMLElement)) return;
-      const mainRoot = document.querySelector("main");
-      if (mainRoot instanceof HTMLElement && !mainRoot.contains(candidate)) return;
-      if (candidate.hasAttribute("data-no-next")) return;
-      if (candidate.matches("a[href]")) {
-        const href = candidate.getAttribute("href") || "";
-        if (href && href !== "#" && !href.startsWith("javascript:")) return;
-      }
-      const text = normalize(candidate.textContent);
-      if (candidate.matches("[data-next-scene]")) {
-        event.preventDefault();
-        goNext(90);
-        return;
-      }
-      if (isBlocked(text)) return;
-      if (candidate.matches(".concept-card,.item-card,[data-choice],[data-option]")) {
-        goNext(180);
-        return;
-      }
-      if (candidate.matches("button")) {
-        if (hasKeyword(text) || (text.length >= 4 && isOptionGroupButton(candidate))) {
-          goNext(220);
-        }
-      }
-    });
-  })();
   
   if (window.ReadoExperienceRuntime && typeof window.ReadoExperienceRuntime.init === "function") {
     window.ReadoExperienceRuntime.init({
       bookId: "zero-to-one",
       moduleSlug: "zero-to-one-the-monopolist-s-choice-6",
-      moduleSlugs: ["zero-to-one-the-monopolist-s-choice","zero-to-one-the-monopolist-s-choice-2","zero-to-one-the-monopolist-s-choice-3","zero-to-one-the-monopolist-s-choice-4","zero-to-one-the-monopolist-s-choice-5","zero-to-one-the-monopolist-s-choice-6","zero-to-one-the-monopolist-s-choice-7","zero-to-one-focus-reading-rhythm-demo"]
+      moduleSlugs: ["zero-to-one-founder-decision-lab","zero-to-one-the-monopolist-s-choice","zero-to-one-the-monopolist-s-choice-2","zero-to-one-the-monopolist-s-choice-3","zero-to-one-the-monopolist-s-choice-4","zero-to-one-the-monopolist-s-choice-5","zero-to-one-the-monopolist-s-choice-6","zero-to-one-the-monopolist-s-choice-7"]
     });
   }
 })();

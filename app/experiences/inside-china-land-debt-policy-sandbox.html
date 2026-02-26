@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>reado: 置身事内 - 地方财政与土地政策沙盘</title>
+  <script src="/shared/vendor/tailwindcss-cdn.js?plugins=forms"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'"/>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            bg: "#0a0e18",
+            panel: "rgba(15, 23, 42, 0.84)",
+            line: "rgba(148, 163, 184, 0.28)",
+            primary: "#60a5fa",
+            alert: "#fb7185",
+            good: "#34d399"
+          },
+          fontFamily: {
+            display: ["Space Grotesk", "Noto Sans SC", "sans-serif"],
+            body: ["Noto Sans SC", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body {
+      background:
+        radial-gradient(circle at 12% 12%, rgba(96, 165, 250, 0.2), transparent 44%),
+        radial-gradient(circle at 88% 14%, rgba(52, 211, 153, 0.14), transparent 42%),
+        linear-gradient(170deg, #060913 0%, #0d1426 52%, #080c16 100%);
+    }
+    .glass { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(148, 163, 184, 0.24); backdrop-filter: blur(9px); }
+    .option:hover { transform: translateY(-2px); border-color: rgba(96, 165, 250, 0.72); }
+  </style>
+</head>
+<body class="text-slate-100 font-body min-h-screen selection:bg-primary selection:text-black">
+<script src="/shared/book-catalog.js?v=1772083919839"></script>
+<script type="module" src="/shared/shell.js?v=1772083919839"></script>
+<reado-app-shell data-page="knowledge-map"></reado-app-shell>
+  <main class="max-w-6xl mx-auto px-4 py-6 md:py-8">
+    <header class="glass rounded-2xl p-4 md:p-5">
+      <div class="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p class="text-[11px] uppercase tracking-[0.18em] text-primary font-bold">市级政策驾驶舱</p>
+          <h1 class="text-2xl md:text-3xl font-black font-display">《置身事内》地方财政与土地政策沙盘</h1>
+          <p class="text-sm text-slate-300 mt-2">身份：地级市常务副市长。任务：在招商、土地财政、城投债和民生之间维持系统平衡。</p>
+        </div>
+        <div class="glass rounded-xl px-3 py-2 text-xs text-slate-300 min-w-[190px]">
+          <p class="font-bold text-primary" id="round-label">第 1 / 5 回合</p>
+          <p class="mt-1">每回合你都要签发一份政策决定</p>
+        </div>
+      </div>
+      <div class="mt-4 h-2 rounded-full bg-slate-800 overflow-hidden">
+        <div id="progress" class="h-full bg-gradient-to-r from-primary to-good" style="width: 20%"></div>
+      </div>
+    </header>
+
+    <section class="mt-4 grid md:grid-cols-5 gap-3">
+      <article class="glass rounded-xl p-3"><p class="text-xs text-slate-400">财政余额（亿）</p><p id="stat-fiscal" class="text-3xl font-black text-primary font-display">18</p></article>
+      <article class="glass rounded-xl p-3"><p class="text-xs text-slate-400">债务率（%）</p><p id="stat-debt" class="text-3xl font-black text-rose-300 font-display">58</p></article>
+      <article class="glass rounded-xl p-3"><p class="text-xs text-slate-400">民意支持（%）</p><p id="stat-support" class="text-3xl font-black text-cyan-300 font-display">72</p></article>
+      <article class="glass rounded-xl p-3"><p class="text-xs text-slate-400">产业活力</p><p id="stat-industry" class="text-3xl font-black text-emerald-300 font-display">46</p></article>
+      <article class="glass rounded-xl p-3"><p class="text-xs text-slate-400">系统稳定度</p><p id="stat-stability" class="text-3xl font-black text-violet-300 font-display">64</p></article>
+    </section>
+
+    <section class="glass rounded-2xl p-4 md:p-6 mt-4">
+      <h2 id="event-title" class="text-2xl font-black font-display">事件标题</h2>
+      <p id="event-brief" class="text-slate-300 mt-2 leading-relaxed">事件描述</p>
+
+      <div class="grid md:grid-cols-2 gap-4 mt-4">
+        <button id="choice-a" class="option text-left glass rounded-xl p-4 transition-all duration-200">
+          <p id="choice-a-tag" class="text-xs uppercase tracking-[0.16em] text-rose-300">政策 A</p>
+          <h3 id="choice-a-title" class="text-xl font-bold mt-1">方案 A</h3>
+          <p id="choice-a-desc" class="mt-2 text-sm text-slate-300">说明</p>
+          <p id="choice-a-risk" class="mt-3 text-xs text-rose-300">政策风险</p>
+        </button>
+        <button id="choice-b" class="option text-left glass rounded-xl p-4 transition-all duration-200 border border-primary/40">
+          <p id="choice-b-tag" class="text-xs uppercase tracking-[0.16em] text-primary">政策 B</p>
+          <h3 id="choice-b-title" class="text-xl font-bold mt-1">方案 B</h3>
+          <p id="choice-b-desc" class="mt-2 text-sm text-slate-300">说明</p>
+          <p id="choice-b-risk" class="mt-3 text-xs text-primary">政策风险</p>
+        </button>
+      </div>
+
+      <p id="feedback" class="mt-4 text-sm text-slate-300 border-t border-line pt-3">请选择一项政策继续。</p>
+    </section>
+
+    <section class="glass rounded-2xl p-4 md:p-6 mt-4">
+      <h2 class="text-lg font-black">政务日志</h2>
+      <ul id="log-list" class="mt-3 space-y-2 text-sm text-slate-300"></ul>
+    </section>
+
+    <section id="result" class="hidden glass rounded-2xl p-4 md:p-6 mt-4">
+      <h2 class="text-2xl font-black font-display">任期结算</h2>
+      <p id="ending-title" class="text-xl text-primary font-bold mt-2">结局</p>
+      <p id="ending-summary" class="text-slate-300 mt-2 leading-relaxed">总结</p>
+      <div class="mt-3 grid md:grid-cols-3 gap-3 text-sm">
+        <div class="glass rounded-lg p-3"><p class="text-xs text-slate-400">模型映射 1</p><p class="mt-1">工业地、住宅地、财政与债务是联动系统。</p></div>
+        <div class="glass rounded-lg p-3"><p class="text-xs text-slate-400">模型映射 2</p><p class="mt-1">短期稳增长常以未来债务和风险为代价。</p></div>
+        <div class="glass rounded-lg p-3"><p class="text-xs text-slate-400">模型映射 3</p><p class="mt-1">地方治理本质是多目标约束下的动态平衡。</p></div>
+      </div>
+      <div class="mt-4 flex justify-end gap-2">
+        <button id="restart" class="px-4 py-2 rounded-lg border border-line hover:border-primary/70">重新开局</button>
+        <button id="next" class="px-4 py-2 rounded-lg bg-primary text-black font-bold hover:bg-blue-300">进入下一模块</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const events = [
+        {
+          title: "头部车企来谈判",
+          brief: "对方要求工业地低价出让和配套路网优先落地，承诺带来就业与税源。",
+          a: {
+            tag: "招商冲刺",
+            title: "工业地低价出让",
+            desc: "先把项目落地，再指望后续产业链外溢。",
+            risk: "风险：财政先亏，债务率可能抬升。",
+            effect: { fiscal: -6, debt: +6, support: +4, industry: +12, stability: +2 },
+            delayed: [{ after: 2, effect: { debt: +5, fiscal: -2 }, text: "配套基建追加投入，偿债压力上升。" }],
+            note: "项目落地速度很快，就业预期改善。"
+          },
+          b: {
+            tag: "保守底线",
+            title: "按成本价谈判",
+            desc: "压缩补贴规模，优先保证财政可持续。",
+            risk: "风险：招商吸引力下降。",
+            effect: { fiscal: -1, debt: +1, support: -3, industry: +4, stability: +1 },
+            delayed: [{ after: 2, effect: { industry: -2 }, text: "配套企业落地慢于预期。" }],
+            note: "财政更稳，但产业导入速度偏慢。"
+          }
+        },
+        {
+          title: "城投平台偿债高峰",
+          brief: "本季度到期债务集中，财政与融资平台都承压。",
+          a: {
+            tag: "滚动续债",
+            title: "借新还旧先稳住",
+            desc: "通过新发债延长到期结构。",
+            risk: "风险：债务滚动依赖增强。",
+            effect: { fiscal: +3, debt: +10, support: +1, industry: +1, stability: -2 },
+            delayed: [{ after: 2, effect: { support: -6 }, text: "居民对债务扩张产生担忧。" }],
+            note: "短期现金流稳住，但风险向后转移。"
+          },
+          b: {
+            tag: "压缩投资",
+            title: "暂停部分基建项目",
+            desc: "削减开支，优先修复资产负债表。",
+            risk: "风险：短期增长体感下降。",
+            effect: { fiscal: +2, debt: -6, support: -8, industry: -5, stability: +4 },
+            delayed: [{ after: 2, effect: { debt: -2, fiscal: +1 }, text: "现金流修复后，债务结构改善。" }],
+            note: "系统风险下降，但社会感受偏冷。"
+          }
+        },
+        {
+          title: "住宅用地窗口打开",
+          brief: "产业园周边需求上行，土地市场出现一次性高溢价机会。",
+          a: {
+            tag: "财政回补",
+            title: "高价出让住宅地",
+            desc: "迅速回补工业地补贴造成的缺口。",
+            risk: "风险：房价预期和民意波动。",
+            effect: { fiscal: +8, debt: -4, support: -6, industry: -2, stability: +1 },
+            delayed: [{ after: 2, effect: { support: -5 }, text: "居住成本上升，民意转弱。" }],
+            note: "财政表面明显好转。"
+          },
+          b: {
+            tag: "保障优先",
+            title: "限价并配建保障房",
+            desc: "控制地价上涨节奏，换取社会稳定。",
+            risk: "风险：财政回补速度慢。",
+            effect: { fiscal: +2, debt: -1, support: +8, industry: +1, stability: +6 },
+            delayed: [{ after: 2, effect: { fiscal: -2 }, text: "土地收益未完全兑现，财政修复变慢。" }],
+            note: "民意和社会预期改善。"
+          }
+        },
+        {
+          title: "上级考核强调稳增长",
+          brief: "你需要在“继续上项目”和“提效存量”之间定方向。",
+          a: {
+            tag: "项目加码",
+            title: "再上一个基建大项目",
+            desc: "用投资拉动短期增长指标。",
+            risk: "风险：债务与维护成本抬升。",
+            effect: { fiscal: -4, debt: +8, support: +2, industry: +7, stability: -3 },
+            delayed: [{ after: 2, effect: { debt: +6 }, text: "项目进入偿债期，财务负担上升。" }],
+            note: "增长数据变好，但后续压力积累。"
+          },
+          b: {
+            tag: "结构提效",
+            title: "优化存量并引导民营配套",
+            desc: "少花钱做精细化运营。",
+            risk: "风险：短期体感不如大项目明显。",
+            effect: { fiscal: +1, debt: -3, support: +1, industry: +3, stability: +5 },
+            delayed: [{ after: 2, effect: { industry: +2 }, text: "产业协同改善，效率提升。" }],
+            note: "增速温和，但系统更健康。"
+          }
+        },
+        {
+          title: "地产下行预警",
+          brief: "交易量回落，市场开始担忧财政与债务联动风险。",
+          a: {
+            tag: "救市思路",
+            title: "阶段性放松限购",
+            desc: "先稳住成交和土地价格。",
+            risk: "风险：债务与风险预期回弹。",
+            effect: { fiscal: +3, debt: +2, support: +2, industry: +1, stability: -2 },
+            delayed: [],
+            note: "短期情绪被托住，但系统韧性改善有限。"
+          },
+          b: {
+            tag: "去杠杆转型",
+            title: "压地产依赖，转向产业税基",
+            desc: "接受短期波动，换长期稳定。",
+            risk: "风险：短期财政承压。",
+            effect: { fiscal: -2, debt: -7, support: -1, industry: +8, stability: +8 },
+            delayed: [],
+            note: "短痛换长稳，系统性风险显著下降。"
+          }
+        }
+      ];
+
+      const ranges = {
+        fiscal: [0, 40],
+        debt: [0, 100],
+        support: [0, 100],
+        industry: [0, 100],
+        stability: [0, 100]
+      };
+
+      const ui = {
+        roundLabel: document.getElementById("round-label"),
+        progress: document.getElementById("progress"),
+        statFiscal: document.getElementById("stat-fiscal"),
+        statDebt: document.getElementById("stat-debt"),
+        statSupport: document.getElementById("stat-support"),
+        statIndustry: document.getElementById("stat-industry"),
+        statStability: document.getElementById("stat-stability"),
+        eventTitle: document.getElementById("event-title"),
+        eventBrief: document.getElementById("event-brief"),
+        choiceA: document.getElementById("choice-a"),
+        choiceB: document.getElementById("choice-b"),
+        choiceATag: document.getElementById("choice-a-tag"),
+        choiceBTag: document.getElementById("choice-b-tag"),
+        choiceATitle: document.getElementById("choice-a-title"),
+        choiceBTitle: document.getElementById("choice-b-title"),
+        choiceADesc: document.getElementById("choice-a-desc"),
+        choiceBDesc: document.getElementById("choice-b-desc"),
+        choiceARisk: document.getElementById("choice-a-risk"),
+        choiceBRisk: document.getElementById("choice-b-risk"),
+        feedback: document.getElementById("feedback"),
+        logList: document.getElementById("log-list"),
+        result: document.getElementById("result"),
+        endingTitle: document.getElementById("ending-title"),
+        endingSummary: document.getElementById("ending-summary"),
+        restart: document.getElementById("restart"),
+        next: document.getElementById("next")
+      };
+
+      const state = {
+        roundIndex: 0,
+        stats: { fiscal: 18, debt: 58, support: 72, industry: 46, stability: 64 },
+        delayed: [],
+        locked: false,
+        logs: []
+      };
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function applyEffect(effect) {
+        Object.keys(effect).forEach((key) => {
+          const range = ranges[key];
+          if (!range) return;
+          state.stats[key] = clamp(state.stats[key] + effect[key], range[0], range[1]);
+        });
+      }
+
+      function renderStats() {
+        ui.statFiscal.textContent = String(state.stats.fiscal);
+        ui.statDebt.textContent = String(state.stats.debt);
+        ui.statSupport.textContent = String(state.stats.support);
+        ui.statIndustry.textContent = String(state.stats.industry);
+        ui.statStability.textContent = String(state.stats.stability);
+      }
+
+      function pushLog(text) {
+        state.logs.unshift(text);
+        ui.logList.innerHTML = state.logs.slice(0, 8).map((line) => `<li class="border-l-2 border-primary/45 pl-3 py-1">${line}</li>`).join("");
+      }
+
+      function applyDueDelayed(roundNo) {
+        const due = state.delayed.filter((item) => item.triggerRound === roundNo);
+        if (!due.length) return [];
+        state.delayed = state.delayed.filter((item) => item.triggerRound !== roundNo);
+        const notes = [];
+        due.forEach((item) => {
+          applyEffect(item.effect);
+          notes.push(item.text);
+          pushLog(`后续影响：${item.text}`);
+        });
+        return notes;
+      }
+
+      function setChoicesDisabled(disabled) {
+        [ui.choiceA, ui.choiceB].forEach((btn) => {
+          btn.disabled = disabled;
+          btn.style.opacity = disabled ? "0.62" : "1";
+          btn.style.cursor = disabled ? "not-allowed" : "pointer";
+        });
+      }
+
+      function renderRound() {
+        if (state.roundIndex >= events.length) {
+          finishGame();
+          return;
+        }
+        const roundNo = state.roundIndex + 1;
+        const current = events[state.roundIndex];
+        ui.roundLabel.textContent = `第 ${roundNo} / ${events.length} 回合`;
+        ui.progress.style.width = `${(roundNo / events.length) * 100}%`;
+        ui.eventTitle.textContent = current.title;
+        ui.eventBrief.textContent = current.brief;
+
+        ui.choiceATag.textContent = current.a.tag;
+        ui.choiceATitle.textContent = current.a.title;
+        ui.choiceADesc.textContent = current.a.desc;
+        ui.choiceARisk.textContent = current.a.risk;
+
+        ui.choiceBTag.textContent = current.b.tag;
+        ui.choiceBTitle.textContent = current.b.title;
+        ui.choiceBDesc.textContent = current.b.desc;
+        ui.choiceBRisk.textContent = current.b.risk;
+      }
+
+      function choose(which) {
+        if (state.locked || state.roundIndex >= events.length) return;
+        state.locked = true;
+        setChoicesDisabled(true);
+
+        const roundNo = state.roundIndex + 1;
+        const current = events[state.roundIndex];
+        const selected = which === "a" ? current.a : current.b;
+
+        applyEffect(selected.effect);
+        selected.delayed.forEach((item) => {
+          state.delayed.push({ triggerRound: roundNo + item.after, effect: item.effect, text: item.text });
+        });
+
+        renderStats();
+        pushLog(`第 ${roundNo} 回合：${selected.title}`);
+
+        state.roundIndex += 1;
+        const delayedNotes = applyDueDelayed(state.roundIndex + 1);
+        ui.feedback.textContent = delayedNotes.length
+          ? `${selected.note} 后续影响触发：${delayedNotes.join("；")}`
+          : selected.note;
+
+        window.setTimeout(() => {
+          state.locked = false;
+          if (state.roundIndex < events.length) {
+            setChoicesDisabled(false);
+            renderRound();
+            renderStats();
+          } else {
+            finishGame();
+          }
+        }, 520);
+      }
+
+      function finishGame() {
+        setChoicesDisabled(true);
+        ui.progress.style.width = "100%";
+        const tail = applyDueDelayed(events.length + 2);
+        if (tail.length) {
+          ui.feedback.textContent = `收尾触发：${tail.join("；")}`;
+          renderStats();
+        }
+
+        let ending = "高压平衡";
+        let summary = "你避免了系统失控，但财政、债务和民意之间仍处于高张力状态。";
+
+        if (state.stats.debt >= 85 || state.stats.stability <= 35) {
+          ending = "债务警报";
+          summary = "短期目标达成了，但债务滚动与系统稳定度恶化，风险已进入预警区间。";
+        } else if (state.stats.industry >= 65 && state.stats.debt <= 60 && state.stats.support >= 60) {
+          ending = "结构转型成功";
+          summary = "你实现了产业、财政与社会感受的相对均衡，进入可持续治理状态。";
+        } else if (state.stats.fiscal >= 24 && state.stats.support < 50) {
+          ending = "账面修复，社会承压";
+          summary = "财政指标改善明显，但居民体感偏弱，政策阻力正在累积。";
+        }
+
+        ui.endingTitle.textContent = ending;
+        ui.endingSummary.textContent = summary;
+        ui.result.classList.remove("hidden");
+      }
+
+      function resolveNextHref(fallback) {
+        try {
+          const match = window.location.pathname.match(/\/experiences\/([^/?#]+)\.html/i);
+          const slug = match && match[1] ? decodeURIComponent(match[1]) : "";
+          const books = Array.isArray(window.__READO_BOOK_CATALOG__?.books) ? window.__READO_BOOK_CATALOG__.books : [];
+          for (const book of books) {
+            const modules = Array.isArray(book?.moduleSlugs) ? book.moduleSlugs : [];
+            const index = modules.indexOf(slug);
+            if (index >= 0) {
+              const nextSlug = modules[index + 1];
+              return nextSlug ? `/experiences/${encodeURIComponent(nextSlug)}.html` : (book.hubHref || fallback);
+            }
+          }
+        } catch {}
+        return fallback;
+      }
+
+      ui.choiceA.addEventListener("click", () => choose("a"));
+      ui.choiceB.addEventListener("click", () => choose("b"));
+      ui.restart.addEventListener("click", () => window.location.reload());
+      ui.next.addEventListener("click", () => {
+        window.location.href = "/books/principles-for-navigating-big-debt-crises.html";
+      });
+
+      renderStats();
+      renderRound();
+      pushLog("开局：你接管财政、土地、城投与产业四条主线。任期目标是“稳住系统，不靠透支未来”。");
+    })();
+  </script>
+
+<script src="/shared/experience-runtime.js?v=1772083919839"></script>
+<script>
+(() => {
+  
+  localStorage.setItem("reado_book_last_principles-for-navigating-big-debt-crises", "inside-china-land-debt-policy-sandbox");
+  if ("inside-china-land-debt-policy-sandbox" === "experience-72") {
+    try {
+      const completedRaw = localStorage.getItem("reado_completed_books_v1") || "[]";
+      const completedSet = new Set(JSON.parse(completedRaw));
+      completedSet.add("principles-for-navigating-big-debt-crises");
+      localStorage.setItem("reado_completed_books_v1", JSON.stringify([...completedSet]));
+    } catch {}
+  }
+  
+  
+  if (window.ReadoExperienceRuntime && typeof window.ReadoExperienceRuntime.init === "function") {
+    window.ReadoExperienceRuntime.init({
+      bookId: "principles-for-navigating-big-debt-crises",
+      moduleSlug: "inside-china-land-debt-policy-sandbox",
+      moduleSlugs: ["inside-china-land-debt-policy-sandbox","the-beautiful-deleveraging-challenge","the-subway-dilemma","debt-cycle-impact-analysis","1994","experience-69","experience-71","experience-72"]
+    });
+  }
+})();
+</script>
+</body>
+</html>

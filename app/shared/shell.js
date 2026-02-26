@@ -1984,6 +1984,59 @@ function ensureGlobalStyle() {
       body.reado-shell-applied.reado-experience-mode.reado-mobile-flow [class*="min-w-["] {
         min-width: 0 !important;
       }
+      body.reado-shell-applied.reado-experience-mode.reado-mobile-flow [class*="md:flex-row"],
+      body.reado-shell-applied.reado-experience-mode.reado-mobile-flow [class*="lg:flex-row"] {
+        flex-direction: column !important;
+      }
+      body.reado-shell-applied.reado-experience-mode.reado-mobile-flow [class*="md:grid-cols-"],
+      body.reado-shell-applied.reado-experience-mode.reado-mobile-flow [class*="lg:grid-cols-"] {
+        grid-template-columns: minmax(0, 1fr) !important;
+      }
+      body.reado-shell-applied:not(.reado-experience-mode).reado-page-map main,
+      body.reado-shell-applied:not(.reado-experience-mode).reado-page-market main,
+      body.reado-shell-applied:not(.reado-experience-mode).reado-page-ranking main,
+      body.reado-shell-applied:not(.reado-experience-mode).reado-page-profile main {
+        height: auto !important;
+        min-height: calc(100dvh - 80px) !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+      }
+      body.reado-shell-applied:not(.reado-experience-mode).reado-page-map main {
+        cursor: auto !important;
+      }
+      body.reado-shell-applied:not(.reado-experience-mode).reado-page-market main {
+        padding: 14px !important;
+      }
+      body.reado-shell-applied:not(.reado-experience-mode).reado-page-market main .grid.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-3.gap-6 {
+        grid-template-columns: minmax(0, 1fr) !important;
+      }
+      body.reado-shell-applied:not(.reado-experience-mode).reado-page-ranking main {
+        flex-direction: column !important;
+      }
+      body.reado-shell-applied:not(.reado-experience-mode).reado-page-ranking main > div {
+        padding: 14px !important;
+        padding-bottom: 16px !important;
+      }
+      body.reado-shell-applied:not(.reado-experience-mode).reado-page-ranking main > div .absolute.bottom-6.left-6.right-6 {
+        position: static !important;
+        left: auto !important;
+        right: auto !important;
+        bottom: auto !important;
+        margin-top: 10px !important;
+      }
+      body.reado-shell-applied:not(.reado-experience-mode).reado-page-ranking main > aside {
+        width: 100% !important;
+        max-width: 100% !important;
+        border-left: 0 !important;
+        border-top: 1px solid rgba(148, 163, 184, 0.2) !important;
+      }
+      body.reado-shell-applied:not(.reado-experience-mode).reado-page-profile > .flex-1.flex.overflow-hidden {
+        flex-direction: column !important;
+        overflow: visible !important;
+      }
+      body.reado-shell-applied:not(.reado-experience-mode).reado-page-profile > .flex-1.flex.overflow-hidden > main {
+        min-height: calc(100dvh - 80px) !important;
+      }
     }
     @keyframes reado-shell-pop {
       0% { transform: scale(1); }
@@ -1998,71 +2051,123 @@ function enableMobileProportionalMode(isExperiencePage) {
   if (!isExperiencePage) return;
   const media = window.matchMedia("(max-width: 900px)");
   let rafId = 0;
+  let timerId = 0;
+  let resizeObserver = null;
+  let observedMain = null;
+  let lastViewportKey = "";
+  let lastMetricKey = "";
+  let lastScale = null;
+  let lastMode = "";
+
+  const resetMode = () => {
+    document.body.classList.remove("reado-mobile-flow");
+    document.body.classList.remove("reado-mobile-proportional");
+    document.body.style.removeProperty("--reado-mobile-scale");
+    document.body.style.removeProperty("--reado-mobile-main-width");
+    document.body.style.removeProperty("--reado-mobile-main-min-height");
+    lastScale = null;
+    lastMode = "";
+  };
+
+  const bindResizeObserver = (main, scheduleApply) => {
+    if (typeof ResizeObserver !== "function") return;
+    if (observedMain === main && resizeObserver) return;
+    if (resizeObserver) {
+      resizeObserver.disconnect();
+    }
+    observedMain = main;
+    resizeObserver = new ResizeObserver(() => {
+      scheduleApply();
+    });
+    resizeObserver.observe(main);
+  };
+
+  const computeContentWidth = (main) => {
+    let contentWidth = Math.max(main.scrollWidth || 0, main.clientWidth || 0, main.offsetWidth || 0);
+    const children = Array.from(main.children).slice(0, 64);
+    for (const child of children) {
+      if (!(child instanceof HTMLElement)) continue;
+      contentWidth = Math.max(
+        contentWidth,
+        child.scrollWidth || 0,
+        child.clientWidth || 0,
+        child.offsetWidth || 0
+      );
+    }
+    return Math.max(1, contentWidth);
+  };
 
   const apply = () => {
-    if (!media.matches) {
-      document.body.classList.remove("reado-mobile-flow");
-      document.body.classList.remove("reado-mobile-proportional");
-      document.body.style.removeProperty("--reado-mobile-scale");
-      document.body.style.removeProperty("--reado-mobile-main-width");
-      document.body.style.removeProperty("--reado-mobile-main-min-height");
+    const viewportKey = (window.innerWidth || 0) + "x" + (window.innerHeight || 0);
+    if (viewportKey === lastViewportKey && !media.matches) {
       return;
     }
+    lastViewportKey = viewportKey;
+
+    if (!media.matches) {
+      resetMode();
+      return;
+    }
+
     const main = document.querySelector("main");
     if (!(main instanceof HTMLElement)) return;
+    bindResizeObserver(main, scheduleApply);
 
     const vw = window.innerWidth || 390;
-    let scale = vw <= 360 ? 0.82 : (vw <= 420 ? 0.88 : 0.92);
-    document.body.classList.add("reado-mobile-proportional");
-    document.body.style.setProperty("--reado-mobile-scale", "1");
-    document.body.style.setProperty("--reado-mobile-main-width", "100%");
-    document.body.style.setProperty("--reado-mobile-main-min-height", Math.ceil(window.innerHeight) + "px");
-    main.getBoundingClientRect();
-
-    let minLeft = Infinity;
-    let maxRight = -Infinity;
-    const allNodes = main.querySelectorAll("*");
-    allNodes.forEach((node) => {
-      if (!(node instanceof HTMLElement)) return;
-      const rect = node.getBoundingClientRect();
-      if (rect.width <= 0 || rect.height <= 0) return;
-      minLeft = Math.min(minLeft, rect.left);
-      maxRight = Math.max(maxRight, rect.right);
-    });
-    const mainRect = main.getBoundingClientRect();
-    minLeft = Math.min(minLeft, mainRect.left);
-    maxRight = Math.max(maxRight, mainRect.right);
-    if (Number.isFinite(minLeft) && Number.isFinite(maxRight) && maxRight > minLeft) {
-      const contentWidth = maxRight - minLeft;
-      const fitScale = (vw - 8) / contentWidth;
-      if (Number.isFinite(fitScale)) {
-        scale = Math.min(scale, fitScale);
-      }
+    const vh = window.innerHeight || 844;
+    const contentWidth = computeContentWidth(main);
+    const metricKey = [vw, vh, contentWidth, main.scrollHeight, main.clientHeight].join("|");
+    if (metricKey === lastMetricKey) {
+      return;
     }
-    if (main.scrollHeight > window.innerHeight * 1.45) {
-      scale = Math.max(0.8, scale - 0.04);
+    lastMetricKey = metricKey;
+
+    let scale = vw <= 360 ? 0.82 : (vw <= 420 ? 0.88 : 0.92);
+    const fitScale = (vw - 8) / Math.max(contentWidth, 1);
+    if (Number.isFinite(fitScale) && fitScale > 0) {
+      scale = Math.min(scale, fitScale);
+    }
+    if (main.scrollHeight > vh * 1.5) {
+      scale = Math.max(0.78, scale - 0.04);
     }
     scale = Math.max(0.62, Math.min(1, scale));
 
     if (scale < 0.72) {
-      document.body.classList.remove("reado-mobile-proportional");
-      document.body.classList.add("reado-mobile-flow");
-      document.body.style.removeProperty("--reado-mobile-scale");
-      document.body.style.removeProperty("--reado-mobile-main-width");
-      document.body.style.removeProperty("--reado-mobile-main-min-height");
+      if (lastMode !== "flow") {
+        document.body.classList.remove("reado-mobile-proportional");
+        document.body.classList.add("reado-mobile-flow");
+        document.body.style.removeProperty("--reado-mobile-scale");
+        document.body.style.removeProperty("--reado-mobile-main-width");
+        document.body.style.removeProperty("--reado-mobile-main-min-height");
+        lastMode = "flow";
+      }
       return;
     }
 
+    const nextScale = Number(scale.toFixed(3));
+    const width = (100 / nextScale).toFixed(3) + "%";
+    const minHeight = Math.ceil(vh / nextScale) + "px";
+
     document.body.classList.remove("reado-mobile-flow");
-    document.body.style.setProperty("--reado-mobile-scale", scale.toFixed(3));
-    document.body.style.setProperty("--reado-mobile-main-width", (100 / scale).toFixed(3) + "%");
-    document.body.style.setProperty("--reado-mobile-main-min-height", Math.ceil(window.innerHeight / scale) + "px");
+    document.body.classList.add("reado-mobile-proportional");
+    if (lastMode !== "proportional" || lastScale !== nextScale) {
+      document.body.style.setProperty("--reado-mobile-scale", String(nextScale));
+      document.body.style.setProperty("--reado-mobile-main-width", width);
+      document.body.style.setProperty("--reado-mobile-main-min-height", minHeight);
+      lastScale = nextScale;
+      lastMode = "proportional";
+    } else {
+      document.body.style.setProperty("--reado-mobile-main-min-height", minHeight);
+    }
   };
 
-  const scheduleApply = () => {
-    cancelAnimationFrame(rafId);
-    rafId = requestAnimationFrame(apply);
-  };
+  function scheduleApply() {
+    clearTimeout(timerId);
+    timerId = setTimeout(() => {
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(apply);
+    }, 120);
+  }
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", scheduleApply, { once: true });
@@ -2076,6 +2181,7 @@ function enableMobileProportionalMode(isExperiencePage) {
   } else if (typeof media.addListener === "function") {
     media.addListener(scheduleApply);
   }
+  window.addEventListener("pageshow", scheduleApply, { passive: true });
 }
 
 function enableImageFallbacks() {

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>reado: 明朝那些事儿 - 第五章 崇祯终局</title>
+</head>
+<body>
+<script src="/shared/book-catalog.js?v=1772083919839"></script>
+<script type="module" src="/shared/shell.js?v=1772083919839"></script>
+<reado-app-shell data-page="knowledge-map"></reado-app-shell>
+  <div id="ming-engine-root"></div>
+  <script src="/experiences/media/ming-dynasty-fate-tableau-01/engine.js"></script>
+  <script>
+    window.MingDynastyEngine.mount({
+      rootId: "ming-engine-root",
+      moduleSlug: "ming-dynasty-chongzhen-endgame-05",
+      requiresCompletion: "ming-dynasty-wanli-tianqi-transition-04",
+      moduleTitle: "明朝那些事儿：第五章 崇祯终局",
+      eraLabel: "1628-1644 · 财政、边患与流民并发",
+      intro:
+        "终局章会集中检验前四章的发育成果。你将面对高频危机叠加：旱灾、兵饷、党争、边线与都城安全，同一回合内可能多重爆雷。",
+      chapterGuide: {
+        title: "第五章引导：终局不是求完美，而是求不崩",
+        background:
+          "崇祯终局是“财政、边防、民心、朝局”四线并发坍塌风险的综合测试。你的目标是建立最小可持续闭环，而非单项高分。",
+        bullets: [
+          "优先防止任一指标跌破 20；低于 15 往往会触发连锁惩罚。",
+          "如果前章拿到军改/银线类遗产，可把关键资源押在中后段。",
+          "最后两回合尽量保留兼顾民心与边防的组合。"
+        ]
+      },
+      bonds: [
+        {
+          id: "bond-sun-chu",
+          name: "孙承宗",
+          role: "边防组织者",
+          desc: "提高边防韧性，尤其在灾变回合能减少防线坍塌。",
+          effectText: "首回合前：边防 +4；灾变事件额外 +2 边防。",
+          effects: {
+            once: { treasury: 0, military: 4, support: 0, court: 1 },
+            eventTagBonus: { eventTag: "disaster", stat: "military", value: 2 }
+          }
+        },
+        {
+          id: "bond-li-zicheng-pressure",
+          name: "闯军压力镜像",
+          role: "社会裂变信号",
+          desc: "通过提前识别社会断裂来强化赈济收益。",
+          effectText: "首回合前：民心 +3；救济标签每次额外 +2 民心。",
+          effects: {
+            once: { treasury: -1, military: 0, support: 3, court: 0 },
+            tagBonus: { tag: "relief", stat: "support", value: 2 }
+          }
+        },
+        {
+          id: "bond-wen-cabinet",
+          name: "复合内阁",
+          role: "最后调度线",
+          desc: "多线联动时提升中枢协调，避免政策互相抵消。",
+          effectText: "首回合前：朝局 +4；三牌回合额外 +2 朝局。",
+          effects: {
+            once: { treasury: 0, military: 0, support: 0, court: 4 },
+            comboBonus: { minCards: 3, stat: "court", value: 2 }
+          }
+        }
+      ],
+      baseStats: { treasury: 42, military: 44, support: 40, court: 41 },
+      nextModuleSlug: "",
+      prevModuleSlug: "ming-dynasty-wanli-tianqi-transition-04",
+      rewardChoices: ["grain_reserve", "granary_relief", "censorate"],
+      moduleCards: [
+        {
+          id: "recruit-and-train",
+          name: "募兵整旅",
+          type: "军政",
+          tags: ["military", "border", "tax"],
+          summary: "紧急增编换防线时效。",
+          lore: "明末兵员组织问题不只是人数，而是饷银、训练与指挥链同步问题。",
+          delta: { treasury: -7, military: 11, support: -1, court: 0 }
+        },
+        {
+          id: "open-granary",
+          name: "开仓抚流",
+          type: "民政",
+          tags: ["relief", "support", "tax"],
+          summary: "先稳社会，再谈追击。",
+          lore: "流民问题本质上是财政与灾荒共同触发的秩序问题。",
+          delta: { treasury: -8, military: 0, support: 12, court: 0 }
+        },
+        {
+          id: "bureau-rebuild",
+          name: "急行台阁改制",
+          type: "改革",
+          tags: ["reform", "control", "scholar"],
+          summary: "压缩流程，提速执行。",
+          lore: "终局改革常常来不及形成制度惯性，但可能换到关键窗口期。",
+          delta: { treasury: 2, military: 0, support: -1, court: 7 }
+        }
+      ],
+      events: [
+        {
+          year: "1628",
+          title: "崇祯新政：重启治理信用",
+          story: "新皇上任，朝野期待高涨。你必须尽快证明中枢还能有效执行。",
+          tags: ["power"],
+          focus: "court",
+          goodTags: ["reform", "scholar", "control"],
+          badTags: ["eunuch"],
+          baseDelta: { treasury: 0, military: 0, support: 1, court: 1 },
+          knowledge: {
+            id: "k-chongzhen-start",
+            title: "崇祯开局困境",
+            text: "崇祯并非没有改革意愿，问题在于可用财政与可用组织能力严重不足。"
+          }
+        },
+        {
+          year: "1631",
+          title: "陕西灾荒与流民链条",
+          story: "灾年连发，地方财政断裂。若救济不到位，治安与兵源会同步恶化。",
+          tags: ["disaster", "relief"],
+          focus: "support",
+          goodTags: ["relief", "support", "tax"],
+          badTags: ["control"],
+          baseDelta: { treasury: -4, military: -1, support: -7, court: -1 },
+          knowledge: {
+            id: "k-shaanxi-famine",
+            title: "灾荒与政权韧性",
+            text: "灾荒不是单一自然事件，它会通过赋税、治安、兵员渠道放大为政治危机。"
+          }
+        },
+        {
+          year: "1639",
+          title: "双线压力：辽东与内地并发",
+          story: "对外要守辽，对内要控乱。你每一笔财政分配都可能引爆另一条战线。",
+          tags: ["war", "border"],
+          focus: "treasury",
+          goodTags: ["military", "tax", "reform"],
+          badTags: ["trade"],
+          baseDelta: { treasury: -9, military: -2, support: -2, court: -1 },
+          knowledge: {
+            id: "k-two-front-war",
+            title: "双线战争财政",
+            text: "明末最大难题是双线高强度支出，而财政扩张手段几乎耗尽。"
+          }
+        },
+        {
+          year: "1642",
+          title: "松锦失利：战略主动权流失",
+          story: "关键战役失利后，边线防守转入被动，决策容错接近归零。",
+          tags: ["border", "disaster"],
+          focus: "military",
+          goodTags: ["military", "border", "control"],
+          badTags: ["eunuch"],
+          baseDelta: { treasury: -4, military: -8, support: -2, court: -3 },
+          knowledge: {
+            id: "k-songjin",
+            title: "松锦战败影响",
+            text: "松锦战败后，明朝在辽东基本失去战略主动，后续多为被动应对。"
+          }
+        },
+        {
+          year: "1644",
+          title: "甲申终局：京师保卫战",
+          story: "流民军逼近京师，边线抽调无力，财政几乎见底。你最后一轮布置将决定大明命运。",
+          tags: ["disaster", "war", "border"],
+          focus: "support",
+          goodTags: ["support", "military", "reform"],
+          badTags: ["eunuch", "control"],
+          baseDelta: { treasury: -10, military: -7, support: -8, court: -8 },
+          knowledge: {
+            id: "k-1644-final",
+            title: "甲申系统崩溃",
+            text: "1644 年的崩溃并非单因果，而是财政、军事、社会治理链条同时失效的结果。"
+          }
+        }
+      ]
+    });
+  </script>
+
+
+<script>
+(() => {
+  
+  
+  
+})();
+</script>
+</body>
+</html>

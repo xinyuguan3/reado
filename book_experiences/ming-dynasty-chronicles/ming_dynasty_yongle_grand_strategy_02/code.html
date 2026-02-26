@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>reado: 明朝那些事儿 - 第二章 永乐棋局</title>
+</head>
+<body>
+  <div id="ming-engine-root"></div>
+  <script src="/experiences/media/ming-dynasty-fate-tableau-01/engine.js"></script>
+  <script>
+    window.MingDynastyEngine.mount({
+      rootId: "ming-engine-root",
+      moduleSlug: "ming-dynasty-yongle-grand-strategy-02",
+      requiresCompletion: "ming-dynasty-fate-tableau-01",
+      moduleTitle: "明朝那些事儿：第二章 永乐棋局",
+      eraLabel: "1402-1449 · 迁都、远航与北征",
+      intro:
+        "永乐时代是高投入高回报的帝国实验场。你要在大工程、远洋布局与北方防务之间分配国力，前章遗产将决定你是否扛得住财政压力。",
+      chapterGuide: {
+        title: "第二章引导：大工程时代的资源分配",
+        background:
+          "迁都、北征、下西洋同时推进时，真正稀缺的是可持续财政与命令协同能力。你需要决定“短期威望”与“长期韧性”的优先级。",
+        bullets: [
+          "这章常见死法是“边防看似稳但国库崩”。",
+          "贸易/海权标签有机会形成正循环，但回报不一定即时。",
+          "若上一章拿到税改类遗产，这章可以更大胆。"
+        ]
+      },
+      bonds: [
+        {
+          id: "bond-yongle",
+          name: "永乐帝",
+          role: "高压动员者",
+          desc: "擅长在高强度工程与军事行动中维持执行速度。",
+          effectText: "首回合前：朝局 +4、边防 +2；军事焦点回合朝局 +1。",
+          effects: {
+            once: { treasury: -1, military: 2, support: 0, court: 4 },
+            focusBoost: { focus: "military", stat: "court", value: 1 }
+          }
+        },
+        {
+          id: "bond-zhenghe",
+          name: "郑和",
+          role: "远洋使臣",
+          desc: "强化海贸与外交回报，适合走外向财政路线。",
+          effectText: "首回合前：国库 +2、民心 +1；贸易标签每次额外 +2 国库。",
+          effects: {
+            once: { treasury: 2, military: 0, support: 1, court: 0 },
+            tagBonus: { tag: "trade", stat: "treasury", value: 2 }
+          }
+        },
+        {
+          id: "bond-yuji",
+          name: "于谦（体系）",
+          role: "危机守城派",
+          desc: "偏防守反击，适合处理土木堡后的危机回合。",
+          effectText: "首回合前：边防 +3；灾变类事件额外 +2 边防。",
+          effects: {
+            once: { treasury: 0, military: 3, support: 0, court: 1 },
+            eventTagBonus: { eventTag: "disaster", stat: "military", value: 2 }
+          }
+        }
+      ],
+      baseStats: { treasury: 54, military: 56, support: 49, court: 54 },
+      nextModuleSlug: "ming-dynasty-mid-late-fracture-03",
+      prevModuleSlug: "ming-dynasty-fate-tableau-01",
+      rewardChoices: ["coastal_trade_network", "drill_camps", "postal_network"],
+      moduleCards: [
+        {
+          id: "beijing-capital",
+          name: "迁都北京工程",
+          type: "工程",
+          tags: ["control", "tax", "reform"],
+          summary: "押注北部战略纵深。",
+          lore: "迁都不仅是地理迁移，更是对帝国防务重心的重排。",
+          delta: { treasury: -7, military: 4, support: -1, court: 4 }
+        },
+        {
+          id: "treasure-fleet",
+          name: "下西洋舰队",
+          type: "远洋",
+          tags: ["trade", "navy", "diplomacy"],
+          summary: "以海权展示国家能力。",
+          lore: "下西洋并非单纯贸易行为，也承担威望建构与朝贡秩序重塑功能。",
+          delta: { treasury: 4, military: 2, support: 2, court: 1 }
+        },
+        {
+          id: "northern-campaign",
+          name: "北征机动作战",
+          type: "军政",
+          tags: ["military", "border", "control"],
+          summary: "主动打击换边线缓冲。",
+          lore: "持续北征提高安全阈值，但后勤费用巨大。",
+          delta: { treasury: -6, military: 11, support: -1, court: 1 }
+        }
+      ],
+      events: [
+        {
+          year: "1402",
+          title: "靖难后整合：合法性修复",
+          story: "夺位成功只是开始。要想稳定秩序，必须处理军功集团、文官系统与地方观望情绪。",
+          tags: ["power"],
+          focus: "court",
+          goodTags: ["control", "scholar", "military"],
+          badTags: ["eunuch"],
+          baseDelta: { treasury: -1, military: 0, support: -2, court: 2 },
+          knowledge: {
+            id: "k-yongle-legitimacy",
+            title: "永乐合法性问题",
+            text: "靖难后的核心课题不是夺权，而是如何让新的权力结构被持续执行。"
+          }
+        },
+        {
+          year: "1406",
+          title: "营建北京：战略重心北移",
+          story: "迁都工程吞噬财政，但北方防线更易协同。你要加大投入还是延后节奏？",
+          tags: ["fiscal", "border"],
+          focus: "treasury",
+          goodTags: ["control", "military", "tax"],
+          badTags: ["relief"],
+          baseDelta: { treasury: -6, military: 2, support: -1, court: 1 },
+          knowledge: {
+            id: "k-beijing-shift",
+            title: "迁都与边防",
+            text: "北京成为政治中心后，明朝的军政资源分配重心明显北移。"
+          }
+        },
+        {
+          year: "1405",
+          title: "下西洋：外向投入的回报窗口",
+          story: "远洋可拓展威望与航路信息，但短期成本高，且争议不断。",
+          tags: ["trade"],
+          focus: "treasury",
+          goodTags: ["trade", "navy", "diplomacy"],
+          badTags: ["control"],
+          baseDelta: { treasury: -3, military: 0, support: 1, court: 0 },
+          knowledge: {
+            id: "k-maritime-network",
+            title: "海权与财政",
+            text: "海上网络能带来间接财政与外交收益，但回报周期长且受政策波动影响。"
+          }
+        },
+        {
+          year: "1424",
+          title: "北征后勤：战线与库银",
+          story: "北线压力持续，后勤系统开始接近极限。如何平衡主动出击与战略收缩？",
+          tags: ["border", "war"],
+          focus: "military",
+          goodTags: ["military", "border", "tax"],
+          badTags: ["trade"],
+          baseDelta: { treasury: -4, military: -2, support: -1, court: 0 },
+          knowledge: {
+            id: "k-northern-logistics",
+            title: "北征后勤成本",
+            text: "边疆战争不是一次性动作，而是对财政、运输、兵员的长期压力测试。"
+          }
+        },
+        {
+          year: "1449",
+          title: "土木堡危机：系统连锁失灵",
+          story: "前线指挥、后勤判断与中枢决策同时失误。你必须在极短时间内止损。",
+          tags: ["border", "disaster"],
+          focus: "military",
+          goodTags: ["military", "control", "border"],
+          badTags: ["eunuch", "trade"],
+          baseDelta: { treasury: -3, military: -8, support: -4, court: -4 },
+          knowledge: {
+            id: "k-tumubao",
+            title: "土木堡之变",
+            text: "土木堡并非单点战败，而是制度决策链在高压下的整体性短路。"
+          }
+        }
+      ]
+    });
+  </script>
+</body>
+</html>

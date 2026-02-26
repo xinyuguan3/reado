@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>reado: 从0到1 - 创业者决策实验室</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            bg: "#070b16",
+            panel: "rgba(15, 23, 42, 0.82)",
+            line: "rgba(148, 163, 184, 0.28)",
+            primary: "#22d3ee",
+            warn: "#fb7185",
+            good: "#84cc16"
+          },
+          fontFamily: {
+            display: ["Space Grotesk", "Noto Sans SC", "sans-serif"],
+            body: ["Noto Sans SC", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body {
+      background:
+        radial-gradient(circle at 15% 10%, rgba(34, 211, 238, 0.18), transparent 42%),
+        radial-gradient(circle at 85% 12%, rgba(244, 63, 94, 0.15), transparent 44%),
+        linear-gradient(165deg, #04070f 0%, #0a1124 50%, #050914 100%);
+    }
+    .glass { background: rgba(15, 23, 42, 0.78); border: 1px solid rgba(148, 163, 184, 0.24); backdrop-filter: blur(8px); }
+    .option:hover { transform: translateY(-2px); border-color: rgba(34, 211, 238, 0.7); }
+  </style>
+</head>
+<body class="text-slate-100 font-body min-h-screen selection:bg-primary selection:text-black">
+  <main class="max-w-6xl mx-auto px-4 py-6 md:py-8">
+    <header class="glass rounded-2xl p-4 md:p-5">
+      <div class="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p class="text-[11px] uppercase tracking-[0.18em] text-primary font-bold">创业战情室</p>
+          <h1 class="text-2xl md:text-3xl font-black font-display">《从0到1》创业者决策实验室</h1>
+          <p class="text-sm text-slate-300 mt-2">身份：创始人 CEO。时间：18 个月窗口。目标：不靠价格战活下去，建立不可复制能力。</p>
+        </div>
+        <div class="glass rounded-xl px-3 py-2 text-xs text-slate-300 min-w-[180px]">
+          <p class="font-bold text-primary" id="round-label">第 1 / 5 回合</p>
+          <p class="mt-1">每回合 1 个突发事件，2 个策略选择</p>
+        </div>
+      </div>
+      <div class="mt-4 h-2 rounded-full bg-slate-800 overflow-hidden">
+        <div id="progress" class="h-full bg-gradient-to-r from-primary to-good" style="width: 20%"></div>
+      </div>
+    </header>
+
+    <section class="mt-4 grid md:grid-cols-4 gap-3">
+      <article class="glass rounded-xl p-3"><p class="text-xs text-slate-400">现金跑道（月）</p><p id="stat-runway" class="text-3xl font-black text-primary font-display">12</p></article>
+      <article class="glass rounded-xl p-3"><p class="text-xs text-slate-400">护城河</p><p id="stat-moat" class="text-3xl font-black text-cyan-300 font-display">45</p></article>
+      <article class="glass rounded-xl p-3"><p class="text-xs text-slate-400">增长质量</p><p id="stat-growth" class="text-3xl font-black text-emerald-300 font-display">40</p></article>
+      <article class="glass rounded-xl p-3"><p class="text-xs text-slate-400">团队稳定度</p><p id="stat-team" class="text-3xl font-black text-violet-300 font-display">60</p></article>
+    </section>
+
+    <section class="glass rounded-2xl p-4 md:p-6 mt-4">
+      <h2 id="event-title" class="text-2xl font-black font-display">事件标题</h2>
+      <p id="event-brief" class="text-slate-300 mt-2 leading-relaxed">事件描述</p>
+
+      <div class="grid md:grid-cols-2 gap-4 mt-4">
+        <button id="choice-a" class="option text-left glass rounded-xl p-4 transition-all duration-200">
+          <p id="choice-a-tag" class="text-xs uppercase tracking-[0.16em] text-rose-300">策略 A</p>
+          <h3 id="choice-a-title" class="text-xl font-bold mt-1">方案 A</h3>
+          <p id="choice-a-desc" class="mt-2 text-sm text-slate-300">说明</p>
+          <p id="choice-a-risk" class="mt-3 text-xs text-rose-300">风险提示</p>
+        </button>
+        <button id="choice-b" class="option text-left glass rounded-xl p-4 transition-all duration-200 border border-primary/40">
+          <p id="choice-b-tag" class="text-xs uppercase tracking-[0.16em] text-primary">策略 B</p>
+          <h3 id="choice-b-title" class="text-xl font-bold mt-1">方案 B</h3>
+          <p id="choice-b-desc" class="mt-2 text-sm text-slate-300">说明</p>
+          <p id="choice-b-risk" class="mt-3 text-xs text-primary">风险提示</p>
+        </button>
+      </div>
+
+      <p id="feedback" class="mt-4 text-sm text-slate-300 border-t border-line pt-3">请选择一项策略继续。</p>
+    </section>
+
+    <section class="glass rounded-2xl p-4 md:p-6 mt-4">
+      <h2 class="text-lg font-black">决策日志</h2>
+      <ul id="log-list" class="mt-3 space-y-2 text-sm text-slate-300"></ul>
+    </section>
+
+    <section id="result" class="hidden glass rounded-2xl p-4 md:p-6 mt-4">
+      <h2 class="text-2xl font-black font-display">阶段结算</h2>
+      <p id="ending-title" class="text-xl text-primary font-bold mt-2">结局</p>
+      <p id="ending-summary" class="text-slate-300 mt-2 leading-relaxed">总结</p>
+      <div class="mt-3 grid md:grid-cols-3 gap-3 text-sm">
+        <div class="glass rounded-lg p-3"><p class="text-xs text-slate-400">模型映射 1</p><p class="mt-1">1→N 会放大执行，0→1 才能形成新价值。</p></div>
+        <div class="glass rounded-lg p-3"><p class="text-xs text-slate-400">模型映射 2</p><p class="mt-1">短期增长与长期垄断位势常冲突。</p></div>
+        <div class="glass rounded-lg p-3"><p class="text-xs text-slate-400">模型映射 3</p><p class="mt-1">现金只是生存条件，护城河决定命运上限。</p></div>
+      </div>
+      <div class="mt-4 flex justify-end gap-2">
+        <button id="restart" class="px-4 py-2 rounded-lg border border-line hover:border-primary/70">重新开局</button>
+        <button id="next" class="px-4 py-2 rounded-lg bg-primary text-black font-bold hover:bg-cyan-300">进入下一模块</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const events = [
+        {
+          title: "巨头复制你的核心功能",
+          brief: "平台公司发布了高度相似的功能，还准备发补贴券抢用户。",
+          a: {
+            tag: "速度优先",
+            title: "补贴拉新，硬拼规模",
+            desc: "立即扩投渠道，先把增长曲线拉起来。",
+            risk: "风险：跑道消耗快，护城河可能变薄。",
+            effect: { runway: -3, moat: -6, growth: +12, team: -2 },
+            delayed: [{ after: 2, effect: { growth: -8 }, text: "补贴用户留存下滑，增长质量回落。" }],
+            note: "你抢到了短期流量，但产品差异化没有同步增强。"
+          },
+          b: {
+            tag: "壁垒优先",
+            title: "聚焦不可复制能力",
+            desc: "缩减投放，把资源投到关键技术路径。",
+            risk: "风险：短期增速承压。",
+            effect: { runway: -2, moat: +10, growth: +4, team: +2 },
+            delayed: [{ after: 2, effect: { growth: +6 }, text: "产品口碑沉淀，新增更稳定。" }],
+            note: "你牺牲了速度，换来更高的长期定价权。"
+          }
+        },
+        {
+          title: "核心工程师出现离职意向",
+          brief: "头部公司高薪挖角，团队对未来路线出现不安。",
+          a: {
+            tag: "现金挽留",
+            title: "立刻发签约奖金",
+            desc: "用现金和期权快速稳定团队。",
+            risk: "风险：现金压力上升。",
+            effect: { runway: -2, moat: +2, growth: +0, team: +8 },
+            delayed: [{ after: 2, effect: { runway: -2 }, text: "激励成本在本季度集中兑现。" }],
+            note: "团队暂时稳住，但财务缓冲变薄。"
+          },
+          b: {
+            tag: "使命重构",
+            title: "公开技术路线与目标",
+            desc: "用长期愿景重建协作共识。",
+            risk: "风险：短期见效慢。",
+            effect: { runway: -1, moat: +6, growth: +2, team: +4 },
+            delayed: [{ after: 2, effect: { team: +3 }, text: "团队信任提升，协作效率回升。" }],
+            note: "组织从“拿薪资”转向“打长期战役”。"
+          }
+        },
+        {
+          title: "监管要求突然收紧",
+          brief: "行业合规门槛提高，旧流程可能无法通过审查。",
+          a: {
+            tag: "最低合规",
+            title: "只做底线整改",
+            desc: "压成本通过本次审查。",
+            risk: "风险：未来波动更大。",
+            effect: { runway: +1, moat: -2, growth: +3, team: -1 },
+            delayed: [{ after: 2, effect: { growth: -6, team: -3 }, text: "后续反复整改，团队疲劳。" }],
+            note: "现金省下来了，但系统稳定性下降。"
+          },
+          b: {
+            tag: "规则前置",
+            title: "把合规做成产品能力",
+            desc: "提前建设流程与底层能力。",
+            risk: "风险：当期投入上升。",
+            effect: { runway: -2, moat: +5, growth: -1, team: +2 },
+            delayed: [{ after: 2, effect: { growth: +4 }, text: "合规稳定后，商机恢复。" }],
+            note: "你把规则成本转成了长期门槛。"
+          }
+        },
+        {
+          title: "融资窗口明显降温",
+          brief: "投资人转向保守，估值与到账速度都在下滑。",
+          a: {
+            tag: "续命优先",
+            title: "裁员并砍掉研发线",
+            desc: "优先拉长现金跑道。",
+            risk: "风险：创新势能受损。",
+            effect: { runway: +3, moat: -3, growth: -2, team: -8 },
+            delayed: [{ after: 1, effect: { growth: -4 }, text: "产品迭代变慢，用户活跃走弱。" }],
+            note: "公司活下来了，但竞争位置下滑。"
+          },
+          b: {
+            tag: "单点突破",
+            title: "集中资源打关键创新",
+            desc: "砍非核心业务，守住 0→1 研发。",
+            risk: "风险：现金压力持续。",
+            effect: { runway: -2, moat: +8, growth: +1, team: +2 },
+            delayed: [{ after: 1, effect: { moat: +4 }, text: "关键技术成熟，差异化增强。" }],
+            note: "你把资源压在最能形成垄断势能的点上。"
+          }
+        },
+        {
+          title: "行业全面打价格战",
+          brief: "主要对手集体降价，市场舆论要求你快速跟进。",
+          a: {
+            tag: "被动跟价",
+            title: "直接降价应战",
+            desc: "先守住市场份额。",
+            risk: "风险：品牌与利润承压。",
+            effect: { runway: -2, moat: -5, growth: +5, team: -1 },
+            delayed: [],
+            note: "你守住了份额，但被拖入同质化战场。"
+          },
+          b: {
+            tag: "价值分层",
+            title: "维持价格并升级价值",
+            desc: "用高价值功能换更高质量客户。",
+            risk: "风险：短期扩张速度下降。",
+            effect: { runway: -1, moat: +6, growth: -1, team: +1 },
+            delayed: [],
+            note: "你拒绝红海内卷，继续放大差异化定位。"
+          }
+        }
+      ];
+
+      const ranges = {
+        runway: [0, 18],
+        moat: [0, 100],
+        growth: [0, 100],
+        team: [0, 100]
+      };
+
+      const ui = {
+        roundLabel: document.getElementById("round-label"),
+        progress: document.getElementById("progress"),
+        statRunway: document.getElementById("stat-runway"),
+        statMoat: document.getElementById("stat-moat"),
+        statGrowth: document.getElementById("stat-growth"),
+        statTeam: document.getElementById("stat-team"),
+        eventTitle: document.getElementById("event-title"),
+        eventBrief: document.getElementById("event-brief"),
+        choiceA: document.getElementById("choice-a"),
+        choiceB: document.getElementById("choice-b"),
+        choiceATag: document.getElementById("choice-a-tag"),
+        choiceBTag: document.getElementById("choice-b-tag"),
+        choiceATitle: document.getElementById("choice-a-title"),
+        choiceBTitle: document.getElementById("choice-b-title"),
+        choiceADesc: document.getElementById("choice-a-desc"),
+        choiceBDesc: document.getElementById("choice-b-desc"),
+        choiceARisk: document.getElementById("choice-a-risk"),
+        choiceBRisk: document.getElementById("choice-b-risk"),
+        feedback: document.getElementById("feedback"),
+        logList: document.getElementById("log-list"),
+        result: document.getElementById("result"),
+        endingTitle: document.getElementById("ending-title"),
+        endingSummary: document.getElementById("ending-summary"),
+        restart: document.getElementById("restart"),
+        next: document.getElementById("next")
+      };
+
+      const state = {
+        roundIndex: 0,
+        stats: { runway: 12, moat: 45, growth: 40, team: 60 },
+        delayed: [],
+        locked: false,
+        logs: []
+      };
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function applyEffect(effect) {
+        Object.keys(effect).forEach((key) => {
+          const range = ranges[key];
+          if (!range) return;
+          state.stats[key] = clamp(state.stats[key] + effect[key], range[0], range[1]);
+        });
+      }
+
+      function renderStats() {
+        ui.statRunway.textContent = String(state.stats.runway);
+        ui.statMoat.textContent = String(state.stats.moat);
+        ui.statGrowth.textContent = String(state.stats.growth);
+        ui.statTeam.textContent = String(state.stats.team);
+      }
+
+      function pushLog(text) {
+        state.logs.unshift(text);
+        ui.logList.innerHTML = state.logs.slice(0, 8).map((line) => `<li class="border-l-2 border-primary/45 pl-3 py-1">${line}</li>`).join("");
+      }
+
+      function applyDueDelayed(roundNo) {
+        const due = state.delayed.filter((item) => item.triggerRound === roundNo);
+        if (!due.length) return [];
+        state.delayed = state.delayed.filter((item) => item.triggerRound !== roundNo);
+        const notes = [];
+        due.forEach((item) => {
+          applyEffect(item.effect);
+          notes.push(item.text);
+          pushLog(`延迟后果：${item.text}`);
+        });
+        return notes;
+      }
+
+      function setChoicesDisabled(disabled) {
+        [ui.choiceA, ui.choiceB].forEach((btn) => {
+          btn.disabled = disabled;
+          btn.style.opacity = disabled ? "0.62" : "1";
+          btn.style.cursor = disabled ? "not-allowed" : "pointer";
+        });
+      }
+
+      function renderRound() {
+        if (state.roundIndex >= events.length) {
+          finishGame();
+          return;
+        }
+        const roundNo = state.roundIndex + 1;
+        const current = events[state.roundIndex];
+        ui.roundLabel.textContent = `第 ${roundNo} / ${events.length} 回合`;
+        ui.progress.style.width = `${(roundNo / events.length) * 100}%`;
+        ui.eventTitle.textContent = current.title;
+        ui.eventBrief.textContent = current.brief;
+
+        ui.choiceATag.textContent = current.a.tag;
+        ui.choiceATitle.textContent = current.a.title;
+        ui.choiceADesc.textContent = current.a.desc;
+        ui.choiceARisk.textContent = current.a.risk;
+
+        ui.choiceBTag.textContent = current.b.tag;
+        ui.choiceBTitle.textContent = current.b.title;
+        ui.choiceBDesc.textContent = current.b.desc;
+        ui.choiceBRisk.textContent = current.b.risk;
+      }
+
+      function choose(which) {
+        if (state.locked || state.roundIndex >= events.length) return;
+        state.locked = true;
+        setChoicesDisabled(true);
+
+        const roundNo = state.roundIndex + 1;
+        const current = events[state.roundIndex];
+        const selected = which === "a" ? current.a : current.b;
+
+        applyEffect(selected.effect);
+        selected.delayed.forEach((item) => {
+          state.delayed.push({
+            triggerRound: roundNo + item.after,
+            effect: item.effect,
+            text: item.text
+          });
+        });
+
+        renderStats();
+        pushLog(`第 ${roundNo} 回合：${selected.title}`);
+
+        state.roundIndex += 1;
+        const delayedNotes = applyDueDelayed(state.roundIndex + 1);
+        ui.feedback.textContent = delayedNotes.length
+          ? `${selected.note} 延迟后果触发：${delayedNotes.join("；")}`
+          : selected.note;
+
+        window.setTimeout(() => {
+          state.locked = false;
+          if (state.roundIndex < events.length) {
+            setChoicesDisabled(false);
+            renderRound();
+            renderStats();
+          } else {
+            finishGame();
+          }
+        }, 520);
+      }
+
+      function finishGame() {
+        setChoicesDisabled(true);
+        ui.progress.style.width = "100%";
+        const lateNotes = applyDueDelayed(events.length + 2);
+        if (lateNotes.length) {
+          ui.feedback.textContent = `收尾阶段触发延迟后果：${lateNotes.join("；")}`;
+          renderStats();
+        }
+
+        let ending = "勉强存活";
+        let summary = "你穿过了窗口期，但尚未建立足够强的不可复制能力。";
+
+        if (state.stats.runway <= 0) {
+          ending = "现金断裂";
+          summary = "现金跑道耗尽，组织在形成壁垒前被迫停摆。你看到了“增长不等于生存”的硬约束。";
+        } else if (state.stats.moat >= 75 && state.stats.growth >= 50) {
+          ending = "垄断雏形";
+          summary = "你在压力下依然优先构建差异化能力，形成了“小市场可控 + 长期可扩”的结构。";
+        } else if (state.stats.growth >= 70 && state.stats.moat < 50) {
+          ending = "红海高速漂移";
+          summary = "增长曲线很亮眼，但可替代性过高，后续极易被价格战或大平台吞噬。";
+        }
+
+        ui.endingTitle.textContent = ending;
+        ui.endingSummary.textContent = summary;
+        ui.result.classList.remove("hidden");
+      }
+
+      function resolveNextHref(fallback) {
+        try {
+          const match = window.location.pathname.match(/\/experiences\/([^/?#]+)\.html/i);
+          const slug = match && match[1] ? decodeURIComponent(match[1]) : "";
+          const books = Array.isArray(window.__READO_BOOK_CATALOG__?.books) ? window.__READO_BOOK_CATALOG__.books : [];
+          for (const book of books) {
+            const modules = Array.isArray(book?.moduleSlugs) ? book.moduleSlugs : [];
+            const index = modules.indexOf(slug);
+            if (index >= 0) {
+              const nextSlug = modules[index + 1];
+              return nextSlug ? `/experiences/${encodeURIComponent(nextSlug)}.html` : (book.hubHref || fallback);
+            }
+          }
+        } catch {}
+        return fallback;
+      }
+
+      ui.choiceA.addEventListener("click", () => choose("a"));
+      ui.choiceB.addEventListener("click", () => choose("b"));
+      ui.restart.addEventListener("click", () => window.location.reload());
+      ui.next.addEventListener("click", () => {
+        window.location.href = "/books/zero-to-one.html";
+      });
+
+      renderStats();
+      renderRound();
+      pushLog("开局：你拿到 18 个月窗口，需要在增长与壁垒之间做抉择。");
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>reado: 明朝那些事儿 - 第一章 洪武定制</title>
+</head>
+<body>
+  <div id="ming-engine-root"></div>
+  <script src="/experiences/media/ming-dynasty-fate-tableau-01/engine.js"></script>
+  <script>
+    window.MingDynastyEngine.mount({
+      rootId: "ming-engine-root",
+      moduleSlug: "ming-dynasty-fate-tableau-01",
+      moduleTitle: "明朝那些事儿：第一章 洪武定制",
+      eraLabel: "1368-1402 · 从草莽建国到制度成型",
+      intro:
+        "你将从洪武朝起步，决定大明国家机器的底层参数。前期拿到的‘制度遗产’会永久带入后续章节，直接影响永乐至崇祯的上限。",
+      chapterGuide: {
+        title: "第一章引导：先定制度，再谈扩张",
+        background:
+          "洪武朝的核心任务是把战时政权转成可执行的常态国家。黄册、卫所制、里甲、厂卫这些关键词，都会在后续章节反复回归。",
+        bullets: [
+          "前两回合建议优先稳住朝局与国库，避免早期崩盘。",
+          "重典与厂卫能速效控场，但会带来民心折损。",
+          "如果你想打长期线，尽量在本章拿到“税改/基层治理”类遗产。"
+        ]
+      },
+      bonds: [
+        {
+          id: "bond-hongwu",
+          name: "朱元璋",
+          role: "开国皇权",
+          desc: "擅长高压整肃和基层控制，能迅速拉起中枢执行力。",
+          effectText: "首回合前：朝局 +5；高压牌民心惩罚减 1。",
+          effects: {
+            once: { treasury: 0, military: 0, support: -1, court: 5 },
+            controlShield: 1,
+            focusBoost: { focus: "court", stat: "court", value: 1 }
+          }
+        },
+        {
+          id: "bond-li-shanchang",
+          name: "李善长",
+          role: "制度搭建者",
+          desc: "偏好文官协同与制度化推进，强调流程与账册。",
+          effectText: "首回合前：国库 +3、朝局 +2；改革标签每次额外 +1 朝局。",
+          effects: {
+            once: { treasury: 3, military: 0, support: 0, court: 2 },
+            tagBonus: { tag: "reform", stat: "court", value: 1 }
+          }
+        },
+        {
+          id: "bond-xu-da",
+          name: "徐达",
+          role: "北防统帅",
+          desc: "强调军边一体化，边疆焦点事件更稳，但财政压力更明显。",
+          effectText: "首回合前：边防 +4；军事焦点事件额外 +2 边防。",
+          effects: {
+            once: { treasury: -1, military: 4, support: 0, court: 0 },
+            eventTagBonus: { eventTag: "border", stat: "military", value: 2 }
+          }
+        }
+      ],
+      baseStats: { treasury: 58, military: 55, support: 53, court: 52 },
+      nextModuleSlug: "ming-dynasty-yongle-grand-strategy-02",
+      prevModuleSlug: "",
+      rewardChoices: ["grain_reserve", "censorate", "single_whip"],
+      moduleCards: [
+        {
+          id: "weisuo-reorg",
+          name: "卫所整编",
+          type: "军政",
+          tags: ["military", "border", "reform"],
+          summary: "重做兵源组织，强化常备防线。",
+          lore: "卫所制在纸面上解决了军费问题，执行质量却高度依赖地方治理。",
+          delta: { treasury: -3, military: 8, support: 0, court: 1 }
+        },
+        {
+          id: "lijia-ledger",
+          name: "里甲黄册",
+          type: "财政",
+          tags: ["tax", "reform", "scholar"],
+          summary: "把人口与土地重新写进账本。",
+          lore: "国家首先要看见社会，才能谈治理。",
+          delta: { treasury: 8, military: 0, support: -1, court: 3 }
+        },
+        {
+          id: "major-purge",
+          name: "重典肃贪",
+          type: "权谋",
+          tags: ["control", "tax"],
+          summary: "以高压清洗换财政纪律。",
+          lore: "严刑可以立刻纠偏，但也会制造官僚恐惧和信息沉默。",
+          delta: { treasury: 6, military: 0, support: -5, court: 4 }
+        }
+      ],
+      events: [
+        {
+          year: "1368",
+          title: "洪武建国：制度蓝图",
+          story: "新朝建立，旧秩序碎裂。你要先抓财政底账，还是先抓军事架构？",
+          tags: ["founding"],
+          focus: "court",
+          goodTags: ["reform", "scholar", "military"],
+          badTags: ["eunuch"],
+          baseDelta: { treasury: 1, military: 1, support: 0, court: 2 },
+          knowledge: {
+            id: "k-hongwu-statecraft",
+            title: "洪武治术",
+            text: "洪武朝以重农、重刑、重基层控制为底色，目标是把战时政权转成可复制的行政政权。"
+          }
+        },
+        {
+          year: "1371",
+          title: "里甲与赋役归并",
+          story: "地方赋役口径混乱，中央税源失真。你要推动清册还是先稳地方合作？",
+          tags: ["fiscal", "reform"],
+          focus: "treasury",
+          goodTags: ["tax", "reform", "scholar"],
+          badTags: ["control"],
+          baseDelta: { treasury: 2, military: 0, support: -1, court: 1 },
+          knowledge: {
+            id: "k-lijia-register",
+            title: "里甲制度",
+            text: "里甲是基层赋役组织与社会控制机制的结合体，它决定国家如何触达乡村。"
+          }
+        },
+        {
+          year: "1380",
+          title: "胡惟庸案与废相",
+          story: "相权被撤，中枢决策全压到皇权。效率提高，但容错空间骤降。",
+          tags: ["power", "control"],
+          focus: "court",
+          goodTags: ["control", "scholar"],
+          badTags: ["trade"],
+          baseDelta: { treasury: 0, military: 0, support: -2, court: 4 },
+          knowledge: {
+            id: "k-no-prime-minister",
+            title: "废相后的结构风险",
+            text: "废相并非简单权力斗争，它改变了决策回路，提升速度但减少缓冲层。"
+          }
+        },
+        {
+          year: "1385",
+          title: "郭桓案：财政震荡",
+          story: "巨案牵连广泛，国家要在追责、维持税收与官僚可运转之间取平衡。",
+          tags: ["fiscal", "disaster"],
+          focus: "treasury",
+          goodTags: ["tax", "control", "reform"],
+          badTags: ["support"],
+          baseDelta: { treasury: 1, military: 0, support: -3, court: 1 },
+          knowledge: {
+            id: "k-guohuan-case",
+            title: "郭桓案与财政秩序",
+            text: "高烈度反腐可重建纪律，但若缺乏制度修复，会让官僚系统进入保守防御。"
+          }
+        },
+        {
+          year: "1402",
+          title: "靖难前夜：藩镇与中枢",
+          story: "地方武装与中枢合法性冲突升级，你需要决定是否加速军事再平衡。",
+          tags: ["border", "war"],
+          focus: "military",
+          goodTags: ["military", "control", "tax"],
+          badTags: ["trade"],
+          baseDelta: { treasury: -2, military: -3, support: -2, court: -1 },
+          knowledge: {
+            id: "k-jingnan-tension",
+            title: "靖难结构张力",
+            text: "靖难之役背后是皇权继承、藩镇军事能力与中枢控制边界的系统冲突。"
+          }
+        }
+      ]
+    });
+  </script>
+</body>
+</html>
