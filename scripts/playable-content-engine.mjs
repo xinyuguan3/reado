@@ -2575,6 +2575,46 @@ export class PlayableContentEngine {
       .slice(0, safeLimit);
   }
 
+  async ensurePublicWorks(options = {}) {
+    const bookIds = new Set(
+      toArray(options.bookIds)
+        .map((value) => toText(value))
+        .filter((value) => isUserGeneratedBookId(value))
+    );
+    const workIds = new Set(
+      toArray(options.workIds)
+        .map((value) => toText(value))
+        .filter(Boolean)
+    );
+    if (!bookIds.size && !workIds.size) {
+      return { updated: 0, skipped: 0 };
+    }
+
+    let updated = 0;
+    let skipped = 0;
+    const updatedAt = nowIso();
+    for (const row of toArray(this.state?.works)) {
+      if (!row || row.deleted_at) continue;
+      const workId = toText(row.id);
+      const bookId = toText(row.book_id);
+      const matched = workIds.has(workId) || bookIds.has(bookId);
+      if (!matched) continue;
+      if (!isUserGeneratedBookId(bookId)) {
+        skipped += 1;
+        continue;
+      }
+      if (Boolean(row.is_public)) continue;
+      row.is_public = true;
+      row.public_at = toText(row.public_at, updatedAt);
+      row.updated_at = updatedAt;
+      updated += 1;
+    }
+    if (updated > 0) {
+      await this.persist();
+    }
+    return { updated, skipped };
+  }
+
   findWorkByBookId(bookId) {
     const target = toText(bookId);
     if (!target) return null;

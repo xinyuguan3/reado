@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>reado: 从0到1 - 聚焦阅读与互动节奏演示</title>
+  <script src="/shared/vendor/tailwindcss-cdn.js?plugins=forms"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'"/>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            ink: "#050816",
+            panel: "rgba(15, 23, 42, 0.82)",
+            line: "rgba(148, 163, 184, 0.28)",
+            cyan: "#22d3ee",
+            amber: "#f59e0b",
+            lime: "#84cc16"
+          },
+          fontFamily: {
+            display: ["Space Grotesk", "Noto Sans SC", "sans-serif"],
+            body: ["Noto Sans SC", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body {
+      background:
+        radial-gradient(circle at 15% 10%, rgba(34, 211, 238, 0.16), transparent 40%),
+        radial-gradient(circle at 85% 15%, rgba(245, 158, 11, 0.14), transparent 42%),
+        linear-gradient(160deg, #04060f 0%, #0b1022 45%, #060a15 100%);
+    }
+    .glass {
+      background: rgba(15, 23, 42, 0.76);
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      backdrop-filter: blur(10px);
+    }
+    .word {
+      line-height: 1.05;
+      letter-spacing: 0.01em;
+      text-shadow: 0 0 24px rgba(34, 211, 238, 0.22);
+    }
+    .pivot {
+      color: #f59e0b;
+    }
+    .option-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(34, 211, 238, 0.64);
+    }
+    .hidden-stage {
+      display: none;
+    }
+  </style>
+</head>
+<body class="text-slate-100 font-body min-h-screen selection:bg-cyan selection:text-black">
+<script src="/shared/book-catalog.js?v=1772076489391"></script>
+<script type="module" src="/shared/shell.js?v=1772076489391"></script>
+<reado-app-shell data-page="knowledge-map"></reado-app-shell>
+  <main class="max-w-6xl mx-auto px-4 py-6 md:py-8">
+    <header class="glass rounded-2xl p-4 md:p-5 flex flex-col gap-4">
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <p class="text-[11px] tracking-[0.18em] uppercase text-cyan font-bold font-display">从0到1 节奏实验</p>
+          <h1 class="text-xl md:text-2xl font-black font-display tracking-tight">聚焦阅读 + 互动 + 聚焦阅读 + 反馈</h1>
+        </div>
+        <div class="text-xs text-slate-300 glass rounded-xl px-3 py-2">
+          <p id="stage-label" class="font-bold text-cyan">阶段 1 / 4</p>
+          <p id="stage-name" class="mt-1">聚焦阅读（概念预热）</p>
+        </div>
+      </div>
+      <div>
+        <div class="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
+          <div id="progress-fill" class="h-full w-1/4 bg-gradient-to-r from-cyan to-amber transition-all duration-500"></div>
+        </div>
+      </div>
+    </header>
+
+    <section id="stage-focus-1" class="glass rounded-2xl p-4 md:p-8 mt-4 md:mt-5">
+      <div class="flex flex-wrap items-center gap-3 md:gap-4 mb-5">
+        <div class="text-xs uppercase tracking-[0.16em] text-slate-400">聚焦阅读器</div>
+        <label class="text-sm flex items-center gap-2">
+          <span class="text-slate-300">WPM</span>
+          <input id="wpm-input" type="range" min="100" max="420" step="10" value="150" class="w-36 accent-cyan" />
+          <span id="wpm-value" class="text-cyan font-bold font-display min-w-[3ch]">150</span>
+        </label>
+        <button id="focus-toggle" class="ml-auto px-4 py-2 rounded-lg bg-cyan text-black font-bold hover:bg-cyan/90">暂停</button>
+      </div>
+      <div class="grid md:grid-cols-3 gap-4 items-center">
+        <div class="md:col-span-2 min-h-[180px] md:min-h-[220px] flex items-center">
+          <p id="focus-word" class="word text-5xl md:text-7xl font-black font-display break-all">创新</p>
+        </div>
+        <div class="text-sm text-slate-300 leading-relaxed space-y-3">
+          <p class="text-slate-400">读法提示：</p>
+          <p>盯住中轴高亮字母/字形，不回读，不逐字翻译。</p>
+          <p>本段目标：抓住“0→1 与 1→N 的结构差异”。</p>
+        </div>
+      </div>
+      <div class="mt-5 flex items-center justify-between gap-4">
+        <p id="focus-counter" class="text-sm text-slate-400">0 / 0</p>
+        <button id="to-stage-2" class="px-4 py-2 rounded-lg bg-amber text-black font-bold hover:bg-amber/90 hidden">进入互动回合</button>
+      </div>
+    </section>
+
+    <section id="stage-interact" class="hidden-stage glass rounded-2xl p-4 md:p-8 mt-4 md:mt-5">
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <div>
+          <p class="text-xs uppercase tracking-[0.16em] text-slate-400">互动甜点</p>
+          <h2 id="event-title" class="text-2xl font-black font-display">回合事件</h2>
+        </div>
+        <p id="round-label" class="text-sm text-cyan font-bold">回合 1 / 3</p>
+      </div>
+      <p id="event-brief" class="text-slate-300 leading-relaxed mb-5">请选择策略。</p>
+
+      <div class="grid md:grid-cols-2 gap-4">
+        <button id="option-a" class="option-card text-left glass rounded-xl p-4 border border-line transition-all duration-200">
+          <p id="option-a-tag" class="text-xs uppercase tracking-[0.16em] text-rose-300">方案 A</p>
+          <h3 id="option-a-title" class="text-xl font-bold mt-1">策略 A</h3>
+          <p id="option-a-desc" class="text-sm text-slate-300 mt-2 leading-relaxed">说明</p>
+          <p id="option-a-hint" class="text-xs text-rose-300 mt-3">短期更快</p>
+        </button>
+        <button id="option-b" class="option-card text-left glass rounded-xl p-4 border border-cyan/35 transition-all duration-200">
+          <p id="option-b-tag" class="text-xs uppercase tracking-[0.16em] text-cyan">方案 B</p>
+          <h3 id="option-b-title" class="text-xl font-bold mt-1">策略 B</h3>
+          <p id="option-b-desc" class="text-sm text-slate-300 mt-2 leading-relaxed">说明</p>
+          <p id="option-b-hint" class="text-xs text-cyan mt-3">长期壁垒</p>
+        </button>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-3 mt-5">
+        <div class="glass rounded-lg p-3">
+          <p class="text-xs text-slate-400">壁垒</p>
+          <p id="stat-moat" class="text-2xl font-black text-cyan font-display">58</p>
+        </div>
+        <div class="glass rounded-lg p-3">
+          <p class="text-xs text-slate-400">现金流</p>
+          <p id="stat-cash" class="text-2xl font-black text-amber font-display">62</p>
+        </div>
+        <div class="glass rounded-lg p-3">
+          <p class="text-xs text-slate-400">确定性</p>
+          <p id="stat-certainty" class="text-2xl font-black text-lime font-display">55</p>
+        </div>
+      </div>
+
+      <p id="decision-feedback" class="mt-5 text-sm text-slate-300 border-t border-line pt-3">完成 3 轮后进入第二段聚焦阅读。</p>
+
+      <div id="mini-quiz" class="mt-4 hidden glass rounded-xl p-4 border border-cyan/30">
+        <p class="text-sm text-slate-200 font-bold">快问快答：从以下选项里，哪条最符合《从0到1》的主张？</p>
+        <div class="mt-3 grid md:grid-cols-3 gap-2">
+          <button class="quiz-option text-left px-3 py-2 rounded-lg border border-line hover:border-cyan/60" data-correct="0">先在红海市场补贴抢份额，再考虑差异化。</button>
+          <button class="quiz-option text-left px-3 py-2 rounded-lg border border-line hover:border-cyan/60" data-correct="1">从小市场建立不可替代能力，再向外扩张。</button>
+          <button class="quiz-option text-left px-3 py-2 rounded-lg border border-line hover:border-cyan/60" data-correct="0">增长优先于一切，护城河可以后补。</button>
+        </div>
+      </div>
+
+      <div class="mt-5 flex justify-end">
+        <button id="to-stage-3" class="px-4 py-2 rounded-lg bg-cyan text-black font-bold hover:bg-cyan/90 hidden">进入第二段聚焦阅读</button>
+      </div>
+    </section>
+
+    <section id="stage-focus-2" class="hidden-stage glass rounded-2xl p-4 md:p-8 mt-4 md:mt-5">
+      <div class="flex items-center justify-between gap-3 mb-4">
+        <div>
+          <p class="text-xs uppercase tracking-[0.16em] text-slate-400">聚焦阅读器</p>
+          <h2 class="text-2xl font-black font-display">回收关键概念</h2>
+        </div>
+        <p id="focus2-counter" class="text-sm text-slate-400">0 / 0</p>
+      </div>
+      <div class="min-h-[190px] md:min-h-[220px] flex items-center">
+        <p id="focus2-word" class="word text-5xl md:text-7xl font-black font-display break-all">壁垒</p>
+      </div>
+      <div class="mt-4 flex justify-end">
+        <button id="to-stage-4" class="px-4 py-2 rounded-lg bg-amber text-black font-bold hover:bg-amber/90 hidden">查看反馈</button>
+      </div>
+    </section>
+
+    <section id="stage-feedback" class="hidden-stage glass rounded-2xl p-4 md:p-8 mt-4 md:mt-5">
+      <div class="flex items-center justify-between gap-3 mb-4">
+        <div>
+          <p class="text-xs uppercase tracking-[0.16em] text-slate-400">反馈</p>
+          <h2 class="text-2xl font-black font-display">本轮学习回顾</h2>
+        </div>
+        <p id="feedback-badge" class="px-3 py-1 rounded-full text-xs font-bold border border-cyan/40 text-cyan">评估中</p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-3">
+        <article class="glass rounded-lg p-4">
+          <p class="text-xs text-slate-400">聚焦完成度</p>
+          <p id="score-focus" class="text-3xl font-black font-display text-cyan mt-1">0</p>
+        </article>
+        <article class="glass rounded-lg p-4">
+          <p class="text-xs text-slate-400">策略质量</p>
+          <p id="score-strategy" class="text-3xl font-black font-display text-amber mt-1">0</p>
+        </article>
+        <article class="glass rounded-lg p-4">
+          <p class="text-xs text-slate-400">理解准确度</p>
+          <p id="score-understanding" class="text-3xl font-black font-display text-lime mt-1">0</p>
+        </article>
+      </div>
+
+      <div class="mt-5 grid md:grid-cols-2 gap-3 text-sm">
+        <div class="glass rounded-lg p-4">
+          <p class="text-slate-400 text-xs mb-1">学习建议</p>
+          <p id="feedback-advice" class="text-slate-200 leading-relaxed">-</p>
+        </div>
+        <div class="glass rounded-lg p-4">
+          <p class="text-slate-400 text-xs mb-1">本轮小结</p>
+          <p id="feedback-summary" class="text-slate-200 leading-relaxed">-</p>
+        </div>
+      </div>
+
+      <div class="mt-5 flex items-center justify-end gap-2">
+        <button id="restart-demo" class="px-4 py-2 rounded-lg border border-line text-slate-200 hover:border-cyan/60">再来一轮</button>
+        <button id="go-next" class="px-4 py-2 rounded-lg bg-cyan text-black font-bold hover:bg-cyan/90">进入下一模块</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const passages = {
+        focus1: "从零到一 的核心 不在于 更拼命地 复制现有模式。真正困难的是 找到 一个 小而真实的 起点市场，先在这里 建立不可替代的产品能力。复制 可以带来 增长曲线，但不能自动带来 护城河。",
+        focus2: "当团队 面对压力时，短期现金 和长期壁垒 常常互相拉扯。高质量决策 不是忽视增长，而是优先守住 差异化和确定性，再把增长接上去。"
+      };
+
+      const stageMeta = [
+        { label: "阶段 1 / 4", name: "聚焦阅读（概念预热）" },
+        { label: "阶段 2 / 4", name: "互动回合（策略抉择）" },
+        { label: "阶段 3 / 4", name: "聚焦阅读（概念回收）" },
+        { label: "阶段 4 / 4", name: "反馈（理解与策略）" }
+      ];
+
+      const eventPool = [
+        {
+          title: "巨头复制突袭",
+          brief: "头部平台计划复制你的关键功能，并用补贴换取用户迁移。",
+          a: {
+            tag: "速度优先",
+            title: "立刻扩量抢占",
+            desc: "加大投放和渠道合作，优先追求曲线修复。",
+            hint: "短期更快，但护城河可能被稀释。",
+            effect: { moat: -5, cash: -8, certainty: 3 },
+            feedback: "你拿到了短期增长，但产品差异化没有同步提升。"
+          },
+          b: {
+            tag: "壁垒优先",
+            title: "深挖核心技术",
+            desc: "缩减扩张节奏，集中资源做不可复制能力。",
+            hint: "短期更慢，但长期更稳。",
+            effect: { moat: 9, cash: -3, certainty: 7 },
+            feedback: "你优先建立了技术壁垒，后续定价权更强。"
+          }
+        },
+        {
+          title: "增长失速",
+          brief: "新增用户连续两月放缓，团队在促销和重做产品之间争执。",
+          a: {
+            tag: "促销拉新",
+            title: "促销换增长",
+            desc: "通过折扣和活动拉升新增，先稳住数据。",
+            hint: "可能吸入低质量用户。",
+            effect: { moat: -4, cash: -6, certainty: 2 },
+            feedback: "增长回升了，但可持续性偏弱。"
+          },
+          b: {
+            tag: "重做产品",
+            title: "重做关键流程",
+            desc: "暂停扩张，优先解决高频场景痛点。",
+            hint: "短期承压，长期回报更高。",
+            effect: { moat: 8, cash: -3, certainty: 6 },
+            feedback: "你为长期复利打下基础，确定性显著上升。"
+          }
+        },
+        {
+          title: "融资环境降温",
+          brief: "资本收紧，下一轮融资估值与速度都明显下滑。",
+          a: {
+            tag: "现金跑道优先",
+            title: "压缩研发续命",
+            desc: "削减高风险项目，优先拉长现金跑道。",
+            hint: "现金更稳，但创新势能下滑。",
+            effect: { moat: -6, cash: 8, certainty: 2 },
+            feedback: "你获得了生存时间，但战略上更接近同质竞争。"
+          },
+          b: {
+            tag: "聚焦 0→1",
+            title: "聚焦单点突破",
+            desc: "砍掉非核心线，资源集中到一项关键创新。",
+            hint: "更冒险，但壁垒提升快。",
+            effect: { moat: 10, cash: -4, certainty: 5 },
+            feedback: "你押注了真正的 0→1，结构优势更明显。"
+          }
+        },
+        {
+          title: "监管窗口变化",
+          brief: "新规临近，行业合规门槛抬高。",
+          a: {
+            tag: "最低合规",
+            title: "最低合规通过",
+            desc: "先过底线要求，尽量压低流程成本。",
+            hint: "省钱但波动更大。",
+            effect: { moat: -2, cash: 4, certainty: -6 },
+            feedback: "你保住现金，但未来不确定性被放大。"
+          },
+          b: {
+            tag: "规则前置",
+            title: "提前布局合规系统",
+            desc: "把合规能力前置，转成行业门槛。",
+            hint: "短期投入，长期稳定。",
+            effect: { moat: 7, cash: -3, certainty: 8 },
+            feedback: "你把规则成本变成了竞争优势。"
+          }
+        }
+      ];
+
+      const ui = {
+        stageLabel: document.getElementById("stage-label"),
+        stageName: document.getElementById("stage-name"),
+        progressFill: document.getElementById("progress-fill"),
+
+        stageFocus1: document.getElementById("stage-focus-1"),
+        stageInteract: document.getElementById("stage-interact"),
+        stageFocus2: document.getElementById("stage-focus-2"),
+        stageFeedback: document.getElementById("stage-feedback"),
+
+        wpmInput: document.getElementById("wpm-input"),
+        wpmValue: document.getElementById("wpm-value"),
+        focusToggle: document.getElementById("focus-toggle"),
+        focusWord: document.getElementById("focus-word"),
+        focusCounter: document.getElementById("focus-counter"),
+        toStage2: document.getElementById("to-stage-2"),
+
+        roundLabel: document.getElementById("round-label"),
+        eventTitle: document.getElementById("event-title"),
+        eventBrief: document.getElementById("event-brief"),
+        optionA: document.getElementById("option-a"),
+        optionB: document.getElementById("option-b"),
+        optionATag: document.getElementById("option-a-tag"),
+        optionBTag: document.getElementById("option-b-tag"),
+        optionATitle: document.getElementById("option-a-title"),
+        optionBTitle: document.getElementById("option-b-title"),
+        optionADesc: document.getElementById("option-a-desc"),
+        optionBDesc: document.getElementById("option-b-desc"),
+        optionAHint: document.getElementById("option-a-hint"),
+        optionBHint: document.getElementById("option-b-hint"),
+        statMoat: document.getElementById("stat-moat"),
+        statCash: document.getElementById("stat-cash"),
+        statCertainty: document.getElementById("stat-certainty"),
+        decisionFeedback: document.getElementById("decision-feedback"),
+        toStage3: document.getElementById("to-stage-3"),
+        miniQuiz: document.getElementById("mini-quiz"),
+
+        focus2Word: document.getElementById("focus2-word"),
+        focus2Counter: document.getElementById("focus2-counter"),
+        toStage4: document.getElementById("to-stage-4"),
+
+        scoreFocus: document.getElementById("score-focus"),
+        scoreStrategy: document.getElementById("score-strategy"),
+        scoreUnderstanding: document.getElementById("score-understanding"),
+        feedbackBadge: document.getElementById("feedback-badge"),
+        feedbackAdvice: document.getElementById("feedback-advice"),
+        feedbackSummary: document.getElementById("feedback-summary"),
+        restartDemo: document.getElementById("restart-demo"),
+        goNext: document.getElementById("go-next")
+      };
+
+      if (!ui.stageFocus1 || !ui.stageInteract || !ui.stageFocus2 || !ui.stageFeedback) return;
+
+      const state = {
+        stage: 0,
+        focus1Tokens: [],
+        focus2Tokens: [],
+        focus1Index: 0,
+        focus2Index: 0,
+        focusPaused: false,
+        focusTimer: null,
+        wpm: 150,
+        focusDisplayed1: 0,
+        focusDisplayed2: 0,
+        focusTarget1: 0,
+        focusTarget2: 0,
+
+        events: [],
+        eventIndex: 0,
+        stats: { moat: 58, cash: 62, certainty: 55 },
+        decisions: [],
+        understandingScore: 50,
+        quizAnswered: false
+      };
+
+      function chunkText(text) {
+        return String(text || "")
+          .match(/[\u4e00-\u9fff]|[A-Za-z]+(?:[-'][A-Za-z]+)?|\d+(?:\.\d+)?|[，。！？；：、→]/g) || [];
+      }
+
+      function pivotWord(word) {
+        if (!word) return "";
+        const clean = String(word);
+        const idx = Math.min(clean.length - 1, Math.max(0, Math.floor(clean.length * 0.35)));
+        return `${clean.slice(0, idx)}<span class="pivot">${clean[idx]}</span>${clean.slice(idx + 1)}`;
+      }
+
+      function showStage(nextStage) {
+        state.stage = nextStage;
+        ui.stageFocus1.classList.toggle("hidden-stage", nextStage !== 0);
+        ui.stageInteract.classList.toggle("hidden-stage", nextStage !== 1);
+        ui.stageFocus2.classList.toggle("hidden-stage", nextStage !== 2);
+        ui.stageFeedback.classList.toggle("hidden-stage", nextStage !== 3);
+
+        const meta = stageMeta[nextStage];
+        ui.stageLabel.textContent = meta.label;
+        ui.stageName.textContent = meta.name;
+        ui.progressFill.style.width = `${(nextStage + 1) * 25}%`;
+      }
+
+      function msPerWord() {
+        return Math.max(80, Math.floor(60000 / state.wpm));
+      }
+
+      function stopFocusTimer() {
+        if (state.focusTimer) {
+          window.clearTimeout(state.focusTimer);
+          state.focusTimer = null;
+        }
+      }
+
+      function finishFocus1() {
+        stopFocusTimer();
+        ui.toStage2.classList.remove("hidden");
+        ui.focusToggle.disabled = true;
+        ui.focusToggle.classList.add("opacity-50", "cursor-not-allowed");
+      }
+
+      function runFocus1() {
+        if (state.focusPaused || state.stage !== 0) return;
+        const token = state.focus1Tokens[state.focus1Index];
+        if (!token) {
+          finishFocus1();
+          return;
+        }
+        state.focus1Index += 1;
+        state.focusDisplayed1 += 1;
+        ui.focusWord.innerHTML = pivotWord(token);
+        ui.focusCounter.textContent = `${state.focus1Index} / ${state.focus1Tokens.length}`;
+        state.focusTimer = window.setTimeout(runFocus1, msPerWord());
+      }
+
+      function finishFocus2() {
+        stopFocusTimer();
+        ui.toStage4.classList.remove("hidden");
+      }
+
+      function runFocus2() {
+        if (state.stage !== 2) return;
+        const token = state.focus2Tokens[state.focus2Index];
+        if (!token) {
+          finishFocus2();
+          return;
+        }
+        state.focus2Index += 1;
+        state.focusDisplayed2 += 1;
+        ui.focus2Word.innerHTML = pivotWord(token);
+        ui.focus2Counter.textContent = `${state.focus2Index} / ${state.focus2Tokens.length}`;
+        state.focusTimer = window.setTimeout(runFocus2, msPerWord());
+      }
+
+      function shuffle(arr) {
+        const next = [...arr];
+        for (let i = next.length - 1; i > 0; i -= 1) {
+          const j = Math.floor(Math.random() * (i + 1));
+          const temp = next[i];
+          next[i] = next[j];
+          next[j] = temp;
+        }
+        return next;
+      }
+
+      function clamp(v, min, max) {
+        return Math.max(min, Math.min(max, v));
+      }
+
+      function renderStats() {
+        ui.statMoat.textContent = String(state.stats.moat);
+        ui.statCash.textContent = String(state.stats.cash);
+        ui.statCertainty.textContent = String(state.stats.certainty);
+      }
+
+      function renderEvent() {
+        const event = state.events[state.eventIndex];
+        if (!event) return;
+        ui.roundLabel.textContent = `回合 ${state.eventIndex + 1} / ${state.events.length}`;
+        ui.eventTitle.textContent = event.title;
+        ui.eventBrief.textContent = event.brief;
+
+        ui.optionATag.textContent = event.a.tag;
+        ui.optionATitle.textContent = event.a.title;
+        ui.optionADesc.textContent = event.a.desc;
+        ui.optionAHint.textContent = event.a.hint;
+
+        ui.optionBTag.textContent = event.b.tag;
+        ui.optionBTitle.textContent = event.b.title;
+        ui.optionBDesc.textContent = event.b.desc;
+        ui.optionBHint.textContent = event.b.hint;
+      }
+
+      function setDecisionDisabled(disabled) {
+        [ui.optionA, ui.optionB].forEach((btn) => {
+          btn.disabled = disabled;
+          btn.style.opacity = disabled ? "0.6" : "1";
+          btn.style.cursor = disabled ? "not-allowed" : "pointer";
+        });
+      }
+
+      function applyDecision(choiceKey) {
+        const event = state.events[state.eventIndex];
+        if (!event) return;
+        const choice = choiceKey === "a" ? event.a : event.b;
+        setDecisionDisabled(true);
+
+        state.stats.moat = clamp(state.stats.moat + choice.effect.moat, 0, 100);
+        state.stats.cash = clamp(state.stats.cash + choice.effect.cash, 0, 100);
+        state.stats.certainty = clamp(state.stats.certainty + choice.effect.certainty, 0, 100);
+        state.decisions.push(choiceKey);
+        renderStats();
+        ui.decisionFeedback.textContent = `${choice.feedback}（壁垒 ${choice.effect.moat >= 0 ? "+" : ""}${choice.effect.moat}，现金流 ${choice.effect.cash >= 0 ? "+" : ""}${choice.effect.cash}，确定性 ${choice.effect.certainty >= 0 ? "+" : ""}${choice.effect.certainty}）`;
+
+        window.setTimeout(() => {
+          state.eventIndex += 1;
+          if (state.eventIndex >= state.events.length) {
+            setDecisionDisabled(true);
+            ui.miniQuiz.classList.remove("hidden");
+            ui.toStage3.classList.remove("hidden");
+            ui.decisionFeedback.textContent = "互动回合完成。请回答 1 个快问快答后进入第二段聚焦阅读。";
+            return;
+          }
+          setDecisionDisabled(false);
+          renderEvent();
+        }, 620);
+      }
+
+      function resolveNextHref(fallback) {
+        try {
+          const match = window.location.pathname.match(/\/experiences\/([^/?#]+)\.html/i);
+          const slug = match && match[1] ? decodeURIComponent(match[1]) : "";
+          const books = Array.isArray(window.__READO_BOOK_CATALOG__?.books) ? window.__READO_BOOK_CATALOG__.books : [];
+          for (const book of books) {
+            const modules = Array.isArray(book?.moduleSlugs) ? book.moduleSlugs : [];
+            const index = modules.indexOf(slug);
+            if (index >= 0) {
+              const nextSlug = modules[index + 1];
+              return nextSlug ? `/experiences/${encodeURIComponent(nextSlug)}.html` : (book.hubHref || fallback);
+            }
+          }
+        } catch {}
+        return fallback;
+      }
+
+      function computeFeedback() {
+        const focusRatio = ((state.focusDisplayed1 + state.focusDisplayed2) / (state.focusTarget1 + state.focusTarget2 || 1));
+        const focusScore = clamp(Math.round(focusRatio * 100), 0, 100);
+        const strategyScore = clamp(Math.round((state.stats.moat * 0.6) + (state.stats.certainty * 0.4)), 0, 100);
+        const understandingScore = clamp(Math.round(state.understandingScore), 0, 100);
+
+        ui.scoreFocus.textContent = String(focusScore);
+        ui.scoreStrategy.textContent = String(strategyScore);
+        ui.scoreUnderstanding.textContent = String(understandingScore);
+
+        const overall = Math.round((focusScore + strategyScore + understandingScore) / 3);
+        ui.feedbackBadge.textContent = overall >= 75 ? "节奏良好" : overall >= 60 ? "可继续优化" : "建议降速重读";
+
+        if (overall >= 75) {
+          ui.feedbackAdvice.textContent = "你已经形成了不错的‘先聚焦理解，再做抉择’节奏。下一轮可以小幅提升 WPM（+20）测试稳定性。";
+        } else if (overall >= 60) {
+          ui.feedbackAdvice.textContent = "策略判断基本在线，但阅读吸收与决策稳定性还有波动。建议保持当前 WPM，多做 1 轮短互动复盘。";
+        } else {
+          ui.feedbackAdvice.textContent = "当前更像‘在玩’，还没形成稳态理解。建议把 WPM 下调到 240 左右，并在每轮后强制 1 句总结。";
+        }
+
+        const longTermBias = state.decisions.filter((x) => x === "b").length;
+        ui.feedbackSummary.textContent = `你在 3 轮中有 ${longTermBias} 次选择了“长期壁垒”路径。当前指标：壁垒 ${state.stats.moat}，现金流 ${state.stats.cash}，确定性 ${state.stats.certainty}。`;
+      }
+
+      function init() {
+        state.focus1Tokens = chunkText(passages.focus1);
+        state.focus2Tokens = chunkText(passages.focus2);
+        state.focusTarget1 = state.focus1Tokens.length;
+        state.focusTarget2 = state.focus2Tokens.length;
+        state.events = shuffle(eventPool).slice(0, 3);
+
+        ui.wpmValue.textContent = String(state.wpm);
+        ui.focusCounter.textContent = `0 / ${state.focusTarget1}`;
+        ui.focus2Counter.textContent = `0 / ${state.focusTarget2}`;
+        renderStats();
+        renderEvent();
+        showStage(0);
+        runFocus1();
+      }
+
+      ui.wpmInput.addEventListener("input", () => {
+        state.wpm = Number(ui.wpmInput.value) || 150;
+        ui.wpmValue.textContent = String(state.wpm);
+      });
+
+      ui.focusToggle.addEventListener("click", () => {
+        state.focusPaused = !state.focusPaused;
+        ui.focusToggle.textContent = state.focusPaused ? "继续" : "暂停";
+        if (!state.focusPaused) {
+          runFocus1();
+        } else {
+          stopFocusTimer();
+        }
+      });
+
+      ui.toStage2.addEventListener("click", () => {
+        stopFocusTimer();
+        showStage(1);
+      });
+
+      ui.optionA.addEventListener("click", () => applyDecision("a"));
+      ui.optionB.addEventListener("click", () => applyDecision("b"));
+
+      document.querySelectorAll(".quiz-option").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          if (state.quizAnswered) return;
+          state.quizAnswered = true;
+          const correct = btn.getAttribute("data-correct") === "1";
+          state.understandingScore = correct ? 88 : 58;
+          btn.classList.add(correct ? "border-lime-400" : "border-rose-400");
+          ui.decisionFeedback.textContent = correct
+            ? "回答正确：你抓住了‘先在小市场建立不可替代能力’这个关键。"
+            : "回答偏差：建议回看‘从小市场建立不可替代能力’这条主线。";
+        });
+      });
+
+      ui.toStage3.addEventListener("click", () => {
+        showStage(2);
+        stopFocusTimer();
+        runFocus2();
+      });
+
+      ui.toStage4.addEventListener("click", () => {
+        stopFocusTimer();
+        showStage(3);
+        computeFeedback();
+      });
+
+      ui.restartDemo.addEventListener("click", () => window.location.reload());
+      ui.goNext.addEventListener("click", () => {
+        window.location.href = resolveNextHref("/books/zero-to-one.html");
+      });
+
+      init();
+    })();
+  </script>
+
+<script src="/shared/experience-runtime.js?v=1772076489391"></script>
+<script>
+(() => {
+  
+  localStorage.setItem("reado_book_last_zero-to-one", "zero-to-one-focus-reading-rhythm-demo");
+  if ("zero-to-one-focus-reading-rhythm-demo" === "zero-to-one-focus-reading-rhythm-demo") {
+    try {
+      const completedRaw = localStorage.getItem("reado_completed_books_v1") || "[]";
+      const completedSet = new Set(JSON.parse(completedRaw));
+      completedSet.add("zero-to-one");
+      localStorage.setItem("reado_completed_books_v1", JSON.stringify([...completedSet]));
+    } catch {}
+  }
+  
+  
+  if (window.ReadoExperienceRuntime && typeof window.ReadoExperienceRuntime.init === "function") {
+    window.ReadoExperienceRuntime.init({
+      bookId: "zero-to-one",
+      moduleSlug: "zero-to-one-focus-reading-rhythm-demo",
+      moduleSlugs: ["zero-to-one-the-monopolist-s-choice","zero-to-one-the-monopolist-s-choice-2","zero-to-one-the-monopolist-s-choice-3","zero-to-one-the-monopolist-s-choice-4","zero-to-one-the-monopolist-s-choice-5","zero-to-one-the-monopolist-s-choice-6","zero-to-one-the-monopolist-s-choice-7","zero-to-one-focus-reading-rhythm-demo"]
+    });
+  }
+})();
+</script>
+</body>
+</html>

@@ -3,10 +3,10 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>reado: 垄断与竞争博弈界面</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Source+Han+Sans+CN:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="/shared/vendor/tailwindcss-cdn.js?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Source+Han+Sans+CN:wght@300;400;500;700;900&amp;display=swap" rel="stylesheet" media="print" onload="this.media='all'"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" media="print" onload="this.media='all'"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" media="print" onload="this.media='all'"/>
 <script>
         tailwind.config = {
             darkMode: "class",
@@ -81,8 +81,8 @@
     </style>
 </head>
 <body class="min-h-screen overflow-hidden flex flex-col relative selection:bg-monopoly-blue selection:text-black">
-<script src="/shared/book-catalog.js?v=1772015080593"></script>
-<script type="module" src="/shared/shell.js?v=1772015080593"></script>
+<script src="/shared/book-catalog.js?v=1772076489391"></script>
+<script type="module" src="/shared/shell.js?v=1772076489391"></script>
 <reado-app-shell data-page="knowledge-map"></reado-app-shell>
 <div class="fixed inset-0 grid-bg pointer-events-none z-0"></div>
 <div class="fixed inset-0 bg-radial-gradient pointer-events-none z-0" style="background: radial-gradient(circle at center, transparent 0%, #05070a 90%);"></div>
@@ -261,12 +261,12 @@
 </script>
 
 
-<script src="/shared/experience-runtime.js?v=1772015080593"></script>
+<script src="/shared/experience-runtime.js?v=1772076489391"></script>
 <script>
 (() => {
   
   localStorage.setItem("reado_book_last_zero-to-one", "zero-to-one-the-monopolist-s-choice-2");
-  if ("zero-to-one-the-monopolist-s-choice-2" === "zero-to-one-the-monopolist-s-choice-7") {
+  if ("zero-to-one-the-monopolist-s-choice-2" === "zero-to-one-focus-reading-rhythm-demo") {
     try {
       const completedRaw = localStorage.getItem("reado_completed_books_v1") || "[]";
       const completedSet = new Set(JSON.parse(completedRaw));
@@ -334,7 +334,7 @@
     window.ReadoExperienceRuntime.init({
       bookId: "zero-to-one",
       moduleSlug: "zero-to-one-the-monopolist-s-choice-2",
-      moduleSlugs: ["zero-to-one-the-monopolist-s-choice","zero-to-one-the-monopolist-s-choice-1","zero-to-one-the-monopolist-s-choice-2","zero-to-one-the-monopolist-s-choice-3","zero-to-one-the-monopolist-s-choice-4","zero-to-one-the-monopolist-s-choice-5","zero-to-one-the-monopolist-s-choice-6","zero-to-one-the-monopolist-s-choice-7"]
+      moduleSlugs: ["zero-to-one-the-monopolist-s-choice","zero-to-one-the-monopolist-s-choice-2","zero-to-one-the-monopolist-s-choice-3","zero-to-one-the-monopolist-s-choice-4","zero-to-one-the-monopolist-s-choice-5","zero-to-one-the-monopolist-s-choice-6","zero-to-one-the-monopolist-s-choice-7","zero-to-one-focus-reading-rhythm-demo"]
     });
   }
 })();

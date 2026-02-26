@@ -15,6 +15,18 @@ const ROUTES = [
   { id: "market", icon: "storefront", labelKey: "route.market", label: "交易中心", href: "/pages/gamified-learning-hub-dashboard-3.html" },
   { id: "profile", icon: "person", labelKey: "route.profile", label: "个人资料", href: "/pages/gamified-learning-hub-dashboard-2.html" }
 ];
+const ICON_FALLBACK_MAP = {
+  map: "🗺",
+  assignment: "✅",
+  auto_awesome: "✨",
+  leaderboard: "🏆",
+  auto_stories: "📚",
+  storefront: "🛍",
+  person: "👤",
+  language: "🌐",
+  diamond: "💎",
+  workspace_premium: "⭐"
+};
 
 const STYLE_ID = "reado-shared-shell-style";
 const ICON_FONT_ID = "reado-shell-material-icons";
@@ -716,6 +728,27 @@ function ensureIconFont() {
   return;
 }
 
+function resolveFallbackIconGlyph(iconName) {
+  const key = String(iconName || "").trim();
+  return ICON_FALLBACK_MAP[key] || "•";
+}
+
+function applyIconFallback(root = document) {
+  const host = root && typeof root.querySelectorAll === "function" ? root : document;
+  // Always use built-in icon glyphs to avoid cross-region font loading issues.
+  const useFallback = true;
+  if (document.body) {
+    document.body.classList.toggle("reado-shell-icons-fallback", useFallback);
+  }
+  const nodes = host.querySelectorAll("[data-icon-name]");
+  nodes.forEach((node) => {
+    if (!(node instanceof HTMLElement)) return;
+    const iconName = String(node.dataset.iconName || "").trim();
+    if (!iconName) return;
+    node.textContent = useFallback ? resolveFallbackIconGlyph(iconName) : iconName;
+  });
+}
+
 function ensureGlobalStyle() {
   if (document.getElementById(STYLE_ID)) return;
   const style = document.createElement("style");
@@ -1121,6 +1154,17 @@ function ensureGlobalStyle() {
     }
     body.reado-shell-applied .reado-shell-link.active .reado-shell-link-icon {
       color: #1e78ff;
+    }
+    body.reado-shell-applied.reado-shell-icons-fallback .reado-shell-link-icon,
+    body.reado-shell-applied.reado-shell-icons-fallback .reado-shell-pill-icon {
+      font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0;
+      -webkit-font-feature-settings: normal;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
     body.reado-shell-applied .reado-shell-weekly {
       margin-top: auto;
@@ -2140,16 +2184,16 @@ class ReadoAppShell extends HTMLElement {
       </a>
       <div class="reado-shell-right">
         <label class="reado-shell-lang">
-          <span class="reado-shell-pill-icon">language</span>
+          <span class="reado-shell-pill-icon" data-icon-name="language">language</span>
           <select data-shell-lang></select>
         </label>
         <span class="reado-shell-pill streak">🔥 <strong data-shell-streak></strong></span>
         <span class="reado-shell-pill gems" data-href="${GEM_CENTER_HREF}">
-          <span class="reado-shell-pill-icon">diamond</span>
+          <span class="reado-shell-pill-icon" data-icon-name="diamond">diamond</span>
           <strong data-shell-gems>0</strong>
         </span>
         <button class="reado-shell-pill pro" type="button" data-open-billing>
-          <span class="reado-shell-pill-icon">workspace_premium</span>
+          <span class="reado-shell-pill-icon" data-icon-name="workspace_premium">workspace_premium</span>
           <strong data-shell-pro-label>${t("billing.subscribe_short", "Subscribe Pro")}</strong>
         </button>
         <div class="reado-shell-user">
@@ -2296,7 +2340,7 @@ class ReadoAppShell extends HTMLElement {
       const active = route.id === page ? "active" : "";
       const resolvedHref = route.href;
       return `<a class="reado-shell-link ${active}" href="${resolvedHref}">
-        <span class="reado-shell-link-icon">${route.icon}</span>
+        <span class="reado-shell-link-icon" data-icon-name="${route.icon}">${route.icon}</span>
         <span>${t(route.labelKey, route.label)}</span>
       </a>`;
     }).join("");
@@ -2464,10 +2508,11 @@ class ReadoAppShell extends HTMLElement {
       nav.innerHTML = ROUTES.map((route) => {
         const active = route.id === page ? "active" : "";
         return `<a class="reado-shell-link ${active}" href="${route.href}">
-          <span class="reado-shell-link-icon">${route.icon}</span>
+          <span class="reado-shell-link-icon" data-icon-name="${route.icon}">${route.icon}</span>
           <span>${t(route.labelKey, route.label)}</span>
         </a>`;
       }).join("");
+      applyIconFallback(nav);
       weekly.querySelector("h4").textContent = t("shell.weekly_challenge", "每周挑战");
       weekly.querySelector("p").textContent = t("shell.weekly_goal", "阅读 3 章节历史书");
       weekly.querySelector("p[style]").textContent = t("shell.weekly_progress", "已完成 2/3");
@@ -2535,6 +2580,10 @@ class ReadoAppShell extends HTMLElement {
     });
 
     wrap.append(top, side, rightPanel);
+    applyIconFallback(wrap);
+    if (document.fonts && document.fonts.ready && typeof document.fonts.ready.then === "function") {
+      document.fonts.ready.then(() => applyIconFallback(wrap)).catch(() => {});
+    }
     document.body.append(wrap);
   }
 }

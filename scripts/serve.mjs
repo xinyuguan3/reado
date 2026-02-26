@@ -130,6 +130,23 @@ for (const id of [stripePriceMonthlyPro, stripePriceAnnualPro]) {
 if (!stripeSmallPriceIds.size && stripePriceId) {
   stripeSmallPriceIds.add(stripePriceId);
 }
+const DEFAULT_PUBLIC_SAMPLE_BOOK_IDS = [
+  "user-book-aae53b-vvu77k-5077",
+  "user-https-eprints-whiterose-ac-uk-id-eprint-170300-vvyqxw-f83d",
+  "user-https-eprints-whiterose-ac-uk-id-eprint-170300-vwuj2e-6f75"
+];
+const publicSampleBookIds = new Set(
+  (
+    process.env.READO_PUBLIC_SAMPLE_BOOK_IDS === undefined
+      ? DEFAULT_PUBLIC_SAMPLE_BOOK_IDS
+      : parseCsvList(process.env.READO_PUBLIC_SAMPLE_BOOK_IDS)
+  )
+    .map((item) => String(item || "").trim())
+    .filter(Boolean)
+);
+const publicSampleWorkIds = new Set(
+  parseCsvList(process.env.READO_PUBLIC_SAMPLE_WORK_IDS || "")
+);
 
 const contentTypes = {
   ".avif": "image/avif",
@@ -200,6 +217,16 @@ function toInt(value) {
   const next = Number(value);
   if (!Number.isFinite(next)) return 0;
   return Math.max(0, Math.floor(next));
+}
+
+function parseCsvList(value) {
+  const raw = String(value || "").trim();
+  if (!raw) return [];
+  if (/^(none|null|off)$/i.test(raw)) return [];
+  return raw
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
 }
 
 function sanitizeUserId(value) {
@@ -2233,6 +2260,19 @@ function buildCatalogScript(sessionId) {
   return `window.__READO_BOOK_CATALOG__ = ${JSON.stringify(scopedCatalog)};`;
 }
 
+async function ensurePublicSampleWorks() {
+  if (!publicSampleBookIds.size && !publicSampleWorkIds.size) return;
+  const result = await playableContentEngine.ensurePublicWorks({
+    bookIds: [...publicSampleBookIds],
+    workIds: [...publicSampleWorkIds]
+  });
+  if (result?.updated || result?.skipped) {
+    console.log(
+      `[studio] sample public works updated=${Number(result.updated) || 0}, skipped=${Number(result.skipped) || 0}`
+    );
+  }
+}
+
 function buildDynamicBookPageHtml(book) {
   const modulesHtml = book.modules.map((module) => `
       <a class="module-card" href="/experiences/${encodeURIComponent(module.slug)}.html">
@@ -3477,6 +3517,8 @@ const server = http.createServer(async (req, res) => {
 await loadCatalog();
 await loadState();
 await playableContentEngine.init();
+await ensurePublicSampleWorks();
+await loadCatalog(true);
 
 server.listen(port, () => {
   console.log(`reado app running on http://localhost:${port}`);
