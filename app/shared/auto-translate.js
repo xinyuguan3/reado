@@ -318,6 +318,8 @@ function runScan() {
     pending.finally(() => {
       if (pendingRoots.size > 0) scheduleScan();
     });
+  } catch {
+    releaseTranslationGate();
   } finally {
     scanning = false;
     if (pendingRoots.size > 0) scheduleScan();
