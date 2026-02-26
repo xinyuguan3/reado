@@ -758,6 +758,11 @@ function interpolate(template, params) {
 
 function detectLanguage() {
   try {
+    const fromBootstrap = normalizeLanguage(window.__READO_BOOTSTRAP_LANG__ || "");
+    if (fromBootstrap) return fromBootstrap;
+  } catch {}
+
+  try {
     const url = new URL(window.location.href);
     const fromQuery = normalizeLanguage(url.searchParams.get("lang") || "");
     if (fromQuery) return fromQuery;

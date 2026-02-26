@@ -289,7 +289,97 @@ function buildBookCatalog(books) {
 
 function buildSharedBookCatalogScript(books) {
   const catalog = buildBookCatalog(books);
-  return `window.${BOOK_CATALOG_GLOBAL} = ${JSON.stringify(catalog)};`;
+  return `${buildLanguageBootstrapScript()}
+window.${BOOK_CATALOG_GLOBAL} = ${JSON.stringify(catalog)};`;
+}
+
+function buildLanguageBootstrapScript() {
+  return `(function () {
+  const LANGUAGE_STORAGE_KEY = "reado_lang";
+  const LANGUAGE_EXPLICIT_KEY = "reado_lang_explicit";
+  const TRANSLATE_GATE_ATTR = "data-reado-translate-pending";
+  const TRANSLATE_GATE_STYLE_ID = "reado-translate-gate-style";
+  const TRANSLATE_GATE_TIMEOUT_MS = 4500;
+  const LANGUAGES = ["zh-CN","en-US","ja-JP","ko-KR","fr-FR","de-DE","es-ES","pt-BR","ru-RU","ar-SA","hi-IN","id-ID"];
+  const RTL_LANGS = { "ar-SA": true };
+
+  function normalizeLanguage(input) {
+    const text = String(input || "").trim();
+    if (!text) return "";
+    const normalized = text.replace(/_/g, "-");
+    const exact = LANGUAGES.find((code) => code.toLowerCase() === normalized.toLowerCase());
+    if (exact) return exact;
+    const short = normalized.split("-")[0].toLowerCase();
+    const match = LANGUAGES.find((code) => code.toLowerCase().startsWith(short + "-"));
+    return match || "";
+  }
+
+  function detectLanguage() {
+    try {
+      const url = new URL(window.location.href);
+      const fromQuery = normalizeLanguage(url.searchParams.get("lang") || "");
+      if (fromQuery) return fromQuery;
+    } catch {}
+
+    try {
+      const explicit = localStorage.getItem(LANGUAGE_EXPLICIT_KEY) === "1";
+      if (explicit) {
+        const fromStorage = normalizeLanguage(localStorage.getItem(LANGUAGE_STORAGE_KEY) || "");
+        if (fromStorage) return fromStorage;
+      }
+    } catch {}
+
+    try {
+      const browserCandidates = Array.isArray(navigator.languages) ? navigator.languages : [navigator.language];
+      for (const candidate of browserCandidates) {
+        const normalized = normalizeLanguage(candidate || "");
+        if (normalized) return normalized;
+      }
+    } catch {}
+
+    return "en-US";
+  }
+
+  function clearGateStyle() {
+    const style = document.getElementById(TRANSLATE_GATE_STYLE_ID);
+    if (style && style.parentNode) {
+      style.parentNode.removeChild(style);
+    }
+  }
+
+  function releaseTranslateGate() {
+    document.documentElement.setAttribute(TRANSLATE_GATE_ATTR, "0");
+    clearGateStyle();
+  }
+
+  function ensureTranslateGate() {
+    document.documentElement.setAttribute(TRANSLATE_GATE_ATTR, "1");
+    if (document.getElementById(TRANSLATE_GATE_STYLE_ID)) return;
+    const style = document.createElement("style");
+    style.id = TRANSLATE_GATE_STYLE_ID;
+    style.textContent = 'html[data-reado-translate-pending="1"] body{visibility:hidden !important;}';
+    (document.head || document.documentElement).appendChild(style);
+  }
+
+  const language = detectLanguage();
+  const html = document.documentElement;
+  window.__READO_BOOTSTRAP_LANG__ = language;
+  window.__READO_RELEASE_TRANSLATE_GATE__ = releaseTranslateGate;
+  html.lang = language;
+  html.setAttribute("data-reado-lang", language);
+  html.dir = RTL_LANGS[language] ? "rtl" : "ltr";
+
+  if (String(language).toLowerCase().startsWith("en")) {
+    ensureTranslateGate();
+    window.setTimeout(() => {
+      if (document.documentElement.getAttribute(TRANSLATE_GATE_ATTR) === "1") {
+        releaseTranslateGate();
+      }
+    }, TRANSLATE_GATE_TIMEOUT_MS);
+  } else {
+    releaseTranslateGate();
+  }
+})();`;
 }
 
 function buildSharedExperienceRuntimeScript() {

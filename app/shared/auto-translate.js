@@ -10,6 +10,8 @@ const TRANSLATE_ENDPOINT = "https://translate.googleapis.com/translate_a/single"
 const ATTRS_TO_TRANSLATE = ["placeholder", "title", "aria-label", "alt"];
 const SKIP_TAGS = new Set(["SCRIPT", "STYLE", "NOSCRIPT", "TEXTAREA", "CODE", "PRE", "SVG"]);
 const CJK_RE = /[\u3400-\u9fff]/;
+const TRANSLATE_GATE_ATTR = "data-reado-translate-pending";
+const TRANSLATE_GATE_STYLE_ID = "reado-translate-gate-style";
 
 let started = false;
 let enabled = false;
@@ -23,6 +25,7 @@ let runtimeCacheMap = new Map();
 let cacheDirty = false;
 let cacheFlushTimer = 0;
 const inFlight = new Map();
+let gateReleased = false;
 
 function normalizeText(value) {
   return String(value || "").replace(/\s+/g, " ").trim();
@@ -30,6 +33,26 @@ function normalizeText(value) {
 
 function isEnglishLanguage(language) {
   return String(language || "").toLowerCase().startsWith("en");
+}
+
+function prepareGateState() {
+  gateReleased = document.documentElement.getAttribute(TRANSLATE_GATE_ATTR) !== "1";
+}
+
+function releaseTranslationGate() {
+  if (gateReleased) return;
+  gateReleased = true;
+  try {
+    if (typeof window.__READO_RELEASE_TRANSLATE_GATE__ === "function") {
+      window.__READO_RELEASE_TRANSLATE_GATE__();
+      return;
+    }
+  } catch {}
+  document.documentElement.setAttribute(TRANSLATE_GATE_ATTR, "0");
+  const style = document.getElementById(TRANSLATE_GATE_STYLE_ID);
+  if (style && style.parentNode) {
+    style.parentNode.removeChild(style);
+  }
 }
 
 function shouldTranslate(text) {
@@ -203,15 +226,38 @@ function collectTargetsFromNode(node, targets) {
   }
 }
 
-async function translateTargets(targets) {
-  if (!targets.length) return;
+function groupTargetsBySource(targets) {
   const grouped = new Map();
   for (const target of targets) {
     if (!grouped.has(target.source)) grouped.set(target.source, []);
     grouped.get(target.source).push(target);
   }
+  return grouped;
+}
 
-  const sources = [...grouped.keys()];
+function applyTranslationToTargets(targetList, translated) {
+  for (const item of targetList) {
+    try {
+      item.apply(translated);
+    } catch {}
+  }
+}
+
+function applyCachedTranslations(grouped) {
+  const misses = [];
+  for (const [source, list] of grouped.entries()) {
+    const cached = readFromCache(source);
+    if (cached && cached !== source) {
+      applyTranslationToTargets(list, cached);
+      continue;
+    }
+    misses.push(source);
+  }
+  return misses;
+}
+
+function translateMissingSources(grouped, sources) {
+  if (!sources.length) return Promise.resolve();
   let cursor = 0;
   const workers = Array.from({ length: 4 }, () => (async () => {
     while (cursor < sources.length) {
@@ -219,15 +265,18 @@ async function translateTargets(targets) {
       cursor += 1;
       const source = sources[index];
       const translated = await translateText(source);
-      const list = grouped.get(source) || [];
-      for (const item of list) {
-        try {
-          item.apply(translated);
-        } catch {}
-      }
+      if (!translated || translated === source) continue;
+      applyTranslationToTargets(grouped.get(source) || [], translated);
     }
   })());
-  await Promise.all(workers);
+  return Promise.all(workers).catch(() => {});
+}
+
+function translateTargets(targets) {
+  if (!targets.length) return Promise.resolve();
+  const grouped = groupTargetsBySource(targets);
+  const misses = applyCachedTranslations(grouped);
+  return translateMissingSources(grouped, misses);
 }
 
 function scheduleScan(root = document.body || document.documentElement) {
@@ -235,10 +284,11 @@ function scheduleScan(root = document.body || document.documentElement) {
   if (root instanceof Node) pendingRoots.add(root);
   if (scanScheduled) return;
   scanScheduled = true;
-  window.setTimeout(runScan, SCAN_DELAY_MS);
+  const delay = document.documentElement.getAttribute(TRANSLATE_GATE_ATTR) === "1" ? 0 : SCAN_DELAY_MS;
+  window.setTimeout(runScan, delay);
 }
 
-async function runScan() {
+function runScan() {
   scanScheduled = false;
   if (!enabled) return;
   if (scanning) {
@@ -262,8 +312,12 @@ async function runScan() {
         }
       });
     }
-    await translateTargets(targets);
+    const pending = translateTargets(targets);
     translatedActive = translatedActive || targets.length > 0;
+    releaseTranslationGate();
+    pending.finally(() => {
+      if (pendingRoots.size > 0) scheduleScan();
+    });
   } finally {
     scanning = false;
     if (pendingRoots.size > 0) scheduleScan();
@@ -308,11 +362,14 @@ function syncLanguage() {
   const shouldEnable = isEnglishLanguage(language);
   if (shouldEnable) {
     enabled = true;
+    prepareGateState();
     ensureObserver();
     scheduleScan();
     return;
   }
   enabled = false;
+  gateReleased = false;
+  releaseTranslationGate();
   stopObserver();
   if (translatedActive) {
     window.location.reload();
