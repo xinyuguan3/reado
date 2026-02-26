@@ -1984,6 +1984,68 @@ function injectAfterBodyOpen(html, snippet) {
   return `${snippet}\n${html}`;
 }
 
+const SHELL_BOOTSTRAP_STYLE_SNIPPET = `<style id="reado-shell-bootstrap-style">body:not(.reado-shell-applied)>header:first-of-type,body:not(.reado-shell-applied)>nav:first-of-type,body:not(.reado-shell-applied)>aside:first-of-type,body:not(.reado-shell-applied)>.flex>nav:first-of-type,body:not(.reado-shell-applied)>.flex>aside:first-of-type,body:not(.reado-shell-applied)>.flex-1>nav:first-of-type,body:not(.reado-shell-applied)>.flex-1>aside:first-of-type,body:not(.reado-shell-applied)>.flex>.flex-1>nav:first-of-type,body:not(.reado-shell-applied)>.flex>.flex-1>aside:first-of-type{visibility:hidden!important;}</style>`;
+
+function ensureShellBootstrapStyle(html) {
+  if (!String(html || "").includes("<reado-app-shell")) return html;
+  if (String(html).includes('id="reado-shell-bootstrap-style"')) return html;
+  return injectAfterBodyOpen(html, SHELL_BOOTSTRAP_STYLE_SNIPPET);
+}
+
+function hasVersionQuery(search) {
+  const raw = String(search || "");
+  return /(?:^|[?&])(v|ver|version)=[^&]+/i.test(raw);
+}
+
+const CACHEABLE_STATIC_EXTENSIONS = new Set([
+  ".js",
+  ".css",
+  ".png",
+  ".jpg",
+  ".jpeg",
+  ".gif",
+  ".webp",
+  ".avif",
+  ".svg",
+  ".ico",
+  ".woff",
+  ".woff2",
+  ".ttf",
+  ".otf",
+  ".mp3",
+  ".wav",
+  ".ogg",
+  ".m4a",
+  ".mp4",
+  ".webm",
+  ".mov",
+  ".pdf",
+  ".txt",
+  ".md"
+]);
+
+function resolveCacheControl(pathname, search, ext) {
+  const extension = String(ext || "").toLowerCase();
+  const route = String(pathname || "");
+  const versioned = hasVersionQuery(search);
+  if (extension === ".html") {
+    return "public, max-age=120, stale-while-revalidate=600";
+  }
+  if (extension === ".json") {
+    return versioned
+      ? "public, max-age=86400, immutable"
+      : "public, max-age=120, stale-while-revalidate=600";
+  }
+
+  const isStaticExt = CACHEABLE_STATIC_EXTENSIONS.has(extension);
+  if (!isStaticExt) return "no-store";
+
+  if (versioned || route.includes("/shared/vendor/")) {
+    return "public, max-age=31536000, immutable";
+  }
+  return "public, max-age=3600, stale-while-revalidate=86400";
+}
+
 function isUserGeneratedBookId(bookId) {
   return /^user-/i.test(String(bookId || "").trim());
 }
@@ -3507,9 +3569,20 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
+    if (payload.ext === ".html") {
+      const html = payload.buffer.toString("utf8");
+      const patchedHtml = ensureShellBootstrapStyle(html);
+      if (patchedHtml !== html) {
+        payload = {
+          ...payload,
+          buffer: Buffer.from(patchedHtml, "utf8")
+        };
+      }
+    }
+
     res.writeHead(200, {
       "Content-Type": contentTypes[payload.ext] || "application/octet-stream",
-      "Cache-Control": "no-store"
+      "Cache-Control": resolveCacheControl(url.pathname, url.search, payload.ext)
     });
     if (method === "HEAD") {
       res.end();
