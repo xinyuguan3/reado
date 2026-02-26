@@ -371,6 +371,17 @@ function sanitizeClientUserId(value) {
   return raw;
 }
 
+function escapeHtml(value) {
+  const text = value === null || value === undefined ? "" : String(value);
+  return text.replace(/[&<>"']/g, (char) => {
+    if (char === "&") return "&amp;";
+    if (char === "<") return "&lt;";
+    if (char === ">") return "&gt;";
+    if (char === "\"") return "&quot;";
+    return "&#39;";
+  });
+}
+
 let userSyncInFlight = false;
 let queuedUserSync = null;
 let lastUserSyncFingerprint = "";
@@ -724,14 +735,36 @@ window.ReadoUser = {
   spendGems
 };
 
+function canRenderMaterialIcons() {
+  try {
+    const probeText = "assignment";
+    const cache = canRenderMaterialIcons;
+    if (!cache.canvas) {
+      cache.canvas = document.createElement("canvas");
+      cache.canvas.width = 96;
+      cache.canvas.height = 32;
+    }
+    const ctx = cache.canvas.getContext("2d");
+    if (!ctx) return false;
+    ctx.font = '16px "Material Icons"';
+    const iconWidth = ctx.measureText(probeText).width;
+    ctx.font = "16px sans-serif";
+    const plainWidth = ctx.measureText(probeText).width;
+    if (!(iconWidth > 0 && plainWidth > 0)) return false;
+    return Math.abs(iconWidth - plainWidth) > 2;
+  } catch {
+    return false;
+  }
+}
+
 function ensureIconFont() {
   const markReady = () => {
-    window.__readoIconFontReady = true;
+    window.__readoIconFontReady = canRenderMaterialIcons();
     applyIconFallback(document);
   };
 
   try {
-    if (document.fonts && typeof document.fonts.check === "function" && document.fonts.check('16px "Material Icons"')) {
+    if (document.fonts && typeof document.fonts.check === "function" && document.fonts.check('16px "Material Icons"') && canRenderMaterialIcons()) {
       markReady();
       return;
     }
@@ -748,7 +781,11 @@ function ensureIconFont() {
     link.id = id;
     link.rel = "stylesheet";
     link.href = href;
-    link.addEventListener("load", markReady, { once: true });
+    link.addEventListener("load", () => {
+      requestAnimationFrame(markReady);
+      setTimeout(markReady, 220);
+    }, { once: true });
+    link.addEventListener("error", markReady, { once: true });
     (document.head || document.documentElement).appendChild(link);
   };
 
@@ -763,7 +800,12 @@ function resolveFallbackIconGlyph(iconName) {
 
 function applyIconFallback(root = document) {
   const host = root && typeof root.querySelectorAll === "function" ? root : document;
-  const useFallback = !Boolean(window.__readoIconFontReady);
+  const mobileExperience = Boolean(
+    document.body
+    && document.body.classList.contains("reado-experience-mode")
+    && window.matchMedia("(max-width: 900px)").matches
+  );
+  const useFallback = mobileExperience || !Boolean(window.__readoIconFontReady);
   if (document.body) {
     document.body.classList.toggle("reado-shell-icons-fallback", useFallback);
   }
@@ -848,11 +890,13 @@ function ensureGlobalStyle() {
       right: 12px;
       height: 56px;
       padding: 0 10px;
+      max-width: calc(100vw - 24px);
       border: 1px solid rgba(255, 255, 255, 0.16);
       border-radius: 14px;
       box-shadow: 0 8px 30px rgba(2, 8, 20, 0.42);
       justify-content: flex-end;
       gap: 8px;
+      overflow: hidden;
     }
     body.reado-shell-applied .reado-shell-brand {
       display: inline-flex;
@@ -882,6 +926,8 @@ function ensureGlobalStyle() {
       display: flex;
       align-items: center;
       gap: 12px;
+      min-width: 0;
+      flex-wrap: nowrap;
     }
     body.reado-shell-applied.reado-experience-mode .reado-shell-right {
       gap: 8px;
@@ -943,6 +989,8 @@ function ensureGlobalStyle() {
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      flex: 0 1 auto;
+      min-width: 0;
       border: 1px solid var(--reado-border);
       border-radius: 999px;
       padding: 4px 10px;
@@ -959,6 +1007,7 @@ function ensureGlobalStyle() {
       font-size: 11px;
       font-weight: 700;
       min-width: 96px;
+      max-width: 120px;
     }
     body.reado-shell-applied .reado-shell-lang option {
       color: #0f172a;
@@ -1079,6 +1128,8 @@ function ensureGlobalStyle() {
       padding: 7px 10px;
       font-size: 12px;
       font-weight: 800;
+      line-height: 1;
+      white-space: nowrap;
       cursor: pointer;
       transition: all 120ms ease;
     }
@@ -1859,15 +1910,21 @@ function ensureGlobalStyle() {
       }
       body.reado-shell-applied.reado-experience-mode .reado-shell-top {
         top: 8px;
+        left: 8px;
         right: 8px;
         height: 48px;
         padding: 0 8px;
         border-radius: 12px;
         gap: 6px;
-        max-width: calc(100vw - 16px);
+        max-width: none;
       }
       body.reado-shell-applied.reado-experience-mode .reado-shell-right {
+        width: 100%;
+        justify-content: flex-end;
         gap: 6px;
+      }
+      body.reado-shell-applied.reado-experience-mode .reado-shell-lang {
+        display: none;
       }
       body.reado-shell-applied.reado-experience-mode .reado-shell-pill.gems {
         padding: 5px 8px;
@@ -2036,6 +2093,15 @@ function ensureGlobalStyle() {
       }
       body.reado-shell-applied:not(.reado-experience-mode).reado-page-profile > .flex-1.flex.overflow-hidden > main {
         min-height: calc(100dvh - 80px) !important;
+      }
+    }
+    @media (max-width: 420px) {
+      body.reado-shell-applied.reado-experience-mode .reado-shell-user {
+        display: none;
+      }
+      body.reado-shell-applied.reado-experience-mode .reado-shell-exit {
+        padding: 6px 7px;
+        font-size: 10px;
       }
     }
     @keyframes reado-shell-pop {
@@ -2517,6 +2583,7 @@ class ReadoAppShell extends HTMLElement {
 
     let latestTaskHistory = [];
     let latestRank = { me: null, totalPlayers: 0 };
+    let latestLeaderboard = { leaders: [], me: null, totalPlayers: 0 };
 
     const renderTaskHistory = (items = []) => {
       if (!taskHistoryListEl) return;
@@ -2569,58 +2636,128 @@ class ReadoAppShell extends HTMLElement {
       }
     };
 
-    const renderLeaderboardPage = (leaders = [], me = null) => {
+    const renderLeaderboardPage = (leaders = [], me = null, totalPlayers = 0) => {
+      latestLeaderboard = {
+        leaders: Array.isArray(leaders) ? leaders : [],
+        me: me || null,
+        totalPlayers: Number(totalPlayers) || 0
+      };
       if (window.location.pathname !== "/pages/global-scholar-leaderboard.html") return;
       const host = document.querySelector("main .flex-1.h-full.overflow-y-auto");
       if (!host) return;
+      if (host.dataset.readoLegacyLeaderboardHidden !== "1") {
+        const legacySections = Array.from(host.children).filter((node) => {
+          if (!(node instanceof HTMLElement)) return false;
+          if (node.tagName === "HEADER") return false;
+          if (node.hasAttribute("data-live-leaderboard")) return false;
+          if (node.classList.contains("absolute")) return true;
+          if (node.classList.contains("space-y-2") && node.classList.contains("mt-2")) return true;
+          if (
+            node.classList.contains("hidden")
+            && node.classList.contains("sm:grid")
+            && node.classList.contains("grid-cols-12")
+          ) {
+            return true;
+          }
+          if (
+            node.classList.contains("flex")
+            && node.classList.contains("justify-center")
+            && node.classList.contains("items-end")
+          ) {
+            return true;
+          }
+          return false;
+        });
+        legacySections.forEach((node) => {
+          node.style.setProperty("display", "none", "important");
+        });
+        host.dataset.readoLegacyLeaderboardHidden = "1";
+      }
       let box = host.querySelector("[data-live-leaderboard]");
       if (!box) {
         box = document.createElement("section");
         box.setAttribute("data-live-leaderboard", "1");
         box.style.marginBottom = "16px";
-        box.style.border = "1px solid rgba(148,163,184,.25)";
-        box.style.borderRadius = "14px";
-        box.style.padding = "12px";
-        box.style.background = "rgba(15,23,42,.45)";
-        box.innerHTML = `
-          <h2 style="margin:0 0 8px;font-size:16px;font-weight:700;">Live Leaderboard</h2>
-          <div data-live-leaderboard-list style="display:grid;gap:8px;"></div>`;
-        host.prepend(box);
+        const header = host.querySelector("header");
+        if (header && header.nextSibling) {
+          host.insertBefore(box, header.nextSibling);
+        } else {
+          host.prepend(box);
+        }
       }
-      const listEl = box.querySelector("[data-live-leaderboard-list]");
-      if (!listEl) return;
-      if (!Array.isArray(leaders) || !leaders.length) {
-        listEl.innerHTML = `<div style="opacity:.8;font-size:13px;">No synced players yet.</div>`;
+      const rows = Array.isArray(leaders) ? leaders : [];
+      if (!rows.length) {
+        box.innerHTML = `<div class="glass-card" style="padding:14px;border-radius:14px;">${escapeHtml(t("shell.leaderboard_empty", "暂无可用榜单数据"))}</div>`;
         return;
       }
-      listEl.innerHTML = leaders.slice(0, 12).map((row) => {
-        const isMe = Boolean(me?.userId && row.userId === me.userId);
+
+      const topThree = rows.slice(0, 3);
+      const listRows = rows.slice(0, 100);
+      const hasMeInList = Boolean(me?.userId && listRows.some((row) => row?.userId === me.userId));
+      const safeTotalPlayers = Math.max(Number(totalPlayers) || rows.length, rows.length);
+      const renderTopCard = (row) => {
+        const isMe = Boolean(me?.userId && row?.userId === me.userId);
+        const badge = row?.rank === 1 ? "🥇" : row?.rank === 2 ? "🥈" : "🥉";
         return `
-          <div style="display:flex;justify-content:space-between;gap:10px;padding:8px 10px;border-radius:10px;border:1px solid ${isMe ? "rgba(19,91,236,.55)" : "rgba(148,163,184,.2)"};background:${isMe ? "rgba(19,91,236,.2)" : "rgba(15,23,42,.35)"};">
-            <strong>#${formatNumber(row.rank)} ${row.displayName || "Reader"}</strong>
-            <span>${formatNumber(row.rankScore || 0)} XP</span>
-          </div>`;
-      }).join("");
+          <article class="glass-card" style="padding:12px;border-radius:12px;display:grid;gap:6px;border:1px solid ${isMe ? "rgba(19,91,236,.45)" : "rgba(148,163,184,.2)"};background:${isMe ? "rgba(19,91,236,.12)" : "rgba(255,255,255,.02)"};">
+            <div style="font-size:20px;line-height:1;">${badge}</div>
+            <strong style="font-size:14px;">#${formatNumber(row?.rank || 0)} ${escapeHtml(row?.displayName || "Reader")}</strong>
+            <span style="font-size:12px;opacity:.75;">Lv.${formatNumber(row?.level || 1)}</span>
+            <span style="font-size:13px;font-weight:700;color:#60a5fa;">${formatNumber(row?.rankScore || 0)} XP</span>
+          </article>`;
+      };
+      const renderListRow = (row) => {
+        const isMe = Boolean(me?.userId && row?.userId === me.userId);
+        return `
+          <article class="glass-card" style="padding:10px 12px;border-radius:12px;display:flex;justify-content:space-between;gap:12px;align-items:center;border:1px solid ${isMe ? "rgba(19,91,236,.55)" : "rgba(148,163,184,.2)"};background:${isMe ? "rgba(19,91,236,.16)" : "rgba(255,255,255,.02)"};">
+            <div style="display:grid;gap:2px;">
+              <strong style="font-size:14px;">#${formatNumber(row?.rank || 0)} ${escapeHtml(row?.displayName || "Reader")}</strong>
+              <span style="font-size:12px;opacity:.75;">${escapeHtml(row?.userId ? "@" + row.userId : "user")} · Lv.${formatNumber(row?.level || 1)}</span>
+            </div>
+            <span style="font-size:13px;font-weight:700;color:#60a5fa;white-space:nowrap;">${formatNumber(row?.rankScore || 0)} XP</span>
+          </article>`;
+      };
+      const meCard = me && !hasMeInList
+        ? `
+          <section class="glass-card" style="padding:12px;border-radius:12px;border:1px solid rgba(19,91,236,.5);background:rgba(19,91,236,.12);">
+            <p style="margin:0 0 6px;font-size:12px;opacity:.8;">${escapeHtml(t("shell.me_position", "我的排名"))}</p>
+            <strong style="font-size:14px;">#${formatNumber(me.rank || 0)} ${escapeHtml(me.displayName || "Reader")}</strong>
+            <div style="margin-top:4px;font-size:12px;opacity:.75;">${escapeHtml(me.userId ? "@" + me.userId : "user")} · Lv.${formatNumber(me.level || 1)} · ${formatNumber(me.rankScore || 0)} XP</div>
+          </section>`
+        : "";
+
+      box.innerHTML = `
+        <section class="glass-card" style="padding:14px;border-radius:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
+          <strong style="font-size:16px;">${escapeHtml(t("shell.live_leaderboard", "实时排行榜"))}</strong>
+          <span style="font-size:12px;opacity:.75;">${escapeHtml(t("shell.total_players", "总玩家"))}: ${formatNumber(safeTotalPlayers)}</span>
+        </section>
+        ${topThree.length ? `<section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;">${topThree.map(renderTopCard).join("")}</section>` : ""}
+        <section style="display:grid;gap:8px;">${listRows.map(renderListRow).join("")}</section>
+        ${meCard}`;
     };
 
     const refreshLiveProgress = async () => {
       const auth = readAuthState();
       const userId = sanitizeClientUserId(auth?.userId);
-      if (!userId) {
-        renderRank(null, 0);
-        renderTaskHistory([]);
-        return;
-      }
       try {
+        const leaderboardPath = userId
+          ? "/api/leaderboard?limit=100&userId=" + encodeURIComponent(userId)
+          : "/api/leaderboard?limit=100";
         const [leaderboard, taskHistory] = await Promise.all([
-          requestJson("GET", "/api/leaderboard?limit=100&userId=" + encodeURIComponent(userId)),
-          requestJson("GET", "/api/user/tasks?limit=20&userId=" + encodeURIComponent(userId))
+          requestJson("GET", leaderboardPath),
+          userId
+            ? requestJson("GET", "/api/user/tasks?limit=20&userId=" + encodeURIComponent(userId))
+            : Promise.resolve({ tasks: [] })
         ]);
-        renderRank(leaderboard?.me || null, Number(leaderboard?.totalPlayers) || 0);
-        renderTaskHistory(Array.isArray(taskHistory?.tasks) ? taskHistory.tasks : []);
-        renderLeaderboardPage(Array.isArray(leaderboard?.leaders) ? leaderboard.leaders : [], leaderboard?.me || null);
+        const me = userId ? (leaderboard?.me || null) : null;
+        const totalPlayers = Number(leaderboard?.totalPlayers) || 0;
+        renderRank(me, totalPlayers);
+        renderTaskHistory(userId && Array.isArray(taskHistory?.tasks) ? taskHistory.tasks : []);
+        renderLeaderboardPage(Array.isArray(leaderboard?.leaders) ? leaderboard.leaders : [], me, totalPlayers);
       } catch {
         renderRank(null, 0);
+        renderTaskHistory([]);
+        renderLeaderboardPage([], null, 0);
       }
     };
 
@@ -2659,6 +2796,7 @@ class ReadoAppShell extends HTMLElement {
       if (taskTitle) taskTitle.textContent = t("shell.current_tasks", "进行中的任务");
       renderRank(latestRank.me, latestRank.totalPlayers);
       renderTaskHistory(latestTaskHistory);
+      renderLeaderboardPage(latestLeaderboard.leaders, latestLeaderboard.me, latestLeaderboard.totalPlayers);
       const exitBtn = top.querySelector(".reado-shell-exit");
       if (exitBtn) exitBtn.textContent = t("shell.exit_experience", "退出体验");
       const toggleBtn = top.querySelector(".reado-shell-toggle");
@@ -2713,10 +2851,13 @@ class ReadoAppShell extends HTMLElement {
     });
 
     wrap.append(top, side, rightPanel);
+    const refreshIconState = () => applyIconFallback(wrap);
     applyIconFallback(wrap);
     if (document.fonts && document.fonts.ready && typeof document.fonts.ready.then === "function") {
-      document.fonts.ready.then(() => applyIconFallback(wrap)).catch(() => {});
+      document.fonts.ready.then(refreshIconState).catch(() => {});
     }
+    window.addEventListener("resize", refreshIconState, { passive: true });
+    window.addEventListener("orientationchange", refreshIconState, { passive: true });
     document.body.append(wrap);
   }
 }
