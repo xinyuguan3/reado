@@ -712,12 +712,8 @@ window.ReadoUser = {
 };
 
 function ensureIconFont() {
-  if (document.getElementById(ICON_FONT_ID)) return;
-  const link = document.createElement("link");
-  link.id = ICON_FONT_ID;
-  link.rel = "stylesheet";
-  link.href = "https://fonts.googleapis.com/icon?family=Material+Icons";
-  document.head.append(link);
+  // Pages already include icon font links. Skip runtime Google fetch to reduce cross-border latency.
+  return;
 }
 
 function ensureGlobalStyle() {

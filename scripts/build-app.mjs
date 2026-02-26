@@ -249,6 +249,31 @@ function injectAfterBodyOpen(html, snippet) {
   return `${snippet}\n${html}`;
 }
 
+function toNonBlockingStylesheetTag(tag) {
+  if (!/\brel\s*=\s*["']stylesheet["']/i.test(tag)) return tag;
+  if (/\bmedia\s*=/i.test(tag) || /\bonload\s*=/i.test(tag)) return tag;
+  const close = tag.trimEnd().endsWith("/>") ? "/>" : ">";
+  const base = tag.slice(0, tag.lastIndexOf(close)).trimEnd();
+  return `${base} media="print" onload="this.media='all'"${close}`;
+}
+
+function sanitizeChinaNetworkDependencies(html) {
+  let out = String(html || "");
+  // Serve Tailwind CDN runtime from our own origin to avoid blocked/slow third-party script fetch.
+  out = out.replace(/https:\/\/cdn\.tailwindcss\.com/gi, "/shared/vendor/tailwindcss-cdn.js");
+  // Drop preconnect hints for blocked font domains to avoid useless connection attempts.
+  out = out.replace(/<link\b[^>]*href=["']https:\/\/fonts\.googleapis\.com["'][^>]*>\s*/gi, "");
+  out = out.replace(/<link\b[^>]*href=["']https:\/\/fonts\.gstatic\.com["'][^>]*>\s*/gi, "");
+  // Make Google Fonts stylesheets non-blocking to avoid render stalls in mainland networks.
+  out = out.replace(
+    /<link\b[^>]*href=["']https:\/\/fonts\.googleapis\.com[^"']*["'][^>]*>/gi,
+    (tag) => toNonBlockingStylesheetTag(tag)
+  );
+  // Remove Google Fonts @import lines inside styles; these are render-blocking and frequently unreachable.
+  out = out.replace(/@import\s+url\((["'])https:\/\/fonts\.googleapis\.com[\s\S]*?\1\)\s*;\s*/gi, "");
+  return out;
+}
+
 function resolveBookCoverId(baseName) {
   const direct = BOOK_COVER_NAME_TO_ID.get(baseName.trim());
   if (direct) return direct;
@@ -5139,6 +5164,7 @@ async function writePages(pages, books) {
     }
     html = injectAppShell(html, getPageKeyBySlug(page.slug));
     html = injectCnAds(html);
+    html = sanitizeChinaNetworkDependencies(html);
     await fs.writeFile(path.join(pagesDir, `${page.slug}.html`), html, "utf8");
     await fs.copyFile(page.imagePath, path.join(screenDir, `${page.slug}.png`));
   }
@@ -5146,18 +5172,18 @@ async function writePages(pages, books) {
 
 async function writeBookPages(books) {
   for (const book of books) {
-    const html = injectAppShell(buildBookHubHtml(book), "knowledge-map");
+    const html = sanitizeChinaNetworkDependencies(injectAppShell(buildBookHubHtml(book), "knowledge-map"));
     await fs.writeFile(path.join(booksDir, `${book.id}.html`), html, "utf8");
   }
 }
 
 async function writeGemCenterPage() {
-  const html = injectAppShell(buildGemCenterHtml(), "other");
+  const html = sanitizeChinaNetworkDependencies(injectAppShell(buildGemCenterHtml(), "other"));
   await fs.writeFile(path.join(pagesDir, "gem-center.html"), html, "utf8");
 }
 
 async function writeAnalyticsDashboardPage() {
-  const html = injectAppShell(buildAnalyticsDashboardHtml(), "analytics");
+  const html = sanitizeChinaNetworkDependencies(injectAppShell(buildAnalyticsDashboardHtml(), "analytics"));
   await fs.writeFile(path.join(pagesDir, "analytics-dashboard.html"), html, "utf8");
 }
 
@@ -5166,6 +5192,7 @@ async function writeExperiencePages(experiences, moduleToBook) {
     const book = moduleToBook.get(experience.slug);
     let html = injectExperienceQuickNav(experience.html, book, experience.slug);
     html = injectAppShell(html, "knowledge-map");
+    html = sanitizeChinaNetworkDependencies(html);
     await fs.writeFile(path.join(experiencePagesDir, `${experience.slug}.html`), html, "utf8");
     await fs.copyFile(experience.imagePath, path.join(experienceScreenDir, `${experience.slug}.png`));
 
@@ -5198,6 +5225,7 @@ async function writeSharedAssets(books) {
   const customI18nSourcePath = path.join(rootDir, "scripts", "shared", "i18n.js");
   const customAutoTranslateSourcePath = path.join(rootDir, "scripts", "shared", "auto-translate.js");
   const customAutoTranslateDictSourcePath = path.join(rootDir, "scripts", "shared", "auto-translate-dict.js");
+  const localTailwindCdnSourcePath = path.join(rootDir, "scripts", "shared", "vendor", "tailwindcss-cdn.js");
   let customShell = "";
   try {
     customShell = await fs.readFile(customShellSourcePath, "utf8");
@@ -5222,6 +5250,12 @@ async function writeSharedAssets(books) {
   }
   await fs.writeFile(path.join(sharedDir, "book-catalog.js"), buildSharedBookCatalogScript(books), "utf8");
   await fs.writeFile(path.join(sharedDir, "experience-runtime.js"), buildSharedExperienceRuntimeScript(), "utf8");
+  try {
+    await fs.mkdir(path.join(sharedDir, "vendor"), { recursive: true });
+    await fs.copyFile(localTailwindCdnSourcePath, path.join(sharedDir, "vendor", "tailwindcss-cdn.js"));
+  } catch {
+    // optional file, used to avoid blocked tailwindcdn.com in mainland networks
+  }
 }
 
 async function writeStudioCustomPages() {
@@ -5229,10 +5263,10 @@ async function writeStudioCustomPages() {
     const entries = await fs.readdir(studioPagesSourceDir, { withFileTypes: true });
     for (const entry of entries) {
       if (!entry.isFile() || !entry.name.endsWith(".html")) continue;
-      await fs.copyFile(
-        path.join(studioPagesSourceDir, entry.name),
-        path.join(pagesDir, entry.name)
-      );
+      const sourcePath = path.join(studioPagesSourceDir, entry.name);
+      const targetPath = path.join(pagesDir, entry.name);
+      const html = await fs.readFile(sourcePath, "utf8");
+      await fs.writeFile(targetPath, sanitizeChinaNetworkDependencies(html), "utf8");
     }
   } catch (error) {
     if (error && error.code === "ENOENT") return;
@@ -5274,7 +5308,7 @@ async function main() {
   await writeAnalyticsDashboardPage();
   await writeBookPages(books);
   await writeExperiencePages(experiences, moduleToBook);
-  await fs.writeFile(path.join(appDir, "index.html"), buildIndexHtml(pages), "utf8");
+  await fs.writeFile(path.join(appDir, "index.html"), sanitizeChinaNetworkDependencies(buildIndexHtml(pages)), "utf8");
   console.log(
     `Built ${pages.length} app pages, ${books.length} books, ${experiences.length} module experiences, and ${customCovers.length} custom covers into ${path.relative(rootDir, appDir)}`
   );
