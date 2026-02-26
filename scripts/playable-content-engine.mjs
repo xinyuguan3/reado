@@ -1,17 +1,43 @@
 import crypto from "node:crypto";
-import { execFile } from "node:child_process";
 import fs from "node:fs/promises";
-import os from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import { promisify } from "node:util";
+import JSZip from "jszip";
 
 const STATE_FILE = "reado-playable-works.json";
 const MAX_TEXT_LEN = 120_000;
 const PLACEHOLDER_PNG_BASE64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO8B6xkAAAAASUVORK5CYII=";
 const CODEX_CONFIG_PATH = path.join(process.env.HOME || "", ".codex", "config.toml");
 const CODEX_AUTH_PATH = path.join(process.env.HOME || "", ".codex", "auth.json");
-const execFileAsync = promisify(execFile);
+const DEFAULT_BROWSER_USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36";
+const DEFAULT_HTTP_HEADERS = {
+  "User-Agent": DEFAULT_BROWSER_USER_AGENT,
+  "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+  "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8"
+};
+const BROWSER_EXECUTABLE_CANDIDATES = [
+  toText(process.env.READO_BROWSER_EXECUTABLE_PATH),
+  toText(process.env.READO_CHROME_EXECUTABLE_PATH),
+  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  "/Applications/Brave Browser.app/Contents/MacOS/Brave Browser",
+  "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge",
+  "/Applications/Chromium.app/Contents/MacOS/Chromium",
+  "/usr/bin/google-chrome",
+  "/usr/bin/google-chrome-stable",
+  "/usr/bin/brave-browser",
+  "/usr/bin/microsoft-edge",
+  "/usr/bin/microsoft-edge-stable",
+  "/usr/bin/chromium",
+  "/usr/bin/chromium-browser",
+  toText(process.env.PROGRAMFILES ? path.join(process.env.PROGRAMFILES, "Google", "Chrome", "Application", "chrome.exe") : ""),
+  toText(process.env["PROGRAMFILES(X86)"] ? path.join(process.env["PROGRAMFILES(X86)"], "Google", "Chrome", "Application", "chrome.exe") : ""),
+  toText(process.env.PROGRAMFILES ? path.join(process.env.PROGRAMFILES, "Microsoft", "Edge", "Application", "msedge.exe") : ""),
+  toText(process.env["PROGRAMFILES(X86)"] ? path.join(process.env["PROGRAMFILES(X86)"], "Microsoft", "Edge", "Application", "msedge.exe") : ""),
+  toText(process.env.LOCALAPPDATA ? path.join(process.env.LOCALAPPDATA, "BraveSoftware", "Brave-Browser", "Application", "brave.exe") : "")
+].filter(Boolean);
+let browserExecutablePathPromise = null;
+let pdfJsModulePromise = null;
+let puppeteerModulePromise = null;
 
 function nowIso() {
   return new Date().toISOString();
@@ -318,7 +344,7 @@ async function fetchWithTimeout(url, options = {}, timeoutMs = 15000) {
       ...options,
       signal: controller.signal,
       headers: {
-        "User-Agent": "reado-playable-engine/1.0",
+        ...DEFAULT_HTTP_HEADERS,
         ...(options?.headers || {})
       }
     });
@@ -336,7 +362,7 @@ async function fetchTextWithTimeout(url, options = {}, timeoutMs = 15000) {
         ...options,
         signal: controller.signal,
         headers: {
-          "User-Agent": "reado-playable-engine/1.0",
+          ...DEFAULT_HTTP_HEADERS,
           ...(options?.headers || {})
         }
       });
@@ -354,6 +380,167 @@ async function fetchTextWithTimeout(url, options = {}, timeoutMs = 15000) {
     return await Promise.race([task, watchdog]);
   } finally {
     if (timer) clearTimeout(timer);
+  }
+}
+
+function decodeTextBuffer(buffer) {
+  const raw = Buffer.isBuffer(buffer) ? buffer : Buffer.from(buffer || "");
+  if (!raw.length) return "";
+
+  if (raw.length >= 3 && raw[0] === 0xef && raw[1] === 0xbb && raw[2] === 0xbf) {
+    return raw.slice(3).toString("utf8");
+  }
+  if (raw.length >= 2 && raw[0] === 0xff && raw[1] === 0xfe) {
+    return raw.slice(2).toString("utf16le");
+  }
+  if (raw.length >= 2 && raw[0] === 0xfe && raw[1] === 0xff) {
+    const swapped = Buffer.alloc(raw.length - 2);
+    for (let i = 2; i + 1 < raw.length; i += 2) {
+      swapped[i - 2] = raw[i + 1];
+      swapped[i - 1] = raw[i];
+    }
+    return swapped.toString("utf16le");
+  }
+
+  const utf8 = raw.toString("utf8");
+  const utf16 = raw.toString("utf16le").replace(/\u0000/g, "");
+  const utf8Bad = (utf8.match(/\uFFFD/g) || []).length;
+  const utf16Bad = (utf16.match(/\uFFFD/g) || []).length;
+  if (utf16 && utf16Bad <= utf8Bad && utf16.length > utf8.length * 0.6) {
+    return utf16;
+  }
+  return utf8;
+}
+
+async function loadPdfJs() {
+  if (!pdfJsModulePromise) {
+    pdfJsModulePromise = import("pdfjs-dist/legacy/build/pdf.mjs");
+  }
+  return pdfJsModulePromise;
+}
+
+async function loadPuppeteerCore() {
+  if (!puppeteerModulePromise) {
+    puppeteerModulePromise = import("puppeteer-core");
+  }
+  return puppeteerModulePromise;
+}
+
+async function resolveBrowserExecutablePath() {
+  if (!browserExecutablePathPromise) {
+    browserExecutablePathPromise = (async () => {
+      for (const candidate of BROWSER_EXECUTABLE_CANDIDATES) {
+        if (!candidate) continue;
+        const resolved = path.resolve(candidate);
+        try {
+          await fs.access(resolved);
+          return resolved;
+        } catch {}
+      }
+      return "";
+    })();
+  }
+  return browserExecutablePathPromise;
+}
+
+async function extractTextFromPdfBuffer(buffer) {
+  const pdfjs = await loadPdfJs().catch(() => null);
+  if (!pdfjs || typeof pdfjs.getDocument !== "function") {
+    throw new Error("pdfjs-dist is not available");
+  }
+  const data = new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength);
+  const task = pdfjs.getDocument({
+    data,
+    disableWorker: true,
+    useSystemFonts: true,
+    stopAtErrors: false
+  });
+  try {
+    const doc = await task.promise;
+    const parts = [];
+    let accLen = 0;
+    const maxPages = Math.max(1, Math.min(Number(doc.numPages) || 1, 240));
+    for (let pageNo = 1; pageNo <= maxPages; pageNo += 1) {
+      const page = await doc.getPage(pageNo);
+      const content = await page.getTextContent().catch(() => ({ items: [] }));
+      const line = toArray(content?.items)
+        .map((item) => toText(item?.str))
+        .filter(Boolean)
+        .join(" ")
+        .replace(/\s+/g, " ")
+        .trim();
+      if (!line) continue;
+      parts.push(line);
+      accLen += line.length;
+      if (accLen > 120_000) break;
+    }
+    const merged = clamp(parts.join("\n\n"), 60_000);
+    if (!merged) throw new Error("pdf text extraction returned empty content");
+    return merged;
+  } finally {
+    await task.destroy().catch(() => {});
+  }
+}
+
+async function extractTextFromUrlWithBrowser(urlText, timeoutMs = 25000) {
+  const normalized = new URL(urlText).toString();
+  const browserPath = await resolveBrowserExecutablePath();
+  if (!browserPath) {
+    throw new Error("Browser executable not found. Set READO_BROWSER_EXECUTABLE_PATH.");
+  }
+  const mod = await loadPuppeteerCore().catch(() => null);
+  const puppeteer = mod?.default || mod;
+  if (!puppeteer || typeof puppeteer.launch !== "function") {
+    throw new Error("puppeteer-core is not available");
+  }
+
+  const browser = await puppeteer.launch({
+    headless: true,
+    executablePath: browserPath,
+    args: [
+      "--disable-blink-features=AutomationControlled",
+      "--disable-dev-shm-usage",
+      "--no-first-run",
+      "--no-default-browser-check"
+    ]
+  });
+  try {
+    const page = await browser.newPage();
+    await page.setUserAgent(DEFAULT_BROWSER_USER_AGENT);
+    await page.setExtraHTTPHeaders({
+      "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8"
+    });
+    const response = await page.goto(normalized, {
+      waitUntil: "domcontentloaded",
+      timeout: timeoutMs
+    });
+    const status = Number(response?.status?.() || 0);
+    if (typeof page.waitForNetworkIdle === "function") {
+      await page.waitForNetworkIdle({ idleTime: 700, timeout: 6000 }).catch(() => {});
+    }
+    const payload = await page.evaluate(() => {
+      const root = document.querySelector("article") || document.querySelector("main") || document.body;
+      const title = String(document?.title || "").trim();
+      const text = String(root?.innerText || document?.body?.innerText || "")
+        .replace(/\s+/g, " ")
+        .trim();
+      return { title, text };
+    });
+    const text = clamp(toText(payload?.text), 60_000);
+    if (!text && status >= 400) {
+      throw new Error(`Unable to fetch url (${status})`);
+    }
+    if (!text) {
+      throw new Error("no readable text extracted from url");
+    }
+    return {
+      title: toText(payload?.title, normalized),
+      content: text,
+      url: toText(page.url(), normalized),
+      status
+    };
+  } finally {
+    await browser.close().catch(() => {});
   }
 }
 
@@ -659,19 +846,13 @@ function fallbackBlueprint({ title, contextText }) {
 
 async function fetchUrlContext(urlText) {
   const normalized = new URL(urlText).toString();
-  const response = await fetchWithTimeout(normalized, { method: "GET", redirect: "follow" }, 18000);
-  if (!response.ok) {
-    throw new Error(`Unable to fetch url (${response.status})`);
-  }
-  const contentType = toText(response.headers.get("content-type"), "text/html");
-  const body = await response.text();
-  const titleMatch = body.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
-  const title = toText(stripHtml(titleMatch?.[1]), normalized);
-  const text = contentType.includes("html") ? stripHtml(body) : body.trim();
+  const extracted = await extractTextFromUrlWithBrowser(normalized, 26000);
+  const title = toText(extracted?.title, normalized);
+  const text = toText(extracted?.content);
   return {
     title,
     contextText: clamp(text, 60_000),
-    sources: [{ title, url: normalized, snippet: clamp(text, 1200) }]
+    sources: [{ title, url: toText(extracted?.url, normalized), snippet: clamp(text, 1200) }]
   };
 }
 
@@ -753,41 +934,34 @@ async function fetchBookContext(bookName) {
 }
 
 async function extractTextFromEpubBuffer(buffer) {
-  const workDir = await fs.mkdtemp(path.join(os.tmpdir(), "reado-epub-"));
-  const epubPath = path.join(workDir, "source.epub");
-  try {
-    await fs.writeFile(epubPath, buffer);
-    const list = await execFileAsync("unzip", ["-Z1", epubPath], { maxBuffer: 8 * 1024 * 1024 }).catch(() => null);
-    if (!list || !toText(list.stdout)) {
-      throw new Error("unable to read epub archive");
-    }
-    const files = String(list.stdout)
-      .split(/\r?\n/)
-      .map((line) => line.trim())
-      .filter(Boolean)
-      .filter((line) => /\.(xhtml|html|htm)$/i.test(line))
-      .slice(0, 120);
-    if (files.length === 0) {
-      throw new Error("epub contains no readable html/xhtml chapters");
-    }
-
-    const parts = [];
-    for (const file of files) {
-      const row = await execFileAsync("unzip", ["-p", epubPath, file], { maxBuffer: 3 * 1024 * 1024 }).catch(() => null);
-      const html = toText(row?.stdout);
-      if (!html) continue;
-      const text = stripHtml(html);
-      if (text) {
-        parts.push(text);
-      }
-      if (parts.join("\n\n").length > 120_000) break;
-    }
-    const merged = clamp(parts.join("\n\n"), 60_000);
-    if (!merged) throw new Error("epub text extraction returned empty content");
-    return merged;
-  } finally {
-    await fs.rm(workDir, { recursive: true, force: true }).catch(() => {});
+  const zip = await JSZip.loadAsync(buffer).catch(() => null);
+  if (!zip) {
+    throw new Error("unable to read epub archive");
   }
+
+  const files = Object.keys(zip.files)
+    .filter((name) => !zip.files[name]?.dir)
+    .filter((name) => /\.(xhtml|html|htm)$/i.test(name))
+    .sort((a, b) => a.localeCompare(b, "en"))
+    .slice(0, 180);
+  if (files.length === 0) {
+    throw new Error("epub contains no readable html/xhtml chapters");
+  }
+
+  const parts = [];
+  let accLen = 0;
+  for (const file of files) {
+    const html = await zip.files[file].async("string").catch(() => "");
+    if (!html) continue;
+    const text = stripHtml(html);
+    if (!text) continue;
+    parts.push(text);
+    accLen += text.length;
+    if (accLen > 120_000) break;
+  }
+  const merged = clamp(parts.join("\n\n"), 60_000);
+  if (!merged) throw new Error("epub text extraction returned empty content");
+  return merged;
 }
 
 function normalizeSourceInput(raw, fallbackIndex = 0) {
@@ -2314,8 +2488,8 @@ export class PlayableContentEngine {
     return this.skills
       .filter((skill) => skill.kind === kind && skill.enabled)
       .sort((a, b) => {
-        const aBuiltin = a.source === "builtin" ? 1 : 0;
-        const bBuiltin = b.source === "builtin" ? 1 : 0;
+        const aBuiltin = a.source === "builtin" ? 0 : 1;
+        const bBuiltin = b.source === "builtin" ? 0 : 1;
         if (aBuiltin !== bBuiltin) return aBuiltin - bBuiltin;
         return a.id.localeCompare(b.id);
       });
@@ -2378,6 +2552,8 @@ export class PlayableContentEngine {
       supports: ({ mimeType, lowerName }) => (
         String(mimeType || "").startsWith("text/")
         || String(lowerName || "").endsWith(".txt")
+        || String(lowerName || "").endsWith(".text")
+        || String(lowerName || "").endsWith(".log")
         || String(lowerName || "").endsWith(".md")
         || String(lowerName || "").endsWith(".markdown")
         || String(lowerName || "").endsWith(".csv")
@@ -2386,7 +2562,7 @@ export class PlayableContentEngine {
         || String(lowerName || "").endsWith(".htm")
       ),
       run: async ({ buffer, mimeType, lowerName }) => {
-        let text = buffer.toString("utf8");
+        let text = decodeTextBuffer(buffer);
         if (String(lowerName || "").endsWith(".html") || String(lowerName || "").endsWith(".htm") || String(mimeType || "").includes("html")) {
           text = stripHtml(text);
         }
@@ -2407,39 +2583,50 @@ export class PlayableContentEngine {
     this.registerSkill({
       id: "ingest.pdf-webhook",
       kind: "ingest",
-      label: "PDF Parser Webhook",
-      description: "Extract PDF text via parser service",
-      enabled: Boolean(this.parserWebhookUrl),
+      label: "PDF Parser",
+      description: "Extract PDF text with built-in parser (optional webhook first)",
+      enabled: true,
       source: "builtin",
       supports: ({ mimeType, lowerName }) => (
         String(mimeType || "") === "application/pdf" || String(lowerName || "").endsWith(".pdf")
       ),
-      run: async ({ name, mimeType, contentBase64 }) => {
-        if (!this.parserWebhookUrl) {
-          throw new Error("PDF requires parser webhook. Set READO_PARSER_WEBHOOK_URL.");
+      run: async ({ name, mimeType, contentBase64, buffer }) => {
+        const errors = [];
+        if (this.parserWebhookUrl) {
+          try {
+            const parserRes = await fetchWithTimeout(
+              this.parserWebhookUrl,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  ...(this.parserWebhookToken ? { Authorization: `Bearer ${this.parserWebhookToken}` } : {})
+                },
+                body: JSON.stringify({
+                  name,
+                  mimeType: mimeType || "application/pdf",
+                  contentBase64
+                })
+              },
+              45000
+            );
+            const parserData = await parserRes.json().catch(() => ({}));
+            const webhookText = clamp(toText(parserData?.text).replace(/\s+/g, " ").trim(), 60_000);
+            if (parserRes.ok && webhookText) {
+              return { text: webhookText };
+            }
+            errors.push(toText(parserData?.error, `PDF webhook failed (${parserRes.status})`));
+          } catch (error) {
+            errors.push(toText(error?.message, "PDF webhook request failed"));
+          }
         }
-        const parserRes = await fetchWithTimeout(
-          this.parserWebhookUrl,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              ...(this.parserWebhookToken ? { Authorization: `Bearer ${this.parserWebhookToken}` } : {})
-            },
-            body: JSON.stringify({
-              name,
-              mimeType: mimeType || "application/pdf",
-              contentBase64
-            })
-          },
-          45000
-        );
-        const parserData = await parserRes.json().catch(() => ({}));
-        const text = toText(parserData?.text);
-        if (!parserRes.ok || !text) {
-          throw new Error(parserData?.error || "PDF parsing failed");
+        try {
+          const localText = await extractTextFromPdfBuffer(buffer);
+          return { text: localText };
+        } catch (error) {
+          errors.push(toText(error?.message, "PDF local parser failed"));
         }
-        return { text };
+        throw new Error(errors[errors.length - 1] || "PDF parsing failed");
       }
     });
 
@@ -2917,13 +3104,11 @@ export class PlayableContentEngine {
       }
     }
 
-    const response = await fetchWithTimeout(normalized, { method: "GET", redirect: "follow" }, 20000);
-    if (!response.ok) {
-      throw new Error(`Unable to fetch url (${response.status})`);
-    }
-    const contentType = toText(response.headers.get("content-type"), "");
-
-    if (contentType.includes("pdf") || looksLikePdfUrl(normalized)) {
+    if (looksLikePdfUrl(normalized)) {
+      const response = await fetchWithTimeout(normalized, { method: "GET", redirect: "follow" }, 25000);
+      if (!response.ok) {
+        throw new Error(`Unable to fetch url (${response.status})`);
+      }
       const buffer = Buffer.from(await response.arrayBuffer());
       const fileName = toText(path.basename(new URL(normalized).pathname), "source.pdf");
       const source = await this.ingestFileSource(
@@ -2942,23 +3127,23 @@ export class PlayableContentEngine {
       };
     }
 
-    const body = await response.text();
-    const text = contentType.includes("html") ? stripHtml(body) : String(body || "").trim();
-    const titleMatch = contentType.includes("html")
-      ? body.match(/<title[^>]*>([\s\S]*?)<\/title>/i)
-      : null;
-    const title = toText(payload?.title, toText(stripHtml(titleMatch?.[1]), normalized));
-    const normalizedText = clamp(text.replace(/\s+/g, " ").trim(), 60_000);
+    this.emitProgress(hooks, "ingesting_url", 52, "Rendering page in browser for stable extraction");
+    const extracted = await extractTextFromUrlWithBrowser(normalized, 28000);
+    if (Number(extracted?.status) >= 400) {
+      this.emitProgress(hooks, "ingesting_url", 72, `Source returned HTTP ${Number(extracted.status)}, using rendered visible text`);
+    }
+    const title = toText(payload?.title, toText(extracted?.title, normalized));
+    const normalizedText = clamp(toText(extracted?.content).replace(/\s+/g, " ").trim(), 60_000);
     if (!normalizedText) {
       throw new Error("no readable text extracted from url");
     }
     this.emitProgress(hooks, "ingesting_url", 88, "Web content extraction completed");
     return {
       title,
-      url: normalized,
+      url: toText(extracted?.url, normalized),
       snippet: clamp(normalizedText, 1200),
       content: normalizedText,
-      parsedBy: "url.fetch"
+      parsedBy: "url.browser"
     };
   }
 
@@ -3037,7 +3222,7 @@ export class PlayableContentEngine {
       if (errors.length > 0) {
         throw new Error(errors[errors.length - 1]);
       }
-      throw new Error("unsupported file type. use txt/md/csv/json/html/epub or pdf(with parser webhook)");
+      throw new Error("unsupported file type. use txt/md/csv/json/html/epub/pdf");
     }
 
     const normalizedText = clamp(text.replace(/\s+/g, " ").trim(), 60_000);

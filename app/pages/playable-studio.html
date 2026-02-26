@@ -1018,6 +1018,8 @@
       setError("");
       setMeta(t("studio.meta_parsing_files", "Parsing files..."));
       setStatus("ingesting");
+      let successCount = 0;
+      let failedCount = 0;
       pushClientLog(t("studio.log_import_start", "Start importing files. Count: {value}", { value: list.length }), "ingest", 0);
       for (let i = 0; i < list.length; i += 1) {
         const file = list[i];
@@ -1031,16 +1033,25 @@
           const source = await ingestFile(file, i, list.length, pendingId);
           removePendingSource(pendingId);
           addSelectedSource(source);
+          successCount += 1;
           pushClientLog(t("studio.log_import_done", "Imported: {name}", { name: file.name }) + (source?.parsedBy ? (" (skill: " + source.parsedBy + ")") : ""), "ingest", 100);
         } catch (error) {
           removePendingSource(pendingId);
+          failedCount += 1;
           setError(error?.message || (t("studio.err_file_parse", "File parse failed: {name}", { name: file.name })));
           pushClientLog(t("studio.log_import_failed", "Import failed: {name} - {error}", { name: file.name, error: error?.message || "unknown" }), "ingest");
         }
       }
-      setStatus("ready");
-      setMeta(t("studio.meta_file_done", "File import completed. Selected: {value}", { value: state.selectedSources.length }));
-      setProgress(100, t("studio.progress_file_done", "File import completed"));
+      if (failedCount > 0) {
+        const ratio = Math.round((successCount / Math.max(list.length, 1)) * 100);
+        setStatus("error");
+        setMeta(`File import completed with errors. Success: ${successCount}, Failed: ${failedCount}`);
+        setProgress(Math.max(5, ratio), `File import partially failed (${failedCount}/${list.length})`);
+      } else {
+        setStatus("ready");
+        setMeta(t("studio.meta_file_done", "File import completed. Selected: {value}", { value: state.selectedSources.length }));
+        setProgress(100, t("studio.progress_file_done", "File import completed"));
+      }
     }
 
     function closeJobChannels() {
