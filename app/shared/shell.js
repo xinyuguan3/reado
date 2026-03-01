@@ -2,6 +2,7 @@ import {
   getCurrentLanguage,
   listLanguages,
   onLanguageChange,
+  setLanguage,
   t
 } from "/shared/i18n.js";
 import { initReadoAutoTranslate } from "/shared/auto-translate.js";
@@ -24,6 +25,8 @@ const ICON_FALLBACK_MAP = {
   storefront: "🛍",
   person: "👤",
   language: "🌐",
+  expand_more: "▾",
+  check: "✓",
   diamond: "💎",
   workspace_premium: "⭐"
 };
@@ -52,9 +55,6 @@ const DEFAULT_DEEPSEEK_ENDPOINT = "https://api.deepseek.com/chat/completions";
 const FALLBACK_AVATAR_DATA_URI = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23135bec'/%3E%3Cstop offset='100%25' stop-color='%2300eaff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='96' height='96' rx='48' fill='url(%23g)'/%3E%3Ccircle cx='48' cy='38' r='18' fill='rgba(255,255,255,0.92)'/%3E%3Cpath d='M18 84c4-16 16-24 30-24s26 8 30 24' fill='rgba(255,255,255,0.92)'/%3E%3C/svg%3E";
 const FALLBACK_IMAGE_DATA_URI = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 360'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%230f172a'/%3E%3Cstop offset='100%25' stop-color='%23135bec'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='640' height='360' fill='url(%23bg)'/%3E%3Ccircle cx='220' cy='140' r='50' fill='rgba(255,255,255,0.2)'/%3E%3Cpath d='M112 290c34-56 76-84 126-84s92 28 126 84' fill='rgba(255,255,255,0.22)'/%3E%3Cpath d='M438 128l44 44 78-78' stroke='rgba(255,255,255,0.65)' stroke-width='16' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ctext x='320' y='326' text-anchor='middle' fill='rgba(255,255,255,0.84)' font-family='Arial,sans-serif' font-size='24'%3EImage unavailable%3C/text%3E%3C/svg%3E";
 const BILLING_MODAL_ID = "reado-billing-modal";
-const ACCESS_WAITLIST_EMAIL_KEY = "reado_waitlist_email_v1";
-const ACCESS_INVITE_CODE_KEY = "reado_invite_code_v1";
-const ACCESS_SLOT_UNLOCKED_KEY = "reado_generation_slot_unlocked_v1";
 const AUTH_STATE_KEY = "reado_auth_state_v1";
 const AUTH_PAGE_PATH = "/pages/auth.html";
 const UMAMI_SCRIPT_ID = "reado-umami-script";
@@ -106,9 +106,9 @@ const BILLING_PLAN_COPY = {
   },
   annual: {
     starter: {
-      price: "$150",
-      unit: "/ year",
-      subtitle: "Equivalent to $12.5 / month",
+      price: "$12.50",
+      unit: "/ month",
+      subtitle: "Billed annually ($150 / year)",
       cta: "Upgrade",
       featured: false,
       features: [
@@ -121,7 +121,7 @@ const BILLING_PLAN_COPY = {
     trial: {
       price: "7-Day Free",
       unit: "",
-      subtitle: "then $150 / year",
+      subtitle: "then $12.50 / month (billed annually)",
       cta: "Get started for free",
       featured: true,
       badge: "Free trial",
@@ -133,9 +133,9 @@ const BILLING_PLAN_COPY = {
       ]
     },
     pro: {
-      price: "$1500",
-      unit: "/ year",
-      subtitle: "Equivalent to $125 / month",
+      price: "$125",
+      unit: "/ month",
+      subtitle: "Billed annually ($1500 / year)",
       cta: "Upgrade",
       featured: false,
       features: [
@@ -458,73 +458,56 @@ function createBillingModal(options = {}) {
   modal.className = "reado-billing-modal";
   modal.innerHTML = `
     <div class="reado-billing-overlay" data-billing-close></div>
-    <section class="reado-billing-panel reado-access-panel" role="dialog" aria-modal="true" aria-labelledby="reado-billing-title">
+    <section class="reado-billing-panel" role="dialog" aria-modal="true" aria-labelledby="reado-billing-title">
       <button class="reado-billing-close" type="button" aria-label="${t("billing.close", "Close")}" data-billing-close>✕</button>
       <header class="reado-billing-head">
-        <h3 id="reado-billing-title">Limited Book Generation Access</h3>
-        <p class="reado-billing-sub">We are currently facing a token shortage. Only a limited number of users can access book generation right now. Join the waitlist with your email and we will notify you as soon as a slot opens. If you have an invite code, you can unlock a slot immediately.</p>
+        <h3 id="reado-billing-title">Choose your plan</h3>
+        <p class="reado-billing-sub">Unlock more generation credits and advanced workflows.</p>
       </header>
-      <div class="reado-billing-main reado-access-main">
-        <section class="reado-access-section">
-          <h4>Join the Waitlist</h4>
-          <p class="reado-access-copy">Leave your email to reserve a spot in the queue.</p>
-          <div class="reado-access-row">
-            <input class="reado-access-input" type="email" placeholder="you@example.com" autocomplete="email" data-waitlist-email />
-            <button class="reado-billing-btn is-dark reado-access-btn" type="button" data-waitlist-submit>Register Waitlist</button>
-          </div>
-          <p class="reado-access-feedback" data-waitlist-feedback aria-live="polite"></p>
-        </section>
-        <section class="reado-access-section">
-          <label class="reado-access-toggle" for="reado-invite-toggle">
-            <input id="reado-invite-toggle" type="checkbox" data-invite-toggle />
-            <span>I have an invite code</span>
-          </label>
-          <div class="reado-access-invite" data-invite-panel hidden>
-            <div class="reado-access-row">
-              <input class="reado-access-input" type="text" placeholder="Enter invite code" autocomplete="off" data-invite-code />
-              <button class="reado-billing-btn is-dark reado-access-btn" type="button" data-invite-submit>Join with Code</button>
-            </div>
-          </div>
-          <p class="reado-access-feedback" data-invite-feedback aria-live="polite"></p>
-        </section>
+      <div class="reado-billing-main">
+        <div class="reado-billing-cycle">
+          <button class="reado-billing-cycle-btn is-active" type="button" data-billing-cycle="monthly">Monthly</button>
+          <button class="reado-billing-cycle-btn" type="button" data-billing-cycle="annual">Annual</button>
+        </div>
+        <div class="reado-billing-cards" data-billing-cards></div>
+        <p class="reado-billing-hint" data-billing-hint>Annual plans are shown as monthly equivalent and billed yearly.</p>
       </div>
-      <footer class="reado-billing-foot reado-access-foot">
+      <footer class="reado-billing-foot">
         <div class="reado-billing-status-wrap">
-          <p class="reado-billing-label">Access Status</p>
-          <p class="reado-billing-status" data-billing-status>Waitlist Open</p>
-          <p class="reado-billing-meta" data-billing-period>Invite code users can unlock instantly.</p>
-          <p class="reado-billing-meta" data-billing-updated>We will notify waitlist users by email when capacity opens.</p>
+          <p class="reado-billing-label">Subscription Status</p>
+          <p class="reado-billing-status" data-billing-status>Not subscribed</p>
+          <p class="reado-billing-meta" data-billing-period>Sign in to subscribe.</p>
+          <p class="reado-billing-meta" data-billing-updated></p>
+          <p class="reado-billing-error" data-billing-error></p>
+        </div>
+        <div class="reado-billing-actions">
+          <button class="reado-billing-btn" type="button" data-billing-refresh>Refresh</button>
+          <button class="reado-billing-btn is-dark" type="button" data-billing-portal>Manage Subscription</button>
         </div>
       </footer>
     </section>`;
 
-  const waitlistEmailInput = modal.querySelector("[data-waitlist-email]");
-  const waitlistFeedbackEl = modal.querySelector("[data-waitlist-feedback]");
-  const waitlistSubmitBtn = modal.querySelector("[data-waitlist-submit]");
-  const inviteToggle = modal.querySelector("[data-invite-toggle]");
-  const invitePanel = modal.querySelector("[data-invite-panel]");
-  const inviteCodeInput = modal.querySelector("[data-invite-code]");
-  const inviteSubmitBtn = modal.querySelector("[data-invite-submit]");
-  const inviteFeedbackEl = modal.querySelector("[data-invite-feedback]");
+  const cardsEl = modal.querySelector("[data-billing-cards]");
+  const cycleButtons = Array.from(modal.querySelectorAll("[data-billing-cycle]"));
+  const hintEl = modal.querySelector("[data-billing-hint]");
   const statusEl = modal.querySelector("[data-billing-status]");
-  const current = { subscriptionActive: false };
-
-  const setFeedback = (el, message, isError) => {
-    if (!el) return;
-    el.textContent = message || "";
-    el.classList.toggle("is-error", Boolean(isError));
-    el.classList.toggle("is-success", Boolean(message) && !isError);
+  const periodEl = modal.querySelector("[data-billing-period]");
+  const updatedEl = modal.querySelector("[data-billing-updated]");
+  const errorEl = modal.querySelector("[data-billing-error]");
+  const refreshBtn = modal.querySelector("[data-billing-refresh]");
+  const portalBtn = modal.querySelector("[data-billing-portal]");
+  const current = {
+    subscriptionActive: false,
+    status: "none",
+    priceId: "",
+    currentPeriodEnd: 0,
+    updatedAt: "",
+    checkoutEnabled: false,
+    prices: { monthly: {}, annual: {} }
   };
-
-  const isValidEmail = (value) => {
-    const trimmed = String(value || "").trim();
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed);
-  };
-
-  const setInvitePanelVisibility = (show) => {
-    if (!invitePanel) return;
-    invitePanel.hidden = !show;
-  };
+  let selectedCycle = "monthly";
+  let loading = false;
+  let errorMessage = "";
 
   const updateStatus = (text, active = false) => {
     if (!statusEl) return;
@@ -532,31 +515,153 @@ function createBillingModal(options = {}) {
     statusEl.classList.toggle("is-active", active);
   };
 
-  const handleWaitlistSubmit = () => {
-    const email = String(waitlistEmailInput?.value || "").trim();
-    if (!isValidEmail(email)) {
-      setFeedback(waitlistFeedbackEl, "Please enter a valid email address.", true);
-      return;
-    }
-    localStorage.setItem(ACCESS_WAITLIST_EMAIL_KEY, email);
-    setFeedback(waitlistFeedbackEl, "You are on the waitlist. We will notify you as soon as a slot opens.", false);
-    updateStatus("Waitlist Confirmed", false);
+  const isPlanCurrent = (priceId) => {
+    return Boolean(priceId) && current.subscriptionActive && current.priceId === priceId;
   };
 
-  const handleInviteSubmit = () => {
-    const inviteCode = String(inviteCodeInput?.value || "").trim();
-    if (!inviteCode) {
-      setFeedback(inviteFeedbackEl, "Please enter an invite code.", true);
+  const setLoading = (nextLoading) => {
+    loading = Boolean(nextLoading);
+    if (refreshBtn) refreshBtn.disabled = loading;
+    if (portalBtn) portalBtn.disabled = loading || !current.subscriptionActive;
+  };
+
+  const renderCards = () => {
+    if (!cardsEl) return;
+    const cyclePlans = BILLING_PLAN_COPY[selectedCycle] || {};
+    const cyclePrices = current.prices?.[selectedCycle] || {};
+    cardsEl.innerHTML = BILLING_PLAN_ORDER.map((planId) => {
+      const plan = cyclePlans[planId] || {};
+      const priceId = String(cyclePrices?.[planId] || "").trim();
+      const currentPlan = isPlanCurrent(priceId);
+      const unavailable = !priceId || !current.checkoutEnabled;
+      const ctaText = currentPlan
+        ? "Current plan"
+        : unavailable
+          ? "Unavailable"
+          : (plan.cta || "Upgrade");
+      const featured = Boolean(plan.featured);
+      const disabled = loading || unavailable || currentPlan;
+      const features = Array.isArray(plan.features) ? plan.features : [];
+      return `
+        <article class="reado-plan-card${featured ? " is-featured" : ""}${currentPlan ? " is-current" : ""}">
+          ${plan.badge ? `<span class="reado-plan-badge">${escapeHtml(plan.badge)}</span>` : ""}
+          <div class="reado-plan-price-row">
+            <strong class="reado-plan-price">${escapeHtml(plan.price || "-")}</strong>
+            <span class="reado-plan-unit">${escapeHtml(plan.unit || "")}</span>
+          </div>
+          <p class="reado-plan-subtitle">${escapeHtml(plan.subtitle || "")}</p>
+          <button
+            class="reado-plan-cta${featured ? " is-featured" : ""}"
+            type="button"
+            data-plan-checkout
+            data-plan-id="${planId}"
+            ${priceId ? `data-price-id="${escapeHtml(priceId)}"` : ""}
+            ${disabled ? "disabled" : ""}>${escapeHtml(ctaText)}</button>
+          <ul class="reado-plan-features">${features.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+        </article>`;
+    }).join("");
+  };
+
+  const renderSummary = () => {
+    cycleButtons.forEach((node) => {
+      node.classList.toggle("is-active", String(node.dataset.billingCycle) === selectedCycle);
+    });
+    const isActive = Boolean(current.subscriptionActive);
+    const statusText = isActive ? "Active" : "Not subscribed";
+    updateStatus(statusText, isActive);
+    if (periodEl) {
+      periodEl.textContent = isActive && current.currentPeriodEnd > 0
+        ? `Renews at ${formatTimestamp(current.currentPeriodEnd)}`
+        : "Sign in to subscribe and unlock Pro benefits.";
+    }
+    if (updatedEl) {
+      updatedEl.textContent = current.updatedAt
+        ? `Last synced: ${new Date(current.updatedAt).toLocaleString(getCurrentLanguage())}`
+        : "";
+    }
+    if (errorEl) errorEl.textContent = errorMessage;
+    if (hintEl) {
+      hintEl.classList.toggle("is-error", Boolean(errorMessage));
+      hintEl.textContent = errorMessage
+        ? "Unable to load live billing data. You can still review plans."
+        : "Annual plans are shown as monthly equivalent and billed yearly.";
+    }
+    renderCards();
+  };
+
+  const refreshStatus = async () => {
+    setLoading(true);
+    errorMessage = "";
+    try {
+      const [subscriptionData, pricingData] = await Promise.all([
+        requestJson("GET", "/api/billing/subscription"),
+        requestJson("GET", "/api/billing/pricing-table")
+      ]);
+      const billing = subscriptionData?.billing || {};
+      current.subscriptionActive = Boolean(billing.subscriptionActive);
+      current.status = String(billing.status || "none");
+      current.priceId = String(billing.priceId || "");
+      current.currentPeriodEnd = Number(billing.currentPeriodEnd) || 0;
+      current.updatedAt = String(billing.updatedAt || "");
+      current.checkoutEnabled = Boolean(pricingData?.checkout?.enabled);
+      current.prices = pricingData?.checkout?.prices && typeof pricingData.checkout.prices === "object"
+        ? pricingData.checkout.prices
+        : { monthly: {}, annual: {} };
+
+      const selectedHasPrice = Object.values(current.prices?.[selectedCycle] || {}).some((item) => Boolean(item));
+      if (!selectedHasPrice) {
+        const monthlyHasPrice = Object.values(current.prices?.monthly || {}).some((item) => Boolean(item));
+        const annualHasPrice = Object.values(current.prices?.annual || {}).some((item) => Boolean(item));
+        if (monthlyHasPrice) selectedCycle = "monthly";
+        else if (annualHasPrice) selectedCycle = "annual";
+      }
+    } catch (error) {
+      errorMessage = error?.message || "Failed to load billing status.";
+    } finally {
+      setLoading(false);
+      renderSummary();
+      if (typeof options.onStatusChange === "function") {
+        options.onStatusChange(current);
+      }
+    }
+  };
+
+  const startCheckout = async (priceId) => {
+    if (!priceId) return;
+    if (!isUserSignedIn()) {
+      window.location.assign(buildAuthRedirectUrl(priceId));
       return;
     }
-    if (inviteCode.length < 4) {
-      setFeedback(inviteFeedbackEl, "Invite code looks too short. Please check and try again.", true);
-      return;
+    setLoading(true);
+    errorMessage = "";
+    renderSummary();
+    try {
+      const result = await requestJson("POST", "/api/billing/checkout", { priceId });
+      const checkoutUrl = String(result?.checkoutUrl || "").trim();
+      if (!checkoutUrl) throw new Error("Stripe checkout URL is empty");
+      window.location.assign(checkoutUrl);
+    } catch (error) {
+      setLoading(false);
+      errorMessage = error?.message || "Checkout failed.";
+      renderSummary();
     }
-    localStorage.setItem(ACCESS_INVITE_CODE_KEY, inviteCode);
-    localStorage.setItem(ACCESS_SLOT_UNLOCKED_KEY, "1");
-    setFeedback(inviteFeedbackEl, "Invite code accepted. Your generation slot is now unlocked.", false);
-    updateStatus("Slot Unlocked", true);
+  };
+
+  const openPortal = async () => {
+    if (!current.subscriptionActive) return;
+    setLoading(true);
+    errorMessage = "";
+    renderSummary();
+    try {
+      const result = await requestJson("POST", "/api/billing/portal");
+      const portalUrl = String(result?.portalUrl || "").trim();
+      if (!portalUrl) throw new Error("Stripe portal URL is empty");
+      window.location.assign(portalUrl);
+    } catch (error) {
+      setLoading(false);
+      errorMessage = error?.message || "Unable to open billing portal.";
+      renderSummary();
+    }
   };
 
   const close = () => {
@@ -567,6 +672,7 @@ function createBillingModal(options = {}) {
   const open = () => {
     modal.classList.add("open");
     document.body.classList.add("reado-modal-open");
+    refreshStatus();
   };
 
   modal.addEventListener("click", (event) => {
@@ -576,95 +682,36 @@ function createBillingModal(options = {}) {
       close();
       return;
     }
-    if (target.closest("[data-waitlist-submit]")) {
-      handleWaitlistSubmit();
+    const cycleBtn = target.closest("[data-billing-cycle]");
+    if (cycleBtn instanceof HTMLElement) {
+      const next = String(cycleBtn.dataset.billingCycle || "").trim();
+      if (next === "monthly" || next === "annual") {
+        selectedCycle = next;
+        cycleButtons.forEach((node) => node.classList.toggle("is-active", node === cycleBtn));
+        renderCards();
+      }
       return;
     }
-    if (target.closest("[data-invite-submit]")) {
-      handleInviteSubmit();
+    const checkoutBtn = target.closest("[data-plan-checkout]");
+    if (checkoutBtn instanceof HTMLElement) {
+      const priceId = String(checkoutBtn.dataset.priceId || "").trim();
+      startCheckout(priceId);
       return;
+    }
+    if (target.closest("[data-billing-refresh]")) {
+      refreshStatus();
+      return;
+    }
+    if (target.closest("[data-billing-portal]")) {
+      openPortal();
     }
   });
-
-  if (waitlistSubmitBtn) {
-    waitlistSubmitBtn.addEventListener("keydown", (event) => {
-      if (event.key === "Enter" || event.key === " ") {
-        event.preventDefault();
-        handleWaitlistSubmit();
-      }
-    });
-  }
-
-  if (waitlistEmailInput) {
-    waitlistEmailInput.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        event.preventDefault();
-        handleWaitlistSubmit();
-      }
-    });
-  }
-
-  if (inviteSubmitBtn) {
-    inviteSubmitBtn.addEventListener("keydown", (event) => {
-      if (event.key === "Enter" || event.key === " ") {
-        event.preventDefault();
-        handleInviteSubmit();
-      }
-    });
-  }
-
-  if (inviteCodeInput) {
-    inviteCodeInput.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        event.preventDefault();
-        handleInviteSubmit();
-      }
-    });
-  }
-
-  if (inviteToggle) {
-    inviteToggle.addEventListener("change", () => {
-      const checked = Boolean(inviteToggle.checked);
-      setInvitePanelVisibility(checked);
-      if (checked && inviteCodeInput) {
-        inviteCodeInput.focus();
-      }
-    });
-  }
 
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
       close();
     }
   });
-
-  const savedEmail = String(localStorage.getItem(ACCESS_WAITLIST_EMAIL_KEY) || "").trim();
-  if (savedEmail && waitlistEmailInput) {
-    waitlistEmailInput.value = savedEmail;
-  }
-
-  const savedInviteCode = String(localStorage.getItem(ACCESS_INVITE_CODE_KEY) || "").trim();
-  if (savedInviteCode) {
-    if (inviteToggle instanceof HTMLInputElement) {
-      inviteToggle.checked = true;
-    }
-    setInvitePanelVisibility(true);
-    if (inviteCodeInput) inviteCodeInput.value = savedInviteCode;
-  }
-
-  if (localStorage.getItem(ACCESS_SLOT_UNLOCKED_KEY) === "1") {
-    updateStatus("Slot Unlocked", true);
-    setFeedback(inviteFeedbackEl, "Invite code accepted. Your generation slot is now unlocked.", false);
-  } else if (savedEmail) {
-    updateStatus("Waitlist Confirmed", false);
-    setFeedback(waitlistFeedbackEl, "You are on the waitlist. We will notify you as soon as a slot opens.", false);
-  }
-
-  const refreshStatus = () => {
-    if (typeof options.onStatusChange === "function") {
-      options.onStatusChange(current);
-    }
-  };
 
   refreshStatus();
   return { modal, open, close, refreshStatus, getCurrent: () => current };
@@ -791,6 +838,7 @@ function ensureIconFont() {
 
   bindLink(ICON_FONT_ID, "https://fonts.googleapis.com/icon?family=Material+Icons");
   bindLink(ICON_FONT_SYMBOLS_ID, "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap");
+  setTimeout(markReady, 2600);
 }
 
 function resolveFallbackIconGlyph(iconName) {
@@ -800,7 +848,7 @@ function resolveFallbackIconGlyph(iconName) {
 
 function applyIconFallback(root = document) {
   const host = root && typeof root.querySelectorAll === "function" ? root : document;
-  const useFallback = true;
+  const useFallback = window.__readoIconFontReady === false;
   if (document.body) {
     document.body.classList.toggle("reado-shell-icons-fallback", useFallback);
   }
@@ -891,7 +939,7 @@ function ensureGlobalStyle() {
       box-shadow: 0 8px 30px rgba(2, 8, 20, 0.42);
       justify-content: flex-end;
       gap: 8px;
-      overflow: hidden;
+      overflow: visible;
     }
     body.reado-shell-applied .reado-shell-brand {
       display: inline-flex;
@@ -906,23 +954,36 @@ function ensureGlobalStyle() {
       display: none;
     }
     body.reado-shell-applied .reado-shell-brand-icon {
-      width: 38px;
-      height: 38px;
-      border-radius: 999px;
-      background: var(--reado-primary);
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      border: 1px solid rgba(88, 173, 255, 0.38);
+      background: rgba(19, 91, 236, 0.16);
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 0 20px rgba(19, 91, 236, 0.5);
-      font-size: 18px;
-      font-weight: 900;
+      color: #aecdff;
+      font-family: "Material Icons";
+      font-size: 20px;
+      line-height: 1;
+      font-weight: 400;
+      letter-spacing: normal;
+      text-transform: none;
+      white-space: nowrap;
+      overflow: hidden;
+      -webkit-font-feature-settings: "liga";
+      font-feature-settings: "liga";
+      -webkit-font-smoothing: antialiased;
     }
     body.reado-shell-applied .reado-shell-right {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       min-width: 0;
+      flex: 1 1 auto;
+      justify-content: flex-end;
       flex-wrap: nowrap;
+      overflow: visible;
     }
     body.reado-shell-applied.reado-experience-mode .reado-shell-right {
       gap: 8px;
@@ -959,59 +1020,113 @@ function ensureGlobalStyle() {
       overflow: hidden;
       white-space: nowrap;
     }
-    body.reado-shell-applied .reado-shell-pill.streak { color: #ffb35a; }
-    body.reado-shell-applied .reado-shell-pill.gems {
-      color: #00eaff;
-      border-color: rgba(0, 234, 255, 0.28);
-      background: rgba(0, 234, 255, 0.08);
-    }
-    body.reado-shell-applied .reado-shell-pill.gems .reado-shell-pill-icon {
-      color: #00eaff;
-    }
     body.reado-shell-applied .reado-shell-pill.pro {
       cursor: pointer;
-      color: #ffe9a8;
-      border-color: rgba(255, 214, 102, 0.42);
-      background: linear-gradient(135deg, rgba(255, 214, 102, 0.2), rgba(212, 139, 24, 0.2));
+      color: #dbe9ff;
+      border-color: rgba(88, 173, 255, 0.35);
+      background: rgba(19, 91, 236, 0.14);
       transition: transform 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
     }
     body.reado-shell-applied .reado-shell-pill.pro .reado-shell-pill-icon {
-      color: #ffd666;
+      color: #aecdff;
     }
     body.reado-shell-applied .reado-shell-pill.pro:hover {
       transform: translateY(-1px);
-      border-color: rgba(255, 224, 148, 0.72);
-      box-shadow: 0 0 0 2px rgba(255, 214, 102, 0.18);
+      border-color: rgba(152, 205, 255, 0.78);
+      box-shadow: 0 0 0 2px rgba(88, 173, 255, 0.2);
     }
     body.reado-shell-applied .reado-shell-pill.flash {
       animation: reado-shell-pop .45s ease;
     }
     body.reado-shell-applied .reado-shell-lang {
+      position: relative;
+      display: inline-flex;
+      min-width: 0;
+      flex: 0 0 auto;
+    }
+    body.reado-shell-applied .reado-shell-lang-btn {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      flex: 0 1 auto;
-      min-width: 0;
-      border: 1px solid var(--reado-border);
-      border-radius: 999px;
-      padding: 4px 10px;
-      background: rgba(16, 22, 34, 0.72);
+      min-height: 34px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 10px;
+      background: rgba(16, 22, 34, 0.78);
       color: #dbe6f9;
-      font-size: 11px;
+      padding: 6px 10px;
+      font-size: 12px;
       font-weight: 700;
+      cursor: pointer;
+      transition: border-color 120ms ease, background 120ms ease;
     }
-    body.reado-shell-applied .reado-shell-lang select {
+    body.reado-shell-applied .reado-shell-lang-btn:hover {
+      border-color: rgba(152, 205, 255, 0.58);
+      background: rgba(19, 91, 236, 0.16);
+    }
+    body.reado-shell-applied .reado-shell-lang-btn[aria-expanded="true"] {
+      border-color: rgba(152, 205, 255, 0.72);
+      background: rgba(19, 91, 236, 0.2);
+    }
+    body.reado-shell-applied .reado-shell-lang-label {
+      min-width: 68px;
+      text-align: left;
+      white-space: nowrap;
+    }
+    body.reado-shell-applied .reado-shell-lang-caret {
+      font-family: "Material Icons";
+      font-size: 18px;
+      line-height: 1;
+      transition: transform 120ms ease;
+    }
+    body.reado-shell-applied .reado-shell-lang.open .reado-shell-lang-caret {
+      transform: rotate(180deg);
+    }
+    body.reado-shell-applied .reado-shell-lang-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      min-width: 170px;
+      max-height: min(360px, 64vh);
+      overflow-y: auto;
+      display: grid;
+      gap: 2px;
+      padding: 6px;
+      border-radius: 12px;
+      border: 1px solid rgba(152, 205, 255, 0.32);
+      background: rgba(8, 14, 26, 0.96);
+      box-shadow: 0 12px 32px rgba(2, 8, 20, 0.5);
+      z-index: 10020;
+    }
+    body.reado-shell-applied .reado-shell-lang-menu[hidden] {
+      display: none !important;
+    }
+    body.reado-shell-applied .reado-shell-lang-item {
       border: 0;
-      outline: 0;
+      border-radius: 8px;
+      padding: 8px 10px;
       background: transparent;
       color: #dbe6f9;
-      font-size: 11px;
-      font-weight: 700;
-      min-width: 96px;
-      max-width: 120px;
+      font-size: 12px;
+      font-weight: 600;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      cursor: pointer;
+      width: 100%;
     }
-    body.reado-shell-applied .reado-shell-lang option {
-      color: #0f172a;
+    body.reado-shell-applied .reado-shell-lang-item:hover {
+      background: rgba(152, 205, 255, 0.16);
+    }
+    body.reado-shell-applied .reado-shell-lang-item.active {
+      background: rgba(19, 91, 236, 0.26);
+      color: #ffffff;
+    }
+    body.reado-shell-applied .reado-shell-lang-check {
+      font-family: "Material Icons";
+      font-size: 16px;
+      line-height: 1;
     }
     body.reado-shell-applied .reado-shell-gain-hint {
       position: fixed;
@@ -1044,9 +1159,12 @@ function ensureGlobalStyle() {
     body.reado-shell-applied .reado-shell-user {
       display: inline-flex;
       align-items: center;
-      gap: 10px;
-      padding-left: 10px;
+      gap: 8px;
+      padding-left: 8px;
       border-left: 1px solid rgba(255, 255, 255, 0.12);
+      min-width: 0;
+      flex: 0 1 220px;
+      max-width: 220px;
     }
     body.reado-shell-applied.reado-experience-mode .reado-shell-user {
       padding-left: 0;
@@ -1055,13 +1173,18 @@ function ensureGlobalStyle() {
     body.reado-shell-applied .reado-shell-user-meta {
       line-height: 1.1;
       text-align: right;
-      min-width: 170px;
+      min-width: 0;
+      max-width: 200px;
+      flex: 1 1 auto;
     }
     body.reado-shell-applied .reado-shell-user-name {
       display: block;
       font-size: 13px;
       font-weight: 700;
       color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     body.reado-shell-applied .reado-shell-user-level {
       display: block;
@@ -1069,6 +1192,9 @@ function ensureGlobalStyle() {
       font-size: 11px;
       color: #9ca9bf;
       font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     body.reado-shell-applied .reado-shell-xp-label {
       margin-top: 4px;
@@ -1076,10 +1202,14 @@ function ensureGlobalStyle() {
       color: #8fb7ff;
       font-weight: 700;
       letter-spacing: .01em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     body.reado-shell-applied .reado-shell-xp-track {
       margin-top: 5px;
-      width: 170px;
+      width: 100%;
+      max-width: 170px;
       height: 5px;
       border-radius: 999px;
       background: rgba(15, 23, 42, 0.7);
@@ -1140,9 +1270,6 @@ function ensureGlobalStyle() {
       background: rgba(0, 234, 255, 0.12);
     }
     body.reado-shell-applied.reado-experience-mode .reado-shell-user-meta {
-      display: none;
-    }
-    body.reado-shell-applied.reado-experience-mode .reado-shell-pill.streak {
       display: none;
     }
     body.reado-shell-applied .reado-shell-toggle {
@@ -1239,7 +1366,10 @@ function ensureGlobalStyle() {
       color: #1e78ff;
     }
     body.reado-shell-applied.reado-shell-icons-fallback .reado-shell-link-icon,
-    body.reado-shell-applied.reado-shell-icons-fallback .reado-shell-pill-icon {
+    body.reado-shell-applied.reado-shell-icons-fallback .reado-shell-pill-icon,
+    body.reado-shell-applied.reado-shell-icons-fallback .reado-shell-brand-icon,
+    body.reado-shell-applied.reado-shell-icons-fallback .reado-shell-lang-caret,
+    body.reado-shell-applied.reado-shell-icons-fallback .reado-shell-lang-check {
       font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
       font-size: 16px;
       font-weight: 600;
@@ -1796,8 +1926,21 @@ function ensureGlobalStyle() {
       body.reado-shell-applied .reado-shell-side { transform: translateX(-100%); }
       body.reado-shell-applied .reado-shell-side.open { transform: translateX(0); }
       body.reado-shell-applied .reado-shell-user-meta,
-      body.reado-shell-applied .reado-shell-pill { display: none; }
-      body.reado-shell-applied .reado-shell-lang select { min-width: 78px; }
+      body.reado-shell-applied .reado-shell-pro { display: none; }
+      body.reado-shell-applied .reado-shell-lang-label { min-width: 0; }
+    }
+    @media (max-width: 1360px) {
+      body.reado-shell-applied .reado-shell-user {
+        flex-basis: 210px;
+        max-width: 210px;
+      }
+      body.reado-shell-applied .reado-shell-user-meta {
+        max-width: 150px;
+      }
+      body.reado-shell-applied .reado-shell-xp-label,
+      body.reado-shell-applied .reado-shell-xp-track {
+        display: none;
+      }
     }
     @media (max-width: 900px) {
       body.reado-shell-applied:not(.reado-experience-mode) {
@@ -1930,10 +2073,6 @@ function ensureGlobalStyle() {
       }
       body.reado-shell-applied.reado-experience-mode .reado-shell-lang {
         display: none;
-      }
-      body.reado-shell-applied.reado-experience-mode .reado-shell-pill.gems {
-        padding: 5px 8px;
-        font-size: 11px;
       }
       body.reado-shell-applied.reado-experience-mode .reado-shell-avatar {
         width: 34px;
@@ -2383,29 +2522,25 @@ class ReadoAppShell extends HTMLElement {
     top.className = "reado-shell-top";
     top.innerHTML = `
       <a class="reado-shell-brand" href="/pages/gamified-learning-hub-dashboard-1.html">
-        <span class="reado-shell-brand-icon">📘</span>
+        <span class="reado-shell-brand-icon" data-icon-name="auto_stories">auto_stories</span>
         <span>reado</span>
       </a>
       <div class="reado-shell-right">
-        <label class="reado-shell-lang">
-          <span class="reado-shell-pill-icon" data-icon-name="language">${resolveFallbackIconGlyph("language")}</span>
-          <select data-shell-lang></select>
-        </label>
-        <span class="reado-shell-pill streak">🔥 <strong data-shell-streak></strong></span>
-        <span class="reado-shell-pill gems" data-href="${GEM_CENTER_HREF}">
-          <span class="reado-shell-pill-icon" data-icon-name="diamond">${resolveFallbackIconGlyph("diamond")}</span>
-          <strong data-shell-gems>0</strong>
-        </span>
-        <button class="reado-shell-pill pro" type="button" data-open-billing>
-          <span class="reado-shell-pill-icon" data-icon-name="workspace_premium">${resolveFallbackIconGlyph("workspace_premium")}</span>
+        <div class="reado-shell-lang" data-shell-lang-wrap>
+          <button class="reado-shell-lang-btn" type="button" data-shell-lang-toggle aria-expanded="false" aria-haspopup="listbox" aria-label="${t("shell.language", "Language")}">
+            <span class="reado-shell-pill-icon" data-icon-name="language">language</span>
+            <span class="reado-shell-lang-label" data-shell-lang-label></span>
+            <span class="reado-shell-lang-caret" data-icon-name="expand_more">expand_more</span>
+          </button>
+          <div class="reado-shell-lang-menu" data-shell-lang-menu role="listbox" hidden></div>
+        </div>
+        <button class="reado-shell-pill pro reado-shell-pro" type="button" data-open-billing>
           <strong data-shell-pro-label>${t("billing.subscribe_short", "Subscribe Pro")}</strong>
         </button>
         <div class="reado-shell-user">
           <div class="reado-shell-user-meta">
             <span class="reado-shell-user-name" data-shell-name></span>
             <span class="reado-shell-user-level" data-shell-level></span>
-            <span class="reado-shell-xp-label" data-shell-xp-label></span>
-            <span class="reado-shell-xp-track" data-shell-xp-track><span data-shell-xp-bar></span></span>
           </div>
           <span class="reado-shell-avatar" data-href="/pages/gamified-learning-hub-dashboard-2.html"><img data-shell-avatar src="" alt="avatar" /></span>
         </div>
@@ -2413,39 +2548,20 @@ class ReadoAppShell extends HTMLElement {
         <button class="reado-shell-toggle" type="button" aria-label="${t("shell.toggle_menu", "Toggle menu")}">☰</button>
       </div>`;
 
-    const streakEl = top.querySelector("[data-shell-streak]");
-    const gemsEl = top.querySelector("[data-shell-gems]");
     const nameEl = top.querySelector("[data-shell-name]");
     const levelEl = top.querySelector("[data-shell-level]");
-    const xpLabelEl = top.querySelector("[data-shell-xp-label]");
-    const xpTrackEl = top.querySelector("[data-shell-xp-track]");
-    const xpBarEl = top.querySelector("[data-shell-xp-bar]");
     const avatarEl = top.querySelector("[data-shell-avatar]");
-    const gemsPillEl = top.querySelector(".reado-shell-pill.gems");
     const proLabelEl = top.querySelector("[data-shell-pro-label]");
-    const langSelectEl = top.querySelector("[data-shell-lang]");
+    const langWrapEl = top.querySelector("[data-shell-lang-wrap]");
+    const langToggleEl = top.querySelector("[data-shell-lang-toggle]");
+    const langLabelEl = top.querySelector("[data-shell-lang-label]");
+    const langMenuEl = top.querySelector("[data-shell-lang-menu]");
 
-    const renderUser = (state, flash = false) => {
+    const renderUser = (state) => {
       const user = normalizeUserState(state);
-      const progress = getLevelProgress(user);
-      if (streakEl) streakEl.textContent = resolveStreakText(user);
-      if (gemsEl) gemsEl.textContent = formatNumber(user.gems);
       if (nameEl) nameEl.textContent = user.name;
       if (levelEl) levelEl.textContent = "Lv." + user.level + " " + (user.title || t("shell.learner", "学习者"));
-      if (xpLabelEl) xpLabelEl.textContent = t("shell.xp_to_next", "距离下一级还差 {xp} EXP", { xp: formatNumber(progress.remain) });
-      if (xpBarEl) xpBarEl.style.width = progress.percent + "%";
       if (avatarEl) avatarEl.src = user.avatar || FALLBACK_AVATAR_DATA_URI;
-
-      if (flash) {
-        if (gemsPillEl) {
-          gemsPillEl.classList.add("flash");
-          setTimeout(() => gemsPillEl.classList.remove("flash"), 420);
-        }
-        if (xpTrackEl) {
-          xpTrackEl.classList.add("flash");
-          setTimeout(() => xpTrackEl.classList.remove("flash"), 420);
-        }
-      }
     };
 
     if (avatarEl) {
@@ -2456,7 +2572,7 @@ class ReadoAppShell extends HTMLElement {
       });
     }
 
-    renderUser(readUserState(), false);
+    renderUser(readUserState());
     syncSignedInUser({ force: true }).finally(() => {
       refreshLiveProgress();
     });
@@ -2498,7 +2614,7 @@ class ReadoAppShell extends HTMLElement {
     window.addEventListener("reado:user-updated", (event) => {
       const detail = event?.detail || {};
       const gain = detail.gain || {};
-      renderUser(detail.state || readUserState(), true);
+      renderUser(detail.state || readUserState());
       if ((gain.gems || 0) > 0) {
         showGainHint(t("shell.gain_gems", "+{value} 宝石", { value: formatNumber(gain.gems) }), "gems");
       }
@@ -2540,14 +2656,17 @@ class ReadoAppShell extends HTMLElement {
     }
     const nav = document.createElement("nav");
     nav.className = "reado-shell-nav";
-    nav.innerHTML = ROUTES.map((route) => {
-      const active = route.id === page ? "active" : "";
-      const resolvedHref = route.href;
-      return `<a class="reado-shell-link ${active}" href="${resolvedHref}">
-        <span class="reado-shell-link-icon" data-icon-name="${route.icon}">${resolveFallbackIconGlyph(route.icon)}</span>
-        <span>${t(route.labelKey, route.label)}</span>
-      </a>`;
-    }).join("");
+    const renderNavLinks = () => {
+      nav.innerHTML = ROUTES.map((route) => {
+        const active = route.id === page ? "active" : "";
+        return `<a class="reado-shell-link ${active}" href="${route.href}">
+          <span class="reado-shell-link-icon" data-icon-name="${route.icon}">${route.icon}</span>
+          <span>${t(route.labelKey, route.label)}</span>
+        </a>`;
+      }).join("");
+      applyIconFallback(nav);
+    };
+    renderNavLinks();
     const weekly = document.createElement("section");
     weekly.className = "reado-shell-weekly";
     weekly.innerHTML = `
@@ -2766,28 +2885,88 @@ class ReadoAppShell extends HTMLElement {
       }
     };
 
-    if (langSelectEl) {
+    const closeLanguageMenu = () => {
+      if (langMenuEl) {
+        langMenuEl.hidden = true;
+        langMenuEl.setAttribute("hidden", "");
+      }
+      if (langWrapEl) langWrapEl.classList.remove("open");
+      if (langToggleEl) langToggleEl.setAttribute("aria-expanded", "false");
+    };
+    const openLanguageMenu = () => {
+      if (langMenuEl) {
+        langMenuEl.hidden = false;
+        langMenuEl.removeAttribute("hidden");
+      }
+      if (langWrapEl) langWrapEl.classList.add("open");
+      if (langToggleEl) langToggleEl.setAttribute("aria-expanded", "true");
+    };
+    const selectLanguage = (nextLang) => {
+      closeLanguageMenu();
+      if (!nextLang) return;
+      if (nextLang === getCurrentLanguage()) return;
+      setLanguage(nextLang);
+    };
+    const renderLanguageMenu = () => {
+      if (!langMenuEl || !langLabelEl || !langToggleEl) return;
       const langs = listLanguages();
-      langSelectEl.innerHTML = langs
-        .map((lang) => `<option value="${lang.code}">${lang.label}</option>`)
-        .join("");
-      langSelectEl.value = getCurrentLanguage();
-      langSelectEl.addEventListener("change", () => {
-        window.ReadoI18n?.setLanguage?.(langSelectEl.value);
-        renderUser(readUserState(), false);
+      const current = getCurrentLanguage();
+      const activeLang = langs.find((lang) => lang.code === current) || langs[0] || null;
+      langLabelEl.textContent = activeLang ? activeLang.label : current;
+      langToggleEl.setAttribute("aria-label", t("shell.language", "Language") + ": " + langLabelEl.textContent);
+      langMenuEl.setAttribute("aria-label", t("shell.language", "Language"));
+      langMenuEl.innerHTML = langs.map((lang) => {
+        const isActive = lang.code === current;
+        return `<button class="reado-shell-lang-item ${isActive ? "active" : ""}" type="button" role="option" aria-selected="${isActive ? "true" : "false"}" data-lang-code="${escapeHtml(lang.code)}">
+          <span>${escapeHtml(lang.label)}</span>
+          ${isActive ? '<span class="reado-shell-lang-check" data-icon-name="check">check</span>' : ""}
+        </button>`;
+      }).join("");
+      applyIconFallback(langMenuEl);
+    };
+    if (langWrapEl && langToggleEl && langMenuEl) {
+      renderLanguageMenu();
+      langToggleEl.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const shouldOpen = langMenuEl.hidden;
+        if (shouldOpen) {
+          openLanguageMenu();
+          return;
+        }
+        closeLanguageMenu();
+      });
+      langMenuEl.addEventListener("pointerdown", (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) return;
+        const option = target.closest("[data-lang-code]");
+        if (!option) return;
+        event.preventDefault();
+        const nextLang = option.getAttribute("data-lang-code");
+        selectLanguage(nextLang);
+      });
+      langMenuEl.addEventListener("click", (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) return;
+        const option = target.closest("[data-lang-code]");
+        if (!option) return;
+        const nextLang = option.getAttribute("data-lang-code");
+        selectLanguage(nextLang);
+      });
+      document.addEventListener("click", (event) => {
+        const target = event.target;
+        if (!(target instanceof Node)) return;
+        if (!langWrapEl.contains(target)) closeLanguageMenu();
+      });
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") closeLanguageMenu();
       });
     }
 
     onLanguageChange(() => {
-      renderUser(readUserState(), false);
-      nav.innerHTML = ROUTES.map((route) => {
-        const active = route.id === page ? "active" : "";
-        return `<a class="reado-shell-link ${active}" href="${route.href}">
-          <span class="reado-shell-link-icon" data-icon-name="${route.icon}">${resolveFallbackIconGlyph(route.icon)}</span>
-          <span>${t(route.labelKey, route.label)}</span>
-        </a>`;
-      }).join("");
-      applyIconFallback(nav);
+      renderUser(readUserState());
+      renderNavLinks();
+      renderLanguageMenu();
       weekly.querySelector("h4").textContent = t("shell.weekly_challenge", "每周挑战");
       weekly.querySelector("p").textContent = t("shell.weekly_goal", "阅读 3 章节历史书");
       weekly.querySelector("p[style]").textContent = t("shell.weekly_progress", "已完成 2/3");
@@ -2806,9 +2985,7 @@ class ReadoAppShell extends HTMLElement {
       if (exitBtn) exitBtn.textContent = t("shell.exit_experience", "退出体验");
       const toggleBtn = top.querySelector(".reado-shell-toggle");
       if (toggleBtn) toggleBtn.setAttribute("aria-label", t("shell.toggle_menu", "Toggle menu"));
-      if (langSelectEl) {
-        langSelectEl.value = getCurrentLanguage();
-      }
+      closeLanguageMenu();
       syncProLabel(billingModalApi.getCurrent());
     });
 

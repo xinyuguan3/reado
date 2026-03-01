@@ -12,6 +12,8 @@ const SKIP_TAGS = new Set(["SCRIPT", "STYLE", "NOSCRIPT", "TEXTAREA", "CODE", "P
 const CJK_RE = /[\u3400-\u9fff]/;
 const TRANSLATE_GATE_ATTR = "data-reado-translate-pending";
 const TRANSLATE_GATE_STYLE_ID = "reado-translate-gate-style";
+const NODE_TRANSLATE_GATE_ATTR = "data-reado-node-translate-pending";
+const NODE_TRANSLATE_GATE_STYLE_ID = "reado-node-translate-gate-style";
 
 let started = false;
 let enabled = false;
@@ -26,6 +28,7 @@ let cacheDirty = false;
 let cacheFlushTimer = 0;
 const inFlight = new Map();
 let gateReleased = false;
+let initialScanCompleted = false;
 
 function normalizeText(value) {
   return String(value || "").replace(/\s+/g, " ").trim();
@@ -37,6 +40,24 @@ function isEnglishLanguage(language) {
 
 function prepareGateState() {
   gateReleased = document.documentElement.getAttribute(TRANSLATE_GATE_ATTR) !== "1";
+}
+
+function ensureTranslationGate() {
+  gateReleased = false;
+  document.documentElement.setAttribute(TRANSLATE_GATE_ATTR, "1");
+  if (document.getElementById(TRANSLATE_GATE_STYLE_ID)) return;
+  const style = document.createElement("style");
+  style.id = TRANSLATE_GATE_STYLE_ID;
+  style.textContent = 'html[data-reado-translate-pending="1"] body{visibility:hidden !important;}';
+  (document.head || document.documentElement).appendChild(style);
+}
+
+function ensureNodeTranslateGateStyle() {
+  if (document.getElementById(NODE_TRANSLATE_GATE_STYLE_ID)) return;
+  const style = document.createElement("style");
+  style.id = NODE_TRANSLATE_GATE_STYLE_ID;
+  style.textContent = `[${NODE_TRANSLATE_GATE_ATTR}="1"]{visibility:hidden !important;}`;
+  (document.head || document.documentElement).appendChild(style);
 }
 
 function releaseTranslationGate() {
@@ -67,6 +88,22 @@ function shouldSkipElement(el) {
   if (SKIP_TAGS.has(el.tagName)) return true;
   if (el.closest(".material-icons, .material-symbols-outlined")) return true;
   return false;
+}
+
+function resolveMaskElement(root) {
+  if (root instanceof Text) return root.parentElement;
+  if (root instanceof Element) return root;
+  return null;
+}
+
+function shouldMaskRoot(root) {
+  const el = resolveMaskElement(root);
+  if (!(el instanceof Element)) return false;
+  if (el === document.body || el === document.documentElement) return false;
+  if (!el.isConnected) return false;
+  const sample = normalizeText(el.textContent || "").slice(0, 1200);
+  if (!sample || !CJK_RE.test(sample)) return false;
+  return true;
 }
 
 function loadCache() {
@@ -288,7 +325,7 @@ function scheduleScan(root = document.body || document.documentElement) {
   window.setTimeout(runScan, delay);
 }
 
-function runScan() {
+async function runScan() {
   scanScheduled = false;
   if (!enabled) return;
   if (scanning) {
@@ -296,9 +333,20 @@ function runScan() {
     return;
   }
   scanning = true;
+  let maskedElements = [];
   try {
     const roots = pendingRoots.size ? [...pendingRoots] : [document.body || document.documentElement];
     pendingRoots.clear();
+    if (gateReleased) {
+      for (const root of roots) {
+        if (!shouldMaskRoot(root)) continue;
+        const el = resolveMaskElement(root);
+        if (!(el instanceof Element)) continue;
+        if (el.getAttribute(NODE_TRANSLATE_GATE_ATTR) === "1") continue;
+        el.setAttribute(NODE_TRANSLATE_GATE_ATTR, "1");
+        maskedElements.push(el);
+      }
+    }
     const targets = [];
     for (const root of roots) {
       if (!(root instanceof Node)) continue;
@@ -312,15 +360,19 @@ function runScan() {
         }
       });
     }
-    const pending = translateTargets(targets);
+    await translateTargets(targets);
     translatedActive = translatedActive || targets.length > 0;
-    releaseTranslationGate();
-    pending.finally(() => {
-      if (pendingRoots.size > 0) scheduleScan();
-    });
   } catch {
-    releaseTranslationGate();
   } finally {
+    maskedElements.forEach((el) => {
+      try {
+        el.removeAttribute(NODE_TRANSLATE_GATE_ATTR);
+      } catch {}
+    });
+    if (!initialScanCompleted) {
+      initialScanCompleted = true;
+      releaseTranslationGate();
+    }
     scanning = false;
     if (pendingRoots.size > 0) scheduleScan();
   }
@@ -363,13 +415,24 @@ function syncLanguage() {
   const language = getCurrentLanguage();
   const shouldEnable = isEnglishLanguage(language);
   if (shouldEnable) {
+    const wasEnabled = enabled;
     enabled = true;
-    prepareGateState();
+    if (!wasEnabled) {
+      initialScanCompleted = false;
+      if (document.documentElement.getAttribute(TRANSLATE_GATE_ATTR) !== "1") {
+        ensureTranslationGate();
+      } else {
+        prepareGateState();
+      }
+    } else {
+      prepareGateState();
+    }
     ensureObserver();
     scheduleScan();
     return;
   }
   enabled = false;
+  initialScanCompleted = false;
   gateReleased = false;
   releaseTranslationGate();
   stopObserver();
@@ -381,6 +444,7 @@ function syncLanguage() {
 export function initReadoAutoTranslate() {
   if (started) return;
   started = true;
+  ensureNodeTranslateGateStyle();
   loadCache();
   syncLanguage();
   onLanguageChange(() => {

@@ -333,7 +333,7 @@ function buildLanguageBootstrapScript() {
   const LANGUAGE_EXPLICIT_KEY = "reado_lang_explicit";
   const TRANSLATE_GATE_ATTR = "data-reado-translate-pending";
   const TRANSLATE_GATE_STYLE_ID = "reado-translate-gate-style";
-  const TRANSLATE_GATE_TIMEOUT_MS = 4500;
+  const TRANSLATE_GATE_TIMEOUT_MS = 12000;
   const LANGUAGES = ["zh-CN","en-US","ja-JP","ko-KR","fr-FR","de-DE","es-ES","pt-BR","ru-RU","ar-SA","hi-IN","id-ID"];
   const RTL_LANGS = { "ar-SA": true };
 

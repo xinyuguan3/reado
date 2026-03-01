@@ -227,6 +227,38 @@ const runtimeBookCatalog = new RuntimeBookCatalog({ rootDir });
 const studioJobs = new Map();
 const STUDIO_JOB_LOG_LIMIT = 180;
 const STUDIO_JOB_RETENTION_MS = 45 * 60 * 1000;
+const BOOK_PIPELINE_MIN_BLOCKS = 6;
+const BOOK_PIPELINE_MAX_BLOCKS = 36;
+const BOOK_PIPELINE_QA_RETRIES = 2;
+const BOOK_PIPELINE_MICRO_TASKS = 10;
+const BOOK_PIPELINE_MICRO_SECONDS = 30;
+const BOOK_PIPELINE_MAX_MODULES = Math.max(
+  BOOK_PIPELINE_MIN_BLOCKS,
+  Math.min(BOOK_PIPELINE_MAX_BLOCKS, toInt(process.env.READO_BOOK_PIPELINE_MAX_MODULES || 12) || 12)
+);
+const BOOK_PIPELINE_QUIZ_WORKERS = Math.max(1, toInt(process.env.READO_BOOK_PIPELINE_WORKERS_QUIZ || 8) || 8);
+const BOOK_PIPELINE_ASSET_WORKERS = Math.max(1, toInt(process.env.READO_BOOK_PIPELINE_WORKERS_ASSET || 4) || 4);
+const BOOK_PIPELINE_AUDIO_WORKERS = Math.max(1, toInt(process.env.READO_BOOK_PIPELINE_WORKERS_AUDIO || 4) || 4);
+const BOOK_PIPELINE_EASTER_WORKERS = Math.max(1, toInt(process.env.READO_BOOK_PIPELINE_WORKERS_EASTER || 2) || 2);
+const BOOK_PIPELINE_IMAGE_PROVIDER = String(process.env.READO_BOOK_PIPELINE_IMAGE_PROVIDER || "auto")
+  .trim()
+  .toLowerCase();
+const BOOK_PIPELINE_AUDIO_PROVIDER = String(process.env.READO_BOOK_PIPELINE_AUDIO_PROVIDER || "auto")
+  .trim()
+  .toLowerCase();
+const BOOK_PIPELINE_IMAGE_ASPECT = String(process.env.READO_BOOK_PIPELINE_IMAGE_ASPECT || "16:9").trim() || "16:9";
+const REPLICATE_API_TOKEN = String(process.env.REPLICATE_API_TOKEN || "").trim();
+const ELEVENLABS_API_KEY = String(process.env.ELEVENLABS_API_KEY || process.env.READO_ELEVENLABS_API_KEY || "").trim();
+const ELEVENLABS_VOICE_ID = String(process.env.READO_ELEVENLABS_VOICE_ID || "EXAVITQu4vr4xnSDxMaL").trim() || "EXAVITQu4vr4xnSDxMaL";
+const ELEVENLABS_MODEL_ID = String(process.env.READO_ELEVENLABS_MODEL_ID || "eleven_multilingual_v2").trim() || "eleven_multilingual_v2";
+const ELEVENLABS_OUTPUT_FORMAT = String(process.env.READO_ELEVENLABS_OUTPUT_FORMAT || "mp3_44100_128").trim() || "mp3_44100_128";
+const CODEX_HOME = String(process.env.CODEX_HOME || process.env.HOME || "").trim();
+const DEFAULT_SKILLS_DIR = CODEX_HOME ? path.join(CODEX_HOME, "skills") : "";
+const READO_CODEX_SKILLS_DIR = String(process.env.READO_CODEX_SKILLS_DIR || DEFAULT_SKILLS_DIR).trim();
+const READO_NANO_BANANA_SCRIPT = String(
+  process.env.READO_NANO_BANANA_SCRIPT
+  || (READO_CODEX_SKILLS_DIR ? path.join(READO_CODEX_SKILLS_DIR, "bex-nano-banana-pro", "generate.py") : "")
+).trim();
 
 function nowIso() {
   return new Date().toISOString();
@@ -812,7 +844,625 @@ function estimateModuleCountFromSourceRows(sources) {
   return Math.max(1, Math.min(6, count || 3));
 }
 
+function isBookPipelinePayload(payload = {}) {
+  const mode = cleanText(payload?.pipelineMode || payload?.generationType || payload?.mode).toLowerCase();
+  if (mode === "book_pipeline" || mode === "book-pipeline" || mode === "book_experience" || mode === "book-experience") {
+    return true;
+  }
+  if (payload?.bookPipeline === true) return true;
+  if (payload?.bookFile && typeof payload.bookFile === "object") return true;
+  if (payload?.file && typeof payload.file === "object" && cleanText(payload.file.contentBase64)) return true;
+  return false;
+}
+
+function roughWordCount(text) {
+  const normalized = String(text || "").replace(/\s+/g, " ").trim();
+  if (!normalized) return 0;
+  const latinWords = normalized.match(/[A-Za-z0-9][A-Za-z0-9'-]*/g) || [];
+  const cjkChars = normalized.match(/[\u4e00-\u9fff]/g) || [];
+  return latinWords.length + Math.ceil(cjkChars.length / 2);
+}
+
+function estimateKnowledgeBlockCount(words) {
+  const raw = Math.round(Math.max(1, toInt(words)) / 1800);
+  return Math.max(BOOK_PIPELINE_MIN_BLOCKS, Math.min(BOOK_PIPELINE_MAX_BLOCKS, raw || BOOK_PIPELINE_MIN_BLOCKS));
+}
+
+function estimateBookPipelineQueueDepth() {
+  let queued = 0;
+  for (const job of studioJobs.values()) {
+    if (!job || !isBookPipelinePayload(job.payload)) continue;
+    if (job.status === "queued" || job.status === "running") queued += 1;
+  }
+  return queued;
+}
+
+function estimateBookPipelineFromPayload(payload = {}, options = {}) {
+  const sourceRows = Array.isArray(payload?.sources) ? payload.sources : [];
+  const sourceText = sourceRows
+    .map((item) => String(item?.content || item?.snippet || ""))
+    .join("\n");
+  const directText = cleanText(payload?.contextText || payload?.input || "");
+  const fileBase64 = cleanText(payload?.bookFile?.contentBase64 || payload?.file?.contentBase64 || "");
+  const fileBytes = fileBase64 ? Math.floor((fileBase64.length * 3) / 4) : 0;
+  const textForEstimate = sourceText || directText;
+  const words = roughWordCount(textForEstimate);
+  const pagesApprox = Math.max(1, toInt(payload?.pageCount) || Math.ceil(words / 420) || Math.ceil(fileBytes / 2200));
+  const ocrPagesApprox = Math.ceil(pagesApprox * (String(payload?.bookFile?.name || payload?.file?.name || "").toLowerCase().endsWith(".pdf") ? 0.35 : 0.1));
+  const blockCount = estimateKnowledgeBlockCount(words || pagesApprox * 420);
+  const queueDepth = Number.isFinite(Number(options.queueDepth))
+    ? Math.max(0, Number(options.queueDepth))
+    : estimateBookPipelineQueueDepth();
+
+  const parseSec = pagesApprox * 0.30 + ocrPagesApprox * 1.2;
+  const parallelSec = Math.max(
+    (blockCount * 26) / BOOK_PIPELINE_QUIZ_WORKERS,
+    (blockCount * 18) / BOOK_PIPELINE_ASSET_WORKERS,
+    (blockCount * 22) / BOOK_PIPELINE_AUDIO_WORKERS,
+    240 / BOOK_PIPELINE_EASTER_WORKERS
+  );
+  const qaSec = blockCount * 6 + 90;
+  const queueWaitSec = queueDepth * 45;
+  const etaSec = Math.ceil((queueWaitSec + parseSec + parallelSec + qaSec) * 1.15);
+  const etaMin = Math.max(1, Math.ceil(etaSec * 0.85 / 60));
+  const etaMax = Math.max(etaMin, Math.ceil(etaSec * 1.25 / 60));
+  const returnAt = new Date(Date.now() + etaSec * 1000).toISOString();
+
+  return {
+    words,
+    pagesApprox,
+    ocrPagesApprox,
+    blockCount,
+    queueDepth,
+    parseSec,
+    parallelSec,
+    qaSec,
+    etaSec,
+    etaMin,
+    etaMax,
+    returnAt
+  };
+}
+
+function estimateBookPipelineCreditCost(payload = {}) {
+  const metrics = estimateBookPipelineFromPayload(payload);
+  const textBytes = cleanText(payload?.bookFile?.contentBase64 || payload?.file?.contentBase64 || "")
+    ? Math.floor(cleanText(payload?.bookFile?.contentBase64 || payload?.file?.contentBase64 || "").length * 0.75)
+    : 0;
+  const parseFactor = Math.ceil(Math.max(metrics.words * 5, textBytes) / 8000);
+  const blockFactor = metrics.blockCount * 22;
+  const mediaFactor = metrics.blockCount * 14;
+  const qaFactor = Math.ceil(metrics.etaSec / 45);
+  const total = 180 + parseFactor * 8 + blockFactor + mediaFactor + qaFactor;
+  return Math.max(240, Math.min(12000, Math.round(total)));
+}
+
+function splitSentencesForPipeline(text) {
+  return String(text || "")
+    .replace(/\s+/g, " ")
+    .split(/(?<=[。！？.!?])\s+|(?<=\.)\s+(?=[A-Z])/)
+    .map((item) => item.trim())
+    .filter((item) => item.length >= 12);
+}
+
+function extractConceptKeywords(text, maxCount = 6) {
+  const stopWords = new Set([
+    "that", "this", "with", "from", "have", "were", "which", "about", "into", "their", "there", "then", "than",
+    "the", "and", "for", "are", "was", "you", "your", "our", "but", "not", "can", "will", "would", "should",
+    "我们", "你们", "他们", "以及", "因为", "所以", "可以", "需要", "然后", "通过", "这个", "那个", "一个"
+  ]);
+  const counts = new Map();
+  const matches = String(text || "").toLowerCase().match(/[a-z][a-z0-9-]{2,}|[\u4e00-\u9fff]{2,}/g) || [];
+  for (const token of matches) {
+    if (stopWords.has(token)) continue;
+    counts.set(token, (counts.get(token) || 0) + 1);
+  }
+  return [...counts.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, Math.max(1, Math.min(20, toInt(maxCount) || 6)))
+    .map(([token]) => token);
+}
+
+function computeDensityScore(text) {
+  const normalized = String(text || "").replace(/\s+/g, " ").trim();
+  const words = Math.max(1, roughWordCount(normalized));
+  const tokens = normalized.toLowerCase().match(/[a-z][a-z0-9-]{2,}|[\u4e00-\u9fff]{2,}/g) || [];
+  const unique = new Set(tokens);
+  const longTokens = tokens.filter((token) => token.length >= 4);
+  const uniqueLong = new Set(longTokens);
+  const claimMarkers = (normalized.match(/because|therefore|however|evidence|data|study|according|表明|研究|数据|证据|因此|但是/gi) || []).length;
+  const actionMarkers = (normalized.match(/should|must|apply|build|choose|decide|practice|reflect|建议|必须|需要|尝试|应用|练习/gi) || []).length;
+  const numeralMarkers = (normalized.match(/\d+/g) || []).length;
+  const conceptDensity = Math.min(1, (uniqueLong.size / words) * 12);
+  const claimEvidenceRatio = Math.min(1, (claimMarkers + numeralMarkers) / Math.max(1, words / 24));
+  const noveltyRatio = Math.min(1, unique.size / Math.max(1, tokens.length * 0.68));
+  const actionabilityRatio = Math.min(1, actionMarkers / Math.max(1, words / 28));
+  const score = 0.35 * conceptDensity
+    + 0.25 * claimEvidenceRatio
+    + 0.20 * noveltyRatio
+    + 0.20 * actionabilityRatio;
+  return {
+    score: Number(score.toFixed(4)),
+    conceptDensity: Number(conceptDensity.toFixed(4)),
+    claimEvidenceRatio: Number(claimEvidenceRatio.toFixed(4)),
+    noveltyRatio: Number(noveltyRatio.toFixed(4)),
+    actionabilityRatio: Number(actionabilityRatio.toFixed(4))
+  };
+}
+
+function splitKnowledgeBlocksFromText(text, opts = {}) {
+  const sourceText = String(text || "").replace(/\s+/g, " ").trim();
+  const totalWords = roughWordCount(sourceText);
+  const target = Math.max(
+    BOOK_PIPELINE_MIN_BLOCKS,
+    Math.min(BOOK_PIPELINE_MAX_BLOCKS, toInt(opts.targetBlocks) || estimateKnowledgeBlockCount(totalWords))
+  );
+  if (!sourceText) return [];
+  const allWords = sourceText.split(/\s+/).filter(Boolean);
+  const chunkSize = Math.max(120, Math.ceil(allWords.length / target));
+  const chunks = [];
+  for (let i = 0; i < allWords.length; i += chunkSize) {
+    const part = allWords.slice(i, i + chunkSize).join(" ").trim();
+    if (part) chunks.push(part);
+  }
+  const minScore = Number.isFinite(Number(opts.minScore)) ? Number(opts.minScore) : 0.62;
+  const withScores = chunks.map((content, idx) => {
+    const sentences = splitSentencesForPipeline(content);
+    const titleSeed = cleanText(sentences[0], `Knowledge Block ${idx + 1}`).slice(0, 72);
+    const density = computeDensityScore(content);
+    return {
+      id: `kb-${String(idx + 1).padStart(2, "0")}`,
+      index: idx + 1,
+      title: titleSeed || `Knowledge Block ${idx + 1}`,
+      content,
+      words: roughWordCount(content),
+      summary: cleanText(sentences.slice(0, 2).join(" "), content.slice(0, 220)).slice(0, 320),
+      keywords: extractConceptKeywords(content, 6),
+      density
+    };
+  });
+  let retained = withScores.filter((item) => Number(item?.density?.score || 0) >= minScore);
+  if (retained.length < Math.min(3, withScores.length)) {
+    retained = [...withScores]
+      .sort((a, b) => Number(b?.density?.score || 0) - Number(a?.density?.score || 0))
+      .slice(0, Math.min(withScores.length, Math.max(3, Math.floor(withScores.length * 0.75))));
+  }
+  return retained
+    .sort((a, b) => a.index - b.index)
+    .map((item, idx) => ({ ...item, gateIndex: idx + 1 }));
+}
+
+function buildPowerUpsForBlock(block, blockIndex) {
+  return [
+    {
+      id: `focus-shield-${blockIndex + 1}`,
+      name: "注意力保护罩",
+      effect: "下个章节进入极简专注模式，附带低刺激背景音轨。",
+      trigger: "mystery_box"
+    },
+    {
+      id: `streak-freeze-${blockIndex + 1}`,
+      name: "连胜冻结券",
+      effect: "连续学习中断 1 天不掉连胜。",
+      trigger: "streak_recovery"
+    }
+  ];
+}
+
+function buildQuizSetForBlock(block, blockIndex) {
+  const concepts = Array.isArray(block?.keywords) && block.keywords.length ? block.keywords : ["核心概念", "关键机制", "应用场景"];
+  const base = cleanText(block?.summary, cleanText(block?.content).slice(0, 180));
+  const makeId = (n) => `q-${String(blockIndex + 1).padStart(2, "0")}-${String(n).padStart(2, "0")}`;
+  const templates = [
+    { type: "reading", prompt: `阅读片段并定位证据：${base.slice(0, 140)}...` },
+    { type: "reading", prompt: `从片段中找出“${concepts[0]}”与“${concepts[1] || concepts[0]}”的关系。` },
+    { type: "discrimination", prompt: `以下哪项最准确描述了“${concepts[0]}”？` },
+    { type: "discrimination", prompt: `将“${concepts[0]} / ${concepts[1] || concepts[0]} / ${concepts[2] || concepts[0]}”按因果顺序排序。` },
+    { type: "discrimination", prompt: `下面哪一项是该知识块中的常见误解？` },
+    { type: "application", prompt: `情景题：如果你在真实场景中遇到该问题，第一步该怎么做？` },
+    { type: "application", prompt: `反例判断：以下案例为什么不符合“${concepts[0]}”的条件？` },
+    { type: "application", prompt: `在限制资源下，如何优先应用“${concepts[1] || concepts[0]}”？` },
+    { type: "debug", prompt: "纠错题：下面推理中哪一步是错的，应该如何修正？" },
+    { type: "mini_project", prompt: `微项目：用 90 秒写出你对“${concepts[0]}”的应用方案并自检。` }
+  ];
+  return templates.map((item, idx) => ({
+    id: makeId(idx + 1),
+    type: item.type,
+    prompt: item.prompt,
+    why_this_matters: `掌握 ${concepts[0]} 并避免常见误判。`,
+    hint: idx < 3
+      ? `先回看本关卡摘要，再找“${concepts[Math.min(idx, concepts.length - 1)]}”相关证据。`
+      : "先拆条件，再做判断；错因通常在定义边界。",
+    retry_feedback: "这次答案信息密度不足。请补上证据句、关键条件和反例边界。",
+    mastery_signal: "能清楚说出概念定义、适用边界和一个真实应用。",
+    estimated_seconds: BOOK_PIPELINE_MICRO_SECONDS
+  }));
+}
+
+function buildAssetPackForBlock(block, blockIndex, bookTitle) {
+  const seedBase = `${bookTitle}:${block?.id || blockIndex + 1}`;
+  const fragments = [0, 1, 2].map((i) => ({
+    id: `fragment-${String(blockIndex + 1).padStart(2, "0")}-${i + 1}`,
+    title: `碎片 ${blockIndex + 1}-${i + 1}`,
+    description: `完成连胜或通过彩蛋挑战可掉落。关联主题：${(block?.keywords || []).slice(0, 2).join(" / ") || "核心概念"}`,
+    image: buildGeneratedCoverDataUri({
+      title: `Fragment ${blockIndex + 1}-${i + 1}`,
+      subtitle: cleanText(block?.title, "Knowledge Fragment"),
+      seed: `${seedBase}:fragment:${i + 1}`
+    })
+  }));
+  const badge = {
+    id: `badge-${String(blockIndex + 1).padStart(2, "0")}`,
+    title: `${cleanText(block?.title, "Knowledge")} 徽章`,
+    description: "收集本知识块全部碎片后解锁。",
+    image: buildGeneratedCoverDataUri({
+      title: `Badge ${blockIndex + 1}`,
+      subtitle: cleanText(block?.title, "Mastery Badge"),
+      seed: `${seedBase}:badge`
+    })
+  };
+  return { fragments, badge };
+}
+
+function buildAudioRecapScript(bookTitle, block) {
+  const keywords = (block?.keywords || []).slice(0, 4).join("、");
+  return [
+    `这是《${bookTitle}》的知识块复盘。`,
+    `本关重点：${cleanText(block?.title, "核心概念")}。`,
+    cleanText(block?.summary, "请回顾本节关键逻辑。"),
+    `请重点记住：${keywords || "定义、边界、应用、反例"}。`,
+    "现在暂停 10 秒，回忆一个你可以马上使用的场景。"
+  ].join(" ");
+}
+
+function sanitizeMediaFileName(fileName, fallback = "asset") {
+  const ext = path.extname(String(fileName || "")).toLowerCase();
+  const base = String(fileName || "")
+    .replace(ext, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  const safeExt = ext && /^[.][a-z0-9]{2,8}$/.test(ext) ? ext : ".png";
+  return `${base || fallback}${safeExt}`;
+}
+
+function safeDecodeUriComponent(value) {
+  try {
+    return decodeURIComponent(String(value || ""));
+  } catch {
+    return String(value || "");
+  }
+}
+
+async function pathExists(targetPath) {
+  return Boolean(await fs.stat(targetPath).catch(() => null));
+}
+
+let cachedPythonCommand = "";
+let pythonCommandChecked = false;
+
+async function resolvePythonCommand() {
+  if (pythonCommandChecked) return cachedPythonCommand;
+  pythonCommandChecked = true;
+  const candidates = ["python3", "python"];
+  for (const cmd of candidates) {
+    try {
+      await execFileAsync(cmd, ["--version"], { timeout: 4_000 });
+      cachedPythonCommand = cmd;
+      return cachedPythonCommand;
+    } catch (error) {
+      if (error?.code === "ENOENT") continue;
+    }
+  }
+  cachedPythonCommand = "";
+  return "";
+}
+
+function shouldUsePipelineImageProvider() {
+  if (BOOK_PIPELINE_IMAGE_PROVIDER === "none" || BOOK_PIPELINE_IMAGE_PROVIDER === "fallback") return false;
+  if (BOOK_PIPELINE_IMAGE_PROVIDER === "nano-banana" || BOOK_PIPELINE_IMAGE_PROVIDER === "banana") return true;
+  return BOOK_PIPELINE_IMAGE_PROVIDER === "auto";
+}
+
+function shouldUsePipelineAudioProvider() {
+  if (BOOK_PIPELINE_AUDIO_PROVIDER === "none" || BOOK_PIPELINE_AUDIO_PROVIDER === "fallback") return false;
+  if (BOOK_PIPELINE_AUDIO_PROVIDER === "elevenlabs" || BOOK_PIPELINE_AUDIO_PROVIDER === "eleven") return true;
+  return BOOK_PIPELINE_AUDIO_PROVIDER === "auto";
+}
+
+function buildRewardImagePrompt({ block, bookTitle, kind, itemTitle }) {
+  const keywords = Array.isArray(block?.keywords) ? block.keywords.slice(0, 4).join(", ") : "";
+  const summary = cleanText(block?.summary).slice(0, 180);
+  const common = `Create a crisp, educational collectible illustration for a gamified reading app. Book: ${bookTitle}. Knowledge block: ${cleanText(block?.title, "Core concept")}. Keywords: ${keywords || "learning, mastery, concept"}. Tone: high-clarity, modern, motivational, no text labels.`;
+  if (kind === "badge") {
+    return `${common} Render a premium badge icon with symbolic elements and strong silhouette. ${summary}`;
+  }
+  return `${common} Render a collectible fragment shard with layered details and subtle glow. ${summary} Variant: ${cleanText(itemTitle, "fragment")}.`;
+}
+
+async function generateImageWithNanoBanana({ prompt, outputPath, aspectRatio = BOOK_PIPELINE_IMAGE_ASPECT }) {
+  if (!shouldUsePipelineImageProvider()) {
+    return { ok: false, reason: "provider_disabled" };
+  }
+  if (!REPLICATE_API_TOKEN) {
+    return { ok: false, reason: "replicate_token_missing" };
+  }
+  const scriptPath = cleanText(READO_NANO_BANANA_SCRIPT);
+  if (!scriptPath || !(await pathExists(scriptPath))) {
+    return { ok: false, reason: "nano_banana_script_missing" };
+  }
+  const pythonCmd = await resolvePythonCommand();
+  if (!pythonCmd) {
+    return { ok: false, reason: "python_missing" };
+  }
+  const args = [
+    scriptPath,
+    "--prompt",
+    cleanText(prompt, "High information density collectible illustration"),
+    "--aspect-ratio",
+    cleanText(aspectRatio, "16:9"),
+    "--output",
+    outputPath
+  ];
+  try {
+    await execFileAsync(pythonCmd, args, {
+      cwd: rootDir,
+      timeout: 180_000,
+      maxBuffer: 6 * 1024 * 1024,
+      env: {
+        ...process.env,
+        REPLICATE_API_TOKEN
+      }
+    });
+    if (!(await pathExists(outputPath))) {
+      return { ok: false, reason: "image_not_written" };
+    }
+    return { ok: true, provider: "nano-banana", outputPath };
+  } catch (error) {
+    return {
+      ok: false,
+      reason: "nano_banana_failed",
+      error: cleanText(error?.message, "nano banana generation failed")
+    };
+  }
+}
+
+async function materializeAssetPackImages({ moduleDir, moduleSlug, block, bookTitle, assetPack }) {
+  const pack = assetPack && typeof assetPack === "object"
+    ? {
+        fragments: Array.isArray(assetPack.fragments) ? assetPack.fragments.map((item) => ({ ...item })) : [],
+        badge: assetPack.badge && typeof assetPack.badge === "object" ? { ...assetPack.badge } : null
+      }
+    : { fragments: [], badge: null };
+  const makePublicHref = (fileName) => `/experiences/media/${encodeURIComponent(moduleSlug)}/${encodeURIComponent(fileName)}`;
+
+  await mapLimit(pack.fragments, BOOK_PIPELINE_ASSET_WORKERS, async (item, idx) => {
+    const fileName = sanitizeMediaFileName(`${cleanText(item?.id, `fragment-${idx + 1}`)}.png`, `fragment-${idx + 1}`);
+    const outputPath = path.join(moduleDir, fileName);
+    const prompt = buildRewardImagePrompt({
+      block,
+      bookTitle,
+      kind: "fragment",
+      itemTitle: cleanText(item?.title, `Fragment ${idx + 1}`)
+    });
+    const generated = await generateImageWithNanoBanana({
+      prompt,
+      outputPath,
+      aspectRatio: BOOK_PIPELINE_IMAGE_ASPECT
+    });
+    if (generated.ok) {
+      item.image = makePublicHref(fileName);
+      item.image_provider = generated.provider;
+    }
+    return item;
+  });
+
+  if (pack.badge) {
+    const fileName = sanitizeMediaFileName(`${cleanText(pack.badge.id, "badge")}.png`, "badge");
+    const outputPath = path.join(moduleDir, fileName);
+    const prompt = buildRewardImagePrompt({
+      block,
+      bookTitle,
+      kind: "badge",
+      itemTitle: cleanText(pack.badge.title, "Mastery Badge")
+    });
+    const generated = await generateImageWithNanoBanana({
+      prompt,
+      outputPath,
+      aspectRatio: "1:1"
+    });
+    if (generated.ok) {
+      pack.badge.image = makePublicHref(fileName);
+      pack.badge.image_provider = generated.provider;
+    }
+  }
+  return pack;
+}
+
+function estimateAudioDurationSeconds(text) {
+  const words = roughWordCount(text);
+  const sec = Math.ceil((words / 2.8) + 4);
+  return Math.max(30, Math.min(15 * 60, sec));
+}
+
+async function generateAudioWithElevenLabs(text) {
+  if (!shouldUsePipelineAudioProvider()) {
+    return { ok: false, reason: "provider_disabled" };
+  }
+  if (!ELEVENLABS_API_KEY) {
+    return { ok: false, reason: "elevenlabs_key_missing" };
+  }
+  try {
+    const response = await fetch(
+      `https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(ELEVENLABS_VOICE_ID)}?output_format=${encodeURIComponent(ELEVENLABS_OUTPUT_FORMAT)}`,
+      {
+        method: "POST",
+        headers: {
+          "xi-api-key": ELEVENLABS_API_KEY,
+          Accept: "audio/mpeg",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          text: cleanText(text, "Knowledge recap"),
+          model_id: ELEVENLABS_MODEL_ID,
+          voice_settings: {
+            stability: 0.5,
+            similarity_boost: 0.65,
+            style: 0.2,
+            use_speaker_boost: true
+          }
+        })
+      }
+    );
+    if (!response.ok) {
+      const reason = await response.text().catch(() => "");
+      return { ok: false, reason: `elevenlabs_${response.status}`, error: cleanText(reason, "tts request failed") };
+    }
+    const buffer = Buffer.from(await response.arrayBuffer());
+    if (!buffer.length) {
+      return { ok: false, reason: "empty_audio_buffer" };
+    }
+    return { ok: true, provider: "elevenlabs", buffer, ext: ".mp3" };
+  } catch (error) {
+    return {
+      ok: false,
+      reason: "elevenlabs_request_failed",
+      error: cleanText(error?.message, "failed to request elevenlabs")
+    };
+  }
+}
+
+async function materializeAudioRecap({ moduleDir, scriptText }) {
+  const transcriptFile = "review.txt";
+  const transcriptPath = path.join(moduleDir, transcriptFile);
+  await fs.writeFile(transcriptPath, scriptText, "utf8");
+
+  const generated = await generateAudioWithElevenLabs(scriptText);
+  if (generated.ok && generated.buffer) {
+    const audioFile = "review.mp3";
+    const audioPath = path.join(moduleDir, audioFile);
+    await fs.writeFile(audioPath, generated.buffer);
+    return {
+      transcriptFile,
+      audioFile,
+      audioProvider: generated.provider,
+      durationSeconds: estimateAudioDurationSeconds(scriptText)
+    };
+  }
+
+  const audioFile = "review.wav";
+  const audioPath = path.join(moduleDir, audioFile);
+  await fs.writeFile(audioPath, buildSilentWavBuffer(2));
+  return {
+    transcriptFile,
+    audioFile,
+    audioProvider: "fallback_silent",
+    durationSeconds: 2
+  };
+}
+
+function buildEasterLevel(bookTitle, blocks) {
+  const top = (Array.isArray(blocks) ? blocks : []).slice(0, 3);
+  const topics = top.map((row) => cleanText(row?.title)).filter(Boolean);
+  return {
+    id: `easter-${sanitizeFileName(bookTitle, "book")}`,
+    title: `${bookTitle}：沉浸式最终挑战`,
+    premise: `你将进入高压决策场景，综合运用全书知识完成关键选择。`,
+    scene: `场景包含 ${topics.join(" / ") || "核心知识块"} 的联动挑战。`,
+    objective: "在资源受限与时间压力下做出最优决策，并解释依据。",
+    stages: [
+      "信息筛选：识别噪音与关键证据",
+      "策略选择：在多个可行路径中做权衡",
+      "复盘反思：指出一次误判并修正策略"
+    ],
+    rewards: [
+      "彩蛋通关纪念徽章",
+      "额外音频速记卡",
+      "连胜保护券"
+    ]
+  };
+}
+
+async function mapLimit(items, limit, taskFn) {
+  const rows = Array.isArray(items) ? items : [];
+  const concurrency = Math.max(1, Math.min(64, toInt(limit) || 1));
+  const out = new Array(rows.length);
+  let cursor = 0;
+  async function worker() {
+    while (true) {
+      const idx = cursor;
+      cursor += 1;
+      if (idx >= rows.length) break;
+      out[idx] = await taskFn(rows[idx], idx);
+    }
+  }
+  const workers = Array.from({ length: Math.min(concurrency, rows.length || 1) }, () => worker());
+  await Promise.all(workers);
+  return out;
+}
+
+function buildSilentWavBuffer(durationSeconds = 2) {
+  const seconds = Math.max(1, Math.min(120, Number(durationSeconds) || 2));
+  const sampleRate = 16000;
+  const channels = 1;
+  const bitsPerSample = 16;
+  const sampleCount = Math.floor(sampleRate * seconds);
+  const blockAlign = channels * (bitsPerSample / 8);
+  const byteRate = sampleRate * blockAlign;
+  const dataSize = sampleCount * blockAlign;
+  const buffer = Buffer.alloc(44 + dataSize);
+  buffer.write("RIFF", 0);
+  buffer.writeUInt32LE(36 + dataSize, 4);
+  buffer.write("WAVE", 8);
+  buffer.write("fmt ", 12);
+  buffer.writeUInt32LE(16, 16);
+  buffer.writeUInt16LE(1, 20);
+  buffer.writeUInt16LE(channels, 22);
+  buffer.writeUInt32LE(sampleRate, 24);
+  buffer.writeUInt32LE(byteRate, 28);
+  buffer.writeUInt16LE(blockAlign, 32);
+  buffer.writeUInt16LE(bitsPerSample, 34);
+  buffer.write("data", 36);
+  buffer.writeUInt32LE(dataSize, 40);
+  return buffer;
+}
+
+function mapBlocksToModules(blocks, moduleSlugs = []) {
+  const list = Array.isArray(blocks) ? blocks : [];
+  const slugs = Array.isArray(moduleSlugs) ? moduleSlugs : [];
+  if (!slugs.length) return [];
+  const mapped = [];
+  const each = Math.max(1, Math.ceil(list.length / slugs.length));
+  for (let i = 0; i < slugs.length; i += 1) {
+    const group = list.slice(i * each, (i + 1) * each);
+    const mergedText = group.map((item) => cleanText(item?.content)).join(" ");
+    const seed = group[0] || list[Math.min(i, Math.max(0, list.length - 1))] || {
+      id: `kb-fallback-${i + 1}`,
+      title: `Knowledge Block ${i + 1}`,
+      content: "",
+      summary: "",
+      keywords: []
+    };
+    mapped.push({
+      moduleSlug: slugs[i],
+      block: {
+        ...seed,
+        id: cleanText(seed.id, `kb-${String(i + 1).padStart(2, "0")}`),
+        title: cleanText(seed.title, `Knowledge Block ${i + 1}`),
+        content: cleanText(mergedText, cleanText(seed.content)),
+        summary: cleanText(seed.summary, cleanText(mergedText).slice(0, 240)),
+        keywords: Array.isArray(seed.keywords) && seed.keywords.length ? seed.keywords : extractConceptKeywords(mergedText || seed.content, 6),
+        gateIndex: i + 1
+      }
+    });
+  }
+  return mapped;
+}
+
 function estimateGenerationCreditCostFromPayload(payload = {}) {
+  if (isBookPipelinePayload(payload)) {
+    return estimateBookPipelineCreditCost(payload);
+  }
   const rows = Array.isArray(payload?.sources) ? payload.sources : [];
   const chars = rows.reduce((sum, item) => sum + String(item?.content || item?.snippet || "").length, 0);
   const sourceCount = Math.max(1, rows.length);
@@ -1290,6 +1940,8 @@ function createStudioJob(sessionId, payload, options = {}) {
       ? { ...options.creditSnapshot }
       : null,
     payload: payload && typeof payload === "object" ? payload : {},
+    eta: options.eta && typeof options.eta === "object" ? { ...options.eta } : null,
+    pipeline: options.pipeline && typeof options.pipeline === "object" ? { ...options.pipeline } : null,
     createdAt: nowIso(),
     updatedAt: nowIso(),
     subscribers: new Set()
@@ -1306,6 +1958,8 @@ function toStudioJobPublic(job) {
     progress: job.progress,
     logs: Array.isArray(job.logs) ? job.logs : [],
     work: job.work || null,
+    eta: job.eta || null,
+    pipeline: job.pipeline || null,
     creditCharge: job.creditCharge || null,
     creditSnapshot: job.creditSnapshot || null,
     error: job.error || "",
@@ -1347,6 +2001,12 @@ function updateStudioJob(job, patch = {}) {
   }
   if (patch.work && typeof patch.work === "object") {
     job.work = patch.work;
+  }
+  if (patch.eta && typeof patch.eta === "object") {
+    job.eta = { ...patch.eta };
+  }
+  if (patch.pipeline && typeof patch.pipeline === "object") {
+    job.pipeline = { ...patch.pipeline };
   }
   if (patch.creditCharge && typeof patch.creditCharge === "object") {
     job.creditCharge = { ...patch.creditCharge };
@@ -1427,9 +2087,412 @@ function finalizeStudioJobCharge(sessionId, job) {
   return nextCharge;
 }
 
+function resolveBookPipelineFilePayload(payload = {}) {
+  const file = payload?.bookFile && typeof payload.bookFile === "object"
+    ? payload.bookFile
+    : (payload?.file && typeof payload.file === "object" ? payload.file : null);
+  if (!file) return null;
+  const contentBase64 = cleanText(file.contentBase64);
+  if (!contentBase64) return null;
+  return {
+    name: cleanText(file.name, "uploaded-book.pdf"),
+    type: cleanText(file.type, "application/octet-stream"),
+    contentBase64
+  };
+}
+
+async function resolveBookPipelineSource(payload = {}, hooks = {}) {
+  const filePayload = resolveBookPipelineFilePayload(payload);
+  if (filePayload) {
+    const source = await playableContentEngine.ingestFileSource(filePayload, hooks);
+    return {
+      source,
+      mode: "file",
+      title: cleanText(payload?.title, cleanText(source?.title, filePayload.name))
+    };
+  }
+  const urlText = cleanText(payload?.url);
+  if (urlText) {
+    const source = await playableContentEngine.ingestUrlSource(
+      { url: urlText, title: cleanText(payload?.title) },
+      hooks
+    );
+    return {
+      source,
+      mode: "url",
+      title: cleanText(payload?.title, cleanText(source?.title, urlText))
+    };
+  }
+  const firstSource = Array.isArray(payload?.sources) ? payload.sources[0] : null;
+  if (firstSource && (cleanText(firstSource?.content) || cleanText(firstSource?.snippet))) {
+    const source = {
+      title: cleanText(firstSource?.title, cleanText(payload?.title, "Uploaded Book")),
+      url: cleanText(firstSource?.url),
+      snippet: clampText(cleanText(firstSource?.snippet, firstSource?.content), 1200),
+      content: clampText(cleanText(firstSource?.content, firstSource?.snippet), 120000)
+    };
+    return {
+      source,
+      mode: "sources",
+      title: cleanText(payload?.title, source.title)
+    };
+  }
+  const inputText = cleanText(payload?.input || payload?.contextText);
+  if (inputText) {
+    const source = {
+      title: cleanText(payload?.title, "Uploaded Book Text"),
+      url: "",
+      snippet: clampText(inputText, 1200),
+      content: clampText(inputText, 120000)
+    };
+    return {
+      source,
+      mode: "text",
+      title: cleanText(payload?.title, source.title)
+    };
+  }
+  throw new Error("No readable book source found. Provide bookFile/file, url, sources, or input text.");
+}
+
+async function buildModulePipelineArtifacts({ work, moduleSlug, block, bookTitle }) {
+  const moduleDir = path.join(rootDir, "book_experiences", cleanText(work?.book_id), moduleSlug);
+  const moduleJsonPath = path.join(moduleDir, "module.json");
+  const quizSet = buildQuizSetForBlock(block, Math.max(0, toInt(block?.gateIndex) - 1));
+  const fallbackAssetPack = buildAssetPackForBlock(block, Math.max(0, toInt(block?.gateIndex) - 1), bookTitle);
+  const powerUps = buildPowerUpsForBlock(block, Math.max(0, toInt(block?.gateIndex) - 1));
+  const audioScript = buildAudioRecapScript(bookTitle, block);
+  await fs.mkdir(moduleDir, { recursive: true });
+  const [assetPack, audioRecap] = await Promise.all([
+    materializeAssetPackImages({
+      moduleDir,
+      moduleSlug,
+      block,
+      bookTitle,
+      assetPack: fallbackAssetPack
+    }),
+    materializeAudioRecap({
+      moduleDir,
+      scriptText: audioScript
+    })
+  ]);
+  const audioHref = `/experiences/media/${encodeURIComponent(moduleSlug)}/${encodeURIComponent(audioRecap.audioFile)}`;
+  const transcriptHref = `/experiences/media/${encodeURIComponent(moduleSlug)}/${encodeURIComponent(audioRecap.transcriptFile)}`;
+  let moduleMeta = {};
+  try {
+    moduleMeta = JSON.parse(await fs.readFile(moduleJsonPath, "utf8")) || {};
+  } catch {}
+  moduleMeta.book_pipeline = {
+    version: 1,
+    generated_at: nowIso(),
+    knowledge_block: {
+      id: cleanText(block?.id),
+      gate_index: toInt(block?.gateIndex),
+      title: cleanText(block?.title),
+      summary: cleanText(block?.summary),
+      words: toInt(block?.words),
+      keywords: Array.isArray(block?.keywords) ? block.keywords.slice(0, 8) : [],
+      density: block?.density || null
+    },
+    quiz_set: quizSet,
+    rewards: {
+      mystery_box: {
+        functional_powerups: powerUps,
+        collectibles: assetPack,
+        knowledge_shortcuts: [
+          {
+            id: `audio-shortcut-${toInt(block?.gateIndex) || 1}`,
+            title: "音频复盘",
+            href: audioHref
+          }
+        ]
+      }
+    },
+    progress_design: {
+      micro_tasks: BOOK_PIPELINE_MICRO_TASKS,
+      micro_task_seconds: BOOK_PIPELINE_MICRO_SECONDS,
+      completion_signal: "10/10 tasks with mastery feedback"
+    },
+    audio_recap: {
+      title: `${cleanText(block?.title, "Knowledge Block")} 复盘`,
+      script: audioScript,
+      href: audioHref,
+      transcript_href: transcriptHref,
+      duration_seconds: Math.max(2, toInt(audioRecap.durationSeconds)),
+      provider: cleanText(audioRecap.audioProvider, "fallback_silent")
+    },
+    media_generation: {
+      image_provider: shouldUsePipelineImageProvider() ? "nano-banana(auto)" : "fallback_svg",
+      audio_provider: cleanText(audioRecap.audioProvider, "fallback_silent")
+    }
+  };
+  await fs.writeFile(moduleJsonPath, JSON.stringify(moduleMeta, null, 2), "utf8");
+  return {
+    moduleSlug,
+    gateIndex: toInt(block?.gateIndex),
+    quizCount: quizSet.length,
+    fragmentCount: Array.isArray(assetPack.fragments) ? assetPack.fragments.length : 0,
+    audioHref,
+    ok: true
+  };
+}
+
+async function verifyAndRepairPipelineModules({ work, moduleBlockMap, bookTitle }) {
+  const failed = [];
+  for (const row of moduleBlockMap) {
+    const moduleSlug = cleanText(row?.moduleSlug);
+    const block = row?.block || {};
+    if (!moduleSlug) continue;
+    const moduleDir = path.join(rootDir, "book_experiences", cleanText(work?.book_id), moduleSlug);
+    const codePath = path.join(moduleDir, "code.html");
+    const moduleJsonPath = path.join(moduleDir, "module.json");
+    const audioPathWav = path.join(moduleDir, "review.wav");
+    const audioPathMp3 = path.join(moduleDir, "review.mp3");
+    const transcriptPath = path.join(moduleDir, "review.txt");
+    const hasCode = Boolean(await fs.stat(codePath).catch(() => null));
+    const hasAudio = Boolean(await fs.stat(audioPathWav).catch(() => null))
+      || Boolean(await fs.stat(audioPathMp3).catch(() => null));
+    const hasTranscript = Boolean(await fs.stat(transcriptPath).catch(() => null));
+    let moduleMeta = null;
+    try {
+      moduleMeta = JSON.parse(await fs.readFile(moduleJsonPath, "utf8")) || null;
+    } catch {
+      moduleMeta = null;
+    }
+    const quizCount = Array.isArray(moduleMeta?.book_pipeline?.quiz_set)
+      ? moduleMeta.book_pipeline.quiz_set.length
+      : 0;
+    const badgeImage = cleanText(moduleMeta?.book_pipeline?.rewards?.mystery_box?.collectibles?.badge?.image);
+    const badgeNeedsFile = badgeImage.startsWith("/experiences/media/");
+    const badgeFile = badgeNeedsFile
+      ? path.join(moduleDir, path.basename(safeDecodeUriComponent(badgeImage)))
+      : "";
+    const hasBadgeAsset = badgeImage
+      ? (badgeNeedsFile ? Boolean(await fs.stat(badgeFile).catch(() => null)) : true)
+      : false;
+    if (!hasCode || !hasAudio || !hasTranscript || quizCount < 8 || !hasBadgeAsset) {
+      failed.push({ moduleSlug, block });
+    }
+  }
+  if (!failed.length) {
+    return { ok: true, failedCount: 0, repaired: 0 };
+  }
+  let repaired = 0;
+  for (const row of failed) {
+    try {
+      await buildModulePipelineArtifacts({
+        work,
+        moduleSlug: row.moduleSlug,
+        block: row.block,
+        bookTitle
+      });
+      repaired += 1;
+    } catch {}
+  }
+  return {
+    ok: repaired === failed.length,
+    failedCount: failed.length,
+    repaired
+  };
+}
+
+async function runBookPipelineGenerationJob(job, sessionId) {
+  updateStudioJob(job, {
+    status: "running",
+    step: "ingest",
+    progress: 4,
+    message: "Book pipeline started: ingesting source"
+  });
+  const resolved = await resolveBookPipelineSource(job.payload, {
+    onProgress: (event) => {
+      updateStudioJob(job, {
+        status: "running",
+        step: cleanText(event?.step, "ingest"),
+        progress: Number.isFinite(Number(event?.progress)) ? Number(event.progress) : 8,
+        message: cleanText(event?.message)
+      });
+    }
+  });
+  const source = resolved.source || {};
+  const sourceText = cleanText(source.content, cleanText(source.snippet));
+  const eta = estimateBookPipelineFromPayload(
+    {
+      ...job.payload,
+      sources: [{ title: source.title, url: source.url, content: sourceText, snippet: source.snippet }]
+    },
+    { queueDepth: Math.max(0, estimateBookPipelineQueueDepth() - 1) }
+  );
+  updateStudioJob(job, {
+    eta,
+    status: "running",
+    step: "planning",
+    progress: 12,
+    message: `Parsed source. Estimated ${eta.etaMin}-${eta.etaMax} minutes; return around ${new Date(eta.returnAt).toLocaleTimeString()}.`
+  });
+
+  const requestedBlocks = toInt(job.payload?.blockCount);
+  const knowledgeBlocks = splitKnowledgeBlocksFromText(sourceText, {
+    targetBlocks: requestedBlocks || eta.blockCount,
+    minScore: 0.62
+  });
+  if (!knowledgeBlocks.length) {
+    throw new Error("No valid knowledge blocks after density filtering.");
+  }
+  const moduleCount = Math.max(3, Math.min(BOOK_PIPELINE_MAX_MODULES, toInt(job.payload?.moduleCount) || knowledgeBlocks.length));
+  const blueprintSource = {
+    title: `${resolved.title} · Knowledge Blueprint`,
+    url: source.url || "",
+    snippet: clampText(
+      knowledgeBlocks.map((item) => `${item.gateIndex}. ${item.title}`).join(" | "),
+      1200
+    ),
+    content: clampText(
+      knowledgeBlocks
+        .map((item) => `Gate ${item.gateIndex}: ${item.title}\nSummary: ${item.summary}\nKeywords: ${(item.keywords || []).join(", ")}`)
+        .join("\n\n"),
+      60000
+    )
+  };
+  const generationPayload = {
+    mode: "sources",
+    input: cleanText(job.payload?.input, resolved.title),
+    title: cleanText(job.payload?.title, resolved.title),
+    moduleCount,
+    sources: [
+      { title: source.title, url: source.url, snippet: source.snippet, content: sourceText },
+      blueprintSource
+    ],
+    bookPipeline: true
+  };
+
+  updateStudioJob(job, {
+    status: "running",
+    step: "generate_core",
+    progress: 20,
+    message: `Generating core modules (${moduleCount} gates)`
+  });
+  const work = await playableContentEngine.generatePlayableBook(sessionId, generationPayload, {
+    onProgress: (event) => {
+      const p = Number.isFinite(Number(event?.progress)) ? Number(event.progress) : 0;
+      const mapped = 20 + Math.round((Math.max(0, Math.min(100, p)) * 0.50));
+      updateStudioJob(job, {
+        status: "running",
+        step: cleanText(event?.step, "generate_core"),
+        progress: mapped,
+        message: cleanText(event?.message)
+      });
+    }
+  });
+
+  const moduleSlugs = Array.isArray(work?.module_slugs) ? work.module_slugs : [];
+  if (!moduleSlugs.length) {
+    throw new Error("Core generation returned no modules.");
+  }
+  const moduleBlockMap = mapBlocksToModules(knowledgeBlocks, moduleSlugs);
+  updateStudioJob(job, {
+    status: "running",
+    step: "parallel_generation",
+    progress: 72,
+    message: `Generating quizzes/assets/audio in parallel for ${moduleBlockMap.length} modules`
+  });
+
+  const artifacts = await mapLimit(moduleBlockMap, Math.min(moduleBlockMap.length, 8), async (row) => {
+    return buildModulePipelineArtifacts({
+      work,
+      moduleSlug: row.moduleSlug,
+      block: row.block,
+      bookTitle: cleanText(work?.title, cleanText(resolved?.title, "Playable Book"))
+    });
+  });
+
+  const easter = buildEasterLevel(cleanText(work?.title, cleanText(resolved?.title, "Playable Book")), knowledgeBlocks);
+  const bookDir = path.join(rootDir, "book_experiences", cleanText(work?.book_id));
+  await fs.writeFile(
+    path.join(bookDir, "book-pipeline-manifest.json"),
+    JSON.stringify(
+      {
+        version: 1,
+        generated_at: nowIso(),
+        eta,
+        source_mode: resolved.mode,
+        total_knowledge_blocks: knowledgeBlocks.length,
+        knowledge_blocks: knowledgeBlocks,
+        module_map: moduleBlockMap.map((row) => ({ module_slug: row.moduleSlug, knowledge_block_id: row.block.id })),
+        easter_level: easter,
+        artifacts
+      },
+      null,
+      2
+    ),
+    "utf8"
+  );
+
+  updateStudioJob(job, {
+    status: "running",
+    step: "qa",
+    progress: 88,
+    message: "Running QA checks and repairing failed modules if needed"
+  });
+  let qaResult = { ok: true, failedCount: 0, repaired: 0 };
+  for (let attempt = 0; attempt <= BOOK_PIPELINE_QA_RETRIES; attempt += 1) {
+    qaResult = await verifyAndRepairPipelineModules({
+      work,
+      moduleBlockMap,
+      bookTitle: cleanText(work?.title, cleanText(resolved?.title, "Playable Book"))
+    });
+    if (qaResult.ok) break;
+    updateStudioJob(job, {
+      status: "running",
+      step: "qa_retry",
+      progress: 90 + attempt,
+      message: `QA retry ${attempt + 1}: repaired ${qaResult.repaired}/${qaResult.failedCount}`
+    });
+  }
+  if (!qaResult.ok) {
+    throw new Error(`QA did not close end-to-end loop after retries (failed ${qaResult.failedCount} modules).`);
+  }
+
+  if (job.payload?.publishPublic === true) {
+    await playableContentEngine.setWorkPublic(sessionId, cleanText(work?.id), true);
+  }
+  if (work && typeof work === "object") {
+    work.book_pipeline = {
+      enabled: true,
+      knowledge_block_count: knowledgeBlocks.length,
+      mystery_box_enabled: true,
+      easter_level_id: easter.id,
+      updated_at: nowIso()
+    };
+    work.updated_at = nowIso();
+    await playableContentEngine.persist();
+  }
+
+  await loadCatalog(true);
+  const capturedCharge = finalizeStudioJobCharge(sessionId, job);
+  updateStudioJob(job, {
+    status: "done",
+    step: "done",
+    progress: 100,
+    work,
+    pipeline: {
+      sourceMode: resolved.mode,
+      eta,
+      qa: qaResult,
+      knowledgeBlockCount: knowledgeBlocks.length,
+      easter
+    },
+    creditCharge: capturedCharge || job.creditCharge || null,
+    creditSnapshot: job.creditSnapshot || null,
+    message: `Book pipeline completed. Charged ${toInt(capturedCharge?.amount || job?.creditCharge?.amount)} credits.`
+  });
+}
+
 async function runStudioGenerationJob(job, sessionId) {
   updateStudioJob(job, { status: "running", step: "queued", progress: 2, message: "Job queued, preparing execution" });
   try {
+    if (isBookPipelinePayload(job.payload)) {
+      await runBookPipelineGenerationJob(job, sessionId);
+      return;
+    }
     const work = await playableContentEngine.generatePlayableBook(sessionId, job.payload, {
       onProgress: (event) => {
         updateStudioJob(job, {
@@ -1726,6 +2789,69 @@ async function handleStudioApi(req, res, url, session) {
       const deleted = await playableContentEngine.deleteWork(session.id, workId);
       await loadCatalog(true);
       writeJson(res, 200, { ok: true, deleted });
+      return true;
+    }
+
+    if (method === "POST" && (route === "/api/studio/books/jobs" || route === "/api/studio/book/jobs")) {
+      const body = await parseJsonBody(req, 24 * 1024 * 1024).catch((error) => ({ __error: error?.message || "Invalid body" }));
+      if (body.__error) {
+        writeJson(res, 400, { ok: false, error: body.__error });
+        return true;
+      }
+      const payload = {
+        ...body,
+        bookPipeline: true,
+        pipelineMode: "book_pipeline",
+        mode: "book_pipeline"
+      };
+      const eta = estimateBookPipelineFromPayload(payload);
+      const charged = chargeCreditsForStudioGeneration(session.id, payload);
+      if (!charged.ok) {
+        writeJson(res, 402, {
+          ok: false,
+          code: "INSUFFICIENT_CREDITS",
+          error: `Insufficient credits. Need ${charged.need}, available ${charged.available}.`,
+          need: charged.need,
+          available: charged.available,
+          eta,
+          credits: charged.credits
+        });
+        return true;
+      }
+      const job = createStudioJob(session.id, payload, {
+        creditCharge: charged.charge,
+        creditSnapshot: charged.credits,
+        eta,
+        pipeline: {
+          type: "book_pipeline",
+          eta,
+          stage: "queued"
+        }
+      });
+      updateStudioJob(job, {
+        status: "queued",
+        step: "queued",
+        progress: 0,
+        eta,
+        pipeline: {
+          type: "book_pipeline",
+          eta,
+          stage: "queued"
+        },
+        creditCharge: job.creditCharge || null,
+        creditSnapshot: job.creditSnapshot || null,
+        message: `Book pipeline created. ETA ${eta.etaMin}-${eta.etaMax} min; check back around ${new Date(eta.returnAt).toLocaleTimeString()}.`
+      });
+      runStudioGenerationJob(job, session.id).catch((error) => {
+        updateStudioJob(job, {
+          status: "error",
+          step: "error",
+          progress: 10,
+          error: error?.message || "Job failed",
+          message: `Generation failed: ${error?.message || "unknown error"}`
+        });
+      });
+      writeJson(res, 200, { ok: true, job: toStudioJobPublic(job) });
       return true;
     }
 
@@ -2336,9 +3462,99 @@ function buildCatalogForSession(sessionId) {
   };
 }
 
+function buildLanguageBootstrapScript() {
+  return `(function () {
+  const LANGUAGE_STORAGE_KEY = "reado_lang";
+  const LANGUAGE_EXPLICIT_KEY = "reado_lang_explicit";
+  const TRANSLATE_GATE_ATTR = "data-reado-translate-pending";
+  const TRANSLATE_GATE_STYLE_ID = "reado-translate-gate-style";
+  const TRANSLATE_GATE_TIMEOUT_MS = 12000;
+  const LANGUAGES = ["zh-CN","en-US","ja-JP","ko-KR","fr-FR","de-DE","es-ES","pt-BR","ru-RU","ar-SA","hi-IN","id-ID"];
+  const RTL_LANGS = { "ar-SA": true };
+
+  function normalizeLanguage(input) {
+    const text = String(input || "").trim();
+    if (!text) return "";
+    const normalized = text.replace(/_/g, "-");
+    const exact = LANGUAGES.find((code) => code.toLowerCase() === normalized.toLowerCase());
+    if (exact) return exact;
+    const short = normalized.split("-")[0].toLowerCase();
+    const match = LANGUAGES.find((code) => code.toLowerCase().startsWith(short + "-"));
+    return match || "";
+  }
+
+  function detectLanguage() {
+    try {
+      const url = new URL(window.location.href);
+      const fromQuery = normalizeLanguage(url.searchParams.get("lang") || "");
+      if (fromQuery) return fromQuery;
+    } catch {}
+
+    try {
+      const explicit = localStorage.getItem(LANGUAGE_EXPLICIT_KEY) === "1";
+      if (explicit) {
+        const fromStorage = normalizeLanguage(localStorage.getItem(LANGUAGE_STORAGE_KEY) || "");
+        if (fromStorage) return fromStorage;
+      }
+    } catch {}
+
+    try {
+      const browserCandidates = Array.isArray(navigator.languages) ? navigator.languages : [navigator.language];
+      for (const candidate of browserCandidates) {
+        const normalized = normalizeLanguage(candidate || "");
+        if (normalized) return normalized;
+      }
+    } catch {}
+
+    return "en-US";
+  }
+
+  function clearGateStyle() {
+    const style = document.getElementById(TRANSLATE_GATE_STYLE_ID);
+    if (style && style.parentNode) {
+      style.parentNode.removeChild(style);
+    }
+  }
+
+  function releaseTranslateGate() {
+    document.documentElement.setAttribute(TRANSLATE_GATE_ATTR, "0");
+    clearGateStyle();
+  }
+
+  function ensureTranslateGate() {
+    document.documentElement.setAttribute(TRANSLATE_GATE_ATTR, "1");
+    if (document.getElementById(TRANSLATE_GATE_STYLE_ID)) return;
+    const style = document.createElement("style");
+    style.id = TRANSLATE_GATE_STYLE_ID;
+    style.textContent = 'html[data-reado-translate-pending="1"] body{visibility:hidden !important;}';
+    (document.head || document.documentElement).appendChild(style);
+  }
+
+  const language = detectLanguage();
+  const html = document.documentElement;
+  window.__READO_BOOTSTRAP_LANG__ = language;
+  window.__READO_RELEASE_TRANSLATE_GATE__ = releaseTranslateGate;
+  html.lang = language;
+  html.setAttribute("data-reado-lang", language);
+  html.dir = RTL_LANGS[language] ? "rtl" : "ltr";
+
+  if (String(language).toLowerCase().startsWith("en")) {
+    ensureTranslateGate();
+    window.setTimeout(() => {
+      if (document.documentElement.getAttribute(TRANSLATE_GATE_ATTR) === "1") {
+        releaseTranslateGate();
+      }
+    }, TRANSLATE_GATE_TIMEOUT_MS);
+  } else {
+    releaseTranslateGate();
+  }
+})();`;
+}
+
 function buildCatalogScript(sessionId) {
   const scopedCatalog = buildCatalogForSession(sessionId);
-  return `(function(){
+  return `${buildLanguageBootstrapScript()}
+(function(){
   if (typeof document === "undefined") return;
   if (document.getElementById("reado-shell-bootstrap-style")) return;
   var style = document.createElement("style");
@@ -2545,7 +3761,228 @@ function buildDynamicBookPageHtml(book) {
 </html>`;
 }
 
-function buildDynamicExperienceHtml(html, module, book) {
+function buildPipelinePanelSnippet(module, pipelineMeta) {
+  const data = pipelineMeta && typeof pipelineMeta === "object" ? pipelineMeta : null;
+  if (!data) return "";
+  const kb = data.knowledge_block && typeof data.knowledge_block === "object" ? data.knowledge_block : {};
+  const quizSet = Array.isArray(data.quiz_set) ? data.quiz_set : [];
+  const rewards = data.rewards && typeof data.rewards === "object" ? data.rewards : {};
+  const mysteryBox = rewards.mystery_box && typeof rewards.mystery_box === "object" ? rewards.mystery_box : {};
+  const powerUps = Array.isArray(mysteryBox.functional_powerups) ? mysteryBox.functional_powerups : [];
+  const collectibles = mysteryBox.collectibles && typeof mysteryBox.collectibles === "object"
+    ? mysteryBox.collectibles
+    : { fragments: [], badge: null };
+  const fragments = Array.isArray(collectibles.fragments) ? collectibles.fragments : [];
+  const badge = collectibles.badge && typeof collectibles.badge === "object" ? collectibles.badge : null;
+  const shortcuts = Array.isArray(mysteryBox.knowledge_shortcuts) ? mysteryBox.knowledge_shortcuts : [];
+  const audioRecap = data.audio_recap && typeof data.audio_recap === "object" ? data.audio_recap : {};
+  const microTasks = Math.max(1, Math.min(20, toInt(data?.progress_design?.micro_tasks) || BOOK_PIPELINE_MICRO_TASKS));
+  const microSeconds = Math.max(10, Math.min(120, toInt(data?.progress_design?.micro_task_seconds) || BOOK_PIPELINE_MICRO_SECONDS));
+  const taskHtml = Array.from({ length: microTasks }, (_, idx) => (
+    `<li><span class="dot"></span><span>Task ${idx + 1}</span><span>${microSeconds}s</span></li>`
+  )).join("");
+  const fragmentHtml = fragments.slice(0, 6).map((item, idx) => `
+      <article class="fragment">
+        <img src="${escapeHtml(cleanText(item?.image, buildGeneratedCoverDataUri({
+          title: `Fragment ${idx + 1}`,
+          subtitle: cleanText(kb?.title, "Knowledge Fragment"),
+          seed: `${module?.slug || "module"}:fragment:${idx + 1}`
+        })))}" alt="${escapeHtml(cleanText(item?.title, `Fragment ${idx + 1}`))}" loading="lazy" />
+        <p>${escapeHtml(cleanText(item?.title, `Fragment ${idx + 1}`))}</p>
+      </article>
+  `).join("");
+  const badgeHtml = badge ? `
+      <article class="badge">
+        <img src="${escapeHtml(cleanText(badge.image, buildGeneratedCoverDataUri({
+          title: cleanText(badge.title, "Badge"),
+          subtitle: cleanText(kb?.title, "Mastery Badge"),
+          seed: `${module?.slug || "module"}:badge`
+        })))}" alt="${escapeHtml(cleanText(badge.title, "Mastery Badge"))}" loading="lazy" />
+        <p>${escapeHtml(cleanText(badge.title, "Mastery Badge"))}</p>
+      </article>
+  ` : "";
+  const powerUpHtml = powerUps.slice(0, 2).map((item) => (
+    `<li>${escapeHtml(cleanText(item?.name, "Power-up"))}</li>`
+  )).join("");
+  const shortcut = shortcuts[0] || null;
+  const audioHref = cleanText(audioRecap.href, cleanText(shortcut?.href));
+
+  return `
+<style>
+  .reado-pipeline-panel {
+    position: fixed;
+    top: 124px;
+    right: 18px;
+    z-index: 65;
+    width: min(320px, calc(100vw - 24px));
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    border-radius: 16px;
+    background: rgba(6, 12, 28, 0.88);
+    box-shadow: 0 20px 42px rgba(2, 8, 23, 0.42);
+    backdrop-filter: blur(8px);
+    padding: 12px;
+    color: #dbeafe;
+    font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+    max-height: calc(100vh - 148px);
+    overflow: auto;
+  }
+  .reado-pipeline-panel h4 {
+    margin: 0 0 6px;
+    font-size: 13px;
+    color: #93c5fd;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+  .reado-pipeline-panel h3 {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.35;
+    color: #eff6ff;
+  }
+  .reado-pipeline-panel .summary {
+    margin: 8px 0 12px;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #cbd5e1;
+  }
+  .reado-pipeline-panel .meta {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .reado-pipeline-panel .meta article {
+    border: 1px solid rgba(96, 165, 250, 0.24);
+    border-radius: 10px;
+    background: rgba(15, 23, 42, 0.72);
+    padding: 8px;
+  }
+  .reado-pipeline-panel .meta p {
+    margin: 0;
+    font-size: 10px;
+    color: #93c5fd;
+    letter-spacing: 0.03em;
+  }
+  .reado-pipeline-panel .meta strong {
+    font-size: 13px;
+    color: #eff6ff;
+  }
+  .reado-pipeline-panel .tasks {
+    margin: 0 0 12px;
+    padding: 0;
+    list-style: none;
+  }
+  .reado-pipeline-panel .tasks li {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 8px;
+    align-items: center;
+    font-size: 12px;
+    color: #dbeafe;
+    padding: 5px 0;
+    border-bottom: 1px dashed rgba(148, 163, 184, 0.18);
+  }
+  .reado-pipeline-panel .tasks .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #22d3ee, #60a5fa);
+    box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.16);
+  }
+  .reado-pipeline-panel .collect-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .reado-pipeline-panel .fragment,
+  .reado-pipeline-panel .badge {
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 10px;
+    overflow: hidden;
+    background: rgba(15, 23, 42, 0.7);
+  }
+  .reado-pipeline-panel img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    display: block;
+  }
+  .reado-pipeline-panel .fragment p,
+  .reado-pipeline-panel .badge p {
+    margin: 0;
+    font-size: 10px;
+    color: #cbd5e1;
+    padding: 5px 6px;
+    line-height: 1.35;
+  }
+  .reado-pipeline-panel .badge {
+    margin-bottom: 10px;
+  }
+  .reado-pipeline-panel .powerups {
+    margin: 0 0 10px;
+    padding-left: 18px;
+    font-size: 12px;
+    color: #cbd5e1;
+    line-height: 1.6;
+  }
+  .reado-pipeline-panel .audio {
+    margin-top: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .reado-pipeline-panel .audio a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(56, 189, 248, 0.38);
+    border-radius: 999px;
+    padding: 8px 10px;
+    text-decoration: none;
+    font-size: 12px;
+    color: #dbeafe;
+    background: rgba(15, 23, 42, 0.7);
+  }
+  @media (max-width: 900px) {
+    .reado-pipeline-panel {
+      top: auto;
+      bottom: 12px;
+      right: 12px;
+      width: calc(100vw - 24px);
+      max-height: 62vh;
+    }
+  }
+</style>
+<aside class="reado-pipeline-panel" aria-label="Knowledge gate mission">
+  <h4>Gate ${escapeHtml(String(toInt(kb?.gate_index) || module?.index || 1))}</h4>
+  <h3>${escapeHtml(cleanText(kb?.title, module?.title || "Knowledge Mission"))}</h3>
+  <p class="summary">${escapeHtml(cleanText(kb?.summary, "High-density learning mission with quizzes, collectibles, and recap."))}</p>
+
+  <section class="meta">
+    <article><p>Questions</p><strong>${escapeHtml(String(quizSet.length || 10))}</strong></article>
+    <article><p>Micro tasks</p><strong>${escapeHtml(`${microTasks} x ${microSeconds}s`)}</strong></article>
+    <article><p>Fragments</p><strong>${escapeHtml(String(fragments.length || 0))}</strong></article>
+  </section>
+
+  <ul class="tasks">${taskHtml}</ul>
+
+  <h4>Collectibles</h4>
+  <section class="collect-grid">${fragmentHtml}</section>
+  ${badgeHtml}
+
+  <h4>Mystery Box</h4>
+  <ul class="powerups">${powerUpHtml || "<li>Focus Shield</li><li>Streak Freeze</li>"}</ul>
+
+  <h4>Audio Recap</h4>
+  <section class="audio">
+    ${audioHref ? `<a href="${escapeHtml(audioHref)}" target="_blank" rel="noopener">Play recap audio</a>` : "<span>Audio recap generating...</span>"}
+    ${cleanText(audioRecap.transcript_href) ? `<a href="${escapeHtml(audioRecap.transcript_href)}" target="_blank" rel="noopener">Open transcript</a>` : ""}
+  </section>
+</aside>`;
+}
+
+function buildDynamicExperienceHtml(html, module, book, pipelineMeta = null) {
   const shellSnippet = `
 <script src="/shared/book-catalog.js"></script>
 <script type="module" src="/shared/shell.js"></script>
@@ -2598,6 +4035,7 @@ function buildDynamicExperienceHtml(html, module, book) {
   <span class="book">${escapeHtml(book?.title || "Book")}</span>
   <span class="idx">${escapeHtml(String(module?.index || 1))}/${escapeHtml(String(book?.moduleCount || 1))}</span>
 </nav>`;
+  const pipelinePanelSnippet = buildPipelinePanelSnippet(module, pipelineMeta);
 
   const completionSnippet = `
 <script>
@@ -2624,7 +4062,10 @@ function buildDynamicExperienceHtml(html, module, book) {
 })();
 </script>`;
 
-  return injectBeforeBody(injectAfterBodyOpen(html, `${shellSnippet}\n${modulePagerSnippet}`), completionSnippet);
+  return injectBeforeBody(
+    injectAfterBodyOpen(html, `${shellSnippet}\n${modulePagerSnippet}\n${pipelinePanelSnippet}`),
+    completionSnippet
+  );
 }
 
 async function readDynamicPayloadForRequest(pathname, sessionId) {
@@ -2667,8 +4108,9 @@ async function readDynamicPayloadForRequest(pathname, sessionId) {
     if (!book) return null;
     const enrichedBook = enrichBookWithWorkMeta(book, sessionId);
     if (!enrichedBook) return null;
+    const pipelineMeta = await readModulePipelineMeta(loaded.module);
     return {
-      buffer: Buffer.from(buildDynamicExperienceHtml(loaded.html, loaded.module, enrichedBook), "utf8"),
+      buffer: Buffer.from(buildDynamicExperienceHtml(loaded.html, loaded.module, enrichedBook, pipelineMeta), "utf8"),
       ext: ".html"
     };
   }
@@ -2982,6 +4424,21 @@ function toPublicModule(module) {
   };
 }
 
+async function readModulePipelineMeta(module) {
+  if (!module || typeof module !== "object") return null;
+  const moduleDirPath = cleanText(module.moduleDirPath);
+  if (!moduleDirPath) return null;
+  const moduleJsonPath = path.join(moduleDirPath, "module.json");
+  try {
+    const parsed = JSON.parse(await fs.readFile(moduleJsonPath, "utf8"));
+    const data = parsed?.book_pipeline;
+    if (!data || typeof data !== "object") return null;
+    return data;
+  } catch {
+    return null;
+  }
+}
+
 async function handleContentApi(req, res, url, session = null) {
   const method = req.method || "GET";
   const pathname = url.pathname;
@@ -3047,6 +4504,27 @@ async function handleContentApi(req, res, url, session = null) {
           highlights: book.highlights,
           modules: book.modules.map(toPublicModule)
         }
+      });
+      return true;
+    }
+
+    const modulePipelineMatch = pathname.match(/^\/api\/content\/modules\/([^/]+)\/pipeline$/);
+    if (method === "GET" && modulePipelineMatch) {
+      const slug = decodeURIComponent(modulePipelineMatch[1] || "").trim();
+      const module = await runtimeBookCatalog.getModule(slug);
+      if (!module) {
+        writeJson(res, 404, { ok: false, error: "Module not found" });
+        return true;
+      }
+      if (isUserGeneratedBookId(module.bookId) && !canSessionViewUserBook(session?.id, module.bookId)) {
+        writeJson(res, 404, { ok: false, error: "Module not found" });
+        return true;
+      }
+      const pipeline = await readModulePipelineMeta(module);
+      writeJson(res, 200, {
+        ok: true,
+        module: toPublicModule(module),
+        pipeline
       });
       return true;
     }
@@ -3631,6 +5109,8 @@ server.listen(port, () => {
   console.log(`[studio] html provider: ${playableContentEngine.htmlProvider || "llm"}`);
   console.log(`[studio] stitch bridge configured: ${playableContentEngine.stitchBridgeEndpoint ? "yes" : "no"}`);
   console.log(`[studio] skills loaded: ${playableContentEngine.listSkills().length}`);
+  console.log(`[studio] book pipeline image provider: ${BOOK_PIPELINE_IMAGE_PROVIDER} (nano script: ${READO_NANO_BANANA_SCRIPT ? "set" : "unset"})`);
+  console.log(`[studio] book pipeline audio provider: ${BOOK_PIPELINE_AUDIO_PROVIDER} (elevenlabs: ${ELEVENLABS_API_KEY ? "set" : "unset"})`);
 });
 
 async function shutdown() {

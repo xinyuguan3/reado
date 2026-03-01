@@ -87,6 +87,44 @@
   </style>
 </head>
 <body>
+<style id="reado-shell-preload-style">
+body.reado-shell-applied {
+  --reado-right-width: clamp(280px, 24vw, 320px);
+  padding-top: 80px !important;
+}
+@media (min-width: 1024px) {
+  body.reado-shell-applied {
+    padding-left: 256px !important;
+  }
+}
+@media (min-width: 1200px) {
+  body.reado-shell-applied {
+    padding-right: var(--reado-right-width) !important;
+  }
+}
+body.reado-shell-applied.reado-experience-mode {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  padding-top: 0 !important;
+  overflow: auto !important;
+}
+body.reado-shell-applied:not(.reado-experience-mode) > header:first-of-type,
+body.reado-shell-applied:not(.reado-experience-mode) > nav:first-of-type,
+body.reado-shell-applied:not(.reado-experience-mode) > aside:first-of-type,
+body.reado-shell-applied:not(.reado-experience-mode) > .flex > nav:first-of-type,
+body.reado-shell-applied:not(.reado-experience-mode) > .flex > aside:first-of-type,
+body.reado-shell-applied:not(.reado-experience-mode) > .flex-1 > nav:first-of-type,
+body.reado-shell-applied:not(.reado-experience-mode) > .flex-1 > aside:first-of-type,
+body.reado-shell-applied:not(.reado-experience-mode) > .flex > .flex-1 > nav:first-of-type,
+body.reado-shell-applied:not(.reado-experience-mode) > .flex > .flex-1 > aside:first-of-type {
+  display: none !important;
+}
+</style>
+<script>
+if (document.body) {
+  document.body.classList.add("reado-shell-applied", "reado-shell-icons-fallback");
+}
+</script>
   <script src="/shared/book-catalog.js"></script>
   <script type="module" src="/shared/shell.js"></script>
   <reado-app-shell data-page="profile"></reado-app-shell>
