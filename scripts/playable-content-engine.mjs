@@ -15,6 +15,9 @@ const DEFAULT_HTTP_HEADERS = {
   "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
   "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8"
 };
+const INGEST_TEXT_LIMIT_DEFAULT = Math.max(60_000, Number(process.env.READO_INGEST_TEXT_LIMIT || 240_000) || 240_000);
+const PDF_EXTRACT_MAX_CHARS_DEFAULT = Math.max(80_000, Number(process.env.READO_PDF_EXTRACT_MAX_CHARS || 320_000) || 320_000);
+const PDF_EXTRACT_MAX_PAGES_DEFAULT = Math.max(16, Number(process.env.READO_PDF_EXTRACT_MAX_PAGES || 480) || 480);
 const BROWSER_EXECUTABLE_CANDIDATES = [
   toText(process.env.READO_BROWSER_EXECUTABLE_PATH),
   toText(process.env.READO_CHROME_EXECUTABLE_PATH),
@@ -460,11 +463,13 @@ async function resolveBrowserExecutablePath() {
   return browserExecutablePathPromise;
 }
 
-async function extractTextFromPdfBuffer(buffer) {
+async function extractTextFromPdfBuffer(buffer, options = {}) {
   const pdfjs = await loadPdfJs().catch(() => null);
   if (!pdfjs || typeof pdfjs.getDocument !== "function") {
     throw new Error("pdfjs-dist is not available");
   }
+  const maxChars = Math.max(20_000, Number(options?.maxChars) || PDF_EXTRACT_MAX_CHARS_DEFAULT);
+  const maxPagesLimit = Math.max(1, Number(options?.maxPages) || PDF_EXTRACT_MAX_PAGES_DEFAULT);
   const data = new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength);
   const task = pdfjs.getDocument({
     data,
@@ -476,7 +481,7 @@ async function extractTextFromPdfBuffer(buffer) {
     const doc = await task.promise;
     const parts = [];
     let accLen = 0;
-    const maxPages = Math.max(1, Math.min(Number(doc.numPages) || 1, 240));
+    const maxPages = Math.max(1, Math.min(Number(doc.numPages) || 1, maxPagesLimit));
     for (let pageNo = 1; pageNo <= maxPages; pageNo += 1) {
       const page = await doc.getPage(pageNo);
       const content = await page.getTextContent().catch(() => ({ items: [] }));
@@ -489,9 +494,9 @@ async function extractTextFromPdfBuffer(buffer) {
       if (!line) continue;
       parts.push(line);
       accLen += line.length;
-      if (accLen > 120_000) break;
+      if (accLen > maxChars * 1.25) break;
     }
-    const merged = clamp(parts.join("\n\n"), 60_000);
+    const merged = clamp(parts.join("\n\n"), maxChars);
     if (!merged) throw new Error("pdf text extraction returned empty content");
     return merged;
   } finally {
@@ -748,12 +753,17 @@ function normalizeModule(raw, index) {
   };
 }
 
-function normalizeBlueprint(raw, fallbackTitle) {
+function normalizeBlueprint(raw, fallbackTitle, options = {}) {
   const data = raw && typeof raw === "object" ? raw : {};
-  const modulesRaw = toArray(data.modules).slice(0, 6);
+  const maxModules = Math.max(1, Math.min(36, Number(options?.maxModules) || 6));
+  const minModules = Math.max(1, Math.min(maxModules, Number(options?.minModules) || Math.min(3, maxModules)));
+  const modulesRaw = toArray(data.modules).slice(0, maxModules);
   const modules = modulesRaw.length > 0
     ? modulesRaw.map((module, index) => normalizeModule(module, index))
-    : [normalizeModule({}, 0), normalizeModule({}, 1), normalizeModule({}, 2)];
+    : [];
+  while (modules.length < minModules) {
+    modules.push(normalizeModule({}, modules.length));
+  }
 
   return {
     title: clamp(toText(data.title, fallbackTitle || "Playable Learning Campaign"), 120),
@@ -767,15 +777,22 @@ function normalizeBlueprint(raw, fallbackTitle) {
   };
 }
 
-function fallbackBlueprint({ title, contextText }) {
+function fallbackBlueprint({ title, contextText, targetModules = 3 }) {
+  const moduleTarget = Math.max(1, Math.min(36, Number(targetModules) || 3));
   const sentences = splitSentences(contextText);
   const core = pickIntroLines(sentences, 8);
-  const moduleSeeds = core.length >= 3 ? core : [
+  const baseSeeds = core.length > 0 ? core : [
     "Map the problem space and constraints",
     "Model interactions among key variables",
     "Translate insight into real-world action"
   ];
-  const modules = moduleSeeds.slice(0, 3).map((seed, index) => ({
+  const moduleSeeds = Array.from({ length: moduleTarget }, (_, index) => {
+    if (!baseSeeds.length) return `Module focus ${index + 1}`;
+    const sourceIndex = Math.min(baseSeeds.length - 1, Math.floor((index / Math.max(moduleTarget - 1, 1)) * (baseSeeds.length - 1)));
+    const seed = toText(baseSeeds[sourceIndex], `Module focus ${index + 1}`);
+    return seed || `Module focus ${index + 1}`;
+  });
+  const modules = moduleSeeds.map((seed, index) => ({
     title: `Module ${index + 1} · ${seed.slice(0, 24)}`,
     scene: `Scenario ${index + 1}`,
     objective: "Make explainable strategic choices under incomplete information.",
@@ -857,7 +874,8 @@ function fallbackBlueprint({ title, contextText }) {
       corePoints: core,
       modules
     },
-    title
+    title,
+    { maxModules: moduleTarget, minModules: moduleTarget }
   );
 }
 
@@ -1513,7 +1531,7 @@ function hasObviousEmptyUiSlots(html) {
 
 function compileModuleHtml({ bookId, blueprint, module, moduleIndex, moduleCount, nextModuleSlug, prevModuleSlug, moduleSlug }) {
   const theme = pickTheme(blueprint, module);
-  const roundsJson = JSON.stringify(module.rounds || []);
+  const roundsJson = JSON.stringify(module.rounds || []).replace(/<\/script/gi, "<\\/script");
   const escapedTitle = escapeHtml(module.title);
   const escapedBookTitle = escapeHtml(blueprint.title);
   const escapedScene = escapeHtml(module.scene || `Scene ${moduleIndex + 1}`);
@@ -1527,6 +1545,9 @@ function compileModuleHtml({ bookId, blueprint, module, moduleIndex, moduleCount
   const escapedSetting = escapeHtml(blueprint.setting || "Complex-system scenario simulation");
   const escapedMission = escapeHtml(blueprint.mission || "Find a better strategy under constraints.");
   const escapedThemeLabel = escapeHtml(theme.label);
+  const sceneJs = JSON.stringify(toText(module.scene || `Scene ${moduleIndex + 1}`));
+  const roleJs = JSON.stringify(toText(blueprint.role || "Chief Decision Officer"));
+  const lastExperienceHrefJs = JSON.stringify(`/experiences/${encodeURIComponent(moduleSlug)}.html`);
   const nextHref = nextModuleSlug ? `/experiences/${encodeURIComponent(nextModuleSlug)}.html` : "";
   const prevHref = prevModuleSlug ? `/experiences/${encodeURIComponent(prevModuleSlug)}.html` : "";
   const hubBookSlug = encodeURIComponent(bookId);
@@ -1920,13 +1941,13 @@ function compileModuleHtml({ bookId, blueprint, module, moduleIndex, moduleCount
         retryBtn.addEventListener("click", () => window.location.reload());
       }
 
-      pushLog("Entered scene: ${escapedScene}");
-      pushLog("Role ready: ${escapedRole}");
+      pushLog("Entered scene: " + ${sceneJs});
+      pushLog("Role ready: " + ${roleJs});
       refreshBars();
       paintRound();
 
       try {
-        localStorage.setItem("reado_last_experience_href", "/experiences/${encodeURIComponent(moduleSlug)}.html");
+        localStorage.setItem("reado_last_experience_href", ${lastExperienceHrefJs});
       } catch {}
     })();
   </script>
@@ -2607,7 +2628,7 @@ export class PlayableContentEngine {
       supports: ({ mimeType, lowerName }) => (
         String(mimeType || "") === "application/pdf" || String(lowerName || "").endsWith(".pdf")
       ),
-      run: async ({ name, mimeType, contentBase64, buffer }) => {
+      run: async ({ name, mimeType, contentBase64, buffer, maxTextLen, maxPages }) => {
         const errors = [];
         if (this.parserWebhookUrl) {
           try {
@@ -2628,7 +2649,10 @@ export class PlayableContentEngine {
               45000
             );
             const parserData = await parserRes.json().catch(() => ({}));
-            const webhookText = clamp(toText(parserData?.text).replace(/\s+/g, " ").trim(), 60_000);
+            const webhookText = clamp(
+              toText(parserData?.text).replace(/\s+/g, " ").trim(),
+              Math.max(60_000, Number(maxTextLen) || INGEST_TEXT_LIMIT_DEFAULT)
+            );
             if (parserRes.ok && webhookText) {
               return { text: webhookText };
             }
@@ -2638,7 +2662,10 @@ export class PlayableContentEngine {
           }
         }
         try {
-          const localText = await extractTextFromPdfBuffer(buffer);
+          const localText = await extractTextFromPdfBuffer(buffer, {
+            maxChars: Math.max(60_000, Number(maxTextLen) || INGEST_TEXT_LIMIT_DEFAULT),
+            maxPages: Math.max(1, Number(maxPages) || PDF_EXTRACT_MAX_PAGES_DEFAULT)
+          });
           return { text: localText };
         } catch (error) {
           errors.push(toText(error?.message, "PDF local parser failed"));
@@ -3197,7 +3224,7 @@ export class PlayableContentEngine {
     return rows;
   }
 
-  async ingestFileSource(payload, hooks = null) {
+  async ingestFileSource(payload, hooks = null, options = {}) {
     const name = clamp(toText(payload?.name, "untitled.txt"), 240);
     const mimeType = toText(payload?.type).toLowerCase();
     const contentBase64 = toText(payload?.contentBase64);
@@ -3209,6 +3236,8 @@ export class PlayableContentEngine {
     if (buffer.length > 12 * 1024 * 1024) throw new Error("file too large (>12MB)");
 
     const lowerName = name.toLowerCase();
+    const maxTextLen = Math.max(60_000, Number(options?.maxTextLen) || INGEST_TEXT_LIMIT_DEFAULT);
+    const maxPages = Math.max(1, Number(options?.maxPages) || PDF_EXTRACT_MAX_PAGES_DEFAULT);
     if (lowerName.endsWith(".mobi") || lowerName.endsWith(".azw") || lowerName.endsWith(".azw3")) {
       throw new Error("MOBI/AZW is not supported right now. Please convert to PDF, EPUB, TXT, or Markdown.");
     }
@@ -3220,9 +3249,9 @@ export class PlayableContentEngine {
 
     for (const skill of ingestSkills) {
       try {
-        if (skill.supports && !skill.supports({ name, mimeType, lowerName, buffer, contentBase64 })) continue;
+        if (skill.supports && !skill.supports({ name, mimeType, lowerName, buffer, contentBase64, maxTextLen, maxPages })) continue;
         this.emitProgress(hooks, "ingesting_file", 45, `Running ingest skill: ${skill.label}`);
-        const result = await skill.run({ name, mimeType, lowerName, buffer, contentBase64 });
+        const result = await skill.run({ name, mimeType, lowerName, buffer, contentBase64, maxTextLen, maxPages });
         const extracted = toText(result?.text);
         if (extracted) {
           text = extracted;
@@ -3242,7 +3271,7 @@ export class PlayableContentEngine {
       throw new Error("unsupported file type. use txt/md/csv/json/html/epub/pdf");
     }
 
-    const normalizedText = clamp(text.replace(/\s+/g, " ").trim(), 60_000);
+    const normalizedText = clamp(text.replace(/\s+/g, " ").trim(), maxTextLen);
     if (!normalizedText) throw new Error("no readable text extracted from file");
     this.emitProgress(hooks, "ingesting_file", 90, `File parsed: ${name}`);
 
@@ -3265,6 +3294,11 @@ export class PlayableContentEngine {
       && (stitchProviderOnly || htmlProvider === "auto");
     const llmHtmlAllowed = this.enableLlmHtml && htmlProvider !== "template";
 
+    const moduleCapFromPayload = Number(payload?.maxModuleCount);
+    const moduleCap = Number.isFinite(moduleCapFromPayload)
+      ? Math.max(1, Math.min(36, Math.floor(moduleCapFromPayload)))
+      : (payload?.bookPipeline ? 24 : 6);
+
     const modeRaw = toText(payload?.mode, "book").toLowerCase();
     const mode = ["book", "url", "search", "sources"].includes(modeRaw)
       ? modeRaw
@@ -3281,7 +3315,7 @@ export class PlayableContentEngine {
 
     const moduleCountRaw = Number(payload?.moduleCount);
     let moduleCount = Number.isFinite(moduleCountRaw)
-      ? Math.max(1, Math.min(6, Math.floor(moduleCountRaw)))
+      ? Math.max(1, Math.min(moduleCap, Math.floor(moduleCountRaw)))
       : 0;
 
     const explicitContext = buildContextFromSourceInputs({
@@ -3308,6 +3342,7 @@ export class PlayableContentEngine {
         contextText: context.contextText,
         sources: context.sources
       });
+      moduleCount = Math.max(1, Math.min(moduleCap, moduleCount));
       this.emitProgress(hooks, "preparing_sources", 30, `Auto module count selected: ${moduleCount}`);
     }
 
@@ -3337,7 +3372,10 @@ export class PlayableContentEngine {
           deniedPatterns: WRITING_BIAS_TERMS
         });
 
-        let normalizedCandidate = normalizeBlueprint(blueprintRaw, title);
+        let normalizedCandidate = normalizeBlueprint(blueprintRaw, title, {
+          maxModules: moduleCount,
+          minModules: moduleCount
+        });
         groundingReport = assessGroundingQuality({
           blueprint: normalizedCandidate,
           contextText: context.contextText || input,
@@ -3366,7 +3404,10 @@ export class PlayableContentEngine {
             groundingHints: groundingReport.missing.slice(0, 12).concat(groundingReport.hits.slice(0, 8)),
             deniedPatterns: WRITING_BIAS_TERMS
           });
-          const retryNormalized = normalizeBlueprint(retryRaw, title);
+          const retryNormalized = normalizeBlueprint(retryRaw, title, {
+            maxModules: moduleCount,
+            minModules: moduleCount
+          });
           const retryReport = assessGroundingQuality({
             blueprint: retryNormalized,
             contextText: context.contextText || input,
@@ -3396,8 +3437,8 @@ export class PlayableContentEngine {
     }
 
     const blueprint = blueprintRaw
-      ? normalizeBlueprint(blueprintRaw, title)
-      : fallbackBlueprint({ title, contextText: context.contextText || input });
+      ? normalizeBlueprint(blueprintRaw, title, { maxModules: moduleCount, minModules: moduleCount })
+      : fallbackBlueprint({ title, contextText: context.contextText || input, targetModules: moduleCount });
 
     const bookBase = slugify(title) || slugify(input) || `book-${shortId().slice(0, 6)}`;
     const bookId = `user-${bookBase}-${Date.now().toString(36).slice(-6)}-${shortId().slice(0, 4)}`;

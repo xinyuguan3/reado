@@ -1,0 +1,205 @@
+{
+  "slug": "u-long-pipeline-stress-boo-01-f45ad2",
+  "order": 1,
+  "title": "Module 1 · Long Pipeline Stress Boo",
+  "generatedBy": "playable-content-engine",
+  "generatedAt": "2026-03-02T09:21:07.368Z",
+  "book_pipeline": {
+    "version": 1,
+    "generated_at": "2026-03-02T09:21:07.375Z",
+    "knowledge_block": {
+      "id": "kb-01",
+      "gate_index": 1,
+      "title": "In decision science chapter 1, we compare assumptions, evidence, and bou",
+      "summary": "In decision science chapter 1, we compare assumptions, evidence, and boundary conditions under uncertainty. We test alternatives, update beliefs, and apply reflective correction with concrete examples and constraints.",
+      "words": 120,
+      "keywords": [
+        "chapter",
+        "decision",
+        "science",
+        "compare",
+        "assumptions",
+        "evidence"
+      ],
+      "density": {
+        "score": 0.8647,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 1,
+        "noveltyRatio": 0.3235,
+        "actionabilityRatio": 1
+      }
+    },
+    "quiz_set": [
+      {
+        "id": "q-01-01",
+        "type": "reading",
+        "prompt": "阅读片段并定位证据：In decision science chapter 1, we compare assumptions, evidence, and boundary conditions under uncertainty. We test alternatives, update bel...",
+        "why_this_matters": "掌握 chapter 并避免常见误判。",
+        "hint": "先回看本关卡摘要，再找“chapter”相关证据。",
+        "retry_feedback": "这次答案信息密度不足。请补上证据句、关键条件和反例边界。",
+        "mastery_signal": "能清楚说出概念定义、适用边界和一个真实应用。",
+        "estimated_seconds": 30
+      },
+      {
+        "id": "q-01-02",
+        "type": "reading",
+        "prompt": "从片段中找出“chapter”与“decision”的关系。",
+        "why_this_matters": "掌握 chapter 并避免常见误判。",
+        "hint": "先回看本关卡摘要，再找“decision”相关证据。",
+        "retry_feedback": "这次答案信息密度不足。请补上证据句、关键条件和反例边界。",
+        "mastery_signal": "能清楚说出概念定义、适用边界和一个真实应用。",
+        "estimated_seconds": 30
+      },
+      {
+        "id": "q-01-03",
+        "type": "discrimination",
+        "prompt": "以下哪项最准确描述了“chapter”？",
+        "why_this_matters": "掌握 chapter 并避免常见误判。",
+        "hint": "先回看本关卡摘要，再找“science”相关证据。",
+        "retry_feedback": "这次答案信息密度不足。请补上证据句、关键条件和反例边界。",
+        "mastery_signal": "能清楚说出概念定义、适用边界和一个真实应用。",
+        "estimated_seconds": 30
+      },
+      {
+        "id": "q-01-04",
+        "type": "discrimination",
+        "prompt": "将“chapter / decision / science”按因果顺序排序。",
+        "why_this_matters": "掌握 chapter 并避免常见误判。",
+        "hint": "先拆条件，再做判断；错因通常在定义边界。",
+        "retry_feedback": "这次答案信息密度不足。请补上证据句、关键条件和反例边界。",
+        "mastery_signal": "能清楚说出概念定义、适用边界和一个真实应用。",
+        "estimated_seconds": 30
+      },
+      {
+        "id": "q-01-05",
+        "type": "discrimination",
+        "prompt": "下面哪一项是该知识块中的常见误解？",
+        "why_this_matters": "掌握 chapter 并避免常见误判。",
+        "hint": "先拆条件，再做判断；错因通常在定义边界。",
+        "retry_feedback": "这次答案信息密度不足。请补上证据句、关键条件和反例边界。",
+        "mastery_signal": "能清楚说出概念定义、适用边界和一个真实应用。",
+        "estimated_seconds": 30
+      },
+      {
+        "id": "q-01-06",
+        "type": "application",
+        "prompt": "情景题：如果你在真实场景中遇到该问题，第一步该怎么做？",
+        "why_this_matters": "掌握 chapter 并避免常见误判。",
+        "hint": "先拆条件，再做判断；错因通常在定义边界。",
+        "retry_feedback": "这次答案信息密度不足。请补上证据句、关键条件和反例边界。",
+        "mastery_signal": "能清楚说出概念定义、适用边界和一个真实应用。",
+        "estimated_seconds": 30
+      },
+      {
+        "id": "q-01-07",
+        "type": "application",
+        "prompt": "反例判断：以下案例为什么不符合“chapter”的条件？",
+        "why_this_matters": "掌握 chapter 并避免常见误判。",
+        "hint": "先拆条件，再做判断；错因通常在定义边界。",
+        "retry_feedback": "这次答案信息密度不足。请补上证据句、关键条件和反例边界。",
+        "mastery_signal": "能清楚说出概念定义、适用边界和一个真实应用。",
+        "estimated_seconds": 30
+      },
+      {
+        "id": "q-01-08",
+        "type": "application",
+        "prompt": "在限制资源下，如何优先应用“decision”？",
+        "why_this_matters": "掌握 chapter 并避免常见误判。",
+        "hint": "先拆条件，再做判断；错因通常在定义边界。",
+        "retry_feedback": "这次答案信息密度不足。请补上证据句、关键条件和反例边界。",
+        "mastery_signal": "能清楚说出概念定义、适用边界和一个真实应用。",
+        "estimated_seconds": 30
+      },
+      {
+        "id": "q-01-09",
+        "type": "debug",
+        "prompt": "纠错题：下面推理中哪一步是错的，应该如何修正？",
+        "why_this_matters": "掌握 chapter 并避免常见误判。",
+        "hint": "先拆条件，再做判断；错因通常在定义边界。",
+        "retry_feedback": "这次答案信息密度不足。请补上证据句、关键条件和反例边界。",
+        "mastery_signal": "能清楚说出概念定义、适用边界和一个真实应用。",
+        "estimated_seconds": 30
+      },
+      {
+        "id": "q-01-10",
+        "type": "mini_project",
+        "prompt": "微项目：用 90 秒写出你对“chapter”的应用方案并自检。",
+        "why_this_matters": "掌握 chapter 并避免常见误判。",
+        "hint": "先拆条件，再做判断；错因通常在定义边界。",
+        "retry_feedback": "这次答案信息密度不足。请补上证据句、关键条件和反例边界。",
+        "mastery_signal": "能清楚说出概念定义、适用边界和一个真实应用。",
+        "estimated_seconds": 30
+      }
+    ],
+    "rewards": {
+      "mystery_box": {
+        "functional_powerups": [
+          {
+            "id": "focus-shield-1",
+            "name": "注意力保护罩",
+            "effect": "下个章节进入极简专注模式，附带低刺激背景音轨。",
+            "trigger": "mystery_box"
+          },
+          {
+            "id": "streak-freeze-1",
+            "name": "连胜冻结券",
+            "effect": "连续学习中断 1 天不掉连胜。",
+            "trigger": "streak_recovery"
+          }
+        ],
+        "collectibles": {
+          "fragments": [
+            {
+              "id": "fragment-01-1",
+              "title": "碎片 1-1",
+              "description": "完成连胜或通过彩蛋挑战可掉落。关联主题：chapter / decision",
+              "image": "data:image/svg+xml,%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%3F%3E%0A%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%201200%20675%22%20width%3D%221200%22%20height%3D%22675%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22hsl(266%2078%25%2032%25)%22%2F%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22hsl(334%2084%25%2038%25)%22%2F%3E%0A%20%20%20%20%3C%2FlinearGradient%3E%0A%20%20%20%20%3CradialGradient%20id%3D%22r%22%20cx%3D%220.1%22%20cy%3D%220.15%22%20r%3D%221%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22rgba(255%2C255%2C255%2C.28)%22%2F%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22rgba(255%2C255%2C255%2C0)%22%2F%3E%0A%20%20%20%20%3C%2FradialGradient%3E%0A%20%20%3C%2Fdefs%3E%0A%20%20%3Crect%20width%3D%221200%22%20height%3D%22675%22%20fill%3D%22url(%23g)%22%2F%3E%0A%20%20%3Crect%20width%3D%221200%22%20height%3D%22675%22%20fill%3D%22url(%23r)%22%2F%3E%0A%20%20%3Cg%20fill%3D%22none%22%20stroke%3D%22rgba(255%2C255%2C255%2C.24)%22%3E%0A%20%20%20%20%3Cpath%20d%3D%22M120%20560C300%20420%20540%20380%20760%20430C900%20462%201010%20520%201120%20600%22%2F%3E%0A%20%20%20%20%3Cpath%20d%3D%22M80%20180C250%20110%20420%20100%20610%20130C760%20154%20920%20220%201080%20300%22%2F%3E%0A%20%20%3C%2Fg%3E%0A%20%20%3Ctext%20x%3D%2272%22%20y%3D%22470%22%20fill%3D%22rgba(255%2C255%2C255%2C.98)%22%20font-size%3D%2262%22%20font-weight%3D%22800%22%20font-family%3D%22Inter%2CSegoe%20UI%2CArial%2Csans-serif%22%3EFragment%201-1%3C%2Ftext%3E%0A%20%20%3Ctext%20x%3D%2272%22%20y%3D%22528%22%20fill%3D%22rgba(255%2C255%2C255%2C.84)%22%20font-size%3D%2228%22%20font-family%3D%22Inter%2CSegoe%20UI%2CArial%2Csans-serif%22%3EIn%20decision%20science%20chapter%201%2C%20we%20compare%20assumptions%2C%20evidence%2C%20a%3C%2Ftext%3E%0A%20%20%3Ctext%20x%3D%2272%22%20y%3D%22614%22%20fill%3D%22rgba(255%2C255%2C255%2C.66)%22%20font-size%3D%2222%22%20letter-spacing%3D%223%22%20font-family%3D%22Inter%2CSegoe%20UI%2CArial%2Csans-serif%22%3EREADO%20PLAYABLE%20EXPERIENCE%3C%2Ftext%3E%0A%3C%2Fsvg%3E"
+            },
+            {
+              "id": "fragment-01-2",
+              "title": "碎片 1-2",
+              "description": "完成连胜或通过彩蛋挑战可掉落。关联主题：chapter / decision",
+              "image": "data:image/svg+xml,%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%3F%3E%0A%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%201200%20675%22%20width%3D%221200%22%20height%3D%22675%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22hsl(87%2078%25%2032%25)%22%2F%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22hsl(155%2084%25%2038%25)%22%2F%3E%0A%20%20%20%20%3C%2FlinearGradient%3E%0A%20%20%20%20%3CradialGradient%20id%3D%22r%22%20cx%3D%220.1%22%20cy%3D%220.15%22%20r%3D%221%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22rgba(255%2C255%2C255%2C.28)%22%2F%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22rgba(255%2C255%2C255%2C0)%22%2F%3E%0A%20%20%20%20%3C%2FradialGradient%3E%0A%20%20%3C%2Fdefs%3E%0A%20%20%3Crect%20width%3D%221200%22%20height%3D%22675%22%20fill%3D%22url(%23g)%22%2F%3E%0A%20%20%3Crect%20width%3D%221200%22%20height%3D%22675%22%20fill%3D%22url(%23r)%22%2F%3E%0A%20%20%3Cg%20fill%3D%22none%22%20stroke%3D%22rgba(255%2C255%2C255%2C.24)%22%3E%0A%20%20%20%20%3Cpath%20d%3D%22M120%20560C300%20420%20540%20380%20760%20430C900%20462%201010%20520%201120%20600%22%2F%3E%0A%20%20%20%20%3Cpath%20d%3D%22M80%20180C250%20110%20420%20100%20610%20130C760%20154%20920%20220%201080%20300%22%2F%3E%0A%20%20%3C%2Fg%3E%0A%20%20%3Ctext%20x%3D%2272%22%20y%3D%22470%22%20fill%3D%22rgba(255%2C255%2C255%2C.98)%22%20font-size%3D%2262%22%20font-weight%3D%22800%22%20font-family%3D%22Inter%2CSegoe%20UI%2CArial%2Csans-serif%22%3EFragment%201-2%3C%2Ftext%3E%0A%20%20%3Ctext%20x%3D%2272%22%20y%3D%22528%22%20fill%3D%22rgba(255%2C255%2C255%2C.84)%22%20font-size%3D%2228%22%20font-family%3D%22Inter%2CSegoe%20UI%2CArial%2Csans-serif%22%3EIn%20decision%20science%20chapter%201%2C%20we%20compare%20assumptions%2C%20evidence%2C%20a%3C%2Ftext%3E%0A%20%20%3Ctext%20x%3D%2272%22%20y%3D%22614%22%20fill%3D%22rgba(255%2C255%2C255%2C.66)%22%20font-size%3D%2222%22%20letter-spacing%3D%223%22%20font-family%3D%22Inter%2CSegoe%20UI%2CArial%2Csans-serif%22%3EREADO%20PLAYABLE%20EXPERIENCE%3C%2Ftext%3E%0A%3C%2Fsvg%3E"
+            },
+            {
+              "id": "fragment-01-3",
+              "title": "碎片 1-3",
+              "description": "完成连胜或通过彩蛋挑战可掉落。关联主题：chapter / decision",
+              "image": "data:image/svg+xml,%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%3F%3E%0A%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%201200%20675%22%20width%3D%221200%22%20height%3D%22675%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22hsl(268%2078%25%2032%25)%22%2F%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22hsl(336%2084%25%2038%25)%22%2F%3E%0A%20%20%20%20%3C%2FlinearGradient%3E%0A%20%20%20%20%3CradialGradient%20id%3D%22r%22%20cx%3D%220.1%22%20cy%3D%220.15%22%20r%3D%221%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22rgba(255%2C255%2C255%2C.28)%22%2F%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22rgba(255%2C255%2C255%2C0)%22%2F%3E%0A%20%20%20%20%3C%2FradialGradient%3E%0A%20%20%3C%2Fdefs%3E%0A%20%20%3Crect%20width%3D%221200%22%20height%3D%22675%22%20fill%3D%22url(%23g)%22%2F%3E%0A%20%20%3Crect%20width%3D%221200%22%20height%3D%22675%22%20fill%3D%22url(%23r)%22%2F%3E%0A%20%20%3Cg%20fill%3D%22none%22%20stroke%3D%22rgba(255%2C255%2C255%2C.24)%22%3E%0A%20%20%20%20%3Cpath%20d%3D%22M120%20560C300%20420%20540%20380%20760%20430C900%20462%201010%20520%201120%20600%22%2F%3E%0A%20%20%20%20%3Cpath%20d%3D%22M80%20180C250%20110%20420%20100%20610%20130C760%20154%20920%20220%201080%20300%22%2F%3E%0A%20%20%3C%2Fg%3E%0A%20%20%3Ctext%20x%3D%2272%22%20y%3D%22470%22%20fill%3D%22rgba(255%2C255%2C255%2C.98)%22%20font-size%3D%2262%22%20font-weight%3D%22800%22%20font-family%3D%22Inter%2CSegoe%20UI%2CArial%2Csans-serif%22%3EFragment%201-3%3C%2Ftext%3E%0A%20%20%3Ctext%20x%3D%2272%22%20y%3D%22528%22%20fill%3D%22rgba(255%2C255%2C255%2C.84)%22%20font-size%3D%2228%22%20font-family%3D%22Inter%2CSegoe%20UI%2CArial%2Csans-serif%22%3EIn%20decision%20science%20chapter%201%2C%20we%20compare%20assumptions%2C%20evidence%2C%20a%3C%2Ftext%3E%0A%20%20%3Ctext%20x%3D%2272%22%20y%3D%22614%22%20fill%3D%22rgba(255%2C255%2C255%2C.66)%22%20font-size%3D%2222%22%20letter-spacing%3D%223%22%20font-family%3D%22Inter%2CSegoe%20UI%2CArial%2Csans-serif%22%3EREADO%20PLAYABLE%20EXPERIENCE%3C%2Ftext%3E%0A%3C%2Fsvg%3E"
+            }
+          ],
+          "badge": {
+            "id": "badge-01",
+            "title": "In decision science chapter 1, we compare assumptions, evidence, and bou 徽章",
+            "description": "收集本知识块全部碎片后解锁。",
+            "image": "data:image/svg+xml,%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22UTF-8%22%3F%3E%0A%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%201200%20675%22%20width%3D%221200%22%20height%3D%22675%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22hsl(310%2078%25%2032%25)%22%2F%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22hsl(18%2084%25%2038%25)%22%2F%3E%0A%20%20%20%20%3C%2FlinearGradient%3E%0A%20%20%20%20%3CradialGradient%20id%3D%22r%22%20cx%3D%220.1%22%20cy%3D%220.15%22%20r%3D%221%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22rgba(255%2C255%2C255%2C.28)%22%2F%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22rgba(255%2C255%2C255%2C0)%22%2F%3E%0A%20%20%20%20%3C%2FradialGradient%3E%0A%20%20%3C%2Fdefs%3E%0A%20%20%3Crect%20width%3D%221200%22%20height%3D%22675%22%20fill%3D%22url(%23g)%22%2F%3E%0A%20%20%3Crect%20width%3D%221200%22%20height%3D%22675%22%20fill%3D%22url(%23r)%22%2F%3E%0A%20%20%3Cg%20fill%3D%22none%22%20stroke%3D%22rgba(255%2C255%2C255%2C.24)%22%3E%0A%20%20%20%20%3Cpath%20d%3D%22M120%20560C300%20420%20540%20380%20760%20430C900%20462%201010%20520%201120%20600%22%2F%3E%0A%20%20%20%20%3Cpath%20d%3D%22M80%20180C250%20110%20420%20100%20610%20130C760%20154%20920%20220%201080%20300%22%2F%3E%0A%20%20%3C%2Fg%3E%0A%20%20%3Ctext%20x%3D%2272%22%20y%3D%22470%22%20fill%3D%22rgba(255%2C255%2C255%2C.98)%22%20font-size%3D%2262%22%20font-weight%3D%22800%22%20font-family%3D%22Inter%2CSegoe%20UI%2CArial%2Csans-serif%22%3EBadge%201%3C%2Ftext%3E%0A%20%20%3Ctext%20x%3D%2272%22%20y%3D%22528%22%20fill%3D%22rgba(255%2C255%2C255%2C.84)%22%20font-size%3D%2228%22%20font-family%3D%22Inter%2CSegoe%20UI%2CArial%2Csans-serif%22%3EIn%20decision%20science%20chapter%201%2C%20we%20compare%20assumptions%2C%20evidence%2C%20a%3C%2Ftext%3E%0A%20%20%3Ctext%20x%3D%2272%22%20y%3D%22614%22%20fill%3D%22rgba(255%2C255%2C255%2C.66)%22%20font-size%3D%2222%22%20letter-spacing%3D%223%22%20font-family%3D%22Inter%2CSegoe%20UI%2CArial%2Csans-serif%22%3EREADO%20PLAYABLE%20EXPERIENCE%3C%2Ftext%3E%0A%3C%2Fsvg%3E"
+          }
+        },
+        "knowledge_shortcuts": [
+          {
+            "id": "audio-shortcut-1",
+            "title": "音频复盘",
+            "href": "/experiences/media/u-long-pipeline-stress-boo-01-f45ad2/review.wav"
+          }
+        ]
+      }
+    },
+    "progress_design": {
+      "micro_tasks": 10,
+      "micro_task_seconds": 30,
+      "completion_signal": "10/10 tasks with mastery feedback"
+    },
+    "audio_recap": {
+      "title": "In decision science chapter 1, we compare assumptions, evidence, and bou 复盘",
+      "script": "这是《Long Pipeline Stress Book》的知识块复盘。 本关重点：In decision science chapter 1, we compare assumptions, evidence, and bou。 In decision science chapter 1, we compare assumptions, evidence, and boundary conditions under uncertainty. We test alternatives, update beliefs, and apply reflective correction with concrete examples and constraints. 请重点记住：chapter、decision、science、compare。 现在暂停 10 秒，回忆一个你可以马上使用的场景。",
+      "href": "/experiences/media/u-long-pipeline-stress-boo-01-f45ad2/review.wav",
+      "transcript_href": "/experiences/media/u-long-pipeline-stress-boo-01-f45ad2/review.txt",
+      "duration_seconds": 2,
+      "provider": "fallback_silent"
+    },
+    "media_generation": {
+      "image_provider": "nano-banana(auto)",
+      "audio_provider": "fallback_silent"
+    }
+  }
+}

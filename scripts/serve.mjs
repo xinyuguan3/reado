@@ -235,12 +235,14 @@ const BOOK_PIPELINE_MICRO_TASKS = 10;
 const BOOK_PIPELINE_MICRO_SECONDS = 30;
 const BOOK_PIPELINE_MAX_MODULES = Math.max(
   BOOK_PIPELINE_MIN_BLOCKS,
-  Math.min(BOOK_PIPELINE_MAX_BLOCKS, toInt(process.env.READO_BOOK_PIPELINE_MAX_MODULES || 12) || 12)
+  Math.min(BOOK_PIPELINE_MAX_BLOCKS, toInt(process.env.READO_BOOK_PIPELINE_MAX_MODULES || 24) || 24)
 );
 const BOOK_PIPELINE_QUIZ_WORKERS = Math.max(1, toInt(process.env.READO_BOOK_PIPELINE_WORKERS_QUIZ || 8) || 8);
 const BOOK_PIPELINE_ASSET_WORKERS = Math.max(1, toInt(process.env.READO_BOOK_PIPELINE_WORKERS_ASSET || 4) || 4);
 const BOOK_PIPELINE_AUDIO_WORKERS = Math.max(1, toInt(process.env.READO_BOOK_PIPELINE_WORKERS_AUDIO || 4) || 4);
 const BOOK_PIPELINE_EASTER_WORKERS = Math.max(1, toInt(process.env.READO_BOOK_PIPELINE_WORKERS_EASTER || 2) || 2);
+const BOOK_PIPELINE_INGEST_MAX_TEXT = Math.max(80_000, toInt(process.env.READO_BOOK_PIPELINE_INGEST_MAX_TEXT || 260_000) || 260_000);
+const BOOK_PIPELINE_INGEST_MAX_PAGES = Math.max(24, toInt(process.env.READO_BOOK_PIPELINE_INGEST_MAX_PAGES || 520) || 520);
 const BOOK_PIPELINE_IMAGE_PROVIDER = String(process.env.READO_BOOK_PIPELINE_IMAGE_PROVIDER || "auto")
   .trim()
   .toLowerCase();
@@ -1059,21 +1061,48 @@ function computeDensityScore(text) {
 }
 
 function splitKnowledgeBlocksFromText(text, opts = {}) {
-  const sourceText = String(text || "").replace(/\s+/g, " ").trim();
+  const sourceRaw = String(text || "").replace(/\r/g, "");
+  const sourceText = sourceRaw.replace(/\s+/g, " ").trim();
   const totalWords = roughWordCount(sourceText);
   const target = Math.max(
     BOOK_PIPELINE_MIN_BLOCKS,
     Math.min(BOOK_PIPELINE_MAX_BLOCKS, toInt(opts.targetBlocks) || estimateKnowledgeBlockCount(totalWords))
   );
   if (!sourceText) return [];
-  const allWords = sourceText.split(/\s+/).filter(Boolean);
-  const chunkSize = Math.max(120, Math.ceil(allWords.length / target));
-  const chunks = [];
-  for (let i = 0; i < allWords.length; i += chunkSize) {
-    const part = allWords.slice(i, i + chunkSize).join(" ").trim();
-    if (part) chunks.push(part);
+  const headingRegex = /(?:chapter|ch\.?|part|section)\s*[0-9ivxlcdm]+|第[一二三四五六七八九十百千0-9]+[章节篇部]/gi;
+  const headingMatches = [...sourceRaw.matchAll(headingRegex)];
+  let chunks = [];
+  if (headingMatches.length >= 3) {
+    const positions = headingMatches
+      .map((row) => Number(row.index))
+      .filter((n) => Number.isFinite(n) && n >= 0);
+    positions.push(sourceRaw.length);
+    for (let i = 0; i < positions.length - 1; i += 1) {
+      const start = positions[i];
+      const end = positions[i + 1];
+      if (end <= start) continue;
+      const part = sourceRaw.slice(start, end).replace(/\s+/g, " ").trim();
+      if (part.length >= 80) chunks.push(part);
+    }
   }
-  const minScore = Number.isFinite(Number(opts.minScore)) ? Number(opts.minScore) : 0.62;
+  if (!chunks.length) {
+    const allWords = sourceText.split(/\s+/).filter(Boolean);
+    if (allWords.length <= 2 && sourceText.length > 1200) {
+      const chunkChars = Math.max(380, Math.ceil(sourceText.length / target));
+      for (let i = 0; i < sourceText.length; i += chunkChars) {
+        const part = sourceText.slice(i, i + chunkChars).trim();
+        if (part) chunks.push(part);
+      }
+    } else {
+      const minWordsPerBlock = Math.max(28, toInt(opts.minWordsPerBlock) || 48);
+      const chunkSize = Math.max(minWordsPerBlock, Math.ceil(allWords.length / target));
+      for (let i = 0; i < allWords.length; i += chunkSize) {
+        const part = allWords.slice(i, i + chunkSize).join(" ").trim();
+        if (part) chunks.push(part);
+      }
+    }
+  }
+  const minScore = Number.isFinite(Number(opts.minScore)) ? Number(opts.minScore) : 0.48;
   const withScores = chunks.map((content, idx) => {
     const sentences = splitSentencesForPipeline(content);
     const titleSeed = cleanText(sentences[0], `Knowledge Block ${idx + 1}`).slice(0, 72);
@@ -1090,10 +1119,10 @@ function splitKnowledgeBlocksFromText(text, opts = {}) {
     };
   });
   let retained = withScores.filter((item) => Number(item?.density?.score || 0) >= minScore);
-  if (retained.length < Math.min(3, withScores.length)) {
+  if (retained.length < Math.min(target, withScores.length) * 0.55) {
     retained = [...withScores]
       .sort((a, b) => Number(b?.density?.score || 0) - Number(a?.density?.score || 0))
-      .slice(0, Math.min(withScores.length, Math.max(3, Math.floor(withScores.length * 0.75))));
+      .slice(0, Math.min(withScores.length, Math.max(3, Math.floor(withScores.length * 0.9))));
   }
   return retained
     .sort((a, b) => a.index - b.index)
@@ -1495,6 +1524,151 @@ function buildSilentWavBuffer(durationSeconds = 2) {
   return buffer;
 }
 
+function buildPipelineModuleHtml({
+  bookId = "",
+  bookTitle,
+  moduleTitle,
+  moduleSummary,
+  keywords = [],
+  quizSet = [],
+  gateIndex = 1,
+  moduleSlug = "",
+  moduleIndex = 1,
+  moduleCount = 1,
+  prevSlug = "",
+  nextSlug = "",
+  audioHref = "",
+  transcriptHref = "",
+  fragments = [],
+  badge = null
+}) {
+  const keywordHtml = (Array.isArray(keywords) ? keywords : [])
+    .slice(0, 8)
+    .map((item) => `<span class="tag">${escapeHtml(String(item || ""))}</span>`)
+    .join("");
+  const quizRows = (Array.isArray(quizSet) ? quizSet : [])
+    .slice(0, 10)
+    .map((item, idx) => `
+      <article class="quiz">
+        <h3>Q${idx + 1} · ${escapeHtml(cleanText(item?.type, "application"))}</h3>
+        <p>${escapeHtml(cleanText(item?.prompt, "Read, reason, and decide."))}</p>
+      </article>
+    `)
+    .join("");
+  const tasks = Array.from({ length: BOOK_PIPELINE_MICRO_TASKS }, (_, idx) => `
+    <label class="task"><input type="checkbox" /> <span>Task ${idx + 1} · ${BOOK_PIPELINE_MICRO_SECONDS}s</span></label>
+  `).join("");
+  const fragmentsHtml = (Array.isArray(fragments) ? fragments : [])
+    .slice(0, 6)
+    .map((item, idx) => `
+      <figure class="asset">
+        <img src="${escapeHtml(cleanText(item?.image, buildGeneratedCoverDataUri({
+          title: `Fragment ${idx + 1}`,
+          subtitle: moduleTitle,
+          seed: `${moduleSlug}:fragment:${idx + 1}`
+        })))}" alt="${escapeHtml(cleanText(item?.title, `Fragment ${idx + 1}`))}" loading="lazy" />
+        <figcaption>${escapeHtml(cleanText(item?.title, `Fragment ${idx + 1}`))}</figcaption>
+      </figure>
+    `)
+    .join("");
+  const badgeHtml = badge && typeof badge === "object" ? `
+    <figure class="asset badge">
+      <img src="${escapeHtml(cleanText(badge.image, buildGeneratedCoverDataUri({
+        title: cleanText(badge.title, "Badge"),
+        subtitle: moduleTitle,
+        seed: `${moduleSlug}:badge`
+      })))}" alt="${escapeHtml(cleanText(badge.title, "Mastery Badge"))}" loading="lazy" />
+      <figcaption>${escapeHtml(cleanText(badge.title, "Mastery Badge"))}</figcaption>
+    </figure>
+  ` : "";
+
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>${escapeHtml(moduleTitle)} · ${escapeHtml(bookTitle)}</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: radial-gradient(circle at 15% 12%, rgba(56, 189, 248, 0.18), transparent 36%), #020617;
+      color: #e2e8f0;
+      font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+    }
+    .page { width: min(1100px, calc(100% - 24px)); margin: 0 auto; padding: 24px 0 36px; }
+    .hero, .panel { border: 1px solid rgba(148, 163, 184, 0.26); border-radius: 14px; background: rgba(15, 23, 42, 0.78); }
+    .hero { padding: 16px; }
+    .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+    .chip { border: 1px solid rgba(148, 163, 184, 0.3); border-radius: 999px; padding: 4px 10px; font-size: 12px; color: #cbd5e1; }
+    h1 { margin: 0; font-size: clamp(28px, 4vw, 40px); line-height: 1.1; letter-spacing: -0.02em; }
+    .summary { margin-top: 10px; font-size: 14px; line-height: 1.7; color: #cbd5e1; }
+    .tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+    .tag { border: 1px solid rgba(56, 189, 248, 0.46); border-radius: 999px; padding: 4px 10px; font-size: 12px; color: #bae6fd; }
+    .grid { margin-top: 12px; display: grid; grid-template-columns: 1.4fr 1fr; gap: 12px; }
+    .panel { padding: 12px; }
+    .panel h2 { margin: 0 0 8px; font-size: 16px; }
+    .tasks { display: grid; gap: 6px; }
+    .task { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #dbeafe; }
+    .quiz-list { display: grid; gap: 8px; }
+    .quiz { border: 1px solid rgba(148, 163, 184, 0.24); border-radius: 10px; background: rgba(2, 6, 23, 0.55); padding: 9px; }
+    .quiz h3 { margin: 0; font-size: 13px; color: #93c5fd; text-transform: capitalize; }
+    .quiz p { margin: 6px 0 0; font-size: 13px; line-height: 1.6; color: #dbeafe; }
+    .assets { margin-top: 10px; display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
+    .asset { margin: 0; border: 1px solid rgba(148, 163, 184, 0.22); border-radius: 10px; overflow: hidden; background: rgba(15, 23, 42, 0.72); }
+    .asset img { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; }
+    .asset figcaption { padding: 6px; font-size: 11px; color: #cbd5e1; line-height: 1.4; }
+    .audio { margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn { border: 1px solid rgba(148, 163, 184, 0.34); border-radius: 999px; padding: 7px 11px; font-size: 12px; color: #e2e8f0; text-decoration: none; background: rgba(15, 23, 42, 0.72); }
+    .nav { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+    @media (max-width: 940px) { .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main class="page" data-book-pipeline-module="1">
+    <section class="hero">
+      <div class="chips">
+        <span class="chip">${escapeHtml(bookTitle)}</span>
+        <span class="chip">Gate ${escapeHtml(String(gateIndex))}</span>
+        <span class="chip">Module ${escapeHtml(String(moduleIndex))}/${escapeHtml(String(moduleCount))}</span>
+      </div>
+      <h1>${escapeHtml(moduleTitle)}</h1>
+      <p class="summary">${escapeHtml(moduleSummary)}</p>
+      <div class="tags">${keywordHtml}</div>
+    </section>
+
+    <section class="grid">
+      <article class="panel">
+        <h2>Micro Tasks (10 x 30s)</h2>
+        <div class="tasks">${tasks}</div>
+        <div class="audio">
+          ${audioHref ? `<a class="btn" href="${escapeHtml(audioHref)}" target="_blank" rel="noopener">Play recap audio</a>` : ""}
+          ${transcriptHref ? `<a class="btn" href="${escapeHtml(transcriptHref)}" target="_blank" rel="noopener">Read transcript</a>` : ""}
+        </div>
+      </article>
+      <article class="panel">
+        <h2>Quiz Set</h2>
+        <div class="quiz-list">${quizRows}</div>
+      </article>
+    </section>
+
+    <section class="panel" style="margin-top:12px">
+      <h2>Collectibles</h2>
+      <div class="assets">
+        ${fragmentsHtml}
+        ${badgeHtml}
+      </div>
+      <nav class="nav">
+        ${prevSlug ? `<a class="btn" href="/experiences/${encodeURIComponent(prevSlug)}.html">Previous</a>` : `<a class="btn" href="/books/${encodeURIComponent(cleanText(bookId))}.html">Back to Hub</a>`}
+        ${nextSlug ? `<a class="btn" href="/experiences/${encodeURIComponent(nextSlug)}.html">Next</a>` : ""}
+      </nav>
+    </section>
+  </main>
+</body>
+</html>`;
+}
+
 function mapBlocksToModules(blocks, moduleSlugs = []) {
   const list = Array.isArray(blocks) ? blocks : [];
   const slugs = Array.isArray(moduleSlugs) ? moduleSlugs : [];
@@ -1513,6 +1687,8 @@ function mapBlocksToModules(blocks, moduleSlugs = []) {
     };
     mapped.push({
       moduleSlug: slugs[i],
+      moduleIndex: i + 1,
+      moduleCount: slugs.length,
       block: {
         ...seed,
         id: cleanText(seed.id, `kb-${String(i + 1).padStart(2, "0")}`),
@@ -2172,7 +2348,14 @@ function resolveBookPipelineFilePayload(payload = {}) {
 async function resolveBookPipelineSource(payload = {}, hooks = {}) {
   const filePayload = resolveBookPipelineFilePayload(payload);
   if (filePayload) {
-    const source = await playableContentEngine.ingestFileSource(filePayload, hooks);
+    const source = await playableContentEngine.ingestFileSource(
+      filePayload,
+      hooks,
+      {
+        maxTextLen: BOOK_PIPELINE_INGEST_MAX_TEXT,
+        maxPages: BOOK_PIPELINE_INGEST_MAX_PAGES
+      }
+    );
     return {
       source,
       mode: "file",
@@ -2224,6 +2407,7 @@ async function resolveBookPipelineSource(payload = {}, hooks = {}) {
 
 async function buildModulePipelineArtifacts({ work, moduleSlug, block, bookTitle }) {
   const moduleDir = path.join(rootDir, "book_experiences", cleanText(work?.book_id), moduleSlug);
+  const codePath = path.join(moduleDir, "code.html");
   const moduleJsonPath = path.join(moduleDir, "module.json");
   const quizSet = buildQuizSetForBlock(block, Math.max(0, toInt(block?.gateIndex) - 1));
   const fallbackAssetPack = buildAssetPackForBlock(block, Math.max(0, toInt(block?.gateIndex) - 1), bookTitle);
@@ -2243,8 +2427,33 @@ async function buildModulePipelineArtifacts({ work, moduleSlug, block, bookTitle
       scriptText: audioScript
     })
   ]);
+  const allModuleSlugs = Array.isArray(work?.module_slugs) ? work.module_slugs : [];
+  const modulePosition = Math.max(0, allModuleSlugs.indexOf(moduleSlug));
+  const moduleIndex = modulePosition >= 0 ? modulePosition + 1 : Math.max(1, toInt(block?.gateIndex) || 1);
+  const moduleCount = allModuleSlugs.length || Math.max(1, moduleIndex);
+  const prevSlug = modulePosition > 0 ? allModuleSlugs[modulePosition - 1] : "";
+  const nextSlug = modulePosition >= 0 && modulePosition < allModuleSlugs.length - 1 ? allModuleSlugs[modulePosition + 1] : "";
   const audioHref = `/experiences/media/${encodeURIComponent(moduleSlug)}/${encodeURIComponent(audioRecap.audioFile)}`;
   const transcriptHref = `/experiences/media/${encodeURIComponent(moduleSlug)}/${encodeURIComponent(audioRecap.transcriptFile)}`;
+  const moduleHtml = buildPipelineModuleHtml({
+    bookId: cleanText(work?.book_id),
+    bookTitle,
+    moduleTitle: cleanText(block?.title, `Knowledge Block ${moduleIndex}`),
+    moduleSummary: cleanText(block?.summary, cleanText(block?.content).slice(0, 280)),
+    keywords: Array.isArray(block?.keywords) ? block.keywords.slice(0, 8) : [],
+    quizSet,
+    gateIndex: toInt(block?.gateIndex) || moduleIndex,
+    moduleSlug,
+    moduleIndex,
+    moduleCount,
+    prevSlug,
+    nextSlug,
+    audioHref,
+    transcriptHref,
+    fragments: Array.isArray(assetPack?.fragments) ? assetPack.fragments : [],
+    badge: assetPack?.badge || null
+  });
+  await fs.writeFile(codePath, moduleHtml, "utf8");
   let moduleMeta = {};
   try {
     moduleMeta = JSON.parse(await fs.readFile(moduleJsonPath, "utf8")) || {};
@@ -2453,6 +2662,7 @@ async function runBookPipelineGenerationJob(job, sessionId) {
     input: cleanText(job.payload?.input, resolved.title),
     title: cleanText(job.payload?.title, resolved.title),
     moduleCount,
+    maxModuleCount: BOOK_PIPELINE_MAX_MODULES,
     htmlProvider: pipelineHtmlProvider,
     requireLlmHtml: false,
     sources: [
