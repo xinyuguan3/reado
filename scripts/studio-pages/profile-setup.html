@@ -108,10 +108,41 @@
       color: #334155;
       word-break: break-all;
     }
+    .avatar-builder {
+      display: grid;
+      gap: 12px;
+    }
+    .avatar-preview-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 0 2px;
+    }
+    .avatar-preview {
+      width: 76px;
+      height: 76px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      box-shadow: 0 8px 22px rgba(15, 23, 42, 0.15);
+      object-fit: cover;
+    }
+    .picker-title {
+      margin: 0 0 6px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      color: #475569;
+      text-transform: uppercase;
+    }
     .avatar-grid {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 8px;
+    }
+    .avatar-icon-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    .avatar-color-grid {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
     }
     .avatar-option {
       border: 1px solid #d5dce8;
@@ -123,11 +154,28 @@
       display: grid;
       place-items: center;
     }
-    .avatar-option img {
-      width: 54px;
-      height: 54px;
+    .avatar-icon-option {
+      min-height: 56px;
+      padding: 8px;
+    }
+    .avatar-icon-option svg {
+      width: 24px;
+      height: 24px;
+      stroke: #0f172a;
+      fill: none;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .avatar-color-option {
+      min-height: 46px;
+      padding: 0;
+    }
+    .avatar-color-dot {
+      width: 26px;
+      height: 26px;
       border-radius: 999px;
-      object-fit: cover;
+      border: 1px solid rgba(15, 23, 42, 0.16);
     }
     .avatar-option.is-active {
       border-color: #1d7dde;
@@ -182,8 +230,11 @@
       .subtitle {
         font-size: 18px;
       }
-      .avatar-grid {
+      .avatar-icon-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+      .avatar-color-grid {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
       }
     }
   </style>
@@ -203,7 +254,19 @@
         <p class="title">Choose avatar and display name</p>
         <p class="sub">This appears in your profile and leaderboard.</p>
         <p id="sessionEmail" class="session-email"></p>
-        <div id="avatarGrid" class="avatar-grid"></div>
+        <div class="avatar-builder">
+          <div class="avatar-preview-wrap">
+            <img id="avatarPreview" class="avatar-preview" src="" alt="Avatar preview">
+          </div>
+          <div>
+            <p class="picker-title">Icon</p>
+            <div id="avatarIconGrid" class="avatar-grid avatar-icon-grid"></div>
+          </div>
+          <div>
+            <p class="picker-title">Background</p>
+            <div id="avatarColorGrid" class="avatar-grid avatar-color-grid"></div>
+          </div>
+        </div>
         <form id="setupForm" class="setup-form">
           <input id="setupNameInput" class="setup-name-input" type="text" maxlength="24" placeholder="Your display name" required>
           <button id="setupSaveBtn" class="setup-save-btn" type="submit">Save and continue</button>
@@ -225,12 +288,16 @@
 
     const statusTextEl = document.getElementById("statusText");
     const sessionEmailEl = document.getElementById("sessionEmail");
-    const avatarGrid = document.getElementById("avatarGrid");
+    const avatarPreviewEl = document.getElementById("avatarPreview");
+    const avatarIconGridEl = document.getElementById("avatarIconGrid");
+    const avatarColorGridEl = document.getElementById("avatarColorGrid");
     const setupForm = document.getElementById("setupForm");
     const setupNameInput = document.getElementById("setupNameInput");
     const setupSaveBtn = document.getElementById("setupSaveBtn");
 
     let selectedAvatar = "";
+    let selectedIconId = "spark";
+    let selectedBgId = "ocean";
 
     function setStatus(message, type = "") {
       statusTextEl.textContent = message || "";
@@ -372,45 +439,150 @@
       }
     }
 
-    function makeAvatarDataUri(bg1, bg2, icon) {
-      const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='${bg1}'/><stop offset='100%' stop-color='${bg2}'/></linearGradient></defs><rect width='128' height='128' rx='64' fill='url(#g)'/><text x='64' y='80' text-anchor='middle' font-size='56' font-family='Arial, sans-serif'>${icon}</text></svg>`;
+    const ICON_PRESETS = [
+      {
+        id: "spark",
+        label: "Spark",
+        template: "<path d='M64 28v16' stroke='{{color}}'/><path d='M64 84v16' stroke='{{color}}'/><path d='M28 64h16' stroke='{{color}}'/><path d='M84 64h16' stroke='{{color}}'/><path d='M40 40l11 11' stroke='{{color}}'/><path d='M77 77l11 11' stroke='{{color}}'/><path d='M88 40L77 51' stroke='{{color}}'/><path d='M51 77L40 88' stroke='{{color}}'/>"
+      },
+      {
+        id: "book",
+        label: "Book",
+        template: "<rect x='36' y='34' width='56' height='60' rx='9' stroke='{{color}}'/><path d='M56 34v60' stroke='{{color}}'/><path d='M64 50h20' stroke='{{color}}'/><path d='M64 62h20' stroke='{{color}}'/>"
+      },
+      {
+        id: "target",
+        label: "Target",
+        template: "<circle cx='64' cy='64' r='28' stroke='{{color}}'/><circle cx='64' cy='64' r='14' stroke='{{color}}'/><circle cx='64' cy='64' r='4' fill='{{color}}' stroke='none'/>"
+      },
+      {
+        id: "chat",
+        label: "Chat",
+        template: "<rect x='32' y='36' width='64' height='44' rx='12' stroke='{{color}}'/><path d='M52 80l-14 14v-14' stroke='{{color}}'/><path d='M46 54h36' stroke='{{color}}'/><path d='M46 66h24' stroke='{{color}}'/>"
+      },
+      {
+        id: "bulb",
+        label: "Bulb",
+        template: "<path d='M45 55a19 19 0 1 1 38 0c0 8-4 13-9 18-3 3-4 6-4 9H58c0-3-1-6-4-9-5-5-9-10-9-18z' stroke='{{color}}'/><path d='M57 88h14' stroke='{{color}}'/><path d='M56 96h16' stroke='{{color}}'/>"
+      },
+      {
+        id: "rocket",
+        label: "Rocket",
+        template: "<path d='M72 34c13 7 22 22 22 40l-23-3-19-19 3-23c6 0 12 2 17 5z' stroke='{{color}}'/><path d='M52 52L36 68' stroke='{{color}}'/><path d='M68 68L52 84' stroke='{{color}}'/><circle cx='72' cy='56' r='5' stroke='{{color}}'/>"
+      },
+      {
+        id: "leaf",
+        label: "Leaf",
+        template: "<path d='M34 74c0-24 18-42 52-44 2 34-16 52-44 52-5 0-8-4-8-8z' stroke='{{color}}'/><path d='M44 74c12-8 22-18 31-31' stroke='{{color}}'/>"
+      },
+      {
+        id: "flag",
+        label: "Flag",
+        template: "<path d='M44 30v68' stroke='{{color}}'/><path d='M44 34h42l-10 15 10 15H44' stroke='{{color}}'/>"
+      }
+    ];
+
+    const BG_PRESETS = [
+      { id: "ocean", label: "Ocean", start: "#1d4ed8", end: "#06b6d4" },
+      { id: "violet", label: "Violet", start: "#7c3aed", end: "#ec4899" },
+      { id: "mint", label: "Mint", start: "#0f766e", end: "#34d399" },
+      { id: "sunset", label: "Sunset", start: "#f97316", end: "#fb7185" },
+      { id: "gold", label: "Gold", start: "#ca8a04", end: "#f59e0b" },
+      { id: "forest", label: "Forest", start: "#166534", end: "#22c55e" },
+      { id: "indigo", label: "Indigo", start: "#3730a3", end: "#6366f1" },
+      { id: "slate", label: "Slate", start: "#0f172a", end: "#334155" },
+      { id: "rose", label: "Rose", start: "#be123c", end: "#fb7185" },
+      { id: "sky", label: "Sky", start: "#0369a1", end: "#38bdf8" },
+      { id: "teal", label: "Teal", start: "#0f766e", end: "#2dd4bf" },
+      { id: "grape", label: "Grape", start: "#6d28d9", end: "#a78bfa" }
+    ];
+
+    function resolveIcon(id) {
+      return ICON_PRESETS.find((icon) => icon.id === id) || ICON_PRESETS[0];
+    }
+
+    function resolveBg(id) {
+      return BG_PRESETS.find((bg) => bg.id === id) || BG_PRESETS[0];
+    }
+
+    function buildIconMarkup(icon, color) {
+      return String(icon?.template || "").split("{{color}}").join(color);
+    }
+
+    function renderIconSvg(icon, color, size = 24) {
+      return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128' width='${size}' height='${size}' fill='none' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'>${buildIconMarkup(icon, color)}</svg>`;
+    }
+
+    function makeAvatarDataUri(bgStart, bgEnd, iconMarkup) {
+      const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='${bgStart}'/><stop offset='100%' stop-color='${bgEnd}'/></linearGradient></defs><rect width='128' height='128' rx='64' fill='url(#g)'/><g fill='none' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'>${iconMarkup}</g></svg>`;
       return "data:image/svg+xml," + encodeURIComponent(svg);
     }
 
-    const PRESET_AVATARS = [
-      makeAvatarDataUri("#1d4ed8", "#06b6d4", "📘"),
-      makeAvatarDataUri("#7c3aed", "#ec4899", "🧠"),
-      makeAvatarDataUri("#16a34a", "#22d3ee", "🚀"),
-      makeAvatarDataUri("#ea580c", "#f59e0b", "🔥"),
-      makeAvatarDataUri("#0f172a", "#334155", "🦉"),
-      makeAvatarDataUri("#db2777", "#9333ea", "✨"),
-      makeAvatarDataUri("#0ea5e9", "#22c55e", "🎯"),
-      makeAvatarDataUri("#be123c", "#fb7185", "🌟")
-    ];
-
-    function renderAvatarOptions(activeAvatar = "") {
-      avatarGrid.innerHTML = PRESET_AVATARS.map((src, idx) => {
-        const isActive = activeAvatar ? src === activeAvatar : idx === 0;
-        return `
-          <button type="button" class="avatar-option${isActive ? " is-active" : ""}" data-avatar="${src}" aria-label="avatar-${idx + 1}">
-            <img src="${src}" alt="Avatar ${idx + 1}">
-          </button>`;
-      }).join("");
-      selectedAvatar = activeAvatar && PRESET_AVATARS.includes(activeAvatar)
-        ? activeAvatar
-        : (PRESET_AVATARS[0] || "");
+    function buildSelectedAvatar() {
+      const bg = resolveBg(selectedBgId);
+      const icon = resolveIcon(selectedIconId);
+      const markup = buildIconMarkup(icon, "rgba(255,255,255,0.95)");
+      return makeAvatarDataUri(bg.start, bg.end, markup);
     }
 
-    avatarGrid.addEventListener("click", (event) => {
+    function refreshAvatarPreview() {
+      selectedAvatar = buildSelectedAvatar();
+      if (avatarPreviewEl) avatarPreviewEl.src = selectedAvatar;
+    }
+
+    function renderIconOptions() {
+      avatarIconGridEl.innerHTML = ICON_PRESETS.map((icon) => {
+        const isActive = icon.id === selectedIconId;
+        return `
+          <button type="button" class="avatar-option avatar-icon-option${isActive ? " is-active" : ""}" data-icon-id="${icon.id}" aria-label="icon-${icon.label}">
+            ${renderIconSvg(icon, "#0f172a", 24)}
+          </button>`;
+      }).join("");
+    }
+
+    function renderColorOptions() {
+      avatarColorGridEl.innerHTML = BG_PRESETS.map((bg) => {
+        const isActive = bg.id === selectedBgId;
+        return `
+          <button type="button" class="avatar-option avatar-color-option${isActive ? " is-active" : ""}" data-bg-id="${bg.id}" aria-label="bg-${bg.label}">
+            <span class="avatar-color-dot" style="background:linear-gradient(135deg, ${bg.start}, ${bg.end});"></span>
+          </button>`;
+      }).join("");
+    }
+
+    function initAvatarBuilder(existingAvatar = "") {
+      renderIconOptions();
+      renderColorOptions();
+      if (existingAvatar) {
+        selectedAvatar = existingAvatar;
+        if (avatarPreviewEl) avatarPreviewEl.src = existingAvatar;
+        return;
+      }
+      refreshAvatarPreview();
+    }
+
+    avatarIconGridEl.addEventListener("click", (event) => {
       const target = event.target;
       if (!(target instanceof HTMLElement)) return;
-      const option = target.closest(".avatar-option");
+      const option = target.closest("[data-icon-id]");
       if (!(option instanceof HTMLElement)) return;
-      const avatar = String(option.getAttribute("data-avatar") || "").trim();
-      if (!avatar) return;
-      selectedAvatar = avatar;
-      avatarGrid.querySelectorAll(".avatar-option").forEach((node) => node.classList.remove("is-active"));
-      option.classList.add("is-active");
+      const iconId = String(option.getAttribute("data-icon-id") || "").trim();
+      if (!iconId) return;
+      selectedIconId = iconId;
+      renderIconOptions();
+      refreshAvatarPreview();
+    });
+
+    avatarColorGridEl.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+      const option = target.closest("[data-bg-id]");
+      if (!(option instanceof HTMLElement)) return;
+      const bgId = String(option.getAttribute("data-bg-id") || "").trim();
+      if (!bgId) return;
+      selectedBgId = bgId;
+      renderColorOptions();
+      refreshAvatarPreview();
     });
 
     const authPayload = readAuthState();
@@ -424,7 +596,7 @@
           setStatus(error?.message || "Unable to continue.", "error");
         });
       } else {
-        renderAvatarOptions(String(current.avatar || ""));
+        initAvatarBuilder(String(current.avatar || ""));
         if (String(current.name || "").trim()) {
           setupNameInput.value = String(current.name || "").trim();
         }
@@ -456,7 +628,7 @@
           gems: Number.isFinite(Number(current.gems)) ? Math.max(0, Math.floor(Number(current.gems))) : 0,
           credits: Number.isFinite(Number(current.credits)) ? Math.max(0, Math.floor(Number(current.credits))) : DEFAULT_SIGNUP_CREDITS,
           streak: current.streak || "Day 1",
-          avatar: selectedAvatar || PRESET_AVATARS[0]
+          avatar: selectedAvatar || buildSelectedAvatar()
         };
         writeUserState(nextState);
         await syncRegisteredUser(payload, nextState, "auth-profile-setup");

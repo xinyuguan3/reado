@@ -4,8 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>reado · Playable Studio</title>
-  <script type="module" src="/shared/shell.js"></script>
-  <script src="/shared/book-catalog.js"></script>
+  <script type="module" src="/shared/shell.js?v=1772438225006"></script>
+  <script src="/shared/book-catalog.js?v=1772438225006"></script>
   <style>
     :root {
       color-scheme: light;
@@ -730,6 +730,13 @@ if (document.body) {
       }
       const stepMap = {
         queued: "Queued",
+        ingest: "Ingesting source",
+        planning: "Planning",
+        knowledge_blocks: "Knowledge blocks",
+        generate_core: "Generating core",
+        parallel_generation: "Parallel generation",
+        qa: "Quality check",
+        qa_retry: "Quality retry",
         preparing_sources: "Preparing sources",
         searching_sources: "Searching sources",
         ingesting_file: "Ingesting file",
@@ -766,6 +773,34 @@ if (document.body) {
         throw error;
       }
       return data;
+    }
+
+    function detectBookPipelineIntent(sources) {
+      const rows = Array.isArray(sources) ? sources : [];
+      if (!rows.length) return false;
+      let ingestCount = 0;
+      let pdfLikeCount = 0;
+      for (const item of rows) {
+        const parsedBy = String(item?.parsedBy || "").toLowerCase();
+        const urlText = String(item?.url || "");
+        if (parsedBy.startsWith("ingest.")) ingestCount += 1;
+        if (parsedBy.includes("pdf") || /\\.pdf(?:$|[?#])/i.test(urlText)) pdfLikeCount += 1;
+      }
+      if (pdfLikeCount > 0) return true;
+      if (ingestCount > 0) return true;
+      return false;
+    }
+
+    function buildKnowledgeBlocksDigest(job) {
+      const pipeline = job?.pipeline && typeof job.pipeline === "object" ? job.pipeline : null;
+      const rows = Array.isArray(pipeline?.knowledgeBlocksPreview) ? pipeline.knowledgeBlocksPreview : [];
+      if (!rows.length) return "";
+      const lines = rows.slice(0, 12).map((row, idx) => {
+        const gate = Number(row?.gateIndex || idx + 1);
+        const title = String(row?.title || ("Knowledge Block " + gate)).trim();
+        return `${gate}. ${title}`;
+      });
+      return lines.join("\n");
     }
 
     function sourceKey(item) {
@@ -1260,6 +1295,14 @@ if (document.body) {
       const lastLog = Array.isArray(state.job?.logs) && state.job.logs[0] ? state.job.logs[0].message : "";
       setProgress(progress, lastLog || ("Processing: " + step));
       renderLogs();
+      const blocksDigest = buildKnowledgeBlocksDigest(state.job);
+      if (blocksDigest && status !== "done" && status !== "error") {
+        const eta = state.job?.eta || state.job?.pipeline?.eta || null;
+        const etaText = eta && Number.isFinite(Number(eta.etaMin))
+          ? `ETA ${Number(eta.etaMin)}-${Number(eta.etaMax || eta.etaMin)} min`
+          : "";
+        setMeta([etaText, "Knowledge blocks:", blocksDigest].filter(Boolean).join("\n"));
+      }
 
       if (status === "error") {
         const charge = state.job?.creditCharge || null;
@@ -1281,6 +1324,7 @@ if (document.body) {
         const charge = state.job?.creditCharge || null;
         const creditSnapshot = state.job?.creditSnapshot || null;
         const href = "/books/" + encodeURIComponent(work.book_id || "") + ".html";
+        const blocksDigestDone = buildKnowledgeBlocksDigest(state.job);
         const info = [
           t("studio.info_done", "Generation completed"),
           t("studio.info_book_url", "Book URL: {value}", { value: href }),
@@ -1292,6 +1336,7 @@ if (document.body) {
           creditSnapshot && Number.isFinite(Number(creditSnapshot.available))
             ? `Credits available: ${Number(creditSnapshot.available)}`
             : "",
+          blocksDigestDone ? ("Knowledge blocks:\n" + blocksDigestDone) : "",
           work.html_generation_error ? t("studio.info_html_error", "HTML generation issue: {value}", { value: work.html_generation_error }) : "",
           work.llm_error ? t("studio.info_fallback_reason", "Fallback reason: {value}", { value: work.llm_error }) : ""
         ].filter(Boolean).join("\n");
@@ -1370,11 +1415,21 @@ if (document.body) {
         const estimatedModules = estimateModuleCountFromSources(state.selectedSources);
         const creditCost = estimateGenerationCreditCost(state.selectedSources, estimatedModules);
         setMeta(`Submitting job and reserving credits (estimated ${creditCost}, auto modules ${estimatedModules})...`);
+        const useBookPipeline = detectBookPipelineIntent(state.selectedSources);
         const payload = {
           mode: "sources",
           input: searchInput.value || "custom sources",
-          sources: state.selectedSources
+          sources: state.selectedSources,
+          ...(useBookPipeline ? {
+            bookPipeline: true,
+            pipelineMode: "book_pipeline",
+            mode: "book_pipeline",
+            pipelineHtmlProvider: "template"
+          } : {})
         };
+        if (useBookPipeline) {
+          pushClientLog("Detected file/book sources. Use book pipeline mode.", "job", 6);
+        }
         await startGenerationJob(payload);
       } catch (error) {
         const available = Number(error?.payload?.credits?.available);

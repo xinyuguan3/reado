@@ -887,6 +887,42 @@ function isBookPipelinePayload(payload = {}) {
   return false;
 }
 
+function shouldAutoBookPipelinePayload(payload = {}) {
+  if (!payload || typeof payload !== "object") return false;
+  if (isBookPipelinePayload(payload)) return true;
+  const mode = cleanText(payload?.mode).toLowerCase();
+  if (mode && mode !== "sources") return false;
+  const sources = Array.isArray(payload?.sources) ? payload.sources : [];
+  if (!sources.length) return false;
+  let ingestCount = 0;
+  let pdfLikeCount = 0;
+  let fileLikeCount = 0;
+  for (const row of sources) {
+    const parsedBy = cleanText(row?.parsedBy).toLowerCase();
+    const urlText = cleanText(row?.url);
+    const contentLen = cleanText(row?.content, cleanText(row?.snippet)).length;
+    if (parsedBy.startsWith("ingest.")) ingestCount += 1;
+    if (parsedBy.includes("pdf") || /\.pdf(?:$|[?#])/i.test(urlText)) pdfLikeCount += 1;
+    if (!urlText && contentLen >= 400) fileLikeCount += 1;
+  }
+  if (pdfLikeCount > 0) return true;
+  if (ingestCount > 0 && fileLikeCount > 0) return true;
+  return false;
+}
+
+function normalizeStudioJobPayload(payload = {}) {
+  const body = payload && typeof payload === "object" ? { ...payload } : {};
+  if (isBookPipelinePayload(body) || shouldAutoBookPipelinePayload(body)) {
+    return {
+      ...body,
+      bookPipeline: true,
+      pipelineMode: "book_pipeline",
+      mode: "book_pipeline"
+    };
+  }
+  return body;
+}
+
 function roughWordCount(text) {
   const normalized = String(text || "").replace(/\s+/g, " ").trim();
   if (!normalized) return 0;
@@ -2374,6 +2410,29 @@ async function runBookPipelineGenerationJob(job, sessionId) {
   if (!knowledgeBlocks.length) {
     throw new Error("No valid knowledge blocks after density filtering.");
   }
+  const blockPreview = knowledgeBlocks.slice(0, 18).map((item) => ({
+    id: cleanText(item?.id),
+    gateIndex: toInt(item?.gateIndex),
+    title: cleanText(item?.title),
+    summary: cleanText(item?.summary).slice(0, 180),
+    keywords: Array.isArray(item?.keywords) ? item.keywords.slice(0, 6) : [],
+    densityScore: Number(item?.density?.score || 0)
+  }));
+  const blockNames = blockPreview.slice(0, 6).map((item) => `${item.gateIndex}. ${item.title}`).join(" | ");
+  updateStudioJob(job, {
+    status: "running",
+    step: "knowledge_blocks",
+    progress: 16,
+    pipeline: {
+      ...(job.pipeline || {}),
+      type: "book_pipeline",
+      eta,
+      stage: "knowledge_blocks",
+      knowledgeBlockCount: knowledgeBlocks.length,
+      knowledgeBlocksPreview: blockPreview
+    },
+    message: `Knowledge blocks planned: ${knowledgeBlocks.length}. ${blockNames || "Generating block names..."}`.trim()
+  });
   const moduleCount = Math.max(3, Math.min(BOOK_PIPELINE_MAX_MODULES, toInt(job.payload?.moduleCount) || knowledgeBlocks.length));
   const blueprintSource = {
     title: `${resolved.title} · Knowledge Blueprint`,
@@ -2513,10 +2572,14 @@ async function runBookPipelineGenerationJob(job, sessionId) {
     progress: 100,
     work,
     pipeline: {
+      ...(job.pipeline || {}),
+      type: "book_pipeline",
+      stage: "done",
       sourceMode: resolved.mode,
       eta,
       qa: qaResult,
       knowledgeBlockCount: knowledgeBlocks.length,
+      knowledgeBlocksPreview: blockPreview,
       easter
     },
     creditCharge: capturedCharge || job.creditCharge || null,
@@ -2837,12 +2900,12 @@ async function handleStudioApi(req, res, url, session) {
         writeJson(res, 400, { ok: false, error: body.__error });
         return true;
       }
-      const payload = {
+      const payload = normalizeStudioJobPayload({
         ...body,
         bookPipeline: true,
         pipelineMode: "book_pipeline",
         mode: "book_pipeline"
-      };
+      });
       const eta = estimateBookPipelineFromPayload(payload);
       const charged = chargeCreditsForStudioGeneration(session.id, payload);
       if (!charged.ok) {
@@ -2948,12 +3011,15 @@ async function handleStudioApi(req, res, url, session) {
     }
 
     if (method === "POST" && route === "/api/studio/jobs") {
-      const body = await parseJsonBody(req, 512 * 1024).catch((error) => ({ __error: error?.message || "Invalid body" }));
+      const body = await parseJsonBody(req, 24 * 1024 * 1024).catch((error) => ({ __error: error?.message || "Invalid body" }));
       if (body.__error) {
         writeJson(res, 400, { ok: false, error: body.__error });
         return true;
       }
-      const charged = chargeCreditsForStudioGeneration(session.id, body);
+      const payload = normalizeStudioJobPayload(body);
+      const isPipeline = isBookPipelinePayload(payload);
+      const eta = isPipeline ? estimateBookPipelineFromPayload(payload) : null;
+      const charged = chargeCreditsForStudioGeneration(session.id, payload);
       if (!charged.ok) {
         writeJson(res, 402, {
           ok: false,
@@ -2961,21 +3027,40 @@ async function handleStudioApi(req, res, url, session) {
           error: `Insufficient credits. Need ${charged.need}, available ${charged.available}.`,
           need: charged.need,
           available: charged.available,
+          eta,
           credits: charged.credits
         });
         return true;
       }
-      const job = createStudioJob(session.id, body, {
+      const job = createStudioJob(session.id, payload, {
         creditCharge: charged.charge,
-        creditSnapshot: charged.credits
+        creditSnapshot: charged.credits,
+        eta: eta || null,
+        pipeline: isPipeline
+          ? {
+              type: "book_pipeline",
+              eta,
+              stage: "queued"
+            }
+          : null
       });
       updateStudioJob(job, {
         status: "queued",
         step: "queued",
         progress: 0,
+        eta: eta || null,
+        pipeline: isPipeline
+          ? {
+              type: "book_pipeline",
+              eta,
+              stage: "queued"
+            }
+          : null,
         creditCharge: job.creditCharge || null,
         creditSnapshot: job.creditSnapshot || null,
-        message: `Job created (reserved ${toInt(charged.charge?.amount)} credits)`
+        message: isPipeline
+          ? `Book pipeline created. ETA ${eta?.etaMin}-${eta?.etaMax} min; check back around ${eta?.returnAt ? new Date(eta.returnAt).toLocaleTimeString() : "soon"}.`
+          : `Job created (reserved ${toInt(charged.charge?.amount)} credits)`
       });
       runStudioGenerationJob(job, session.id).catch((error) => {
         updateStudioJob(job, {

@@ -1,0 +1,103 @@
+{
+  "version": 1,
+  "generated_at": "2026-03-02T08:18:32.506Z",
+  "eta": {
+    "words": 27,
+    "pagesApprox": 1,
+    "ocrPagesApprox": 1,
+    "blockCount": 6,
+    "queueDepth": 0,
+    "parseSec": 1.5,
+    "parallelSec": 120,
+    "qaSec": 126,
+    "etaSec": 285,
+    "etaMin": 5,
+    "etaMax": 6,
+    "returnAt": "2026-03-02T08:23:17.005Z"
+  },
+  "source_mode": "sources",
+  "total_knowledge_blocks": 1,
+  "knowledge_blocks": [
+    {
+      "id": "kb-01",
+      "index": 1,
+      "title": "Chapter 1 reflective practice under pressure improves transfer.",
+      "content": "Chapter 1 reflective practice under pressure improves transfer. Chapter 2 evidence and assumptions drive better judgment. Chapter 3 deliberate loops with retries and error analysis improve mastery.",
+      "words": 27,
+      "summary": "Chapter 1 reflective practice under pressure improves transfer. Chapter 2 evidence and assumptions drive better judgment.",
+      "keywords": [
+        "chapter",
+        "reflective",
+        "practice",
+        "under",
+        "pressure",
+        "improves"
+      ],
+      "density": {
+        "score": 1,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 1,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 1
+      },
+      "gateIndex": 1
+    }
+  ],
+  "module_map": [
+    {
+      "module_slug": "u-uploaded-pdf-01-0cefd2",
+      "knowledge_block_id": "kb-01"
+    },
+    {
+      "module_slug": "u-uploaded-pdf-02-e6adc7",
+      "knowledge_block_id": "kb-01"
+    },
+    {
+      "module_slug": "u-uploaded-pdf-03-c38bf4",
+      "knowledge_block_id": "kb-01"
+    }
+  ],
+  "easter_level": {
+    "id": "easter-uploaded-pdf",
+    "title": "uploaded.pdf：沉浸式最终挑战",
+    "premise": "你将进入高压决策场景，综合运用全书知识完成关键选择。",
+    "scene": "场景包含 Chapter 1 reflective practice under pressure improves transfer. 的联动挑战。",
+    "objective": "在资源受限与时间压力下做出最优决策，并解释依据。",
+    "stages": [
+      "信息筛选：识别噪音与关键证据",
+      "策略选择：在多个可行路径中做权衡",
+      "复盘反思：指出一次误判并修正策略"
+    ],
+    "rewards": [
+      "彩蛋通关纪念徽章",
+      "额外音频速记卡",
+      "连胜保护券"
+    ]
+  },
+  "artifacts": [
+    {
+      "moduleSlug": "u-uploaded-pdf-01-0cefd2",
+      "gateIndex": 1,
+      "quizCount": 10,
+      "fragmentCount": 3,
+      "audioHref": "/experiences/media/u-uploaded-pdf-01-0cefd2/review.wav",
+      "ok": true
+    },
+    {
+      "moduleSlug": "u-uploaded-pdf-02-e6adc7",
+      "gateIndex": 2,
+      "quizCount": 10,
+      "fragmentCount": 3,
+      "audioHref": "/experiences/media/u-uploaded-pdf-02-e6adc7/review.wav",
+      "ok": true
+    },
+    {
+      "moduleSlug": "u-uploaded-pdf-03-c38bf4",
+      "gateIndex": 3,
+      "quizCount": 10,
+      "fragmentCount": 3,
+      "audioHref": "/experiences/media/u-uploaded-pdf-03-c38bf4/review.wav",
+      "ok": true
+    }
+  ]
+}

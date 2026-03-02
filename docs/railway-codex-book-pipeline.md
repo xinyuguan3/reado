@@ -188,15 +188,17 @@ density_score = 0.35*concept_density
 ## 13. 新增 API（已落地）
 
 1. `POST /api/studio/books/jobs`
-2. Body（JSON）支持：
+2. `POST /api/studio/jobs`（兼容旧前端；若检测到文件解析来源会自动切换到 `book_pipeline`）
+3. Body（JSON）支持：
    - `bookFile`: `{ name, type, contentBase64 }`
    - 或 `file`: `{ name, type, contentBase64 }`
    - 或 `url` / `sources` / `input`
    - 可选：`title`, `moduleCount`, `blockCount`, `publishPublic`
    - 可选：`pipelineHtmlProvider` (`template|llm|auto`，默认 `template`，避免依赖 stitch)
-3. 返回：
+4. 返回：
    - `job.eta`（预计分钟区间 + 建议返回时间）
    - `job.pipeline`（book pipeline 摘要）
+   - `job.pipeline.knowledgeBlocksPreview`（拆出的知识块预览，含标题/摘要/关键词）
    - `job.creditCharge`（预扣额度）
 
 ## 14. 媒体生成 Provider（已落地）
