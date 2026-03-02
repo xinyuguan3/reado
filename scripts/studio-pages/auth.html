@@ -12,7 +12,6 @@
       --muted: #737373;
       --line: #dfdfdf;
       --blue: #1d7dde;
-      --btn: #111111;
     }
     * { box-sizing: border-box; }
     body {
@@ -93,8 +92,7 @@
     }
     .oauth-btn,
     .email-btn,
-    .session-btn,
-    .setup-save-btn {
+    .session-btn {
       width: 100%;
       border-radius: 12px;
       border: 1px solid var(--line);
@@ -140,13 +138,11 @@
     }
     .divider::before { left: 0; }
     .divider::after { right: 0; }
-    .email-form,
-    .setup-form {
+    .email-form {
       display: grid;
       gap: 10px;
     }
-    .email-input,
-    .setup-name-input {
+    .email-input {
       width: 100%;
       border-radius: 12px;
       border: 1px solid #d7d7d7;
@@ -156,16 +152,11 @@
       font-size: 16px;
       outline: none;
     }
-    .email-btn,
-    .setup-save-btn {
+    .email-btn {
       border-color: #a9a9a9;
       background: #8e8e8e;
       color: #fff;
       min-height: 50px;
-    }
-    .setup-save-btn {
-      background: var(--blue);
-      border-color: var(--blue);
     }
     .status {
       min-height: 20px;
@@ -176,8 +167,7 @@
     }
     .status.success { color: #047857; }
     .status.error { color: #dc2626; }
-    .session-card,
-    .setup-card {
+    .session-card {
       border: 1px solid #d9e8fb;
       border-radius: 14px;
       background: #f5faff;
@@ -185,47 +175,6 @@
       text-align: left;
       display: grid;
       gap: 10px;
-    }
-    .setup-card {
-      border-color: #dbe4ef;
-      background: #ffffff;
-    }
-    .setup-title {
-      margin: 0;
-      font-size: 16px;
-      font-weight: 700;
-      color: #111827;
-    }
-    .setup-sub {
-      margin: 0;
-      font-size: 13px;
-      color: #64748b;
-    }
-    .avatar-grid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 8px;
-    }
-    .avatar-option {
-      border: 1px solid #d5dce8;
-      border-radius: 12px;
-      background: #fff;
-      padding: 4px;
-      min-height: 66px;
-      cursor: pointer;
-      display: grid;
-      place-items: center;
-    }
-    .avatar-option img {
-      width: 54px;
-      height: 54px;
-      border-radius: 999px;
-      object-fit: cover;
-    }
-    .avatar-option.is-active {
-      border-color: #1d7dde;
-      box-shadow: inset 0 0 0 1px rgba(29, 125, 222, 0.22);
-      background: #eef6ff;
     }
     .session-email {
       margin: 0;
@@ -270,9 +219,6 @@
       .subtitle {
         font-size: 18px;
       }
-      .avatar-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
     }
   </style>
   <script defer src="https://umami-production-9f03.up.railway.app/script.js" data-website-id="a7e6844a-97e6-4878-bf40-5a18520d1310"></script>
@@ -298,16 +244,6 @@
           <button id="emailBtn" class="email-btn" type="submit">Continue</button>
         </form>
         <p id="statusText" class="status"></p>
-
-        <section id="setupCard" class="setup-card" hidden>
-          <h3 class="setup-title">Set up your profile</h3>
-          <p class="setup-sub">Choose an avatar and set your display name before continuing.</p>
-          <div id="avatarGrid" class="avatar-grid"></div>
-          <form id="setupForm" class="setup-form">
-            <input id="setupNameInput" class="setup-name-input" type="text" maxlength="24" placeholder="Your display name" required>
-            <button id="setupSaveBtn" class="setup-save-btn" type="submit">Save and continue</button>
-          </form>
-        </section>
 
         <section id="sessionCard" class="session-card" hidden>
           <p class="session-email" id="sessionEmail"></p>
@@ -335,11 +271,6 @@
     const emailForm = document.getElementById("emailForm");
     const emailInput = document.getElementById("emailInput");
     const emailBtn = document.getElementById("emailBtn");
-    const setupCard = document.getElementById("setupCard");
-    const avatarGrid = document.getElementById("avatarGrid");
-    const setupForm = document.getElementById("setupForm");
-    const setupNameInput = document.getElementById("setupNameInput");
-    const setupSaveBtn = document.getElementById("setupSaveBtn");
     const sessionCard = document.getElementById("sessionCard");
     const sessionEmail = document.getElementById("sessionEmail");
     const continueBtn = document.getElementById("continueBtn");
@@ -347,7 +278,6 @@
 
     let supabase = null;
     let currentAuthPayload = null;
-    let selectedAvatar = "";
 
     function setStatus(message, type = "") {
       statusTextEl.textContent = message || "";
@@ -378,21 +308,15 @@
       return url.toString();
     }
 
-    function makeAvatarDataUri(bg1, bg2, icon) {
-      const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='${bg1}'/><stop offset='100%' stop-color='${bg2}'/></linearGradient></defs><rect width='128' height='128' rx='64' fill='url(#g)'/><text x='64' y='80' text-anchor='middle' font-size='56' font-family='Arial, sans-serif'>${icon}</text></svg>`;
-      return "data:image/svg+xml," + encodeURIComponent(svg);
+    function buildProfileSetupUrl() {
+      const url = new URL("/pages/profile-setup.html", window.location.origin);
+      url.searchParams.set("next", nextPath);
+      if (intent === "checkout" && pendingPriceId) {
+        url.searchParams.set("intent", "checkout");
+        url.searchParams.set("priceId", pendingPriceId);
+      }
+      return url.toString();
     }
-
-    const PRESET_AVATARS = [
-      makeAvatarDataUri("#1d4ed8", "#06b6d4", "📘"),
-      makeAvatarDataUri("#7c3aed", "#ec4899", "🧠"),
-      makeAvatarDataUri("#16a34a", "#22d3ee", "🚀"),
-      makeAvatarDataUri("#ea580c", "#f59e0b", "🔥"),
-      makeAvatarDataUri("#0f172a", "#334155", "🦉"),
-      makeAvatarDataUri("#db2777", "#9333ea", "✨"),
-      makeAvatarDataUri("#0ea5e9", "#22c55e", "🎯"),
-      makeAvatarDataUri("#be123c", "#fb7185", "🌟")
-    ];
 
     function readUserState() {
       try {
@@ -403,8 +327,34 @@
       }
     }
 
-    function writeUserState(state) {
-      localStorage.setItem(USER_STATE_KEY, JSON.stringify(state));
+    async function syncRegisteredUser(authPayload, state, reason = "auth-sync") {
+      const userId = String(authPayload?.userId || "").trim();
+      if (!userId) return null;
+      const userState = state && typeof state === "object" ? state : readUserState();
+      const body = {
+        userId,
+        email: String(authPayload?.email || "").trim(),
+        displayName: String(userState?.name || "").trim(),
+        state: {
+          level: Number.isFinite(Number(userState?.level)) ? Math.max(1, Math.floor(Number(userState.level))) : 1,
+          xp: Number.isFinite(Number(userState?.xp)) ? Math.max(0, Math.floor(Number(userState.xp))) : 0,
+          gems: Number.isFinite(Number(userState?.gems)) ? Math.max(0, Math.floor(Number(userState.gems))) : 0
+        },
+        reason: String(reason || "").trim()
+      };
+      try {
+        const response = await fetch("/api/user/sync", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "same-origin",
+          body: JSON.stringify(body)
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || data?.ok === false) return null;
+        return data;
+      } catch {
+        return null;
+      }
     }
 
     function persistAuthState(session) {
@@ -426,14 +376,6 @@
       localStorage.removeItem(AUTH_STATE_KEY);
     }
 
-    function saveProfileSetup(payload) {
-      localStorage.setItem(PROFILE_SETUP_KEY, JSON.stringify({
-        userId: payload.userId,
-        done: true,
-        updatedAt: new Date().toISOString()
-      }));
-    }
-
     function hasProfileSetup(payload) {
       if (!payload?.userId) return false;
       try {
@@ -447,23 +389,6 @@
       const name = String(userState?.name || "").trim();
       const avatar = String(userState?.avatar || "").trim();
       return Boolean(name && avatar);
-    }
-
-    function renderAvatarOptions() {
-      avatarGrid.innerHTML = PRESET_AVATARS.map((src, idx) => `
-        <button type="button" class="avatar-option${idx === 0 ? " is-active" : ""}" data-avatar="${src}" aria-label="avatar-${idx + 1}">
-          <img src="${src}" alt="Avatar ${idx + 1}">
-        </button>`).join("");
-      selectedAvatar = PRESET_AVATARS[0] || "";
-    }
-
-    function toggleSetupMode(enabled) {
-      setupCard.hidden = !enabled;
-      googleBtn.disabled = enabled;
-      emailBtn.disabled = enabled;
-      emailInput.disabled = enabled;
-      continueBtn.disabled = enabled;
-      continueBtn.textContent = enabled ? "Complete profile first" : "Continue";
     }
 
     function setSignedInUi(payload) {
@@ -504,12 +429,11 @@
       currentAuthPayload = payload;
       setSignedInUi(payload);
       if (!hasProfileSetup(payload)) {
-        toggleSetupMode(true);
-        setStatus("Almost done: choose avatar and name.", "");
+        window.location.assign(buildProfileSetupUrl());
         return;
       }
-      toggleSetupMode(false);
       try {
+        await syncRegisteredUser(payload, readUserState(), "auth-signin");
         await runPostLoginFlow();
       } catch (error) {
         setStatus(error?.message || "Signed in, but checkout redirect failed.", "error");
@@ -541,7 +465,6 @@
           clearAuthState();
           currentAuthPayload = null;
           sessionCard.hidden = true;
-          toggleSetupMode(false);
           if (event === "SIGNED_OUT") setStatus("Signed out.", "");
           return;
         }
@@ -554,7 +477,7 @@
         await applySignedIn(data.session);
       } else {
         clearAuthState();
-        toggleSetupMode(false);
+        sessionCard.hidden = true;
         setStatus("Use Google or email magic link to continue.", "");
       }
     }
@@ -599,53 +522,6 @@
       }
     });
 
-    avatarGrid.addEventListener("click", (event) => {
-      const target = event.target;
-      if (!(target instanceof HTMLElement)) return;
-      const option = target.closest(".avatar-option");
-      if (!(option instanceof HTMLElement)) return;
-      const avatar = String(option.getAttribute("data-avatar") || "").trim();
-      if (!avatar) return;
-      selectedAvatar = avatar;
-      avatarGrid.querySelectorAll(".avatar-option").forEach((node) => node.classList.remove("is-active"));
-      option.classList.add("is-active");
-    });
-
-    setupForm.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      if (!currentAuthPayload?.userId) {
-        setStatus("Please sign in first.", "error");
-        return;
-      }
-      const name = String(setupNameInput.value || "").trim();
-      if (name.length < 2) {
-        setStatus("Name should be at least 2 characters.", "error");
-        return;
-      }
-      setupSaveBtn.disabled = true;
-      try {
-        const current = readUserState();
-        writeUserState({
-          ...current,
-          name,
-          title: "Learner",
-          level: Number.isFinite(Number(current.level)) ? Math.max(1, Math.floor(Number(current.level))) : 1,
-          xp: Number.isFinite(Number(current.xp)) ? Math.max(0, Math.floor(Number(current.xp))) : 0,
-          gems: Number.isFinite(Number(current.gems)) ? Math.max(0, Math.floor(Number(current.gems))) : 0,
-          streak: current.streak || "Day 1",
-          avatar: selectedAvatar || PRESET_AVATARS[0]
-        });
-        saveProfileSetup(currentAuthPayload);
-        toggleSetupMode(false);
-        setStatus("Profile saved.", "success");
-        await runPostLoginFlow();
-      } catch (error) {
-        setStatus(error?.message || "Failed to save profile.", "error");
-      } finally {
-        setupSaveBtn.disabled = false;
-      }
-    });
-
     continueBtn.addEventListener("click", async () => {
       try {
         const redirected = await continueCheckoutIfNeeded();
@@ -665,20 +541,16 @@
         clearAuthState();
         currentAuthPayload = null;
         sessionCard.hidden = true;
-        toggleSetupMode(false);
       }
     });
-
-    renderAvatarOptions();
 
     setupSupabase().catch((error) => {
       setStatus(error?.message || "Failed to initialize auth.", "error");
       googleBtn.disabled = true;
       emailBtn.disabled = true;
       emailInput.disabled = true;
-      setupSaveBtn.disabled = true;
-      setupNameInput.disabled = true;
-      toggleSetupMode(false);
+      continueBtn.disabled = true;
+      logoutBtn.disabled = true;
     });
   </script>
 </body>

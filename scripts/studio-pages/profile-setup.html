@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Reado Profile Setup</title>
+  <style>
+    :root {
+      --bg: #f7f7f7;
+      --card: #ffffff;
+      --text: #191919;
+      --muted: #737373;
+      --line: #dfdfdf;
+      --blue: #1d7dde;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text);
+      background-color: var(--bg);
+      background-image: radial-gradient(circle at 1px 1px, #e1e1e1 1px, transparent 0);
+      background-size: 18px 18px;
+      display: flex;
+      flex-direction: column;
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 18px 26px;
+      font-size: 18px;
+      font-weight: 700;
+      color: #232323;
+    }
+    .topbar-mark {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      border: 1px solid #d6d6d6;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      background: #fff;
+    }
+    main {
+      width: 100%;
+      flex: 1;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+    .wrap {
+      width: min(100%, 520px);
+      text-align: center;
+    }
+    .hero-icon {
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 10px;
+      border-radius: 999px;
+      background: #fff;
+      border: 1px solid var(--line);
+      display: grid;
+      place-items: center;
+      font-size: 34px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 42px;
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+      font-family: Georgia, "Times New Roman", serif;
+      font-weight: 600;
+    }
+    .subtitle {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 20px;
+    }
+    .panel {
+      margin-top: 22px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(4px);
+      padding: 16px;
+      display: grid;
+      gap: 10px;
+      text-align: left;
+    }
+    .title {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 700;
+      color: #111827;
+    }
+    .sub {
+      margin: 0;
+      font-size: 13px;
+      color: #64748b;
+    }
+    .session-email {
+      margin: 0;
+      font-size: 13px;
+      color: #334155;
+      word-break: break-all;
+    }
+    .avatar-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .avatar-option {
+      border: 1px solid #d5dce8;
+      border-radius: 12px;
+      background: #fff;
+      padding: 4px;
+      min-height: 66px;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+    }
+    .avatar-option img {
+      width: 54px;
+      height: 54px;
+      border-radius: 999px;
+      object-fit: cover;
+    }
+    .avatar-option.is-active {
+      border-color: #1d7dde;
+      box-shadow: inset 0 0 0 1px rgba(29, 125, 222, 0.22);
+      background: #eef6ff;
+    }
+    .setup-form {
+      display: grid;
+      gap: 10px;
+    }
+    .setup-name-input {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid #d7d7d7;
+      background: #fff;
+      min-height: 50px;
+      padding: 0 14px;
+      font-size: 16px;
+      outline: none;
+    }
+    .setup-save-btn {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--blue);
+      min-height: 50px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      background: var(--blue);
+      color: #fff;
+    }
+    .status {
+      min-height: 20px;
+      margin: 2px 0 0;
+      font-size: 13px;
+      color: #666;
+      text-align: left;
+    }
+    .status.success { color: #047857; }
+    .status.error { color: #dc2626; }
+    @media (max-width: 640px) {
+      .topbar {
+        padding: 14px 14px;
+        font-size: 16px;
+      }
+      .wrap {
+        width: min(100%, 420px);
+      }
+      h1 {
+        font-size: 34px;
+      }
+      .subtitle {
+        font-size: 18px;
+      }
+      .avatar-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+  </style>
+  <script defer src="https://umami-production-9f03.up.railway.app/script.js" data-website-id="a7e6844a-97e6-4878-bf40-5a18520d1310"></script>
+</head>
+<body>
+  <header class="topbar">
+    <span class="topbar-mark">R</span>
+    <span>reado</span>
+  </header>
+  <main>
+    <section class="wrap" aria-label="Profile Setup">
+      <div class="hero-icon">✨</div>
+      <h1>Set up your profile</h1>
+      <p class="subtitle">Only needed once for a new account</p>
+      <div class="panel">
+        <p class="title">Choose avatar and display name</p>
+        <p class="sub">This appears in your profile and leaderboard.</p>
+        <p id="sessionEmail" class="session-email"></p>
+        <div id="avatarGrid" class="avatar-grid"></div>
+        <form id="setupForm" class="setup-form">
+          <input id="setupNameInput" class="setup-name-input" type="text" maxlength="24" placeholder="Your display name" required>
+          <button id="setupSaveBtn" class="setup-save-btn" type="submit">Save and continue</button>
+        </form>
+        <p id="statusText" class="status"></p>
+      </div>
+    </section>
+  </main>
+
+  <script type="module">
+    const AUTH_STATE_KEY = "reado_auth_state_v1";
+    const USER_STATE_KEY = "reado_user_state_v1";
+    const PROFILE_SETUP_KEY = "reado_profile_setup_v1";
+    const FALLBACK_NEXT = "/pages/gamified-learning-hub-dashboard-1.html";
+    const DEFAULT_SIGNUP_CREDITS = 500;
+    const params = new URLSearchParams(window.location.search);
+    const intent = String(params.get("intent") || "").trim();
+    const pendingPriceId = String(params.get("priceId") || "").trim();
+
+    const statusTextEl = document.getElementById("statusText");
+    const sessionEmailEl = document.getElementById("sessionEmail");
+    const avatarGrid = document.getElementById("avatarGrid");
+    const setupForm = document.getElementById("setupForm");
+    const setupNameInput = document.getElementById("setupNameInput");
+    const setupSaveBtn = document.getElementById("setupSaveBtn");
+
+    let selectedAvatar = "";
+
+    function setStatus(message, type = "") {
+      statusTextEl.textContent = message || "";
+      statusTextEl.className = "status" + (type ? " " + type : "");
+    }
+
+    function sanitizeNextPath(raw) {
+      const value = String(raw || "").trim();
+      if (!value) return FALLBACK_NEXT;
+      try {
+        const full = new URL(value, window.location.origin);
+        if (full.origin !== window.location.origin) return FALLBACK_NEXT;
+        return full.pathname + full.search + full.hash;
+      } catch {
+        return FALLBACK_NEXT;
+      }
+    }
+
+    const nextPath = sanitizeNextPath(params.get("next"));
+
+    function buildAuthUrl() {
+      const url = new URL("/pages/auth.html", window.location.origin);
+      url.searchParams.set("next", nextPath);
+      if (intent === "checkout" && pendingPriceId) {
+        url.searchParams.set("intent", "checkout");
+        url.searchParams.set("priceId", pendingPriceId);
+      }
+      return url.toString();
+    }
+
+    function readAuthState() {
+      try {
+        const raw = JSON.parse(localStorage.getItem(AUTH_STATE_KEY) || "null");
+        if (!raw || typeof raw !== "object") return null;
+        const userId = typeof raw.userId === "string" ? raw.userId.trim() : "";
+        const email = typeof raw.email === "string" ? raw.email.trim() : "";
+        const expiresAt = Number(raw.expiresAt);
+        if (Number.isFinite(expiresAt) && expiresAt > 0 && Date.now() > expiresAt) {
+          localStorage.removeItem(AUTH_STATE_KEY);
+          return null;
+        }
+        if (!userId) return null;
+        return { userId, email, expiresAt };
+      } catch {
+        return null;
+      }
+    }
+
+    function readUserState() {
+      try {
+        const raw = JSON.parse(localStorage.getItem(USER_STATE_KEY) || "null");
+        return raw && typeof raw === "object" ? raw : {};
+      } catch {
+        return {};
+      }
+    }
+
+    function writeUserState(state) {
+      localStorage.setItem(USER_STATE_KEY, JSON.stringify(state));
+    }
+
+    function saveProfileSetup(payload) {
+      localStorage.setItem(PROFILE_SETUP_KEY, JSON.stringify({
+        userId: payload.userId,
+        done: true,
+        updatedAt: new Date().toISOString()
+      }));
+    }
+
+    function hasProfileSetup(payload) {
+      if (!payload?.userId) return false;
+      try {
+        const setup = JSON.parse(localStorage.getItem(PROFILE_SETUP_KEY) || "null");
+        if (!setup || typeof setup !== "object") return false;
+        if (setup.userId !== payload.userId || setup.done !== true) return false;
+      } catch {
+        return false;
+      }
+      const userState = readUserState();
+      const name = String(userState?.name || "").trim();
+      const avatar = String(userState?.avatar || "").trim();
+      return Boolean(name && avatar);
+    }
+
+    async function syncRegisteredUser(authPayload, state, reason = "auth-profile-setup") {
+      const userId = String(authPayload?.userId || "").trim();
+      if (!userId) return null;
+      const userState = state && typeof state === "object" ? state : readUserState();
+      const body = {
+        userId,
+        email: String(authPayload?.email || "").trim(),
+        displayName: String(userState?.name || "").trim(),
+        state: {
+          level: Number.isFinite(Number(userState?.level)) ? Math.max(1, Math.floor(Number(userState.level))) : 1,
+          xp: Number.isFinite(Number(userState?.xp)) ? Math.max(0, Math.floor(Number(userState.xp))) : 0,
+          gems: Number.isFinite(Number(userState?.gems)) ? Math.max(0, Math.floor(Number(userState.gems))) : 0
+        },
+        reason: String(reason || "").trim()
+      };
+      try {
+        const response = await fetch("/api/user/sync", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "same-origin",
+          body: JSON.stringify(body)
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || data?.ok === false) return null;
+        return data;
+      } catch {
+        return null;
+      }
+    }
+
+    async function continueCheckoutIfNeeded() {
+      if (intent !== "checkout" || !pendingPriceId) return false;
+      setStatus("Profile saved, redirecting to checkout...", "success");
+      const response = await fetch("/api/billing/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({ priceId: pendingPriceId })
+      });
+      let data = {};
+      try { data = await response.json(); } catch {}
+      if (!response.ok || data?.ok === false) {
+        throw new Error(data?.error || `Checkout failed with ${response.status}`);
+      }
+      const checkoutUrl = String(data?.checkoutUrl || "").trim();
+      if (!checkoutUrl) throw new Error("Stripe checkout URL is empty");
+      window.location.assign(checkoutUrl);
+      return true;
+    }
+
+    async function continueAfterSetup() {
+      const redirected = await continueCheckoutIfNeeded();
+      if (!redirected) {
+        window.location.assign(nextPath);
+      }
+    }
+
+    function makeAvatarDataUri(bg1, bg2, icon) {
+      const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='${bg1}'/><stop offset='100%' stop-color='${bg2}'/></linearGradient></defs><rect width='128' height='128' rx='64' fill='url(#g)'/><text x='64' y='80' text-anchor='middle' font-size='56' font-family='Arial, sans-serif'>${icon}</text></svg>`;
+      return "data:image/svg+xml," + encodeURIComponent(svg);
+    }
+
+    const PRESET_AVATARS = [
+      makeAvatarDataUri("#1d4ed8", "#06b6d4", "📘"),
+      makeAvatarDataUri("#7c3aed", "#ec4899", "🧠"),
+      makeAvatarDataUri("#16a34a", "#22d3ee", "🚀"),
+      makeAvatarDataUri("#ea580c", "#f59e0b", "🔥"),
+      makeAvatarDataUri("#0f172a", "#334155", "🦉"),
+      makeAvatarDataUri("#db2777", "#9333ea", "✨"),
+      makeAvatarDataUri("#0ea5e9", "#22c55e", "🎯"),
+      makeAvatarDataUri("#be123c", "#fb7185", "🌟")
+    ];
+
+    function renderAvatarOptions(activeAvatar = "") {
+      avatarGrid.innerHTML = PRESET_AVATARS.map((src, idx) => {
+        const isActive = activeAvatar ? src === activeAvatar : idx === 0;
+        return `
+          <button type="button" class="avatar-option${isActive ? " is-active" : ""}" data-avatar="${src}" aria-label="avatar-${idx + 1}">
+            <img src="${src}" alt="Avatar ${idx + 1}">
+          </button>`;
+      }).join("");
+      selectedAvatar = activeAvatar && PRESET_AVATARS.includes(activeAvatar)
+        ? activeAvatar
+        : (PRESET_AVATARS[0] || "");
+    }
+
+    avatarGrid.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+      const option = target.closest(".avatar-option");
+      if (!(option instanceof HTMLElement)) return;
+      const avatar = String(option.getAttribute("data-avatar") || "").trim();
+      if (!avatar) return;
+      selectedAvatar = avatar;
+      avatarGrid.querySelectorAll(".avatar-option").forEach((node) => node.classList.remove("is-active"));
+      option.classList.add("is-active");
+    });
+
+    const authPayload = readAuthState();
+    if (!authPayload?.userId) {
+      window.location.replace(buildAuthUrl());
+    } else {
+      sessionEmailEl.textContent = authPayload.email ? `Signed in as ${authPayload.email}` : "Signed in";
+      const current = readUserState();
+      if (hasProfileSetup(authPayload)) {
+        continueAfterSetup().catch((error) => {
+          setStatus(error?.message || "Unable to continue.", "error");
+        });
+      } else {
+        renderAvatarOptions(String(current.avatar || ""));
+        if (String(current.name || "").trim()) {
+          setupNameInput.value = String(current.name || "").trim();
+        }
+      }
+    }
+
+    setupForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const payload = readAuthState();
+      if (!payload?.userId) {
+        window.location.replace(buildAuthUrl());
+        return;
+      }
+      const name = String(setupNameInput.value || "").trim();
+      if (name.length < 2) {
+        setStatus("Name should be at least 2 characters.", "error");
+        return;
+      }
+      setupSaveBtn.disabled = true;
+      setStatus("Saving profile...", "");
+      try {
+        const current = readUserState();
+        const nextState = {
+          ...current,
+          name,
+          title: "Learner",
+          level: Number.isFinite(Number(current.level)) ? Math.max(1, Math.floor(Number(current.level))) : 1,
+          xp: Number.isFinite(Number(current.xp)) ? Math.max(0, Math.floor(Number(current.xp))) : 0,
+          gems: Number.isFinite(Number(current.gems)) ? Math.max(0, Math.floor(Number(current.gems))) : 0,
+          credits: Number.isFinite(Number(current.credits)) ? Math.max(0, Math.floor(Number(current.credits))) : DEFAULT_SIGNUP_CREDITS,
+          streak: current.streak || "Day 1",
+          avatar: selectedAvatar || PRESET_AVATARS[0]
+        };
+        writeUserState(nextState);
+        await syncRegisteredUser(payload, nextState, "auth-profile-setup");
+        saveProfileSetup(payload);
+        setStatus("Profile saved.", "success");
+        await continueAfterSetup();
+      } catch (error) {
+        setStatus(error?.message || "Failed to save profile.", "error");
+      } finally {
+        setupSaveBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

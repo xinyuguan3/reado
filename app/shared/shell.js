@@ -37,12 +37,18 @@ const ICON_FONT_SYMBOLS_ID = "reado-shell-material-symbols";
 const USER_STATE_KEY = "reado_user_state_v1";
 const DAILY_GEM_CLAIM_LEGACY_KEY = "reado_daily_gem_claim_v1";
 const DAILY_GEM_CLAIM_STREAK_KEY = "reado_daily_gem_claim_streak_v2";
+const DAILY_GEM_CYCLE_DAYS = 30;
+const DAILY_GEM_MILESTONE_DAYS = [3, 7, 10, 14, 18, 21, 25, 30];
+const DAILY_GEM_BASE_REWARD = 20;
+const DAILY_GEM_MILESTONE_EXTRA = 40;
+const DEFAULT_SIGNUP_CREDITS = 500;
 const DEFAULT_USER_STATE = {
   name: "Guest",
   title: "Unregistered",
   level: 1,
   xp: 0,
   gems: 0,
+  credits: DEFAULT_SIGNUP_CREDITS,
   streak: "Sign in to save progress",
   avatar: ""
 };
@@ -209,7 +215,17 @@ function buildStreakLabel(days) {
   return formatNumber(Math.max(0, days)) + "-day streak";
 }
 
-function readDailyGemStreakDays() {
+function getDailyGemCycleDay(streak) {
+  const safe = Math.max(1, Math.floor(Number(streak) || 1));
+  return ((safe - 1) % DAILY_GEM_CYCLE_DAYS) + 1;
+}
+
+function getDailyGemReward(cycleDay) {
+  const hasMilestoneBonus = DAILY_GEM_MILESTONE_DAYS.includes(cycleDay);
+  return DAILY_GEM_BASE_REWARD + (hasMilestoneBonus ? DAILY_GEM_MILESTONE_EXTRA : 0);
+}
+
+function readDailyGemClaimState() {
   let lastClaimDay = "";
   let streak = 0;
   try {
@@ -227,13 +243,52 @@ function readDailyGemStreakDays() {
       }
     }
   } catch {
-    return 0;
+    return { lastClaimDay: "", streak: 0 };
   }
-  if (!parseDayKey(lastClaimDay)) return 0;
-  const diff = dayDiff(lastClaimDay, getDayKey());
-  if (diff === 0 || diff === 1) return Math.max(1, streak || 1);
+  return {
+    lastClaimDay: parseDayKey(lastClaimDay) ? lastClaimDay : "",
+    streak: Math.max(0, streak)
+  };
+}
+
+function writeDailyGemClaimState(nextState) {
+  try {
+    localStorage.setItem(DAILY_GEM_CLAIM_STREAK_KEY, JSON.stringify({
+      lastClaimDay: parseDayKey(nextState?.lastClaimDay) ? nextState.lastClaimDay : "",
+      streak: Math.max(0, Math.floor(Number(nextState?.streak) || 0))
+    }));
+  } catch {}
+}
+
+function getNextDailyGemStreak(state, today) {
+  if (!state?.lastClaimDay) return 1;
+  const diff = dayDiff(state.lastClaimDay, today);
+  if (diff === 1) return Math.max(0, Math.floor(Number(state.streak) || 0)) + 1;
+  return 1;
+}
+
+function readDailyGemStreakDays() {
+  const state = readDailyGemClaimState();
+  if (!parseDayKey(state.lastClaimDay)) return 0;
+  const diff = dayDiff(state.lastClaimDay, getDayKey());
+  if (diff === 0 || diff === 1) return Math.max(1, state.streak || 1);
   if (diff > 1) return 0;
-  return Math.max(0, streak || 0);
+  return Math.max(0, state.streak || 0);
+}
+
+function autoGrantDailyGemIfNeeded() {
+  if (!window.ReadoUser?.grantRewards) return;
+  const state = readDailyGemClaimState();
+  const today = getDayKey();
+  if (state.lastClaimDay === today) return;
+  const nextStreak = getNextDailyGemStreak(state, today);
+  const cycleDay = getDailyGemCycleDay(nextStreak);
+  const reward = getDailyGemReward(cycleDay);
+  writeDailyGemClaimState({ lastClaimDay: today, streak: nextStreak });
+  try {
+    localStorage.setItem(DAILY_GEM_CLAIM_LEGACY_KEY, today);
+  } catch {}
+  grantRewards({ gems: reward, xp: 0, reason: "daily-auto-gems-day-" + cycleDay });
 }
 
 function resolveStreakText(user) {
@@ -254,7 +309,8 @@ function normalizeUserState(raw) {
     ...merged,
     level: Number.isFinite(merged.level) ? Math.max(1, Math.floor(merged.level)) : DEFAULT_USER_STATE.level,
     xp: Number.isFinite(merged.xp) ? Math.max(0, Math.floor(merged.xp)) : DEFAULT_USER_STATE.xp,
-    gems: Number.isFinite(merged.gems) ? Math.max(0, Math.floor(merged.gems)) : DEFAULT_USER_STATE.gems
+    gems: Number.isFinite(merged.gems) ? Math.max(0, Math.floor(merged.gems)) : DEFAULT_USER_STATE.gems,
+    credits: Number.isFinite(merged.credits) ? Math.max(0, Math.floor(merged.credits)) : DEFAULT_USER_STATE.credits
   };
 }
 
@@ -364,11 +420,26 @@ function buildAuthRedirectUrl(priceId) {
   return url.toString();
 }
 
+function buildAuthEntryUrl(mode) {
+  const url = new URL(buildAuthRedirectUrl(), window.location.origin);
+  const normalizedMode = typeof mode === "string" ? mode.trim().toLowerCase() : "";
+  if (normalizedMode === "signup" || normalizedMode === "login") {
+    url.searchParams.set("mode", normalizedMode);
+  }
+  return url.toString();
+}
+
 function sanitizeClientUserId(value) {
   const raw = typeof value === "string" ? value.trim() : "";
   if (!raw) return "";
   if (!/^[a-zA-Z0-9._:-]{4,128}$/.test(raw)) return "";
   return raw;
+}
+
+function isPlaceholderUserName(value) {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (!normalized) return true;
+  return normalized === "guest" || normalized === "reader" || normalized === "unregistered";
 }
 
 function escapeHtml(value) {
@@ -391,26 +462,34 @@ async function syncSignedInUser(extra = {}) {
   const userId = sanitizeClientUserId(auth?.userId);
   if (!userId) return null;
   const state = normalizeUserState(extra.state || readUserState());
+  const hasGain = Boolean(extra.gain && typeof extra.gain === "object");
+  const hasSpend = Boolean(extra.spend && typeof extra.spend === "object");
+  const hasReason = Boolean(typeof extra.reason === "string" && extra.reason.trim());
+  const hasMeaningfulProfile = !isPlaceholderUserName(state.name);
+  const hasProgressState = state.level > 1 || state.xp > 0 || state.gems > 0;
+  const shouldSendState = hasReason || hasGain || hasSpend || hasMeaningfulProfile || hasProgressState;
   const payload = {
     userId,
     email: typeof auth?.email === "string" ? auth.email : "",
-    displayName: state.name || "",
-    state: {
-      level: state.level,
-      xp: state.xp,
-      gems: state.gems
-    },
-    gain: extra.gain && typeof extra.gain === "object" ? extra.gain : undefined,
-    spend: extra.spend && typeof extra.spend === "object" ? extra.spend : undefined,
+    displayName: hasMeaningfulProfile ? state.name : "",
+    state: shouldSendState
+      ? {
+          level: state.level,
+          xp: state.xp,
+          gems: state.gems
+        }
+      : undefined,
+    gain: hasGain ? extra.gain : undefined,
+    spend: hasSpend ? extra.spend : undefined,
     reason: typeof extra.reason === "string" ? extra.reason : "",
     pathname: window.location.pathname,
     at: new Date().toISOString()
   };
   const fingerprint = [
     payload.userId,
-    payload.state.level,
-    payload.state.xp,
-    payload.state.gems,
+    payload.state?.level || 0,
+    payload.state?.xp || 0,
+    payload.state?.gems || 0,
     payload.reason,
     payload.gain?.xp || 0,
     payload.gain?.gems || 0
@@ -1035,6 +1114,14 @@ function ensureGlobalStyle() {
       border-color: rgba(152, 205, 255, 0.78);
       box-shadow: 0 0 0 2px rgba(88, 173, 255, 0.2);
     }
+    body.reado-shell-applied .reado-shell-credit {
+      color: #c6f7ff;
+      border-color: rgba(0, 234, 255, 0.32);
+      background: rgba(0, 234, 255, 0.08);
+    }
+    body.reado-shell-applied .reado-shell-credit .reado-shell-pill-icon {
+      color: #85edff;
+    }
     body.reado-shell-applied .reado-shell-pill.flash {
       animation: reado-shell-pop .45s ease;
     }
@@ -1155,6 +1242,38 @@ function ensureGlobalStyle() {
       color: #ccffe2;
       border-color: rgba(130, 255, 183, 0.5);
       background: rgba(22, 163, 74, 0.22);
+    }
+    body.reado-shell-applied .reado-shell-auth {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding-left: 8px;
+      border-left: 1px solid rgba(255, 255, 255, 0.12);
+      flex: 0 0 auto;
+      min-width: 0;
+    }
+    body.reado-shell-applied .reado-shell-auth-btn {
+      border: 1px solid rgba(88, 173, 255, 0.42);
+      border-radius: 999px;
+      background: rgba(19, 91, 236, 0.16);
+      color: #dbe9ff;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
+      white-space: nowrap;
+      min-height: 32px;
+    }
+    body.reado-shell-applied .reado-shell-auth-btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(152, 205, 255, 0.78);
+      background: rgba(19, 91, 236, 0.28);
+    }
+    body.reado-shell-applied .reado-shell-auth-btn.login {
+      border-color: rgba(255, 255, 255, 0.24);
+      background: rgba(16, 22, 34, 0.62);
+      color: #dbe6f9;
     }
     body.reado-shell-applied .reado-shell-user {
       display: inline-flex;
@@ -1927,6 +2046,14 @@ function ensureGlobalStyle() {
       body.reado-shell-applied .reado-shell-side.open { transform: translateX(0); }
       body.reado-shell-applied .reado-shell-user-meta,
       body.reado-shell-applied .reado-shell-pro { display: none; }
+      body.reado-shell-applied .reado-shell-auth {
+        gap: 6px;
+        padding-left: 6px;
+      }
+      body.reado-shell-applied .reado-shell-auth-btn {
+        padding: 5px 9px;
+        font-size: 11px;
+      }
       body.reado-shell-applied .reado-shell-lang-label { min-width: 0; }
     }
     @media (max-width: 1360px) {
@@ -2468,6 +2595,7 @@ class ReadoAppShell extends HTMLElement {
     enableImageFallbacks();
     document.body.classList.add("reado-shell-applied");
     maybeMigrateLegacyMockUser();
+    autoGrantDailyGemIfNeeded();
 
     const page = this.dataset.page || "other";
     const path = window.location.pathname;
@@ -2537,7 +2665,15 @@ class ReadoAppShell extends HTMLElement {
         <button class="reado-shell-pill pro reado-shell-pro" type="button" data-open-billing>
           <strong data-shell-pro-label>${t("billing.subscribe_short", "Subscribe Pro")}</strong>
         </button>
-        <div class="reado-shell-user">
+      <button class="reado-shell-pill reado-shell-credit" type="button" data-href="${GEM_CENTER_HREF}" aria-label="${t("shell.gems", "Gems")}">
+          <span class="reado-shell-pill-icon" data-icon-name="diamond">diamond</span>
+          <strong data-shell-gems>0</strong>
+        </button>
+        <div class="reado-shell-auth" data-shell-auth>
+          <button class="reado-shell-auth-btn signup" type="button" data-href="${buildAuthEntryUrl("signup")}">${t("shell.sign_in", "Sign in")}</button>
+          <button class="reado-shell-auth-btn login" type="button" data-href="${buildAuthEntryUrl("login")}">${t("shell.log_in", "Log in")}</button>
+        </div>
+        <div class="reado-shell-user" data-shell-user>
           <div class="reado-shell-user-meta">
             <span class="reado-shell-user-name" data-shell-name></span>
             <span class="reado-shell-user-level" data-shell-level></span>
@@ -2551,6 +2687,9 @@ class ReadoAppShell extends HTMLElement {
     const nameEl = top.querySelector("[data-shell-name]");
     const levelEl = top.querySelector("[data-shell-level]");
     const avatarEl = top.querySelector("[data-shell-avatar]");
+    const authEl = top.querySelector("[data-shell-auth]");
+    const userEl = top.querySelector("[data-shell-user]");
+    const gemsEl = top.querySelector("[data-shell-gems]");
     const proLabelEl = top.querySelector("[data-shell-pro-label]");
     const langWrapEl = top.querySelector("[data-shell-lang-wrap]");
     const langToggleEl = top.querySelector("[data-shell-lang-toggle]");
@@ -2558,7 +2697,12 @@ class ReadoAppShell extends HTMLElement {
     const langMenuEl = top.querySelector("[data-shell-lang-menu]");
 
     const renderUser = (state) => {
+      const signedIn = isUserSignedIn();
+      if (authEl) authEl.hidden = signedIn;
+      if (userEl) userEl.hidden = !signedIn;
       const user = normalizeUserState(state);
+      if (gemsEl) gemsEl.textContent = formatNumber(user.gems);
+      if (!signedIn) return;
       if (nameEl) nameEl.textContent = user.name;
       if (levelEl) levelEl.textContent = "Lv." + user.level + " " + (user.title || t("shell.learner", "学习者"));
       if (avatarEl) avatarEl.src = user.avatar || FALLBACK_AVATAR_DATA_URI;

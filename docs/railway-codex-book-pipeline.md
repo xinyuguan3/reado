@@ -193,6 +193,7 @@ density_score = 0.35*concept_density
    - 或 `file`: `{ name, type, contentBase64 }`
    - 或 `url` / `sources` / `input`
    - 可选：`title`, `moduleCount`, `blockCount`, `publishPublic`
+   - 可选：`pipelineHtmlProvider` (`template|llm|auto`，默认 `template`，避免依赖 stitch)
 3. 返回：
    - `job.eta`（预计分钟区间 + 建议返回时间）
    - `job.pipeline`（book pipeline 摘要）

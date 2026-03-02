@@ -1,0 +1,102 @@
+{
+  "version": 1,
+  "generated_at": "2026-03-02T04:52:13.026Z",
+  "eta": {
+    "words": 5,
+    "pagesApprox": 1,
+    "ocrPagesApprox": 1,
+    "blockCount": 6,
+    "queueDepth": 0,
+    "parseSec": 1.5,
+    "parallelSec": 120,
+    "qaSec": 126,
+    "etaSec": 285,
+    "etaMin": 5,
+    "etaMax": 6,
+    "returnAt": "2026-03-02T04:56:57.549Z"
+  },
+  "source_mode": "file",
+  "total_knowledge_blocks": 1,
+  "knowledge_blocks": [
+    {
+      "id": "kb-01",
+      "index": 1,
+      "title": "PDF Pipeline Parse Skill Check",
+      "content": "PDF Pipeline Parse Skill Check",
+      "words": 5,
+      "summary": "PDF Pipeline Parse Skill Check",
+      "keywords": [
+        "pdf",
+        "pipeline",
+        "parse",
+        "skill",
+        "check"
+      ],
+      "density": {
+        "score": 0.55,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0
+      },
+      "gateIndex": 1
+    }
+  ],
+  "module_map": [
+    {
+      "module_slug": "u-pdf-parse-smoke-01-5721f7",
+      "knowledge_block_id": "kb-01"
+    },
+    {
+      "module_slug": "u-pdf-parse-smoke-02-2e75fd",
+      "knowledge_block_id": "kb-01"
+    },
+    {
+      "module_slug": "u-pdf-parse-smoke-03-c1da7c",
+      "knowledge_block_id": "kb-01"
+    }
+  ],
+  "easter_level": {
+    "id": "easter-pdf-parse-smoke",
+    "title": "PDF Parse Smoke：沉浸式最终挑战",
+    "premise": "你将进入高压决策场景，综合运用全书知识完成关键选择。",
+    "scene": "场景包含 PDF Pipeline Parse Skill Check 的联动挑战。",
+    "objective": "在资源受限与时间压力下做出最优决策，并解释依据。",
+    "stages": [
+      "信息筛选：识别噪音与关键证据",
+      "策略选择：在多个可行路径中做权衡",
+      "复盘反思：指出一次误判并修正策略"
+    ],
+    "rewards": [
+      "彩蛋通关纪念徽章",
+      "额外音频速记卡",
+      "连胜保护券"
+    ]
+  },
+  "artifacts": [
+    {
+      "moduleSlug": "u-pdf-parse-smoke-01-5721f7",
+      "gateIndex": 1,
+      "quizCount": 10,
+      "fragmentCount": 3,
+      "audioHref": "/experiences/media/u-pdf-parse-smoke-01-5721f7/review.wav",
+      "ok": true
+    },
+    {
+      "moduleSlug": "u-pdf-parse-smoke-02-2e75fd",
+      "gateIndex": 2,
+      "quizCount": 10,
+      "fragmentCount": 3,
+      "audioHref": "/experiences/media/u-pdf-parse-smoke-02-2e75fd/review.wav",
+      "ok": true
+    },
+    {
+      "moduleSlug": "u-pdf-parse-smoke-03-c1da7c",
+      "gateIndex": 3,
+      "quizCount": 10,
+      "fragmentCount": 3,
+      "audioHref": "/experiences/media/u-pdf-parse-smoke-03-c1da7c/review.wav",
+      "ok": true
+    }
+  ]
+}

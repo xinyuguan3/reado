@@ -4,8 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>reado · Playable Studio</title>
-  <script type="module" src="/shared/shell.js?v=1772106375696"></script>
-  <script src="/shared/book-catalog.js"></script>
+  <script type="module" src="/shared/shell.js?v=1772435210588"></script>
+  <script src="/shared/book-catalog.js?v=1772435210588"></script>
   <style>
     :root {
       color-scheme: light;
@@ -605,6 +605,8 @@ if (document.body) {
     const sourceModalCancelEl = document.getElementById("source-modal-cancel");
     const sourceModalConfirmEl = document.getElementById("source-modal-confirm");
     const ACTIVE_JOB_KEY = "reado_studio_active_job_id";
+    const AUTH_STATE_KEY = "reado_auth_state_v1";
+    const PROFILE_SETUP_KEY = "reado_profile_setup_v1";
 
     const state = {
       searchResults: [],
@@ -617,6 +619,60 @@ if (document.body) {
       pollTimer: null,
       openedJobId: ""
     };
+
+    function readAuthState() {
+      try {
+        const raw = JSON.parse(localStorage.getItem(AUTH_STATE_KEY) || "null");
+        if (!raw || typeof raw !== "object") return null;
+        const userId = typeof raw.userId === "string" ? raw.userId.trim() : "";
+        const expiresAt = Number(raw.expiresAt);
+        if (Number.isFinite(expiresAt) && expiresAt > 0 && Date.now() > expiresAt) {
+          localStorage.removeItem(AUTH_STATE_KEY);
+          return null;
+        }
+        if (!userId) return null;
+        return { userId };
+      } catch {
+        return null;
+      }
+    }
+
+    function hasProfileSetup(userId) {
+      if (!userId) return false;
+      try {
+        const setup = JSON.parse(localStorage.getItem(PROFILE_SETUP_KEY) || "null");
+        return Boolean(setup && typeof setup === "object" && setup.userId === userId && setup.done === true);
+      } catch {
+        return false;
+      }
+    }
+
+    function buildAuthUrl() {
+      const url = new URL("/pages/auth.html", window.location.origin);
+      url.searchParams.set("next", window.location.pathname + window.location.search + window.location.hash);
+      return url.toString();
+    }
+
+    function buildProfileSetupUrl() {
+      const url = new URL("/pages/profile-setup.html", window.location.origin);
+      url.searchParams.set("next", window.location.pathname + window.location.search + window.location.hash);
+      return url.toString();
+    }
+
+    function ensureReadyForGeneration() {
+      const auth = readAuthState();
+      if (!auth?.userId) {
+        setMeta(t("studio.auth_required", "Please sign in before generating."));
+        window.location.assign(buildAuthUrl());
+        return false;
+      }
+      if (!hasProfileSetup(auth.userId)) {
+        setMeta(t("studio.profile_required", "Please complete your profile before generating."));
+        window.location.assign(buildProfileSetupUrl());
+        return false;
+      }
+      return true;
+    }
 
     function esc(value) {
       return String(value || "")
@@ -1292,6 +1348,9 @@ if (document.body) {
     }
 
     async function generatePlayable() {
+      if (!ensureReadyForGeneration()) {
+        return;
+      }
       if (state.pendingSources.length > 0) {
         setError(t("studio.err_wait_pending", "Please wait until source uploads/parsing complete."));
         return;

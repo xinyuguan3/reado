@@ -105,6 +105,7 @@ const stripeCheckoutConfigStatus = {
 };
 const creditsDailyFree = toInt(process.env.READO_CREDITS_DAILY_FREE || 0);
 const creditsMonthlyFree = toInt(process.env.READO_CREDITS_MONTHLY_FREE || 0);
+const creditsInitialGrant = toInt(process.env.READO_CREDITS_INITIAL_GRANT || 500);
 const creditsDailySmall = toInt(process.env.READO_CREDITS_DAILY_SMALL || 120);
 const creditsMonthlySmall = toInt(process.env.READO_CREDITS_MONTHLY_SMALL || 4800);
 const creditsDailyLarge = toInt(process.env.READO_CREDITS_DAILY_LARGE || 1800);
@@ -301,6 +302,12 @@ function sanitizeDisplayName(value, fallback = "") {
   return base.slice(0, 60);
 }
 
+function isPlaceholderDisplayName(value) {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (!normalized) return true;
+  return normalized === "reader" || normalized === "guest" || normalized === "unregistered";
+}
+
 function deriveDisplayNameFromEmail(email) {
   const cleanEmail = sanitizeEmail(email);
   if (!cleanEmail) return "";
@@ -424,14 +431,34 @@ function updatePlayerFromSync(payload = {}) {
   const now = nowIso();
   const nextEmail = sanitizeEmail(payload.email);
   if (nextEmail) row.email = nextEmail;
-  row.displayName = sanitizeDisplayName(
-    payload.displayName,
-    row.displayName || deriveDisplayNameFromEmail(row.email) || "Reader"
-  );
+  const incomingDisplayName = sanitizeDisplayName(payload.displayName, "");
+  if (incomingDisplayName && !isPlaceholderDisplayName(incomingDisplayName)) {
+    row.displayName = incomingDisplayName;
+  } else if (!row.displayName || isPlaceholderDisplayName(row.displayName)) {
+    row.displayName = sanitizeDisplayName(
+      deriveDisplayNameFromEmail(row.email),
+      row.displayName || "Reader"
+    );
+  }
   const nextState = payload.state && typeof payload.state === "object" ? payload.state : {};
-  row.level = Math.max(1, toInt(nextState.level) || row.level || 1);
-  row.xp = toInt(nextState.xp);
-  row.gems = toInt(nextState.gems);
+  if (Object.prototype.hasOwnProperty.call(nextState, "level")) {
+    const nextLevel = Number(nextState.level);
+    if (Number.isFinite(nextLevel)) {
+      row.level = Math.max(1, Math.floor(nextLevel));
+    }
+  }
+  if (Object.prototype.hasOwnProperty.call(nextState, "xp")) {
+    const nextXp = Number(nextState.xp);
+    if (Number.isFinite(nextXp)) {
+      row.xp = Math.max(0, Math.floor(nextXp));
+    }
+  }
+  if (Object.prototype.hasOwnProperty.call(nextState, "gems")) {
+    const nextGems = Number(nextState.gems);
+    if (Number.isFinite(nextGems)) {
+      row.gems = Math.max(0, Math.floor(nextGems));
+    }
+  }
 
   const gain = payload.gain && typeof payload.gain === "object" ? payload.gain : {};
   row.lifetimeXp += toInt(gain.xp);
@@ -699,9 +726,14 @@ function reconcileCreditsForRecord(record, nowMs = Date.now()) {
     changed = true;
   }
 
+  const hadMonthKey = Boolean(sanitizeStripeString(record.creditsMonthKey));
   if (sanitizeStripeString(record.creditsMonthKey) !== monthKey) {
     record.creditsMonthKey = monthKey;
-    record.creditsMonthlyBalance = Math.max(0, toInt(plan.monthlyGrant));
+    const canGrantInitial = !hadMonthKey
+      && toInt(record.creditsSpentTotal) <= 0
+      && toInt(record.creditsRefundedTotal) <= 0;
+    const initialGrant = canGrantInitial ? Math.max(0, toInt(creditsInitialGrant)) : 0;
+    record.creditsMonthlyBalance = Math.max(0, toInt(plan.monthlyGrant), initialGrant);
     changed = true;
   }
 
@@ -2314,6 +2346,11 @@ async function runBookPipelineGenerationJob(job, sessionId) {
   });
   const source = resolved.source || {};
   const sourceText = cleanText(source.content, cleanText(source.snippet));
+  const parsedBy = cleanText(source?.parsedBy);
+  const requestedPipelineHtmlProvider = cleanText(job.payload?.pipelineHtmlProvider, cleanText(job.payload?.htmlProvider, "template")).toLowerCase();
+  const pipelineHtmlProvider = ["template", "llm", "auto"].includes(requestedPipelineHtmlProvider)
+    ? requestedPipelineHtmlProvider
+    : "template";
   const eta = estimateBookPipelineFromPayload(
     {
       ...job.payload,
@@ -2326,7 +2363,7 @@ async function runBookPipelineGenerationJob(job, sessionId) {
     status: "running",
     step: "planning",
     progress: 12,
-    message: `Parsed source. Estimated ${eta.etaMin}-${eta.etaMax} minutes; return around ${new Date(eta.returnAt).toLocaleTimeString()}.`
+    message: `Parsed source${parsedBy ? ` via ${parsedBy}` : ""}. Estimated ${eta.etaMin}-${eta.etaMax} minutes; return around ${new Date(eta.returnAt).toLocaleTimeString()}.`
   });
 
   const requestedBlocks = toInt(job.payload?.blockCount);
@@ -2357,6 +2394,8 @@ async function runBookPipelineGenerationJob(job, sessionId) {
     input: cleanText(job.payload?.input, resolved.title),
     title: cleanText(job.payload?.title, resolved.title),
     moduleCount,
+    htmlProvider: pipelineHtmlProvider,
+    requireLlmHtml: false,
     sources: [
       { title: source.title, url: source.url, snippet: source.snippet, content: sourceText },
       blueprintSource
@@ -2368,7 +2407,7 @@ async function runBookPipelineGenerationJob(job, sessionId) {
     status: "running",
     step: "generate_core",
     progress: 20,
-    message: `Generating core modules (${moduleCount} gates)`
+    message: `Generating core modules (${moduleCount} gates, html=${pipelineHtmlProvider})`
   });
   const work = await playableContentEngine.generatePlayableBook(sessionId, generationPayload, {
     onProgress: (event) => {

@@ -52,6 +52,23 @@ function toArray(value) {
   return Array.isArray(value) ? value : [];
 }
 
+function parseOptionalBoolean(value) {
+  if (typeof value === "boolean") return value;
+  const text = toText(value).toLowerCase();
+  if (!text) return null;
+  if (["1", "true", "yes", "on"].includes(text)) return true;
+  if (["0", "false", "no", "off"].includes(text)) return false;
+  return null;
+}
+
+function normalizeHtmlProvider(value, fallback = "auto") {
+  const raw = toText(value, fallback).toLowerCase();
+  if (!raw) return "auto";
+  if (raw === "stitch-bridge") return "stitch_bridge";
+  if (["auto", "llm", "template", "stitch", "stitch_bridge"].includes(raw)) return raw;
+  return toText(fallback, "auto").toLowerCase();
+}
+
 function clamp(value, maxLen = MAX_TEXT_LEN) {
   const text = String(value || "");
   return text.length > maxLen ? text.slice(0, maxLen) : text;
@@ -3240,6 +3257,14 @@ export class PlayableContentEngine {
 
   async generatePlayableBook(ownerSessionId, payload, hooks = null) {
     this.emitProgress(hooks, "preparing_sources", 4, "Preparing sources");
+    const htmlProvider = normalizeHtmlProvider(payload?.htmlProvider, this.htmlProvider);
+    const requireLlmHtmlFromPayload = parseOptionalBoolean(payload?.requireLlmHtml);
+    const requireLlmHtml = requireLlmHtmlFromPayload === null ? this.requireLlmHtml : requireLlmHtmlFromPayload;
+    const stitchProviderOnly = htmlProvider === "stitch" || htmlProvider === "stitch_bridge";
+    const stitchProviderEnabled = Boolean(this.stitchBridgeEndpoint)
+      && (stitchProviderOnly || htmlProvider === "auto");
+    const llmHtmlAllowed = this.enableLlmHtml && htmlProvider !== "template";
+
     const modeRaw = toText(payload?.mode, "book").toLowerCase();
     const mode = ["book", "url", "search", "sources"].includes(modeRaw)
       ? modeRaw
@@ -3379,11 +3404,9 @@ export class PlayableContentEngine {
     const moduleRows = blueprint.modules.slice(0, moduleCount);
     const moduleSlugs = moduleRows.map((_, index) => `u-${bookBase.slice(0, 24)}-${String(index + 1).padStart(2, "0")}-${shortId().slice(0, 6)}`);
     const writtenModules = [];
-    let htmlGenerationMode = this.requireLlmHtml ? "llm_required" : "template";
+    let htmlGenerationMode = requireLlmHtml ? "llm_required" : "template";
+    if (htmlProvider === "template") htmlGenerationMode = "template_forced";
     const htmlGenerationErrors = [];
-    const stitchProviderOnly = this.htmlProvider === "stitch" || this.htmlProvider === "stitch_bridge";
-    const stitchProviderEnabled = Boolean(this.stitchBridgeEndpoint)
-      && (stitchProviderOnly || this.htmlProvider === "auto");
     if (stitchProviderOnly && !this.stitchBridgeEndpoint) {
       throw new Error("READO_STITCH_BRIDGE_ENDPOINT is required when READO_HTML_PROVIDER=stitch");
     }
@@ -3418,12 +3441,12 @@ export class PlayableContentEngine {
           const stitchError = toText(error?.message, "stitch bridge html failed");
           htmlGenerationErrors.push(stitchError);
           this.emitProgress(hooks, "compiling_modules", progress, `Stitch bridge failed (${i + 1}/${moduleRows.length}): ${stitchError}`);
-          if (stitchProviderOnly && this.requireLlmHtml) {
+          if (stitchProviderOnly && requireLlmHtml) {
             throw new Error(`Stitch bridge HTML generation failed: ${stitchError}`);
           }
         }
       }
-      if (!html && this.enableLlmHtml && this.llmApiKey && this.llmEndpoint && !stitchProviderOnly) {
+      if (!html && llmHtmlAllowed && this.llmApiKey && this.llmEndpoint && !stitchProviderOnly) {
         try {
           this.emitProgress(hooks, "compiling_modules", progress, `LLM generating immersive HTML: ${i + 1}/${moduleRows.length}`);
           html = await generateModuleHtmlWithLlm({
@@ -3465,7 +3488,7 @@ export class PlayableContentEngine {
           } catch (retryError) {
             const retryMsg = toText(retryError?.message, "llm html retry failed");
             htmlGenerationErrors.push(retryMsg);
-            if (this.requireLlmHtml) {
+            if (requireLlmHtml) {
               throw new Error(`LLM HTML generation failed after retry: ${retryMsg}`);
             }
             this.emitProgress(hooks, "compiling_modules", progress, `LLM HTML failed, fallback template used: ${retryMsg}`);
@@ -3473,7 +3496,7 @@ export class PlayableContentEngine {
         }
       }
       if (!html) {
-        if (this.requireLlmHtml) {
+        if (requireLlmHtml) {
           throw new Error("LLM HTML required but no valid HTML was generated");
         }
         html = compileModuleHtml({
@@ -3530,7 +3553,8 @@ export class PlayableContentEngine {
       llm_error: usedLlmBlueprint ? "" : llmError,
       html_generation_mode: htmlGenerationMode,
       html_generation_error: htmlGenerationErrors[0] || "",
-      llm_html_required: Boolean(this.requireLlmHtml),
+      llm_html_required: Boolean(requireLlmHtml),
+      html_provider: htmlProvider,
       parent_work_id: parentWorkId,
       root_work_id: toText(rootWorkIdInput, parentWorkId),
       modification_prompt: modificationPrompt,
