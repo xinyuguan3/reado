@@ -6,234 +6,260 @@
   <title>Reado Profile Setup</title>
   <style>
     :root {
-      --bg: #f7f7f7;
-      --card: #ffffff;
-      --text: #191919;
-      --muted: #737373;
-      --line: #dfdfdf;
-      --blue: #1d7dde;
+      --bg: #0f172a;
+      --bg-soft: #111c34;
+      --panel: rgba(16, 24, 40, 0.9);
+      --line: rgba(148, 163, 184, 0.25);
+      --line-strong: rgba(125, 175, 255, 0.42);
+      --text: #e5edff;
+      --muted: #9fb0cc;
+      --primary: #2563eb;
+      --primary-strong: #1d4ed8;
+      --danger: #ef4444;
+      --ok: #22c55e;
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
       min-height: 100vh;
-      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: "SF Pro Text", "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
       color: var(--text);
-      background-color: var(--bg);
-      background-image: radial-gradient(circle at 1px 1px, #e1e1e1 1px, transparent 0);
-      background-size: 18px 18px;
+      background:
+        radial-gradient(circle at 16% 12%, rgba(37, 99, 235, 0.2), transparent 45%),
+        radial-gradient(circle at 90% 8%, rgba(34, 197, 94, 0.12), transparent 34%),
+        linear-gradient(180deg, #0f172a, #111c34 56%, #0f172a);
       display: flex;
       flex-direction: column;
     }
     .topbar {
+      height: 74px;
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 18px 26px;
-      font-size: 18px;
-      font-weight: 700;
-      color: #232323;
+      justify-content: space-between;
+      padding: 0 22px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+      background: rgba(15, 23, 42, 0.76);
+      backdrop-filter: blur(10px);
     }
-    .topbar-mark {
-      width: 28px;
-      height: 28px;
-      border-radius: 8px;
-      border: 1px solid #d6d6d6;
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text);
+      font-size: 38px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      border: 1px solid rgba(88, 173, 255, 0.4);
+      background: rgba(19, 91, 236, 0.16);
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 15px;
-      background: #fff;
+      color: #aecdff;
+      font-family: "Material Icons";
+      font-size: 20px;
+      line-height: 1;
+      font-weight: 400;
+    }
+    .top-link {
+      color: #cfe0ff;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      border-radius: 999px;
+      padding: 8px 12px;
+      background: rgba(15, 23, 42, 0.35);
     }
     main {
-      width: 100%;
       flex: 1;
       display: grid;
       place-items: center;
-      padding: 24px;
+      padding: 28px 16px;
     }
-    .wrap {
-      width: min(100%, 520px);
-      text-align: center;
-    }
-    .hero-icon {
-      width: 72px;
-      height: 72px;
-      margin: 0 auto 10px;
-      border-radius: 999px;
-      background: #fff;
+    .setup-card {
+      width: min(100%, 560px);
       border: 1px solid var(--line);
+      border-radius: 20px;
+      background: var(--panel);
+      box-shadow: 0 24px 50px rgba(2, 8, 23, 0.42);
+      backdrop-filter: blur(10px);
+      padding: 22px;
       display: grid;
-      place-items: center;
-      font-size: 34px;
+      gap: 14px;
+    }
+    .eyebrow {
+      margin: 0;
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-weight: 800;
+      color: #86b6ff;
     }
     h1 {
       margin: 0;
-      font-size: 42px;
-      line-height: 1.08;
+      font-size: 28px;
+      line-height: 1.15;
       letter-spacing: -0.02em;
-      font-family: Georgia, "Times New Roman", serif;
-      font-weight: 600;
+      font-weight: 800;
     }
-    .subtitle {
-      margin: 10px 0 0;
-      color: var(--muted);
-      font-size: 20px;
-    }
-    .panel {
-      margin-top: 22px;
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      background: rgba(255, 255, 255, 0.9);
-      backdrop-filter: blur(4px);
-      padding: 16px;
-      display: grid;
-      gap: 10px;
-      text-align: left;
-    }
-    .title {
-      margin: 0;
-      font-size: 16px;
-      font-weight: 700;
-      color: #111827;
-    }
-    .sub {
-      margin: 0;
-      font-size: 13px;
-      color: #64748b;
-    }
+    .subtitle,
     .session-email {
       margin: 0;
-      font-size: 13px;
-      color: #334155;
-      word-break: break-all;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
     }
-    .avatar-builder {
-      display: grid;
-      gap: 12px;
+    .session-email {
+      font-size: 13px;
     }
     .avatar-preview-wrap {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 10px 0 2px;
+      display: grid;
+      place-items: center;
+      padding: 8px 0 4px;
     }
     .avatar-preview {
-      width: 76px;
-      height: 76px;
+      width: 84px;
+      height: 84px;
       border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.45);
-      box-shadow: 0 8px 22px rgba(15, 23, 42, 0.15);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      box-shadow: 0 10px 24px rgba(2, 8, 23, 0.35);
       object-fit: cover;
     }
     .picker-title {
-      margin: 0 0 6px;
+      margin: 0 0 8px;
       font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.03em;
-      color: #475569;
+      letter-spacing: 0.05em;
       text-transform: uppercase;
+      font-weight: 700;
+      color: #aac4ec;
     }
-    .avatar-grid {
+    .picker-grid {
       display: grid;
       gap: 8px;
     }
-    .avatar-icon-grid {
+    .icon-grid {
       grid-template-columns: repeat(4, minmax(0, 1fr));
     }
-    .avatar-color-grid {
+    .color-grid {
       grid-template-columns: repeat(6, minmax(0, 1fr));
     }
-    .avatar-option {
-      border: 1px solid #d5dce8;
+    .picker-btn {
+      border: 1px solid rgba(148, 163, 184, 0.36);
       border-radius: 12px;
-      background: #fff;
-      padding: 4px;
-      min-height: 66px;
+      min-height: 52px;
+      background: rgba(15, 23, 42, 0.6);
       cursor: pointer;
       display: grid;
       place-items: center;
+      transition: border-color 120ms ease, transform 120ms ease, background 120ms ease;
+      color: #e7efff;
     }
-    .avatar-icon-option {
-      min-height: 56px;
-      padding: 8px;
+    .picker-btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(152, 205, 255, 0.7);
+      background: rgba(30, 64, 175, 0.24);
     }
-    .avatar-icon-option svg {
+    .picker-btn.is-active {
+      border-color: rgba(125, 175, 255, 0.9);
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2) inset;
+      background: rgba(30, 64, 175, 0.28);
+    }
+    .picker-btn svg {
       width: 24px;
       height: 24px;
-      stroke: #0f172a;
+      stroke: #e8f1ff;
       fill: none;
       stroke-width: 1.8;
       stroke-linecap: round;
       stroke-linejoin: round;
     }
-    .avatar-color-option {
-      min-height: 46px;
-      padding: 0;
-    }
-    .avatar-color-dot {
+    .color-dot {
       width: 26px;
       height: 26px;
       border-radius: 999px;
-      border: 1px solid rgba(15, 23, 42, 0.16);
-    }
-    .avatar-option.is-active {
-      border-color: #1d7dde;
-      box-shadow: inset 0 0 0 1px rgba(29, 125, 222, 0.22);
-      background: #eef6ff;
+      border: 1px solid rgba(255, 255, 255, 0.28);
     }
     .setup-form {
       display: grid;
       gap: 10px;
     }
-    .setup-name-input {
+    .name-input {
       width: 100%;
+      min-height: 46px;
       border-radius: 12px;
-      border: 1px solid #d7d7d7;
-      background: #fff;
-      min-height: 50px;
-      padding: 0 14px;
+      border: 1px solid rgba(148, 163, 184, 0.42);
+      background: rgba(15, 23, 42, 0.62);
+      color: #e5edff;
       font-size: 16px;
+      padding: 0 14px;
       outline: none;
     }
-    .setup-save-btn {
-      width: 100%;
+    .name-input::placeholder {
+      color: #91a6c7;
+    }
+    .name-input:focus {
+      border-color: rgba(125, 175, 255, 0.88);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+    }
+    .save-btn {
+      border: 1px solid rgba(125, 175, 255, 0.7);
       border-radius: 12px;
-      border: 1px solid var(--blue);
-      min-height: 50px;
+      min-height: 46px;
+      width: 100%;
+      background: linear-gradient(180deg, var(--primary), var(--primary-strong));
+      color: #e5edff;
       font-size: 16px;
       font-weight: 700;
       cursor: pointer;
-      background: var(--blue);
-      color: #fff;
+      transition: transform 120ms ease;
+    }
+    .save-btn:hover {
+      transform: translateY(-1px);
+    }
+    .save-btn[disabled] {
+      opacity: 0.66;
+      cursor: not-allowed;
+      transform: none;
     }
     .status {
       min-height: 20px;
-      margin: 2px 0 0;
+      margin: 0;
       font-size: 13px;
-      color: #666;
-      text-align: left;
+      color: var(--muted);
+      line-height: 1.4;
     }
-    .status.success { color: #047857; }
-    .status.error { color: #dc2626; }
+    .status.success { color: var(--ok); }
+    .status.error { color: var(--danger); }
     @media (max-width: 640px) {
       .topbar {
-        padding: 14px 14px;
-        font-size: 16px;
+        height: 64px;
+        padding: 0 12px;
       }
-      .wrap {
-        width: min(100%, 420px);
+      .brand {
+        font-size: 32px;
+      }
+      .brand-mark {
+        width: 30px;
+        height: 30px;
+        font-size: 17px;
+      }
+      .setup-card {
+        border-radius: 16px;
+        padding: 18px;
       }
       h1 {
-        font-size: 34px;
+        font-size: 24px;
       }
-      .subtitle {
-        font-size: 18px;
-      }
-      .avatar-icon-grid {
+      .icon-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
       }
-      .avatar-color-grid {
+      .color-grid {
         grid-template-columns: repeat(5, minmax(0, 1fr));
       }
     }
@@ -242,37 +268,40 @@
 </head>
 <body>
   <header class="topbar">
-    <span class="topbar-mark">R</span>
-    <span>reado</span>
+    <a class="brand" href="/pages/gamified-learning-hub-dashboard-1.html" aria-label="reado home">
+      <span class="brand-mark">auto_stories</span>
+      <span>reado</span>
+    </a>
+    <a class="top-link" href="/pages/gamified-learning-hub-dashboard-1.html">Back to app</a>
   </header>
+
   <main>
-    <section class="wrap" aria-label="Profile Setup">
-      <div class="hero-icon">✨</div>
+    <section class="setup-card" aria-label="Profile Setup">
+      <p class="eyebrow">Profile setup</p>
       <h1>Set up your profile</h1>
-      <p class="subtitle">Only needed once for a new account</p>
-      <div class="panel">
-        <p class="title">Choose avatar and display name</p>
-        <p class="sub">This appears in your profile and leaderboard.</p>
-        <p id="sessionEmail" class="session-email"></p>
-        <div class="avatar-builder">
-          <div class="avatar-preview-wrap">
-            <img id="avatarPreview" class="avatar-preview" src="" alt="Avatar preview">
-          </div>
-          <div>
-            <p class="picker-title">Icon</p>
-            <div id="avatarIconGrid" class="avatar-grid avatar-icon-grid"></div>
-          </div>
-          <div>
-            <p class="picker-title">Background</p>
-            <div id="avatarColorGrid" class="avatar-grid avatar-color-grid"></div>
-          </div>
-        </div>
-        <form id="setupForm" class="setup-form">
-          <input id="setupNameInput" class="setup-name-input" type="text" maxlength="24" placeholder="Your display name" required>
-          <button id="setupSaveBtn" class="setup-save-btn" type="submit">Save and continue</button>
-        </form>
-        <p id="statusText" class="status"></p>
+      <p class="subtitle">Only once for new users. This name and avatar are used on leaderboard.</p>
+      <p id="sessionEmail" class="session-email"></p>
+
+      <div class="avatar-preview-wrap">
+        <img id="avatarPreview" class="avatar-preview" src="" alt="Avatar preview">
       </div>
+
+      <div>
+        <p class="picker-title">Icon</p>
+        <div id="avatarIconGrid" class="picker-grid icon-grid"></div>
+      </div>
+
+      <div>
+        <p class="picker-title">Background</p>
+        <div id="avatarColorGrid" class="picker-grid color-grid"></div>
+      </div>
+
+      <form id="setupForm" class="setup-form">
+        <input id="setupNameInput" class="name-input" type="text" maxlength="24" placeholder="Your display name" required>
+        <button id="setupSaveBtn" class="save-btn" type="submit">Save and continue</button>
+      </form>
+
+      <p id="statusText" class="status"></p>
     </section>
   </main>
 
@@ -282,12 +311,13 @@
     const PROFILE_SETUP_KEY = "reado_profile_setup_v1";
     const FALLBACK_NEXT = "/pages/gamified-learning-hub-dashboard-1.html";
     const DEFAULT_SIGNUP_CREDITS = 500;
+
     const params = new URLSearchParams(window.location.search);
     const intent = String(params.get("intent") || "").trim();
     const pendingPriceId = String(params.get("priceId") || "").trim();
 
-    const statusTextEl = document.getElementById("statusText");
     const sessionEmailEl = document.getElementById("sessionEmail");
+    const statusTextEl = document.getElementById("statusText");
     const avatarPreviewEl = document.getElementById("avatarPreview");
     const avatarIconGridEl = document.getElementById("avatarIconGrid");
     const avatarColorGridEl = document.getElementById("avatarColorGrid");
@@ -298,6 +328,64 @@
     let selectedAvatar = "";
     let selectedIconId = "spark";
     let selectedBgId = "ocean";
+
+    const ICON_PRESETS = [
+      {
+        id: "spark",
+        label: "Spark",
+        template: "<path d='M64 28v16' stroke='{{color}}'/><path d='M64 84v16' stroke='{{color}}'/><path d='M28 64h16' stroke='{{color}}'/><path d='M84 64h16' stroke='{{color}}'/><path d='M40 40l11 11' stroke='{{color}}'/><path d='M77 77l11 11' stroke='{{color}}'/><path d='M88 40L77 51' stroke='{{color}}'/><path d='M51 77L40 88' stroke='{{color}}'/>"
+      },
+      {
+        id: "book",
+        label: "Book",
+        template: "<rect x='36' y='34' width='56' height='60' rx='9' stroke='{{color}}'/><path d='M56 34v60' stroke='{{color}}'/><path d='M64 50h20' stroke='{{color}}'/><path d='M64 62h20' stroke='{{color}}'/>"
+      },
+      {
+        id: "target",
+        label: "Target",
+        template: "<circle cx='64' cy='64' r='28' stroke='{{color}}'/><circle cx='64' cy='64' r='14' stroke='{{color}}'/><circle cx='64' cy='64' r='4' fill='{{color}}' stroke='none'/>"
+      },
+      {
+        id: "chat",
+        label: "Chat",
+        template: "<rect x='32' y='36' width='64' height='44' rx='12' stroke='{{color}}'/><path d='M52 80l-14 14v-14' stroke='{{color}}'/><path d='M46 54h36' stroke='{{color}}'/><path d='M46 66h24' stroke='{{color}}'/>"
+      },
+      {
+        id: "bulb",
+        label: "Bulb",
+        template: "<path d='M45 55a19 19 0 1 1 38 0c0 8-4 13-9 18-3 3-4 6-4 9H58c0-3-1-6-4-9-5-5-9-10-9-18z' stroke='{{color}}'/><path d='M57 88h14' stroke='{{color}}'/><path d='M56 96h16' stroke='{{color}}'/>"
+      },
+      {
+        id: "rocket",
+        label: "Rocket",
+        template: "<path d='M72 34c13 7 22 22 22 40l-23-3-19-19 3-23c6 0 12 2 17 5z' stroke='{{color}}'/><path d='M52 52L36 68' stroke='{{color}}'/><path d='M68 68L52 84' stroke='{{color}}'/><circle cx='72' cy='56' r='5' stroke='{{color}}'/>"
+      },
+      {
+        id: "leaf",
+        label: "Leaf",
+        template: "<path d='M34 74c0-24 18-42 52-44 2 34-16 52-44 52-5 0-8-4-8-8z' stroke='{{color}}'/><path d='M44 74c12-8 22-18 31-31' stroke='{{color}}'/>"
+      },
+      {
+        id: "flag",
+        label: "Flag",
+        template: "<path d='M44 30v68' stroke='{{color}}'/><path d='M44 34h42l-10 15 10 15H44' stroke='{{color}}'/>"
+      }
+    ];
+
+    const BG_PRESETS = [
+      { id: "ocean", label: "Ocean", start: "#1d4ed8", end: "#06b6d4" },
+      { id: "violet", label: "Violet", start: "#7c3aed", end: "#ec4899" },
+      { id: "mint", label: "Mint", start: "#0f766e", end: "#34d399" },
+      { id: "sunset", label: "Sunset", start: "#f97316", end: "#fb7185" },
+      { id: "gold", label: "Gold", start: "#ca8a04", end: "#f59e0b" },
+      { id: "forest", label: "Forest", start: "#166534", end: "#22c55e" },
+      { id: "indigo", label: "Indigo", start: "#3730a3", end: "#6366f1" },
+      { id: "slate", label: "Slate", start: "#0f172a", end: "#334155" },
+      { id: "rose", label: "Rose", start: "#be123c", end: "#fb7185" },
+      { id: "sky", label: "Sky", start: "#0369a1", end: "#38bdf8" },
+      { id: "teal", label: "Teal", start: "#0f766e", end: "#2dd4bf" },
+      { id: "grape", label: "Grape", start: "#6d28d9", end: "#a78bfa" }
+    ];
 
     function setStatus(message, type = "") {
       statusTextEl.textContent = message || "";
@@ -320,6 +408,7 @@
 
     function buildAuthUrl() {
       const url = new URL("/pages/auth.html", window.location.origin);
+      url.searchParams.set("mode", "signin");
       url.searchParams.set("next", nextPath);
       if (intent === "checkout" && pendingPriceId) {
         url.searchParams.set("intent", "checkout");
@@ -414,7 +503,6 @@
 
     async function continueCheckoutIfNeeded() {
       if (intent !== "checkout" || !pendingPriceId) return false;
-      setStatus("Profile saved, redirecting to checkout...", "success");
       const response = await fetch("/api/billing/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -438,64 +526,6 @@
         window.location.assign(nextPath);
       }
     }
-
-    const ICON_PRESETS = [
-      {
-        id: "spark",
-        label: "Spark",
-        template: "<path d='M64 28v16' stroke='{{color}}'/><path d='M64 84v16' stroke='{{color}}'/><path d='M28 64h16' stroke='{{color}}'/><path d='M84 64h16' stroke='{{color}}'/><path d='M40 40l11 11' stroke='{{color}}'/><path d='M77 77l11 11' stroke='{{color}}'/><path d='M88 40L77 51' stroke='{{color}}'/><path d='M51 77L40 88' stroke='{{color}}'/>"
-      },
-      {
-        id: "book",
-        label: "Book",
-        template: "<rect x='36' y='34' width='56' height='60' rx='9' stroke='{{color}}'/><path d='M56 34v60' stroke='{{color}}'/><path d='M64 50h20' stroke='{{color}}'/><path d='M64 62h20' stroke='{{color}}'/>"
-      },
-      {
-        id: "target",
-        label: "Target",
-        template: "<circle cx='64' cy='64' r='28' stroke='{{color}}'/><circle cx='64' cy='64' r='14' stroke='{{color}}'/><circle cx='64' cy='64' r='4' fill='{{color}}' stroke='none'/>"
-      },
-      {
-        id: "chat",
-        label: "Chat",
-        template: "<rect x='32' y='36' width='64' height='44' rx='12' stroke='{{color}}'/><path d='M52 80l-14 14v-14' stroke='{{color}}'/><path d='M46 54h36' stroke='{{color}}'/><path d='M46 66h24' stroke='{{color}}'/>"
-      },
-      {
-        id: "bulb",
-        label: "Bulb",
-        template: "<path d='M45 55a19 19 0 1 1 38 0c0 8-4 13-9 18-3 3-4 6-4 9H58c0-3-1-6-4-9-5-5-9-10-9-18z' stroke='{{color}}'/><path d='M57 88h14' stroke='{{color}}'/><path d='M56 96h16' stroke='{{color}}'/>"
-      },
-      {
-        id: "rocket",
-        label: "Rocket",
-        template: "<path d='M72 34c13 7 22 22 22 40l-23-3-19-19 3-23c6 0 12 2 17 5z' stroke='{{color}}'/><path d='M52 52L36 68' stroke='{{color}}'/><path d='M68 68L52 84' stroke='{{color}}'/><circle cx='72' cy='56' r='5' stroke='{{color}}'/>"
-      },
-      {
-        id: "leaf",
-        label: "Leaf",
-        template: "<path d='M34 74c0-24 18-42 52-44 2 34-16 52-44 52-5 0-8-4-8-8z' stroke='{{color}}'/><path d='M44 74c12-8 22-18 31-31' stroke='{{color}}'/>"
-      },
-      {
-        id: "flag",
-        label: "Flag",
-        template: "<path d='M44 30v68' stroke='{{color}}'/><path d='M44 34h42l-10 15 10 15H44' stroke='{{color}}'/>"
-      }
-    ];
-
-    const BG_PRESETS = [
-      { id: "ocean", label: "Ocean", start: "#1d4ed8", end: "#06b6d4" },
-      { id: "violet", label: "Violet", start: "#7c3aed", end: "#ec4899" },
-      { id: "mint", label: "Mint", start: "#0f766e", end: "#34d399" },
-      { id: "sunset", label: "Sunset", start: "#f97316", end: "#fb7185" },
-      { id: "gold", label: "Gold", start: "#ca8a04", end: "#f59e0b" },
-      { id: "forest", label: "Forest", start: "#166534", end: "#22c55e" },
-      { id: "indigo", label: "Indigo", start: "#3730a3", end: "#6366f1" },
-      { id: "slate", label: "Slate", start: "#0f172a", end: "#334155" },
-      { id: "rose", label: "Rose", start: "#be123c", end: "#fb7185" },
-      { id: "sky", label: "Sky", start: "#0369a1", end: "#38bdf8" },
-      { id: "teal", label: "Teal", start: "#0f766e", end: "#2dd4bf" },
-      { id: "grape", label: "Grape", start: "#6d28d9", end: "#a78bfa" }
-    ];
 
     function resolveIcon(id) {
       return ICON_PRESETS.find((icon) => icon.id === id) || ICON_PRESETS[0];
@@ -527,15 +557,15 @@
 
     function refreshAvatarPreview() {
       selectedAvatar = buildSelectedAvatar();
-      if (avatarPreviewEl) avatarPreviewEl.src = selectedAvatar;
+      avatarPreviewEl.src = selectedAvatar;
     }
 
     function renderIconOptions() {
       avatarIconGridEl.innerHTML = ICON_PRESETS.map((icon) => {
         const isActive = icon.id === selectedIconId;
         return `
-          <button type="button" class="avatar-option avatar-icon-option${isActive ? " is-active" : ""}" data-icon-id="${icon.id}" aria-label="icon-${icon.label}">
-            ${renderIconSvg(icon, "#0f172a", 24)}
+          <button type="button" class="picker-btn${isActive ? " is-active" : ""}" data-icon-id="${icon.id}" aria-label="icon-${icon.label}">
+            ${renderIconSvg(icon, "#e8f1ff", 24)}
           </button>`;
       }).join("");
     }
@@ -544,8 +574,8 @@
       avatarColorGridEl.innerHTML = BG_PRESETS.map((bg) => {
         const isActive = bg.id === selectedBgId;
         return `
-          <button type="button" class="avatar-option avatar-color-option${isActive ? " is-active" : ""}" data-bg-id="${bg.id}" aria-label="bg-${bg.label}">
-            <span class="avatar-color-dot" style="background:linear-gradient(135deg, ${bg.start}, ${bg.end});"></span>
+          <button type="button" class="picker-btn${isActive ? " is-active" : ""}" data-bg-id="${bg.id}" aria-label="bg-${bg.label}">
+            <span class="color-dot" style="background:linear-gradient(135deg, ${bg.start}, ${bg.end});"></span>
           </button>`;
       }).join("");
     }
@@ -555,10 +585,10 @@
       renderColorOptions();
       if (existingAvatar) {
         selectedAvatar = existingAvatar;
-        if (avatarPreviewEl) avatarPreviewEl.src = existingAvatar;
-        return;
+        avatarPreviewEl.src = existingAvatar;
+      } else {
+        refreshAvatarPreview();
       }
-      refreshAvatarPreview();
     }
 
     avatarIconGridEl.addEventListener("click", (event) => {
@@ -615,6 +645,7 @@
         setStatus("Name should be at least 2 characters.", "error");
         return;
       }
+
       setupSaveBtn.disabled = true;
       setStatus("Saving profile...", "");
       try {
@@ -633,7 +664,7 @@
         writeUserState(nextState);
         await syncRegisteredUser(payload, nextState, "auth-profile-setup");
         saveProfileSetup(payload);
-        setStatus("Profile saved.", "success");
+        setStatus("Profile saved. Redirecting...", "success");
         await continueAfterSetup();
       } catch (error) {
         setStatus(error?.message || "Failed to save profile.", "error");

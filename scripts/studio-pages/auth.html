@@ -6,218 +6,275 @@
   <title>Reado Auth</title>
   <style>
     :root {
-      --bg: #f7f7f7;
-      --card: #ffffff;
-      --text: #191919;
-      --muted: #737373;
-      --line: #dfdfdf;
-      --blue: #1d7dde;
+      --bg: #0f172a;
+      --bg-soft: #111c34;
+      --panel: rgba(16, 24, 40, 0.9);
+      --line: rgba(148, 163, 184, 0.25);
+      --line-strong: rgba(125, 175, 255, 0.42);
+      --text: #e5edff;
+      --muted: #9fb0cc;
+      --primary: #2563eb;
+      --primary-strong: #1d4ed8;
+      --danger: #ef4444;
+      --ok: #22c55e;
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
       min-height: 100vh;
-      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: "SF Pro Text", "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
       color: var(--text);
-      background-color: var(--bg);
-      background-image: radial-gradient(circle at 1px 1px, #e1e1e1 1px, transparent 0);
-      background-size: 18px 18px;
+      background:
+        radial-gradient(circle at 16% 12%, rgba(37, 99, 235, 0.2), transparent 45%),
+        radial-gradient(circle at 90% 8%, rgba(34, 197, 94, 0.12), transparent 34%),
+        linear-gradient(180deg, #0f172a, #111c34 56%, #0f172a);
       display: flex;
       flex-direction: column;
     }
     .topbar {
+      height: 74px;
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 18px 26px;
-      font-size: 18px;
-      font-weight: 700;
-      color: #232323;
+      justify-content: space-between;
+      padding: 0 22px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+      background: rgba(15, 23, 42, 0.76);
+      backdrop-filter: blur(10px);
     }
-    .topbar-mark {
-      width: 28px;
-      height: 28px;
-      border-radius: 8px;
-      border: 1px solid #d6d6d6;
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text);
+      font-size: 38px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      border: 1px solid rgba(88, 173, 255, 0.4);
+      background: rgba(19, 91, 236, 0.16);
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 15px;
-      background: #fff;
+      color: #aecdff;
+      font-family: "Material Icons";
+      font-size: 20px;
+      line-height: 1;
+      font-weight: 400;
+    }
+    .top-link {
+      color: #cfe0ff;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      border-radius: 999px;
+      padding: 8px 12px;
+      background: rgba(15, 23, 42, 0.35);
     }
     main {
-      width: 100%;
       flex: 1;
       display: grid;
       place-items: center;
-      padding: 24px;
+      padding: 28px 16px;
     }
-    .auth-wrap {
-      width: min(100%, 500px);
-      text-align: center;
-    }
-    .hero-icon {
-      width: 72px;
-      height: 72px;
-      margin: 0 auto 10px;
-      border-radius: 999px;
-      background: #fff;
+    .auth-card {
+      width: min(100%, 460px);
       border: 1px solid var(--line);
+      border-radius: 20px;
+      background: var(--panel);
+      box-shadow: 0 24px 50px rgba(2, 8, 23, 0.42);
+      backdrop-filter: blur(10px);
+      padding: 22px;
       display: grid;
-      place-items: center;
-      font-size: 34px;
+      gap: 14px;
+    }
+    .eyebrow {
+      margin: 0;
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-weight: 800;
+      color: #86b6ff;
     }
     h1 {
       margin: 0;
-      font-size: 46px;
-      line-height: 1.08;
+      font-size: 28px;
+      line-height: 1.15;
       letter-spacing: -0.02em;
-      font-family: Georgia, "Times New Roman", serif;
-      font-weight: 600;
+      font-weight: 800;
     }
     .subtitle {
-      margin: 10px 0 0;
+      margin: 0;
       color: var(--muted);
-      font-size: 24px;
-    }
-    .panel {
-      margin-top: 22px;
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      background: rgba(255, 255, 255, 0.9);
-      backdrop-filter: blur(4px);
-      padding: 16px;
-      display: grid;
-      gap: 10px;
+      font-size: 14px;
+      line-height: 1.45;
     }
     .oauth-btn,
-    .email-btn,
-    .session-btn {
-      width: 100%;
+    .email-submit,
+    .switch-account-btn {
+      border: 1px solid transparent;
       border-radius: 12px;
-      border: 1px solid var(--line);
-      min-height: 48px;
+      min-height: 46px;
+      width: 100%;
       font-size: 16px;
       font-weight: 700;
       cursor: pointer;
-      background: #fff;
-      color: #1f1f1f;
+      color: #e5edff;
+      transition: border-color 140ms ease, transform 140ms ease, background 140ms ease;
     }
     .oauth-btn {
-      display: flex;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
+      background: rgba(30, 41, 59, 0.92);
+      border-color: rgba(148, 163, 184, 0.36);
+    }
+    .oauth-btn:hover,
+    .email-submit:hover,
+    .switch-account-btn:hover {
+      transform: translateY(-1px);
+    }
+    .oauth-btn:hover {
+      border-color: rgba(152, 205, 255, 0.72);
     }
     .google-dot {
-      width: 20px;
-      height: 20px;
+      width: 18px;
+      height: 18px;
       border-radius: 999px;
+      background: conic-gradient(#ea4335 0 25%, #fbbc05 0 50%, #34a853 0 75%, #4285f4 0 100%);
       display: inline-grid;
       place-items: center;
-      background: conic-gradient(#ea4335 0 25%, #fbbc05 0 50%, #34a853 0 75%, #4285f4 0 100%);
       color: #fff;
+      font-size: 10px;
       font-weight: 900;
-      font-size: 11px;
     }
     .divider {
       margin: 2px 0;
-      color: #8a8a8a;
-      font-size: 14px;
-      position: relative;
-      text-align: center;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #8ca1c2;
+      font-size: 13px;
+      font-weight: 700;
     }
     .divider::before,
     .divider::after {
       content: "";
-      position: absolute;
-      top: 50%;
-      width: 40%;
+      flex: 1;
       height: 1px;
-      background: #d9d9d9;
+      background: rgba(148, 163, 184, 0.28);
     }
-    .divider::before { left: 0; }
-    .divider::after { right: 0; }
     .email-form {
       display: grid;
       gap: 10px;
     }
+    .remember-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #bcd0ef;
+      font-weight: 600;
+      user-select: none;
+    }
+    .remember-row input {
+      width: 15px;
+      height: 15px;
+      margin: 0;
+      accent-color: #3b82f6;
+    }
     .email-input {
       width: 100%;
+      min-height: 46px;
       border-radius: 12px;
-      border: 1px solid #d7d7d7;
-      background: #fff;
-      min-height: 50px;
-      padding: 0 14px;
+      border: 1px solid rgba(148, 163, 184, 0.42);
+      background: rgba(15, 23, 42, 0.62);
+      color: #e5edff;
       font-size: 16px;
+      padding: 0 14px;
       outline: none;
     }
-    .email-btn {
-      border-color: #a9a9a9;
-      background: #8e8e8e;
-      color: #fff;
-      min-height: 50px;
+    .email-input::placeholder {
+      color: #91a6c7;
+    }
+    .email-input:focus {
+      border-color: rgba(125, 175, 255, 0.88);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+    }
+    .email-submit {
+      background: linear-gradient(180deg, var(--primary), var(--primary-strong));
+      border-color: rgba(125, 175, 255, 0.7);
+    }
+    .email-submit[disabled],
+    .oauth-btn[disabled],
+    .switch-account-btn[disabled] {
+      opacity: 0.66;
+      cursor: not-allowed;
+      transform: none;
     }
     .status {
       min-height: 20px;
-      margin: 2px 0 0;
+      margin: 0;
       font-size: 13px;
-      color: #666;
-      text-align: left;
+      color: var(--muted);
+      line-height: 1.4;
     }
-    .status.success { color: #047857; }
-    .status.error { color: #dc2626; }
-    .session-card {
-      border: 1px solid #d9e8fb;
-      border-radius: 14px;
-      background: #f5faff;
+    .status.success { color: var(--ok); }
+    .status.error { color: var(--danger); }
+    .signed-box {
+      border: 1px solid rgba(125, 175, 255, 0.38);
+      border-radius: 12px;
+      background: rgba(29, 78, 216, 0.14);
       padding: 12px;
-      text-align: left;
       display: grid;
       gap: 10px;
     }
-    .session-email {
+    .signed-box[hidden] {
+      display: none !important;
+    }
+    .signed-email {
       margin: 0;
-      font-size: 14px;
-      color: #334155;
+      font-size: 13px;
+      color: #d8e6ff;
       word-break: break-all;
     }
-    .session-actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .session-btn.primary {
-      border-color: var(--blue);
-      background: var(--blue);
-      color: #fff;
-    }
-    .session-btn {
-      min-height: 40px;
-      padding: 0 14px;
-      width: auto;
+    .switch-account-btn {
+      background: rgba(15, 23, 42, 0.68);
+      border-color: rgba(148, 163, 184, 0.36);
       font-size: 14px;
-      border-radius: 999px;
+      min-height: 40px;
     }
     .bottom-note {
-      margin-top: 16px;
-      color: #919191;
+      margin: 0;
       font-size: 12px;
-      text-align: center;
+      color: #8ca1c2;
+      line-height: 1.5;
     }
     @media (max-width: 640px) {
       .topbar {
-        padding: 14px 14px;
-        font-size: 16px;
+        height: 64px;
+        padding: 0 12px;
       }
-      .auth-wrap {
-        width: min(100%, 420px);
+      .brand {
+        font-size: 32px;
+      }
+      .brand-mark {
+        width: 30px;
+        height: 30px;
+        font-size: 17px;
+      }
+      .auth-card {
+        border-radius: 16px;
+        padding: 18px;
       }
       h1 {
-        font-size: 35px;
-      }
-      .subtitle {
-        font-size: 18px;
+        font-size: 24px;
       }
     }
   </style>
@@ -225,35 +282,43 @@
 </head>
 <body>
   <header class="topbar">
-    <span class="topbar-mark">R</span>
-    <span>reado</span>
+    <a class="brand" href="/pages/gamified-learning-hub-dashboard-1.html" aria-label="reado home">
+      <span class="brand-mark">auto_stories</span>
+      <span>reado</span>
+    </a>
+    <a class="top-link" href="/pages/gamified-learning-hub-dashboard-1.html">Back to app</a>
   </header>
-  <main>
-    <section class="auth-wrap" aria-label="Auth Panel">
-      <div class="hero-icon">✌</div>
-      <h1>Sign in or sign up</h1>
-      <p class="subtitle">Start creating with Reado</p>
-      <div class="panel">
-        <button id="googleBtn" class="oauth-btn" type="button">
-          <span class="google-dot">G</span>
-          <span>Continue with Google</span>
-        </button>
-        <div class="divider">Or</div>
-        <form id="emailForm" class="email-form">
-          <input id="emailInput" class="email-input" type="email" autocomplete="email" placeholder="Enter your email address" required>
-          <button id="emailBtn" class="email-btn" type="submit">Continue</button>
-        </form>
-        <p id="statusText" class="status"></p>
 
-        <section id="sessionCard" class="session-card" hidden>
-          <p class="session-email" id="sessionEmail"></p>
-          <div class="session-actions">
-            <button id="continueBtn" class="session-btn primary" type="button">Continue</button>
-            <button id="logoutBtn" class="session-btn" type="button">Sign out</button>
-          </div>
-        </section>
-      </div>
-      <p class="bottom-note">By continuing you agree to Reado terms and privacy policy.</p>
+  <main>
+    <section class="auth-card" aria-label="Authentication">
+      <p id="authEyebrow" class="eyebrow"></p>
+      <h1 id="authTitle"></h1>
+      <p id="authSubtitle" class="subtitle"></p>
+
+      <button id="googleBtn" class="oauth-btn" type="button">
+        <span class="google-dot">G</span>
+        <span id="googleBtnLabel">Continue with Google</span>
+      </button>
+
+      <div class="divider">or</div>
+
+      <form id="emailForm" class="email-form">
+        <input id="emailInput" class="email-input" type="email" autocomplete="email" placeholder="Enter your email" required>
+        <label class="remember-row">
+          <input id="rememberMeInput" type="checkbox" checked>
+          <span>Remember me</span>
+        </label>
+        <button id="emailBtn" class="email-submit" type="submit">Send magic link</button>
+      </form>
+
+      <p id="statusText" class="status"></p>
+
+      <section id="signedBox" class="signed-box" hidden>
+        <p id="signedEmail" class="signed-email"></p>
+        <button id="switchAccountBtn" class="switch-account-btn" type="button">Use another account</button>
+      </section>
+
+      <p class="bottom-note">By continuing, you agree to Reado terms and privacy policy.</p>
     </section>
   </main>
 
@@ -261,23 +326,46 @@
     const AUTH_STATE_KEY = "reado_auth_state_v1";
     const USER_STATE_KEY = "reado_user_state_v1";
     const PROFILE_SETUP_KEY = "reado_profile_setup_v1";
+    const AUTH_REMEMBER_KEY = "reado_auth_remember_v1";
     const FALLBACK_NEXT = "/pages/gamified-learning-hub-dashboard-1.html";
+
     const params = new URLSearchParams(window.location.search);
+    const rawMode = String(params.get("mode") || "").trim().toLowerCase();
+    const authMode = rawMode === "signup" ? "signup" : "signin";
     const intent = String(params.get("intent") || "").trim();
     const pendingPriceId = String(params.get("priceId") || "").trim();
 
-    const statusTextEl = document.getElementById("statusText");
+    const authEyebrowEl = document.getElementById("authEyebrow");
+    const authTitleEl = document.getElementById("authTitle");
+    const authSubtitleEl = document.getElementById("authSubtitle");
     const googleBtn = document.getElementById("googleBtn");
+    const googleBtnLabel = document.getElementById("googleBtnLabel");
     const emailForm = document.getElementById("emailForm");
     const emailInput = document.getElementById("emailInput");
+    const rememberMeInput = document.getElementById("rememberMeInput");
     const emailBtn = document.getElementById("emailBtn");
-    const sessionCard = document.getElementById("sessionCard");
-    const sessionEmail = document.getElementById("sessionEmail");
-    const continueBtn = document.getElementById("continueBtn");
-    const logoutBtn = document.getElementById("logoutBtn");
+    const statusTextEl = document.getElementById("statusText");
+    const signedBoxEl = document.getElementById("signedBox");
+    const signedEmailEl = document.getElementById("signedEmail");
+    const switchAccountBtn = document.getElementById("switchAccountBtn");
 
     let supabase = null;
-    let currentAuthPayload = null;
+    let redirecting = false;
+    let handledSessionKey = "";
+
+    function setModeCopy() {
+      if (authMode === "signup") {
+        authEyebrowEl.textContent = "Create account";
+        authTitleEl.textContent = "Sign up to start";
+        authSubtitleEl.textContent = "Create your account first. We only ask profile setup once.";
+      } else {
+        authEyebrowEl.textContent = "Welcome back";
+        authTitleEl.textContent = "Sign in to continue";
+        authSubtitleEl.textContent = "Sign in and we will take you back to your previous page.";
+      }
+      googleBtnLabel.textContent = authMode === "signup" ? "Continue with Google" : "Sign in with Google";
+      emailBtn.textContent = authMode === "signup" ? "Sign up with email" : "Sign in with email";
+    }
 
     function setStatus(message, type = "") {
       statusTextEl.textContent = message || "";
@@ -300,6 +388,7 @@
 
     function buildAuthReturnUrl() {
       const url = new URL("/pages/auth.html", window.location.origin);
+      url.searchParams.set("mode", authMode);
       url.searchParams.set("next", nextPath);
       if (intent === "checkout" && pendingPriceId) {
         url.searchParams.set("intent", "checkout");
@@ -325,6 +414,65 @@
       } catch {
         return {};
       }
+    }
+
+    function dispatchAuthStateChanged(signedIn, payload) {
+      window.dispatchEvent(new CustomEvent("reado:auth-state-changed", {
+        detail: {
+          signedIn: Boolean(signedIn),
+          payload: payload && typeof payload === "object" ? payload : null
+        }
+      }));
+    }
+
+    function readRememberPreference() {
+      const raw = String(localStorage.getItem(AUTH_REMEMBER_KEY) || "").trim().toLowerCase();
+      return raw !== "0";
+    }
+
+    function saveRememberPreference(value) {
+      localStorage.setItem(AUTH_REMEMBER_KEY, value ? "1" : "0");
+    }
+
+    function persistAuthState(session) {
+      const user = session?.user || {};
+      const expiresAtSeconds = Number(session?.expires_at);
+      const rememberMe = readRememberPreference();
+      const sessionExpiresAt = Number.isFinite(expiresAtSeconds) ? expiresAtSeconds * 1000 : 0;
+      const localFallback = Date.now() + (rememberMe ? 1000 * 60 * 60 * 24 * 30 : 1000 * 60 * 60 * 12);
+      const expiresAt = rememberMe
+        ? (sessionExpiresAt || localFallback)
+        : Math.min(sessionExpiresAt || localFallback, localFallback);
+      const payload = {
+        userId: typeof user.id === "string" ? user.id : "",
+        email: typeof user.email === "string" ? user.email : "",
+        provider: typeof user?.app_metadata?.provider === "string" ? user.app_metadata.provider : "",
+        expiresAt,
+        updatedAt: new Date().toISOString()
+      };
+      localStorage.setItem(AUTH_STATE_KEY, JSON.stringify(payload));
+      dispatchAuthStateChanged(true, payload);
+      return payload;
+    }
+
+    function clearAuthState() {
+      localStorage.removeItem(AUTH_STATE_KEY);
+      dispatchAuthStateChanged(false, null);
+    }
+
+    function hasProfileSetup(payload) {
+      if (!payload?.userId) return false;
+      try {
+        const setup = JSON.parse(localStorage.getItem(PROFILE_SETUP_KEY) || "null");
+        if (!setup || typeof setup !== "object") return false;
+        if (setup.userId !== payload.userId || setup.done !== true) return false;
+      } catch {
+        return false;
+      }
+      const userState = readUserState();
+      const name = String(userState?.name || "").trim();
+      const avatar = String(userState?.avatar || "").trim();
+      return Boolean(name && avatar);
     }
 
     async function syncRegisteredUser(authPayload, state, reason = "auth-sync") {
@@ -357,49 +505,8 @@
       }
     }
 
-    function persistAuthState(session) {
-      const user = session?.user || {};
-      const expiresAtSeconds = Number(session?.expires_at);
-      const expiresAt = Number.isFinite(expiresAtSeconds) ? expiresAtSeconds * 1000 : 0;
-      const payload = {
-        userId: typeof user.id === "string" ? user.id : "",
-        email: typeof user.email === "string" ? user.email : "",
-        provider: typeof user?.app_metadata?.provider === "string" ? user.app_metadata.provider : "",
-        expiresAt,
-        updatedAt: new Date().toISOString()
-      };
-      localStorage.setItem(AUTH_STATE_KEY, JSON.stringify(payload));
-      return payload;
-    }
-
-    function clearAuthState() {
-      localStorage.removeItem(AUTH_STATE_KEY);
-    }
-
-    function hasProfileSetup(payload) {
-      if (!payload?.userId) return false;
-      try {
-        const setup = JSON.parse(localStorage.getItem(PROFILE_SETUP_KEY) || "null");
-        if (!setup || typeof setup !== "object") return false;
-        if (setup.userId !== payload.userId || setup.done !== true) return false;
-      } catch {
-        return false;
-      }
-      const userState = readUserState();
-      const name = String(userState?.name || "").trim();
-      const avatar = String(userState?.avatar || "").trim();
-      return Boolean(name && avatar);
-    }
-
-    function setSignedInUi(payload) {
-      const email = payload?.email || "Signed in";
-      sessionEmail.textContent = `Signed in as ${email}`;
-      sessionCard.hidden = false;
-    }
-
     async function continueCheckoutIfNeeded() {
       if (intent !== "checkout" || !pendingPriceId) return false;
-      setStatus("Signing in successful, redirecting to checkout...", "success");
       const response = await fetch("/api/billing/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -417,26 +524,44 @@
       return true;
     }
 
-    async function runPostLoginFlow() {
-      const redirected = await continueCheckoutIfNeeded();
-      if (!redirected) {
-        setStatus("Signed in successfully.", "success");
-      }
+    function renderSignedBox(payload) {
+      signedBoxEl.hidden = false;
+      signedEmailEl.textContent = payload?.email
+        ? `Signed in as ${payload.email}`
+        : "Signed in. Redirecting...";
     }
 
-    async function applySignedIn(session) {
-      const payload = persistAuthState(session);
-      currentAuthPayload = payload;
-      setSignedInUi(payload);
+    async function routeAfterSignIn(payload) {
+      if (redirecting) return;
+      redirecting = true;
+      renderSignedBox(payload);
+      setStatus("Signed in. Redirecting...", "success");
+
       if (!hasProfileSetup(payload)) {
         window.location.assign(buildProfileSetupUrl());
         return;
       }
+
+      await syncRegisteredUser(payload, readUserState(), "auth-signin");
+      const redirectedToCheckout = await continueCheckoutIfNeeded();
+      if (!redirectedToCheckout) {
+        window.location.assign(nextPath);
+      }
+    }
+
+    async function handleSignedInSession(session) {
+      const userId = String(session?.user?.id || "").trim();
+      const expiresAt = Number(session?.expires_at) || 0;
+      const sessionKey = userId + ":" + String(expiresAt);
+      if (!userId) return;
+      if (sessionKey && sessionKey === handledSessionKey && redirecting) return;
+      handledSessionKey = sessionKey;
+      const payload = persistAuthState(session);
       try {
-        await syncRegisteredUser(payload, readUserState(), "auth-signin");
-        await runPostLoginFlow();
+        await routeAfterSignIn(payload);
       } catch (error) {
-        setStatus(error?.message || "Signed in, but checkout redirect failed.", "error");
+        redirecting = false;
+        setStatus(error?.message || "Signed in, but redirect failed.", "error");
       }
     }
 
@@ -462,22 +587,25 @@
 
       supabase.auth.onAuthStateChange(async (event, session) => {
         if (!session) {
+          if (event === "SIGNED_OUT") {
+            redirecting = false;
+            handledSessionKey = "";
+            signedBoxEl.hidden = true;
+            setStatus("Signed out. You can sign in with another account.", "");
+          }
           clearAuthState();
-          currentAuthPayload = null;
-          sessionCard.hidden = true;
-          if (event === "SIGNED_OUT") setStatus("Signed out.", "");
           return;
         }
-        await applySignedIn(session);
+        await handleSignedInSession(session);
       });
 
       const { data, error } = await supabase.auth.getSession();
       if (error) throw error;
       if (data?.session) {
-        await applySignedIn(data.session);
+        await handleSignedInSession(data.session);
       } else {
         clearAuthState();
-        sessionCard.hidden = true;
+        signedBoxEl.hidden = true;
         setStatus("Use Google or email magic link to continue.", "");
       }
     }
@@ -486,6 +614,7 @@
       if (!supabase) return;
       setStatus("Redirecting to Google...", "");
       googleBtn.disabled = true;
+      emailBtn.disabled = true;
       try {
         const { error } = await supabase.auth.signInWithOAuth({
           provider: "google",
@@ -493,8 +622,9 @@
         });
         if (error) throw error;
       } catch (error) {
-        setStatus(error?.message || "Google sign-in failed", "error");
+        setStatus(error?.message || "Google sign-in failed.", "error");
         googleBtn.disabled = false;
+        emailBtn.disabled = false;
       }
     });
 
@@ -508,6 +638,7 @@
       }
       setStatus("Sending magic link...", "");
       emailBtn.disabled = true;
+      googleBtn.disabled = true;
       try {
         const { error } = await supabase.auth.signInWithOtp({
           email,
@@ -516,41 +647,37 @@
         if (error) throw error;
         setStatus("Magic link sent. Please check your inbox.", "success");
       } catch (error) {
-        setStatus(error?.message || "Email login failed", "error");
+        setStatus(error?.message || "Email sign-in failed.", "error");
       } finally {
-        emailBtn.disabled = false;
-      }
-    });
-
-    continueBtn.addEventListener("click", async () => {
-      try {
-        const redirected = await continueCheckoutIfNeeded();
-        if (!redirected) {
-          window.location.assign(nextPath);
+        if (!redirecting) {
+          emailBtn.disabled = false;
+          googleBtn.disabled = false;
         }
-      } catch (error) {
-        setStatus(error?.message || "Unable to continue.", "error");
       }
     });
 
-    logoutBtn.addEventListener("click", async () => {
+    switchAccountBtn.addEventListener("click", async () => {
       if (!supabase) return;
+      switchAccountBtn.disabled = true;
       try {
         await supabase.auth.signOut();
       } finally {
-        clearAuthState();
-        currentAuthPayload = null;
-        sessionCard.hidden = true;
+        switchAccountBtn.disabled = false;
       }
     });
 
+    setModeCopy();
+    rememberMeInput.checked = readRememberPreference();
+    rememberMeInput.addEventListener("change", () => {
+      saveRememberPreference(Boolean(rememberMeInput.checked));
+    });
     setupSupabase().catch((error) => {
       setStatus(error?.message || "Failed to initialize auth.", "error");
       googleBtn.disabled = true;
       emailBtn.disabled = true;
       emailInput.disabled = true;
-      continueBtn.disabled = true;
-      logoutBtn.disabled = true;
+      rememberMeInput.disabled = true;
+      switchAccountBtn.disabled = true;
     });
   </script>
 </body>

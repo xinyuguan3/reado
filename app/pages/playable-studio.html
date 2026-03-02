@@ -329,6 +329,60 @@
       color: #64748b;
       line-height: 1.5;
     }
+    .knowledge-list {
+      max-height: 320px;
+    }
+    .knowledge-item {
+      border: 1px solid #d6dbe7;
+      border-radius: 12px;
+      background: #f8fafc;
+      padding: 10px;
+      display: grid;
+      gap: 6px;
+    }
+    .knowledge-item h4 {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.35;
+      color: #0f172a;
+    }
+    .knowledge-item p {
+      margin: 0;
+      font-size: 12px;
+      color: #64748b;
+      line-height: 1.5;
+    }
+    .knowledge-meta {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      border: 1px solid #c7d2fe;
+      border-radius: 999px;
+      background: #eef2ff;
+      color: #3730a3;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+    }
+    .knowledge-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .knowledge-tags span {
+      border: 1px solid #dbeafe;
+      border-radius: 999px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      font-size: 10px;
+      padding: 2px 7px;
+      font-weight: 700;
+    }
+    .knowledge-score {
+      font-size: 11px;
+      color: #475569;
+      font-variant-numeric: tabular-nums;
+    }
     .item .ops {
       display: flex;
       gap: 8px;
@@ -539,6 +593,15 @@ if (document.body) {
         </section>
       </div>
 
+      <section class="block" style="margin-top:12px;">
+        <div class="progress-head">
+          <h3 style="margin:0;font-size:15px;color:#111827;">Knowledge Blocks</h3>
+          <span id="knowledge-count" class="status-badge">0</span>
+        </div>
+        <p id="knowledge-diagnostics" class="meta-line" style="margin:8px 0 0;"></p>
+        <div id="knowledge-blocks" class="list knowledge-list"></div>
+      </section>
+
       <section class="progress-wrap">
         <div class="progress-head">
           <h3 style="margin:0;font-size:15px;color:#111827;" data-i18n="studio.progress">Processing Progress</h3>
@@ -589,6 +652,9 @@ if (document.body) {
     const dropZone = document.getElementById("drop-zone");
     const searchResultsEl = document.getElementById("search-results");
     const selectedSourcesEl = document.getElementById("selected-sources");
+    const knowledgeBlocksEl = document.getElementById("knowledge-blocks");
+    const knowledgeCountEl = document.getElementById("knowledge-count");
+    const knowledgeDiagnosticsEl = document.getElementById("knowledge-diagnostics");
     const metaLineEl = document.getElementById("meta-line");
     const errorLineEl = document.getElementById("error-line");
     const progressFillEl = document.getElementById("progress-fill");
@@ -701,6 +767,17 @@ if (document.body) {
       progressTextEl.textContent = text || (t("studio.progress_pct", "Progress {value}%", { value: safe }));
     }
 
+    function publishCreditSnapshot(snapshot) {
+      const available = Number(snapshot?.available);
+      if (!Number.isFinite(available)) return;
+      window.dispatchEvent(new CustomEvent("reado:credits-updated", {
+        detail: {
+          available: Math.max(0, Math.floor(available)),
+          updatedAt: typeof snapshot?.updatedAt === "string" ? snapshot.updatedAt : new Date().toISOString()
+        }
+      }));
+    }
+
     function formatTime(iso) {
       const date = iso ? new Date(iso) : new Date();
       if (Number.isNaN(date.getTime())) return "";
@@ -801,6 +878,113 @@ if (document.body) {
         return `${gate}. ${title}`;
       });
       return lines.join("\n");
+    }
+
+    function normalizeKnowledgeBlock(block, index = 0, sourceTitle = "", status = "retained") {
+      const gateRaw = Number(block?.gateIndex || block?.index || block?.order || index + 1);
+      const gate = Number.isFinite(gateRaw) ? Math.max(1, Math.floor(gateRaw)) : (index + 1);
+      const title = String(
+        block?.title ||
+        block?.heading ||
+        block?.name ||
+        ("Knowledge Block " + gate)
+      ).trim();
+      const summary = String(
+        block?.summary ||
+        block?.description ||
+        block?.snippet ||
+        block?.content ||
+        ""
+      ).trim();
+      return {
+        gate,
+        title,
+        summary: summary.slice(0, 260),
+        sourceTitle: String(sourceTitle || "").trim(),
+        status,
+        keywords: Array.isArray(block?.keywords) ? block.keywords.slice(0, 6) : [],
+        densityScore: Number(block?.densityScore || block?.density?.score || 0),
+        reason: String(block?.reason || "").trim()
+      };
+    }
+
+    function collectKnowledgeBlocks() {
+      const fromJob = Array.isArray(state.job?.pipeline?.knowledgeBlocksPreview)
+        ? state.job.pipeline.knowledgeBlocksPreview
+        : [];
+      const diagnostics = state.job?.pipeline?.knowledgeBlockDiagnostics || null;
+      if (fromJob.length || diagnostics) {
+        const retained = fromJob.slice(0, 36).map((row, index) => normalizeKnowledgeBlock(row, index, "", "retained"));
+        const filteredRaw = Array.isArray(diagnostics?.filteredPreview) ? diagnostics.filteredPreview : [];
+        const filtered = filteredRaw.slice(0, 24).map((row, index) => normalizeKnowledgeBlock(row, index, "", "filtered"));
+        return {
+          rows: retained.concat(filtered),
+          diagnostics: diagnostics && typeof diagnostics === "object" ? diagnostics : null
+        };
+      }
+
+      const rows = [];
+      for (const source of (Array.isArray(state.selectedSources) ? state.selectedSources : [])) {
+        const sourceTitle = String(source?.title || "").trim();
+        const candidates = []
+          .concat(Array.isArray(source?.knowledgeBlocksPreview) ? source.knowledgeBlocksPreview : [])
+          .concat(Array.isArray(source?.knowledge_blocks) ? source.knowledge_blocks : [])
+          .concat(Array.isArray(source?.knowledgeBlocks) ? source.knowledgeBlocks : [])
+          .concat(Array.isArray(source?.pipeline?.knowledgeBlocksPreview) ? source.pipeline.knowledgeBlocksPreview : []);
+        for (let i = 0; i < candidates.length; i += 1) {
+          rows.push(normalizeKnowledgeBlock(candidates[i], i, sourceTitle, "retained"));
+        }
+      }
+
+      const deduped = [];
+      const seen = new Set();
+      for (const row of rows) {
+        const key = (row.title + "::" + row.summary).toLowerCase();
+        if (seen.has(key)) continue;
+        seen.add(key);
+        deduped.push(row);
+      }
+      return {
+        rows: deduped.slice(0, 36),
+        diagnostics: null
+      };
+    }
+
+    function renderKnowledgeBlocks() {
+      const collected = collectKnowledgeBlocks();
+      const rows = Array.isArray(collected?.rows) ? collected.rows : [];
+      const diagnostics = collected?.diagnostics && typeof collected.diagnostics === "object"
+        ? collected.diagnostics
+        : null;
+      const retainedCount = rows.filter((row) => row.status !== "filtered").length;
+      if (knowledgeCountEl) knowledgeCountEl.textContent = String(retainedCount);
+      if (knowledgeDiagnosticsEl) {
+        if (diagnostics) {
+          const candidates = Number(diagnostics.candidates || rows.length);
+          const retained = Number(diagnostics.retained || retainedCount);
+          const filteredOut = Number(diagnostics.filteredOut || Math.max(0, candidates - retained));
+          const minScore = Number(diagnostics.minDensityScore || 0);
+          const avg = Number(diagnostics.averageDensityScore || 0);
+          knowledgeDiagnosticsEl.textContent = `Split diagnostics: retained ${retained}/${candidates}, filtered ${filteredOut}, min score ${minScore.toFixed(2)}, avg ${avg.toFixed(2)}.`;
+        } else {
+          knowledgeDiagnosticsEl.textContent = "";
+        }
+      }
+      if (!knowledgeBlocksEl) return;
+      if (!rows.length) {
+        knowledgeBlocksEl.innerHTML = `<div class="item"><p>${esc("No knowledge blocks yet. Upload a book source and start parsing/generation.")}</p></div>`;
+        return;
+      }
+      knowledgeBlocksEl.innerHTML = rows.map((row, index) => `
+        <article class="knowledge-item" style="${row.status === "filtered" ? "opacity:0.76;" : ""}">
+          <span class="knowledge-meta">${row.status === "filtered" ? "Filtered" : "Gate " + esc(String(row.gate || (index + 1)))}</span>
+          <h4>${esc(row.title || ("Knowledge Block " + (index + 1)))}</h4>
+          ${row.summary ? `<p>${esc(row.summary)}</p>` : ""}
+          <p class="knowledge-score">${esc("density: " + Number(row.densityScore || 0).toFixed(3))}${row.reason ? ` · ${esc(row.reason)}` : ""}</p>
+          ${Array.isArray(row.keywords) && row.keywords.length ? `<div class="knowledge-tags">${row.keywords.map((item) => `<span>${esc(item)}</span>`).join("")}</div>` : ""}
+          ${row.sourceTitle ? `<p style="font-size:11px;color:#475569;">Source: ${esc(row.sourceTitle)}</p>` : ""}
+        </article>
+      `).join("");
     }
 
     function sourceKey(item) {
@@ -1008,6 +1192,7 @@ if (document.body) {
       const pending = Array.isArray(state.pendingSources) ? state.pendingSources : [];
       if (!rows.length && !pending.length) {
         selectedSourcesEl.innerHTML = `<div class="item"><p>${esc(t("studio.selected_empty", "No sources yet. Search or upload first."))}</p></div>`;
+        renderKnowledgeBlocks();
         return;
       }
       const pendingHtml = pending.map((item) => {
@@ -1040,6 +1225,7 @@ if (document.body) {
           removeSelectedSource(idx);
         });
       });
+      renderKnowledgeBlocks();
     }
 
     async function searchSources() {
@@ -1296,6 +1482,10 @@ if (document.body) {
       setProgress(progress, lastLog || ("Processing: " + step));
       renderLogs();
       const blocksDigest = buildKnowledgeBlocksDigest(state.job);
+      renderKnowledgeBlocks();
+      if (state.job?.creditSnapshot) {
+        publishCreditSnapshot(state.job.creditSnapshot);
+      }
       if (blocksDigest && status !== "done" && status !== "error") {
         const eta = state.job?.eta || state.job?.pipeline?.eta || null;
         const etaText = eta && Number.isFinite(Number(eta.etaMin))
@@ -1435,6 +1625,10 @@ if (document.body) {
         const available = Number(error?.payload?.credits?.available);
         if (error?.payload?.code === "INSUFFICIENT_CREDITS" && Number.isFinite(available)) {
           setMeta(`Credits available: ${available}`);
+          publishCreditSnapshot({
+            available,
+            updatedAt: new Date().toISOString()
+          });
         }
         setError(error?.message || t("studio.err_generation_failed", "Generation failed"));
         setStatus("error");
@@ -1574,6 +1768,7 @@ if (document.body) {
     setupDropZone();
     renderSearchResults();
     renderSelectedSources();
+    renderKnowledgeBlocks();
     renderLogs();
     loadMyWorks().catch(() => {});
     refreshWorksBtn.addEventListener("click", () => {

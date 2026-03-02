@@ -117,8 +117,12 @@ density_score = 0.35*concept_density
               + 0.20*novelty_ratio
               + 0.20*actionability_ratio
 
-保留条件: density_score >= 0.62
+保留条件: density_score >= min_density_score
 ```
+
+默认线上建议：
+- `READO_BOOK_PIPELINE_DENSITY_MIN_SCORE=0.48`（长书优先召回，再通过题目质量门禁过滤）
+- 可按书类型在 `0.45~0.62` 区间调优
 
 低于阈值：
 - 不生成独立知识块。
@@ -189,6 +193,9 @@ density_score = 0.35*concept_density
 
 1. `POST /api/studio/books/jobs`
 2. `POST /api/studio/jobs`（兼容旧前端；若检测到文件解析来源会自动切换到 `book_pipeline`）
+3. `GET /api/studio/works/:id/pipeline`（读取拆解诊断、知识块列表、module map、最近再生记录）
+4. `POST /api/studio/works/:id/regenerate`（按失败模块或全量重建，不依赖原始 PDF）
+5. `POST /api/studio/books/:bookId/regenerate`（按书籍 id 触发再生，自动选择当前会话可编辑的最新 work）
 3. Body（JSON）支持：
    - `bookFile`: `{ name, type, contentBase64 }`
    - 或 `file`: `{ name, type, contentBase64 }`
@@ -199,7 +206,20 @@ density_score = 0.35*concept_density
    - `job.eta`（预计分钟区间 + 建议返回时间）
    - `job.pipeline`（book pipeline 摘要）
    - `job.pipeline.knowledgeBlocksPreview`（拆出的知识块预览，含标题/摘要/关键词）
+   - `job.pipeline.knowledgeBlockDiagnostics`（候选数/保留数/过滤数/均值/过滤原因预览）
    - `job.creditCharge`（预扣额度）
+
+`POST /api/studio/works/:id/regenerate` body 示例：
+
+```json
+{
+  "target": "failed",
+  "moduleSlugs": ["u-book-01-xxxxxx"]
+}
+```
+
+- `target=failed|all`，默认 `failed`
+- `moduleSlugs` 可选；传入后只重建指定模块
 
 ## 14. 媒体生成 Provider（已落地）
 
@@ -215,6 +235,9 @@ density_score = 0.35*concept_density
 关键环境变量：
 - `READO_BOOK_PIPELINE_IMAGE_PROVIDER=auto|nano-banana|fallback`
 - `READO_BOOK_PIPELINE_AUDIO_PROVIDER=auto|elevenlabs|fallback`
+- `READO_BOOK_PIPELINE_DENSITY_MIN_SCORE=0.48`
+- `READO_BOOK_PIPELINE_QUIZ_MIN_SCORE=0.66`
+- `READO_BOOK_PIPELINE_QUIZ_REWRITE_RETRIES=2`
 - `READO_CODEX_SKILLS_DIR` / `READO_NANO_BANANA_SCRIPT`
 - `REPLICATE_API_TOKEN`
 - `ELEVENLABS_API_KEY`
@@ -230,3 +253,21 @@ density_score = 0.35*concept_density
 2. 返回：
    - `module`（公开模块基础信息）
    - `pipeline`（来自 `module.json.book_pipeline`，可用于前端任务面板/奖励面板/音频入口）
+
+## 16. Playwright 质检脚本（P0）
+
+新增脚本：
+- `scripts/studio-tools/playwright-book-pipeline-qa.js`
+- `scripts/studio-tools/run-playwright-book-pipeline-qa.sh`
+
+用途：
+- 验证书页与模块页基础闭环（模块数量、题卡数量、任务数量、面板渲染、JS pageerror、关键 console error）。
+
+示例：
+
+```bash
+BASE_URL=http://localhost:4310 \
+BOOK_ID=user-xxx \
+MODULE_SLUG=u-xxx-01-yyyyyy \
+bash scripts/studio-tools/run-playwright-book-pipeline-qa.sh
+```

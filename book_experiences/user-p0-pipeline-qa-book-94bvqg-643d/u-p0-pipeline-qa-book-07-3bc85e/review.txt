@@ -1,0 +1,1 @@
+这是《P0 Pipeline QA Book》的知识块复盘。 本关重点：Chapter 13 Decision Systems In this chapter we explain mechanism, eviden。 Chapter 13 Decision Systems In this chapter we explain mechanism, evidence, tradeoff, and practical action. Data point 39. 请重点记住：chapter、one、decision、systems。 现在暂停 10 秒，回忆一个你可以马上使用的场景。

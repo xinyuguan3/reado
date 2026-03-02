@@ -233,6 +233,9 @@ const BOOK_PIPELINE_MAX_BLOCKS = 36;
 const BOOK_PIPELINE_QA_RETRIES = 2;
 const BOOK_PIPELINE_MICRO_TASKS = 10;
 const BOOK_PIPELINE_MICRO_SECONDS = 30;
+const BOOK_PIPELINE_DENSITY_MIN_SCORE = Math.max(0.2, Math.min(0.92, Number(process.env.READO_BOOK_PIPELINE_DENSITY_MIN_SCORE || 0.48) || 0.48));
+const BOOK_PIPELINE_QUIZ_MIN_SCORE = Math.max(0.45, Math.min(0.95, Number(process.env.READO_BOOK_PIPELINE_QUIZ_MIN_SCORE || 0.66) || 0.66));
+const BOOK_PIPELINE_QUIZ_REWRITE_RETRIES = Math.max(0, Math.min(4, toInt(process.env.READO_BOOK_PIPELINE_QUIZ_REWRITE_RETRIES || 2) || 2));
 const BOOK_PIPELINE_MAX_MODULES = Math.max(
   BOOK_PIPELINE_MIN_BLOCKS,
   Math.min(BOOK_PIPELINE_MAX_BLOCKS, toInt(process.env.READO_BOOK_PIPELINE_MAX_MODULES || 24) || 24)
@@ -1102,7 +1105,9 @@ function splitKnowledgeBlocksFromText(text, opts = {}) {
       }
     }
   }
-  const minScore = Number.isFinite(Number(opts.minScore)) ? Number(opts.minScore) : 0.48;
+  const minScore = Number.isFinite(Number(opts.minScore))
+    ? Number(opts.minScore)
+    : BOOK_PIPELINE_DENSITY_MIN_SCORE;
   const withScores = chunks.map((content, idx) => {
     const sentences = splitSentencesForPipeline(content);
     const titleSeed = cleanText(sentences[0], `Knowledge Block ${idx + 1}`).slice(0, 72);
@@ -1124,9 +1129,41 @@ function splitKnowledgeBlocksFromText(text, opts = {}) {
       .sort((a, b) => Number(b?.density?.score || 0) - Number(a?.density?.score || 0))
       .slice(0, Math.min(withScores.length, Math.max(3, Math.floor(withScores.length * 0.9))));
   }
-  return retained
+  const normalized = retained
     .sort((a, b) => a.index - b.index)
     .map((item, idx) => ({ ...item, gateIndex: idx + 1 }));
+  if (opts.returnDiagnostics !== true) {
+    return normalized;
+  }
+  const rejected = withScores
+    .filter((item) => !normalized.some((keep) => keep.id === item.id))
+    .sort((a, b) => Number(b?.density?.score || 0) - Number(a?.density?.score || 0))
+    .slice(0, 24)
+    .map((item) => ({
+      id: item.id,
+      index: item.index,
+      title: cleanText(item.title),
+      words: toInt(item.words),
+      densityScore: Number(item?.density?.score || 0),
+      reason: Number(item?.density?.score || 0) >= minScore
+        ? "pruned_for_balance"
+        : "below_density_threshold"
+    }));
+  const averageScore = withScores.length
+    ? Number((withScores.reduce((sum, item) => sum + Number(item?.density?.score || 0), 0) / withScores.length).toFixed(4))
+    : 0;
+  return {
+    blocks: normalized,
+    diagnostics: {
+      minDensityScore: minScore,
+      targetBlocks: target,
+      candidates: withScores.length,
+      retained: normalized.length,
+      filteredOut: Math.max(0, withScores.length - normalized.length),
+      averageDensityScore: averageScore,
+      filteredPreview: rejected
+    }
+  };
 }
 
 function buildPowerUpsForBlock(block, blockIndex) {
@@ -1148,32 +1185,178 @@ function buildPowerUpsForBlock(block, blockIndex) {
 
 function buildQuizSetForBlock(block, blockIndex) {
   const concepts = Array.isArray(block?.keywords) && block.keywords.length ? block.keywords : ["核心概念", "关键机制", "应用场景"];
-  const base = cleanText(block?.summary, cleanText(block?.content).slice(0, 180));
+  const base = cleanText(block?.summary, cleanText(block?.content).slice(0, 220));
   const makeId = (n) => `q-${String(blockIndex + 1).padStart(2, "0")}-${String(n).padStart(2, "0")}`;
   const templates = [
-    { type: "reading", prompt: `阅读片段并定位证据：${base.slice(0, 140)}...` },
-    { type: "reading", prompt: `从片段中找出“${concepts[0]}”与“${concepts[1] || concepts[0]}”的关系。` },
-    { type: "discrimination", prompt: `以下哪项最准确描述了“${concepts[0]}”？` },
-    { type: "discrimination", prompt: `将“${concepts[0]} / ${concepts[1] || concepts[0]} / ${concepts[2] || concepts[0]}”按因果顺序排序。` },
-    { type: "discrimination", prompt: `下面哪一项是该知识块中的常见误解？` },
-    { type: "application", prompt: `情景题：如果你在真实场景中遇到该问题，第一步该怎么做？` },
-    { type: "application", prompt: `反例判断：以下案例为什么不符合“${concepts[0]}”的条件？` },
-    { type: "application", prompt: `在限制资源下，如何优先应用“${concepts[1] || concepts[0]}”？` },
-    { type: "debug", prompt: "纠错题：下面推理中哪一步是错的，应该如何修正？" },
-    { type: "mini_project", prompt: `微项目：用 90 秒写出你对“${concepts[0]}”的应用方案并自检。` }
+    { type: "reading", prompt: `阅读片段并定位证据：${base.slice(0, 160)}...` },
+    { type: "reading", prompt: `从片段中找出“${concepts[0]}”与“${concepts[1] || concepts[0]}”的因果关系，并标注支撑句。` },
+    { type: "discrimination", prompt: `以下哪项最准确描述“${concepts[0]}”的定义边界？请给出一条反例。` },
+    { type: "discrimination", prompt: `将“${concepts[0]} / ${concepts[1] || concepts[0]} / ${concepts[2] || concepts[0]}”按发生顺序排序，并解释原因。` },
+    { type: "discrimination", prompt: `下面哪一项是该知识块中的高频误解？它为何容易误导初学者？` },
+    { type: "application", prompt: `情景题：若你在真实场景中遇到同类问题，第一步怎么做，为什么？` },
+    { type: "application", prompt: `反例判断：以下案例为何不满足“${concepts[0]}”的成立条件？` },
+    { type: "application", prompt: `在资源受限下，如何优先应用“${concepts[1] || concepts[0]}”，同时控制副作用？` },
+    { type: "debug", prompt: "纠错题：下面推理中哪一步错误最大？请改写为可验证推理链。"},
+    { type: "mini_project", prompt: `微项目：用 90 秒写出“${concepts[0]}”的实战方案，包含目标、指标与回退策略。` }
   ];
   return templates.map((item, idx) => ({
     id: makeId(idx + 1),
     type: item.type,
     prompt: item.prompt,
-    why_this_matters: `掌握 ${concepts[0]} 并避免常见误判。`,
+    why_this_matters: `掌握 ${concepts[0]} 的定义边界，避免“看似正确但不可执行”的误判。`,
     hint: idx < 3
-      ? `先回看本关卡摘要，再找“${concepts[Math.min(idx, concepts.length - 1)]}”相关证据。`
-      : "先拆条件，再做判断；错因通常在定义边界。",
-    retry_feedback: "这次答案信息密度不足。请补上证据句、关键条件和反例边界。",
-    mastery_signal: "能清楚说出概念定义、适用边界和一个真实应用。",
+      ? `先回看本关卡摘要，再找“${concepts[Math.min(idx, concepts.length - 1)]}”相关证据句，最后补一条反例。`
+      : "先拆条件再做判断，写清成立条件、边界条件和失败条件。",
+    retry_feedback: "答案信息密度不足。请补上证据句、关键条件、反例边界和可执行动作。",
+    mastery_signal: "可完整说出概念定义、适用边界、失败信号，并给出一个真实应用。",
     estimated_seconds: BOOK_PIPELINE_MICRO_SECONDS
   }));
+}
+
+function normalizeQuizType(value, fallback = "application") {
+  const raw = cleanText(value).toLowerCase();
+  if (["reading", "discrimination", "application", "debug", "mini_project"].includes(raw)) return raw;
+  return fallback;
+}
+
+function buildQuizFallbackPrompt(type, concept, blockTitle, summary, index) {
+  const safeConcept = cleanText(concept, "核心概念");
+  const safeTitle = cleanText(blockTitle, "本知识块");
+  const safeSummary = cleanText(summary).slice(0, 140);
+  if (type === "reading") {
+    return `阅读 ${safeTitle} 片段并找出“${safeConcept}”的证据句，再解释其与主结论的关系。${safeSummary ? ` 片段提示：${safeSummary}` : ""}`;
+  }
+  if (type === "discrimination") {
+    return `辨析题：以下选项中，哪一项符合“${safeConcept}”的定义边界？请说明你排除其他选项的依据。`;
+  }
+  if (type === "debug") {
+    return `纠错题：给定一段关于“${safeConcept}”的推理，请指出逻辑断裂点并改写成可验证步骤。`;
+  }
+  if (type === "mini_project") {
+    return `微项目：围绕“${safeConcept}”设计一个 30 秒可启动的小实验，包含目标、操作和复盘标准。`;
+  }
+  return `应用题：在真实场景中应用“${safeConcept}”解决问题。请写出第一步、判断依据与风险控制。#${index + 1}`;
+}
+
+function rewriteQuizSetForQuality(quizSet, block, attempt = 0) {
+  const rows = Array.isArray(quizSet) ? quizSet : [];
+  const concepts = Array.isArray(block?.keywords) && block.keywords.length
+    ? block.keywords
+    : ["核心概念", "关键机制", "应用场景"];
+  const summary = cleanText(block?.summary, cleanText(block?.content).slice(0, 220));
+  const types = ["reading", "reading", "discrimination", "discrimination", "discrimination", "application", "application", "application", "debug", "mini_project"];
+  const out = [];
+  const targetCount = 10;
+  const seenPrompt = new Set();
+  for (let i = 0; i < targetCount; i += 1) {
+    const source = rows[i] && typeof rows[i] === "object" ? rows[i] : {};
+    const concept = concepts[i % concepts.length] || concepts[0];
+    const type = normalizeQuizType(source.type, types[i]);
+    let prompt = cleanText(source.prompt);
+    if (prompt.length < 28) {
+      prompt = buildQuizFallbackPrompt(type, concept, cleanText(block?.title), summary, i);
+    }
+    if (!prompt.includes(concept)) {
+      prompt = `${prompt} 请明确指出“${concept}”的证据与边界。`;
+    }
+    const promptKey = prompt.replace(/\s+/g, " ").toLowerCase();
+    if (seenPrompt.has(promptKey)) {
+      prompt = `${prompt}（角度 ${i + 1}）`;
+    }
+    seenPrompt.add(prompt.replace(/\s+/g, " ").toLowerCase());
+    const why = cleanText(
+      source.why_this_matters,
+      `掌握 ${concept} 可以减少误判，并提升在真实场景下的决策解释力。`
+    );
+    const hint = cleanText(
+      source.hint,
+      `先写出 ${concept} 的成立条件，再补 1 条反例和 1 条边界条件。`
+    );
+    const retry = cleanText(
+      source.retry_feedback,
+      `重试时请补全证据句、关键条件与反例边界，避免只给结论。`
+    );
+    const mastery = cleanText(
+      source.mastery_signal,
+      `能说明 ${concept} 的定义、边界、失败信号，并给出一个可执行应用。`
+    );
+    out.push({
+      id: cleanText(source.id, `q-${String(toInt(block?.gateIndex) || 1).padStart(2, "0")}-${String(i + 1).padStart(2, "0")}`),
+      type,
+      prompt,
+      why_this_matters: why,
+      hint,
+      retry_feedback: retry,
+      mastery_signal: mastery,
+      estimated_seconds: Math.max(20, Math.min(120, toInt(source.estimated_seconds) || BOOK_PIPELINE_MICRO_SECONDS)),
+      rewrite_attempt: attempt
+    });
+  }
+  return out;
+}
+
+function evaluateQuizSetQuality(quizSet) {
+  const rows = Array.isArray(quizSet) ? quizSet : [];
+  const requiredKeys = ["prompt", "why_this_matters", "hint", "retry_feedback", "mastery_signal"];
+  const uniquePrompts = new Set();
+  let missingFields = 0;
+  let richItems = 0;
+  let densitySum = 0;
+  const typeSet = new Set();
+  for (const row of rows) {
+    const item = row && typeof row === "object" ? row : {};
+    typeSet.add(normalizeQuizType(item.type, ""));
+    for (const key of requiredKeys) {
+      if (!cleanText(item[key])) missingFields += 1;
+    }
+    const prompt = cleanText(item.prompt).replace(/\s+/g, " ");
+    if (prompt) uniquePrompts.add(prompt.toLowerCase());
+    const density = computeDensityScore(
+      `${cleanText(item.prompt)} ${cleanText(item.hint)} ${cleanText(item.retry_feedback)} ${cleanText(item.why_this_matters)} ${cleanText(item.mastery_signal)}`
+    );
+    densitySum += Number(density?.score || 0);
+    if (Number(density?.score || 0) >= 0.38) richItems += 1;
+  }
+  const countScore = Math.min(1, rows.length / 10);
+  const typeScore = Math.min(1, typeSet.size / 5);
+  const fieldScore = rows.length
+    ? Math.max(0, 1 - (missingFields / (rows.length * requiredKeys.length)))
+    : 0;
+  const densityScore = rows.length ? (densitySum / rows.length) : 0;
+  const uniquenessScore = rows.length ? (uniquePrompts.size / rows.length) : 0;
+  const score = Number((0.20 * countScore + 0.20 * typeScore + 0.25 * fieldScore + 0.20 * densityScore + 0.15 * uniquenessScore).toFixed(4));
+  const passed = score >= BOOK_PIPELINE_QUIZ_MIN_SCORE
+    && rows.length >= 8
+    && typeSet.size >= 4
+    && missingFields === 0
+    && densityScore >= 0.34
+    && uniquePrompts.size >= Math.max(6, rows.length - 1)
+    && richItems >= Math.max(6, rows.length - 2);
+  return {
+    passed,
+    score,
+    count: rows.length,
+    typeDiversity: typeSet.size,
+    missingFields,
+    avgDensity: Number(densityScore.toFixed(4)),
+    uniquePrompts: uniquePrompts.size,
+    richItems,
+    threshold: BOOK_PIPELINE_QUIZ_MIN_SCORE
+  };
+}
+
+function buildQualityGatedQuizSet(block, blockIndex) {
+  let quizSet = buildQuizSetForBlock(block, blockIndex);
+  let qualityReport = evaluateQuizSetQuality(quizSet);
+  for (let attempt = 1; attempt <= BOOK_PIPELINE_QUIZ_REWRITE_RETRIES && !qualityReport.passed; attempt += 1) {
+    quizSet = rewriteQuizSetForQuality(quizSet, block, attempt);
+    qualityReport = evaluateQuizSetQuality(quizSet);
+  }
+  if (!qualityReport.passed) {
+    quizSet = rewriteQuizSetForQuality([], block, BOOK_PIPELINE_QUIZ_REWRITE_RETRIES + 1);
+    qualityReport = evaluateQuizSetQuality(quizSet);
+  }
+  return { quizSet, qualityReport };
 }
 
 function buildAssetPackForBlock(block, blockIndex, bookTitle) {
@@ -2380,7 +2563,7 @@ async function resolveBookPipelineSource(payload = {}, hooks = {}) {
       title: cleanText(firstSource?.title, cleanText(payload?.title, "Uploaded Book")),
       url: cleanText(firstSource?.url),
       snippet: clampText(cleanText(firstSource?.snippet, firstSource?.content), 1200),
-      content: clampText(cleanText(firstSource?.content, firstSource?.snippet), 120000)
+      content: clampText(cleanText(firstSource?.content, firstSource?.snippet), BOOK_PIPELINE_INGEST_MAX_TEXT)
     };
     return {
       source,
@@ -2394,7 +2577,7 @@ async function resolveBookPipelineSource(payload = {}, hooks = {}) {
       title: cleanText(payload?.title, "Uploaded Book Text"),
       url: "",
       snippet: clampText(inputText, 1200),
-      content: clampText(inputText, 120000)
+      content: clampText(inputText, BOOK_PIPELINE_INGEST_MAX_TEXT)
     };
     return {
       source,
@@ -2409,7 +2592,7 @@ async function buildModulePipelineArtifacts({ work, moduleSlug, block, bookTitle
   const moduleDir = path.join(rootDir, "book_experiences", cleanText(work?.book_id), moduleSlug);
   const codePath = path.join(moduleDir, "code.html");
   const moduleJsonPath = path.join(moduleDir, "module.json");
-  const quizSet = buildQuizSetForBlock(block, Math.max(0, toInt(block?.gateIndex) - 1));
+  const { quizSet, qualityReport } = buildQualityGatedQuizSet(block, Math.max(0, toInt(block?.gateIndex) - 1));
   const fallbackAssetPack = buildAssetPackForBlock(block, Math.max(0, toInt(block?.gateIndex) - 1), bookTitle);
   const powerUps = buildPowerUpsForBlock(block, Math.max(0, toInt(block?.gateIndex) - 1));
   const audioScript = buildAudioRecapScript(bookTitle, block);
@@ -2470,6 +2653,7 @@ async function buildModulePipelineArtifacts({ work, moduleSlug, block, bookTitle
       keywords: Array.isArray(block?.keywords) ? block.keywords.slice(0, 8) : [],
       density: block?.density || null
     },
+    quality_report: qualityReport,
     quiz_set: quizSet,
     rewards: {
       mystery_box: {
@@ -2507,13 +2691,15 @@ async function buildModulePipelineArtifacts({ work, moduleSlug, block, bookTitle
     moduleSlug,
     gateIndex: toInt(block?.gateIndex),
     quizCount: quizSet.length,
+    quizQualityScore: Number(qualityReport?.score || 0),
+    quizQualityPassed: Boolean(qualityReport?.passed),
     fragmentCount: Array.isArray(assetPack.fragments) ? assetPack.fragments.length : 0,
     audioHref,
     ok: true
   };
 }
 
-async function verifyAndRepairPipelineModules({ work, moduleBlockMap, bookTitle }) {
+async function detectPipelineModuleFailures({ work, moduleBlockMap }) {
   const failed = [];
   for (const row of moduleBlockMap) {
     const moduleSlug = cleanText(row?.moduleSlug);
@@ -2538,6 +2724,7 @@ async function verifyAndRepairPipelineModules({ work, moduleBlockMap, bookTitle 
     const quizCount = Array.isArray(moduleMeta?.book_pipeline?.quiz_set)
       ? moduleMeta.book_pipeline.quiz_set.length
       : 0;
+    const quizQualityPassed = moduleMeta?.book_pipeline?.quality_report?.passed === true;
     const badgeImage = cleanText(moduleMeta?.book_pipeline?.rewards?.mystery_box?.collectibles?.badge?.image);
     const badgeNeedsFile = badgeImage.startsWith("/experiences/media/");
     const badgeFile = badgeNeedsFile
@@ -2546,12 +2733,24 @@ async function verifyAndRepairPipelineModules({ work, moduleBlockMap, bookTitle 
     const hasBadgeAsset = badgeImage
       ? (badgeNeedsFile ? Boolean(await fs.stat(badgeFile).catch(() => null)) : true)
       : false;
-    if (!hasCode || !hasAudio || !hasTranscript || quizCount < 8 || !hasBadgeAsset) {
-      failed.push({ moduleSlug, block });
+    const reasons = [];
+    if (!hasCode) reasons.push("missing_code_html");
+    if (!hasAudio) reasons.push("missing_audio");
+    if (!hasTranscript) reasons.push("missing_transcript");
+    if (quizCount < 8) reasons.push("quiz_count_below_8");
+    if (!quizQualityPassed) reasons.push("quiz_quality_failed");
+    if (!hasBadgeAsset) reasons.push("missing_badge_asset");
+    if (!hasCode || !hasAudio || !hasTranscript || quizCount < 8 || !quizQualityPassed || !hasBadgeAsset) {
+      failed.push({ moduleSlug, block, reasons });
     }
   }
+  return failed;
+}
+
+async function verifyAndRepairPipelineModules({ work, moduleBlockMap, bookTitle }) {
+  const failed = await detectPipelineModuleFailures({ work, moduleBlockMap });
   if (!failed.length) {
-    return { ok: true, failedCount: 0, repaired: 0 };
+    return { ok: true, failedCount: 0, repaired: 0, failedModules: [] };
   }
   let repaired = 0;
   for (const row of failed) {
@@ -2568,7 +2767,170 @@ async function verifyAndRepairPipelineModules({ work, moduleBlockMap, bookTitle 
   return {
     ok: repaired === failed.length,
     failedCount: failed.length,
-    repaired
+    repaired,
+    failedModules: failed.map((row) => ({
+      moduleSlug: cleanText(row?.moduleSlug),
+      reasons: Array.isArray(row?.reasons) ? row.reasons : []
+    }))
+  };
+}
+
+async function readBookPipelineManifestByBookId(bookId) {
+  const safeBookId = cleanText(bookId);
+  if (!safeBookId) return { manifest: null, manifestPath: "" };
+  const manifestPath = path.join(rootDir, "book_experiences", safeBookId, "book-pipeline-manifest.json");
+  try {
+    const parsed = JSON.parse(await fs.readFile(manifestPath, "utf8"));
+    if (!parsed || typeof parsed !== "object") return { manifest: null, manifestPath };
+    return { manifest: parsed, manifestPath };
+  } catch {
+    return { manifest: null, manifestPath };
+  }
+}
+
+function createFallbackBlockFromModule(moduleSlug, index = 0) {
+  const gate = index + 1;
+  return {
+    id: `kb-fallback-${String(gate).padStart(2, "0")}`,
+    gateIndex: gate,
+    title: `Knowledge Block ${gate}`,
+    summary: `Regenerated block for module ${moduleSlug}.`,
+    content: `Regeneration fallback content for ${moduleSlug}.`,
+    keywords: ["核心概念", "关键机制", "应用场景"],
+    words: 80,
+    density: { score: BOOK_PIPELINE_DENSITY_MIN_SCORE }
+  };
+}
+
+function resolveModuleBlockMapFromManifest(work, manifest) {
+  const blocks = Array.isArray(manifest?.knowledge_blocks) ? manifest.knowledge_blocks : [];
+  const blockById = new Map();
+  const blockByGate = new Map();
+  for (const row of blocks) {
+    const block = row && typeof row === "object" ? row : {};
+    const id = cleanText(block.id);
+    const gate = toInt(block.gateIndex || block.gate_index || block.index);
+    if (id) blockById.set(id, block);
+    if (gate > 0 && !blockByGate.has(gate)) blockByGate.set(gate, block);
+  }
+
+  const moduleMap = Array.isArray(manifest?.module_map) ? manifest.module_map : [];
+  const workSlugs = Array.isArray(work?.module_slugs) ? work.module_slugs : [];
+  const mapped = [];
+  if (moduleMap.length) {
+    for (let i = 0; i < moduleMap.length; i += 1) {
+      const row = moduleMap[i] && typeof moduleMap[i] === "object" ? moduleMap[i] : {};
+      const moduleSlug = cleanText(row.module_slug, cleanText(workSlugs[i]));
+      if (!moduleSlug) continue;
+      const blockId = cleanText(row.knowledge_block_id);
+      const byId = blockId ? blockById.get(blockId) : null;
+      const byGate = blockByGate.get(i + 1) || null;
+      mapped.push({
+        moduleSlug,
+        block: byId || byGate || blocks[i] || createFallbackBlockFromModule(moduleSlug, i)
+      });
+    }
+  } else {
+    for (let i = 0; i < workSlugs.length; i += 1) {
+      const moduleSlug = cleanText(workSlugs[i]);
+      if (!moduleSlug) continue;
+      mapped.push({
+        moduleSlug,
+        block: blockByGate.get(i + 1) || blocks[i] || createFallbackBlockFromModule(moduleSlug, i)
+      });
+    }
+  }
+  if (!mapped.length && workSlugs.length) {
+    return workSlugs.map((moduleSlug, index) => ({
+      moduleSlug: cleanText(moduleSlug),
+      block: createFallbackBlockFromModule(moduleSlug, index)
+    }));
+  }
+  return mapped;
+}
+
+async function regenerateBookPipelineForWork({ work, target = "failed", moduleSlugs = [] }) {
+  const safeWork = work && typeof work === "object" ? work : null;
+  if (!safeWork) throw new Error("Work not found");
+  const bookId = cleanText(safeWork.book_id);
+  if (!bookId) throw new Error("Work has no book id");
+  const { manifest, manifestPath } = await readBookPipelineManifestByBookId(bookId);
+  if (!manifest) {
+    throw new Error("book-pipeline-manifest.json not found for this work");
+  }
+  const moduleBlockMap = resolveModuleBlockMapFromManifest(safeWork, manifest);
+  if (!moduleBlockMap.length) {
+    throw new Error("No module map available for regeneration");
+  }
+  const requestedSlugs = new Set(
+    (Array.isArray(moduleSlugs) ? moduleSlugs : [])
+      .map((item) => cleanText(item))
+      .filter(Boolean)
+  );
+  const scopedRows = requestedSlugs.size
+    ? moduleBlockMap.filter((row) => requestedSlugs.has(cleanText(row?.moduleSlug)))
+    : moduleBlockMap;
+  const regenTarget = cleanText(target, "failed").toLowerCase();
+  const failedRows = await detectPipelineModuleFailures({ work: safeWork, moduleBlockMap: scopedRows });
+  const rowsToRebuild = regenTarget === "all"
+    ? scopedRows
+    : failedRows;
+  const bookTitle = cleanText(safeWork?.title, cleanText(manifest?.title, "Playable Book"));
+  const rebuilt = [];
+  const rebuildErrors = [];
+  await mapLimit(rowsToRebuild, Math.min(8, Math.max(1, rowsToRebuild.length)), async (row) => {
+    try {
+      const result = await buildModulePipelineArtifacts({
+        work: safeWork,
+        moduleSlug: cleanText(row?.moduleSlug),
+        block: row?.block || {},
+        bookTitle
+      });
+      rebuilt.push(result);
+    } catch (error) {
+      rebuildErrors.push({
+        moduleSlug: cleanText(row?.moduleSlug),
+        error: cleanText(error?.message, "regenerate_failed")
+      });
+    }
+  });
+  const verifyRows = requestedSlugs.size
+    ? moduleBlockMap.filter((row) => requestedSlugs.has(cleanText(row?.moduleSlug)))
+    : moduleBlockMap;
+  const qa = await verifyAndRepairPipelineModules({
+    work: safeWork,
+    moduleBlockMap: verifyRows,
+    bookTitle
+  });
+  manifest.regeneration = {
+    at: nowIso(),
+    target: regenTarget,
+    requested_modules: [...requestedSlugs],
+    rebuild_requested: rowsToRebuild.length,
+    rebuild_succeeded: rebuilt.length,
+    rebuild_failed: rebuildErrors.length,
+    rebuild_errors: rebuildErrors,
+    qa
+  };
+  if (Array.isArray(rebuilt) && rebuilt.length) {
+    const currentArtifacts = Array.isArray(manifest.artifacts) ? manifest.artifacts : [];
+    const bySlug = new Map(currentArtifacts.map((row) => [cleanText(row?.moduleSlug), row]));
+    for (const row of rebuilt) {
+      bySlug.set(cleanText(row?.moduleSlug), row);
+    }
+    manifest.artifacts = [...bySlug.values()];
+  }
+  await fs.writeFile(manifestPath, JSON.stringify(manifest, null, 2), "utf8");
+  return {
+    ok: qa.ok && rebuildErrors.length === 0,
+    target: regenTarget,
+    requestedModules: [...requestedSlugs],
+    scannedModules: scopedRows.length,
+    failedBeforeRegen: failedRows.length,
+    rebuildRequested: rowsToRebuild.length,
+    rebuiltCount: rebuilt.length,
+    rebuildErrors,
+    qa
   };
 }
 
@@ -2612,10 +2974,16 @@ async function runBookPipelineGenerationJob(job, sessionId) {
   });
 
   const requestedBlocks = toInt(job.payload?.blockCount);
-  const knowledgeBlocks = splitKnowledgeBlocksFromText(sourceText, {
+  const requestedMinScore = Number(job.payload?.minDensityScore);
+  const splitResult = splitKnowledgeBlocksFromText(sourceText, {
     targetBlocks: requestedBlocks || eta.blockCount,
-    minScore: 0.62
+    minScore: Number.isFinite(requestedMinScore) ? requestedMinScore : BOOK_PIPELINE_DENSITY_MIN_SCORE,
+    returnDiagnostics: true
   });
+  const knowledgeBlocks = Array.isArray(splitResult?.blocks) ? splitResult.blocks : [];
+  const splitDiagnostics = splitResult?.diagnostics && typeof splitResult.diagnostics === "object"
+    ? splitResult.diagnostics
+    : null;
   if (!knowledgeBlocks.length) {
     throw new Error("No valid knowledge blocks after density filtering.");
   }
@@ -2638,9 +3006,10 @@ async function runBookPipelineGenerationJob(job, sessionId) {
       eta,
       stage: "knowledge_blocks",
       knowledgeBlockCount: knowledgeBlocks.length,
-      knowledgeBlocksPreview: blockPreview
+      knowledgeBlocksPreview: blockPreview,
+      knowledgeBlockDiagnostics: splitDiagnostics
     },
-    message: `Knowledge blocks planned: ${knowledgeBlocks.length}. ${blockNames || "Generating block names..."}`.trim()
+    message: `Knowledge blocks planned: ${knowledgeBlocks.length}/${splitDiagnostics?.candidates || knowledgeBlocks.length}. ${blockNames || "Generating block names..."}`.trim()
   });
   const moduleCount = Math.max(3, Math.min(BOOK_PIPELINE_MAX_MODULES, toInt(job.payload?.moduleCount) || knowledgeBlocks.length));
   const blueprintSource = {
@@ -2723,6 +3092,7 @@ async function runBookPipelineGenerationJob(job, sessionId) {
         eta,
         source_mode: resolved.mode,
         total_knowledge_blocks: knowledgeBlocks.length,
+        split_diagnostics: splitDiagnostics,
         knowledge_blocks: knowledgeBlocks,
         module_map: moduleBlockMap.map((row) => ({ module_slug: row.moduleSlug, knowledge_block_id: row.block.id })),
         easter_level: easter,
@@ -2790,6 +3160,7 @@ async function runBookPipelineGenerationJob(job, sessionId) {
       qa: qaResult,
       knowledgeBlockCount: knowledgeBlocks.length,
       knowledgeBlocksPreview: blockPreview,
+      knowledgeBlockDiagnostics: splitDiagnostics,
       easter
     },
     creditCharge: capturedCharge || job.creditCharge || null,
@@ -2983,6 +3354,95 @@ async function handleStudioApi(req, res, url, session) {
         "Cache-Control": "no-store"
       });
       res.end(zipBuffer);
+      return true;
+    }
+
+    const workPipelineMatch = route.match(/^\/api\/studio\/works\/([^/]+)\/pipeline$/);
+    if (method === "GET" && workPipelineMatch) {
+      const workId = decodeURIComponent(workPipelineMatch[1] || "").trim();
+      const work = getWorkById(workId);
+      if (!work || !canSessionViewWork(session.id, work)) {
+        writeJson(res, 404, { ok: false, error: "Work not found" });
+        return true;
+      }
+      const { manifest } = await readBookPipelineManifestByBookId(cleanText(work.book_id));
+      if (!manifest) {
+        writeJson(res, 404, { ok: false, error: "Pipeline manifest not found" });
+        return true;
+      }
+      writeJson(res, 200, {
+        ok: true,
+        workId: cleanText(work.id),
+        bookId: cleanText(work.book_id),
+        splitDiagnostics: manifest.split_diagnostics || null,
+        totalKnowledgeBlocks: toInt(manifest.total_knowledge_blocks),
+        knowledgeBlocks: Array.isArray(manifest.knowledge_blocks) ? manifest.knowledge_blocks : [],
+        moduleMap: Array.isArray(manifest.module_map) ? manifest.module_map : [],
+        regeneration: manifest.regeneration || null
+      });
+      return true;
+    }
+
+    const workRegenerateMatch = route.match(/^\/api\/studio\/works\/([^/]+)\/regenerate$/);
+    if (method === "POST" && workRegenerateMatch) {
+      const workId = decodeURIComponent(workRegenerateMatch[1] || "").trim();
+      const work = getWorkById(workId);
+      if (!work || !canSessionViewWork(session.id, work)) {
+        writeJson(res, 404, { ok: false, error: "Work not found" });
+        return true;
+      }
+      if (!canSessionEditWork(session.id, work)) {
+        writeJson(res, 403, { ok: false, error: "Only the owner can regenerate this work" });
+        return true;
+      }
+      const body = await parseJsonBody(req, 128 * 1024).catch((error) => ({ __error: error?.message || "Invalid body" }));
+      if (body.__error) {
+        writeJson(res, 400, { ok: false, error: body.__error });
+        return true;
+      }
+      const result = await regenerateBookPipelineForWork({
+        work,
+        target: cleanText(body?.target, "failed"),
+        moduleSlugs: Array.isArray(body?.moduleSlugs) ? body.moduleSlugs : []
+      });
+      if (result?.qa?.ok === false) {
+        writeJson(res, 500, { ok: false, error: "Regeneration finished but QA is still failing", result });
+        return true;
+      }
+      await loadCatalog(true);
+      writeJson(res, 200, { ok: true, result });
+      return true;
+    }
+
+    const bookRegenerateMatch = route.match(/^\/api\/studio\/books\/([^/]+)\/regenerate$/);
+    if (method === "POST" && bookRegenerateMatch) {
+      const bookId = decodeURIComponent(bookRegenerateMatch[1] || "").trim();
+      const work = getEditableWorkByBookId(session.id, bookId);
+      if (!work) {
+        writeJson(res, 404, { ok: false, error: "Editable work for this book not found" });
+        return true;
+      }
+      const body = await parseJsonBody(req, 128 * 1024).catch((error) => ({ __error: error?.message || "Invalid body" }));
+      if (body.__error) {
+        writeJson(res, 400, { ok: false, error: body.__error });
+        return true;
+      }
+      const result = await regenerateBookPipelineForWork({
+        work,
+        target: cleanText(body?.target, "failed"),
+        moduleSlugs: Array.isArray(body?.moduleSlugs) ? body.moduleSlugs : []
+      });
+      if (result?.qa?.ok === false) {
+        writeJson(res, 500, { ok: false, error: "Regeneration finished but QA is still failing", result });
+        return true;
+      }
+      await loadCatalog(true);
+      writeJson(res, 200, {
+        ok: true,
+        workId: cleanText(work.id),
+        bookId: cleanText(work.book_id),
+        result
+      });
       return true;
     }
 
@@ -3635,6 +4095,12 @@ function canSessionViewWork(sessionId, work) {
   return cleanText(work.owner_session_id) === sid || Boolean(work.is_public);
 }
 
+function canSessionEditWork(sessionId, work) {
+  const sid = cleanText(sessionId);
+  if (!sid || !work || typeof work !== "object") return false;
+  return cleanText(work.owner_session_id) === sid;
+}
+
 function listVisibleChildMods(sessionId, workId) {
   const sid = cleanText(sessionId);
   const target = cleanText(workId);
@@ -3651,6 +4117,7 @@ async function buildWorkDetailPayload(work, sessionId) {
   const base = summaries[0] || null;
   if (!base) return null;
   const book = await runtimeBookCatalog.getBook(cleanText(work.book_id));
+  const { manifest } = await readBookPipelineManifestByBookId(cleanText(work.book_id));
   const modules = Array.isArray(book?.modules)
     ? book.modules.map((module) => ({
         slug: module.slug,
@@ -3665,6 +4132,17 @@ async function buildWorkDetailPayload(work, sessionId) {
     ...base,
     sources: Array.isArray(work.sources) ? work.sources.slice(0, 10) : [],
     modules,
+    pipeline: manifest
+      ? {
+          totalKnowledgeBlocks: toInt(manifest.total_knowledge_blocks),
+          splitDiagnostics: manifest.split_diagnostics || null,
+          knowledgeBlocksPreview: Array.isArray(manifest.knowledge_blocks)
+            ? manifest.knowledge_blocks.slice(0, 24)
+            : [],
+          moduleMap: Array.isArray(manifest.module_map) ? manifest.module_map : [],
+          regeneration: manifest.regeneration || null
+        }
+      : null,
     parent_work_id: cleanText(work.parent_work_id),
     root_work_id: cleanText(work.root_work_id, cleanText(work.parent_work_id, cleanText(work.id))),
     modification_prompt: cleanText(work.modification_prompt),
@@ -3746,6 +4224,16 @@ function getVisibleWorkByBookId(sessionId) {
     if (!map.has(bookId)) map.set(bookId, item);
   }
   return map;
+}
+
+function getEditableWorkByBookId(sessionId, bookId) {
+  const sid = cleanText(sessionId);
+  const targetBookId = cleanText(bookId);
+  if (!sid || !targetBookId) return null;
+  const rows = getAllWorks()
+    .filter((item) => cleanText(item.book_id) === targetBookId && cleanText(item.owner_session_id) === sid)
+    .sort((a, b) => String(b.created_at || "").localeCompare(String(a.created_at || "")));
+  return rows[0] || null;
 }
 
 function enrichBookWithWorkMeta(book, sessionId) {

@@ -35,6 +35,7 @@ const STYLE_ID = "reado-shared-shell-style";
 const ICON_FONT_ID = "reado-shell-material-icons";
 const ICON_FONT_SYMBOLS_ID = "reado-shell-material-symbols";
 const USER_STATE_KEY = "reado_user_state_v1";
+const CREDIT_SNAPSHOT_KEY = "reado_credit_snapshot_v1";
 const DAILY_GEM_CLAIM_LEGACY_KEY = "reado_daily_gem_claim_v1";
 const DAILY_GEM_CLAIM_STREAK_KEY = "reado_daily_gem_claim_streak_v2";
 const DAILY_GEM_CYCLE_DAYS = 30;
@@ -340,6 +341,32 @@ function readUserState() {
   }
 }
 
+function readCreditSnapshot() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(CREDIT_SNAPSHOT_KEY) || "null");
+    if (!raw || typeof raw !== "object") return null;
+    const available = Number(raw.available);
+    if (!Number.isFinite(available)) return null;
+    return {
+      available: Math.max(0, Math.floor(available)),
+      updatedAt: typeof raw.updatedAt === "string" ? raw.updatedAt : ""
+    };
+  } catch {
+    return null;
+  }
+}
+
+function writeCreditSnapshot(snapshot) {
+  const available = Number(snapshot?.available);
+  if (!Number.isFinite(available)) return;
+  try {
+    localStorage.setItem(CREDIT_SNAPSHOT_KEY, JSON.stringify({
+      available: Math.max(0, Math.floor(available)),
+      updatedAt: typeof snapshot?.updatedAt === "string" ? snapshot.updatedAt : new Date().toISOString()
+    }));
+  } catch {}
+}
+
 function ensureDeepSeekDefaults() {
   try {
     if (DEFAULT_DEEPSEEK_API_KEY && !localStorage.getItem(DEEPSEEK_KEY_STORAGE)) {
@@ -423,8 +450,8 @@ function buildAuthRedirectUrl(priceId) {
 function buildAuthEntryUrl(mode) {
   const url = new URL(buildAuthRedirectUrl(), window.location.origin);
   const normalizedMode = typeof mode === "string" ? mode.trim().toLowerCase() : "";
-  if (normalizedMode === "signup" || normalizedMode === "login") {
-    url.searchParams.set("mode", normalizedMode);
+  if (normalizedMode === "signup" || normalizedMode === "signin" || normalizedMode === "login") {
+    url.searchParams.set("mode", normalizedMode === "login" ? "signin" : normalizedMode);
   }
   return url.toString();
 }
@@ -1274,6 +1301,10 @@ function ensureGlobalStyle() {
       border-color: rgba(255, 255, 255, 0.24);
       background: rgba(16, 22, 34, 0.62);
       color: #dbe6f9;
+    }
+    body.reado-shell-applied [data-shell-auth][hidden],
+    body.reado-shell-applied [data-shell-user][hidden] {
+      display: none !important;
     }
     body.reado-shell-applied .reado-shell-user {
       display: inline-flex;
@@ -2665,13 +2696,13 @@ class ReadoAppShell extends HTMLElement {
         <button class="reado-shell-pill pro reado-shell-pro" type="button" data-open-billing>
           <strong data-shell-pro-label>${t("billing.subscribe_short", "Subscribe Pro")}</strong>
         </button>
-      <button class="reado-shell-pill reado-shell-credit" type="button" data-href="${GEM_CENTER_HREF}" aria-label="${t("shell.gems", "Gems")}">
+      <button class="reado-shell-pill reado-shell-credit" type="button" data-open-billing aria-label="${t("shell.credits", "Credits")}">
           <span class="reado-shell-pill-icon" data-icon-name="diamond">diamond</span>
-          <strong data-shell-gems>0</strong>
+          <strong data-shell-credits>0</strong>
         </button>
         <div class="reado-shell-auth" data-shell-auth>
-          <button class="reado-shell-auth-btn signup" type="button" data-href="${buildAuthEntryUrl("signup")}">${t("shell.sign_in", "Sign in")}</button>
-          <button class="reado-shell-auth-btn login" type="button" data-href="${buildAuthEntryUrl("login")}">${t("shell.log_in", "Log in")}</button>
+          <button class="reado-shell-auth-btn signup" type="button" data-href="${buildAuthEntryUrl("signup")}">${t("shell.sign_up", "Sign up")}</button>
+          <button class="reado-shell-auth-btn login" type="button" data-href="${buildAuthEntryUrl("signin")}">${t("shell.sign_in", "Sign in")}</button>
         </div>
         <div class="reado-shell-user" data-shell-user>
           <div class="reado-shell-user-meta">
@@ -2689,23 +2720,63 @@ class ReadoAppShell extends HTMLElement {
     const avatarEl = top.querySelector("[data-shell-avatar]");
     const authEl = top.querySelector("[data-shell-auth]");
     const userEl = top.querySelector("[data-shell-user]");
-    const gemsEl = top.querySelector("[data-shell-gems]");
+    const creditsEl = top.querySelector("[data-shell-credits]");
     const proLabelEl = top.querySelector("[data-shell-pro-label]");
     const langWrapEl = top.querySelector("[data-shell-lang-wrap]");
     const langToggleEl = top.querySelector("[data-shell-lang-toggle]");
     const langLabelEl = top.querySelector("[data-shell-lang-label]");
     const langMenuEl = top.querySelector("[data-shell-lang-menu]");
 
+    let shellCredits = Number(readCreditSnapshot()?.available);
+    if (!Number.isFinite(shellCredits)) {
+      shellCredits = normalizeUserState(readUserState()).credits;
+    }
+
+    const syncLocalCredits = (value) => {
+      const available = Number(value);
+      if (!Number.isFinite(available)) return;
+      const normalized = Math.max(0, Math.floor(available));
+      shellCredits = normalized;
+      const current = readUserState();
+      if (current.credits !== normalized) {
+        writeUserState({ ...current, credits: normalized });
+      }
+    };
+
     const renderUser = (state) => {
       const signedIn = isUserSignedIn();
       if (authEl) authEl.hidden = signedIn;
       if (userEl) userEl.hidden = !signedIn;
       const user = normalizeUserState(state);
-      if (gemsEl) gemsEl.textContent = formatNumber(user.gems);
+      const displayCredits = Number.isFinite(shellCredits) ? shellCredits : user.credits;
+      if (creditsEl) creditsEl.textContent = formatNumber(Math.max(0, Math.floor(displayCredits)));
       if (!signedIn) return;
       if (nameEl) nameEl.textContent = user.name;
       if (levelEl) levelEl.textContent = "Lv." + user.level + " " + (user.title || t("shell.learner", "学习者"));
       if (avatarEl) avatarEl.src = user.avatar || FALLBACK_AVATAR_DATA_URI;
+    };
+
+    let creditsSyncInFlight = false;
+    const refreshCredits = async () => {
+      if (creditsSyncInFlight) return;
+      creditsSyncInFlight = true;
+      try {
+        const data = await requestJson("GET", "/api/billing/credits");
+        const available = Number(data?.credits?.available);
+        if (Number.isFinite(available)) {
+          const snapshot = {
+            available: Math.max(0, Math.floor(available)),
+            updatedAt: typeof data?.credits?.updatedAt === "string" ? data.credits.updatedAt : new Date().toISOString()
+          };
+          writeCreditSnapshot(snapshot);
+          syncLocalCredits(snapshot.available);
+          renderUser(readUserState());
+        }
+      } catch {
+        renderUser(readUserState());
+      } finally {
+        creditsSyncInFlight = false;
+      }
     };
 
     if (avatarEl) {
@@ -2717,8 +2788,39 @@ class ReadoAppShell extends HTMLElement {
     }
 
     renderUser(readUserState());
+    window.addEventListener("reado:auth-state-changed", () => {
+      renderUser(readUserState());
+      refreshCredits().catch(() => {});
+    });
+    window.addEventListener("reado:credits-updated", (event) => {
+      const available = Number(event?.detail?.available);
+      if (!Number.isFinite(available)) return;
+      syncLocalCredits(available);
+      writeCreditSnapshot({
+        available,
+        updatedAt: typeof event?.detail?.updatedAt === "string" ? event.detail.updatedAt : new Date().toISOString()
+      });
+      renderUser(readUserState());
+    });
+    window.addEventListener("storage", (event) => {
+      if (event?.key === AUTH_STATE_KEY) {
+        renderUser(readUserState());
+        refreshCredits().catch(() => {});
+      }
+      if (event?.key === CREDIT_SNAPSHOT_KEY) {
+        const snapshot = readCreditSnapshot();
+        if (snapshot) {
+          syncLocalCredits(snapshot.available);
+          renderUser(readUserState());
+        }
+      }
+    });
     syncSignedInUser({ force: true }).finally(() => {
       refreshLiveProgress();
+    });
+    refreshCredits().catch(() => {});
+    window.addEventListener("focus", () => {
+      refreshCredits().catch(() => {});
     });
 
     const syncProLabel = (billing) => {
