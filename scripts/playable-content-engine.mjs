@@ -3,6 +3,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import JSZip from "jszip";
+import { fetchBookCoverToFile } from "./studio-tools/fetch-book-cover.mjs";
 
 const STATE_FILE = "reado-playable-works.json";
 const MAX_TEXT_LEN = 120_000;
@@ -3575,7 +3576,24 @@ export class PlayableContentEngine {
       });
     }
 
-    await fs.writeFile(path.join(this.bookCoversDir, `${bookId}.png`), Buffer.from(PLACEHOLDER_PNG_BASE64, "base64"));
+    let coverSaved = false;
+    try {
+      const coverResult = await fetchBookCoverToFile({
+        title: blueprint.title,
+        bookId,
+        outputDir: this.bookCoversDir,
+        logger: (line) => this.emitProgress(hooks, "publishing_catalog", 95, line)
+      });
+      if (coverResult?.ok) {
+        coverSaved = true;
+        this.emitProgress(hooks, "publishing_catalog", 95, `Book cover fetched from ${toText(coverResult.source, "external source")}`);
+      }
+    } catch (error) {
+      this.emitProgress(hooks, "publishing_catalog", 95, `Book cover fetch failed, fallback placeholder used: ${toText(error?.message, "unknown error")}`);
+    }
+    if (!coverSaved) {
+      await fs.writeFile(path.join(this.bookCoversDir, `${bookId}.png`), Buffer.from(PLACEHOLDER_PNG_BASE64, "base64"));
+    }
     this.emitProgress(hooks, "publishing_catalog", 96, "Modules compiled, publishing to catalog");
 
     const work = {

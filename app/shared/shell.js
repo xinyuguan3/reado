@@ -8,9 +8,8 @@ import {
 import { initReadoAutoTranslate } from "/shared/auto-translate.js";
 
 const ROUTES = [
-  { id: "knowledge-map", icon: "map", labelKey: "route.knowledge_map", label: "个人书库", href: "/pages/playable-studio.html#my-library" },
-  { id: "mission", icon: "assignment", labelKey: "route.mission", label: "任务中心", href: "/pages/simulator-library-level-selection-2.html" },
   { id: "studio", icon: "auto_awesome", labelKey: "route.studio", label: "创作工坊", href: "/pages/playable-studio.html" },
+  { id: "mission", icon: "assignment", labelKey: "route.mission", label: "任务中心", href: "/pages/simulator-library-level-selection-2.html" },
   { id: "ranking", icon: "leaderboard", labelKey: "route.ranking", label: "排行榜", href: "/pages/global-scholar-leaderboard.html" },
   { id: "library", icon: "auto_stories", labelKey: "route.library", label: "公共书库", href: "/pages/playable-studio.html#public-library" },
   { id: "profile", icon: "person", labelKey: "route.profile", label: "个人资料", href: "/pages/gamified-learning-hub-dashboard-2.html" }
@@ -2459,12 +2458,6 @@ function ensureGlobalStyle() {
         min-height: calc(100dvh - 80px) !important;
         overflow-y: auto !important;
         overflow-x: hidden !important;
-      }
-      body.reado-shell-applied:not(.reado-experience-mode).reado-page-studio {
-        padding-right: 0 !important;
-      }
-      body.reado-shell-applied:not(.reado-experience-mode).reado-page-studio .reado-shell-right-panel {
-        display: none !important;
       }
       body.reado-shell-applied:not(.reado-experience-mode).reado-page-map main {
         cursor: auto !important;

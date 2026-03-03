@@ -8,6 +8,7 @@
     "build": "node scripts/build-app.mjs",
     "start": "node scripts/serve.mjs",
     "dev": "node scripts/build-app.mjs && node scripts/serve.mjs",
+    "cover:fetch": "node scripts/studio-tools/fetch-book-cover.mjs",
     "stitch-bridge": "node scripts/studio-tools/stitch-bridge.mjs",
     "skills:railway": "bash scripts/studio-tools/install-railway-skills.sh"
   },
