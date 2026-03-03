@@ -1093,26 +1093,11 @@
 
       <section id="my-library" class="block" style="margin-top:12px;">
         <div class="progress-head">
-          <h3 class="section-title">个人书库</h3>
-          <span class="meta-line" style="margin:0;">已购买与已解锁书籍</span>
-        </div>
-        <div id="owned-books" class="books-grid"></div>
-      </section>
-
-      <section class="block" style="margin-top:12px;">
-        <div class="progress-head">
-          <h3 class="section-title">历史生成书</h3>
+          <h3 class="section-title">个人书架</h3>
+          <span class="meta-line" style="margin:0;">上传文件并生成后，这里会逐步出现你的书</span>
           <button id="refresh-works-btn" class="tiny" type="button" data-i18n="studio.refresh">Refresh</button>
         </div>
-        <div id="my-works" class="list"></div>
-      </section>
-
-      <section id="public-library" class="block" style="margin-top:12px;">
-        <div class="progress-head">
-          <h3 class="section-title">公共书库</h3>
-          <span class="meta-line" style="margin:0;">未购买可试读 3 章节，购买后可完整打开</span>
-        </div>
-        <div id="public-books" class="books-grid"></div>
+        <div id="owned-books" class="books-grid"></div>
       </section>
 
       <p id="meta-line" class="meta-line"></p>
@@ -1186,7 +1171,6 @@
     const searchResultsEl = document.getElementById("search-results");
     const selectedSourcesEl = document.getElementById("selected-sources");
     const ownedBooksEl = document.getElementById("owned-books");
-    const publicBooksEl = document.getElementById("public-books");
     const knowledgeBlocksEl = document.getElementById("knowledge-blocks");
     const knowledgeCountEl = document.getElementById("knowledge-count");
     const knowledgeDiagnosticsEl = document.getElementById("knowledge-diagnostics");
@@ -1398,26 +1382,40 @@
       return String(book.firstModuleHref || "");
     }
 
+    function getWorkOpenHref(work) {
+      const safeBookId = String(work?.book_id || "").trim();
+      const catalogBook = getCatalogBook(safeBookId);
+      if (catalogBook) {
+        const mapped = getBookOpenHref(catalogBook);
+        if (mapped) return mapped;
+      }
+      const first = String(work?.first_module_href || "").trim();
+      if (first) return first;
+      return String(work?.book_href || "").trim();
+    }
+
     function renderOwnedBooks() {
       if (!ownedBooksEl) return;
-      const unlocked = readUnlockedBooks();
-      const rows = catalogBooks.filter((book) => unlocked.has(String(book?.id || "").trim()));
+      const rows = Array.isArray(state.myWorks) ? state.myWorks : [];
       if (!rows.length) {
-        ownedBooksEl.innerHTML = `<article class="item"><p>当前还没有已购买书籍。可在下方公共书库试读或购买。</p></article>`;
+        ownedBooksEl.innerHTML = `<article class="item"><p>你的书架现在是空的。上传文件并点击生成后，书会自动出现在这里。</p></article>`;
         return;
       }
-      ownedBooksEl.innerHTML = rows.map((book) => {
-        const openHref = getBookOpenHref(book);
-        const desc = String((Array.isArray(book.highlights) && book.highlights[0]) || book.categoryHint || "").trim();
+      ownedBooksEl.innerHTML = rows.map((work) => {
+        const safeBookId = String(work?.book_id || "").trim();
+        const catalogBook = getCatalogBook(safeBookId);
+        const openHref = getWorkOpenHref(work);
+        const cover = String(work?.cover || catalogBook?.cover || "").trim();
+        const title = String(work?.title || catalogBook?.title || "Untitled").trim();
+        const desc = String(work?.subtitle || work?.hook || (Array.isArray(catalogBook?.highlights) ? catalogBook.highlights[0] : "") || "").trim();
         return `
           <article class="book-card">
-            <img class="book-cover" src="${esc(book.cover || "")}" alt="${esc(book.title || "book")}" loading="lazy" />
+            <img class="book-cover" src="${esc(cover)}" alt="${esc(title || "book")}" loading="lazy" />
             <div class="book-body">
-              <h4 class="book-title">${esc(book.title || "Untitled")}</h4>
-              <p class="book-desc">${esc(desc || "已解锁，可随时继续学习。")}</p>
+              <h4 class="book-title">${esc(title || "Untitled")}</h4>
+              <p class="book-desc">${esc(desc || "已生成，可随时继续学习。")}</p>
               <div class="book-actions">
-                <button class="tiny" data-act="open-owned" data-id="${esc(book.id)}" data-href="${esc(openHref)}">打开</button>
-                <a class="tiny" href="${esc(book.hubHref || "#")}" target="_blank" rel="noreferrer">目录</a>
+                <button class="tiny" data-act="open-owned" data-id="${esc(safeBookId)}" data-href="${esc(openHref)}">打开</button>
               </div>
             </div>
           </article>`;
@@ -1425,36 +1423,7 @@
     }
 
     function renderPublicBooks() {
-      if (!publicBooksEl) return;
-      const unlocked = readUnlockedBooks();
-      const rows = catalogBooks.filter((book) => !/^user-/i.test(String(book?.id || "")));
-      if (!rows.length) {
-        publicBooksEl.innerHTML = `<article class="item"><p>公共书库为空。</p></article>`;
-        return;
-      }
-      publicBooksEl.innerHTML = rows.map((book) => {
-        const bookId = String(book?.id || "").trim();
-        const isUnlocked = unlocked.has(bookId);
-        const remain = getTrialRemain(bookId);
-        const openHref = getBookOpenHref(book);
-        const desc = String((Array.isArray(book.highlights) && book.highlights[0]) || book.categoryHint || "").trim();
-        return `
-          <article class="book-card">
-            <img class="book-cover" src="${esc(book.cover || "")}" alt="${esc(book.title || "book")}" loading="lazy" />
-            <div class="book-body">
-              <h4 class="book-title">${esc(book.title || "Untitled")}</h4>
-              <p class="book-desc">${esc(desc || "可进入目录选择章节体验。")}</p>
-              <p class="book-price">${Number(book.price || 0)} 宝石</p>
-              <div class="book-actions">
-                ${isUnlocked
-                  ? `<button class="tiny" data-act="open-public" data-id="${esc(bookId)}" data-href="${esc(openHref)}">打开</button>`
-                  : `<button class="tiny" data-act="trial" data-id="${esc(bookId)}">试用（剩余 ${remain}/3）</button>
-                     <button class="tiny" data-act="buy" data-id="${esc(bookId)}">购买</button>`
-                }
-              </div>
-            </div>
-          </article>`;
-      }).join("");
+      // Public library is removed from Studio in the current product flow.
     }
 
     async function purchaseBook(bookId) {
@@ -1568,72 +1537,6 @@
           if (!btn) return;
           const href = btn.getAttribute("data-href") || "";
           openBookHref(href);
-        });
-      }
-
-      if (publicBooksEl) {
-        publicBooksEl.addEventListener("click", async (event) => {
-          const btn = event.target && event.target.closest ? event.target.closest("button[data-act]") : null;
-          if (!btn) return;
-          const act = String(btn.getAttribute("data-act") || "").trim();
-          const bookId = String(btn.getAttribute("data-id") || "").trim();
-          if (!act || !bookId) return;
-          if (act === "open-public") {
-            openBookHref(btn.getAttribute("data-href") || "");
-            return;
-          }
-          if (act === "trial") {
-            setError("");
-            openTrialModal(bookId).catch((error) => {
-              setError(error?.message || "加载试读章节失败。");
-            });
-            return;
-          }
-          if (act === "buy") {
-            if (btn.disabled) return;
-            btn.disabled = true;
-            try {
-              await purchaseBook(bookId);
-            } finally {
-              btn.disabled = false;
-            }
-          }
-        });
-      }
-
-      if (trialModuleListEl) {
-        trialModuleListEl.addEventListener("click", async (event) => {
-          const btn = event.target && event.target.closest ? event.target.closest('button[data-act="trial-module"]') : null;
-          if (!btn || btn.disabled) return;
-          const bookId = String(btn.getAttribute("data-book-id") || "").trim();
-          const slug = String(btn.getAttribute("data-slug") || "").trim();
-          const href = String(btn.getAttribute("data-href") || "").trim();
-          if (!bookId || !href) return;
-          const unlocked = readUnlockedBooks().has(bookId);
-          if (!unlocked) {
-            const tried = getTrialSet(bookId);
-            const already = slug && tried.has(slug);
-            const accepted = already || addTrialModule(bookId, slug);
-            if (!accepted) {
-              setError("该书试读章节已达 3 个，请购买后继续。");
-              const modules = await fetchBookModules(bookId);
-              renderTrialModal(bookId, modules);
-              renderPublicBooks();
-              return;
-            }
-            renderPublicBooks();
-          }
-          closeTrialModal();
-          openBookHref(href);
-        });
-      }
-
-      if (trialModalCloseEl) {
-        trialModalCloseEl.addEventListener("click", () => closeTrialModal());
-      }
-      if (trialModalEl) {
-        trialModalEl.addEventListener("click", (event) => {
-          if (event.target === trialModalEl) closeTrialModal();
         });
       }
     }
@@ -2632,10 +2535,10 @@
       }
       renderMyWorks();
       renderOwnedBooks();
-      renderPublicBooks();
     }
 
     function renderMyWorks() {
+      if (!myWorksEl) return;
       const rows = Array.isArray(state.myWorks) ? state.myWorks : [];
       if (!rows.length) {
         myWorksEl.innerHTML = `<div class="item"><p>${esc(t("studio.my_works_empty", "No playable books yet."))}</p></div>`;
@@ -3086,16 +2989,17 @@
     bindLibraryActions();
     setupDropZone();
     renderOwnedBooks();
-    renderPublicBooks();
     renderSearchResults();
     renderSelectedSources();
     renderKnowledgeBlocks();
     renderLogs();
     renderPipelineViewer();
     loadMyWorks().catch(() => {});
-    refreshWorksBtn.addEventListener("click", () => {
-      loadMyWorks().catch(() => {});
-    });
+    if (refreshWorksBtn) {
+      refreshWorksBtn.addEventListener("click", () => {
+        loadMyWorks().catch(() => {});
+      });
+    }
     translateDom(document);
     onLanguageChange(() => {
       translateDom(document);

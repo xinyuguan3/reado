@@ -11,7 +11,7 @@ const ROUTES = [
   { id: "studio", icon: "auto_awesome", labelKey: "route.studio", label: "创作工坊", href: "/pages/playable-studio.html" },
   { id: "mission", icon: "assignment", labelKey: "route.mission", label: "任务中心", href: "/pages/simulator-library-level-selection-2.html" },
   { id: "ranking", icon: "leaderboard", labelKey: "route.ranking", label: "排行榜", href: "/pages/global-scholar-leaderboard.html" },
-  { id: "library", icon: "auto_stories", labelKey: "route.library", label: "公共书库", href: "/pages/playable-studio.html#public-library" },
+  { id: "library", icon: "auto_stories", labelKey: "route.library", label: "我的书架", href: "/pages/playable-studio.html#my-library" },
   { id: "profile", icon: "person", labelKey: "route.profile", label: "个人资料", href: "/pages/gamified-learning-hub-dashboard-2.html" }
 ];
 const ICON_FALLBACK_MAP = {
@@ -75,8 +75,8 @@ const BILLING_PLAN_COPY = {
       cta: "Upgrade",
       featured: false,
       features: [
-        "300 refresh credits every day",
-        "4,000 credits per month",
+        "120 refresh credits every day",
+        "4,800 credits per month",
         "Professional websites for standard output",
         "20 scheduled tasks"
       ]
@@ -89,8 +89,8 @@ const BILLING_PLAN_COPY = {
       featured: true,
       badge: "Free trial",
       features: [
-        "300 refresh credits every day",
-        "8,000 credits per month",
+        "120 refresh credits every day",
+        "4,800 credits per month",
         "In-depth research with self-set usage",
         "20 scheduled tasks"
       ]
@@ -102,8 +102,8 @@ const BILLING_PLAN_COPY = {
       cta: "Upgrade",
       featured: false,
       features: [
-        "300 refresh credits every day",
-        "40,000 credits per month",
+        "1,800 refresh credits every day",
+        "90,000 credits per month",
         "Professional websites with data analytics",
         "20 scheduled tasks"
       ]
@@ -117,8 +117,8 @@ const BILLING_PLAN_COPY = {
       cta: "Upgrade",
       featured: false,
       features: [
-        "300 refresh credits every day",
-        "4,000 credits per month",
+        "120 refresh credits every day",
+        "4,800 credits per month",
         "Professional websites for standard output",
         "20 scheduled tasks"
       ]
@@ -131,8 +131,8 @@ const BILLING_PLAN_COPY = {
       featured: true,
       badge: "Free trial",
       features: [
-        "300 refresh credits every day",
-        "8,000 credits per month",
+        "120 refresh credits every day",
+        "4,800 credits per month",
         "In-depth research with self-set usage",
         "20 scheduled tasks"
       ]
@@ -144,8 +144,8 @@ const BILLING_PLAN_COPY = {
       cta: "Upgrade",
       featured: false,
       features: [
-        "300 refresh credits every day",
-        "40,000 credits per month",
+        "1,800 refresh credits every day",
+        "90,000 credits per month",
         "Professional websites with data analytics",
         "20 scheduled tasks"
       ]
@@ -683,7 +683,8 @@ function createBillingModal(options = {}) {
     currentPeriodEnd: 0,
     updatedAt: "",
     checkoutEnabled: false,
-    prices: { monthly: {}, annual: {} }
+    prices: { monthly: {}, annual: {} },
+    creditPlans: null
   };
   let selectedCycle = "monthly";
   let loading = false;
@@ -705,9 +706,54 @@ function createBillingModal(options = {}) {
     if (portalBtn) portalBtn.disabled = loading || !current.subscriptionActive;
   };
 
+  const applyCreditsToPlanFeatures = (plan, dailyRefresh, monthlyGrant) => {
+    const safePlan = plan && typeof plan === "object" ? plan : {};
+    const rest = Array.isArray(safePlan.features) ? safePlan.features.slice(2) : [];
+    const hasDaily = Number.isFinite(Number(dailyRefresh));
+    const hasMonthly = Number.isFinite(Number(monthlyGrant));
+    if (!hasDaily || !hasMonthly) return safePlan;
+    return {
+      ...safePlan,
+      features: [
+        `${formatNumber(Math.max(0, Math.floor(Number(dailyRefresh))))} refresh credits every day`,
+        `${formatNumber(Math.max(0, Math.floor(Number(monthlyGrant))))} credits per month`,
+        ...rest
+      ]
+    };
+  };
+
+  const resolveCyclePlans = () => {
+    const cyclePlans = BILLING_PLAN_COPY[selectedCycle] || {};
+    const cloned = {
+      starter: { ...(cyclePlans.starter || {}) },
+      trial: { ...(cyclePlans.trial || {}) },
+      pro: { ...(cyclePlans.pro || {}) }
+    };
+    const creditPlans = current.creditPlans && typeof current.creditPlans === "object"
+      ? current.creditPlans
+      : null;
+    if (!creditPlans) return cloned;
+    cloned.starter = applyCreditsToPlanFeatures(
+      cloned.starter,
+      creditPlans?.small?.dailyRefresh,
+      creditPlans?.small?.monthlyGrant
+    );
+    cloned.trial = applyCreditsToPlanFeatures(
+      cloned.trial,
+      creditPlans?.small?.dailyRefresh,
+      creditPlans?.small?.monthlyGrant
+    );
+    cloned.pro = applyCreditsToPlanFeatures(
+      cloned.pro,
+      creditPlans?.large?.dailyRefresh,
+      creditPlans?.large?.monthlyGrant
+    );
+    return cloned;
+  };
+
   const renderCards = () => {
     if (!cardsEl) return;
-    const cyclePlans = BILLING_PLAN_COPY[selectedCycle] || {};
+    const cyclePlans = resolveCyclePlans();
     const cyclePrices = current.prices?.[selectedCycle] || {};
     cardsEl.innerHTML = BILLING_PLAN_ORDER.map((planId) => {
       const plan = cyclePlans[planId] || {};
@@ -787,6 +833,9 @@ function createBillingModal(options = {}) {
       current.prices = pricingData?.checkout?.prices && typeof pricingData.checkout.prices === "object"
         ? pricingData.checkout.prices
         : { monthly: {}, annual: {} };
+      current.creditPlans = pricingData?.creditPlans && typeof pricingData.creditPlans === "object"
+        ? pricingData.creditPlans
+        : null;
 
       const selectedHasPrice = Object.values(current.prices?.[selectedCycle] || {}).some((item) => Boolean(item));
       if (!selectedHasPrice) {

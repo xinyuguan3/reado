@@ -1,0 +1,29 @@
+# reado
+
+> reado is a web application for reading habit formation and reading gamification. It helps people who struggle with reading consistency, reading anxiety, and ADHD-related reading interruptions.
+
+## Product summary
+
+- Product: reado
+- URL: https://reado.fun/
+- App URL: https://reado.fun/pages/playable-studio.html
+- Blog URL: https://reado.fun/blog/
+- Type: Educational web application
+
+## Core use cases
+
+- reading anxiety reduction via short, finishable reading missions
+- struggle in reading consistency with habit loops and progress visibility
+- reading gamification with levels, quests, and restart-friendly workflows
+- guidance on how to read more books without burnout
+- guidance on how to read books with adhd using continuity design
+
+## Priority pages
+
+- Home: https://reado.fun/
+- Blog index: https://reado.fun/blog/
+- Reading anxiety guide: https://reado.fun/blog/reading-anxiety/
+- Struggle in reading guide: https://reado.fun/blog/struggle-in-reading/
+- Reading gamification guide: https://reado.fun/blog/reading-gamification/
+- How to read more books guide: https://reado.fun/blog/how-to-read-more-books/
+- How to read books with ADHD guide: https://reado.fun/blog/how-to-read-books-with-adhd/

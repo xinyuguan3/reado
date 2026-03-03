@@ -35,6 +35,7 @@ const experienceScreenDir = path.join(appDir, "assets", "experiences");
 const bookCoverSourceDir = path.join(rootDir, "book_covers");
 const remoteImageSourceDir = path.join(rootDir, "assets", "remote-images");
 const studioPagesSourceDir = path.join(rootDir, "scripts", "studio-pages");
+const seoPagesSourceDir = path.join(rootDir, "scripts", "seo-pages");
 const bookCoverDir = path.join(appDir, "assets", "book-covers");
 const remoteImageDir = path.join(appDir, "assets", "remote-images");
 const sharedDir = path.join(appDir, "shared");
@@ -3241,8 +3242,7 @@ function buildAnalyticsDashboardHtml() {
 }
 
 function buildIndexHtml(pages) {
-  const home = pages.find((page) => page.slug === "gamified-learning-hub-dashboard-1");
-  const homeHref = home ? `/pages/${home.slug}.html` : `/pages/${pages[0].slug}.html`;
+  const homeHref = "/pages/playable-studio.html";
 
   return `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -3264,6 +3264,26 @@ function buildIndexHtml(pages) {
 <body>
   <p>正在进入 reado 应用…</p>
   <p><a href="${homeHref}">如果没有自动跳转，请点击这里。</a></p>
+</body>
+</html>`;
+}
+
+function buildLegacyRedirectHtml(targetHref, linkText = "正在跳转…") {
+  const safeHref = toText(targetHref, "/pages/playable-studio.html");
+  const safeLinkText = escapeHtml(toText(linkText, "正在跳转…"));
+  return `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>reado redirect</title>
+  <meta http-equiv="refresh" content="0; url=${safeHref}" />
+  <script>
+    window.location.replace(${JSON.stringify(safeHref)});
+  </script>
+</head>
+<body>
+  <p><a href="${safeHref}">${safeLinkText}</a></p>
 </body>
 </html>`;
 }
@@ -5165,10 +5185,13 @@ function buildModuleToBookMap(books) {
 
 async function writePages(pages, books) {
   for (const page of pages) {
-    let html = rewireSidebarLinks(page.html);
     if (page.slug === "gamified-learning-hub-dashboard-3") {
-      html = injectMarketplaceBooks(html, books);
+      const redirectHtml = buildLegacyRedirectHtml("/pages/playable-studio.html#my-library", "正在进入我的书架…");
+      await fs.writeFile(path.join(pagesDir, `${page.slug}.html`), redirectHtml, "utf8");
+      await fs.copyFile(page.imagePath, path.join(screenDir, `${page.slug}.png`));
+      continue;
     }
+    let html = rewireSidebarLinks(page.html);
     if (page.slug === "gamified-learning-hub-dashboard-1") {
       html = injectKnowledgeMapBooks(html, books);
     }
@@ -5306,6 +5329,43 @@ async function writeStudioCustomPages() {
   }
 }
 
+async function copySeoPagesRecursive(sourceDir, targetDir) {
+  const entries = await fs.readdir(sourceDir, { withFileTypes: true });
+  for (const entry of entries) {
+    const sourcePath = path.join(sourceDir, entry.name);
+    const targetPath = path.join(targetDir, entry.name);
+    if (entry.isDirectory()) {
+      await fs.mkdir(targetPath, { recursive: true });
+      await copySeoPagesRecursive(sourcePath, targetPath);
+      continue;
+    }
+    if (!entry.isFile()) continue;
+    const ext = path.extname(entry.name).toLowerCase();
+    if (ext === ".html") {
+      const html = await fs.readFile(sourcePath, "utf8");
+      await fs.writeFile(targetPath, sanitizeChinaNetworkDependencies(html), "utf8");
+      continue;
+    }
+    await fs.copyFile(sourcePath, targetPath);
+  }
+}
+
+async function writeSeoPages(pages) {
+  try {
+    await copySeoPagesRecursive(seoPagesSourceDir, appDir);
+    return;
+  } catch (error) {
+    if (!error || error.code !== "ENOENT") {
+      throw error;
+    }
+  }
+  await fs.writeFile(
+    path.join(appDir, "index.html"),
+    sanitizeChinaNetworkDependencies(buildIndexHtml(pages)),
+    "utf8"
+  );
+}
+
 async function writeRemoteImageAssets() {
   let entries;
   try {
@@ -5340,7 +5400,7 @@ async function main() {
   await writeAnalyticsDashboardPage();
   await writeBookPages(books);
   await writeExperiencePages(experiences, moduleToBook);
-  await fs.writeFile(path.join(appDir, "index.html"), sanitizeChinaNetworkDependencies(buildIndexHtml(pages)), "utf8");
+  await writeSeoPages(pages);
   console.log(
     `Built ${pages.length} app pages, ${books.length} books, ${experiences.length} module experiences, and ${customCovers.length} custom covers into ${path.relative(rootDir, appDir)}`
   );

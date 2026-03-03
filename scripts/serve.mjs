@@ -39,6 +39,8 @@ const port = Number(process.env.PORT || 4173);
 const sessionCookieName = "reado_sid";
 const MAX_DURATION_MS = 6 * 60 * 60 * 1000;
 const MAX_STRIPE_WEBHOOK_EVENT_LOG = 5000;
+const BILLING_STRIPE_SYNC_COOLDOWN_MS = 20 * 1000;
+const BILLING_ORPHAN_PENDING_CHARGE_REFUND_MS = 3 * 60 * 1000;
 const STRIPE_API_BASE = "https://api.stripe.com/v1";
 const stripeSecretKey = String(process.env.STRIPE_SECRET_KEY || "").trim();
 const stripeWebhookSecret = String(process.env.STRIPE_WEBHOOK_SECRET || "").trim();
@@ -190,7 +192,8 @@ const contentTypes = {
   ".webm": "video/webm",
   ".webp": "image/webp",
   ".woff": "font/woff",
-  ".woff2": "font/woff2"
+  ".woff2": "font/woff2",
+  ".xml": "application/xml; charset=utf-8"
 };
 
 function createDefaultState() {
@@ -1048,6 +1051,23 @@ function normalizeAnalyticsState(nextState) {
 
 function normalizeBillingRecord(sessionId, rawRecord) {
   const row = rawRecord && typeof rawRecord === "object" ? rawRecord : {};
+  const pendingRaw = row.pendingCreditCharges && typeof row.pendingCreditCharges === "object"
+    ? row.pendingCreditCharges
+    : {};
+  const pendingCreditCharges = {};
+  for (const [chargeId, charge] of Object.entries(pendingRaw)) {
+    if (typeof chargeId !== "string" || !chargeId.trim()) continue;
+    const amount = toInt(charge?.amount);
+    if (amount <= 0) continue;
+    pendingCreditCharges[chargeId.trim()] = {
+      id: chargeId.trim(),
+      amount,
+      reason: typeof charge?.reason === "string" ? charge.reason : "",
+      status: typeof charge?.status === "string" && charge.status.trim() ? charge.status.trim() : "reserved",
+      reservedAt: typeof charge?.reservedAt === "string" ? charge.reservedAt : "",
+      jobId: typeof charge?.jobId === "string" ? charge.jobId : ""
+    };
+  }
   return {
     sessionId,
     customerId: typeof row.customerId === "string" ? row.customerId : "",
@@ -1065,7 +1085,10 @@ function normalizeBillingRecord(sessionId, rawRecord) {
     creditsMonthlyBalance: toInt(row.creditsMonthlyBalance),
     creditsSpentTotal: toInt(row.creditsSpentTotal),
     creditsRefundedTotal: toInt(row.creditsRefundedTotal),
+    pendingCreditCharges,
     creditsUpdatedAt: typeof row.creditsUpdatedAt === "string" ? row.creditsUpdatedAt : "",
+    lastStripeSyncAt: typeof row.lastStripeSyncAt === "string" ? row.lastStripeSyncAt : "",
+    lastStripeSyncError: typeof row.lastStripeSyncError === "string" ? row.lastStripeSyncError : "",
     updatedAt: typeof row.updatedAt === "string" ? row.updatedAt : ""
   };
 }
@@ -1230,6 +1253,10 @@ function reconcileCreditsForRecord(record, nowMs = Date.now()) {
   record.creditsDailyResetAtMs = toInt(record.creditsDailyResetAtMs);
   record.creditsSpentTotal = toInt(record.creditsSpentTotal);
   record.creditsRefundedTotal = toInt(record.creditsRefundedTotal);
+  if (!record.pendingCreditCharges || typeof record.pendingCreditCharges !== "object") {
+    record.pendingCreditCharges = {};
+    changed = true;
+  }
 
   const planChanged = sanitizeStripeString(record.creditPlanId) !== plan.id;
   if (planChanged) {
@@ -1275,9 +1302,115 @@ function reconcileCreditsForRecord(record, nowMs = Date.now()) {
     changed = true;
   }
 
+  const pendingChanged = reconcilePendingCreditChargesForRecord(record, nowMs);
+  if (pendingChanged) {
+    changed = true;
+  }
+
   if (changed) {
     record.creditsUpdatedAt = nowIso();
     record.updatedAt = nowIso();
+  }
+  return changed;
+}
+
+function listPendingCreditCharges(record) {
+  if (!record || typeof record !== "object") return [];
+  const charges = record.pendingCreditCharges && typeof record.pendingCreditCharges === "object"
+    ? record.pendingCreditCharges
+    : {};
+  return Object.values(charges);
+}
+
+function getPendingCreditChargeTotal(record) {
+  return listPendingCreditCharges(record)
+    .filter((charge) => sanitizeStripeString(charge?.status).toLowerCase() === "reserved")
+    .reduce((sum, charge) => sum + toInt(charge?.amount), 0);
+}
+
+function upsertPendingCreditCharge(record, charge, options = {}) {
+  if (!record || typeof record !== "object") return false;
+  const chargeId = sanitizeStripeString(charge?.id);
+  const amount = toInt(charge?.amount);
+  if (!chargeId || amount <= 0) return false;
+  if (!record.pendingCreditCharges || typeof record.pendingCreditCharges !== "object") {
+    record.pendingCreditCharges = {};
+  }
+  const previous = record.pendingCreditCharges[chargeId] && typeof record.pendingCreditCharges[chargeId] === "object"
+    ? record.pendingCreditCharges[chargeId]
+    : {};
+  const next = {
+    id: chargeId,
+    amount,
+    reason: sanitizeStripeString(charge?.reason || previous.reason || options.reason),
+    status: "reserved",
+    reservedAt: sanitizeStripeString(previous.reservedAt || charge?.at) || nowIso(),
+    jobId: sanitizeStripeString(options.jobId || previous.jobId)
+  };
+  const before = JSON.stringify(previous);
+  const after = JSON.stringify(next);
+  if (before === after) return false;
+  record.pendingCreditCharges[chargeId] = next;
+  record.creditsUpdatedAt = nowIso();
+  record.updatedAt = nowIso();
+  return true;
+}
+
+function attachPendingChargeJob(record, chargeId, jobId) {
+  if (!record || typeof record !== "object") return false;
+  const normalizedChargeId = sanitizeStripeString(chargeId);
+  const normalizedJobId = sanitizeStripeString(jobId);
+  if (!normalizedChargeId || !normalizedJobId) return false;
+  if (!record.pendingCreditCharges || typeof record.pendingCreditCharges !== "object") return false;
+  const row = record.pendingCreditCharges[normalizedChargeId];
+  if (!row || typeof row !== "object") return false;
+  if (sanitizeStripeString(row.jobId) === normalizedJobId) return false;
+  row.jobId = normalizedJobId;
+  row.reservedAt = sanitizeStripeString(row.reservedAt) || nowIso();
+  record.creditsUpdatedAt = nowIso();
+  record.updatedAt = nowIso();
+  return true;
+}
+
+function clearPendingCreditCharge(record, chargeId) {
+  if (!record || typeof record !== "object") return false;
+  const normalizedChargeId = sanitizeStripeString(chargeId);
+  if (!normalizedChargeId) return false;
+  if (!record.pendingCreditCharges || typeof record.pendingCreditCharges !== "object") return false;
+  if (!record.pendingCreditCharges[normalizedChargeId]) return false;
+  delete record.pendingCreditCharges[normalizedChargeId];
+  record.creditsUpdatedAt = nowIso();
+  record.updatedAt = nowIso();
+  return true;
+}
+
+function reconcilePendingCreditChargesForRecord(record, nowMs = Date.now()) {
+  if (!record || typeof record !== "object") return false;
+  const pending = record.pendingCreditCharges && typeof record.pendingCreditCharges === "object"
+    ? record.pendingCreditCharges
+    : {};
+  let changed = false;
+  for (const [chargeId, charge] of Object.entries(pending)) {
+    const normalizedChargeId = sanitizeStripeString(chargeId);
+    const amount = toInt(charge?.amount);
+    const status = sanitizeStripeString(charge?.status).toLowerCase() || "reserved";
+    if (!normalizedChargeId || amount <= 0 || status === "captured" || status === "refunded" || status !== "reserved") {
+      delete pending[chargeId];
+      changed = true;
+      continue;
+    }
+    const reservedAtMs = Date.parse(sanitizeStripeString(charge?.reservedAt) || "");
+    const ageMs = Number.isFinite(reservedAtMs) ? Math.max(0, nowMs - reservedAtMs) : Number.POSITIVE_INFINITY;
+    const jobId = sanitizeStripeString(charge?.jobId);
+    const job = jobId ? studioJobs.get(jobId) : null;
+    const jobTerminal = Boolean(job && (job.status === "done" || job.status === "error"));
+    const hasLiveJob = Boolean(job && !jobTerminal);
+    if (!hasLiveJob && ageMs >= BILLING_ORPHAN_PENDING_CHARGE_REFUND_MS) {
+      record.creditsMonthlyBalance = toInt(record.creditsMonthlyBalance) + amount;
+      record.creditsRefundedTotal = toInt(record.creditsRefundedTotal) + amount;
+      delete pending[chargeId];
+      changed = true;
+    }
   }
   return changed;
 }
@@ -1298,6 +1431,7 @@ function toPublicCreditSnapshot(record) {
     monthlyBalance: toInt(record?.creditsMonthlyBalance),
     monthlyGrantAmount: toInt(plan.monthlyGrant),
     monthKey: sanitizeStripeString(record?.creditsMonthKey),
+    pendingReserved: getPendingCreditChargeTotal(record),
     spentTotal: toInt(record?.creditsSpentTotal),
     refundedTotal: toInt(record?.creditsRefundedTotal),
     updatedAt: sanitizeStripeString(record?.creditsUpdatedAt)
@@ -1354,6 +1488,7 @@ function refundCreditsToRecord(record, charge, reason = "refund") {
   reconcileCreditsForRecord(record);
   record.creditsMonthlyBalance = toInt(record.creditsMonthlyBalance) + amount;
   record.creditsRefundedTotal = toInt(record.creditsRefundedTotal) + amount;
+  clearPendingCreditCharge(record, charge?.id);
   record.creditsUpdatedAt = nowIso();
   record.updatedAt = nowIso();
   return true;
@@ -2700,6 +2835,156 @@ async function stripeApiRequest(method, apiPath, formFields = {}) {
   return payload;
 }
 
+function extractStripePriceIdFromSubscription(subscription) {
+  const firstItem = Array.isArray(subscription?.items?.data) ? subscription.items.data[0] : null;
+  return sanitizeStripeString(firstItem?.price?.id || firstItem?.plan?.id);
+}
+
+function selectBestStripeSubscription(subscriptions) {
+  const rows = Array.isArray(subscriptions) ? subscriptions : [];
+  if (!rows.length) return null;
+  const sorted = rows
+    .filter((row) => row && typeof row === "object")
+    .sort((a, b) => toInt(b?.created) - toInt(a?.created));
+  if (!sorted.length) return null;
+  const active = sorted.find((row) => isBillingSubscriptionActiveStatus(row?.status));
+  return active || sorted[0] || null;
+}
+
+async function fetchStripeSubscriptionById(subscriptionId) {
+  const safeId = sanitizeStripeString(subscriptionId);
+  if (!safeId) return null;
+  const query = new URLSearchParams();
+  query.append("expand[]", "items.data.price");
+  return await stripeApiRequest("GET", `/subscriptions/${encodeURIComponent(safeId)}?${query.toString()}`);
+}
+
+async function fetchStripeCheckoutSessionById(checkoutSessionId) {
+  const safeId = sanitizeStripeString(checkoutSessionId);
+  if (!safeId) return null;
+  const query = new URLSearchParams();
+  query.append("expand[]", "subscription");
+  query.append("expand[]", "line_items.data.price");
+  return await stripeApiRequest("GET", `/checkout/sessions/${encodeURIComponent(safeId)}?${query.toString()}`);
+}
+
+async function fetchStripeSubscriptionByCustomer(customerId) {
+  const safeId = sanitizeStripeString(customerId);
+  if (!safeId) return null;
+  const query = new URLSearchParams({
+    customer: safeId,
+    status: "all",
+    limit: "5"
+  });
+  const listed = await stripeApiRequest("GET", `/subscriptions?${query.toString()}`);
+  return selectBestStripeSubscription(listed?.data);
+}
+
+function canAttemptStripeBillingSync(record, force = false, nowMs = Date.now()) {
+  if (!stripeSecretKey) return false;
+  if (force) return true;
+  const hasStripeReference = Boolean(
+    sanitizeStripeString(record?.customerId)
+    || sanitizeStripeString(record?.subscriptionId)
+    || sanitizeStripeString(record?.lastCheckoutSessionId)
+  );
+  if (!hasStripeReference) return false;
+  if (isBillingSubscriptionActiveStatus(record?.status)) {
+    const periodEndSec = toInt(record?.currentPeriodEnd);
+    if (periodEndSec > 0 && nowMs >= (periodEndSec * 1000 + 10 * 60 * 1000)) {
+      return true;
+    }
+    return false;
+  }
+  const lastSyncMs = Date.parse(sanitizeStripeString(record?.lastStripeSyncAt) || "");
+  if (Number.isFinite(lastSyncMs) && nowMs - lastSyncMs < BILLING_STRIPE_SYNC_COOLDOWN_MS) {
+    return false;
+  }
+  return true;
+}
+
+async function syncBillingRecordFromStripe(sessionId, options = {}) {
+  if (!isValidSessionId(sessionId) || !stripeSecretKey) {
+    return { ok: false, skipped: true, reason: "not_configured" };
+  }
+  const force = options?.force === true;
+  const record = getOrCreateBillingRecord(sessionId);
+  if (!canAttemptStripeBillingSync(record, force)) {
+    return { ok: true, skipped: true, reason: "not_needed" };
+  }
+  try {
+    let customerId = sanitizeStripeString(record.customerId);
+    let subscriptionId = sanitizeStripeString(record.subscriptionId);
+    let subscription = null;
+
+    if (subscriptionId) {
+      subscription = await fetchStripeSubscriptionById(subscriptionId).catch(() => null);
+    }
+    if (!subscription && sanitizeStripeString(record.lastCheckoutSessionId)) {
+      const checkout = await fetchStripeCheckoutSessionById(record.lastCheckoutSessionId).catch(() => null);
+      if (checkout && typeof checkout === "object") {
+        customerId = sanitizeStripeString(checkout.customer) || customerId;
+        if (checkout.subscription && typeof checkout.subscription === "object") {
+          subscription = checkout.subscription;
+        } else {
+          subscriptionId = sanitizeStripeString(checkout.subscription) || subscriptionId;
+        }
+      }
+    }
+    if (!subscription && subscriptionId) {
+      subscription = await fetchStripeSubscriptionById(subscriptionId).catch(() => null);
+    }
+    if (!subscription && customerId) {
+      subscription = await fetchStripeSubscriptionByCustomer(customerId).catch(() => null);
+    }
+
+    let touched = false;
+    if (subscription && typeof subscription === "object") {
+      customerId = sanitizeStripeString(subscription.customer) || customerId;
+      subscriptionId = sanitizeStripeString(subscription.id) || subscriptionId;
+      touched = applyBillingUpdateForSession({
+        sessionId,
+        customerId,
+        subscriptionId,
+        status: sanitizeStripeString(subscription.status),
+        priceId: extractStripePriceIdFromSubscription(subscription),
+        currentPeriodEnd: toInt(subscription.current_period_end),
+        cancelAtPeriodEnd: Boolean(subscription.cancel_at_period_end)
+      }) || touched;
+    } else if (customerId || subscriptionId) {
+      touched = applyBillingUpdateForSession({
+        sessionId,
+        customerId,
+        subscriptionId
+      }) || touched;
+    }
+
+    record.lastStripeSyncAt = nowIso();
+    record.lastStripeSyncError = "";
+    record.updatedAt = nowIso();
+    const reconciled = reconcileCreditsForRecord(record);
+    if (touched || reconciled || force) {
+      schedulePersist();
+    }
+    return {
+      ok: true,
+      skipped: false,
+      touched,
+      reconciled
+    };
+  } catch (error) {
+    record.lastStripeSyncAt = nowIso();
+    record.lastStripeSyncError = cleanText(error?.message, "stripe_sync_failed");
+    record.updatedAt = nowIso();
+    schedulePersist();
+    return {
+      ok: false,
+      skipped: false,
+      error: record.lastStripeSyncError
+    };
+  }
+}
+
 async function parseRawBody(req, maxBytes = 2 * 1024 * 1024) {
   const chunks = [];
   let size = 0;
@@ -3115,6 +3400,12 @@ function createStudioJob(sessionId, payload, options = {}) {
     updatedAt: nowIso(),
     subscribers: new Set()
   };
+  if (job.creditCharge?.id) {
+    const record = getOrCreateBillingRecord(sessionId);
+    if (attachPendingChargeJob(record, job.creditCharge.id, job.id)) {
+      schedulePersist();
+    }
+  }
   studioJobs.set(job.id, job);
   return job;
 }
@@ -3196,12 +3487,17 @@ function updateStudioJob(job, patch = {}) {
   broadcastStudioJob(job);
 }
 
-function chargeCreditsForStudioGeneration(sessionId, payload) {
+function chargeCreditsForStudioGeneration(sessionId, payload, options = {}) {
   const record = getOrCreateBillingRecord(sessionId);
   const reconciled = reconcileCreditsForRecord(record);
   const estimatedCost = estimateGenerationCreditCostFromPayload(payload);
   const spend = spendCreditsFromRecord(record, estimatedCost, "studio_generation");
-  if (reconciled || spend.ok) {
+  const trackPending = options?.trackPending !== false;
+  let pendingChanged = false;
+  if (trackPending && spend.ok && toInt(spend?.charge?.amount) > 0) {
+    pendingChanged = upsertPendingCreditCharge(record, spend.charge);
+  }
+  if (reconciled || spend.ok || pendingChanged) {
     schedulePersist();
   }
   if (!spend.ok) {
@@ -3245,6 +3541,7 @@ function finalizeStudioJobCharge(sessionId, job) {
   if (!charge || charge.status === "captured" || charge.status === "refunded") return null;
   const record = getOrCreateBillingRecord(sessionId);
   reconcileCreditsForRecord(record);
+  clearPendingCreditCharge(record, charge.id);
   const nextCharge = {
     ...charge,
     status: "captured",
@@ -4628,7 +4925,7 @@ async function handleStudioApi(req, res, url, session) {
         writeJson(res, 400, { ok: false, error: body.__error });
         return true;
       }
-      const charged = chargeCreditsForStudioGeneration(session.id, body);
+      const charged = chargeCreditsForStudioGeneration(session.id, body, { trackPending: false });
       if (!charged.ok) {
         writeJson(res, 402, {
           ok: false,
@@ -4645,7 +4942,8 @@ async function handleStudioApi(req, res, url, session) {
         await loadCatalog(true);
         const record = getOrCreateBillingRecord(session.id);
         const reconcileChanged = reconcileCreditsForRecord(record);
-        if (reconcileChanged) schedulePersist();
+        const pendingCleared = clearPendingCreditCharge(record, charged?.charge?.id);
+        if (reconcileChanged || pendingCleared) schedulePersist();
         writeJson(res, 200, {
           ok: true,
           work,
@@ -6608,16 +6906,26 @@ async function handleApi(req, res, url, providedSession = null) {
   }
 
   if (method === "GET" && pathname === "/api/billing/subscription") {
+    const forceRefresh = url.searchParams.get("refresh") === "1";
+    const syncResult = await syncBillingRecordFromStripe(session.id, { force: forceRefresh });
     const record = getOrCreateBillingRecord(session.id);
     writeJson(res, 200, {
       ok: true,
       session: { id: session.id },
-      billing: toPublicBillingSnapshot(record)
+      billing: toPublicBillingSnapshot(record),
+      sync: {
+        attempted: !syncResult?.skipped,
+        ok: syncResult?.skipped ? true : syncResult?.ok !== false,
+        reason: typeof syncResult?.reason === "string" ? syncResult.reason : "",
+        error: typeof syncResult?.error === "string" ? syncResult.error : ""
+      }
     });
     return true;
   }
 
   if (method === "GET" && pathname === "/api/billing/credits") {
+    const forceRefresh = url.searchParams.get("refresh") === "1";
+    await syncBillingRecordFromStripe(session.id, { force: forceRefresh });
     const record = getOrCreateBillingRecord(session.id);
     const changed = reconcileCreditsForRecord(record);
     if (changed) {
@@ -6658,6 +6966,26 @@ async function handleApi(req, res, url, providedSession = null) {
         defaultPriceId: stripeDefaultCheckoutPriceId,
         prices: stripeCheckoutPrices,
         configStatus: stripeCheckoutConfigStatus
+      },
+      creditPlans: {
+        free: {
+          dailyRefresh: creditsDailyFree,
+          monthlyGrant: creditsMonthlyFree
+        },
+        small: {
+          dailyRefresh: creditsDailySmall,
+          monthlyGrant: creditsMonthlySmall
+        },
+        large: {
+          dailyRefresh: creditsDailyLarge,
+          monthlyGrant: creditsMonthlyLarge
+        },
+        initialGrant: creditsInitialGrant,
+        mapping: {
+          starter: "small",
+          trial: "small",
+          pro: "large"
+        }
       },
       pricingTable: {
         publishableKey: stripePricingTableReady() ? stripePublishableKey : "",
