@@ -196,6 +196,7 @@ density_score = 0.35*concept_density
 3. `GET /api/studio/works/:id/pipeline`（读取拆解诊断、知识块列表、module map、最近再生记录）
 4. `POST /api/studio/works/:id/regenerate`（按失败模块或全量重建，不依赖原始 PDF）
 5. `POST /api/studio/books/:bookId/regenerate`（按书籍 id 触发再生，自动选择当前会话可编辑的最新 work）
+6. `PATCH /api/studio/works/:id/pipeline/blocks`（手动编辑知识块：`merge|split|update|reorder|replace`，可选 `regenerate=true`）
 3. Body（JSON）支持：
    - `bookFile`: `{ name, type, contentBase64 }`
    - 或 `file`: `{ name, type, contentBase64 }`

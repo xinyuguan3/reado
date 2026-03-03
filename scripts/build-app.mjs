@@ -250,6 +250,13 @@ function injectAfterBodyOpen(html, snippet) {
   return `${snippet}\n${html}`;
 }
 
+function injectBeforeHeadClose(html, snippet) {
+  if (/<\/head>/i.test(html)) {
+    return html.replace(/<\/head>/i, `${snippet}\n</head>`);
+  }
+  return injectAfterBodyOpen(html, snippet);
+}
+
 function toNonBlockingStylesheetTag(tag) {
   if (!/\brel\s*=\s*["']stylesheet["']/i.test(tag)) return tag;
   if (/\bmedia\s*=/i.test(tag) || /\bonload\s*=/i.test(tag)) return tag;
@@ -635,13 +642,55 @@ function getPageKeyBySlug(slug) {
 }
 
 function injectAppShell(html, pageKey) {
-  if (html.includes("<reado-app-shell")) {
-    return html;
+  const preloadSnippet = `<style id="reado-shell-preload-style">
+html.reado-shell-preload body:not(.reado-shell-applied) {
+  padding-top: 80px !important;
+}
+@media (min-width: 1024px) {
+  html.reado-shell-preload:not(.reado-shell-preload-learning) body:not(.reado-shell-applied) {
+    padding-left: 256px !important;
   }
-  const snippet = `<script src="/shared/book-catalog.js?v=${shellAssetVersion}"></script>
+}
+@media (min-width: 1200px) {
+  html.reado-shell-preload:not(.reado-shell-preload-learning) body:not(.reado-shell-applied) {
+    padding-right: clamp(280px, 24vw, 320px) !important;
+  }
+}
+html.reado-shell-preload body:not(.reado-shell-applied) > header:first-of-type,
+html.reado-shell-preload body:not(.reado-shell-applied) > nav:first-of-type,
+html.reado-shell-preload body:not(.reado-shell-applied) > aside:first-of-type,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex > nav,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex > aside,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex-1 > nav,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex-1 > aside,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex > .flex-1 > nav,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex > .flex-1 > aside {
+  display: none !important;
+}
+</style>
+<script id="reado-shell-preload-script">
+(() => {
+  const root = document.documentElement;
+  root.classList.add("reado-shell-preload");
+  const path = window.location.pathname || "";
+  if (path.startsWith("/experiences/") || path.startsWith("/books/")) {
+    root.classList.add("reado-shell-preload-learning");
+  }
+})();
+</script>`;
+
+  const shellSnippet = `<script src="/shared/book-catalog.js?v=${shellAssetVersion}"></script>
 <script type="module" src="/shared/shell.js?v=${shellAssetVersion}"></script>
 <reado-app-shell data-page="${pageKey}"></reado-app-shell>`;
-  return injectAfterBodyOpen(html, snippet);
+
+  let next = html;
+  if (!next.includes("id=\"reado-shell-preload-script\"")) {
+    next = injectBeforeHeadClose(next, preloadSnippet);
+  }
+  if (!next.includes("<reado-app-shell")) {
+    next = injectAfterBodyOpen(next, shellSnippet);
+  }
+  return next;
 }
 
 function injectCnAds(html) {

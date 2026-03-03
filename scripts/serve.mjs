@@ -326,6 +326,292 @@ function estimateRankScore(level, xp, lifetimeXp) {
   return Math.max(fromLevel, fromLifetime);
 }
 
+function getXpForNextLevel(level) {
+  return Math.max(1000, toInt(level) * 600);
+}
+
+function normalizeLevelAndXp(level, xp) {
+  let nextLevel = Math.max(1, toInt(level) || 1);
+  let nextXp = Math.max(0, toInt(xp));
+  let guard = 0;
+  while (nextXp >= getXpForNextLevel(nextLevel) && guard < 1000) {
+    nextXp -= getXpForNextLevel(nextLevel);
+    nextLevel += 1;
+    guard += 1;
+  }
+  return { level: nextLevel, xp: nextXp };
+}
+
+function sanitizeTaskId(value) {
+  const raw = typeof value === "string" ? value.trim() : "";
+  if (!raw) return "";
+  if (!/^[a-zA-Z0-9:_-]{2,96}$/.test(raw)) return "";
+  return raw;
+}
+
+function sanitizeTaskTab(value) {
+  const raw = typeof value === "string" ? value.trim().toLowerCase() : "";
+  if (raw === "daily" || raw === "weekly" || raw === "achievement") return raw;
+  return "achievement";
+}
+
+function sanitizeTaskClaimId(value) {
+  const raw = typeof value === "string" ? value.trim() : "";
+  if (!raw) return "";
+  if (!/^[a-zA-Z0-9:_-]{2,140}$/.test(raw)) return "";
+  return raw;
+}
+
+function resetAdjustedDate(baseDate = new Date(), resetHour = 4) {
+  const date = new Date(baseDate);
+  if (!Number.isFinite(date.getTime())) return new Date();
+  if (date.getHours() < resetHour) {
+    date.setDate(date.getDate() - 1);
+  }
+  return date;
+}
+
+function toDateKey(baseDate = new Date()) {
+  const date = new Date(baseDate);
+  if (!Number.isFinite(date.getTime())) return "";
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+function getDailyPeriodKey(baseDate = new Date()) {
+  return toDateKey(resetAdjustedDate(baseDate, 4));
+}
+
+function getWeeklyPeriodKey(baseDate = new Date()) {
+  const date = resetAdjustedDate(baseDate, 4);
+  date.setHours(0, 0, 0, 0);
+  const weekday = (date.getDay() + 6) % 7;
+  date.setDate(date.getDate() - weekday + 3);
+  const year = date.getFullYear();
+  const firstThursday = new Date(year, 0, 4);
+  firstThursday.setHours(0, 0, 0, 0);
+  const firstWeekday = (firstThursday.getDay() + 6) % 7;
+  firstThursday.setDate(firstThursday.getDate() - firstWeekday + 3);
+  const week = 1 + Math.round((date.getTime() - firstThursday.getTime()) / 604800000);
+  return `${year}-W${String(Math.max(1, week)).padStart(2, "0")}`;
+}
+
+function getWeeklyWindowStartMs(baseDate = new Date()) {
+  const date = resetAdjustedDate(baseDate, 4);
+  date.setHours(0, 0, 0, 0);
+  const weekday = (date.getDay() + 6) % 7;
+  date.setDate(date.getDate() - weekday);
+  date.setHours(4, 0, 0, 0);
+  return date.getTime();
+}
+
+function buildTaskClaimId(taskId, tab, periodKey) {
+  const cleanTaskId = sanitizeTaskId(taskId);
+  const cleanTab = sanitizeTaskTab(tab);
+  if (!cleanTaskId) return "";
+  if (cleanTab === "achievement") return `${cleanTaskId}::all`;
+  const cleanPeriodKey = typeof periodKey === "string" ? periodKey.trim() : "";
+  if (!cleanPeriodKey) return "";
+  return `${cleanTaskId}::${cleanPeriodKey}`;
+}
+
+const TASK_LIBRARY = {
+  daily: [
+    {
+      id: "daily-start-learning",
+      icon: "auto_stories",
+      title: "开启一次学习流程",
+      desc: "进入任意书籍模块并开始体验。",
+      metric: "startedBooks",
+      goal: 1,
+      rewardGems: 120,
+      rewardXp: 60,
+      actionLabel: "去学习",
+      actionHref: "/pages/gamified-learning-hub-dashboard-1.html"
+    },
+    {
+      id: "daily-unlock-book",
+      icon: "shopping_bag",
+      title: "解锁 1 本书",
+      desc: "前往交易中心购买任意一本书籍模块。",
+      metric: "unlockedBooks",
+      goal: 1,
+      rewardGems: 180,
+      rewardXp: 90,
+      actionLabel: "去交易中心",
+      actionHref: "/pages/gamified-learning-hub-dashboard-3.html"
+    },
+    {
+      id: "daily-finish-book",
+      icon: "task_alt",
+      title: "完成 1 本书",
+      desc: "完整通关一本书的全部模块并激活徽章。",
+      metric: "completedBooks",
+      goal: 1,
+      rewardGems: 260,
+      rewardXp: 140,
+      actionLabel: "去完成",
+      actionHref: "/pages/gamified-learning-hub-dashboard-2.html"
+    }
+  ],
+  weekly: [
+    {
+      id: "weekly-complete-two-books",
+      icon: "menu_book",
+      title: "本周通关 2 本书",
+      desc: "完成跨主题学习，积累稳定输出能力。",
+      metric: "completedBooks",
+      goal: 2,
+      rewardGems: 900,
+      rewardXp: 420,
+      actionLabel: "继续推进",
+      actionHref: "/pages/gamified-learning-hub-dashboard-1.html"
+    },
+    {
+      id: "weekly-unlock-three-books",
+      icon: "inventory_2",
+      title: "本周解锁 3 本书",
+      desc: "扩充你的学习库，准备更高强度挑战。",
+      metric: "unlockedBooks",
+      goal: 3,
+      rewardGems: 780,
+      rewardXp: 360,
+      actionLabel: "去交易中心",
+      actionHref: "/pages/gamified-learning-hub-dashboard-3.html"
+    },
+    {
+      id: "weekly-two-categories",
+      icon: "hub",
+      title: "本周覆盖 2 个领域",
+      desc: "跨领域学习可显著提升迁移能力。",
+      metric: "categoriesCompleted",
+      goal: 2,
+      rewardGems: 820,
+      rewardXp: 380,
+      actionLabel: "去个人书库",
+      actionHref: "/pages/gamified-learning-hub-dashboard-1.html"
+    },
+    {
+      id: "weekly-career-book",
+      icon: "trending_up",
+      title: "本周完成 1 本事业/财富书",
+      desc: "优先提升可直接转化的实战能力。",
+      metric: "completedCareerBooks",
+      goal: 1,
+      rewardGems: 560,
+      rewardXp: 260,
+      actionLabel: "去挑战",
+      actionHref: "/pages/gamified-learning-hub-dashboard-1.html"
+    }
+  ],
+  achievement: [
+    {
+      id: "achievement-unlock-all-books",
+      icon: "library_books",
+      title: "全书库解锁",
+      desc: "解锁当前版本所有书籍模块。",
+      metric: "unlockedBooks",
+      dynamicGoal: "bookCount",
+      goal: 1,
+      rewardGems: 2000,
+      rewardXp: 1000,
+      actionLabel: "去解锁",
+      actionHref: "/pages/gamified-learning-hub-dashboard-3.html"
+    },
+    {
+      id: "achievement-complete-all-books",
+      icon: "workspace_premium",
+      title: "全书库通关",
+      desc: "完成当前版本所有书籍并点亮全部徽章。",
+      metric: "completedBooks",
+      dynamicGoal: "bookCount",
+      goal: 1,
+      rewardGems: 3000,
+      rewardXp: 1500,
+      actionLabel: "去完成",
+      actionHref: "/pages/gamified-learning-hub-dashboard-2.html"
+    },
+    {
+      id: "achievement-four-categories",
+      icon: "public",
+      title: "四大领域探索者",
+      desc: "在四个生活战场中都完成至少一本书。",
+      metric: "categoriesCompleted",
+      goal: 4,
+      rewardGems: 2400,
+      rewardXp: 1200,
+      actionLabel: "去探索",
+      actionHref: "/pages/gamified-learning-hub-dashboard-1.html"
+    },
+    {
+      id: "achievement-20-modules",
+      icon: "insights",
+      title: "20 模块深度学习者",
+      desc: "累计完成 20 个模块，建立系统知识网络。",
+      metric: "totalCompletedModules",
+      goal: 20,
+      rewardGems: 1600,
+      rewardXp: 900,
+      actionLabel: "继续学习",
+      actionHref: "/pages/gamified-learning-hub-dashboard-1.html"
+    }
+  ]
+};
+
+function normalizeTaskClaimRecord(raw) {
+  const row = raw && typeof raw === "object" ? raw : {};
+  return {
+    claimId: sanitizeTaskClaimId(row.claimId),
+    taskId: sanitizeTaskId(row.taskId),
+    tab: sanitizeTaskTab(row.tab),
+    periodKey: typeof row.periodKey === "string" ? row.periodKey.slice(0, 32) : "",
+    claimedAt: typeof row.claimedAt === "string" ? row.claimedAt : "",
+    rewardXp: toInt(row.rewardXp),
+    rewardGems: toInt(row.rewardGems)
+  };
+}
+
+function normalizePlayerProgress(raw) {
+  const row = raw && typeof raw === "object" ? raw : {};
+  return {
+    startedBooks: toInt(row.startedBooks),
+    unlockedBooks: toInt(row.unlockedBooks),
+    completedBooks: toInt(row.completedBooks),
+    categoriesUnlocked: toInt(row.categoriesUnlocked),
+    categoriesCompleted: toInt(row.categoriesCompleted),
+    completedCareerBooks: toInt(row.completedCareerBooks),
+    totalCompletedModules: toInt(row.totalCompletedModules),
+    updatedAt: typeof row.updatedAt === "string" ? row.updatedAt : ""
+  };
+}
+
+function normalizeRewardLogItem(raw) {
+  const row = raw && typeof raw === "object" ? raw : {};
+  return {
+    at: typeof row.at === "string" ? row.at : "",
+    xp: toInt(row.xp),
+    gems: toInt(row.gems),
+    reason: typeof row.reason === "string" ? row.reason.slice(0, 120) : ""
+  };
+}
+
+function getTaskTotalBookCount() {
+  return Math.max(1, bookToModuleSlugs.size || 0);
+}
+
+function readProgressMetric(progress, metric) {
+  if (metric === "startedBooks") return toInt(progress.startedBooks);
+  if (metric === "unlockedBooks") return toInt(progress.unlockedBooks);
+  if (metric === "completedBooks") return toInt(progress.completedBooks);
+  if (metric === "categoriesUnlocked") return toInt(progress.categoriesUnlocked);
+  if (metric === "categoriesCompleted") return toInt(progress.categoriesCompleted);
+  if (metric === "completedCareerBooks") return toInt(progress.completedCareerBooks);
+  if (metric === "totalCompletedModules") return toInt(progress.totalCompletedModules);
+  return 0;
+}
+
 function normalizeTaskRecord(raw) {
   const row = raw && typeof raw === "object" ? raw : {};
   return {
@@ -335,25 +621,217 @@ function normalizeTaskRecord(raw) {
   };
 }
 
+function mergePlayerProgress(currentProgress, patchProgress, updatedAt = "") {
+  const base = normalizePlayerProgress(currentProgress);
+  const patch = patchProgress && typeof patchProgress === "object" ? patchProgress : null;
+  if (!patch) return base;
+  const next = { ...base };
+  let changed = false;
+  const keys = [
+    "startedBooks",
+    "unlockedBooks",
+    "completedBooks",
+    "categoriesUnlocked",
+    "categoriesCompleted",
+    "completedCareerBooks",
+    "totalCompletedModules"
+  ];
+  for (const key of keys) {
+    if (!Object.prototype.hasOwnProperty.call(patch, key)) continue;
+    const value = toInt(patch[key]);
+    if (value !== next[key]) {
+      next[key] = value;
+      changed = true;
+    }
+  }
+  if (changed) {
+    next.updatedAt = updatedAt || nowIso();
+  }
+  return next;
+}
+
+function appendRewardLog(row, reward, reason = "", at = nowIso()) {
+  const xp = toInt(reward?.xp);
+  const gems = toInt(reward?.gems);
+  if (!xp && !gems) return;
+  const log = Array.isArray(row.rewardLog) ? row.rewardLog : [];
+  log.push({
+    at: typeof at === "string" ? at : nowIso(),
+    xp,
+    gems,
+    reason: typeof reason === "string" ? reason.slice(0, 120) : ""
+  });
+  row.rewardLog = log.slice(-2000);
+}
+
+function applyRewardToPlayer(row, reward, reason = "", at = nowIso()) {
+  const gainXp = toInt(reward?.xp);
+  const gainGems = toInt(reward?.gems);
+  const beforeLevel = Math.max(1, toInt(row.level) || 1);
+  row.gems = Math.max(0, toInt(row.gems) + gainGems);
+  const nextProgress = normalizeLevelAndXp(beforeLevel, toInt(row.xp) + gainXp);
+  row.level = nextProgress.level;
+  row.xp = nextProgress.xp;
+  row.lifetimeXp = Math.max(0, toInt(row.lifetimeXp) + gainXp);
+  row.lifetimeGems = Math.max(0, toInt(row.lifetimeGems) + gainGems);
+  appendRewardLog(row, { xp: gainXp, gems: gainGems }, reason, at);
+  row.rankScore = estimateRankScore(row.level, row.xp, row.lifetimeXp);
+  return {
+    xp: gainXp,
+    gems: gainGems,
+    levelUps: Math.max(0, row.level - beforeLevel)
+  };
+}
+
+function computePlayerWeeklyXp(row, baseDate = new Date()) {
+  const log = Array.isArray(row?.rewardLog) ? row.rewardLog : [];
+  if (!log.length) return 0;
+  const startMs = getWeeklyWindowStartMs(baseDate);
+  let totalXp = 0;
+  for (const event of log) {
+    const ts = event?.at ? Date.parse(event.at) : NaN;
+    if (!Number.isFinite(ts) || ts < startMs) continue;
+    totalXp += toInt(event?.xp);
+  }
+  return Math.max(0, totalXp);
+}
+
+function buildTaskBoard(player, options = {}) {
+  const nowDate = options.nowDate instanceof Date ? options.nowDate : new Date();
+  const totalBooks = Math.max(1, toInt(options.totalBooks) || getTaskTotalBookCount());
+  const progress = normalizePlayerProgress(player?.progress);
+  const claimMap = player?.taskClaims && typeof player.taskClaims === "object" ? player.taskClaims : {};
+  const tabs = { daily: [], weekly: [], achievement: [] };
+  const tabKeys = ["daily", "weekly", "achievement"];
+  for (const tab of tabKeys) {
+    const periodKey = tab === "daily"
+      ? getDailyPeriodKey(nowDate)
+      : tab === "weekly"
+        ? getWeeklyPeriodKey(nowDate)
+        : "all";
+    const defs = Array.isArray(TASK_LIBRARY[tab]) ? TASK_LIBRARY[tab] : [];
+    tabs[tab] = defs.map((def) => {
+      const taskId = sanitizeTaskId(def.id);
+      const goal = def.dynamicGoal === "bookCount" ? totalBooks : Math.max(1, toInt(def.goal) || 1);
+      const rawProgress = readProgressMetric(progress, def.metric);
+      const progressValue = Math.min(rawProgress, goal);
+      const percent = Math.max(0, Math.min(100, Math.round((progressValue / Math.max(goal, 1)) * 100)));
+      const claimId = buildTaskClaimId(taskId, tab, periodKey);
+      const claimRow = claimMap[claimId];
+      const claimed = Boolean(claimRow && typeof claimRow.claimedAt === "string" && claimRow.claimedAt);
+      const complete = rawProgress >= goal;
+      return {
+        taskId,
+        tab,
+        icon: cleanText(def.icon, "assignment"),
+        title: cleanText(def.title, taskId),
+        desc: cleanText(def.desc),
+        goal,
+        progress: progressValue,
+        rawProgress,
+        percent,
+        rewardXp: toInt(def.rewardXp),
+        rewardGems: toInt(def.rewardGems),
+        actionLabel: cleanText(def.actionLabel, "去完成"),
+        actionHref: cleanText(def.actionHref, "/pages/gamified-learning-hub-dashboard-1.html"),
+        periodKey,
+        claimId,
+        claimed,
+        complete,
+        status: claimed ? "claimed" : (complete ? "claimable" : "active"),
+        lastClaimAt: typeof claimRow?.claimedAt === "string" ? claimRow.claimedAt : ""
+      };
+    });
+  }
+
+  const activeTasks = [...tabs.daily, ...tabs.weekly, ...tabs.achievement]
+    .filter((task) => !task.claimed)
+    .sort((a, b) => {
+      const claimableDiff = Number(b.complete) - Number(a.complete);
+      if (claimableDiff !== 0) return claimableDiff;
+      const percentDiff = b.percent - a.percent;
+      if (percentDiff !== 0) return percentDiff;
+      const tabRank = { daily: 0, weekly: 1, achievement: 2 };
+      const tabDiff = (tabRank[a.tab] ?? 9) - (tabRank[b.tab] ?? 9);
+      if (tabDiff !== 0) return tabDiff;
+      return a.taskId.localeCompare(b.taskId);
+    })
+    .slice(0, 3);
+
+  const weeklyTasks = tabs.weekly;
+  const weeklyCompleteCount = weeklyTasks.filter((task) => task.complete).length;
+  const weeklyClaimedCount = weeklyTasks.filter((task) => task.claimed).length;
+  const weeklyClaimableCount = weeklyTasks.filter((task) => task.status === "claimable").length;
+  const primaryWeekly = weeklyTasks[0] || null;
+  const weeklyChallenge = {
+    taskId: primaryWeekly?.taskId || "",
+    title: cleanText(primaryWeekly?.title, "本周挑战"),
+    desc: cleanText(primaryWeekly?.desc, "完成周任务获取额外奖励"),
+    progress: toInt(primaryWeekly?.progress),
+    goal: Math.max(1, toInt(primaryWeekly?.goal) || 1),
+    percent: Math.max(0, Math.min(100, toInt(primaryWeekly?.percent))),
+    completedTasks: weeklyCompleteCount,
+    claimedTasks: weeklyClaimedCount,
+    claimableTasks: weeklyClaimableCount,
+    totalTasks: weeklyTasks.length
+  };
+
+  return {
+    tabs,
+    activeTasks,
+    weeklyChallenge
+  };
+}
+
+function getTaskFromBoard(taskBoard, taskId, tab) {
+  const cleanTaskId = sanitizeTaskId(taskId);
+  if (!cleanTaskId || !taskBoard?.tabs) return null;
+  const rawTab = typeof tab === "string" ? tab.trim().toLowerCase() : "";
+  if (rawTab && Array.isArray(taskBoard.tabs[rawTab])) {
+    const exact = taskBoard.tabs[rawTab].find((task) => task.taskId === cleanTaskId);
+    if (exact) return exact;
+  }
+  for (const key of ["daily", "weekly", "achievement"]) {
+    const list = Array.isArray(taskBoard.tabs[key]) ? taskBoard.tabs[key] : [];
+    const found = list.find((task) => task.taskId === cleanTaskId);
+    if (found) return found;
+  }
+  return null;
+}
+
 function normalizePlayerRecord(userId, rawRecord) {
   const row = rawRecord && typeof rawRecord === "object" ? rawRecord : {};
   const tasksRaw = row.tasks && typeof row.tasks === "object" ? row.tasks : {};
   const tasks = {};
   for (const [taskId, taskRow] of Object.entries(tasksRaw)) {
-    const taskKey = typeof taskId === "string" ? taskId.trim() : "";
+    const taskKey = sanitizeTaskId(taskId);
     if (!taskKey) continue;
     tasks[taskKey] = normalizeTaskRecord(taskRow);
+  }
+  const taskClaimsRaw = row.taskClaims && typeof row.taskClaims === "object" ? row.taskClaims : {};
+  const taskClaims = {};
+  for (const [claimId, claimRow] of Object.entries(taskClaimsRaw)) {
+    const cleanClaimId = sanitizeTaskClaimId(claimId);
+    if (!cleanClaimId) continue;
+    const normalized = normalizeTaskClaimRecord({ ...(claimRow || {}), claimId: cleanClaimId });
+    if (!normalized.taskId) continue;
+    taskClaims[cleanClaimId] = normalized;
   }
   const email = sanitizeEmail(row.email);
   const displayName = sanitizeDisplayName(
     row.displayName,
     deriveDisplayNameFromEmail(email) || "Reader"
   );
-  const level = toInt(row.level) || 1;
-  const xp = toInt(row.xp);
+  const normalizedLevelXp = normalizeLevelAndXp(toInt(row.level) || 1, toInt(row.xp));
+  const level = normalizedLevelXp.level;
+  const xp = normalizedLevelXp.xp;
   const gems = toInt(row.gems);
   const lifetimeXp = toInt(row.lifetimeXp);
   const lifetimeGems = toInt(row.lifetimeGems);
+  const progress = normalizePlayerProgress(row.progress);
+  const rewardLog = Array.isArray(row.rewardLog)
+    ? row.rewardLog.map(normalizeRewardLogItem).filter((item) => item.at).slice(-2000)
+    : [];
   return {
     userId,
     email,
@@ -365,6 +843,9 @@ function normalizePlayerRecord(userId, rawRecord) {
     lifetimeGems,
     missionClaims: toInt(row.missionClaims),
     tasks,
+    taskClaims,
+    progress,
+    rewardLog,
     rankScore: Math.max(toInt(row.rankScore), estimateRankScore(level, xp, lifetimeXp)),
     createdAt: typeof row.createdAt === "string" ? row.createdAt : "",
     updatedAt: typeof row.updatedAt === "string" ? row.updatedAt : "",
@@ -409,11 +890,11 @@ function getOrCreatePlayer(userId) {
   return row;
 }
 
-function toPublicPlayerSnapshot(row) {
+function toPublicPlayerSnapshot(row, options = {}) {
   const level = toInt(row?.level) || 1;
   const xp = toInt(row?.xp);
   const lifetimeXp = toInt(row?.lifetimeXp);
-  return {
+  const snapshot = {
     userId: sanitizeUserId(row?.userId),
     displayName: sanitizeDisplayName(row?.displayName, "Reader"),
     email: sanitizeEmail(row?.email),
@@ -426,6 +907,10 @@ function toPublicPlayerSnapshot(row) {
     rankScore: Math.max(toInt(row?.rankScore), estimateRankScore(level, xp, lifetimeXp)),
     updatedAt: typeof row?.updatedAt === "string" ? row.updatedAt : ""
   };
+  if (options.includeWeeklyXp) {
+    snapshot.weeklyXp = computePlayerWeeklyXp(row, options.nowDate instanceof Date ? options.nowDate : new Date());
+  }
+  return snapshot;
 }
 
 function updatePlayerFromSync(payload = {}) {
@@ -464,10 +949,15 @@ function updatePlayerFromSync(payload = {}) {
       row.gems = Math.max(0, Math.floor(nextGems));
     }
   }
+  const normalizedLevelXp = normalizeLevelAndXp(row.level, row.xp);
+  row.level = normalizedLevelXp.level;
+  row.xp = normalizedLevelXp.xp;
+  row.progress = mergePlayerProgress(row.progress, payload.progress, now);
 
   const gain = payload.gain && typeof payload.gain === "object" ? payload.gain : {};
   row.lifetimeXp += toInt(gain.xp);
   row.lifetimeGems += toInt(gain.gems);
+  appendRewardLog(row, gain, payload.reason, now);
 
   const reason = typeof payload.reason === "string" ? payload.reason.trim() : "";
   if (reason.startsWith("mission-claim:")) {
@@ -488,14 +978,24 @@ function updatePlayerFromSync(payload = {}) {
   return row;
 }
 
-function buildLeaderboard(limit = 50) {
+function buildLeaderboard(limit = 50, options = {}) {
+  const scope = options.scope === "weekly" ? "weekly" : "all";
+  const nowDate = options.nowDate instanceof Date ? options.nowDate : new Date();
   const rows = Object.values(getPlayersState())
     .filter((row) => row && typeof row === "object")
     .map((row) => normalizePlayerRecord(sanitizeUserId(row.userId), row))
     .filter((row) => sanitizeUserId(row.userId))
     .sort((a, b) => {
-      const scoreDiff = toInt(b.rankScore) - toInt(a.rankScore);
+      const aWeeklyXp = computePlayerWeeklyXp(a, nowDate);
+      const bWeeklyXp = computePlayerWeeklyXp(b, nowDate);
+      const aScore = scope === "weekly" ? aWeeklyXp : toInt(a.rankScore);
+      const bScore = scope === "weekly" ? bWeeklyXp : toInt(b.rankScore);
+      const scoreDiff = bScore - aScore;
       if (scoreDiff !== 0) return scoreDiff;
+      if (scope === "weekly") {
+        const weeklyDiff = bWeeklyXp - aWeeklyXp;
+        if (weeklyDiff !== 0) return weeklyDiff;
+      }
       const xpDiff = toInt(b.lifetimeXp) - toInt(a.lifetimeXp);
       if (xpDiff !== 0) return xpDiff;
       const levelDiff = toInt(b.level) - toInt(a.level);
@@ -504,10 +1004,16 @@ function buildLeaderboard(limit = 50) {
     });
 
   const capped = Math.max(1, Math.min(50000, toInt(limit) || 50));
-  return rows.slice(0, capped).map((row, index) => ({
-    rank: index + 1,
-    ...toPublicPlayerSnapshot(row)
-  }));
+  return rows.slice(0, capped).map((row, index) => {
+    const weeklyXp = computePlayerWeeklyXp(row, nowDate);
+    return {
+      rank: index + 1,
+      scope,
+      leaderboardScore: scope === "weekly" ? weeklyXp : toInt(row.rankScore),
+      weeklyXp,
+      ...toPublicPlayerSnapshot(row, { includeWeeklyXp: false })
+    };
+  });
 }
 
 function normalizeAnalyticsState(nextState) {
@@ -941,6 +1447,36 @@ function estimateKnowledgeBlockCount(words) {
   return Math.max(BOOK_PIPELINE_MIN_BLOCKS, Math.min(BOOK_PIPELINE_MAX_BLOCKS, raw || BOOK_PIPELINE_MIN_BLOCKS));
 }
 
+function detectPdfLikePayload(payload = {}) {
+  const directName = cleanText(payload?.bookFile?.name, cleanText(payload?.file?.name)).toLowerCase();
+  if (directName.endsWith(".pdf")) return true;
+  const rows = Array.isArray(payload?.sources) ? payload.sources : [];
+  for (const row of rows) {
+    const parsedBy = cleanText(row?.parsedBy).toLowerCase();
+    const urlText = cleanText(row?.url);
+    if (parsedBy.includes("pdf") || /\.pdf(?:$|[?#])/i.test(urlText)) return true;
+  }
+  return false;
+}
+
+function estimateSourcePageCount(payload = {}, words = 0, fileBytes = 0) {
+  const rows = Array.isArray(payload?.sources) ? payload.sources : [];
+  let explicitPages = Math.max(0, toInt(payload?.pageCount));
+  for (const row of rows) {
+    const rowPagesRaw = Number.isFinite(Number(row?.pageCount))
+      ? Number(row.pageCount)
+      : (Number.isFinite(Number(row?.pages))
+        ? Number(row.pages)
+        : Number(row?.meta?.pageCount));
+    const rowPages = Math.max(0, toInt(rowPagesRaw));
+    explicitPages += rowPages;
+  }
+  if (explicitPages > 0) return explicitPages;
+  if (toInt(words) > 0) return Math.ceil(Math.max(1, toInt(words)) / 420);
+  if (toInt(fileBytes) > 0) return Math.ceil(Math.max(1, toInt(fileBytes)) / 5000);
+  return Math.max(1, rows.length * 6);
+}
+
 function estimateBookPipelineQueueDepth() {
   let queued = 0;
   for (const job of studioJobs.values()) {
@@ -960,7 +1496,7 @@ function estimateBookPipelineFromPayload(payload = {}, options = {}) {
   const fileBytes = fileBase64 ? Math.floor((fileBase64.length * 3) / 4) : 0;
   const textForEstimate = sourceText || directText;
   const words = roughWordCount(textForEstimate);
-  const pagesApprox = Math.max(1, toInt(payload?.pageCount) || Math.ceil(words / 420) || Math.ceil(fileBytes / 2200));
+  const pagesApprox = Math.max(1, estimateSourcePageCount(payload, words, fileBytes));
   const ocrPagesApprox = Math.ceil(pagesApprox * (String(payload?.bookFile?.name || payload?.file?.name || "").toLowerCase().endsWith(".pdf") ? 0.35 : 0.1));
   const blockCount = estimateKnowledgeBlockCount(words || pagesApprox * 420);
   const queueDepth = Number.isFinite(Number(options.queueDepth))
@@ -998,16 +1534,19 @@ function estimateBookPipelineFromPayload(payload = {}, options = {}) {
 }
 
 function estimateBookPipelineCreditCost(payload = {}) {
-  const metrics = estimateBookPipelineFromPayload(payload);
-  const textBytes = cleanText(payload?.bookFile?.contentBase64 || payload?.file?.contentBase64 || "")
-    ? Math.floor(cleanText(payload?.bookFile?.contentBase64 || payload?.file?.contentBase64 || "").length * 0.75)
-    : 0;
-  const parseFactor = Math.ceil(Math.max(metrics.words * 5, textBytes) / 8000);
-  const blockFactor = metrics.blockCount * 22;
-  const mediaFactor = metrics.blockCount * 14;
-  const qaFactor = Math.ceil(metrics.etaSec / 45);
-  const total = 180 + parseFactor * 8 + blockFactor + mediaFactor + qaFactor;
-  return Math.max(240, Math.min(12000, Math.round(total)));
+  const metrics = estimateBookPipelineFromPayload(payload, { queueDepth: 0 });
+  const sourceRows = Array.isArray(payload?.sources) ? payload.sources : [];
+  const sourceCount = Math.max(1, sourceRows.length);
+  const pages = Math.max(1, toInt(metrics.pagesApprox));
+  const blocks = Math.max(BOOK_PIPELINE_MIN_BLOCKS, Math.min(BOOK_PIPELINE_MAX_BLOCKS, toInt(metrics.blockCount)));
+  const isPdfLike = detectPdfLikePayload(payload);
+  const base = isPdfLike ? 140 : 120;
+  const pageFactor = Math.ceil(pages / 8) * 24;
+  const blockFactor = blocks * 20;
+  const sourceFactor = Math.max(0, sourceCount - 1) * 30;
+  const ocrFactor = Math.ceil(Math.max(0, toInt(metrics.ocrPagesApprox)) * 0.8);
+  const total = base + pageFactor + blockFactor + sourceFactor + ocrFactor;
+  return Math.max(260, Math.min(2600, Math.round(total)));
 }
 
 function splitSentencesForPipeline(text) {
@@ -1063,6 +1602,181 @@ function computeDensityScore(text) {
   };
 }
 
+function extractPageAnchors(sourceRaw = "") {
+  const text = String(sourceRaw || "");
+  const regex = /(?:^|\n)\s*(?:page|p\.)\s*([0-9]{1,4})(?:\s*\/\s*[0-9]{1,4})?\s*(?=\n|$)|(?:^|\n)\s*第\s*([0-9一二三四五六七八九十百千]+)\s*页\s*(?=\n|$)/gim;
+  const out = [];
+  for (const m of text.matchAll(regex)) {
+    const index = Number(m.index);
+    if (!Number.isFinite(index) || index < 0) continue;
+    const marker = cleanText(m[0]);
+    if (!marker) continue;
+    out.push({ index, marker });
+  }
+  return out;
+}
+
+function splitByAnchors(sourceRaw = "", anchors = []) {
+  const text = String(sourceRaw || "");
+  const rows = Array.isArray(anchors) ? anchors : [];
+  if (!rows.length) return [];
+  const sorted = [...rows]
+    .map((row) => ({
+      index: Number(row?.index),
+      marker: cleanText(row?.marker)
+    }))
+    .filter((row) => Number.isFinite(row.index) && row.index >= 0)
+    .sort((a, b) => a.index - b.index);
+  if (!sorted.length) return [];
+  const chunks = [];
+  for (let i = 0; i < sorted.length; i += 1) {
+    const start = sorted[i].index;
+    const end = i + 1 < sorted.length ? sorted[i + 1].index : text.length;
+    if (end <= start) continue;
+    const part = text.slice(start, end).replace(/\s+/g, " ").trim();
+    if (part.length < 80) continue;
+    chunks.push({
+      content: part,
+      anchor: sorted[i].marker || "",
+      anchorType: "page"
+    });
+  }
+  return chunks;
+}
+
+function splitByHeadings(sourceRaw = "") {
+  const text = String(sourceRaw || "");
+  const headingRegex = /(?:chapter|ch\.?|part|section)\s*[0-9ivxlcdm]+|第[一二三四五六七八九十百千0-9]+[章节篇部]/gi;
+  const matches = [...text.matchAll(headingRegex)];
+  if (matches.length < 2) return [];
+  const positions = matches
+    .map((row) => Number(row.index))
+    .filter((n) => Number.isFinite(n) && n >= 0);
+  const anchors = matches
+    .map((row) => cleanText(row[0]))
+    .filter(Boolean);
+  positions.push(text.length);
+  const chunks = [];
+  for (let i = 0; i < positions.length - 1; i += 1) {
+    const start = positions[i];
+    const end = positions[i + 1];
+    if (end <= start) continue;
+    const part = text.slice(start, end).replace(/\s+/g, " ").trim();
+    if (part.length < 80) continue;
+    chunks.push({
+      content: part,
+      anchor: anchors[i] || "",
+      anchorType: "heading"
+    });
+  }
+  return chunks;
+}
+
+function splitByParagraphs(sourceRaw = "", target = 10) {
+  const rows = String(sourceRaw || "")
+    .split(/\n{2,}/)
+    .map((item) => item.replace(/\s+/g, " ").trim())
+    .filter((item) => item.length >= 36);
+  if (!rows.length) return [];
+  const chunkTarget = Math.max(3, toInt(target) || 10);
+  const perChunk = Math.max(1, Math.ceil(rows.length / chunkTarget));
+  const out = [];
+  for (let i = 0; i < rows.length; i += perChunk) {
+    const part = rows.slice(i, i + perChunk).join(" ").trim();
+    if (!part) continue;
+    out.push({
+      content: part,
+      anchor: `paragraph-${Math.floor(i / perChunk) + 1}`,
+      anchorType: "paragraph"
+    });
+  }
+  return out;
+}
+
+function splitChunkBySentences(chunkText = "", splitCount = 2) {
+  const text = cleanText(chunkText);
+  if (!text) return [];
+  const sentences = splitSentencesForPipeline(text);
+  if (sentences.length < 3) return [];
+  const target = Math.max(2, Math.min(4, toInt(splitCount) || 2));
+  const step = Math.max(1, Math.ceil(sentences.length / target));
+  const out = [];
+  for (let i = 0; i < sentences.length; i += step) {
+    const part = sentences.slice(i, i + step).join(" ").trim();
+    if (part.length >= 48) out.push(part);
+  }
+  return out;
+}
+
+function rebalanceChunkRows(rows, targetCount) {
+  const list = Array.isArray(rows) ? rows.map((row) => ({ ...row })) : [];
+  const target = Math.max(BOOK_PIPELINE_MIN_BLOCKS, Math.min(BOOK_PIPELINE_MAX_BLOCKS, toInt(targetCount) || BOOK_PIPELINE_MIN_BLOCKS));
+  if (!list.length) return [];
+  // Expand when chunk count is too low: split long chunks by sentence boundaries.
+  for (let guard = 0; guard < 48 && list.length < target; guard += 1) {
+    let expanded = false;
+    for (let i = 0; i < list.length && list.length < target; i += 1) {
+      const row = list[i] || {};
+      const content = cleanText(row.content);
+      if (roughWordCount(content) < 240) continue;
+      const parts = splitChunkBySentences(content, 2);
+      if (parts.length < 2) continue;
+      list.splice(i, 1, ...parts.map((part, idx) => ({
+        content: part,
+        anchor: cleanText(row.anchor, `segment-${i + 1}`),
+        anchorType: cleanText(row.anchorType, "split"),
+        splitHint: `${cleanText(row.anchor, `segment-${i + 1}`)}.${idx + 1}`
+      })));
+      expanded = true;
+      break;
+    }
+    if (!expanded) break;
+  }
+  // Compress when too many chunks: merge shortest adjacent chunks.
+  for (let guard = 0; guard < 96 && list.length > Math.max(target + 2, Math.ceil(target * 1.2)); guard += 1) {
+    let minIdx = 0;
+    let minWords = Infinity;
+    for (let i = 0; i < list.length; i += 1) {
+      const words = roughWordCount(cleanText(list[i]?.content));
+      if (words < minWords) {
+        minWords = words;
+        minIdx = i;
+      }
+    }
+    if (list.length <= 1) break;
+    const mergeWith = minIdx === 0 ? 1 : minIdx - 1;
+    const left = list[Math.min(minIdx, mergeWith)] || {};
+    const right = list[Math.max(minIdx, mergeWith)] || {};
+    const merged = {
+      content: `${cleanText(left.content)} ${cleanText(right.content)}`.trim(),
+      anchor: cleanText(left.anchor, cleanText(right.anchor)),
+      anchorType: cleanText(left.anchorType, cleanText(right.anchorType, "merge"))
+    };
+    const start = Math.min(minIdx, mergeWith);
+    list.splice(start, 2, merged);
+  }
+  return list;
+}
+
+function collectKnowledgeAnchors(sourceRaw = "", maxCount = 64) {
+  const text = String(sourceRaw || "");
+  const anchors = [];
+  const headingRegex = /(?:chapter|ch\.?|part|section)\s*[0-9ivxlcdm]+[^\n]{0,80}|第[一二三四五六七八九十百千0-9]+[章节篇部][^\n]{0,48}/gim;
+  for (const m of text.matchAll(headingRegex)) {
+    const marker = cleanText(m[0]);
+    if (marker) anchors.push(marker);
+    if (anchors.length >= maxCount) break;
+  }
+  if (anchors.length < Math.min(6, maxCount)) {
+    for (const page of extractPageAnchors(text)) {
+      if (!page?.marker) continue;
+      anchors.push(page.marker);
+      if (anchors.length >= maxCount) break;
+    }
+  }
+  return anchors.slice(0, maxCount);
+}
+
 function splitKnowledgeBlocksFromText(text, opts = {}) {
   const sourceRaw = String(text || "").replace(/\r/g, "");
   const sourceText = sourceRaw.replace(/\s+/g, " ").trim();
@@ -1072,43 +1786,55 @@ function splitKnowledgeBlocksFromText(text, opts = {}) {
     Math.min(BOOK_PIPELINE_MAX_BLOCKS, toInt(opts.targetBlocks) || estimateKnowledgeBlockCount(totalWords))
   );
   if (!sourceText) return [];
-  const headingRegex = /(?:chapter|ch\.?|part|section)\s*[0-9ivxlcdm]+|第[一二三四五六七八九十百千0-9]+[章节篇部]/gi;
-  const headingMatches = [...sourceRaw.matchAll(headingRegex)];
-  let chunks = [];
-  if (headingMatches.length >= 3) {
-    const positions = headingMatches
-      .map((row) => Number(row.index))
-      .filter((n) => Number.isFinite(n) && n >= 0);
-    positions.push(sourceRaw.length);
-    for (let i = 0; i < positions.length - 1; i += 1) {
-      const start = positions[i];
-      const end = positions[i + 1];
-      if (end <= start) continue;
-      const part = sourceRaw.slice(start, end).replace(/\s+/g, " ").trim();
-      if (part.length >= 80) chunks.push(part);
+  let chunkRows = [];
+  const headingChunks = splitByHeadings(sourceRaw);
+  const pageChunks = splitByAnchors(sourceRaw, extractPageAnchors(sourceRaw));
+  const paragraphChunks = splitByParagraphs(sourceRaw, target);
+  if (headingChunks.length >= 2) {
+    chunkRows = headingChunks;
+    if (chunkRows.length < Math.ceil(target * 0.75) && paragraphChunks.length > chunkRows.length) {
+      chunkRows = paragraphChunks;
     }
+  } else if (pageChunks.length >= 3) {
+    chunkRows = pageChunks;
+  } else if (paragraphChunks.length >= 2) {
+    chunkRows = paragraphChunks;
   }
-  if (!chunks.length) {
+  if (!chunkRows.length) {
     const allWords = sourceText.split(/\s+/).filter(Boolean);
     if (allWords.length <= 2 && sourceText.length > 1200) {
       const chunkChars = Math.max(380, Math.ceil(sourceText.length / target));
       for (let i = 0; i < sourceText.length; i += chunkChars) {
         const part = sourceText.slice(i, i + chunkChars).trim();
-        if (part) chunks.push(part);
+        if (part) {
+          chunkRows.push({
+            content: part,
+            anchor: `chunk-${Math.floor(i / chunkChars) + 1}`,
+            anchorType: "chunk"
+          });
+        }
       }
     } else {
       const minWordsPerBlock = Math.max(28, toInt(opts.minWordsPerBlock) || 48);
       const chunkSize = Math.max(minWordsPerBlock, Math.ceil(allWords.length / target));
       for (let i = 0; i < allWords.length; i += chunkSize) {
         const part = allWords.slice(i, i + chunkSize).join(" ").trim();
-        if (part) chunks.push(part);
+        if (part) {
+          chunkRows.push({
+            content: part,
+            anchor: `word-chunk-${Math.floor(i / chunkSize) + 1}`,
+            anchorType: "word_chunk"
+          });
+        }
       }
     }
   }
+  chunkRows = rebalanceChunkRows(chunkRows, target);
   const minScore = Number.isFinite(Number(opts.minScore))
     ? Number(opts.minScore)
     : BOOK_PIPELINE_DENSITY_MIN_SCORE;
-  const withScores = chunks.map((content, idx) => {
+  const withScores = chunkRows.map((row, idx) => {
+    const content = cleanText(row?.content);
     const sentences = splitSentencesForPipeline(content);
     const titleSeed = cleanText(sentences[0], `Knowledge Block ${idx + 1}`).slice(0, 72);
     const density = computeDensityScore(content);
@@ -1120,7 +1846,10 @@ function splitKnowledgeBlocksFromText(text, opts = {}) {
       words: roughWordCount(content),
       summary: cleanText(sentences.slice(0, 2).join(" "), content.slice(0, 220)).slice(0, 320),
       keywords: extractConceptKeywords(content, 6),
-      density
+      density,
+      anchor: cleanText(row?.anchor),
+      anchorType: cleanText(row?.anchorType),
+      splitHint: cleanText(row?.splitHint)
     };
   });
   let retained = withScores.filter((item) => Number(item?.density?.score || 0) >= minScore);
@@ -1152,6 +1881,7 @@ function splitKnowledgeBlocksFromText(text, opts = {}) {
   const averageScore = withScores.length
     ? Number((withScores.reduce((sum, item) => sum + Number(item?.density?.score || 0), 0) / withScores.length).toFixed(4))
     : 0;
+  const anchorPreview = collectKnowledgeAnchors(sourceRaw, 64);
   return {
     blocks: normalized,
     diagnostics: {
@@ -1161,7 +1891,12 @@ function splitKnowledgeBlocksFromText(text, opts = {}) {
       retained: normalized.length,
       filteredOut: Math.max(0, withScores.length - normalized.length),
       averageDensityScore: averageScore,
-      filteredPreview: rejected
+      filteredPreview: rejected,
+      chunkStrategy: headingChunks.length >= 2
+        ? "heading+rebalance"
+        : (pageChunks.length >= 3 ? "page+rebalance" : (paragraphChunks.length >= 2 ? "paragraph+rebalance" : "word_chunk+rebalance")),
+      anchorCount: anchorPreview.length,
+      anchorPreview: anchorPreview.slice(0, 24)
     }
   };
 }
@@ -1891,19 +2626,26 @@ function estimateGenerationCreditCostFromPayload(payload = {}) {
     return estimateBookPipelineCreditCost(payload);
   }
   const rows = Array.isArray(payload?.sources) ? payload.sources : [];
-  const chars = rows.reduce((sum, item) => sum + String(item?.content || item?.snippet || "").length, 0);
+  const text = rows.map((item) => String(item?.content || item?.snippet || "")).join("\n");
+  const chars = text.length;
+  const words = roughWordCount(text);
   const sourceCount = Math.max(1, rows.length);
   const moduleCountRaw = Number(payload?.moduleCount);
   const moduleCount = Number.isFinite(moduleCountRaw)
     ? Math.max(1, Math.min(6, Math.floor(moduleCountRaw)))
     : estimateModuleCountFromSourceRows(rows);
-  const notebookLikeParse = Math.ceil(chars / 5000);
-  const notebookLikeContext = Math.ceil(chars / 14000) * 2 + Math.ceil(sourceCount / 2);
-  const stitchRender = moduleCount * 4;
-  const base = 8;
-  const total = base + notebookLikeParse + notebookLikeContext + stitchRender;
-  const scaled = Math.round(total * 10);
-  return Math.max(100, Math.min(4800, scaled));
+  const pagesApprox = Math.max(
+    1,
+    words > 0 ? Math.ceil(words / 420) : Math.ceil(Math.max(1, chars) / 5000)
+  );
+  const blocksApprox = estimateKnowledgeBlockCount(words || pagesApprox * 420);
+  const base = 90;
+  const pageFactor = pagesApprox * 4;
+  const blockFactor = blocksApprox * 12;
+  const moduleFactor = moduleCount * 16;
+  const sourceFactor = Math.max(0, sourceCount - 1) * 18;
+  const total = base + pageFactor + blockFactor + moduleFactor + sourceFactor;
+  return Math.max(120, Math.min(2000, Math.round(total)));
 }
 
 function stripeCheckoutReady() {
@@ -2788,6 +3530,194 @@ async function readBookPipelineManifestByBookId(bookId) {
   }
 }
 
+function normalizeManifestKnowledgeBlock(block, index = 0) {
+  const row = block && typeof block === "object" ? { ...block } : {};
+  const gate = Math.max(1, toInt(row.gateIndex || row.gate_index || row.index || index + 1) || (index + 1));
+  const content = cleanText(row.content);
+  const summary = cleanText(row.summary, content.slice(0, 320)).slice(0, 1200);
+  const title = cleanText(
+    row.title,
+    cleanText(splitSentencesForPipeline(content)[0], `Knowledge Block ${gate}`).slice(0, 90)
+  );
+  const keywords = Array.isArray(row.keywords) && row.keywords.length
+    ? row.keywords.slice(0, 12).map((item) => cleanText(item)).filter(Boolean)
+    : extractConceptKeywords(`${title} ${summary} ${content}`, 8);
+  const density = row.density && typeof row.density === "object"
+    ? row.density
+    : computeDensityScore(`${summary} ${content}`);
+  return {
+    id: cleanText(row.id, `kb-${String(gate).padStart(2, "0")}`),
+    gateIndex: gate,
+    index: gate,
+    title: cleanText(title, `Knowledge Block ${gate}`),
+    summary,
+    content,
+    keywords,
+    words: Math.max(1, roughWordCount(content || `${title} ${summary}`)),
+    density
+  };
+}
+
+function normalizeManifestKnowledgeBlocks(rows = []) {
+  return (Array.isArray(rows) ? rows : [])
+    .map((row, index) => normalizeManifestKnowledgeBlock(row, index))
+    .sort((a, b) => toInt(a.gateIndex) - toInt(b.gateIndex))
+    .map((row, index) => ({
+      ...row,
+      gateIndex: index + 1,
+      index: index + 1
+    }));
+}
+
+function splitKnowledgeBlockForManualEdit(block) {
+  const row = normalizeManifestKnowledgeBlock(block, 0);
+  const sentences = splitSentencesForPipeline(`${row.title}. ${row.content}`);
+  if (sentences.length < 4) {
+    return [row];
+  }
+  const midpoint = Math.max(2, Math.floor(sentences.length / 2));
+  const leftText = cleanText(sentences.slice(0, midpoint).join(" "));
+  const rightText = cleanText(sentences.slice(midpoint).join(" "));
+  if (!leftText || !rightText) return [row];
+  const left = normalizeManifestKnowledgeBlock({
+    ...row,
+    id: `${row.id}-a`,
+    title: `${row.title} · Part A`,
+    content: leftText,
+    summary: cleanText(leftText.slice(0, 300))
+  }, 0);
+  const right = normalizeManifestKnowledgeBlock({
+    ...row,
+    id: `${row.id}-b`,
+    title: `${row.title} · Part B`,
+    content: rightText,
+    summary: cleanText(rightText.slice(0, 300))
+  }, 1);
+  return [left, right];
+}
+
+function applyKnowledgeBlockManualEdit(blocks, edit = {}) {
+  const action = cleanText(edit?.action).toLowerCase();
+  const list = normalizeManifestKnowledgeBlocks(blocks);
+  if (!action) {
+    return { blocks: list, changed: false, reason: "missing_action" };
+  }
+  if (action === "replace") {
+    const rows = normalizeManifestKnowledgeBlocks(Array.isArray(edit?.blocks) ? edit.blocks : []);
+    return { blocks: rows, changed: true, reason: "replace" };
+  }
+  if (action === "reorder") {
+    const ordered = Array.isArray(edit?.orderedIds) ? edit.orderedIds.map((id) => cleanText(id)).filter(Boolean) : [];
+    if (!ordered.length) return { blocks: list, changed: false, reason: "missing_ordered_ids" };
+    const byId = new Map(list.map((row) => [cleanText(row.id), row]));
+    const next = [];
+    for (const id of ordered) {
+      if (byId.has(id)) {
+        next.push(byId.get(id));
+        byId.delete(id);
+      }
+    }
+    for (const row of byId.values()) next.push(row);
+    return { blocks: normalizeManifestKnowledgeBlocks(next), changed: true, reason: "reorder" };
+  }
+  if (action === "update") {
+    const targetId = cleanText(edit?.id);
+    if (!targetId) return { blocks: list, changed: false, reason: "missing_id" };
+    const next = list.map((row) => {
+      if (cleanText(row.id) !== targetId) return row;
+      const patch = edit?.patch && typeof edit.patch === "object" ? edit.patch : {};
+      return normalizeManifestKnowledgeBlock({
+        ...row,
+        title: cleanText(patch.title, row.title),
+        summary: cleanText(patch.summary, row.summary),
+        content: cleanText(patch.content, row.content),
+        keywords: Array.isArray(patch.keywords) ? patch.keywords : row.keywords
+      }, toInt(row.gateIndex) - 1);
+    });
+    return { blocks: normalizeManifestKnowledgeBlocks(next), changed: true, reason: "update" };
+  }
+  if (action === "split") {
+    const targetId = cleanText(edit?.id);
+    if (!targetId) return { blocks: list, changed: false, reason: "missing_id" };
+    const next = [];
+    let splitHit = false;
+    for (const row of list) {
+      if (cleanText(row.id) !== targetId) {
+        next.push(row);
+        continue;
+      }
+      const parts = splitKnowledgeBlockForManualEdit(row);
+      next.push(...parts);
+      splitHit = parts.length > 1;
+    }
+    return {
+      blocks: normalizeManifestKnowledgeBlocks(next),
+      changed: splitHit,
+      reason: splitHit ? "split" : "split_noop"
+    };
+  }
+  if (action === "merge") {
+    const ids = Array.isArray(edit?.ids)
+      ? edit.ids.map((id) => cleanText(id)).filter(Boolean)
+      : [];
+    if (ids.length < 2) return { blocks: list, changed: false, reason: "missing_ids" };
+    const set = new Set(ids);
+    const picked = list.filter((row) => set.has(cleanText(row.id)));
+    if (picked.length < 2) return { blocks: list, changed: false, reason: "merge_targets_not_found" };
+    const mergedContent = picked.map((row) => cleanText(row.content)).join(" ").trim();
+    const mergedSummary = picked.map((row) => cleanText(row.summary)).join(" ").trim().slice(0, 1200);
+    const mergedTitle = cleanText(edit?.title, picked.map((row) => row.title).join(" / ").slice(0, 90));
+    const mergedKeywords = extractConceptKeywords(
+      picked.flatMap((row) => Array.isArray(row.keywords) ? row.keywords : []).join(" "),
+      8
+    );
+    const merged = normalizeManifestKnowledgeBlock({
+      id: `${cleanText(picked[0]?.id, "kb-merged")}-m`,
+      title: mergedTitle,
+      summary: mergedSummary,
+      content: mergedContent,
+      keywords: mergedKeywords
+    }, 0);
+    const rest = list.filter((row) => !set.has(cleanText(row.id)));
+    const insertAt = Math.max(0, list.findIndex((row) => set.has(cleanText(row.id))));
+    const next = [...rest];
+    next.splice(Math.min(insertAt, next.length), 0, merged);
+    return { blocks: normalizeManifestKnowledgeBlocks(next), changed: true, reason: "merge" };
+  }
+  return { blocks: list, changed: false, reason: "unsupported_action" };
+}
+
+function buildModuleMapFromBlocks(work, blocks = []) {
+  const slugs = Array.isArray(work?.module_slugs) ? work.module_slugs.map((item) => cleanText(item)).filter(Boolean) : [];
+  const list = normalizeManifestKnowledgeBlocks(blocks);
+  if (!slugs.length || !list.length) return [];
+  return slugs.map((moduleSlug, idx) => {
+    const mappedIndex = Math.min(list.length - 1, Math.floor((idx * list.length) / Math.max(1, slugs.length)));
+    const block = list[mappedIndex] || list[Math.min(idx, list.length - 1)];
+    return {
+      module_slug: moduleSlug,
+      knowledge_block_id: cleanText(block?.id)
+    };
+  });
+}
+
+async function updateBookPipelineManifestForWork(work, updater, options = {}) {
+  const safeWork = work && typeof work === "object" ? work : null;
+  if (!safeWork) throw new Error("work required");
+  const bookId = cleanText(safeWork.book_id);
+  if (!bookId) throw new Error("work has no book id");
+  const { manifest, manifestPath } = await readBookPipelineManifestByBookId(bookId);
+  if (!manifest) throw new Error("Pipeline manifest not found");
+  const draft = JSON.parse(JSON.stringify(manifest));
+  await updater(draft);
+  draft.total_knowledge_blocks = Array.isArray(draft.knowledge_blocks) ? draft.knowledge_blocks.length : 0;
+  draft.updated_at = nowIso();
+  if (options?.save !== false) {
+    await fs.writeFile(manifestPath, JSON.stringify(draft, null, 2), "utf8");
+  }
+  return { manifest: draft, manifestPath };
+}
+
 function createFallbackBlockFromModule(moduleSlug, index = 0) {
   const gate = index + 1;
   return {
@@ -3374,11 +4304,76 @@ async function handleStudioApi(req, res, url, session) {
         ok: true,
         workId: cleanText(work.id),
         bookId: cleanText(work.book_id),
+        generatedAt: cleanText(manifest.generated_at),
+        updatedAt: cleanText(manifest.updated_at),
         splitDiagnostics: manifest.split_diagnostics || null,
         totalKnowledgeBlocks: toInt(manifest.total_knowledge_blocks),
         knowledgeBlocks: Array.isArray(manifest.knowledge_blocks) ? manifest.knowledge_blocks : [],
         moduleMap: Array.isArray(manifest.module_map) ? manifest.module_map : [],
         regeneration: manifest.regeneration || null
+      });
+      return true;
+    }
+
+    const workPipelineBlocksMatch = route.match(/^\/api\/studio\/works\/([^/]+)\/pipeline\/blocks$/);
+    if ((method === "PATCH" || method === "POST") && workPipelineBlocksMatch) {
+      const workId = decodeURIComponent(workPipelineBlocksMatch[1] || "").trim();
+      const work = getWorkById(workId);
+      if (!work || !canSessionViewWork(session.id, work)) {
+        writeJson(res, 404, { ok: false, error: "Work not found" });
+        return true;
+      }
+      if (!canSessionEditWork(session.id, work)) {
+        writeJson(res, 403, { ok: false, error: "Only the owner can edit knowledge blocks" });
+        return true;
+      }
+      const body = await parseJsonBody(req, 512 * 1024).catch((error) => ({ __error: error?.message || "Invalid body" }));
+      if (body.__error) {
+        writeJson(res, 400, { ok: false, error: body.__error });
+        return true;
+      }
+      const action = cleanText(body?.action).toLowerCase();
+      const regenerate = body?.regenerate === true;
+      const result = await updateBookPipelineManifestForWork(work, async (draft) => {
+        const currentBlocks = normalizeManifestKnowledgeBlocks(Array.isArray(draft.knowledge_blocks) ? draft.knowledge_blocks : []);
+        const editResult = applyKnowledgeBlockManualEdit(currentBlocks, body || {});
+        if (!editResult.changed && action !== "replace") {
+          throw new Error(`No changes applied (${editResult.reason})`);
+        }
+        const nextBlocks = normalizeManifestKnowledgeBlocks(editResult.blocks);
+        draft.knowledge_blocks = nextBlocks;
+        draft.module_map = buildModuleMapFromBlocks(work, nextBlocks);
+        draft.split_diagnostics = {
+          ...(draft.split_diagnostics && typeof draft.split_diagnostics === "object" ? draft.split_diagnostics : {}),
+          manualEdited: true,
+          manualEditAction: action || "unknown",
+          manualEditedAt: nowIso(),
+          retained: nextBlocks.length,
+          targetBlocks: nextBlocks.length
+        };
+        draft.manual_edit = {
+          action: action || "unknown",
+          at: nowIso()
+        };
+      });
+      let regenResult = null;
+      if (regenerate) {
+        regenResult = await regenerateBookPipelineForWork({
+          work,
+          target: "all",
+          moduleSlugs: []
+        });
+      }
+      await loadCatalog(true);
+      writeJson(res, 200, {
+        ok: true,
+        workId: cleanText(work.id),
+        bookId: cleanText(work.book_id),
+        totalKnowledgeBlocks: toInt(result?.manifest?.total_knowledge_blocks),
+        splitDiagnostics: result?.manifest?.split_diagnostics || null,
+        knowledgeBlocks: Array.isArray(result?.manifest?.knowledge_blocks) ? result.manifest.knowledge_blocks : [],
+        moduleMap: Array.isArray(result?.manifest?.module_map) ? result.manifest.module_map : [],
+        regenerate: regenResult
       });
       return true;
     }
@@ -5435,7 +6430,7 @@ async function handleApi(req, res, url, providedSession = null) {
       return true;
     }
     schedulePersist();
-    const leaders = buildLeaderboard(50000);
+    const leaders = buildLeaderboard(50000, { scope: "all" });
     const rank = leaders.find((row) => row.userId === userId)?.rank || 0;
     writeJson(res, 200, {
       ok: true,
@@ -5448,20 +6443,127 @@ async function handleApi(req, res, url, providedSession = null) {
 
   if (method === "GET" && pathname === "/api/leaderboard") {
     const userId = sanitizeUserId(url.searchParams.get("userId"));
+    const scope = String(url.searchParams.get("scope") || "all").trim().toLowerCase() === "weekly" ? "weekly" : "all";
     const limit = Math.max(1, Math.min(100, toInt(url.searchParams.get("limit")) || 20));
-    const leaders = buildLeaderboard(limit);
+    const all = buildLeaderboard(50000, { scope });
+    const leaders = all.slice(0, limit);
     let me = null;
     if (userId) {
-      const all = buildLeaderboard(10000);
       const found = all.find((row) => row.userId === userId);
       if (found) me = found;
     }
     writeJson(res, 200, {
       ok: true,
+      scope,
       leaders,
       me,
-      totalPlayers: Object.keys(getPlayersState()).length,
+      totalPlayers: all.length,
       updatedAt: nowIso()
+    });
+    return true;
+  }
+
+  if (method === "GET" && pathname === "/api/tasks") {
+    const userId = sanitizeUserId(url.searchParams.get("userId"));
+    if (!userId) {
+      writeJson(res, 400, { ok: false, error: "userId is required" });
+      return true;
+    }
+    const player = getOrCreatePlayer(userId);
+    if (!player) {
+      writeJson(res, 404, { ok: false, error: "User not found" });
+      return true;
+    }
+    const taskBoard = buildTaskBoard(player, {
+      totalBooks: getTaskTotalBookCount()
+    });
+    writeJson(res, 200, {
+      ok: true,
+      user: toPublicPlayerSnapshot(player),
+      missionClaims: toInt(player.missionClaims),
+      tabs: taskBoard.tabs,
+      activeTasks: taskBoard.activeTasks,
+      weeklyChallenge: taskBoard.weeklyChallenge
+    });
+    return true;
+  }
+
+  if (method === "POST" && pathname === "/api/tasks/claim") {
+    const body = await parseJsonBody(req, 64 * 1024).catch((error) => ({ __error: error?.message || "Invalid body" }));
+    if (body.__error) {
+      writeJson(res, 400, { ok: false, error: body.__error });
+      return true;
+    }
+    const userId = sanitizeUserId(body.userId);
+    const taskId = sanitizeTaskId(body.taskId);
+    const tab = sanitizeTaskTab(body.tab);
+    if (!userId || !taskId) {
+      writeJson(res, 400, { ok: false, error: "userId and taskId are required" });
+      return true;
+    }
+    const player = getOrCreatePlayer(userId);
+    if (!player) {
+      writeJson(res, 404, { ok: false, error: "User not found" });
+      return true;
+    }
+
+    const taskBoard = buildTaskBoard(player, {
+      totalBooks: getTaskTotalBookCount()
+    });
+    const task = getTaskFromBoard(taskBoard, taskId, tab);
+    if (!task) {
+      writeJson(res, 404, { ok: false, error: "Task not found" });
+      return true;
+    }
+    if (task.claimed) {
+      writeJson(res, 409, { ok: false, error: "Task reward already claimed for this period" });
+      return true;
+    }
+    if (!task.complete) {
+      writeJson(res, 409, { ok: false, error: "Task is not complete yet" });
+      return true;
+    }
+
+    const now = nowIso();
+    const reward = {
+      xp: toInt(task.rewardXp),
+      gems: toInt(task.rewardGems)
+    };
+    const gain = applyRewardToPlayer(player, reward, "mission-claim:" + task.taskId, now);
+    const claimId = sanitizeTaskClaimId(task.claimId);
+    if (claimId) {
+      player.taskClaims[claimId] = normalizeTaskClaimRecord({
+        claimId,
+        taskId: task.taskId,
+        tab: task.tab,
+        periodKey: task.periodKey,
+        claimedAt: now,
+        rewardXp: reward.xp,
+        rewardGems: reward.gems
+      });
+    }
+    const summaryTask = normalizeTaskRecord(player.tasks[task.taskId]);
+    summaryTask.count += 1;
+    summaryTask.lastClaimAt = now;
+    summaryTask.updatedAt = now;
+    player.tasks[task.taskId] = summaryTask;
+    player.missionClaims = toInt(player.missionClaims) + 1;
+    player.updatedAt = now;
+    player.lastSeenAt = now;
+    schedulePersist();
+
+    const updatedTaskBoard = buildTaskBoard(player, {
+      totalBooks: getTaskTotalBookCount()
+    });
+    writeJson(res, 200, {
+      ok: true,
+      user: toPublicPlayerSnapshot(player),
+      reward,
+      gain,
+      claimedTask: getTaskFromBoard(updatedTaskBoard, task.taskId, task.tab) || null,
+      tabs: updatedTaskBoard.tabs,
+      activeTasks: updatedTaskBoard.activeTasks,
+      weeklyChallenge: updatedTaskBoard.weeklyChallenge
     });
     return true;
   }
@@ -5478,7 +6580,7 @@ async function handleApi(req, res, url, providedSession = null) {
       return true;
     }
     const limit = Math.max(1, Math.min(100, toInt(url.searchParams.get("limit")) || 20));
-    const tasks = Object.entries(player.tasks || {})
+    const history = Object.entries(player.tasks || {})
       .map(([taskId, row]) => ({
         taskId,
         count: toInt(row?.count),
@@ -5491,11 +6593,16 @@ async function handleApi(req, res, url, providedSession = null) {
         return bTs - aTs;
       })
       .slice(0, limit);
+    const taskBoard = buildTaskBoard(player, {
+      totalBooks: getTaskTotalBookCount()
+    });
     writeJson(res, 200, {
       ok: true,
       user: toPublicPlayerSnapshot(player),
       missionClaims: toInt(player.missionClaims),
-      tasks
+      tasks: taskBoard.activeTasks,
+      history,
+      weeklyChallenge: taskBoard.weeklyChallenge
     });
     return true;
   }

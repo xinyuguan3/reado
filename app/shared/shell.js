@@ -115,7 +115,7 @@ const BILLING_PLAN_COPY = {
     starter: {
       price: "$12.50",
       unit: "/ month",
-      subtitle: "Billed annually ($150 / year)",
+      subtitle: "Billed annually",
       cta: "Upgrade",
       featured: false,
       features: [
@@ -128,7 +128,7 @@ const BILLING_PLAN_COPY = {
     trial: {
       price: "7-Day Free",
       unit: "",
-      subtitle: "then $12.50 / month (billed annually)",
+      subtitle: "then $12.50 / month",
       cta: "Get started for free",
       featured: true,
       badge: "Free trial",
@@ -142,7 +142,7 @@ const BILLING_PLAN_COPY = {
     pro: {
       price: "$125",
       unit: "/ month",
-      subtitle: "Billed annually ($1500 / year)",
+      subtitle: "Billed annually",
       cta: "Upgrade",
       featured: false,
       features: [
@@ -480,6 +480,71 @@ function escapeHtml(value) {
   });
 }
 
+function readStringSetFromStorage(key) {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(key) || "[]");
+    const list = Array.isArray(parsed) ? parsed : [];
+    return new Set(list.map((item) => String(item || "").trim()).filter(Boolean));
+  } catch {
+    return new Set();
+  }
+}
+
+function buildLearningProgressSnapshot() {
+  const catalog = window.__READO_BOOK_CATALOG__;
+  const books = Array.isArray(catalog?.books) ? catalog.books : [];
+  if (!books.length) {
+    return {
+      startedBooks: 0,
+      unlockedBooks: 0,
+      completedBooks: 0,
+      categoriesUnlocked: 0,
+      categoriesCompleted: 0,
+      completedCareerBooks: 0,
+      totalCompletedModules: 0
+    };
+  }
+  const unlockKey = catalog?.storage?.unlockKey || "reado_unlocked_books_v1";
+  const completedKey = catalog?.storage?.completedKey || "reado_completed_books_v1";
+  const unlocked = readStringSetFromStorage(unlockKey);
+  const completed = readStringSetFromStorage(completedKey);
+  const started = new Set(
+    books
+      .filter((book) => Boolean(localStorage.getItem("reado_book_last_" + String(book?.id || "").trim())))
+      .map((book) => String(book?.id || "").trim())
+      .filter(Boolean)
+  );
+  const categoriesUnlocked = new Set(
+    books
+      .filter((book) => unlocked.has(String(book?.id || "").trim()))
+      .map((book) => String(book?.category || "").trim())
+      .filter(Boolean)
+  );
+  const categoriesCompleted = new Set(
+    books
+      .filter((book) => completed.has(String(book?.id || "").trim()))
+      .map((book) => String(book?.category || "").trim())
+      .filter(Boolean)
+  );
+  const completedCareerBooks = books.filter((book) => {
+    const id = String(book?.id || "").trim();
+    const category = String(book?.category || "").trim();
+    return completed.has(id) && category === "career-wealth";
+  }).length;
+  const totalCompletedModules = books
+    .filter((book) => completed.has(String(book?.id || "").trim()))
+    .reduce((sum, book) => sum + Math.max(0, Number(book?.moduleCount) || 0), 0);
+  return {
+    startedBooks: started.size,
+    unlockedBooks: unlocked.size,
+    completedBooks: completed.size,
+    categoriesUnlocked: categoriesUnlocked.size,
+    categoriesCompleted: categoriesCompleted.size,
+    completedCareerBooks,
+    totalCompletedModules
+  };
+}
+
 let userSyncInFlight = false;
 let queuedUserSync = null;
 let lastUserSyncFingerprint = "";
@@ -489,6 +554,9 @@ async function syncSignedInUser(extra = {}) {
   const userId = sanitizeClientUserId(auth?.userId);
   if (!userId) return null;
   const state = normalizeUserState(extra.state || readUserState());
+  const progress = extra.progress && typeof extra.progress === "object"
+    ? extra.progress
+    : buildLearningProgressSnapshot();
   const hasGain = Boolean(extra.gain && typeof extra.gain === "object");
   const hasSpend = Boolean(extra.spend && typeof extra.spend === "object");
   const hasReason = Boolean(typeof extra.reason === "string" && extra.reason.trim());
@@ -508,6 +576,7 @@ async function syncSignedInUser(extra = {}) {
       : undefined,
     gain: hasGain ? extra.gain : undefined,
     spend: hasSpend ? extra.spend : undefined,
+    progress,
     reason: typeof extra.reason === "string" ? extra.reason : "",
     pathname: window.location.pathname,
     at: new Date().toISOString()
@@ -519,7 +588,14 @@ async function syncSignedInUser(extra = {}) {
     payload.state?.gems || 0,
     payload.reason,
     payload.gain?.xp || 0,
-    payload.gain?.gems || 0
+    payload.gain?.gems || 0,
+    payload.progress?.startedBooks || 0,
+    payload.progress?.unlockedBooks || 0,
+    payload.progress?.completedBooks || 0,
+    payload.progress?.categoriesUnlocked || 0,
+    payload.progress?.categoriesCompleted || 0,
+    payload.progress?.completedCareerBooks || 0,
+    payload.progress?.totalCompletedModules || 0
   ].join("|");
   const force = Boolean(extra.force);
   if (!force && !payload.reason && fingerprint === lastUserSyncFingerprint) {
@@ -859,6 +935,28 @@ function grantRewards(reward) {
   return { state: next, gain: { xp: gainXp, gems: gainGems, levelUps } };
 }
 
+function applyServerState(nextState, options = {}) {
+  const base = readUserState();
+  const merged = normalizeUserState({ ...base, ...(nextState || {}) });
+  writeUserState(merged);
+  const gain = options.gain && typeof options.gain === "object"
+    ? {
+        xp: Math.max(0, Math.floor(Number(options.gain.xp) || 0)),
+        gems: Math.max(0, Math.floor(Number(options.gain.gems) || 0)),
+        levelUps: Math.max(0, Math.floor(Number(options.gain.levelUps) || 0))
+      }
+    : { xp: 0, gems: 0, levelUps: Math.max(0, merged.level - base.level) };
+  window.dispatchEvent(new CustomEvent("reado:user-updated", {
+    detail: {
+      state: merged,
+      gain,
+      reason: typeof options.reason === "string" ? options.reason : "server-state",
+      skipSync: Boolean(options.skipSync)
+    }
+  }));
+  return { state: merged, gain };
+}
+
 function spendGems(amount, reason = "spend") {
   const cost = Math.max(0, Math.floor(Number(amount) || 0));
   const base = readUserState();
@@ -885,7 +983,9 @@ window.ReadoUser = {
   getState: readUserState,
   getLevelProgress,
   grantRewards,
-  spendGems
+  spendGems,
+  applyServerState,
+  buildProgressSnapshot: buildLearningProgressSnapshot
 };
 
 function canRenderMaterialIcons() {
@@ -2708,6 +2808,8 @@ class ReadoAppShell extends HTMLElement {
           <div class="reado-shell-user-meta">
             <span class="reado-shell-user-name" data-shell-name></span>
             <span class="reado-shell-user-level" data-shell-level></span>
+            <span class="reado-shell-xp-label" data-shell-xp-label></span>
+            <span class="reado-shell-xp-track" data-shell-xp-track><span data-shell-xp-bar></span></span>
           </div>
           <span class="reado-shell-avatar" data-href="/pages/gamified-learning-hub-dashboard-2.html"><img data-shell-avatar src="" alt="avatar" /></span>
         </div>
@@ -2717,6 +2819,9 @@ class ReadoAppShell extends HTMLElement {
 
     const nameEl = top.querySelector("[data-shell-name]");
     const levelEl = top.querySelector("[data-shell-level]");
+    const xpLabelEl = top.querySelector("[data-shell-xp-label]");
+    const xpTrackEl = top.querySelector("[data-shell-xp-track]");
+    const xpBarEl = top.querySelector("[data-shell-xp-bar]");
     const avatarEl = top.querySelector("[data-shell-avatar]");
     const authEl = top.querySelector("[data-shell-auth]");
     const userEl = top.querySelector("[data-shell-user]");
@@ -2748,11 +2853,18 @@ class ReadoAppShell extends HTMLElement {
       if (authEl) authEl.hidden = signedIn;
       if (userEl) userEl.hidden = !signedIn;
       const user = normalizeUserState(state);
+      const progress = getLevelProgress(user);
       const displayCredits = Number.isFinite(shellCredits) ? shellCredits : user.credits;
       if (creditsEl) creditsEl.textContent = formatNumber(Math.max(0, Math.floor(displayCredits)));
       if (!signedIn) return;
       if (nameEl) nameEl.textContent = user.name;
       if (levelEl) levelEl.textContent = "Lv." + user.level + " " + (user.title || t("shell.learner", "学习者"));
+      if (xpLabelEl) {
+        xpLabelEl.textContent = t("shell.xp_to_next", "距离下一级还差 {xp} EXP", { xp: formatNumber(progress.remain) });
+      }
+      if (xpBarEl) {
+        xpBarEl.style.width = progress.percent + "%";
+      }
       if (avatarEl) avatarEl.src = user.avatar || FALLBACK_AVATAR_DATA_URI;
     };
 
@@ -2821,6 +2933,9 @@ class ReadoAppShell extends HTMLElement {
     refreshCredits().catch(() => {});
     window.addEventListener("focus", () => {
       refreshCredits().catch(() => {});
+      syncSignedInUser({ force: true }).finally(() => {
+        refreshLiveProgress();
+      });
     });
 
     const syncProLabel = (billing) => {
@@ -2870,6 +2985,10 @@ class ReadoAppShell extends HTMLElement {
       if ((gain.levelUps || 0) > 0) {
         showGainHint(t("shell.level_up", "等级提升 +{value}", { value: gain.levelUps }), "level");
       }
+      if (detail.skipSync) {
+        refreshLiveProgress();
+        return;
+      }
       syncSignedInUser({
         state: detail.state || readUserState(),
         gain: detail.gain || {},
@@ -2916,11 +3035,11 @@ class ReadoAppShell extends HTMLElement {
     const weekly = document.createElement("section");
     weekly.className = "reado-shell-weekly";
     weekly.innerHTML = `
-      <h4>${t("shell.weekly_challenge", "每周挑战")}</h4>
-      <p>${t("shell.weekly_goal", "阅读 3 章节历史书")}</p>
-      <div class="reado-shell-progress"><span></span></div>
-      <p style="margin-top:8px;font-size:11px;color:#9cc2ff;font-weight:700;">${t("shell.weekly_progress", "已完成 2/3")}</p>
-      <button class="reado-task-btn" type="button" data-open-billing>${t("billing.unlock_cta", "Unlock Pro")}</button>`;
+      <h4 data-weekly-title>${t("shell.weekly_challenge", "每周挑战")}</h4>
+      <p data-weekly-desc>${t("shell.weekly_goal", "阅读 3 章节历史书")}</p>
+      <div class="reado-shell-progress"><span data-weekly-bar style="width:0%"></span></div>
+      <p style="margin-top:8px;font-size:11px;color:#9cc2ff;font-weight:700;" data-weekly-meta>${t("shell.weekly_progress", "已完成 0/0")}</p>
+      <button class="reado-task-btn" type="button" data-href="/pages/simulator-library-level-selection-2.html">${t("shell.continue_learning", "继续学习")}</button>`;
     side.append(nav, weekly);
 
     const rightPanel = document.createElement("aside");
@@ -2949,11 +3068,42 @@ class ReadoAppShell extends HTMLElement {
     const rankNumEl = rightPanel.querySelector("[data-rank-number]");
     const rankTotalEl = rightPanel.querySelector("[data-rank-total]");
     const rankPercentEl = rightPanel.querySelector("[data-rank-percent]");
+    const rankProgressBarEl = rightPanel.querySelector(".reado-rank-progress > span");
     const taskHistoryListEl = rightPanel.querySelector("[data-task-history-list]");
+    const weeklyTitleEl = weekly.querySelector("[data-weekly-title]");
+    const weeklyDescEl = weekly.querySelector("[data-weekly-desc]");
+    const weeklyBarEl = weekly.querySelector("[data-weekly-bar]");
+    const weeklyMetaEl = weekly.querySelector("[data-weekly-meta]");
 
     let latestTaskHistory = [];
     let latestRank = { me: null, totalPlayers: 0 };
-    let latestLeaderboard = { leaders: [], me: null, totalPlayers: 0 };
+    let latestLeaderboard = { leaders: [], me: null, totalPlayers: 0, scope: "all" };
+    let latestWeeklyChallenge = null;
+    let currentLeaderboardScope = "weekly";
+    let leaderboardScopeButtonsBound = false;
+
+    const leaderboardScopeLabels = () => ({
+      weekly: t("shell.weekly_board", "本周"),
+      all: t("shell.total_board", "总榜")
+    });
+
+    const renderWeeklyChallenge = (challenge) => {
+      latestWeeklyChallenge = challenge && typeof challenge === "object" ? challenge : null;
+      const safe = latestWeeklyChallenge || {};
+      const progress = Math.max(0, Number(safe.progress) || 0);
+      const goal = Math.max(1, Number(safe.goal) || 1);
+      const percent = Math.max(0, Math.min(100, Number(safe.percent) || Math.round((progress / goal) * 100)));
+      const completedTasks = Math.max(0, Number(safe.completedTasks) || 0);
+      const totalTasks = Math.max(0, Number(safe.totalTasks) || 0);
+      if (weeklyTitleEl) weeklyTitleEl.textContent = t("shell.weekly_challenge", "每周挑战");
+      if (weeklyDescEl) weeklyDescEl.textContent = safe.title || t("shell.weekly_goal", "阅读 3 章节历史书");
+      if (weeklyBarEl) weeklyBarEl.style.width = percent + "%";
+      if (weeklyMetaEl) {
+        weeklyMetaEl.textContent = safe.title
+          ? `${formatNumber(progress)}/${formatNumber(goal)} · ${t("shell.weekly_progress", "已完成 {done}/{total}", { done: formatNumber(completedTasks), total: formatNumber(totalTasks) })}`
+          : t("shell.weekly_progress", "已完成 {done}/{total}", { done: "0", total: "0" });
+      }
+    };
 
     const renderTaskHistory = (items = []) => {
       if (!taskHistoryListEl) return;
@@ -2971,15 +3121,23 @@ class ReadoAppShell extends HTMLElement {
       }
       taskHistoryListEl.innerHTML = rows.slice(0, 3).map((item, index) => {
         const taskId = String(item?.taskId || "").trim() || "mission";
-        const count = Math.max(1, Number(item?.count) || 0);
-        const updatedText = item?.lastClaimAt
-          ? new Date(item.lastClaimAt).toLocaleString(getCurrentLanguage())
-          : t("shell.recently", "Recently");
-        const percent = Math.max(10, 90 - index * 18);
+        const title = String(item?.title || "").trim() || taskId.replace(/[-_]+/g, " ").slice(0, 42);
+        const progress = Math.max(0, Number(item?.progress) || 0);
+        const goal = Math.max(1, Number(item?.goal) || 1);
+        const percent = Math.max(0, Math.min(100, Number(item?.percent) || Math.round((progress / goal) * 100)));
+        const tab = String(item?.tab || "").trim();
+        const tabLabel = tab === "weekly"
+          ? t("shell.weekly_board", "本周")
+          : tab === "achievement"
+            ? t("shell.achievement_board", "成就")
+            : t("shell.daily_board", "每日");
+        const statusText = item?.lastClaimAt
+          ? t("shell.task_claimed", "已领取")
+          : `${formatNumber(progress)}/${formatNumber(goal)} · ${tabLabel}`;
         return `
           <article class="reado-task${index === 0 ? " active" : ""}">
-            <p class="reado-task-title">${taskId.replace(/[-_]+/g, " ").slice(0, 42)}</p>
-            <p class="reado-task-sub">${t("shell.task_claimed", "Claimed {count} time(s) · {updated}", { count: formatNumber(count), updated: updatedText })}</p>
+            <p class="reado-task-title">${escapeHtml(title)}</p>
+            <p class="reado-task-sub">${escapeHtml(statusText)}</p>
             <div class="reado-task-line"><span style="width:${percent}%"></span></div>
           </article>`;
       }).join("");
@@ -3000,21 +3158,60 @@ class ReadoAppShell extends HTMLElement {
         if (me?.rank && totalPlayers) {
           const percentile = Math.max(1, Math.round((me.rank / Math.max(totalPlayers, 1)) * 100));
           rankPercentEl.textContent = t("shell.rank_top", "Top {value}%", { value: formatNumber(percentile) });
+          if (rankProgressBarEl) rankProgressBarEl.style.width = percentile + "%";
         } else {
           rankPercentEl.textContent = t("shell.rank_top_unknown", "Top --");
+          if (rankProgressBarEl) rankProgressBarEl.style.width = "0%";
         }
       }
     };
 
-    const renderLeaderboardPage = (leaders = [], me = null, totalPlayers = 0) => {
+    const bindLeaderboardScopeButtons = () => {
+      if (window.location.pathname !== "/pages/global-scholar-leaderboard.html") return;
+      const host = document.querySelector("main .flex-1.h-full.overflow-y-auto");
+      const header = host?.querySelector("header");
+      if (!header) return;
+      const buttons = Array.from(header.querySelectorAll("button")).slice(0, 2);
+      if (buttons.length < 2) return;
+      const labels = leaderboardScopeLabels();
+      buttons[0].dataset.scope = "weekly";
+      buttons[1].dataset.scope = "all";
+      buttons[0].textContent = labels.weekly;
+      buttons[1].textContent = labels.all;
+      const setButtonState = () => {
+        buttons.forEach((button) => {
+          const active = button.dataset.scope === currentLeaderboardScope;
+          button.className = active
+            ? "px-6 py-1.5 rounded-md text-sm font-medium bg-white dark:bg-primary text-slate-900 dark:text-white shadow-sm transition-all"
+            : "px-6 py-1.5 rounded-md text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all";
+        });
+      };
+      setButtonState();
+      if (leaderboardScopeButtonsBound) return;
+      leaderboardScopeButtonsBound = true;
+      buttons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const scope = button.dataset.scope === "weekly" ? "weekly" : "all";
+          if (currentLeaderboardScope === scope) return;
+          currentLeaderboardScope = scope;
+          setButtonState();
+          refreshLiveProgress();
+        });
+      });
+    };
+
+    const renderLeaderboardPage = (leaders = [], me = null, totalPlayers = 0, scope = "all") => {
       latestLeaderboard = {
         leaders: Array.isArray(leaders) ? leaders : [],
         me: me || null,
-        totalPlayers: Number(totalPlayers) || 0
+        totalPlayers: Number(totalPlayers) || 0,
+        scope: scope === "weekly" ? "weekly" : "all"
       };
       if (window.location.pathname !== "/pages/global-scholar-leaderboard.html") return;
+      currentLeaderboardScope = latestLeaderboard.scope;
       const host = document.querySelector("main .flex-1.h-full.overflow-y-auto");
       if (!host) return;
+      bindLeaderboardScopeButtons();
       if (host.dataset.readoLegacyLeaderboardHidden !== "1") {
         const legacySections = Array.from(host.children).filter((node) => {
           if (!(node instanceof HTMLElement)) return false;
@@ -3065,26 +3262,37 @@ class ReadoAppShell extends HTMLElement {
       const listRows = rows.slice(0, 100);
       const hasMeInList = Boolean(me?.userId && listRows.some((row) => row?.userId === me.userId));
       const safeTotalPlayers = Math.max(Number(totalPlayers) || rows.length, rows.length);
+      const scoreTitle = currentLeaderboardScope === "weekly"
+        ? t("shell.weekly_score", "本周 XP")
+        : t("shell.total_score", "总 XP");
+      const getRowScore = (row) => {
+        if (currentLeaderboardScope === "weekly") {
+          return Math.max(0, Number(row?.weeklyXp ?? row?.leaderboardScore ?? 0));
+        }
+        return Math.max(0, Number(row?.rankScore ?? row?.leaderboardScore ?? 0));
+      };
       const renderTopCard = (row) => {
         const isMe = Boolean(me?.userId && row?.userId === me.userId);
         const badge = row?.rank === 1 ? "🥇" : row?.rank === 2 ? "🥈" : "🥉";
+        const score = getRowScore(row);
         return `
           <article class="glass-card" style="padding:12px;border-radius:12px;display:grid;gap:6px;border:1px solid ${isMe ? "rgba(19,91,236,.45)" : "rgba(148,163,184,.2)"};background:${isMe ? "rgba(19,91,236,.12)" : "rgba(255,255,255,.02)"};">
             <div style="font-size:20px;line-height:1;">${badge}</div>
             <strong style="font-size:14px;">#${formatNumber(row?.rank || 0)} ${escapeHtml(row?.displayName || "Reader")}</strong>
             <span style="font-size:12px;opacity:.75;">Lv.${formatNumber(row?.level || 1)}</span>
-            <span style="font-size:13px;font-weight:700;color:#60a5fa;">${formatNumber(row?.rankScore || 0)} XP</span>
+            <span style="font-size:13px;font-weight:700;color:#60a5fa;">${formatNumber(score)} ${escapeHtml(scoreTitle)}</span>
           </article>`;
       };
       const renderListRow = (row) => {
         const isMe = Boolean(me?.userId && row?.userId === me.userId);
+        const score = getRowScore(row);
         return `
           <article class="glass-card" style="padding:10px 12px;border-radius:12px;display:flex;justify-content:space-between;gap:12px;align-items:center;border:1px solid ${isMe ? "rgba(19,91,236,.55)" : "rgba(148,163,184,.2)"};background:${isMe ? "rgba(19,91,236,.16)" : "rgba(255,255,255,.02)"};">
             <div style="display:grid;gap:2px;">
               <strong style="font-size:14px;">#${formatNumber(row?.rank || 0)} ${escapeHtml(row?.displayName || "Reader")}</strong>
-              <span style="font-size:12px;opacity:.75;">${escapeHtml(row?.userId ? "@" + row.userId : "user")} · Lv.${formatNumber(row?.level || 1)}</span>
+              <span style="font-size:12px;opacity:.75;">Lv.${formatNumber(row?.level || 1)}</span>
             </div>
-            <span style="font-size:13px;font-weight:700;color:#60a5fa;white-space:nowrap;">${formatNumber(row?.rankScore || 0)} XP</span>
+            <span style="font-size:13px;font-weight:700;color:#60a5fa;white-space:nowrap;">${formatNumber(score)} ${escapeHtml(scoreTitle)}</span>
           </article>`;
       };
       const meCard = me && !hasMeInList
@@ -3092,7 +3300,7 @@ class ReadoAppShell extends HTMLElement {
           <section class="glass-card" style="padding:12px;border-radius:12px;border:1px solid rgba(19,91,236,.5);background:rgba(19,91,236,.12);">
             <p style="margin:0 0 6px;font-size:12px;opacity:.8;">${escapeHtml(t("shell.me_position", "我的排名"))}</p>
             <strong style="font-size:14px;">#${formatNumber(me.rank || 0)} ${escapeHtml(me.displayName || "Reader")}</strong>
-            <div style="margin-top:4px;font-size:12px;opacity:.75;">${escapeHtml(me.userId ? "@" + me.userId : "user")} · Lv.${formatNumber(me.level || 1)} · ${formatNumber(me.rankScore || 0)} XP</div>
+            <div style="margin-top:4px;font-size:12px;opacity:.75;">Lv.${formatNumber(me.level || 1)} · ${formatNumber(getRowScore(me))} ${escapeHtml(scoreTitle)}</div>
           </section>`
         : "";
 
@@ -3110,9 +3318,12 @@ class ReadoAppShell extends HTMLElement {
       const auth = readAuthState();
       const userId = sanitizeClientUserId(auth?.userId);
       try {
+        const scope = window.location.pathname === "/pages/global-scholar-leaderboard.html"
+          ? currentLeaderboardScope
+          : "all";
         const leaderboardPath = userId
-          ? "/api/leaderboard?limit=100&userId=" + encodeURIComponent(userId)
-          : "/api/leaderboard?limit=100";
+          ? "/api/leaderboard?limit=100&scope=" + encodeURIComponent(scope) + "&userId=" + encodeURIComponent(userId)
+          : "/api/leaderboard?limit=100&scope=" + encodeURIComponent(scope);
         const [leaderboard, taskHistory] = await Promise.all([
           requestJson("GET", leaderboardPath),
           userId
@@ -3123,11 +3334,18 @@ class ReadoAppShell extends HTMLElement {
         const totalPlayers = Number(leaderboard?.totalPlayers) || 0;
         renderRank(me, totalPlayers);
         renderTaskHistory(userId && Array.isArray(taskHistory?.tasks) ? taskHistory.tasks : []);
-        renderLeaderboardPage(Array.isArray(leaderboard?.leaders) ? leaderboard.leaders : [], me, totalPlayers);
+        renderWeeklyChallenge(userId ? (taskHistory?.weeklyChallenge || null) : null);
+        renderLeaderboardPage(
+          Array.isArray(leaderboard?.leaders) ? leaderboard.leaders : [],
+          me,
+          totalPlayers,
+          leaderboard?.scope || scope
+        );
       } catch {
         renderRank(null, 0);
         renderTaskHistory([]);
-        renderLeaderboardPage([], null, 0);
+        renderWeeklyChallenge(null);
+        renderLeaderboardPage([], null, 0, currentLeaderboardScope);
       }
     };
 
@@ -3213,11 +3431,9 @@ class ReadoAppShell extends HTMLElement {
       renderUser(readUserState());
       renderNavLinks();
       renderLanguageMenu();
-      weekly.querySelector("h4").textContent = t("shell.weekly_challenge", "每周挑战");
-      weekly.querySelector("p").textContent = t("shell.weekly_goal", "阅读 3 章节历史书");
-      weekly.querySelector("p[style]").textContent = t("shell.weekly_progress", "已完成 2/3");
-      const billingBtn = weekly.querySelector("button[data-open-billing]");
-      if (billingBtn) billingBtn.textContent = t("billing.unlock_cta", "Unlock Pro");
+      const weeklyBtn = weekly.querySelector("button[data-href]");
+      if (weeklyBtn) weeklyBtn.textContent = t("shell.continue_learning", "继续学习");
+      bindLeaderboardScopeButtons();
       const rankTitle = rightPanel.querySelector(".reado-rank-title");
       if (rankTitle) rankTitle.textContent = t("shell.global_rank", "全球排名");
       const rankLabel = rightPanel.querySelector(".reado-rank-label");
@@ -3226,7 +3442,8 @@ class ReadoAppShell extends HTMLElement {
       if (taskTitle) taskTitle.textContent = t("shell.current_tasks", "进行中的任务");
       renderRank(latestRank.me, latestRank.totalPlayers);
       renderTaskHistory(latestTaskHistory);
-      renderLeaderboardPage(latestLeaderboard.leaders, latestLeaderboard.me, latestLeaderboard.totalPlayers);
+      renderWeeklyChallenge(latestWeeklyChallenge);
+      renderLeaderboardPage(latestLeaderboard.leaders, latestLeaderboard.me, latestLeaderboard.totalPlayers, latestLeaderboard.scope);
       const exitBtn = top.querySelector(".reado-shell-exit");
       if (exitBtn) exitBtn.textContent = t("shell.exit_experience", "退出体验");
       const toggleBtn = top.querySelector(".reado-shell-toggle");
@@ -3252,6 +3469,14 @@ class ReadoAppShell extends HTMLElement {
     side.addEventListener("click", (event) => {
       const target = event.target;
       if (!(target instanceof HTMLElement)) return;
+      const navButton = target.closest("[data-href]");
+      if (navButton) {
+        const href = navButton.getAttribute("data-href");
+        if (href) {
+          window.location.href = href;
+          return;
+        }
+      }
       const billingTrigger = target.closest("[data-open-billing]");
       if (!billingTrigger) return;
       event.preventDefault();

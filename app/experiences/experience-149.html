@@ -80,10 +80,46 @@
             background: linear-gradient(180deg, rgba(16, 185, 129, 0.2) 0%, rgba(16, 185, 129, 0) 100%);
         }
     </style>
+<style id="reado-shell-preload-style">
+html.reado-shell-preload body:not(.reado-shell-applied) {
+  padding-top: 80px !important;
+}
+@media (min-width: 1024px) {
+  html.reado-shell-preload:not(.reado-shell-preload-learning) body:not(.reado-shell-applied) {
+    padding-left: 256px !important;
+  }
+}
+@media (min-width: 1200px) {
+  html.reado-shell-preload:not(.reado-shell-preload-learning) body:not(.reado-shell-applied) {
+    padding-right: clamp(280px, 24vw, 320px) !important;
+  }
+}
+html.reado-shell-preload body:not(.reado-shell-applied) > header:first-of-type,
+html.reado-shell-preload body:not(.reado-shell-applied) > nav:first-of-type,
+html.reado-shell-preload body:not(.reado-shell-applied) > aside:first-of-type,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex > nav,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex > aside,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex-1 > nav,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex-1 > aside,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex > .flex-1 > nav,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex > .flex-1 > aside {
+  display: none !important;
+}
+</style>
+<script id="reado-shell-preload-script">
+(() => {
+  const root = document.documentElement;
+  root.classList.add("reado-shell-preload");
+  const path = window.location.pathname || "";
+  if (path.startsWith("/experiences/") || path.startsWith("/books/")) {
+    root.classList.add("reado-shell-preload-learning");
+  }
+})();
+</script>
 </head>
 <body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-100 font-body min-h-screen flex flex-col overflow-hidden bg-grid-pattern selection:bg-primary selection:text-white">
-<script src="/shared/book-catalog.js?v=1772451455814"></script>
-<script type="module" src="/shared/shell.js?v=1772451455814"></script>
+<script src="/shared/book-catalog.js?v=1772525052070"></script>
+<script type="module" src="/shared/shell.js?v=1772525052070"></script>
 <reado-app-shell data-page="knowledge-map"></reado-app-shell>
 <!-- Top Navigation / Status Bar -->
 <header class="h-16 border-b border-slate-200 dark:border-slate-800 bg-surface-light dark:bg-surface-dark flex items-center justify-between px-6 sticky top-0 z-50 shadow-sm">
@@ -345,12 +381,12 @@
 <!-- Overlay Grid for "Tech" feel -->
 <div class="fixed inset-0 pointer-events-none z-0 opacity-[0.02] bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImgridIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiPjxwYXRoIGQ9Ik0gNDAgMCBMIDAgMCAwIDQwIiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] dark:invert"></div>
 
-<script src="/shared/experience-runtime.js?v=1772451455814"></script>
+<script src="/shared/experience-runtime.js?v=1772525052070"></script>
 <script>
 (() => {
   
-  localStorage.setItem("reado_book_last_principles-for-navigating-big-debt-crises", "experience-115");
-  if ("experience-115" === "experience-115") {
+  localStorage.setItem("reado_book_last_principles-for-navigating-big-debt-crises", "experience-149");
+  if ("experience-149" === "experience-149") {
     try {
       const completedRaw = localStorage.getItem("reado_completed_books_v1") || "[]";
       const completedSet = new Set(JSON.parse(completedRaw));
@@ -363,8 +399,8 @@
   if (window.ReadoExperienceRuntime && typeof window.ReadoExperienceRuntime.init === "function") {
     window.ReadoExperienceRuntime.init({
       bookId: "principles-for-navigating-big-debt-crises",
-      moduleSlug: "experience-115",
-      moduleSlugs: ["inside-china-land-debt-policy-sandbox","the-beautiful-deleveraging-challenge","the-subway-dilemma","debt-cycle-impact-analysis","1994","experience-112","experience-114","experience-115"]
+      moduleSlug: "experience-149",
+      moduleSlugs: ["inside-china-land-debt-policy-sandbox","the-beautiful-deleveraging-challenge","the-subway-dilemma","debt-cycle-impact-analysis","1994","experience-146","experience-148","experience-149"]
     });
   }
 })();

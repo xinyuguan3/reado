@@ -8,21 +8,29 @@
   <script src="/shared/book-catalog.js?v=1772438225006"></script>
   <style>
     :root {
-      color-scheme: light;
-      --bg: #f4f6fb;
-      --card: #f6f7fb;
-      --line: #cfd6e3;
-      --line-strong: #3b5bff;
-      --text: #1f2937;
-      --sub: #667085;
-      --chip: #eef2ff;
-      --chip-line: #c7d2fe;
+      color-scheme: dark;
+      --bg: #050914;
+      --bg-accent: rgba(19, 91, 236, 0.24);
+      --panel: rgba(9, 14, 26, 0.9);
+      --panel-line: rgba(148, 163, 184, 0.26);
+      --card: rgba(14, 22, 38, 0.94);
+      --card-line: rgba(148, 163, 184, 0.24);
+      --card-hover: rgba(20, 31, 52, 0.96);
+      --text: #e5ecff;
+      --sub: #9fb0d8;
+      --accent: #5b8dff;
+      --accent-strong: #22d3ee;
+      --ok: #34d399;
+      --danger: #fb7185;
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
       min-height: 100vh;
-      background: radial-gradient(circle at 10% 8%, rgba(112, 154, 255, 0.18), transparent 32%), var(--bg);
+      background:
+        radial-gradient(circle at 8% 10%, var(--bg-accent), transparent 34%),
+        radial-gradient(circle at 92% 0%, rgba(34, 211, 238, 0.18), transparent 28%),
+        var(--bg);
       font-family: "Noto Sans SC", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
       color: var(--text);
     }
@@ -34,37 +42,87 @@
       gap: 14px;
     }
     .panel {
-      border: 1px solid rgba(148, 163, 184, 0.28);
-      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid var(--panel-line);
+      background: var(--panel);
       border-radius: 22px;
-      box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
+      box-shadow: 0 24px 58px rgba(2, 8, 20, 0.52);
       padding: 26px;
+      backdrop-filter: blur(10px);
     }
     h1 {
       margin: 0;
-      text-align: center;
-      font-size: clamp(34px, 4.5vw, 60px);
-      letter-spacing: -0.03em;
-      line-height: 1.1;
+      text-align: left;
+      font-size: clamp(24px, 2.8vw, 36px);
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      color: #f8fbff;
     }
     .hero-sub {
-      margin-top: 8px;
-      text-align: center;
-      font-size: clamp(24px, 3.5vw, 44px);
-      background: linear-gradient(90deg, #4f46e5, #06b6d4, #22c55e);
-      -webkit-background-clip: text;
-      color: transparent;
-      font-weight: 800;
-      letter-spacing: -0.02em;
+      margin-top: 6px;
+      text-align: left;
+      font-size: 14px;
+      color: #9fb0d8;
+      font-weight: 600;
+      letter-spacing: 0;
     }
-    .composer {
+    .intake-shell {
       margin-top: 18px;
-      border: 2px solid var(--line-strong);
-      border-radius: 20px;
+      display: grid;
+      gap: 14px;
+    }
+    .intake-primary {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 12px;
+    }
+    .intake-card {
+      border: 1px solid var(--card-line);
+      border-radius: 18px;
       background: var(--card);
-      padding: 16px;
+      padding: 14px;
       display: grid;
       gap: 10px;
+    }
+    .intake-card h3 {
+      margin: 0;
+      font-size: 15px;
+      color: #f8fbff;
+      letter-spacing: -0.01em;
+    }
+    .intake-card p {
+      margin: 0;
+      color: var(--sub);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .url-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+    .url-input {
+      width: 100%;
+      min-height: 46px;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      border-radius: 12px;
+      background: rgba(8, 13, 25, 0.9);
+      color: #dbe8ff;
+      padding: 0 12px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 130ms ease, box-shadow 130ms ease;
+    }
+    .url-input:focus {
+      border-color: rgba(123, 162, 255, 0.88);
+      box-shadow: 0 0 0 3px rgba(91, 141, 255, 0.22);
+    }
+    .url-hint {
+      color: #7dd3fc;
+      font-size: 11px;
+    }
+    .search-card {
+      gap: 12px;
     }
     .search-row {
       display: grid;
@@ -76,114 +134,95 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      border: 1px solid rgba(148, 163, 184, 0.4);
-      border-radius: 14px;
-      background: #fff;
+      border: 1px solid rgba(148, 163, 184, 0.34);
+      border-radius: 12px;
+      background: rgba(8, 13, 25, 0.88);
       padding: 0 12px;
-      min-height: 54px;
+      min-height: 46px;
     }
     .search-box input {
       border: 0;
       outline: 0;
       width: 100%;
-      font-size: 32px;
-      letter-spacing: -0.02em;
-      color: #334155;
+      font-size: 14px;
+      color: #dbe8ff;
       background: transparent;
     }
     .go-btn {
-      width: 54px;
-      height: 54px;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.4);
-      background: #eef2ff;
-      color: #334155;
-      font-size: 26px;
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      background: rgba(91, 141, 255, 0.2);
+      color: #cfe0ff;
+      font-size: 20px;
+      line-height: 1;
       cursor: pointer;
+      transition: border-color 130ms ease, background 130ms ease, transform 130ms ease;
     }
-    .chip-row {
+    .go-btn:hover {
+      border-color: rgba(125, 165, 255, 0.76);
+      background: rgba(91, 141, 255, 0.3);
+      transform: translateY(-1px);
+    }
+    .generate-strip {
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(21, 32, 54, 0.95), rgba(9, 14, 26, 0.96));
+      padding: 12px 14px;
       display: flex;
-      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
       flex-wrap: wrap;
     }
-    .chip {
-      border: 1px solid var(--chip-line);
-      background: var(--chip);
-      border-radius: 999px;
-      padding: 7px 14px;
-      font-size: 14px;
-      color: #334155;
-      font-weight: 600;
+    .generate-copy {
+      display: grid;
+      gap: 4px;
+    }
+    .generate-title {
+      margin: 0;
+      font-size: 13px;
+      color: #dbe8ff;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+    .generate-hint {
+      margin: 0;
+      font-size: 12px;
+      color: #93a7d0;
+      line-height: 1.4;
     }
     .drop-zone {
-      margin-top: 14px;
-      border: 3px dashed #d5dbe8;
-      border-radius: 22px;
-      background: rgba(255, 255, 255, 0.6);
-      padding: 22px;
+      border: 2px dashed rgba(148, 163, 184, 0.34);
+      border-radius: 16px;
+      background: rgba(8, 13, 24, 0.68);
+      padding: 18px;
       text-align: center;
       transition: border-color 140ms ease, background 140ms ease;
     }
     .drop-zone.dragover {
-      border-color: #4f46e5;
-      background: rgba(238, 242, 255, 0.8);
+      border-color: rgba(123, 162, 255, 0.9);
+      background: rgba(33, 50, 82, 0.7);
     }
     .drop-title {
-      margin: 8px 0 0;
-      font-size: 50px;
-      letter-spacing: -0.03em;
-      color: #374151;
+      margin: 0;
+      font-size: 16px;
+      letter-spacing: -0.01em;
+      color: #eff6ff;
       font-weight: 700;
     }
     .drop-sub {
       margin: 8px 0 0;
-      font-size: 22px;
-      color: #6b7280;
-      letter-spacing: -0.02em;
+      font-size: 12px;
+      color: var(--sub);
     }
     .drop-actions {
-      margin-top: 18px;
+      margin-top: 14px;
       display: flex;
       gap: 12px;
       justify-content: center;
       flex-wrap: wrap;
-    }
-    .source-add-wrap {
-      position: relative;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .source-menu {
-      position: absolute;
-      top: calc(100% + 8px);
-      left: 50%;
-      transform: translateX(-50%);
-      min-width: 210px;
-      border: 1px solid #cbd5e1;
-      border-radius: 14px;
-      background: #fff;
-      box-shadow: 0 16px 36px rgba(15, 23, 42, 0.14);
-      padding: 8px;
-      display: grid;
-      gap: 6px;
-      z-index: 20;
-    }
-    .source-menu[hidden] { display: none; }
-    .menu-item {
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      background: #f8fafc;
-      color: #0f172a;
-      padding: 8px 10px;
-      cursor: pointer;
-      font-size: 13px;
-      text-align: left;
-      font-weight: 600;
-    }
-    .menu-item:hover {
-      border-color: #c7d2fe;
-      background: #eef2ff;
     }
     .source-modal {
       position: fixed;
@@ -198,10 +237,10 @@
     .source-modal[hidden] { display: none; }
     .source-modal-card {
       width: min(760px, 100%);
-      border: 1px solid rgba(99, 102, 241, 0.35);
+      border: 1px solid rgba(148, 163, 184, 0.36);
       border-radius: 18px;
-      background: rgba(255, 255, 255, 0.98);
-      box-shadow: 0 26px 56px rgba(15, 23, 42, 0.26);
+      background: rgba(9, 14, 26, 0.98);
+      box-shadow: 0 26px 56px rgba(2, 8, 20, 0.58);
       padding: 18px;
       display: grid;
       gap: 10px;
@@ -210,22 +249,22 @@
       margin: 0;
       font-size: 20px;
       letter-spacing: -0.02em;
-      color: #0f172a;
+      color: #f8fbff;
       font-weight: 800;
     }
     .source-modal-label {
       margin: 2px 0 0;
       font-size: 13px;
-      color: #334155;
+      color: #bfd0f3;
       font-weight: 700;
     }
     .source-modal-input,
     .source-modal-textarea {
       width: 100%;
-      border: 1px solid #cbd5e1;
+      border: 1px solid rgba(148, 163, 184, 0.38);
       border-radius: 14px;
-      background: #fff;
-      color: #0f172a;
+      background: rgba(8, 13, 24, 0.9);
+      color: #e3edff;
       font-size: 15px;
       font-family: inherit;
       padding: 12px;
@@ -234,8 +273,8 @@
     }
     .source-modal-input:focus,
     .source-modal-textarea:focus {
-      border-color: #4f46e5;
-      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.14);
+      border-color: rgba(123, 162, 255, 0.88);
+      box-shadow: 0 0 0 4px rgba(91, 141, 255, 0.2);
     }
     .source-modal-textarea {
       min-height: 170px;
@@ -250,52 +289,78 @@
       flex-wrap: wrap;
     }
     .source-modal-btn {
-      border: 1px solid #cbd5e1;
+      border: 1px solid rgba(148, 163, 184, 0.44);
       border-radius: 999px;
-      background: #f8fafc;
-      color: #334155;
+      background: rgba(24, 34, 55, 0.9);
+      color: #dbe8ff;
       padding: 8px 16px;
       font-size: 13px;
       font-weight: 700;
       cursor: pointer;
     }
     .source-modal-btn.primary {
-      border-color: #4f46e5;
-      background: #4f46e5;
+      border-color: rgba(91, 141, 255, 0.9);
+      background: linear-gradient(135deg, rgba(91, 141, 255, 0.95), rgba(34, 211, 238, 0.92));
       color: #fff;
     }
     .btn {
-      border: 1px solid #cbd5e1;
-      border-radius: 999px;
-      background: #fff;
-      color: #111827;
-      padding: 10px 16px;
-      font-size: 16px;
+      border: 1px solid rgba(148, 163, 184, 0.34);
+      border-radius: 12px;
+      background: rgba(24, 34, 55, 0.9);
+      color: #dbe8ff;
+      padding: 10px 14px;
+      font-size: 14px;
       cursor: pointer;
-      font-weight: 600;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      transition: border-color 130ms ease, background 130ms ease, transform 130ms ease, opacity 130ms ease;
+    }
+    .btn:hover {
+      border-color: rgba(125, 165, 255, 0.78);
+      background: rgba(35, 51, 80, 0.92);
+      transform: translateY(-1px);
     }
     .btn.primary {
-      border-color: #4f46e5;
-      background: #4f46e5;
+      border-color: rgba(91, 141, 255, 0.95);
+      background: linear-gradient(135deg, rgba(91, 141, 255, 0.96), rgba(34, 211, 238, 0.9));
       color: #fff;
+    }
+    .btn.ghost {
+      background: rgba(8, 13, 24, 0.8);
+      color: #bcd0f8;
+    }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .generate-btn {
+      min-width: 220px;
+      min-height: 44px;
+      font-size: 15px;
     }
     .source-grid {
       display: grid;
-      grid-template-columns: 1.2fr 1fr;
+      grid-template-columns: 1fr 1fr;
       gap: 12px;
       margin-top: 14px;
     }
     .block {
-      border: 1px solid #d8deea;
+      border: 1px solid var(--card-line);
       border-radius: 16px;
-      background: #fff;
+      background: var(--card);
       padding: 12px;
       min-height: 220px;
     }
     .block h3 {
       margin: 0;
       font-size: 15px;
-      color: #111827;
+      color: #f8fbff;
+    }
+    .section-title {
+      margin: 0;
+      font-size: 15px;
+      color: #f8fbff;
     }
     .list {
       margin-top: 10px;
@@ -306,36 +371,36 @@
       padding-right: 2px;
     }
     .item {
-      border: 1px solid #d6dbe7;
+      border: 1px solid rgba(148, 163, 184, 0.24);
       border-radius: 12px;
-      background: #f8fafc;
+      background: rgba(18, 29, 50, 0.78);
       padding: 10px;
       display: grid;
       gap: 5px;
     }
     .item.pending {
       border-style: dashed;
-      background: #f8fbff;
+      background: rgba(21, 35, 62, 0.74);
     }
     .item h4 {
       margin: 0;
       font-size: 14px;
       line-height: 1.4;
-      color: #0f172a;
+      color: #eff6ff;
     }
     .item p {
       margin: 0;
       font-size: 12px;
-      color: #64748b;
+      color: #9fb0d8;
       line-height: 1.5;
     }
     .knowledge-list {
       max-height: 320px;
     }
     .knowledge-item {
-      border: 1px solid #d6dbe7;
+      border: 1px solid rgba(148, 163, 184, 0.24);
       border-radius: 12px;
-      background: #f8fafc;
+      background: rgba(18, 29, 50, 0.78);
       padding: 10px;
       display: grid;
       gap: 6px;
@@ -344,22 +409,22 @@
       margin: 0;
       font-size: 14px;
       line-height: 1.35;
-      color: #0f172a;
+      color: #eff6ff;
     }
     .knowledge-item p {
       margin: 0;
       font-size: 12px;
-      color: #64748b;
+      color: #9fb0d8;
       line-height: 1.5;
     }
     .knowledge-meta {
       display: inline-flex;
       align-items: center;
       width: fit-content;
-      border: 1px solid #c7d2fe;
+      border: 1px solid rgba(91, 141, 255, 0.45);
       border-radius: 999px;
-      background: #eef2ff;
-      color: #3730a3;
+      background: rgba(91, 141, 255, 0.16);
+      color: #cddcff;
       font-size: 11px;
       font-weight: 700;
       padding: 2px 8px;
@@ -370,17 +435,17 @@
       gap: 6px;
     }
     .knowledge-tags span {
-      border: 1px solid #dbeafe;
+      border: 1px solid rgba(34, 211, 238, 0.38);
       border-radius: 999px;
-      background: #eff6ff;
-      color: #1d4ed8;
+      background: rgba(34, 211, 238, 0.14);
+      color: #baf6ff;
       font-size: 10px;
       padding: 2px 7px;
       font-weight: 700;
     }
     .knowledge-score {
       font-size: 11px;
-      color: #475569;
+      color: #9fb0d8;
       font-variant-numeric: tabular-nums;
     }
     .item .ops {
@@ -393,21 +458,21 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      color: #475569;
+      color: #a7b7d9;
       font-size: 12px;
       font-weight: 600;
     }
     .spinner {
       width: 14px;
       height: 14px;
-      border: 2px solid #cbd5e1;
-      border-top-color: #3b82f6;
+      border: 2px solid rgba(148, 163, 184, 0.36);
+      border-top-color: rgba(34, 211, 238, 0.96);
       border-radius: 999px;
       animation: spin 0.9s linear infinite;
       flex: 0 0 14px;
     }
     .pending-meta {
-      color: #64748b;
+      color: #9fb0d8;
       font-size: 11px;
     }
     @keyframes spin {
@@ -415,26 +480,26 @@
     }
     .tiny {
       font-size: 12px;
-      border-radius: 999px;
-      border: 1px solid #cbd5e1;
-      background: #fff;
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.34);
+      background: rgba(20, 31, 52, 0.88);
       padding: 4px 10px;
-      color: #334155;
+      color: #cfe0ff;
       cursor: pointer;
       text-decoration: none;
     }
     .meta-line {
       margin-top: 10px;
-      color: #64748b;
+      color: var(--sub);
       font-size: 12px;
       white-space: pre-wrap;
     }
-    .error { color: #dc2626; }
+    .error { color: var(--danger); }
     .progress-wrap {
       margin-top: 12px;
-      border: 1px solid #d8deea;
+      border: 1px solid var(--card-line);
       border-radius: 16px;
-      background: #fff;
+      background: var(--card);
       padding: 12px;
       display: grid;
       gap: 8px;
@@ -447,10 +512,10 @@
       flex-wrap: wrap;
     }
     .status-badge {
-      border: 1px solid #c7d2fe;
+      border: 1px solid rgba(91, 141, 255, 0.45);
       border-radius: 999px;
-      background: #eef2ff;
-      color: #3730a3;
+      background: rgba(91, 141, 255, 0.16);
+      color: #cddcff;
       font-size: 12px;
       padding: 4px 10px;
       font-weight: 700;
@@ -459,13 +524,13 @@
       width: 100%;
       height: 10px;
       border-radius: 999px;
-      background: #e2e8f0;
+      background: rgba(148, 163, 184, 0.28);
       overflow: hidden;
     }
     .progress-fill {
       height: 100%;
       width: 0%;
-      background: linear-gradient(90deg, #4f46e5, #22c55e);
+      background: linear-gradient(90deg, #5b8dff, #22d3ee, #34d399);
       transition: width 180ms ease;
     }
     .log-list {
@@ -478,101 +543,288 @@
       overflow: auto;
     }
     .log-item {
-      border: 1px solid #d8deea;
+      border: 1px solid rgba(148, 163, 184, 0.24);
       border-radius: 10px;
-      background: #f8fafc;
+      background: rgba(18, 29, 50, 0.78);
       padding: 8px;
       font-size: 12px;
-      color: #334155;
+      color: #dbe8ff;
       line-height: 1.5;
     }
     .log-item .time {
-      color: #64748b;
+      color: #9fb0d8;
       margin-right: 6px;
       font-variant-numeric: tabular-nums;
     }
+    .pipeline-viewer {
+      position: fixed;
+      inset: 0;
+      z-index: 92;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      background: rgba(5, 10, 22, 0.66);
+      backdrop-filter: blur(3px);
+    }
+    .pipeline-viewer[hidden] { display: none; }
+    .pipeline-viewer-card {
+      width: min(1320px, 100%);
+      max-height: min(92vh, 980px);
+      border: 1px solid rgba(102, 157, 255, 0.35);
+      border-radius: 18px;
+      background: rgba(9, 15, 30, 0.98);
+      box-shadow: 0 24px 60px rgba(2, 6, 18, 0.5);
+      display: grid;
+      grid-template-rows: auto 1fr;
+      overflow: hidden;
+    }
+    .pipeline-viewer-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+      background: rgba(12, 22, 42, 0.95);
+      padding: 12px 14px;
+    }
+    .pipeline-viewer-title {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.2;
+      color: #e8f2ff;
+      letter-spacing: -0.02em;
+      font-weight: 800;
+    }
+    .pipeline-viewer-sub {
+      margin: 2px 0 0;
+      font-size: 12px;
+      color: #9ab2df;
+    }
+    .pipeline-viewer-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .pipeline-tab {
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      border-radius: 999px;
+      background: rgba(18, 29, 50, 0.9);
+      color: #cfe2ff;
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .pipeline-tab.active {
+      border-color: rgba(96, 165, 250, 0.7);
+      background: rgba(37, 99, 235, 0.18);
+      color: #e2ebff;
+    }
+    .pipeline-close {
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      border-radius: 10px;
+      background: rgba(18, 29, 50, 0.9);
+      color: #dbe8ff;
+      width: 34px;
+      height: 34px;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .pipeline-viewer-body {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      min-height: 0;
+    }
+    .pipeline-tree {
+      border-right: 1px solid rgba(148, 163, 184, 0.2);
+      background: rgba(8, 15, 30, 0.88);
+      padding: 10px;
+      overflow: auto;
+    }
+    .pipeline-tree-title {
+      margin: 2px 0 8px;
+      font-size: 13px;
+      color: #a9bee4;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+    .pipeline-tree-list {
+      display: grid;
+      gap: 6px;
+    }
+    .pipeline-tree-item {
+      border: 1px solid rgba(148, 163, 184, 0.24);
+      border-radius: 10px;
+      background: rgba(17, 30, 52, 0.9);
+      color: #dbe8ff;
+      padding: 8px 10px;
+      text-align: left;
+      font-size: 13px;
+      line-height: 1.45;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .pipeline-tree-item small {
+      display: block;
+      margin-top: 2px;
+      color: #98afd9;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .pipeline-tree-item.active {
+      border-color: rgba(96, 165, 250, 0.75);
+      background: rgba(37, 99, 235, 0.22);
+      color: #eff6ff;
+    }
+    .pipeline-main {
+      min-width: 0;
+      min-height: 0;
+      padding: 12px;
+      overflow: auto;
+      background: rgba(10, 16, 30, 0.97);
+    }
+    .pipeline-code {
+      margin: 0;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 12px;
+      background: #050b18;
+      color: #dbeafe;
+      font-size: 13px;
+      line-height: 1.55;
+      padding: 14px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: "SF Mono", "Menlo", "Consolas", monospace;
+    }
+    .pipeline-preview-card {
+      border: 1px solid rgba(148, 163, 184, 0.24);
+      border-radius: 14px;
+      background: rgba(17, 30, 52, 0.88);
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+    }
+    .pipeline-preview-card h4 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.35;
+      color: #eff6ff;
+    }
+    .pipeline-preview-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .pipeline-chip {
+      border: 1px solid rgba(129, 140, 248, 0.45);
+      border-radius: 999px;
+      background: rgba(99, 102, 241, 0.18);
+      color: #dbeafe;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .pipeline-kws {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .pipeline-kws span {
+      border: 1px solid rgba(125, 211, 252, 0.36);
+      border-radius: 999px;
+      background: rgba(14, 116, 144, 0.2);
+      color: #cde7ff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+    }
+    .pipeline-empty {
+      border: 1px dashed rgba(148, 163, 184, 0.32);
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.64);
+      color: #9fb0d8;
+      font-size: 13px;
+      padding: 14px;
+    }
     @media (max-width: 980px) {
+      .intake-primary { grid-template-columns: 1fr; }
       .source-grid { grid-template-columns: 1fr; }
-      .drop-title { font-size: 38px; }
-      .search-box input { font-size: 24px; }
+      .generate-btn { width: 100%; min-width: 0; }
+      .url-row { grid-template-columns: 1fr; }
+      .search-row { grid-template-columns: 1fr; }
+      .go-btn { width: 100%; }
+      .pipeline-viewer-card {
+        width: 100%;
+        max-height: 100vh;
+        border-radius: 0;
+      }
+      .pipeline-viewer-body { grid-template-columns: 1fr; }
+      .pipeline-tree {
+        max-height: 36vh;
+        border-right: 0;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+      }
     }
   </style>
 </head>
 <body>
-<style id="reado-shell-preload-style">
-body.reado-shell-applied {
-  --reado-right-width: clamp(280px, 24vw, 320px);
-  padding-top: 80px !important;
-}
-@media (min-width: 1024px) {
-  body.reado-shell-applied {
-    padding-left: 256px !important;
-  }
-}
-@media (min-width: 1200px) {
-  body.reado-shell-applied {
-    padding-right: var(--reado-right-width) !important;
-  }
-}
-body.reado-shell-applied.reado-experience-mode {
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-  padding-top: 0 !important;
-  overflow: auto !important;
-}
-body.reado-shell-applied:not(.reado-experience-mode) > header:first-of-type,
-body.reado-shell-applied:not(.reado-experience-mode) > nav:first-of-type,
-body.reado-shell-applied:not(.reado-experience-mode) > aside:first-of-type,
-body.reado-shell-applied:not(.reado-experience-mode) > .flex > nav:first-of-type,
-body.reado-shell-applied:not(.reado-experience-mode) > .flex > aside:first-of-type,
-body.reado-shell-applied:not(.reado-experience-mode) > .flex-1 > nav:first-of-type,
-body.reado-shell-applied:not(.reado-experience-mode) > .flex-1 > aside:first-of-type,
-body.reado-shell-applied:not(.reado-experience-mode) > .flex > .flex-1 > nav:first-of-type,
-body.reado-shell-applied:not(.reado-experience-mode) > .flex > .flex-1 > aside:first-of-type {
-  display: none !important;
-}
-</style>
-<script>
-if (document.body) {
-  document.body.classList.add("reado-shell-applied", "reado-shell-icons-fallback");
-}
-</script>
   <reado-app-shell data-page="studio"></reado-app-shell>
 
   <main class="wrap">
     <section class="panel">
-      <h1 data-i18n="studio.title">Generate Playable Learning Missions from Sources</h1>
-      <p class="hero-sub" data-i18n="studio.subtitle">Your Notebook</p>
+      <h1 data-i18n="studio.title">Studio</h1>
+      <p class="hero-sub" data-i18n="studio.subtitle">Add sources, then generate</p>
 
-      <div class="composer">
-        <div class="search-row">
-          <div class="search-box">
-            <span style="font-size:26px;color:#94a3b8;">🔍</span>
-            <input id="search-input" type="text" placeholder="Search web sources (paper title, DOI, keywords)" data-i18n-placeholder="studio.search_placeholder" />
-          </div>
-          <button id="search-btn" class="go-btn" title="Search Sources" data-i18n-title="studio.search_btn_title">➜</button>
-        </div>
-        <div class="chip-row">
-          <span class="chip" data-i18n="studio.chip_web">🌐 Web</span>
-          <span class="chip" data-i18n="studio.chip_fast">⚡ Fast Research</span>
-          <span class="chip" data-i18n="studio.chip_multi">🧠 Multi-source</span>
-        </div>
-      </div>
-
-      <section id="drop-zone" class="drop-zone">
-        <p class="drop-title" data-i18n="studio.drop_title">Or drag and drop files</p>
-        <p class="drop-sub" data-i18n="studio.drop_sub">EPUB, TXT, Markdown, PDF, web text, and more</p>
-        <div class="drop-actions">
-          <div class="source-add-wrap">
-            <button id="add-source-btn" class="btn"><span>➕ </span><span data-i18n="studio.add_source">Add Source</span></button>
-            <div id="add-source-menu" class="source-menu" hidden>
-              <button id="upload-btn" class="menu-item" type="button"><span>⬆️ </span><span data-i18n="studio.upload">Upload</span></button>
-              <button id="website-btn" class="menu-item" type="button"><span>🔗 </span><span data-i18n="studio.website">Website</span></button>
-              <button id="paste-btn" class="menu-item" type="button"><span>📋 </span><span data-i18n="studio.paste">Paste Text</span></button>
+      <div class="intake-shell">
+        <div class="intake-primary">
+          <section class="intake-card">
+            <h3 data-i18n="studio.website_section_title">Website URL</h3>
+            <p data-i18n="studio.website_section_desc">Paste one link and add it to your sources.</p>
+            <div class="url-row">
+              <input id="website-input" class="url-input" type="url" placeholder="https://example.com/article" />
+              <button id="website-btn" class="btn primary" type="button" data-i18n="studio.add_url">Add URL</button>
             </div>
-          </div>
-          <button id="generate-btn" class="btn primary" data-i18n="studio.generate">Generate Playable Web</button>
+            <p class="url-hint" data-i18n="studio.url_hint">Supports article/doc/paper links. Missing protocol will auto-use https://</p>
+          </section>
+          <section class="intake-card">
+            <h3 data-i18n="studio.upload_section_title">Upload Files</h3>
+            <p data-i18n="studio.upload_section_desc">Upload PDF/EPUB/Markdown/TXT, or drag files into the area.</p>
+            <section id="drop-zone" class="drop-zone">
+              <p class="drop-title" data-i18n="studio.drop_title">Or drag and drop files</p>
+              <p class="drop-sub" data-i18n="studio.drop_sub">EPUB, TXT, Markdown, PDF, web text, and more</p>
+              <div class="drop-actions">
+                <button id="upload-btn" class="btn primary" type="button"><span>⬆️ </span><span data-i18n="studio.upload">Upload</span></button>
+                <button id="paste-btn" class="btn ghost" type="button"><span>📋 </span><span data-i18n="studio.paste">Paste Text</span></button>
+              </div>
+            </section>
+          </section>
         </div>
+
+        <section class="intake-card search-card">
+          <h3 data-i18n="studio.search_section_title">Web Search (Optional)</h3>
+          <p data-i18n="studio.search_section_desc">Only use when you need extra sources.</p>
+          <div class="search-row">
+            <div class="search-box">
+              <span style="font-size:18px;color:#8fa3ca;">🔍</span>
+              <input id="search-input" type="text" placeholder="Search web sources (paper title, DOI, keywords)" data-i18n-placeholder="studio.search_placeholder" />
+            </div>
+            <button id="search-btn" class="go-btn" title="Search Sources" data-i18n-title="studio.search_btn_title">➜</button>
+          </div>
+        </section>
+
+        <div class="generate-strip">
+          <div class="generate-copy">
+            <p class="generate-title" data-i18n="studio.generate_title">Generate</p>
+            <p id="generate-hint" class="generate-hint" data-i18n="studio.generate_need_source">Add a website URL or upload files first.</p>
+          </div>
+          <button id="generate-btn" class="btn primary generate-btn" data-i18n="studio.generate">Generate Playable Web</button>
+        </div>
+
         <input
           id="file-input"
           type="file"
@@ -580,7 +832,7 @@ if (document.body) {
           accept=".txt,.md,.markdown,.csv,.json,.html,.htm,.epub,.pdf,text/plain,text/markdown,text/csv,application/json,text/html,application/epub+zip,application/pdf"
           hidden
         />
-      </section>
+      </div>
 
       <div class="source-grid">
         <section class="block">
@@ -595,7 +847,7 @@ if (document.body) {
 
       <section class="block" style="margin-top:12px;">
         <div class="progress-head">
-          <h3 style="margin:0;font-size:15px;color:#111827;">Knowledge Blocks</h3>
+          <h3 class="section-title" data-i18n="studio.knowledge_blocks">Knowledge Blocks</h3>
           <span id="knowledge-count" class="status-badge">0</span>
         </div>
         <p id="knowledge-diagnostics" class="meta-line" style="margin:8px 0 0;"></p>
@@ -604,7 +856,7 @@ if (document.body) {
 
       <section class="progress-wrap">
         <div class="progress-head">
-          <h3 style="margin:0;font-size:15px;color:#111827;" data-i18n="studio.progress">Processing Progress</h3>
+          <h3 class="section-title" data-i18n="studio.progress">Processing Progress</h3>
           <span id="status-badge" class="status-badge">idle</span>
         </div>
         <div class="progress-track"><div id="progress-fill" class="progress-fill"></div></div>
@@ -614,7 +866,7 @@ if (document.body) {
 
       <section class="block" style="margin-top:12px;">
         <div class="progress-head">
-          <h3 style="margin:0;font-size:15px;color:#111827;" data-i18n="studio.my_works">My Playable Books</h3>
+          <h3 class="section-title" data-i18n="studio.my_works">My Playable Books</h3>
           <button id="refresh-works-btn" class="tiny" type="button" data-i18n="studio.refresh">Refresh</button>
         </div>
         <div id="my-works" class="list"></div>
@@ -636,6 +888,31 @@ if (document.body) {
       </div>
     </div>
   </div>
+  <div id="pipeline-viewer" class="pipeline-viewer" hidden>
+    <div class="pipeline-viewer-card" role="dialog" aria-modal="true" aria-labelledby="pipeline-viewer-title">
+      <header class="pipeline-viewer-head">
+        <div>
+          <h3 id="pipeline-viewer-title" class="pipeline-viewer-title">Knowledge Blocks Explorer</h3>
+          <p id="pipeline-viewer-sub" class="pipeline-viewer-sub">Loading…</p>
+        </div>
+        <div class="pipeline-viewer-actions">
+          <button id="pipeline-tab-code" class="pipeline-tab active" type="button">Code</button>
+          <button id="pipeline-tab-preview" class="pipeline-tab" type="button">Preview</button>
+          <button id="pipeline-viewer-close" class="pipeline-close" type="button" aria-label="Close">×</button>
+        </div>
+      </header>
+      <div class="pipeline-viewer-body">
+        <aside class="pipeline-tree">
+          <p class="pipeline-tree-title">SKILLS 目录</p>
+          <div id="pipeline-tree-list" class="pipeline-tree-list"></div>
+        </aside>
+        <section class="pipeline-main">
+          <pre id="pipeline-code" class="pipeline-code"></pre>
+          <div id="pipeline-preview" hidden></div>
+        </section>
+      </div>
+    </div>
+  </div>
 
   <script type="module">
     import { onLanguageChange, translateDom, t } from "/shared/i18n.js";
@@ -643,8 +920,8 @@ if (document.body) {
     const searchInput = document.getElementById("search-input");
     const searchBtn = document.getElementById("search-btn");
     const generateBtn = document.getElementById("generate-btn");
-    const addSourceBtn = document.getElementById("add-source-btn");
-    const addSourceMenu = document.getElementById("add-source-menu");
+    const generateHintEl = document.getElementById("generate-hint");
+    const websiteInput = document.getElementById("website-input");
     const uploadBtn = document.getElementById("upload-btn");
     const websiteBtn = document.getElementById("website-btn");
     const pasteBtn = document.getElementById("paste-btn");
@@ -670,6 +947,14 @@ if (document.body) {
     const sourceModalTextareaEl = document.getElementById("source-modal-textarea");
     const sourceModalCancelEl = document.getElementById("source-modal-cancel");
     const sourceModalConfirmEl = document.getElementById("source-modal-confirm");
+    const pipelineViewerEl = document.getElementById("pipeline-viewer");
+    const pipelineViewerSubEl = document.getElementById("pipeline-viewer-sub");
+    const pipelineViewerCloseEl = document.getElementById("pipeline-viewer-close");
+    const pipelineTabCodeEl = document.getElementById("pipeline-tab-code");
+    const pipelineTabPreviewEl = document.getElementById("pipeline-tab-preview");
+    const pipelineTreeListEl = document.getElementById("pipeline-tree-list");
+    const pipelineCodeEl = document.getElementById("pipeline-code");
+    const pipelinePreviewEl = document.getElementById("pipeline-preview");
     const ACTIVE_JOB_KEY = "reado_studio_active_job_id";
     const AUTH_STATE_KEY = "reado_auth_state_v1";
     const PROFILE_SETUP_KEY = "reado_profile_setup_v1";
@@ -683,7 +968,19 @@ if (document.body) {
       clientLogs: [],
       currentStream: null,
       pollTimer: null,
-      openedJobId: ""
+      openedJobId: "",
+      submittingJob: false,
+      viewerAutoOpenedJobId: "",
+      pipelineViewer: {
+        open: false,
+        loading: false,
+        tab: "code",
+        workId: "",
+        bookId: "",
+        title: "",
+        selectedId: "__index__",
+        data: null
+      }
     };
 
     function readAuthState() {
@@ -765,6 +1062,45 @@ if (document.body) {
       const safe = Math.max(0, Math.min(100, Math.round(Number(percent) || 0)));
       progressFillEl.style.width = safe + "%";
       progressTextEl.textContent = text || (t("studio.progress_pct", "Progress {value}%", { value: safe }));
+    }
+
+    function isJobRunning() {
+      const status = String(state.job?.status || "").toLowerCase();
+      if (!status) return false;
+      return status !== "done" && status !== "error";
+    }
+
+    function updateGenerateCtaState() {
+      const hasSources = Array.isArray(state.selectedSources) && state.selectedSources.length > 0;
+      const hasPending = Array.isArray(state.pendingSources) && state.pendingSources.length > 0;
+      const running = isJobRunning();
+      const disabled = state.submittingJob || hasPending || !hasSources || running;
+      if (generateBtn) generateBtn.disabled = disabled;
+      if (!generateHintEl) return;
+
+      if (state.submittingJob) {
+        generateHintEl.textContent = t("studio.generate_submitting", "Submitting job...");
+        return;
+      }
+      if (running) {
+        generateHintEl.textContent = t("studio.generate_running", "Generation is running in background. You can keep using this page.");
+        return;
+      }
+      if (hasPending) {
+        generateHintEl.textContent = t("studio.generate_pending", "Sources are still parsing. Wait for completion before generating.");
+        return;
+      }
+      if (!hasSources) {
+        generateHintEl.textContent = t("studio.generate_need_source", "Add a website URL or upload files first.");
+        return;
+      }
+      const modules = estimateModuleCountFromSources(state.selectedSources);
+      const estimatedCredits = estimateGenerationCreditCost(state.selectedSources, modules);
+      generateHintEl.textContent = t(
+        "studio.generate_ready",
+        "Ready to generate. Estimated credits: {value}.",
+        { value: estimatedCredits }
+      );
     }
 
     function publishCreditSnapshot(snapshot) {
@@ -861,7 +1197,7 @@ if (document.body) {
         const parsedBy = String(item?.parsedBy || "").toLowerCase();
         const urlText = String(item?.url || "");
         if (parsedBy.startsWith("ingest.")) ingestCount += 1;
-        if (parsedBy.includes("pdf") || /\\.pdf(?:$|[?#])/i.test(urlText)) pdfLikeCount += 1;
+        if (parsedBy.includes("pdf") || /\.pdf(?:$|[?#])/i.test(urlText)) pdfLikeCount += 1;
       }
       if (pdfLikeCount > 0) return true;
       if (ingestCount > 0) return true;
@@ -982,9 +1318,247 @@ if (document.body) {
           ${row.summary ? `<p>${esc(row.summary)}</p>` : ""}
           <p class="knowledge-score">${esc("density: " + Number(row.densityScore || 0).toFixed(3))}${row.reason ? ` · ${esc(row.reason)}` : ""}</p>
           ${Array.isArray(row.keywords) && row.keywords.length ? `<div class="knowledge-tags">${row.keywords.map((item) => `<span>${esc(item)}</span>`).join("")}</div>` : ""}
-          ${row.sourceTitle ? `<p style="font-size:11px;color:#475569;">Source: ${esc(row.sourceTitle)}</p>` : ""}
+          ${row.sourceTitle ? `<p style="font-size:11px;color:#9fb0d8;">Source: ${esc(row.sourceTitle)}</p>` : ""}
         </article>
       `).join("");
+    }
+
+    function normalizeViewerBlock(block, index = 0, moduleSlug = "") {
+      const row = block && typeof block === "object" ? block : {};
+      const gate = Math.max(1, Number(row.gateIndex || row.gate_index || row.index || index + 1) || (index + 1));
+      return {
+        id: String(row.id || ("kb-" + String(gate).padStart(2, "0"))).trim(),
+        gate,
+        title: String(row.title || ("Knowledge Block " + gate)).trim(),
+        summary: String(row.summary || row.content || "").trim().slice(0, 1200),
+        keywords: Array.isArray(row.keywords) ? row.keywords.slice(0, 12) : [],
+        words: Number(row.words || 0),
+        densityScore: Number(row?.densityScore || row?.density?.score || 0),
+        moduleSlug: String(moduleSlug || "").trim()
+      };
+    }
+
+    function getViewerNormalizedRows(data) {
+      const raw = data && typeof data === "object" ? data : {};
+      const blocks = Array.isArray(raw.knowledgeBlocks) ? raw.knowledgeBlocks : [];
+      const moduleMap = Array.isArray(raw.moduleMap) ? raw.moduleMap : [];
+      const moduleByBlockId = new Map();
+      for (const row of moduleMap) {
+        const blockId = String(row?.knowledge_block_id || "").trim();
+        const moduleSlug = String(row?.module_slug || "").trim();
+        if (blockId && moduleSlug) moduleByBlockId.set(blockId, moduleSlug);
+      }
+      return blocks.map((block, index) => {
+        const blockId = String(block?.id || "").trim();
+        const fallbackModule = String(moduleMap[index]?.module_slug || "").trim();
+        const moduleSlug = moduleByBlockId.get(blockId) || fallbackModule;
+        return normalizeViewerBlock(block, index, moduleSlug);
+      });
+    }
+
+    function buildViewerIndexMarkdown(data, rows) {
+      const diagnostics = data?.splitDiagnostics && typeof data.splitDiagnostics === "object"
+        ? data.splitDiagnostics
+        : null;
+      const lines = [];
+      lines.push("# Knowledge Blocks Index");
+      lines.push("");
+      lines.push(`- book_id: ${String(data?.bookId || "").trim()}`);
+      lines.push(`- total_blocks: ${Number(data?.totalKnowledgeBlocks || rows.length)}`);
+      lines.push(`- generated_at: ${String(data?.generatedAt || data?.regeneration?.at || "").trim()}`);
+      if (diagnostics) {
+        lines.push(`- candidates: ${Number(diagnostics.candidates || rows.length)}`);
+        lines.push(`- retained: ${Number(diagnostics.retained || rows.length)}`);
+        lines.push(`- filtered: ${Number(diagnostics.filteredOut || 0)}`);
+        lines.push(`- min_density_score: ${Number(diagnostics.minDensityScore || 0).toFixed(2)}`);
+      }
+      lines.push("");
+      lines.push("## Blocks");
+      lines.push("");
+      for (const row of rows) {
+        lines.push(`- [gate-${row.gate}] ${row.title} (${row.moduleSlug || "unmapped"})`);
+      }
+      lines.push("");
+      lines.push("## Notes");
+      lines.push("");
+      lines.push("This page mirrors parser output and is intended for QA/inspection before gameplay publish.");
+      return lines.join("\n");
+    }
+
+    function buildViewerBlockMarkdown(block, total) {
+      const lines = [];
+      lines.push(`# Gate ${block.gate} / ${total}`);
+      lines.push(`${block.title}`);
+      lines.push("");
+      lines.push(`- knowledge_block_id: ${block.id}`);
+      lines.push(`- mapped_module: ${block.moduleSlug || "unmapped"}`);
+      lines.push(`- words: ${Number(block.words || 0)}`);
+      lines.push(`- density_score: ${Number(block.densityScore || 0).toFixed(4)}`);
+      lines.push("");
+      lines.push("## Summary");
+      lines.push("");
+      lines.push(block.summary || "No summary available.");
+      lines.push("");
+      lines.push("## Keywords");
+      lines.push("");
+      if (block.keywords.length) {
+        for (const item of block.keywords) lines.push(`- ${item}`);
+      } else {
+        lines.push("- (none)");
+      }
+      return lines.join("\n");
+    }
+
+    function renderPipelineViewer() {
+      const viewer = state.pipelineViewer;
+      if (!pipelineViewerEl) return;
+      if (!viewer.open) {
+        pipelineViewerEl.hidden = true;
+        return;
+      }
+      pipelineViewerEl.hidden = false;
+      const data = viewer.data && typeof viewer.data === "object" ? viewer.data : {};
+      const rows = getViewerNormalizedRows(data);
+      const total = Number(data?.totalKnowledgeBlocks || rows.length || 0);
+      const title = String(viewer.title || data?.bookId || "Knowledge Blocks Explorer").trim();
+      if (pipelineViewerSubEl) {
+        pipelineViewerSubEl.textContent = viewer.loading
+          ? "Loading pipeline data..."
+          : `${title} · ${rows.length}/${total} blocks`;
+      }
+      if (pipelineTabCodeEl) pipelineTabCodeEl.classList.toggle("active", viewer.tab === "code");
+      if (pipelineTabPreviewEl) pipelineTabPreviewEl.classList.toggle("active", viewer.tab === "preview");
+
+      const selectedId = String(viewer.selectedId || "__index__");
+      const hasSelected = selectedId === "__index__" || rows.some((row) => row.id === selectedId);
+      if (!hasSelected) viewer.selectedId = "__index__";
+
+      if (pipelineTreeListEl) {
+        const indexActive = viewer.selectedId === "__index__" ? " active" : "";
+        const rowsHtml = rows.map((row) => {
+          const active = viewer.selectedId === row.id ? " active" : "";
+          return `<button class="pipeline-tree-item${active}" data-viewer-id="${esc(row.id)}" type="button">📁 gate-${esc(String(row.gate))}<small>${esc(row.title)}</small></button>`;
+        }).join("");
+        pipelineTreeListEl.innerHTML = `<button class="pipeline-tree-item${indexActive}" data-viewer-id="__index__" type="button">📄 index.md<small>Knowledge blocks overview</small></button>${rowsHtml}`;
+        pipelineTreeListEl.querySelectorAll("button[data-viewer-id]").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            state.pipelineViewer.selectedId = String(btn.getAttribute("data-viewer-id") || "__index__");
+            renderPipelineViewer();
+          });
+        });
+      }
+
+      const selectedBlock = rows.find((row) => row.id === viewer.selectedId) || null;
+      const markdown = selectedBlock
+        ? buildViewerBlockMarkdown(selectedBlock, Math.max(1, total))
+        : buildViewerIndexMarkdown(data, rows);
+      if (pipelineCodeEl) {
+        pipelineCodeEl.hidden = viewer.tab !== "code";
+        pipelineCodeEl.textContent = markdown;
+      }
+
+      if (pipelinePreviewEl) {
+        pipelinePreviewEl.hidden = viewer.tab !== "preview";
+        if (!selectedBlock) {
+          pipelinePreviewEl.innerHTML = `
+            <article class="pipeline-preview-card">
+              <h4>Knowledge Blocks Overview</h4>
+              <div class="pipeline-preview-meta">
+                <span class="pipeline-chip">Total ${esc(String(total))}</span>
+                <span class="pipeline-chip">Visible ${esc(String(rows.length))}</span>
+              </div>
+              <p class="pipeline-empty">Select a block from the left tree to inspect summary, keywords, density score, and mapped module.</p>
+            </article>
+          `;
+        } else {
+          pipelinePreviewEl.innerHTML = `
+            <article class="pipeline-preview-card">
+              <h4>${esc(selectedBlock.title)}</h4>
+              <div class="pipeline-preview-meta">
+                <span class="pipeline-chip">Gate ${esc(String(selectedBlock.gate))}/${esc(String(total))}</span>
+                <span class="pipeline-chip">Density ${esc(Number(selectedBlock.densityScore || 0).toFixed(3))}</span>
+                <span class="pipeline-chip">Words ${esc(String(selectedBlock.words || 0))}</span>
+              </div>
+              <p>${esc(selectedBlock.summary || "No summary available.")}</p>
+              <div class="pipeline-kws">${selectedBlock.keywords.length ? selectedBlock.keywords.map((item) => `<span>${esc(item)}</span>`).join("") : `<span>(none)</span>`}</div>
+              ${selectedBlock.moduleSlug ? `<a class="tiny" href="/experiences/${esc(encodeURIComponent(selectedBlock.moduleSlug))}.html" target="_blank" rel="noreferrer">Open mapped module</a>` : `<p class="pipeline-empty">This block is not mapped to a module yet.</p>`}
+            </article>
+          `;
+        }
+      }
+    }
+
+    function closePipelineViewer() {
+      state.pipelineViewer.open = false;
+      renderPipelineViewer();
+    }
+
+    async function openPipelineViewerByWork(workId = "", fallbackTitle = "") {
+      const safeWorkId = String(workId || "").trim();
+      if (!safeWorkId) return;
+      state.pipelineViewer = {
+        ...state.pipelineViewer,
+        open: true,
+        loading: true,
+        tab: "code",
+        selectedId: "__index__",
+        workId: safeWorkId,
+        title: String(fallbackTitle || "").trim(),
+        data: null
+      };
+      renderPipelineViewer();
+      try {
+        const data = await request("GET", "/api/studio/works/" + encodeURIComponent(safeWorkId) + "/pipeline");
+        state.pipelineViewer = {
+          ...state.pipelineViewer,
+          open: true,
+          loading: false,
+          workId: safeWorkId,
+          bookId: String(data?.bookId || "").trim(),
+          title: String(fallbackTitle || data?.bookId || "").trim(),
+          data: {
+            ...data,
+            generatedAt: new Date().toISOString()
+          }
+        };
+      } catch (error) {
+        state.pipelineViewer.loading = false;
+        setError(error?.message || "Failed to load pipeline blocks.");
+      }
+      renderPipelineViewer();
+    }
+
+    function openPipelineViewerFromJob(job) {
+      const row = job && typeof job === "object" ? job : {};
+      const preview = Array.isArray(row?.pipeline?.knowledgeBlocksPreview)
+        ? row.pipeline.knowledgeBlocksPreview
+        : [];
+      if (!preview.length) return;
+      state.pipelineViewer = {
+        ...state.pipelineViewer,
+        open: true,
+        loading: false,
+        tab: "code",
+        workId: String(row?.work?.id || "").trim(),
+        bookId: String(row?.work?.book_id || "").trim(),
+        title: String(row?.work?.title || row?.work?.book_id || "Parsed Book").trim(),
+        selectedId: "__index__",
+        data: {
+          bookId: String(row?.work?.book_id || "").trim(),
+          totalKnowledgeBlocks: Number(row?.pipeline?.knowledgeBlockCount || preview.length),
+          splitDiagnostics: row?.pipeline?.knowledgeBlockDiagnostics || null,
+          knowledgeBlocks: preview.map((item, index) => ({
+            id: String(item?.id || ("kb-" + String(index + 1).padStart(2, "0"))).trim(),
+            gateIndex: Number(item?.gateIndex || index + 1),
+            title: String(item?.title || ("Knowledge Block " + (index + 1))).trim(),
+            summary: String(item?.summary || "").trim(),
+            keywords: Array.isArray(item?.keywords) ? item.keywords.slice(0, 8) : [],
+            densityScore: Number(item?.densityScore || 0)
+          })),
+          moduleMap: []
+        }
+      };
+      renderPipelineViewer();
     }
 
     function sourceKey(item) {
@@ -1019,20 +1593,83 @@ if (document.body) {
       return Math.max(1, Math.min(6, count || 3));
     }
 
+    function roughWordCount(text) {
+      const normalized = String(text || "").replace(/\s+/g, " ").trim();
+      if (!normalized) return 0;
+      const latinWords = normalized.match(/[A-Za-z0-9][A-Za-z0-9'-]*/g) || [];
+      const cjkChars = normalized.match(/[\u4e00-\u9fff]/g) || [];
+      return latinWords.length + Math.ceil(cjkChars.length / 2);
+    }
+
+    function estimateKnowledgeBlockCount(words) {
+      const safe = Math.max(1, Math.floor(Number(words) || 0));
+      const raw = Math.round(safe / 1800);
+      return Math.max(6, Math.min(36, raw || 6));
+    }
+
+    function detectPdfLikeSources(sources) {
+      const rows = Array.isArray(sources) ? sources : [];
+      return rows.some((item) => {
+        const parsedBy = String(item?.parsedBy || "").toLowerCase();
+        const urlText = String(item?.url || "");
+        return parsedBy.includes("pdf") || /\.pdf(?:$|[?#])/i.test(urlText);
+      });
+    }
+
+    function estimatePageCountFromSources(sources, words, chars) {
+      const rows = Array.isArray(sources) ? sources : [];
+      let explicitPages = 0;
+      for (const item of rows) {
+        const pageCount = Number(item?.pageCount ?? item?.pages ?? item?.meta?.pageCount);
+        if (Number.isFinite(pageCount) && pageCount > 0) {
+          explicitPages += Math.floor(pageCount);
+        }
+      }
+      if (explicitPages > 0) return explicitPages;
+      if (Number(words) > 0) return Math.ceil(Number(words) / 420);
+      if (Number(chars) > 0) return Math.ceil(Number(chars) / 5000);
+      return Math.max(1, rows.length * 6);
+    }
+
+    function estimateBookPipelineCreditCost(sources) {
+      const rows = Array.isArray(sources) ? sources : [];
+      const text = rows.map((item) => String(item?.content || item?.snippet || "")).join("\n");
+      const words = roughWordCount(text);
+      const chars = text.length;
+      const pages = Math.max(1, estimatePageCountFromSources(rows, words, chars));
+      const blocks = estimateKnowledgeBlockCount(words || pages * 420);
+      const sourceCount = Math.max(1, rows.length);
+      const isPdfLike = detectPdfLikeSources(rows);
+      const ocrPages = Math.ceil(pages * (isPdfLike ? 0.35 : 0.1));
+
+      const base = isPdfLike ? 140 : 120;
+      const pageFactor = Math.ceil(pages / 8) * 24;
+      const blockFactor = blocks * 20;
+      const sourceFactor = Math.max(0, sourceCount - 1) * 30;
+      const ocrFactor = Math.ceil(ocrPages * 0.8);
+      const total = base + pageFactor + blockFactor + sourceFactor + ocrFactor;
+      return Math.max(260, Math.min(2600, Math.round(total)));
+    }
+
     function estimateGenerationCreditCost(sources, moduleCount) {
       const rows = Array.isArray(sources) ? sources : [];
-      const chars = rows.reduce((sum, item) => (
-        sum + String(item?.content || item?.snippet || "").length
-      ), 0);
+      if (detectBookPipelineIntent(rows)) {
+        return estimateBookPipelineCreditCost(rows);
+      }
+      const text = rows.map((item) => String(item?.content || item?.snippet || "")).join("\n");
+      const chars = text.length;
+      const words = roughWordCount(text);
       const sourceCount = Math.max(1, rows.length);
       const modules = Math.max(1, Math.min(6, Number(moduleCount) || 1));
-      const notebookLikeParse = Math.ceil(chars / 5000);
-      const notebookLikeContext = Math.ceil(chars / 14000) * 2 + Math.ceil(sourceCount / 2);
-      const stitchRender = modules * 4;
-      const base = 8;
-      const total = base + notebookLikeParse + notebookLikeContext + stitchRender;
-      const scaled = Math.round(total * 10);
-      return Math.max(100, Math.min(4800, scaled));
+      const pages = Math.max(1, estimatePageCountFromSources(rows, words, chars));
+      const blocks = estimateKnowledgeBlockCount(words || pages * 420);
+      const base = 90;
+      const pageFactor = pages * 4;
+      const blockFactor = blocks * 12;
+      const moduleFactor = modules * 16;
+      const sourceFactor = Math.max(0, sourceCount - 1) * 18;
+      const total = base + pageFactor + blockFactor + moduleFactor + sourceFactor;
+      return Math.max(120, Math.min(2000, Math.round(total)));
     }
 
     function openSourceInputModal({
@@ -1191,8 +1828,9 @@ if (document.body) {
       const rows = Array.isArray(state.selectedSources) ? state.selectedSources : [];
       const pending = Array.isArray(state.pendingSources) ? state.pendingSources : [];
       if (!rows.length && !pending.length) {
-        selectedSourcesEl.innerHTML = `<div class="item"><p>${esc(t("studio.selected_empty", "No sources yet. Search or upload first."))}</p></div>`;
+        selectedSourcesEl.innerHTML = `<div class="item"><p>${esc(t("studio.selected_empty", "No sources yet. Add a website URL or upload files first."))}</p></div>`;
         renderKnowledgeBlocks();
+        updateGenerateCtaState();
         return;
       }
       const pendingHtml = pending.map((item) => {
@@ -1226,6 +1864,7 @@ if (document.body) {
         });
       });
       renderKnowledgeBlocks();
+      updateGenerateCtaState();
     }
 
     async function searchSources() {
@@ -1406,12 +2045,29 @@ if (document.body) {
           <p>${esc("Mode: " + (item.html_generation_mode || "unknown") + (item.html_generation_error ? (" · " + item.html_generation_error) : ""))}</p>
           <div class="ops">
             <a class="tiny" href="${esc(item.book_href || "#")}" target="_blank" rel="noreferrer">${esc(t("studio.open_book", "Open Book"))}</a>
+            <button class="tiny" data-act="blocks" data-id="${esc(item.id)}">Knowledge Blocks</button>
             <button class="tiny" data-act="rename" data-id="${esc(item.id)}">${esc(t("studio.rename", "Rename"))}</button>
             <button class="tiny" data-act="publish" data-id="${esc(item.id)}">${esc(item.is_public ? t("studio.unpublish", "Unpublish") : t("studio.publish", "Publish to Library"))}</button>
             <button class="tiny" data-act="delete" data-id="${esc(item.id)}">${esc(t("studio.delete", "Delete"))}</button>
           </div>
         </article>
       `).join("");
+
+      myWorksEl.querySelectorAll('button[data-act="blocks"]').forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const id = btn.getAttribute("data-id") || "";
+          const row = rows.find((item) => item.id === id);
+          if (!id || !row) return;
+          btn.disabled = true;
+          try {
+            await openPipelineViewerByWork(id, row.title || row.book_id || "Knowledge Blocks");
+          } catch (error) {
+            setError(error?.message || "Failed to open knowledge blocks.");
+          } finally {
+            btn.disabled = false;
+          }
+        });
+      });
 
       myWorksEl.querySelectorAll('button[data-act="rename"]').forEach((btn) => {
         btn.addEventListener("click", async () => {
@@ -1483,6 +2139,10 @@ if (document.body) {
       renderLogs();
       const blocksDigest = buildKnowledgeBlocksDigest(state.job);
       renderKnowledgeBlocks();
+      if (step === "knowledge_blocks" && state.job?.id && state.viewerAutoOpenedJobId !== state.job.id) {
+        state.viewerAutoOpenedJobId = state.job.id;
+        openPipelineViewerFromJob(state.job);
+      }
       if (state.job?.creditSnapshot) {
         publishCreditSnapshot(state.job.creditSnapshot);
       }
@@ -1507,6 +2167,7 @@ if (document.body) {
         try { localStorage.removeItem(ACTIVE_JOB_KEY); } catch {}
         closeJobChannels();
         loadMyWorks().catch(() => {});
+        updateGenerateCtaState();
         return;
       }
       if (status === "done") {
@@ -1533,12 +2194,17 @@ if (document.body) {
         setMeta(info);
         try { localStorage.removeItem(ACTIVE_JOB_KEY); } catch {}
         loadMyWorks().catch(() => {});
+        if (work?.id && state.viewerAutoOpenedJobId !== `${state.job.id}:done`) {
+          state.viewerAutoOpenedJobId = `${state.job.id}:done`;
+          openPipelineViewerByWork(work.id, work.title || work.book_id || "Knowledge Blocks").catch(() => {});
+        }
         if (state.job.id && state.openedJobId !== state.job.id && href) {
           state.openedJobId = state.job.id;
           window.open(href, "_blank", "noopener,noreferrer");
         }
         closeJobChannels();
       }
+      updateGenerateCtaState();
     }
 
     async function pollJob(jobId) {
@@ -1586,17 +2252,23 @@ if (document.body) {
       if (!ensureReadyForGeneration()) {
         return;
       }
+      if (state.submittingJob || isJobRunning()) {
+        return;
+      }
       if (state.pendingSources.length > 0) {
         setError(t("studio.err_wait_pending", "Please wait until source uploads/parsing complete."));
+        updateGenerateCtaState();
         return;
       }
       if (!state.selectedSources.length) {
-        setError(t("studio.err_need_source", "Add at least one source first (search result or uploaded file)."));
+        setError(t("studio.err_need_source", "Add at least one source first (website URL or uploaded file)."));
+        updateGenerateCtaState();
         return;
       }
       setError("");
       setMeta(t("studio.meta_generating", "Generating playable web, please wait..."));
-      generateBtn.disabled = true;
+      state.submittingJob = true;
+      updateGenerateCtaState();
       setStatus("queued");
       setProgress(2, t("studio.progress_job_submitted", "Job submitted, waiting..."));
       pushClientLog(t("studio.log_generate_start", "Start generating playable web"), "job", 2);
@@ -1608,7 +2280,7 @@ if (document.body) {
         const useBookPipeline = detectBookPipelineIntent(state.selectedSources);
         const payload = {
           mode: "sources",
-          input: searchInput.value || "custom sources",
+          input: (searchInput.value || websiteInput?.value || "custom sources"),
           sources: state.selectedSources,
           ...(useBookPipeline ? {
             bookPipeline: true,
@@ -1634,7 +2306,8 @@ if (document.body) {
         setStatus("error");
         pushClientLog(t("studio.log_generation_failed", "Generation failed: {value}", { value: error?.message || "unknown" }), "job");
       } finally {
-        generateBtn.disabled = false;
+        state.submittingJob = false;
+        updateGenerateCtaState();
       }
     }
 
@@ -1655,66 +2328,43 @@ if (document.body) {
         const files = event.dataTransfer?.files;
         ingestFileList(files).catch((error) => setError(error?.message || t("studio.err_file_import_failed", "File import failed")));
       });
-    }
-
-    function closeAddSourceMenu() {
-      if (!addSourceMenu) return;
-      addSourceMenu.hidden = true;
-    }
-
-    function toggleAddSourceMenu() {
-      if (!addSourceMenu) return;
-      addSourceMenu.hidden = !addSourceMenu.hidden;
-    }
-
-    searchBtn.addEventListener("click", searchSources);
-    searchInput.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") searchSources();
-    });
-    generateBtn.addEventListener("click", generatePlayable);
-
-    addSourceBtn.addEventListener("click", (event) => {
-      event.stopPropagation();
-      toggleAddSourceMenu();
-    });
-    document.addEventListener("click", (event) => {
-      if (!addSourceMenu || addSourceMenu.hidden) return;
-      if (addSourceMenu.contains(event.target) || addSourceBtn.contains(event.target)) return;
-      closeAddSourceMenu();
-    });
-
-    uploadBtn.addEventListener("click", () => {
-      closeAddSourceMenu();
-      fileInput.click();
-    });
-    fileInput.addEventListener("change", () => {
-      ingestFileList(fileInput.files).catch((error) => setError(error?.message || t("studio.err_file_import_failed", "File import failed")));
-      fileInput.value = "";
-    });
-
-    websiteBtn.addEventListener("click", async () => {
-      closeAddSourceMenu();
-      const url = await openSourceInputModal({
-        title: t("studio.website", "Website"),
-        label: t("studio.prompt_url", "Paste website / paper URL"),
-        placeholder: "https://",
-        multiline: false,
-        confirmText: t("studio.modal_add_source", "Add Source"),
-        cancelText: t("studio.modal_cancel", "Cancel")
+      dropZone.addEventListener("click", (event) => {
+        if (event.target && event.target.closest && event.target.closest("button")) return;
+        fileInput.click();
       });
-      if (!url) return;
+    }
+
+    function normalizeWebsiteUrl(value) {
+      const raw = String(value || "").trim();
+      if (!raw) return "";
+      try {
+        return new URL(raw).toString();
+      } catch {}
+      try {
+        return new URL("https://" + raw).toString();
+      } catch {}
+      return "";
+    }
+
+    async function ingestWebsiteUrl(url) {
+      const normalizedUrl = normalizeWebsiteUrl(url);
+      if (!normalizedUrl) {
+        setError(t("studio.err_invalid_url", "Please enter a valid website URL."));
+        if (websiteInput) websiteInput.focus();
+        return;
+      }
       setError("");
       setStatus("ingesting");
       setProgress(12, t("studio.progress_fetching_page", "Fetching page content..."));
-      pushClientLog(t("studio.log_fetch_start", "Start fetching source: {value}", { value: url }), "source", 12);
+      pushClientLog(t("studio.log_fetch_start", "Start fetching source: {value}", { value: normalizedUrl }), "source", 12);
       const pendingId = createPendingSource({
-        title: url,
+        title: normalizedUrl,
         kind: "url",
         status: t("studio.pending_fetching", "Fetching web source..."),
         progress: 12
       });
       try {
-        const data = await request("POST", "/api/studio/sources/ingest-url", { url });
+        const data = await request("POST", "/api/studio/sources/ingest-url", { url: normalizedUrl });
         const events = Array.isArray(data.events) ? data.events : [];
         for (const event of events) {
           pushClientLog(event.message || t("studio.log_processing_web", "Processing webpage"), event.step || "ingest_url", event.progress);
@@ -1736,16 +2386,47 @@ if (document.body) {
         setMeta(t("studio.meta_website_added", "Website source added with extracted content."));
         setStatus("ready");
         setProgress(100, t("studio.progress_website_done", "Website source import completed"));
+        if (websiteInput) websiteInput.value = "";
       } catch (error) {
         removePendingSource(pendingId);
         setStatus("error");
         setError(error?.message || t("studio.err_website_failed", "Website source fetch failed"));
         pushClientLog(t("studio.log_website_failed", "Website fetch failed: {value}", { value: error?.message || "unknown" }), "source");
       }
+    }
+
+    searchBtn.addEventListener("click", searchSources);
+    searchInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") searchSources();
+    });
+    generateBtn.addEventListener("click", generatePlayable);
+
+    uploadBtn.addEventListener("click", () => {
+      fileInput.click();
+    });
+    fileInput.addEventListener("change", () => {
+      ingestFileList(fileInput.files).catch((error) => setError(error?.message || t("studio.err_file_import_failed", "File import failed")));
+      fileInput.value = "";
     });
 
+    websiteBtn.addEventListener("click", async () => {
+      if (websiteBtn.disabled) return;
+      websiteBtn.disabled = true;
+      try {
+        await ingestWebsiteUrl(websiteInput?.value || "");
+      } finally {
+        websiteBtn.disabled = false;
+      }
+    });
+    if (websiteInput) {
+      websiteInput.addEventListener("keydown", (event) => {
+        if (event.key !== "Enter") return;
+        event.preventDefault();
+        websiteBtn.click();
+      });
+    }
+
     pasteBtn.addEventListener("click", async () => {
-      closeAddSourceMenu();
       const text = await openSourceInputModal({
         title: t("studio.paste", "Paste Text"),
         label: t("studio.prompt_paste", "Paste text content for generation context"),
@@ -1765,11 +2446,41 @@ if (document.body) {
       pushClientLog(t("studio.log_text_added", "Pasted text source added"), "source");
     });
 
+    if (pipelineViewerCloseEl) {
+      pipelineViewerCloseEl.addEventListener("click", () => closePipelineViewer());
+    }
+    if (pipelineTabCodeEl) {
+      pipelineTabCodeEl.addEventListener("click", () => {
+        state.pipelineViewer.tab = "code";
+        renderPipelineViewer();
+      });
+    }
+    if (pipelineTabPreviewEl) {
+      pipelineTabPreviewEl.addEventListener("click", () => {
+        state.pipelineViewer.tab = "preview";
+        renderPipelineViewer();
+      });
+    }
+    if (pipelineViewerEl) {
+      pipelineViewerEl.addEventListener("click", (event) => {
+        if (event.target === pipelineViewerEl) {
+          closePipelineViewer();
+        }
+      });
+    }
+    window.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && state.pipelineViewer.open) {
+        event.preventDefault();
+        closePipelineViewer();
+      }
+    });
+
     setupDropZone();
     renderSearchResults();
     renderSelectedSources();
     renderKnowledgeBlocks();
     renderLogs();
+    renderPipelineViewer();
     loadMyWorks().catch(() => {});
     refreshWorksBtn.addEventListener("click", () => {
       loadMyWorks().catch(() => {});

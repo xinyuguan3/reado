@@ -49,10 +49,46 @@
             font-family: 'Noto Sans SC', sans-serif;
         }
     </style>
+<style id="reado-shell-preload-style">
+html.reado-shell-preload body:not(.reado-shell-applied) {
+  padding-top: 80px !important;
+}
+@media (min-width: 1024px) {
+  html.reado-shell-preload:not(.reado-shell-preload-learning) body:not(.reado-shell-applied) {
+    padding-left: 256px !important;
+  }
+}
+@media (min-width: 1200px) {
+  html.reado-shell-preload:not(.reado-shell-preload-learning) body:not(.reado-shell-applied) {
+    padding-right: clamp(280px, 24vw, 320px) !important;
+  }
+}
+html.reado-shell-preload body:not(.reado-shell-applied) > header:first-of-type,
+html.reado-shell-preload body:not(.reado-shell-applied) > nav:first-of-type,
+html.reado-shell-preload body:not(.reado-shell-applied) > aside:first-of-type,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex > nav,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex > aside,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex-1 > nav,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex-1 > aside,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex > .flex-1 > nav,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex > .flex-1 > aside {
+  display: none !important;
+}
+</style>
+<script id="reado-shell-preload-script">
+(() => {
+  const root = document.documentElement;
+  root.classList.add("reado-shell-preload");
+  const path = window.location.pathname || "";
+  if (path.startsWith("/experiences/") || path.startsWith("/books/")) {
+    root.classList.add("reado-shell-preload-learning");
+  }
+})();
+</script>
 </head>
 <body class="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-100 min-h-screen flex flex-col relative overflow-x-hidden selection:bg-primary selection:text-white">
-<script src="/shared/book-catalog.js?v=1772451455814"></script>
-<script type="module" src="/shared/shell.js?v=1772451455814"></script>
+<script src="/shared/book-catalog.js?v=1772525052070"></script>
+<script type="module" src="/shared/shell.js?v=1772525052070"></script>
 <reado-app-shell data-page="other"></reado-app-shell>
 <div class="fixed inset-0 z-0 pointer-events-none opacity-20 bg-grid-pattern bg-[length:40px_40px]"></div>
 <div class="fixed inset-0 z-0 pointer-events-none texture-overlay"></div>
