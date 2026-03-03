@@ -9,6 +9,7 @@ import { initReadoAutoTranslate } from "/shared/auto-translate.js";
 
 const ROUTES = [
   { id: "studio", icon: "auto_awesome", labelKey: "route.studio", label: "创作工坊", href: "/pages/playable-studio.html" },
+  { id: "blog", icon: "article", labelKey: "route.blog", label: "博客", href: "/blog/" },
   { id: "mission", icon: "assignment", labelKey: "route.mission", label: "任务中心", href: "/pages/simulator-library-level-selection-2.html" },
   { id: "ranking", icon: "leaderboard", labelKey: "route.ranking", label: "排行榜", href: "/pages/global-scholar-leaderboard.html" },
   { id: "library", icon: "auto_stories", labelKey: "route.library", label: "我的书架", href: "/pages/playable-studio.html#my-library" },
@@ -16,6 +17,7 @@ const ROUTES = [
 ];
 const ICON_FALLBACK_MAP = {
   map: "🗺",
+  article: "📰",
   assignment: "✅",
   auto_awesome: "✨",
   leaderboard: "🏆",

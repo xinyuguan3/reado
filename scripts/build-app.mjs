@@ -3298,6 +3298,7 @@ function buildSharedShellScript() {
   { id: "knowledge-map", icon: "map", label: "个人书库", href: "/pages/gamified-learning-hub-dashboard-1.html" },
   { id: "mission", icon: "assignment", label: "任务中心", href: "/pages/simulator-library-level-selection-2.html" },
   { id: "studio", icon: "auto_awesome", label: "创作工坊", href: "/pages/playable-studio.html" },
+  { id: "blog", icon: "article", label: "博客", href: "/blog/" },
   { id: "ranking", icon: "leaderboard", label: "排行榜", href: "/pages/global-scholar-leaderboard.html" },
   { id: "market", icon: "storefront", label: "交易中心", href: "/pages/gamified-learning-hub-dashboard-3.html" },
   { id: "profile", icon: "person", label: "个人资料", href: "/pages/gamified-learning-hub-dashboard-2.html" }
