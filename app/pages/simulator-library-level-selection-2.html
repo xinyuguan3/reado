@@ -97,8 +97,8 @@ html.reado-shell-preload body:not(.reado-shell-applied) > .flex > .flex-1 > asid
 </script>
 </head>
 <body class="antialiased h-screen w-full overflow-hidden flex selection:bg-primary selection:text-white">
-<script src="/shared/book-catalog.js?v=1772525052070"></script>
-<script type="module" src="/shared/shell.js?v=1772525052070"></script>
+<script src="/shared/book-catalog.js?v=1772544454014"></script>
+<script type="module" src="/shared/shell.js?v=1772544454014"></script>
 <reado-app-shell data-page="mission"></reado-app-shell>
 <div class="fixed inset-0 z-0 pointer-events-none">
 <div class="absolute inset-0 bg-cover bg-center opacity-5 blur-3xl scale-110" style="background-image: url('/assets/remote-images/07e79e02e21e9fa07c8ab125.png');"></div>
@@ -390,8 +390,12 @@ html.reado-shell-preload body:not(.reado-shell-applied) > .flex > .flex-1 > asid
 
 <script id="reado-mission-center-script">
 (() => {
+  const catalog = window.__READO_BOOK_CATALOG__;
+  const books = Array.isArray(catalog?.books) ? catalog.books : [];
+  const unlockKey = catalog?.storage?.unlockKey || "reado_unlocked_books_v1";
+  const completedKey = catalog?.storage?.completedKey || "reado_completed_books_v1";
+  const claimKey = "reado_mission_claims_v1";
   const activeTabKey = "reado_mission_active_tab_v1";
-  const authStateKey = "reado_auth_state_v1";
 
   const contentHost = document.querySelector("main .flex-1.overflow-y-auto.px-8.pb-12.hide-scrollbar .max-w-5xl");
   const tabWrap = document.querySelector("main header .flex.items-center.gap-2.bg-reado-sidebar");
@@ -410,79 +414,236 @@ html.reado-shell-preload body:not(.reado-shell-applied) > .flex > .flex-1 > asid
     achievement: { icon: "emoji_events", title: "长期里程碑", reset: "永久累计，不重置" }
   };
 
-  const requestJson = async (method, path, payload) => {
-    const response = await fetch(path, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      credentials: "same-origin",
-      body: payload ? JSON.stringify(payload) : undefined
-    });
-    let data = {};
+  const readSet = (key) => {
     try {
-      data = await response.json();
+      const raw = JSON.parse(localStorage.getItem(key) || "[]");
+      return new Set(Array.isArray(raw) ? raw : []);
     } catch {
-      data = {};
+      return new Set();
     }
-    if (!response.ok || data?.ok === false) {
-      throw new Error(data?.error || ("Request failed with " + response.status));
-    }
-    return data;
   };
 
-  const readAuthState = () => {
+  const readClaims = () => {
     try {
-      const raw = JSON.parse(localStorage.getItem(authStateKey) || "null");
-      return raw && typeof raw === "object" ? raw : null;
+      const raw = JSON.parse(localStorage.getItem(claimKey) || "{}");
+      return raw && typeof raw === "object" ? raw : {};
     } catch {
-      return null;
+      return {};
     }
   };
 
-  const getAuthUserId = () => {
-    const auth = readAuthState();
-    const userId = String(auth?.userId || "").trim();
-    return /^[a-zA-Z0-9._:-]{4,128}$/.test(userId) ? userId : "";
+  const writeClaims = (claims) => {
+    localStorage.setItem(claimKey, JSON.stringify(claims));
   };
 
-  const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    "\"": "&quot;",
-    "'": "&#39;"
-  }[char] || char));
-
-  const applyActiveTabButton = (activeTab) => {
-    tabButtons.forEach((button) => {
-      const tab = button.dataset.tab;
-      const isActive = tab === activeTab;
-      button.className = isActive
-        ? "px-6 py-2 rounded-lg bg-primary text-white font-bold text-sm shadow-lg active-glow transition-all"
-        : "px-6 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 font-bold text-sm transition-all";
-    });
+  const getDayKey = () => {
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, "0");
+    const d = String(now.getDate()).padStart(2, "0");
+    return y + "-" + m + "-" + d;
   };
 
-  const normalizeTasksByTab = (tabs) => {
+  const getWeekKey = () => {
+    const now = new Date();
+    const start = new Date(now.getFullYear(), 0, 1);
+    const day = Math.floor((now - start) / 86400000) + 1;
+    const week = Math.ceil((day + start.getDay()) / 7);
+    return now.getFullYear() + "-W" + String(week).padStart(2, "0");
+  };
+
+  const getSnapshot = () => {
+    const unlocked = readSet(unlockKey);
+    const completed = readSet(completedKey);
+    const started = new Set(
+      books
+        .filter((book) => Boolean(localStorage.getItem("reado_book_last_" + book.id)))
+        .map((book) => book.id)
+    );
+    const categoriesUnlocked = new Set(
+      books.filter((book) => unlocked.has(book.id)).map((book) => book.category)
+    );
+    const categoriesCompleted = new Set(
+      books.filter((book) => completed.has(book.id)).map((book) => book.category)
+    );
+    const completedCareerBooks = books.filter((book) => completed.has(book.id) && book.category === "career-wealth").length;
+    const totalCompletedModules = books
+      .filter((book) => completed.has(book.id))
+      .reduce((sum, book) => sum + (book.moduleCount || 0), 0);
     return {
-      daily: Array.isArray(tabs?.daily) ? tabs.daily : [],
-      weekly: Array.isArray(tabs?.weekly) ? tabs.weekly : [],
-      achievement: Array.isArray(tabs?.achievement) ? tabs.achievement : []
+      unlocked,
+      completed,
+      started,
+      categoriesUnlocked,
+      categoriesCompleted,
+      completedCareerBooks,
+      totalCompletedModules
     };
   };
 
-  const isTaskClaimed = (task) => Boolean(task?.claimed || task?.status === "claimed");
-  const isTaskComplete = (task) => Boolean(task?.complete || task?.status === "claimable" || task?.status === "claimed");
-  const getProgressPercent = (task) => {
-    const percent = Number(task?.percent);
-    if (Number.isFinite(percent)) return Math.max(0, Math.min(100, Math.round(percent)));
-    const progress = Math.max(0, Number(task?.progress) || 0);
-    const goal = Math.max(1, Number(task?.goal) || 1);
-    return Math.max(0, Math.min(100, Math.round((progress / goal) * 100)));
+  const buildTasks = () => {
+    const s = getSnapshot();
+    const openBook = books.find((book) => s.unlocked.has(book.id) && !s.completed.has(book.id));
+    const firstBook = books[0];
+    const knowledgeHref = "/pages/gamified-learning-hub-dashboard-1.html";
+    const marketHref = "/pages/gamified-learning-hub-dashboard-3.html";
+    const profileHref = "/pages/gamified-learning-hub-dashboard-2.html";
+
+    return {
+      daily: [
+        {
+          id: "daily-start-learning",
+          icon: "auto_stories",
+          title: "开启一次学习流程",
+          desc: "进入任意书籍模块并开始体验。",
+          goal: 1,
+          progress: Math.min(s.started.size, 1),
+          rewardCoins: 120,
+          rewardExp: 60,
+          actionLabel: "去学习",
+          actionHref: openBook ? openBook.hubHref : knowledgeHref
+        },
+        {
+          id: "daily-unlock-book",
+          icon: "shopping_bag",
+          title: "解锁 1 本书",
+          desc: "前往交易中心购买任意一本书籍模块。",
+          goal: 1,
+          progress: Math.min(s.unlocked.size, 1),
+          rewardCoins: 180,
+          rewardExp: 90,
+          actionLabel: "去交易中心",
+          actionHref: marketHref
+        },
+        {
+          id: "daily-finish-book",
+          icon: "task_alt",
+          title: "完成 1 本书",
+          desc: "完整通关一本书的全部模块并激活徽章。",
+          goal: 1,
+          progress: Math.min(s.completed.size, 1),
+          rewardCoins: 260,
+          rewardExp: 140,
+          actionLabel: "去完成",
+          actionHref: openBook ? openBook.hubHref : profileHref
+        }
+      ],
+      weekly: [
+        {
+          id: "weekly-complete-two-books",
+          icon: "menu_book",
+          title: "本周通关 2 本书",
+          desc: "完成跨主题学习，积累稳定输出能力。",
+          goal: 2,
+          progress: Math.min(s.completed.size, 2),
+          rewardCoins: 900,
+          rewardExp: 420,
+          actionLabel: "继续推进",
+          actionHref: openBook ? openBook.hubHref : knowledgeHref
+        },
+        {
+          id: "weekly-unlock-three-books",
+          icon: "inventory_2",
+          title: "本周解锁 3 本书",
+          desc: "扩充你的学习库，准备更高强度挑战。",
+          goal: 3,
+          progress: Math.min(s.unlocked.size, 3),
+          rewardCoins: 780,
+          rewardExp: 360,
+          actionLabel: "去交易中心",
+          actionHref: marketHref
+        },
+        {
+          id: "weekly-two-categories",
+          icon: "hub",
+          title: "本周覆盖 2 个领域",
+          desc: "跨领域学习可显著提升迁移能力。",
+          goal: 2,
+          progress: Math.min(s.categoriesCompleted.size, 2),
+          rewardCoins: 820,
+          rewardExp: 380,
+          actionLabel: "去个人书库",
+          actionHref: knowledgeHref
+        },
+        {
+          id: "weekly-career-book",
+          icon: "trending_up",
+          title: "本周完成 1 本事业/财富书",
+          desc: "优先提升可直接转化的实战能力。",
+          goal: 1,
+          progress: Math.min(s.completedCareerBooks, 1),
+          rewardCoins: 560,
+          rewardExp: 260,
+          actionLabel: "去挑战",
+          actionHref: openBook ? openBook.hubHref : knowledgeHref
+        }
+      ],
+      achievement: [
+        {
+          id: "achievement-unlock-all-books",
+          icon: "library_books",
+          title: "全书库解锁",
+          desc: "解锁当前版本所有书籍模块。",
+          goal: Math.max(books.length, 1),
+          progress: s.unlocked.size,
+          rewardCoins: 2000,
+          rewardExp: 1000,
+          actionLabel: "去解锁",
+          actionHref: marketHref
+        },
+        {
+          id: "achievement-complete-all-books",
+          icon: "workspace_premium",
+          title: "全书库通关",
+          desc: "完成当前版本所有书籍并点亮全部徽章。",
+          goal: Math.max(books.length, 1),
+          progress: s.completed.size,
+          rewardCoins: 3000,
+          rewardExp: 1500,
+          actionLabel: "去完成",
+          actionHref: openBook ? openBook.hubHref : profileHref
+        },
+        {
+          id: "achievement-four-categories",
+          icon: "public",
+          title: "四大领域探索者",
+          desc: "在四个生活战场中都完成至少一本书。",
+          goal: 4,
+          progress: Math.min(s.categoriesCompleted.size, 4),
+          rewardCoins: 2400,
+          rewardExp: 1200,
+          actionLabel: "去探索",
+          actionHref: knowledgeHref
+        },
+        {
+          id: "achievement-20-modules",
+          icon: "insights",
+          title: "20 模块深度学习者",
+          desc: "累计完成 20 个模块，建立系统知识网络。",
+          goal: 20,
+          progress: Math.min(s.totalCompletedModules, 20),
+          rewardCoins: 1600,
+          rewardExp: 900,
+          actionLabel: "继续学习",
+          actionHref: firstBook ? firstBook.hubHref : knowledgeHref
+        }
+      ]
+    };
   };
 
-  const renderTaskCard = (task, tab) => {
+  const getClaimId = (task, tab) => {
+    if (tab === "daily") return task.id + "::" + getDayKey();
+    if (tab === "weekly") return task.id + "::" + getWeekKey();
+    return task.id;
+  };
+
+  const isTaskClaimed = (claims, task, tab) => Boolean(claims[getClaimId(task, tab)]);
+  const isTaskComplete = (task) => task.progress >= task.goal;
+  const getProgressPercent = (task) => Math.max(0, Math.min(100, Math.round((task.progress / Math.max(task.goal, 1)) * 100)));
+
+  const renderTaskCard = (task, tab, claims) => {
     const complete = isTaskComplete(task);
-    const claimed = isTaskClaimed(task);
+    const claimed = isTaskClaimed(claims, task, tab);
     const percent = getProgressPercent(task);
     const buttonState = claimed
       ? { type: "disabled", label: "已领取", className: "bg-white/5 text-slate-500 cursor-not-allowed border border-white/5" }
@@ -500,19 +661,19 @@ html.reado-shell-preload body:not(.reado-shell-applied) > .flex > .flex-1 > asid
         <div class="flex items-center justify-between gap-6">
           <div class="flex items-center gap-5 flex-1">
             <div class="w-12 h-12 rounded-xl ${complete ? "bg-primary/20 border-primary/30" : "bg-primary/10 border-primary/20"} border flex items-center justify-center">
-              <span class="material-icons text-primary">${esc(task.icon || "assignment")}</span>
+              <span class="material-icons text-primary">${task.icon || "assignment"}</span>
             </div>
             <div class="flex-1">
               <div class="flex items-center gap-3 mb-1">
-                <h4 class="text-white font-bold">${esc(task.title)}</h4>
+                <h4 class="text-white font-bold">${task.title}</h4>
                 ${statusBadge}
               </div>
-              <p class="text-sm text-slate-400 mb-2">${esc(task.desc)}</p>
+              <p class="text-sm text-slate-400 mb-2">${task.desc}</p>
               <div class="flex items-center gap-4">
                 <div class="flex-1 max-w-xs bg-black/40 h-2 rounded-full overflow-hidden mt-1">
                   <div class="progress-glow h-full ${complete ? "bg-accent-cyan shadow-[0_0_10px_rgba(0,242,255,0.5)]" : "bg-primary"} transition-all duration-700" style="width:${percent}%"></div>
                 </div>
-                <span class="text-xs font-bold ${complete ? "text-accent-cyan" : "text-primary"} italic">${Math.max(0, Number(task.progress) || 0)}/${Math.max(1, Number(task.goal) || 1)}</span>
+                <span class="text-xs font-bold ${complete ? "text-accent-cyan" : "text-primary"} italic">${task.progress}/${task.goal}</span>
               </div>
             </div>
           </div>
@@ -521,32 +682,32 @@ html.reado-shell-preload body:not(.reado-shell-applied) > .flex > .flex-1 > asid
               <div class="flex flex-col items-center">
                 <div class="flex items-center gap-1 text-accent-cyan font-bold">
                   <span class="material-icons text-sm">diamond</span>
-                  <span>+${Math.max(0, Number(task.rewardGems) || 0)}</span>
+                  <span>+${task.rewardCoins || 0}</span>
                 </div>
                 <span class="text-[10px] text-slate-500 font-bold uppercase">宝石</span>
               </div>
               <div class="flex flex-col items-center">
                 <div class="flex items-center gap-1 text-primary font-bold">
                   <span class="material-icons text-sm">bolt</span>
-                  <span>+${Math.max(0, Number(task.rewardXp) || 0)}</span>
+                  <span>+${task.rewardExp || 0}</span>
                 </div>
                 <span class="text-[10px] text-slate-500 font-bold uppercase">经验</span>
               </div>
             </div>
-            <button data-task-id="${esc(task.taskId)}" data-tab="${esc(tab)}" data-state="${buttonState.type}" data-action="${esc(task.actionHref || "")}" class="px-6 py-2 font-bold text-sm rounded-lg transition-all ${buttonState.className}">${buttonState.label}</button>
+            <button data-task-id="${task.id}" data-tab="${tab}" data-state="${buttonState.type}" data-action="${task.actionHref || ""}" class="px-6 py-2 font-bold text-sm rounded-lg transition-all ${buttonState.className}">${buttonState.label}</button>
           </div>
         </div>
       </div>`;
   };
 
-  const chooseRecommended = (tasksByTab) => {
+  const chooseRecommended = (tasksByTab, claims) => {
     const candidates = [];
     for (const tab of ["daily", "weekly"]) {
       for (const task of tasksByTab[tab]) {
         const complete = isTaskComplete(task);
-        const claimed = isTaskClaimed(task);
+        const claimed = isTaskClaimed(claims, task, tab);
         if (claimed) continue;
-        const ratio = (Number(task.progress) || 0) / Math.max(Number(task.goal) || 1, 1);
+        const ratio = task.progress / Math.max(task.goal, 1);
         let score = tab === "weekly" ? 85 : 60;
         score += Math.round(ratio * 100);
         if (complete) score += 400;
@@ -558,10 +719,10 @@ html.reado-shell-preload body:not(.reado-shell-applied) > .flex > .flex-1 > asid
     return candidates[0] || null;
   };
 
-  const chooseMilestone = (tasksByTab) => {
+  const chooseMilestone = (tasksByTab, claims) => {
     const list = tasksByTab.achievement
-      .filter((task) => !isTaskClaimed(task))
-      .sort((a, b) => ((Number(b.progress) || 0) / Math.max(Number(b.goal) || 1, 1)) - ((Number(a.progress) || 0) / Math.max(Number(a.goal) || 1, 1)));
+      .filter((task) => !isTaskClaimed(claims, task, "achievement"))
+      .sort((a, b) => (b.progress / Math.max(b.goal, 1)) - (a.progress / Math.max(a.goal, 1)));
     return list[0] || tasksByTab.achievement[0] || null;
   };
 
@@ -570,9 +731,20 @@ html.reado-shell-preload body:not(.reado-shell-applied) > .flex > .flex-1 > asid
     return tabOrder.includes(raw) ? raw : "daily";
   };
 
-  tabButtons.forEach((button, index) => {
-    button.dataset.tab = tabOrder[index] || "daily";
-    button.textContent = tabLabels[button.dataset.tab] || tabLabels.daily;
+  const setActiveButtonStyles = (activeTab) => {
+    tabButtons.forEach((button) => {
+      const tab = button.dataset.tab;
+      const isActive = tab === activeTab;
+      button.className = isActive
+        ? "px-6 py-2 rounded-lg bg-primary text-white font-bold text-sm shadow-lg active-glow transition-all"
+        : "px-6 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 font-bold text-sm transition-all";
+    });
+  };
+
+  tabButtons.forEach((button) => {
+    const label = (button.textContent || "").trim();
+    const matched = Object.entries(tabLabels).find(([, value]) => value === label);
+    button.dataset.tab = matched ? matched[0] : "daily";
   });
 
   contentHost.innerHTML = `
@@ -589,17 +761,17 @@ html.reado-shell-preload body:not(.reado-shell-applied) > .flex > .flex-1 > asid
   const milestoneEl = document.getElementById("reado-mission-milestone");
   if (!summaryEl || !listEl || !recommendEl || !milestoneEl) return;
 
-  let board = { tabs: { daily: [], weekly: [], achievement: [] } };
   let activeTab = getActiveTab();
 
   const render = () => {
-    const tasksByTab = normalizeTasksByTab(board.tabs);
+    const tasksByTab = buildTasks();
+    const claims = readClaims();
     const currentTasks = tasksByTab[activeTab] || [];
     const completeCount = currentTasks.filter((task) => isTaskComplete(task)).length;
-    const claimedCount = currentTasks.filter((task) => isTaskClaimed(task)).length;
+    const claimedCount = currentTasks.filter((task) => isTaskClaimed(claims, task, activeTab)).length;
     const meta = tabMeta[activeTab];
 
-    applyActiveTabButton(activeTab);
+    setActiveButtonStyles(activeTab);
     summaryEl.innerHTML = `
       <div class="flex items-center gap-2">
         <span class="material-icons text-primary">${meta.icon}</span>
@@ -608,9 +780,9 @@ html.reado-shell-preload body:not(.reado-shell-applied) > .flex > .flex-1 > asid
       </div>
       <div class="text-sm font-bold text-slate-400">已完成 ${completeCount}/${currentTasks.length} · 已领取 ${claimedCount}</div>`;
 
-    listEl.innerHTML = currentTasks.map((task) => renderTaskCard(task, activeTab)).join("");
+    listEl.innerHTML = currentTasks.map((task) => renderTaskCard(task, activeTab, claims)).join("");
 
-    const recommended = chooseRecommended(tasksByTab);
+    const recommended = chooseRecommended(tasksByTab, claims);
     if (!recommended) {
       recommendEl.innerHTML = `
         <div class="p-6 rounded-2xl bg-reado-sidebar border border-white/5">
@@ -630,21 +802,21 @@ html.reado-shell-preload body:not(.reado-shell-applied) > .flex > .flex-1 > asid
             </div>
             <span class="px-2 py-0.5 rounded-full bg-primary/20 text-primary text-[10px] font-bold">${tabLabels[recommended.tab]}</span>
           </div>
-          <h5 class="text-white font-bold mb-2">${esc(task.title)}</h5>
-          <p class="text-slate-400 text-xs leading-relaxed mb-4 font-medium">${esc(task.desc)}</p>
+          <h5 class="text-white font-bold mb-2">${task.title}</h5>
+          <p class="text-slate-400 text-xs leading-relaxed mb-4 font-medium">${task.desc}</p>
           <div class="w-full bg-black/40 h-1.5 rounded-full overflow-hidden mb-3">
             <div class="h-full bg-primary" style="width:${ratio}%"></div>
           </div>
           <div class="flex items-center justify-between">
-            <p class="text-[11px] text-slate-400">${Math.max(0, Number(task.progress) || 0)}/${Math.max(1, Number(task.goal) || 1)}</p>
-            <button data-task-id="${esc(task.taskId)}" data-tab="${esc(recommended.tab)}" data-state="${isTaskComplete(task) ? "claim" : "action"}" data-action="${esc(task.actionHref || "")}" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-primary/10 text-primary hover:bg-primary hover:text-white border border-primary/30 transition-all">
+            <p class="text-[11px] text-slate-400">${task.progress}/${task.goal}</p>
+            <button data-task-id="${task.id}" data-tab="${recommended.tab}" data-state="${isTaskComplete(task) ? "claim" : "action"}" data-action="${task.actionHref || ""}" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-primary/10 text-primary hover:bg-primary hover:text-white border border-primary/30 transition-all">
               ${isTaskComplete(task) ? "领取奖励" : (task.actionLabel || "去完成")}
             </button>
           </div>
         </div>`;
     }
 
-    const milestone = chooseMilestone(tasksByTab);
+    const milestone = chooseMilestone(tasksByTab, claims);
     if (!milestone) {
       milestoneEl.innerHTML = "";
     } else {
@@ -653,51 +825,23 @@ html.reado-shell-preload body:not(.reado-shell-applied) > .flex > .flex-1 > asid
         <div class="p-6 rounded-2xl bg-reado-sidebar border border-white/5 group transition-all hover:border-primary/30">
           <div class="flex justify-between items-start mb-6">
             <div class="w-10 h-10 rounded-lg bg-accent-cyan/10 flex items-center justify-center">
-              <span class="material-icons text-accent-cyan">${esc(milestone.icon || "emoji_events")}</span>
+              <span class="material-icons text-accent-cyan">${milestone.icon || "emoji_events"}</span>
             </div>
             <span class="material-icons text-slate-600 group-hover:text-accent-cyan transition-colors">flag</span>
           </div>
-          <h5 class="text-white font-bold mb-2">${esc(milestone.title)}</h5>
-          <p class="text-slate-400 text-xs leading-relaxed mb-4 font-medium">${esc(milestone.desc)}</p>
+          <h5 class="text-white font-bold mb-2">${milestone.title}</h5>
+          <p class="text-slate-400 text-xs leading-relaxed mb-4 font-medium">${milestone.desc}</p>
           <div class="w-full bg-black/40 h-1.5 rounded-full overflow-hidden mb-3">
             <div class="h-full bg-accent-cyan" style="width:${milestoneRatio}%"></div>
           </div>
           <div class="flex items-center justify-between">
-            <p class="text-[11px] text-slate-400">${Math.max(0, Number(milestone.progress) || 0)}/${Math.max(1, Number(milestone.goal) || 1)}</p>
-            <button data-task-id="${esc(milestone.taskId)}" data-tab="achievement" data-state="${isTaskComplete(milestone) ? "claim" : "action"}" data-action="${esc(milestone.actionHref || "")}" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-accent-cyan/10 text-accent-cyan hover:bg-accent-cyan hover:text-background-dark border border-accent-cyan/40 transition-all">
+            <p class="text-[11px] text-slate-400">${milestone.progress}/${milestone.goal}</p>
+            <button data-task-id="${milestone.id}" data-tab="achievement" data-state="${isTaskComplete(milestone) ? "claim" : "action"}" data-action="${milestone.actionHref || ""}" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-accent-cyan/10 text-accent-cyan hover:bg-accent-cyan hover:text-background-dark border border-accent-cyan/40 transition-all">
               ${isTaskComplete(milestone) ? "领取奖励" : (milestone.actionLabel || "去完成")}
             </button>
           </div>
         </div>`;
     }
-  };
-
-  const syncProgress = async () => {
-    const userId = getAuthUserId();
-    if (!userId || !window.ReadoUser?.buildProgressSnapshot) return;
-    const progress = window.ReadoUser.buildProgressSnapshot();
-    await requestJson("POST", "/api/user/sync", {
-      userId,
-      progress,
-      reason: "mission-progress-sync"
-    }).catch(() => null);
-  };
-
-  const loadBoard = async () => {
-    const userId = getAuthUserId();
-    if (!userId) {
-      summaryEl.innerHTML = '<div class="text-slate-400 text-sm">请先登录后查看任务中心。</div>';
-      listEl.innerHTML = "";
-      recommendEl.innerHTML = "";
-      milestoneEl.innerHTML = "";
-      return;
-    }
-    await syncProgress();
-    const data = await requestJson("GET", "/api/tasks?userId=" + encodeURIComponent(userId));
-    board = {
-      tabs: normalizeTasksByTab(data?.tabs)
-    };
-    render();
   };
 
   tabButtons.forEach((button) => {
@@ -724,41 +868,20 @@ html.reado-shell-preload body:not(.reado-shell-applied) > .flex > .flex-1 > asid
       return true;
     }
     if (state === "claim") {
-      const userId = getAuthUserId();
-      if (!userId) return true;
-      requestJson("POST", "/api/tasks/claim", { userId, taskId, tab })
-        .then((data) => {
-          const user = data?.user || {};
-          const reward = data?.reward || {};
-          if (window.ReadoUser?.applyServerState) {
-            window.ReadoUser.applyServerState({
-              level: Number(user.level) || 1,
-              xp: Number(user.xp) || 0,
-              gems: Number(user.gems) || 0
-            }, {
-              gain: {
-                xp: Number(reward.xp) || 0,
-                gems: Number(reward.gems) || 0,
-                levelUps: Number(data?.gain?.levelUps) || 0
-              },
-              reason: "mission-claim:" + String(taskId),
-              skipSync: true
-            });
-          } else if (window.ReadoUser?.grantRewards) {
-            window.ReadoUser.grantRewards({
-              gems: Number(reward.gems) || 0,
-              xp: Number(reward.xp) || 0,
-              reason: "mission-claim:" + String(taskId)
-            });
-          }
-          board = {
-            tabs: normalizeTasksByTab(data?.tabs)
-          };
-          render();
-        })
-        .catch((error) => {
-          console.warn("[mission] claim failed:", error?.message || error);
+      const tasksByTab = buildTasks();
+      const task = (tasksByTab[tab] || []).find((item) => item.id === taskId);
+      if (!task || !isTaskComplete(task)) return true;
+      if (window.ReadoUser?.grantRewards) {
+        window.ReadoUser.grantRewards({
+          gems: task.rewardCoins || 0,
+          xp: task.rewardExp || 0,
+          reason: "mission-claim:" + task.id
         });
+      }
+      const claims = readClaims();
+      claims[getClaimId(task, tab)] = Date.now();
+      writeClaims(claims);
+      render();
       return true;
     }
     return true;
@@ -774,9 +897,7 @@ html.reado-shell-preload body:not(.reado-shell-applied) > .flex > .flex-1 > asid
     handleAction(event.target);
   });
 
-  loadBoard().catch((error) => {
-    console.warn("[mission] load failed:", error?.message || error);
-  });
+  render();
 })();
 </script>
 </body></html>

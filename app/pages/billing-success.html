@@ -87,8 +87,8 @@
   </style>
 </head>
 <body>
-  <script src="/shared/book-catalog.js?v=1772525052070"></script>
-  <script type="module" src="/shared/shell.js?v=1772525052070"></script>
+  <script src="/shared/book-catalog.js?v=1772544454014"></script>
+  <script type="module" src="/shared/shell.js?v=1772544454014"></script>
   <reado-app-shell data-page="profile"></reado-app-shell>
   <main class="wrap">
     <section class="card">
@@ -105,16 +105,28 @@
   <script>
     (async () => {
       const statusText = document.getElementById("statusText");
-      try {
-        const response = await fetch("/api/billing/subscription", { credentials: "same-origin" });
+      const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+      async function fetchBilling(forceRefresh = false) {
+        const query = forceRefresh ? "?refresh=1" : "";
+        const response = await fetch("/api/billing/subscription" + query, { credentials: "same-origin" });
         const data = await response.json().catch(() => ({}));
         if (!response.ok || data?.ok === false) {
           throw new Error(data?.error || "Unable to verify subscription");
         }
-        const billing = data?.billing || {};
-        const active = Boolean(billing?.subscriptionActive);
+        return data?.billing || {};
+      }
+      try {
+        let billing = {};
+        let active = false;
+        for (let attempt = 0; attempt < 5; attempt += 1) {
+          billing = await fetchBilling(true);
+          active = Boolean(billing?.subscriptionActive);
+          if (active) break;
+          statusText.textContent = `Payment received. Subscription syncing (${attempt + 1}/5)...`;
+          await wait(3500);
+        }
         if (!active) {
-          statusText.textContent = "Payment received. Subscription may still be syncing, please refresh in 10-20 seconds.";
+          statusText.textContent = "Payment received. Subscription is still syncing. Please reopen Billing in a few seconds.";
           return;
         }
         const renewal = Number(billing?.currentPeriodEnd);

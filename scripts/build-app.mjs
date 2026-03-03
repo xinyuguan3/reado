@@ -3269,21 +3269,26 @@ function buildIndexHtml(pages) {
 }
 
 function buildLegacyRedirectHtml(targetHref, linkText = "正在跳转…") {
-  const safeHref = toText(targetHref, "/pages/playable-studio.html");
-  const safeLinkText = escapeHtml(toText(linkText, "正在跳转…"));
+  const normalize = (value, fallback) => {
+    const text = String(value ?? "").trim();
+    return text || fallback;
+  };
+  const safeHref = normalize(targetHref, "/pages/playable-studio.html");
+  const safeHrefAttr = escapeHtml(safeHref);
+  const safeLinkText = escapeHtml(normalize(linkText, "正在跳转…"));
   return `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>reado redirect</title>
-  <meta http-equiv="refresh" content="0; url=${safeHref}" />
+  <meta http-equiv="refresh" content="0; url=${safeHrefAttr}" />
   <script>
     window.location.replace(${JSON.stringify(safeHref)});
   </script>
 </head>
 <body>
-  <p><a href="${safeHref}">${safeLinkText}</a></p>
+  <p><a href="${safeHrefAttr}">${safeLinkText}</a></p>
 </body>
 </html>`;
 }
