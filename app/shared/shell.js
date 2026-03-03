@@ -8,12 +8,11 @@ import {
 import { initReadoAutoTranslate } from "/shared/auto-translate.js";
 
 const ROUTES = [
-  { id: "knowledge-map", icon: "map", labelKey: "route.knowledge_map", label: "个人书库", href: "/pages/gamified-learning-hub-dashboard-1.html" },
+  { id: "knowledge-map", icon: "map", labelKey: "route.knowledge_map", label: "个人书库", href: "/pages/playable-studio.html#my-library" },
   { id: "mission", icon: "assignment", labelKey: "route.mission", label: "任务中心", href: "/pages/simulator-library-level-selection-2.html" },
   { id: "studio", icon: "auto_awesome", labelKey: "route.studio", label: "创作工坊", href: "/pages/playable-studio.html" },
   { id: "ranking", icon: "leaderboard", labelKey: "route.ranking", label: "排行榜", href: "/pages/global-scholar-leaderboard.html" },
-  { id: "library", icon: "auto_stories", labelKey: "route.library", label: "体验库", href: "/pages/public-library.html" },
-  { id: "market", icon: "storefront", labelKey: "route.market", label: "交易中心", href: "/pages/gamified-learning-hub-dashboard-3.html" },
+  { id: "library", icon: "auto_stories", labelKey: "route.library", label: "公共书库", href: "/pages/playable-studio.html#public-library" },
   { id: "profile", icon: "person", labelKey: "route.profile", label: "个人资料", href: "/pages/gamified-learning-hub-dashboard-2.html" }
 ];
 const ICON_FALLBACK_MAP = {
@@ -2454,11 +2453,18 @@ function ensureGlobalStyle() {
       body.reado-shell-applied:not(.reado-experience-mode).reado-page-map main,
       body.reado-shell-applied:not(.reado-experience-mode).reado-page-market main,
       body.reado-shell-applied:not(.reado-experience-mode).reado-page-ranking main,
-      body.reado-shell-applied:not(.reado-experience-mode).reado-page-profile main {
+      body.reado-shell-applied:not(.reado-experience-mode).reado-page-profile main,
+      body.reado-shell-applied:not(.reado-experience-mode).reado-page-studio main {
         height: auto !important;
         min-height: calc(100dvh - 80px) !important;
         overflow-y: auto !important;
         overflow-x: hidden !important;
+      }
+      body.reado-shell-applied:not(.reado-experience-mode).reado-page-studio {
+        padding-right: 0 !important;
+      }
+      body.reado-shell-applied:not(.reado-experience-mode).reado-page-studio .reado-shell-right-panel {
+        display: none !important;
       }
       body.reado-shell-applied:not(.reado-experience-mode).reado-page-map main {
         cursor: auto !important;
@@ -2759,6 +2765,9 @@ class ReadoAppShell extends HTMLElement {
     if (path === "/pages/analytics-dashboard.html") {
       document.body.classList.add("reado-page-analytics");
     }
+    if (path === "/pages/playable-studio.html") {
+      document.body.classList.add("reado-page-studio");
+    }
     enableMobileProportionalMode(isExperiencePage);
     if (isExperiencePage) {
       const fullHref = window.location.pathname + window.location.search + window.location.hash;
@@ -2780,7 +2789,7 @@ class ReadoAppShell extends HTMLElement {
     const top = document.createElement("header");
     top.className = "reado-shell-top";
     top.innerHTML = `
-      <a class="reado-shell-brand" href="/pages/gamified-learning-hub-dashboard-1.html">
+      <a class="reado-shell-brand" href="/pages/playable-studio.html">
         <span class="reado-shell-brand-icon" data-icon-name="auto_stories">auto_stories</span>
         <span>reado</span>
       </a>
@@ -2813,7 +2822,7 @@ class ReadoAppShell extends HTMLElement {
           </div>
           <span class="reado-shell-avatar" data-href="/pages/gamified-learning-hub-dashboard-2.html"><img data-shell-avatar src="" alt="avatar" /></span>
         </div>
-        ${isLearningPage ? `<button class="reado-shell-exit" type="button" data-href="/pages/gamified-learning-hub-dashboard-1.html">${t("shell.exit_experience", "退出体验")}</button>` : ""}
+        ${isLearningPage ? `<button class="reado-shell-exit" type="button" data-href="/pages/playable-studio.html">${t("shell.exit_experience", "退出体验")}</button>` : ""}
         <button class="reado-shell-toggle" type="button" aria-label="${t("shell.toggle_menu", "Toggle menu")}">☰</button>
       </div>`;
 

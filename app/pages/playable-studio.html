@@ -4,8 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>reado · Playable Studio</title>
-  <script type="module" src="/shared/shell.js?v=1772438225006"></script>
-  <script src="/shared/book-catalog.js?v=1772438225006"></script>
+  <script type="module" src="/shared/shell.js?v=1772534527149"></script>
+  <script src="/shared/book-catalog.js?v=1772534527149"></script>
   <style>
     :root {
       color-scheme: dark;
@@ -94,6 +94,56 @@
       color: var(--sub);
       font-size: 12px;
       line-height: 1.5;
+    }
+    .fold-card {
+      padding: 0;
+      gap: 0;
+      overflow: hidden;
+    }
+    .fold-card > summary {
+      list-style: none;
+    }
+    .fold-card > summary::-webkit-details-marker {
+      display: none;
+    }
+    .fold-summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 14px;
+      cursor: pointer;
+    }
+    .fold-summary:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
+    .fold-title {
+      margin: 0;
+      font-size: 15px;
+      color: #f8fbff;
+      letter-spacing: -0.01em;
+      font-weight: 700;
+    }
+    .fold-toggle-text {
+      font-size: 12px;
+      color: #8fb7ff;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .fold-toggle-text .open-only {
+      display: none;
+    }
+    details[open] .fold-toggle-text .open-only {
+      display: inline;
+    }
+    details[open] .fold-toggle-text .closed-only {
+      display: none;
+    }
+    .fold-body {
+      padding: 0 14px 14px;
+      display: grid;
+      gap: 10px;
+      border-top: 1px solid rgba(148, 163, 184, 0.2);
     }
     .url-row {
       display: grid;
@@ -352,6 +402,17 @@
       padding: 12px;
       min-height: 220px;
     }
+    details.block {
+      min-height: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+    details.block .fold-summary {
+      padding: 12px;
+    }
+    details.block .fold-body {
+      padding: 0 12px 12px;
+    }
     .block h3 {
       margin: 0;
       font-size: 15px;
@@ -487,6 +548,86 @@
       color: #cfe0ff;
       cursor: pointer;
       text-decoration: none;
+    }
+    .books-grid {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 10px;
+    }
+    .book-card {
+      border: 1px solid rgba(148, 163, 184, 0.24);
+      border-radius: 12px;
+      background: rgba(18, 29, 50, 0.78);
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+    .book-cover {
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      object-fit: cover;
+      display: block;
+      background: rgba(30, 41, 59, 0.6);
+    }
+    .book-body {
+      padding: 10px;
+      display: grid;
+      gap: 6px;
+    }
+    .book-title {
+      margin: 0;
+      font-size: 14px;
+      color: #eff6ff;
+      line-height: 1.35;
+      font-weight: 800;
+    }
+    .book-desc {
+      margin: 0;
+      font-size: 12px;
+      color: #9fb0d8;
+      line-height: 1.45;
+      min-height: 34px;
+    }
+    .book-actions {
+      margin-top: 4px;
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .book-actions .tiny[disabled] {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+    .book-price {
+      font-size: 12px;
+      color: #93c5fd;
+      font-weight: 700;
+    }
+    .trial-line {
+      border: 1px solid rgba(148, 163, 184, 0.24);
+      border-radius: 10px;
+      background: rgba(18, 29, 50, 0.72);
+      padding: 10px;
+      display: grid;
+      gap: 6px;
+    }
+    .trial-line h4 {
+      margin: 0;
+      font-size: 13px;
+      color: #e5ecff;
+      line-height: 1.35;
+    }
+    .trial-line p {
+      margin: 0;
+      font-size: 11px;
+      color: #9fb0d8;
+    }
+    .trial-line .ops {
+      margin-top: 2px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
     }
     .meta-line {
       margin-top: 10px;
@@ -787,7 +928,7 @@
             <p data-i18n="studio.website_section_desc">Paste one link and add it to your sources.</p>
             <div class="url-row">
               <input id="website-input" class="url-input" type="url" placeholder="https://example.com/article" />
-              <button id="website-btn" class="btn primary" type="button" data-i18n="studio.add_url">Add URL</button>
+              <button id="website-btn" class="btn ghost" type="button" data-i18n="studio.add_url">Add URL</button>
             </div>
             <p class="url-hint" data-i18n="studio.url_hint">Supports article/doc/paper links. Missing protocol will auto-use https://</p>
           </section>
@@ -798,24 +939,32 @@
               <p class="drop-title" data-i18n="studio.drop_title">Or drag and drop files</p>
               <p class="drop-sub" data-i18n="studio.drop_sub">EPUB, TXT, Markdown, PDF, web text, and more</p>
               <div class="drop-actions">
-                <button id="upload-btn" class="btn primary" type="button"><span>⬆️ </span><span data-i18n="studio.upload">Upload</span></button>
+                <button id="upload-btn" class="btn ghost" type="button"><span>⬆️ </span><span data-i18n="studio.upload">Upload</span></button>
                 <button id="paste-btn" class="btn ghost" type="button"><span>📋 </span><span data-i18n="studio.paste">Paste Text</span></button>
               </div>
             </section>
           </section>
         </div>
 
-        <section class="intake-card search-card">
-          <h3 data-i18n="studio.search_section_title">Web Search (Optional)</h3>
-          <p data-i18n="studio.search_section_desc">Only use when you need extra sources.</p>
-          <div class="search-row">
-            <div class="search-box">
-              <span style="font-size:18px;color:#8fa3ca;">🔍</span>
-              <input id="search-input" type="text" placeholder="Search web sources (paper title, DOI, keywords)" data-i18n-placeholder="studio.search_placeholder" />
+        <details id="search-fold" class="intake-card search-card fold-card">
+          <summary class="fold-summary">
+            <span class="fold-title" data-i18n="studio.search_section_title">Web Search (Optional)</span>
+            <span class="fold-toggle-text">
+              <span class="closed-only" data-i18n="studio.expand_optional">展开</span>
+              <span class="open-only" data-i18n="studio.collapse_optional">收起</span>
+            </span>
+          </summary>
+          <div class="fold-body">
+            <p data-i18n="studio.search_section_desc">Only use when you need extra sources.</p>
+            <div class="search-row">
+              <div class="search-box">
+                <span style="font-size:18px;color:#8fa3ca;">🔍</span>
+                <input id="search-input" type="text" placeholder="Search web sources (paper title, DOI, keywords)" data-i18n-placeholder="studio.search_placeholder" />
+              </div>
+              <button id="search-btn" class="go-btn" title="Search Sources" data-i18n-title="studio.search_btn_title">➜</button>
             </div>
-            <button id="search-btn" class="go-btn" title="Search Sources" data-i18n-title="studio.search_btn_title">➜</button>
           </div>
-        </section>
+        </details>
 
         <div class="generate-strip">
           <div class="generate-copy">
@@ -835,7 +984,7 @@
       </div>
 
       <div class="source-grid">
-        <section class="block">
+        <section id="search-results-section" class="block" hidden>
           <h3 data-i18n="studio.search_results">Search Results</h3>
           <div id="search-results" class="list"></div>
         </section>
@@ -845,14 +994,22 @@
         </section>
       </div>
 
-      <section class="block" style="margin-top:12px;">
-        <div class="progress-head">
+      <details id="knowledge-fold" class="block" style="margin-top:12px;">
+        <summary class="progress-head fold-summary">
           <h3 class="section-title" data-i18n="studio.knowledge_blocks">Knowledge Blocks</h3>
-          <span id="knowledge-count" class="status-badge">0</span>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span id="knowledge-count" class="status-badge">0</span>
+            <span class="fold-toggle-text">
+              <span class="closed-only" data-i18n="studio.expand_optional">展开</span>
+              <span class="open-only" data-i18n="studio.collapse_optional">收起</span>
+            </span>
+          </div>
+        </summary>
+        <div class="fold-body">
+          <p id="knowledge-diagnostics" class="meta-line" style="margin:8px 0 0;"></p>
+          <div id="knowledge-blocks" class="list knowledge-list"></div>
         </div>
-        <p id="knowledge-diagnostics" class="meta-line" style="margin:8px 0 0;"></p>
-        <div id="knowledge-blocks" class="list knowledge-list"></div>
-      </section>
+      </details>
 
       <section class="progress-wrap">
         <div class="progress-head">
@@ -864,12 +1021,28 @@
         <ul id="log-list" class="log-list"></ul>
       </section>
 
+      <section id="my-library" class="block" style="margin-top:12px;">
+        <div class="progress-head">
+          <h3 class="section-title">个人书库</h3>
+          <span class="meta-line" style="margin:0;">已购买与已解锁书籍</span>
+        </div>
+        <div id="owned-books" class="books-grid"></div>
+      </section>
+
       <section class="block" style="margin-top:12px;">
         <div class="progress-head">
-          <h3 class="section-title" data-i18n="studio.my_works">My Playable Books</h3>
+          <h3 class="section-title">历史生成书</h3>
           <button id="refresh-works-btn" class="tiny" type="button" data-i18n="studio.refresh">Refresh</button>
         </div>
         <div id="my-works" class="list"></div>
+      </section>
+
+      <section id="public-library" class="block" style="margin-top:12px;">
+        <div class="progress-head">
+          <h3 class="section-title">公共书库</h3>
+          <span class="meta-line" style="margin:0;">未购买可试读 3 章节，购买后可完整打开</span>
+        </div>
+        <div id="public-books" class="books-grid"></div>
       </section>
 
       <p id="meta-line" class="meta-line"></p>
@@ -885,6 +1058,16 @@
       <div class="source-modal-actions">
         <button id="source-modal-cancel" class="source-modal-btn" type="button">Cancel</button>
         <button id="source-modal-confirm" class="source-modal-btn primary" type="button">Confirm</button>
+      </div>
+    </div>
+  </div>
+  <div id="trial-modal" class="source-modal" hidden>
+    <div class="source-modal-card" role="dialog" aria-modal="true" aria-labelledby="trial-modal-title">
+      <h3 id="trial-modal-title" class="source-modal-title">试读章节</h3>
+      <p id="trial-modal-meta" class="source-modal-label">每本书可试读 3 章节</p>
+      <div id="trial-module-list" class="list"></div>
+      <div class="source-modal-actions">
+        <button id="trial-modal-close" class="source-modal-btn" type="button">关闭</button>
       </div>
     </div>
   </div>
@@ -927,8 +1110,13 @@
     const pasteBtn = document.getElementById("paste-btn");
     const fileInput = document.getElementById("file-input");
     const dropZone = document.getElementById("drop-zone");
+    const searchFoldEl = document.getElementById("search-fold");
+    const knowledgeFoldEl = document.getElementById("knowledge-fold");
+    const searchResultsSectionEl = document.getElementById("search-results-section");
     const searchResultsEl = document.getElementById("search-results");
     const selectedSourcesEl = document.getElementById("selected-sources");
+    const ownedBooksEl = document.getElementById("owned-books");
+    const publicBooksEl = document.getElementById("public-books");
     const knowledgeBlocksEl = document.getElementById("knowledge-blocks");
     const knowledgeCountEl = document.getElementById("knowledge-count");
     const knowledgeDiagnosticsEl = document.getElementById("knowledge-diagnostics");
@@ -947,6 +1135,11 @@
     const sourceModalTextareaEl = document.getElementById("source-modal-textarea");
     const sourceModalCancelEl = document.getElementById("source-modal-cancel");
     const sourceModalConfirmEl = document.getElementById("source-modal-confirm");
+    const trialModalEl = document.getElementById("trial-modal");
+    const trialModalTitleEl = document.getElementById("trial-modal-title");
+    const trialModalMetaEl = document.getElementById("trial-modal-meta");
+    const trialModuleListEl = document.getElementById("trial-module-list");
+    const trialModalCloseEl = document.getElementById("trial-modal-close");
     const pipelineViewerEl = document.getElementById("pipeline-viewer");
     const pipelineViewerSubEl = document.getElementById("pipeline-viewer-sub");
     const pipelineViewerCloseEl = document.getElementById("pipeline-viewer-close");
@@ -958,6 +1151,10 @@
     const ACTIVE_JOB_KEY = "reado_studio_active_job_id";
     const AUTH_STATE_KEY = "reado_auth_state_v1";
     const PROFILE_SETUP_KEY = "reado_profile_setup_v1";
+    const catalog = window.__READO_BOOK_CATALOG__ || {};
+    const catalogBooks = Array.isArray(catalog?.books) ? catalog.books : [];
+    const unlockStorageKey = catalog?.storage?.unlockKey || "reado_unlocked_books_v1";
+    const trialStorageKey = "reado_trial_modules_v1";
 
     const state = {
       searchResults: [],
@@ -980,7 +1177,9 @@
         title: "",
         selectedId: "__index__",
         data: null
-      }
+      },
+      activeTrialBookId: "",
+      modulesByBookId: {}
     };
 
     function readAuthState() {
@@ -1044,6 +1243,329 @@
         .replaceAll(">", "&gt;")
         .replaceAll("\"", "&quot;")
         .replaceAll("'", "&#39;");
+    }
+    const BOOK_FORCE_FIRST_IDS = new Set([
+      "wanli-fifteen",
+      "sapiens",
+      "zero-to-one",
+      "principles-for-navigating-big-debt-crises"
+    ]);
+
+    function readUnlockedBooks() {
+      try {
+        const raw = JSON.parse(localStorage.getItem(unlockStorageKey) || "[]");
+        return new Set(Array.isArray(raw) ? raw.map((item) => String(item || "").trim()).filter(Boolean) : []);
+      } catch {
+        return new Set();
+      }
+    }
+
+    function saveUnlockedBooks(set) {
+      localStorage.setItem(unlockStorageKey, JSON.stringify([...set]));
+    }
+
+    function readTrialMap() {
+      try {
+        const raw = JSON.parse(localStorage.getItem(trialStorageKey) || "{}");
+        if (!raw || typeof raw !== "object") return {};
+        const next = {};
+        for (const [bookId, list] of Object.entries(raw)) {
+          next[bookId] = Array.isArray(list)
+            ? Array.from(new Set(list.map((slug) => String(slug || "").trim()).filter(Boolean))).slice(0, 3)
+            : [];
+        }
+        return next;
+      } catch {
+        return {};
+      }
+    }
+
+    function writeTrialMap(map) {
+      localStorage.setItem(trialStorageKey, JSON.stringify(map));
+    }
+
+    function getTrialSet(bookId) {
+      const safeBookId = String(bookId || "").trim();
+      if (!safeBookId) return new Set();
+      const map = readTrialMap();
+      return new Set(Array.isArray(map[safeBookId]) ? map[safeBookId] : []);
+    }
+
+    function getTrialRemain(bookId) {
+      return Math.max(0, 3 - getTrialSet(bookId).size);
+    }
+
+    function addTrialModule(bookId, moduleSlug) {
+      const safeBookId = String(bookId || "").trim();
+      const safeModuleSlug = String(moduleSlug || "").trim();
+      if (!safeBookId || !safeModuleSlug) return false;
+      const map = readTrialMap();
+      const current = Array.isArray(map[safeBookId]) ? map[safeBookId] : [];
+      if (current.includes(safeModuleSlug)) return true;
+      if (current.length >= 3) return false;
+      map[safeBookId] = current.concat(safeModuleSlug).slice(0, 3);
+      writeTrialMap(map);
+      return true;
+    }
+
+    function getCatalogBook(bookId) {
+      const safeBookId = String(bookId || "").trim();
+      return catalogBooks.find((book) => String(book?.id || "").trim() === safeBookId) || null;
+    }
+
+    function getBookOpenHref(book) {
+      if (!book) return "";
+      const forceFirst = BOOK_FORCE_FIRST_IDS.has(String(book.id || "").trim());
+      if (forceFirst) {
+        localStorage.removeItem("reado_book_last_" + String(book.id || "").trim());
+        return String(book.firstModuleHref || "");
+      }
+      const last = localStorage.getItem("reado_book_last_" + String(book.id || "").trim());
+      const moduleSlugs = Array.isArray(book.moduleSlugs) ? book.moduleSlugs : [];
+      if (last && moduleSlugs.includes(last)) {
+        return "/experiences/" + encodeURIComponent(last) + ".html";
+      }
+      return String(book.firstModuleHref || "");
+    }
+
+    function renderOwnedBooks() {
+      if (!ownedBooksEl) return;
+      const unlocked = readUnlockedBooks();
+      const rows = catalogBooks.filter((book) => unlocked.has(String(book?.id || "").trim()));
+      if (!rows.length) {
+        ownedBooksEl.innerHTML = `<article class="item"><p>当前还没有已购买书籍。可在下方公共书库试读或购买。</p></article>`;
+        return;
+      }
+      ownedBooksEl.innerHTML = rows.map((book) => {
+        const openHref = getBookOpenHref(book);
+        const desc = String((Array.isArray(book.highlights) && book.highlights[0]) || book.categoryHint || "").trim();
+        return `
+          <article class="book-card">
+            <img class="book-cover" src="${esc(book.cover || "")}" alt="${esc(book.title || "book")}" loading="lazy" />
+            <div class="book-body">
+              <h4 class="book-title">${esc(book.title || "Untitled")}</h4>
+              <p class="book-desc">${esc(desc || "已解锁，可随时继续学习。")}</p>
+              <div class="book-actions">
+                <button class="tiny" data-act="open-owned" data-id="${esc(book.id)}" data-href="${esc(openHref)}">打开</button>
+                <a class="tiny" href="${esc(book.hubHref || "#")}" target="_blank" rel="noreferrer">目录</a>
+              </div>
+            </div>
+          </article>`;
+      }).join("");
+    }
+
+    function renderPublicBooks() {
+      if (!publicBooksEl) return;
+      const unlocked = readUnlockedBooks();
+      const rows = catalogBooks.filter((book) => !/^user-/i.test(String(book?.id || "")));
+      if (!rows.length) {
+        publicBooksEl.innerHTML = `<article class="item"><p>公共书库为空。</p></article>`;
+        return;
+      }
+      publicBooksEl.innerHTML = rows.map((book) => {
+        const bookId = String(book?.id || "").trim();
+        const isUnlocked = unlocked.has(bookId);
+        const remain = getTrialRemain(bookId);
+        const openHref = getBookOpenHref(book);
+        const desc = String((Array.isArray(book.highlights) && book.highlights[0]) || book.categoryHint || "").trim();
+        return `
+          <article class="book-card">
+            <img class="book-cover" src="${esc(book.cover || "")}" alt="${esc(book.title || "book")}" loading="lazy" />
+            <div class="book-body">
+              <h4 class="book-title">${esc(book.title || "Untitled")}</h4>
+              <p class="book-desc">${esc(desc || "可进入目录选择章节体验。")}</p>
+              <p class="book-price">${Number(book.price || 0)} 宝石</p>
+              <div class="book-actions">
+                ${isUnlocked
+                  ? `<button class="tiny" data-act="open-public" data-id="${esc(bookId)}" data-href="${esc(openHref)}">打开</button>`
+                  : `<button class="tiny" data-act="trial" data-id="${esc(bookId)}">试用（剩余 ${remain}/3）</button>
+                     <button class="tiny" data-act="buy" data-id="${esc(bookId)}">购买</button>`
+                }
+              </div>
+            </div>
+          </article>`;
+      }).join("");
+    }
+
+    async function purchaseBook(bookId) {
+      const book = getCatalogBook(bookId);
+      if (!book) return;
+      const unlocked = readUnlockedBooks();
+      const safeBookId = String(book.id || "").trim();
+      if (!safeBookId || unlocked.has(safeBookId)) return;
+      const price = Math.max(0, Number(book.price) || 0);
+      if (price > 0 && window.ReadoUser?.spendGems) {
+        const result = window.ReadoUser.spendGems(price, "book-purchase:" + safeBookId);
+        if (!result?.ok) {
+          setError(`宝石不足，购买 ${book.title} 需要 ${price}。`);
+          return;
+        }
+      }
+      unlocked.add(safeBookId);
+      saveUnlockedBooks(unlocked);
+      setMeta(`已购买：${book.title}`);
+      setError("");
+      renderOwnedBooks();
+      renderPublicBooks();
+    }
+
+    async function fetchBookModules(bookId) {
+      const safeBookId = String(bookId || "").trim();
+      if (!safeBookId) return [];
+      if (Array.isArray(state.modulesByBookId[safeBookId])) {
+        return state.modulesByBookId[safeBookId];
+      }
+      try {
+        const data = await request("GET", "/api/content/books/" + encodeURIComponent(safeBookId));
+        const list = Array.isArray(data?.book?.modules) ? data.book.modules : [];
+        state.modulesByBookId[safeBookId] = list;
+        return list;
+      } catch {
+        const book = getCatalogBook(safeBookId);
+        const fallback = Array.isArray(book?.moduleSlugs)
+          ? book.moduleSlugs.map((slug, index) => ({
+              slug,
+              title: "章节 " + String(index + 1),
+              index: index + 1,
+              href: "/experiences/" + encodeURIComponent(slug) + ".html"
+            }))
+          : [];
+        state.modulesByBookId[safeBookId] = fallback;
+        return fallback;
+      }
+    }
+
+    function closeTrialModal() {
+      if (!trialModalEl) return;
+      trialModalEl.hidden = true;
+      state.activeTrialBookId = "";
+      if (trialModuleListEl) trialModuleListEl.innerHTML = "";
+    }
+
+    function renderTrialModal(bookId, modules) {
+      if (!trialModalEl || !trialModalTitleEl || !trialModalMetaEl || !trialModuleListEl) return;
+      const book = getCatalogBook(bookId);
+      const unlocked = readUnlockedBooks().has(String(bookId || "").trim());
+      const tried = getTrialSet(bookId);
+      const remain = Math.max(0, 3 - tried.size);
+      trialModalTitleEl.textContent = `试读章节 · ${book?.title || bookId}`;
+      trialModalMetaEl.textContent = unlocked
+        ? "当前已购买，可打开任意章节。"
+        : `每本书最多试读 3 章节，已试读 ${tried.size}/3。`;
+      trialModuleListEl.innerHTML = modules.map((module, index) => {
+        const slug = String(module?.slug || "").trim();
+        const href = String(module?.href || (slug ? ("/experiences/" + encodeURIComponent(slug) + ".html") : "")).trim();
+        const title = String(module?.title || ("章节 " + String(index + 1))).trim();
+        const isTried = slug && tried.has(slug);
+        const disabled = !unlocked && !isTried && remain <= 0;
+        const label = unlocked ? "打开" : (isTried ? "打开已试读" : (disabled ? "试读次数已用完" : "试读本章"));
+        return `
+          <article class="trial-line">
+            <h4>${esc(String(index + 1) + ". " + title)}</h4>
+            <p>${esc(slug || "未知章节")}</p>
+            <div class="ops">
+              <button class="tiny" data-act="trial-module" data-book-id="${esc(String(bookId))}" data-slug="${esc(slug)}" data-href="${esc(href)}" ${disabled || !href ? "disabled" : ""}>${label}</button>
+            </div>
+          </article>`;
+      }).join("");
+      trialModalEl.hidden = false;
+    }
+
+    async function openTrialModal(bookId) {
+      const safeBookId = String(bookId || "").trim();
+      if (!safeBookId) return;
+      state.activeTrialBookId = safeBookId;
+      if (trialModuleListEl) trialModuleListEl.innerHTML = `<article class="item"><p>加载章节中...</p></article>`;
+      if (trialModalEl) trialModalEl.hidden = false;
+      const modules = await fetchBookModules(safeBookId);
+      renderTrialModal(safeBookId, modules);
+    }
+
+    function openBookHref(rawHref) {
+      const href = String(rawHref || "").trim();
+      if (!href) {
+        setError("当前书籍暂无可打开章节。");
+        return;
+      }
+      setError("");
+      window.location.assign(href);
+    }
+
+    function bindLibraryActions() {
+      if (ownedBooksEl) {
+        ownedBooksEl.addEventListener("click", (event) => {
+          const btn = event.target && event.target.closest ? event.target.closest('button[data-act="open-owned"]') : null;
+          if (!btn) return;
+          const href = btn.getAttribute("data-href") || "";
+          openBookHref(href);
+        });
+      }
+
+      if (publicBooksEl) {
+        publicBooksEl.addEventListener("click", async (event) => {
+          const btn = event.target && event.target.closest ? event.target.closest("button[data-act]") : null;
+          if (!btn) return;
+          const act = String(btn.getAttribute("data-act") || "").trim();
+          const bookId = String(btn.getAttribute("data-id") || "").trim();
+          if (!act || !bookId) return;
+          if (act === "open-public") {
+            openBookHref(btn.getAttribute("data-href") || "");
+            return;
+          }
+          if (act === "trial") {
+            setError("");
+            openTrialModal(bookId).catch((error) => {
+              setError(error?.message || "加载试读章节失败。");
+            });
+            return;
+          }
+          if (act === "buy") {
+            if (btn.disabled) return;
+            btn.disabled = true;
+            try {
+              await purchaseBook(bookId);
+            } finally {
+              btn.disabled = false;
+            }
+          }
+        });
+      }
+
+      if (trialModuleListEl) {
+        trialModuleListEl.addEventListener("click", async (event) => {
+          const btn = event.target && event.target.closest ? event.target.closest('button[data-act="trial-module"]') : null;
+          if (!btn || btn.disabled) return;
+          const bookId = String(btn.getAttribute("data-book-id") || "").trim();
+          const slug = String(btn.getAttribute("data-slug") || "").trim();
+          const href = String(btn.getAttribute("data-href") || "").trim();
+          if (!bookId || !href) return;
+          const unlocked = readUnlockedBooks().has(bookId);
+          if (!unlocked) {
+            const tried = getTrialSet(bookId);
+            const already = slug && tried.has(slug);
+            const accepted = already || addTrialModule(bookId, slug);
+            if (!accepted) {
+              setError("该书试读章节已达 3 个，请购买后继续。");
+              const modules = await fetchBookModules(bookId);
+              renderTrialModal(bookId, modules);
+              renderPublicBooks();
+              return;
+            }
+            renderPublicBooks();
+          }
+          closeTrialModal();
+          openBookHref(href);
+        });
+      }
+
+      if (trialModalCloseEl) {
+        trialModalCloseEl.addEventListener("click", () => closeTrialModal());
+      }
+      if (trialModalEl) {
+        trialModalEl.addEventListener("click", (event) => {
+          if (event.target === trialModalEl) closeTrialModal();
+        });
+      }
     }
 
     function setMeta(text) {
@@ -1310,6 +1832,9 @@
       if (!rows.length) {
         knowledgeBlocksEl.innerHTML = `<div class="item"><p>${esc("No knowledge blocks yet. Upload a book source and start parsing/generation.")}</p></div>`;
         return;
+      }
+      if (knowledgeFoldEl instanceof HTMLDetailsElement) {
+        knowledgeFoldEl.open = true;
       }
       knowledgeBlocksEl.innerHTML = rows.map((row, index) => `
         <article class="knowledge-item" style="${row.status === "filtered" ? "opacity:0.76;" : ""}">
@@ -1801,9 +2326,15 @@
 
     function renderSearchResults() {
       const rows = Array.isArray(state.searchResults) ? state.searchResults : [];
+      if (searchResultsSectionEl) {
+        searchResultsSectionEl.hidden = rows.length === 0;
+      }
       if (!rows.length) {
         searchResultsEl.innerHTML = `<div class="item"><p>${esc(t("studio.search_empty", "No search results yet."))}</p></div>`;
         return;
+      }
+      if (searchFoldEl instanceof HTMLDetailsElement) {
+        searchFoldEl.open = true;
       }
       searchResultsEl.innerHTML = rows.map((item, index) => `
         <article class="item">
@@ -2030,6 +2561,8 @@
         state.myWorks = [];
       }
       renderMyWorks();
+      renderOwnedBooks();
+      renderPublicBooks();
     }
 
     function renderMyWorks() {
@@ -2469,13 +3002,21 @@
       });
     }
     window.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && trialModalEl && !trialModalEl.hidden) {
+        event.preventDefault();
+        closeTrialModal();
+        return;
+      }
       if (event.key === "Escape" && state.pipelineViewer.open) {
         event.preventDefault();
         closePipelineViewer();
       }
     });
 
+    bindLibraryActions();
     setupDropZone();
+    renderOwnedBooks();
+    renderPublicBooks();
     renderSearchResults();
     renderSelectedSources();
     renderKnowledgeBlocks();
