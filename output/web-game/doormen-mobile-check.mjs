@@ -1,0 +1,16 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import { chromium } from 'playwright';
+const out = '/Users/guanxinyu/Documents/GitHub/reado/output/web-game/doormen-mobile';
+fs.mkdirSync(out, { recursive: true });
+const browser = await chromium.launch({ headless: true });
+const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+await page.goto('http://127.0.0.1:4273/book_experiences/doormen/doormen_boundary_shift_01/code.html', { waitUntil: 'domcontentloaded' });
+await page.waitForTimeout(300);
+await page.screenshot({ path: path.join(out, 'mobile-menu.png'), fullPage: true });
+await page.click('#start-btn');
+await page.waitForTimeout(250);
+await page.keyboard.press('Space');
+await page.waitForTimeout(180);
+await page.screenshot({ path: path.join(out, 'mobile-play.png'), fullPage: true });
+await browser.close();

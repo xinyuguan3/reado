@@ -1589,12 +1589,9 @@
         generateHintEl.textContent = t("studio.generate_need_source", "Add a website URL or upload files first.");
         return;
       }
-      const modules = estimateModuleCountFromSources(state.selectedSources);
-      const estimatedCredits = estimateGenerationCreditCost(state.selectedSources, modules);
       generateHintEl.textContent = t(
         "studio.generate_ready",
-        "Ready to generate. Estimated credits: {value}.",
-        { value: estimatedCredits }
+        "Ready to generate. Credits settle after completion based on token usage."
       );
     }
 
@@ -2097,77 +2094,6 @@
       const latinWords = normalized.match(/[A-Za-z0-9][A-Za-z0-9'-]*/g) || [];
       const cjkChars = normalized.match(/[\u4e00-\u9fff]/g) || [];
       return latinWords.length + Math.ceil(cjkChars.length / 2);
-    }
-
-    function estimateKnowledgeBlockCount(words) {
-      const safe = Math.max(1, Math.floor(Number(words) || 0));
-      const raw = Math.round(safe / 1800);
-      return Math.max(6, Math.min(36, raw || 6));
-    }
-
-    function detectPdfLikeSources(sources) {
-      const rows = Array.isArray(sources) ? sources : [];
-      return rows.some((item) => {
-        const parsedBy = String(item?.parsedBy || "").toLowerCase();
-        const urlText = String(item?.url || "");
-        return parsedBy.includes("pdf") || /\.pdf(?:$|[?#])/i.test(urlText);
-      });
-    }
-
-    function estimatePageCountFromSources(sources, words, chars) {
-      const rows = Array.isArray(sources) ? sources : [];
-      let explicitPages = 0;
-      for (const item of rows) {
-        const pageCount = Number(item?.pageCount ?? item?.pages ?? item?.meta?.pageCount);
-        if (Number.isFinite(pageCount) && pageCount > 0) {
-          explicitPages += Math.floor(pageCount);
-        }
-      }
-      if (explicitPages > 0) return explicitPages;
-      if (Number(words) > 0) return Math.ceil(Number(words) / 420);
-      if (Number(chars) > 0) return Math.ceil(Number(chars) / 5000);
-      return Math.max(1, rows.length * 6);
-    }
-
-    function estimateBookPipelineCreditCost(sources) {
-      const rows = Array.isArray(sources) ? sources : [];
-      const text = rows.map((item) => String(item?.content || item?.snippet || "")).join("\n");
-      const words = roughWordCount(text);
-      const chars = text.length;
-      const pages = Math.max(1, estimatePageCountFromSources(rows, words, chars));
-      const blocks = estimateKnowledgeBlockCount(words || pages * 420);
-      const sourceCount = Math.max(1, rows.length);
-      const isPdfLike = detectPdfLikeSources(rows);
-      const ocrPages = Math.ceil(pages * (isPdfLike ? 0.35 : 0.1));
-
-      const base = isPdfLike ? 140 : 120;
-      const pageFactor = Math.ceil(pages / 8) * 24;
-      const blockFactor = blocks * 20;
-      const sourceFactor = Math.max(0, sourceCount - 1) * 30;
-      const ocrFactor = Math.ceil(ocrPages * 0.8);
-      const total = base + pageFactor + blockFactor + sourceFactor + ocrFactor;
-      return Math.max(260, Math.min(2600, Math.round(total)));
-    }
-
-    function estimateGenerationCreditCost(sources, moduleCount) {
-      const rows = Array.isArray(sources) ? sources : [];
-      if (detectBookPipelineIntent(rows)) {
-        return estimateBookPipelineCreditCost(rows);
-      }
-      const text = rows.map((item) => String(item?.content || item?.snippet || "")).join("\n");
-      const chars = text.length;
-      const words = roughWordCount(text);
-      const sourceCount = Math.max(1, rows.length);
-      const modules = Math.max(1, Math.min(6, Number(moduleCount) || 1));
-      const pages = Math.max(1, estimatePageCountFromSources(rows, words, chars));
-      const blocks = estimateKnowledgeBlockCount(words || pages * 420);
-      const base = 90;
-      const pageFactor = pages * 4;
-      const blockFactor = blocks * 12;
-      const moduleFactor = modules * 16;
-      const sourceFactor = Math.max(0, sourceCount - 1) * 18;
-      const total = base + pageFactor + blockFactor + moduleFactor + sourceFactor;
-      return Math.max(120, Math.min(2000, Math.round(total)));
     }
 
     function openSourceInputModal({
@@ -2688,7 +2614,7 @@
           t("studio.info_generation_mode", "Generation mode: {value}", { value: work.generation_mode || "unknown" }),
           t("studio.info_html_mode", "HTML mode: {value}", { value: work.html_generation_mode || "unknown" }),
           charge && Number(charge.amount || 0) > 0
-            ? `Credits charged: ${Number(charge.amount || 0)} (${charge.status || "reserved"})`
+            ? `Credits charged: ${Number(charge.amount || 0)} (${charge.status || "captured"})`
             : "",
           creditSnapshot && Number.isFinite(Number(creditSnapshot.available))
             ? `Credits available: ${Number(creditSnapshot.available)}`
@@ -2781,8 +2707,7 @@
       pushClientLog(t("studio.warn_active_job", "Generation keeps running in background. You can switch sections and come back later."), "job", 4);
       try {
         const estimatedModules = estimateModuleCountFromSources(state.selectedSources);
-        const creditCost = estimateGenerationCreditCost(state.selectedSources, estimatedModules);
-        setMeta(`Submitting job and reserving credits (estimated ${creditCost}, auto modules ${estimatedModules})...`);
+        setMeta(`Submitting job. Credits will be settled after completion based on token usage (auto modules ${estimatedModules}).`);
         const useBookPipeline = detectBookPipelineIntent(state.selectedSources);
         const payload = {
           mode: "sources",

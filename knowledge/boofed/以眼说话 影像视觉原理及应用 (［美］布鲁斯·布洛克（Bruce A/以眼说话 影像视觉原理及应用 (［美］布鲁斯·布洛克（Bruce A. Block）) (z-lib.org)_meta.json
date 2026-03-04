@@ -1,0 +1,3733 @@
+{
+    "languages": [
+        "en"
+    ],
+    "filetype": "pdf",
+    "toc": [
+        {
+            "title": "\u5c01\u9762",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 0,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "\u4e66\u540d",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 2,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "\u7248\u6743",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 3,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "\u524d\u8a00",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 4,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "\u76ee\u5f55",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 6,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "\u7b2c\u4e00\u7ae0  \u89c6\u89c9\u5143\u7d20",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 10,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    1.1  \u89c6\u89c9\u6210\u5206",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 11,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    1.2  \u57fa\u672c\u89c6\u89c9\u5143\u7d20",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 11,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u7a7a\u95f4",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 11,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u7ebf\u6761\u548c\u5f62\u72b6",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 11,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u5f71\u8c03",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 11,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u8272\u5f69",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 12,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u8fd0\u52a8",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 12,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u8282\u594f",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 12,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    1.3  \u7406\u89e3\u548c\u638c\u63a7\u89c6\u89c9\u5143\u7d20",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 12,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    1.4  \u672f\u8bed",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 13,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u5c4f\u5e55",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 14,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u771f\u5b9e\u4e16\u754c\uff0f\u5c4f\u5e55\u4e16\u754c",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 14,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u524d\u666f\uff0f\u4e2d\u666f\uff0f\u540e\u666f",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 14,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u56fe\u50cf\u5e73\u9762",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 14,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u89c6\u89c9\u8fdb\u9636",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 15,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    1.5  \u52e4\u4e8e\u5b9e\u8df5\uff0c\u907f\u514d\u7eb8\u4e0a\u8c08\u5175",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 16,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "\u7b2c\u4e8c\u7ae0  \u5bf9\u6bd4\u548c\u76f8\u4f3c",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 18,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "  2.1  \u89c6\u89c9\u7ed3\u6784\u7684\u5173\u952e",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 19,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "\u7b2c\u4e09\u7ae0  \u7a7a\u95f4",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 22,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "\u7b2c\u4e00\u90e8\u5206  \u4e3b\u8981\u5b50\u5143\u7d20",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 23,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    3.1  \u7eb5\u6df1\u7a7a\u95f4",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 23,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u6df1\u5ea6\u7ebf\u7d22",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 24,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u900f\u89c6",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 24,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u5355\u70b9\u900f\u89c6",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 25,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u4e24\u70b9\u900f\u89c6",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 27,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u4e09\u70b9\u900f\u89c6",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 30,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u8fd1\u5927\u8fdc\u5c0f\u89c4\u5f8b",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 34,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u8fd0\u52a8",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 35,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u88ab\u6444\u7269\u7684\u8fd0\u52a8",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 35,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u6444\u5f71\u673a\u7684\u8fd0\u52a8",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 37,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u4e0d\u540c\u6750\u8d28\u7684\u6563\u5c04",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 41,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u7a7a\u6c14\u6563\u5c04",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 42,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u5f62\u72b6\u53d8\u5316",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 43,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u5f71\u8c03\u5206\u79bb",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 45,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u8272\u5f69\u5206\u79bb",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 46,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u4f4d\u7f6e\u9ad8\u4f4e",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 47,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u91cd\u53e0",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 48,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u805a\u7126",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 49,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u4e09\u7ef4\u5f71\u7247",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 49,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "3.2  \u5e73\u9762\u7a7a\u95f4",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 50,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u5e73\u9762\u7ebf\u7d22",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 50,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u6b63\u5e73\u9762",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 50,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u5927\u5c0f\u6052\u5b9a",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 51,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u8fd0\u52a8",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 51,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u88ab\u6444\u7269\u7684\u8fd0\u52a8",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 51,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u6444\u5f71\u673a\u7684\u8fd0\u52a8",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 52,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u4e0d\u540c\u6750\u8d28\u7684\u6563\u5c04",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 55,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u7a7a\u6c14\u6563\u5c04",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 56,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u5f62\u72b6\u53d8\u5316",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 56,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u5f71\u8c03\u5206\u79bb",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 56,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u8272\u5f69\u5206\u79bb",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 57,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u4f4d\u7f6e\u9ad8\u4f4e",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 57,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u91cd\u53e0",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 57,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u805a\u7126",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 57,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u53cd\u5411\u4f7f\u7528\u6df1\u5ea6\u7ebf\u7d22",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 58,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u5f71\u8c03\u5206\u79bb",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 58,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u8272\u5f69\u5206\u79bb",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 58,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u4e0d\u540c\u6750\u8d28\u7684\u6563\u5c04",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 58,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u8fd1\u5927\u8fdc\u5c0f\u89c4\u5f8b",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 58,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    3.3  \u6709\u9650\u7a7a\u95f4",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 59,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    3.4  \u6a21\u7cca\u7a7a\u95f4",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 61,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    3.5  \u6bd4\u8f83\u56db\u79cd\u7c7b\u578b\u7684\u7a7a\u95f4",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 64,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    3.6  \u5728\u62cd\u6444\u4e2d\u63a7\u5236\u7a7a\u95f4",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 66,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "\u7b2c\u4e8c\u90e8\u5206  \u8fb9\u6846",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 68,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "  3.7  \u753b\u5e45\u5bbd\u9ad8\u6bd4",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 68,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u80f6\u7247\u753b\u5e45\u5bbd\u9ad8\u6bd4",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 68,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u6570\u5b57\u753b\u5e45\u5bbd\u9ad8\u6bd4",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 69,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u5c4f\u5e55\u5bbd\u9ad8\u6bd4",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 69,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    3.8  \u5e73\u9762\u5206\u5272",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 72,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u5206\u5272\u753b\u9762",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 72,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u5e73\u9762\u5206\u5272\u7269",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 73,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u5e73\u9762\u5206\u5272\u7684\u76ee\u7684",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 76,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    3.9  \u5c01\u95ed\u7a7a\u95f4\u4e0e\u5f00\u653e\u7a7a\u95f4",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 79,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u5c01\u95ed\u7a7a\u95f4",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 79,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u5f00\u653e\u7a7a\u95f4",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 80,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u5927\u94f6\u5e55",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 81,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u5f3a\u70c8\u7684\u89c6\u89c9\u8fd0\u52a8",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 81,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u6d88\u9664\u56fa\u5b9a\u7ebf\u6761",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 83,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "  3.10  \u5bf9\u6bd4\u548c\u76f8\u4f3c",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 84,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "  \u63a8\u8350\u7247\u76ee",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 87,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "\u7b2c\u56db\u7ae0  \u7ebf\u6761\u548c\u5f62\u72b6",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 92,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    4.1  \u7ebf\u6761",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 93,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u8fb9\u6cbf",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 93,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u8f6e\u5ed3",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 94,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u95ed\u5408\u7ebf",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 95,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u5e73\u9762\u4ea4\u7ebf",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 96,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u7531\u8ddd\u79bb\u6784\u6210\u7684\u6a21\u62df\u7ebf\u6761",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 97,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u8f74\u7ebf",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 98,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u8f68\u8ff9",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 99,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u771f\u5b9e\u8f68\u8ff9",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 99,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u65e0\u5f62\u8f68\u8ff9",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 99,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    4.2  \u7ebf\u6027\u4e3b\u9898",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 100,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    4.3  \u5bf9\u6bd4\u548c\u76f8\u4f3c",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 102,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u56fa\u5b9a\u65b9\u5411",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 102,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u8fd0\u52a8\u65b9\u5411",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 107,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u5c5e\u6027",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 108,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    4.4  \u5f62\u72b6",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 110,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u57fa\u672c\u5f62\u72b6\u7684\u8bc6\u522b",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 111,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "  4.5  \u5bf9\u6bd4\u548c\u76f8\u4f3c",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 113,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "  4.6  \u5728\u62cd\u6444\u4e2d\u63a7\u5236\u7ebf\u6761\u4e0e\u5f62\u72b6",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 115,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "  \u63a8\u8350\u7247\u76ee",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 117,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "\u7b2c\u4e94\u7ae0  \u5f71\u8c03",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 120,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "  5.1  \u63a7\u5236\u7070\u5ea6\u9636",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 121,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u53cd\u5c04\u5149\u63a7\u5236\uff08\u7f8e\u672f\u8bbe\u8ba1\uff09",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 121,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u5165\u5c04\u5149\u63a7\u5236\uff08\u706f\u5149\uff09",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 123,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u66dd\u5149\u63a7\u5236",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 124,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    5.2  \u540c\u6b65\u4e0e\u975e\u540c\u6b65",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 125,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    5.3  \u5bf9\u6bd4\u548c\u76f8\u4f3c",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 128,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    5.4  \u5728\u62cd\u6444\u4e2d\u63a7\u5236\u5f71\u8c03",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 129,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u63a8\u8350\u7247\u76ee",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 131,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "\u7b2c\u516d\u7ae0  \u8272\u5f69",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 134,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    6.1  \u5149",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 135,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    6.2  \u8272\u5f69\u539f\u7406",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 136,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u8272\u5f69\u7684\u76f8\u52a0\u539f\u7406",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 136,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u76f8\u52a0\u539f\u7406\u7684\u8272\u73af",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 137,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u8272\u5f69\u7684\u76f8\u51cf\u539f\u7406",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 137,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u76f8\u51cf\u539f\u7406\u7684\u8272\u73af",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 138,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    6.3  \u8272\u5f69\u7684\u57fa\u672c\u7ec4\u6210",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 139,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u8272\u76f8",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 140,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u4eae\u5ea6",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 140,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u9971\u548c\u5ea6",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 141,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u4eae\u5ea6VS\u9971\u548c\u5ea6",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 143,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    6.4  \u5bf9\u6bd4\u548c\u76f8\u4f3c",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 144,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u8272\u76f8",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 144,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u4eae\u5ea6",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 145,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u9971\u548c\u5ea6",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 146,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u51b7\u6696\u8272",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 147,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u5ef6\u5c55\u5ea6",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 148,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    6.5  \u8272\u5f69\u95f4\u7684\u76f8\u4e92\u4f5c\u7528",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 148,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u9ed1\u767d\u4e0e\u8272\u76f8\u95f4\u7684\u76f8\u4e92\u4f5c\u7528",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 149,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u4e92\u8865\u8272\u95f4\u7684\u76f8\u4e92\u4f5c\u7528",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 150,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u76f8\u8fd1\u8272\u95f4\u7684\u76f8\u4e92\u4f5c\u7528",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 151,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    6.6  \u8272\u5f69\u642d\u914d",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 154,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u5355\u4e00\u8272\u76f8",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 154,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u4e92\u8865\u8272",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 155,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u90bb\u63a5\u4e92\u8865\u8272",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 156,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u4e09\u5206\u6cd5",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 156,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u56db\u5206\u6cd5",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 157,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "6.7  \u5728\u62cd\u6444\u4e2d\u63a7\u5236\u8272\u5f69",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 159,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u8c03\u8272\u677f",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 159,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u6ee4\u955c",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 160,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u955c\u5934\u6ee4\u955c",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 160,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u6ee4\u5149\u955c",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 160,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u65f6\u95f4\uff0f\u5730\u70b9",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 160,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u80f6\u7247\u6444\u5f71",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 161,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u6570\u5b57\u6444\u5f71",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 161,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u6d17\u5370\u8f66\u95f4",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 161,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u95ea\u5149",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 161,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u51b2\u6d17",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 162,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u5316\u5b66\u914d\u5149",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 162,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u6570\u5b57\u914d\u5149",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 162,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "\u63a8\u8350\u7247\u76ee",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 163,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "\u7b2c\u4e03\u7ae0  \u8fd0\u52a8",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 166,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    7.1  \u5b9e\u9645\u8fd0\u52a8",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 167,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    7.2  \u8868\u8c61\u8fd0\u52a8",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 167,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    7.3  \u8bf1\u5bfc\u8fd0\u52a8",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 168,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    7.4  \u76f8\u5bf9\u8fd0\u52a8",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 168,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    7.5  \u7b80\u5355\u8fd0\u52a8\u548c\u590d\u6742\u8fd0\u52a8",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 170,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    7.6  \u5c4f\u5e55\u4e16\u754c\u4e2d\u7684\u8fd0\u52a8",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 171,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u88ab\u6444\u7269\u7684\u8fd0\u52a8",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 171,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u65b9\u5411",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 171,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u7279\u8d28",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 172,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u8303\u56f4",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 172,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u901f\u5ea6",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 173,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u6444\u5f71\u673a\u7684\u8fd0\u52a8",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 173,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u65b9\u5411",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 173,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u8303\u56f4",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 173,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u901f\u5ea6",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 173,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u5173\u6ce8\u70b9\u7684\u79fb\u52a8",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 174,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u65b9\u5411",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 174,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u7279\u8d28",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 175,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u8303\u56f4",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 175,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "7.7  \u5bf9\u6bd4\u548c\u76f8\u4f3c",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 175,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u5355\u4e00\u88ab\u6444\u7269\u7684\u8fd0\u52a8",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 175,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u8fd0\u52a8\uff0f\u9759\u6b62",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 176,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u65b9\u5411",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 176,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u7279\u8d28",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 176,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u901f\u5ea6",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 177,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u7ed3\u5408\u540e\u666f\u7684\u88ab\u6444\u7269\u8fd0\u52a8",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 177,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u6444\u5f71\u673a\u8fd0\u52a8",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 179,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u8fd0\u52a8\uff0f\u9759",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 179,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u4e8c\u7ef4\uff0f\u4e09\u7ef4\u8fd0\u52a8",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 179,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u5de6\u53f3\u6447\uff0f\u5e73\u79fb",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 179,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u4e0a\u4e0b\u6447\uff0f\u5347\u964d",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 179,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u53d8\u7126\uff0f\u63a8\u62c9",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 179,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u6c34\u5e73\uff0f\u4e0d\u6c34\u5e73",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 180,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u8fd0\u52a8\u7684\u8303\u56f4",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 180,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u6bcf\u79d2\u5e27\u6570",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 180,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "7.8  \u8fd0\u52a8\u7684\u8fde\u7eed\u6027",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 181,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u955c\u5934\u4e2d\u7684\u8fde\u7eed\u6027",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 182,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u955c\u5934\u4e4b\u95f4\u7684\u8fde\u7eed\u6027",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 185,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "7.9  \u5728\u62cd\u6444\u4e2d\u63a7\u5236\u8fd0\u52a8",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 187,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "\u63a8\u8350\u7247\u76ee",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 192,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "\u7b2c\u516b\u7ae0  \u8282\u594f",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 194,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u95f4\u9694",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 195,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u91cd\u590d",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 195,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u8282\u62cd",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 195,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "  8.1  \u9759\u6b62\u7269\u4f53\u7684\u8282\u594f",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 195,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "  8.2  \u8fd0\u52a8\u7269\u4f53\u7684\u89c6\u89c9\u8282\u594f",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 202,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u4e3b\u8981\u8282\u594f",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 202,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u8fdb\u5165\u548c\u79bb\u5f00\u666f\u6846",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 202,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u7ecf\u8fc7\u53e6\u5916\u4e00\u4e2a\u7269\u4f53",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 203,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u8fd0\u52a8\u548c\u9759\u6b62",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 203,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u6539\u53d8\u65b9\u5411",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 204,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u6b21\u8981\u8282\u594f",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 204,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u526a\u8f91\u8282\u594f",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 204,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "  8.3  \u4e8b\u4ef6",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 206,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u8fde\u7eed\u62cd\u6444\u4e8b\u4ef6",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 206,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u5206\u89e3\u62cd\u6444\u4e8b\u4ef6",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 206,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u89c6\u89c9\u5f3a\u8c03",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 207,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u5bf9\u6bd4\u548c\u76f8\u4f3c\u7684\u63a7\u5236",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 207,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u526a\u8f91\u4e8b\u4ef6\u7684\u63a7\u5236",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 207,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u526a\u8f91\u8282\u594f\u7684\u63a7\u5236",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 207,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u89c6\u89c9\u591a\u6837\u6027",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 207,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u5bfb\u627e\u8282\u594f",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 208,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u521b\u4f5c\u8005\u7684\u9009\u62e9",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 208,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "8.4  \u8282\u594f\u6a21\u5f0f",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 208,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "8.5  \u5bf9\u6bd4\u548c\u76f8\u4f3c",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 209,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u6162\uff0f\u5feb",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 209,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u89c4\u5219\uff0f\u4e0d\u89c4\u5219",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 209,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "8.6  \u5728\u62cd\u6444\u8fc7\u7a0b\u4e2d\u63a7\u5236\u89c6\u89c9\u8282\u594f",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 210,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "\u63a8\u8350\u7247\u76ee",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 211,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "\u7b2c\u4e5d\u7ae0  \u6545\u4e8b\u7ed3\u6784\u548c\u89c6\u89c9\u7ed3\u6784",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 214,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": " 9.1  \u5173\u952e\u8054\u7cfb",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 215,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u5f00\u7aef",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 215,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u51b2\u7a81\u548c\u9ad8\u6f6e",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 217,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u7ed3\u5c40",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 218,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": " 9.2  \u6545\u4e8b\u7ed3\u6784\u56fe\u8868",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 218,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u300a\u897f\u5317\u504f\u5317\u300b",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 220,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u6545\u4e8b\u6b21\u5e8f\u8868",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 220,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u519c\u836f\u55b7\u6d12\u673a\u6bb5\u843d\u7684\u6545\u4e8b\u6b21\u5e8f\u8868",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 222,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u300a\u8c0d\u5f71\u91cd\u91cd\u300b\u7684\u6545\u4e8b\u6b21\u5e8f\u8868",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 222,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u300a\u970d\u534e\u5fb7\u5e84\u56ed\u300b\u7684\u6545\u4e8b\u6b21\u5e8f\u8868",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 224,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "9.3  \u89c6\u89c9\u7ed3\u6784",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 226,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u89c6\u89c9\u5f00\u7aef",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 226,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u89c6\u89c9\u51b2\u7a81\u548c\u9ad8\u6f6e",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 227,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u89c6\u89c9\u7ed3\u5c40",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 227,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "9.4  \u89c6\u89c9\u7ed3\u6784\u56fe\u8868",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 228,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u5f62\u5f0f1\uff1a\u6052\u5b9a",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 229,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u5f62\u5f0f2\uff1a\u6e10\u53d8",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 230,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u5f62\u5f0f3\uff1a\u5bf9\u6bd4\u548c\u76f8\u4f3c",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 231,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "9.5  \u5229\u7528\u8fd9\u4e9b\u56fe\u8868",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 232,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "\u7b2c\u5341\u7ae0  \u52e4\u4e8e\u5b9e\u8df5\uff0c\u907f\u514d\u7eb8\u4e0a\u8c08\u5175",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 246,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    10.1  \u89c6\u89d2",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 247,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    10.2  \u9009\u62e9\u89c6\u89c9\u5143\u7d20",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 248,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u76f4\u89c9\u6cd5",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 249,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u4e3b\u89c2\u6cd5",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 249,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u7814\u7a76\u6cd5",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 249,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u5206\u6790\u9009\u62e9\u6cd5",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 250,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "10.3  \u9009\u62e9\u548c\u628a\u63e1\u89c6\u89c9\u5143\u7d20",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 250,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u300a\u89c6\u5dee\u300b",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 251,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u300a\u8bc1\u4eba\u300b",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 252,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u300a\u5386\u52ab\u4f73\u4eba\u300b",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 252,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u300a\u7231\u662f\u59a5\u534f\u300b",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 252,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "10.4  \u4f7f\u7528\u89c6\u89c9\u7ed3\u6784",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 253,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "10.5  \u51c6\u5907\u7684\u7ed3\u679c",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 255,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u5e7f\u544a",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 255,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u7eaa\u5f55\u7247",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 256,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u8d44\u6599\u5f71\u50cf",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 257,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u5728\u53ef\u63a7\u73af\u5883\u4e0b\u62cd\u6444\u7684\u7eaa\u5f55\u7247",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 257,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u5728\u4e0d\u53ef\u63a7\u73af\u5883\u4e0b\u62cd\u6444\u7684\u7eaa\u5f55\u7247",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 258,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u7535\u5b50\u6e38\u620f",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 258,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u56e0\u7279\u7f51",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 258,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u591a\u673a\u4f4d\u7535\u89c6\u8282\u76ee",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 259,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u5355\u673a\u4f4d\u7535\u89c6\u8282\u76ee",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 260,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u52a8\u753b\u7247",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 261,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "10.6  \u522b\u53d1\u75af",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 261,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "\u9644\u5f55",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 264,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    A  \u8282\u70b9\u6444\u5f71",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 265,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    B  \u666f\u6df1\uff1a\u53ef\u6e05\u6670\u6210\u50cf\u7684\u7a7a\u95f4\u8303\u56f4",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 265,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    C  \u53d8\u5f62\u955c\u5934\u548c70\u6beb\u7c73\u80f6\u7247",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 268,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    D  \u9ec4\u91d1\u5206\u5272",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 270,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    E  \u5f00\u5c14\u6587\u8272\u6e29",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 271,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    \u5149\u548c\u6444\u5f71",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 273,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    F  \u663e\u793a\u5668\u4e0a\u7684\u6df7\u5408\u8272",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 275,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    G  \u6307\u793a\u6027\u8282\u62cd",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 275,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "    H  \u5bbd\u9ad8\u6bd4\u548c\u89c6\u9891\u517c\u5bb9\u6027",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 278,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        },
+        {
+            "title": "\u53c2\u8003\u4e66\u76ee",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 282,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                711.0,
+                0.0
+            ]
+        },
+        {
+            "title": "\u51fa\u7248\u540e\u8bb0",
+            "level": 0,
+            "is_closed": null,
+            "n_kids": 0,
+            "page_index": 285,
+            "view_mode": "XYZ",
+            "view_pos": [
+                0.0,
+                687.0,
+                0.0
+            ]
+        }
+    ],
+    "pages": 293,
+    "ocr_stats": {
+        "ocr_pages": 287,
+        "ocr_failed": 0,
+        "ocr_success": 287,
+        "ocr_engine": "surya"
+    },
+    "block_stats": {
+        "header_footer": 0,
+        "code": 0,
+        "table": 7,
+        "equations": {
+            "successful_ocr": 0,
+            "unsuccessful_ocr": 0,
+            "equations": 0
+        }
+    },
+    "postprocess_stats": {
+        "edit": {}
+    }
+}

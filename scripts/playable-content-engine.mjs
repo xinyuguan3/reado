@@ -335,6 +335,55 @@ function extractLlmTextFromPayload(payload) {
   return toText(outputText);
 }
 
+function toSafeInt(value) {
+  const next = Number(value);
+  if (!Number.isFinite(next)) return 0;
+  return Math.max(0, Math.floor(next));
+}
+
+function extractLlmUsageFromPayload(payload) {
+  const row = payload && typeof payload === "object" ? payload : {};
+  const usage = row?.usage && typeof row.usage === "object"
+    ? row.usage
+    : (row?.response?.usage && typeof row.response.usage === "object" ? row.response.usage : {});
+  const inputTokens = toSafeInt(
+    usage?.input_tokens
+    ?? usage?.prompt_tokens
+    ?? usage?.inputTokens
+    ?? usage?.promptTokens
+  );
+  const outputTokens = toSafeInt(
+    usage?.output_tokens
+    ?? usage?.completion_tokens
+    ?? usage?.outputTokens
+    ?? usage?.completionTokens
+  );
+  const totalRaw = toSafeInt(
+    usage?.total_tokens
+    ?? usage?.totalTokens
+    ?? usage?.tokens
+  );
+  const totalTokens = Math.max(totalRaw, inputTokens + outputTokens);
+  return {
+    inputTokens,
+    outputTokens,
+    totalTokens
+  };
+}
+
+function accumulateTokenUsage(target, usage) {
+  if (!target || typeof target !== "object") return;
+  const inputTokens = toSafeInt(usage?.inputTokens);
+  const outputTokens = toSafeInt(usage?.outputTokens);
+  const totalTokens = toSafeInt(usage?.totalTokens);
+  const hasUsage = inputTokens > 0 || outputTokens > 0 || totalTokens > 0;
+  if (!hasUsage) return;
+  target.inputTokens = toSafeInt(target.inputTokens) + inputTokens;
+  target.outputTokens = toSafeInt(target.outputTokens) + outputTokens;
+  target.totalTokens = toSafeInt(target.totalTokens) + Math.max(totalTokens, inputTokens + outputTokens);
+  target.calls = toSafeInt(target.calls) + 1;
+}
+
 function deepFindHtml(value, depth = 0) {
   if (depth > 8) return "";
   if (typeof value === "string") {
@@ -1965,7 +2014,8 @@ async function generateBlueprintWithLlm({
   moduleCount,
   strictMode = false,
   groundingHints = [],
-  deniedPatterns = []
+  deniedPatterns = [],
+  onUsage = null
 }) {
   const focusedContext = makeFocusedContextSnippet({
     contextText,
@@ -2045,7 +2095,8 @@ async function generateBlueprintWithLlm({
     maxTokens: 3600,
     timeoutMs: 120000,
     retries: 1,
-    temperature: 0.25
+    temperature: 0.25,
+    onUsage
   });
   const parsed = extractJsonBlock(content);
   if (!parsed) {
@@ -2063,7 +2114,8 @@ async function requestLlmText({
   maxTokens = 2600,
   timeoutMs = 120000,
   retries = 2,
-  temperature = 0.3
+  temperature = 0.3,
+  onUsage = null
 }) {
   const normalizedEndpoint = String(endpoint || "").trim();
   let activeEndpoint = normalizedEndpoint;
@@ -2119,6 +2171,12 @@ async function requestLlmText({
       }
 
       const content = extractLlmTextFromPayload(data);
+      const usage = extractLlmUsageFromPayload(data);
+      if (typeof onUsage === "function") {
+        try {
+          onUsage(usage);
+        } catch {}
+      }
 
       if (!response.ok || !content) {
         const preview = toText(rawBody).slice(0, 220);
@@ -2355,7 +2413,8 @@ async function generateModuleHtmlWithLlm({
   contextText,
   nextModuleSlug,
   prevModuleSlug,
-  retryHint = ""
+  retryHint = "",
+  onUsage = null
 }) {
   const moduleTitle = toText(module?.title, `Module ${moduleIndex + 1}`);
   const moduleScene = toText(module?.scene, `Scene ${moduleIndex + 1}`);
@@ -2448,7 +2507,8 @@ async function generateModuleHtmlWithLlm({
     maxTokens: 5600,
     timeoutMs: 120000,
     retries: 0,
-    temperature: 0.85
+    temperature: 0.85,
+    onUsage
   });
 
   const html = extractHtmlBlock(content);
@@ -3353,6 +3413,23 @@ export class PlayableContentEngine {
       .join("\n\n");
     const groundingTerms = extractGroundingTerms(`${context.contextText}\n${sourceLines}`, 28);
     this.emitProgress(hooks, "preparing_sources", 28, `Sources prepared (${toArray(context.sources).length} items)`);
+    const llmTokenUsage = {
+      inputTokens: 0,
+      outputTokens: 0,
+      totalTokens: 0,
+      calls: 0
+    };
+    const onLlmUsage = (usage) => {
+      accumulateTokenUsage(llmTokenUsage, usage);
+      if (typeof hooks?.onUsage === "function") {
+        try {
+          hooks.onUsage({
+            ...usage,
+            at: nowIso()
+          });
+        } catch {}
+      }
+    };
 
     let blueprintRaw = null;
     let llmError = "";
@@ -3370,7 +3447,8 @@ export class PlayableContentEngine {
           sourceLines,
           moduleCount,
           groundingHints: groundingTerms.slice(0, 16),
-          deniedPatterns: WRITING_BIAS_TERMS
+          deniedPatterns: WRITING_BIAS_TERMS,
+          onUsage: onLlmUsage
         });
 
         let normalizedCandidate = normalizeBlueprint(blueprintRaw, title, {
@@ -3403,7 +3481,8 @@ export class PlayableContentEngine {
             moduleCount,
             strictMode: true,
             groundingHints: groundingReport.missing.slice(0, 12).concat(groundingReport.hits.slice(0, 8)),
-            deniedPatterns: WRITING_BIAS_TERMS
+            deniedPatterns: WRITING_BIAS_TERMS,
+            onUsage: onLlmUsage
           });
           const retryNormalized = normalizeBlueprint(retryRaw, title, {
             maxModules: moduleCount,
@@ -3503,7 +3582,8 @@ export class PlayableContentEngine {
             sourceLines,
             contextText: context.contextText || input,
             nextModuleSlug: moduleSlugs[i + 1] || "",
-            prevModuleSlug: moduleSlugs[i - 1] || ""
+            prevModuleSlug: moduleSlugs[i - 1] || "",
+            onUsage: onLlmUsage
           });
           htmlGenerationMode = "llm_html";
         } catch (error) {
@@ -3524,7 +3604,8 @@ export class PlayableContentEngine {
               contextText: clamp(context.contextText || input, 3600),
               nextModuleSlug: moduleSlugs[i + 1] || "",
               prevModuleSlug: moduleSlugs[i - 1] || "",
-              retryHint: `Previous output invalid: ${firstError}. Generate a richer non-template interaction system with fully populated content.`
+              retryHint: `Previous output invalid: ${firstError}. Generate a richer non-template interaction system with fully populated content.`,
+              onUsage: onLlmUsage
             });
             htmlGenerationMode = "llm_html_compact";
           } catch (retryError) {
@@ -3620,6 +3701,12 @@ export class PlayableContentEngine {
       is_public: false,
       public_at: "",
       grounding: groundingReport || null,
+      token_usage: {
+        inputTokens: Math.max(0, toSafeInt(llmTokenUsage.inputTokens)),
+        outputTokens: Math.max(0, toSafeInt(llmTokenUsage.outputTokens)),
+        totalTokens: Math.max(0, toSafeInt(llmTokenUsage.totalTokens)),
+        calls: Math.max(0, toSafeInt(llmTokenUsage.calls))
+      },
       created_at: nowIso(),
       updated_at: nowIso()
     };

@@ -112,6 +112,9 @@ const creditsDailySmall = toInt(process.env.READO_CREDITS_DAILY_SMALL || 120);
 const creditsMonthlySmall = toInt(process.env.READO_CREDITS_MONTHLY_SMALL || 4800);
 const creditsDailyLarge = toInt(process.env.READO_CREDITS_DAILY_LARGE || 1800);
 const creditsMonthlyLarge = toInt(process.env.READO_CREDITS_MONTHLY_LARGE || 90000);
+const creditsPer1kTokens = Math.max(0.2, Number(process.env.READO_CREDITS_PER_1K_TOKENS || 4) || 4);
+const studioMinTokenCharge = Math.max(0, toInt(process.env.READO_STUDIO_MIN_TOKEN_CHARGE || 0));
+const studioMaxTokenCharge = Math.max(studioMinTokenCharge, toInt(process.env.READO_STUDIO_MAX_TOKEN_CHARGE || 2400));
 const stripeSmallPriceIds = new Set(
   String(process.env.READO_STRIPE_PRICE_IDS_SMALL || "")
     .split(",")
@@ -261,13 +264,47 @@ const ELEVENLABS_API_KEY = String(process.env.ELEVENLABS_API_KEY || process.env.
 const ELEVENLABS_VOICE_ID = String(process.env.READO_ELEVENLABS_VOICE_ID || "EXAVITQu4vr4xnSDxMaL").trim() || "EXAVITQu4vr4xnSDxMaL";
 const ELEVENLABS_MODEL_ID = String(process.env.READO_ELEVENLABS_MODEL_ID || "eleven_multilingual_v2").trim() || "eleven_multilingual_v2";
 const ELEVENLABS_OUTPUT_FORMAT = String(process.env.READO_ELEVENLABS_OUTPUT_FORMAT || "mp3_44100_128").trim() || "mp3_44100_128";
-const CODEX_HOME = String(process.env.CODEX_HOME || process.env.HOME || "").trim();
+const CODEX_HOME = String(process.env.CODEX_HOME || path.join(process.env.HOME || "", ".codex")).trim();
 const DEFAULT_SKILLS_DIR = CODEX_HOME ? path.join(CODEX_HOME, "skills") : "";
 const READO_CODEX_SKILLS_DIR = String(process.env.READO_CODEX_SKILLS_DIR || DEFAULT_SKILLS_DIR).trim();
 const READO_NANO_BANANA_SCRIPT = String(
   process.env.READO_NANO_BANANA_SCRIPT
   || (READO_CODEX_SKILLS_DIR ? path.join(READO_CODEX_SKILLS_DIR, "bex-nano-banana-pro", "generate.py") : "")
 ).trim();
+const KNOWLEDGE_ABSORBER_SKILL_DIR = String(
+  process.env.READO_BOOK_PIPELINE_KA_SKILL_DIR
+  || path.join(CODEX_HOME || "", "skills", "knowledge-absorber")
+).trim();
+const KNOWLEDGE_ABSORBER_SCRIPT_PATH = String(
+  process.env.READO_BOOK_PIPELINE_KA_SCRIPT
+  || (KNOWLEDGE_ABSORBER_SKILL_DIR ? path.join(KNOWLEDGE_ABSORBER_SKILL_DIR, "scripts", "content_ingester.py") : "")
+).trim();
+const KNOWLEDGE_ABSORBER_RAW_OUTPUT_PATH = String(
+  process.env.READO_BOOK_PIPELINE_KA_OUTPUT
+  || (KNOWLEDGE_ABSORBER_SKILL_DIR ? path.join(KNOWLEDGE_ABSORBER_SKILL_DIR, "config", "raw_content.txt") : "")
+).trim();
+const KNOWLEDGE_ABSORBER_MD_OUTPUT_PATH = KNOWLEDGE_ABSORBER_RAW_OUTPUT_PATH
+  ? (
+    /\.txt$/i.test(KNOWLEDGE_ABSORBER_RAW_OUTPUT_PATH)
+      ? KNOWLEDGE_ABSORBER_RAW_OUTPUT_PATH.replace(/\.txt$/i, "_feishu.md")
+      : `${KNOWLEDGE_ABSORBER_RAW_OUTPUT_PATH}_feishu.md`
+  )
+  : "";
+const KNOWLEDGE_ABSORBER_HTML_OUTPUT_PATH = KNOWLEDGE_ABSORBER_RAW_OUTPUT_PATH
+  ? (
+    /\.txt$/i.test(KNOWLEDGE_ABSORBER_RAW_OUTPUT_PATH)
+      ? KNOWLEDGE_ABSORBER_RAW_OUTPUT_PATH.replace(/\.txt$/i, ".html")
+      : `${KNOWLEDGE_ABSORBER_RAW_OUTPUT_PATH}.html`
+  )
+  : "";
+const BOOK_PIPELINE_USE_KNOWLEDGE_ABSORBER = String(
+  process.env.READO_BOOK_PIPELINE_USE_KNOWLEDGE_ABSORBER
+  || process.env.READO_BOOK_PIPELINE_ENABLE_KNOWLEDGE_ABSORBER
+  || "on"
+).trim().toLowerCase() !== "off";
+const BOOK_PIPELINE_KA_TIMEOUT_MS = Math.max(60_000, toInt(process.env.READO_BOOK_PIPELINE_KA_TIMEOUT_MS || 8 * 60 * 1000) || 8 * 60 * 1000);
+const BOOK_PIPELINE_KA_MIN_CHARS = Math.max(600, toInt(process.env.READO_BOOK_PIPELINE_KA_MIN_CHARS || 1800) || 1800);
+let knowledgeAbsorberRunLock = Promise.resolve();
 
 function nowIso() {
   return new Date().toISOString();
@@ -1912,6 +1949,26 @@ function collectKnowledgeAnchors(sourceRaw = "", maxCount = 64) {
   return anchors.slice(0, maxCount);
 }
 
+function stripLeadingPageMarker(text = "") {
+  let next = cleanText(text);
+  if (!next) return "";
+  next = next
+    .replace(/^=+\s*page\s*\d+\s*(?:text|ocr)?\s*=+\s*/i, "")
+    .replace(/^page\s*\d+\s*(?:text|ocr)?\s*[:：-]?\s*/i, "")
+    .replace(/^第\s*\d+\s*页\s*[:：-]?\s*/i, "")
+    .replace(/^[-–—:：·\s]+/, "")
+    .trim();
+  return next;
+}
+
+function normalizeKnowledgeBlockTitle(title, fallback = "") {
+  let next = stripLeadingPageMarker(cleanText(title));
+  if (!next) next = stripLeadingPageMarker(cleanText(fallback));
+  if (!next) return "";
+  next = next.replace(/\s{2,}/g, " ").trim();
+  return next.slice(0, 72).trim();
+}
+
 function splitKnowledgeBlocksFromText(text, opts = {}) {
   const sourceRaw = String(text || "").replace(/\r/g, "");
   const sourceText = sourceRaw.replace(/\s+/g, " ").trim();
@@ -1970,8 +2027,12 @@ function splitKnowledgeBlocksFromText(text, opts = {}) {
     : BOOK_PIPELINE_DENSITY_MIN_SCORE;
   const withScores = chunkRows.map((row, idx) => {
     const content = cleanText(row?.content);
-    const sentences = splitSentencesForPipeline(content);
-    const titleSeed = cleanText(sentences[0], `Knowledge Block ${idx + 1}`).slice(0, 72);
+    const normalizedLead = stripLeadingPageMarker(content);
+    const sentences = splitSentencesForPipeline(normalizedLead || content);
+    const titleSeed = normalizeKnowledgeBlockTitle(
+      cleanText(sentences[0]),
+      cleanText(row?.anchor, `Knowledge Block ${idx + 1}`)
+    );
     const density = computeDensityScore(content);
     return {
       id: `kb-${String(idx + 1).padStart(2, "0")}`,
@@ -2288,6 +2349,12 @@ async function pathExists(targetPath) {
   return Boolean(await fs.stat(targetPath).catch(() => null));
 }
 
+function withKnowledgeAbsorberLock(task) {
+  const run = knowledgeAbsorberRunLock.then(() => task(), () => task());
+  knowledgeAbsorberRunLock = run.catch(() => {});
+  return run;
+}
+
 let cachedPythonCommand = "";
 let pythonCommandChecked = false;
 
@@ -2306,6 +2373,209 @@ async function resolvePythonCommand() {
   }
   cachedPythonCommand = "";
   return "";
+}
+
+function normalizeKnowledgeAbsorberOutput(raw = "", maxChars = BOOK_PIPELINE_INGEST_MAX_TEXT) {
+  const text = String(raw || "").replace(/\r\n/g, "\n");
+  if (!text.trim()) return "";
+  const cleaned = [];
+  for (const line of text.split("\n")) {
+    const trimmed = line.trim();
+    if (!trimmed) {
+      cleaned.push("");
+      continue;
+    }
+    if (/^={20,}$/.test(trimmed)) continue;
+    if (/^---\s*source\s+\d+:/i.test(trimmed)) continue;
+    if (/^(title|author|source|date):\s+/i.test(trimmed)) continue;
+    if (/^===\s*content\s*===$/i.test(trimmed)) continue;
+    if (/^generated by lcs knowledge absorber/i.test(trimmed)) continue;
+    cleaned.push(line);
+  }
+  return clampText(
+    cleaned
+      .join("\n")
+      .replace(/[ \t]+\n/g, "\n")
+      .replace(/\n{3,}/g, "\n\n")
+      .trim(),
+    Math.max(12_000, toInt(maxChars) || BOOK_PIPELINE_INGEST_MAX_TEXT)
+  );
+}
+
+function parseKnowledgeAbsorberMetadata(raw = "") {
+  const text = String(raw || "").replace(/\r\n/g, "\n");
+  const takeAll = (pattern) => [...text.matchAll(pattern)]
+    .map((row) => cleanText(row?.[1]))
+    .filter(Boolean);
+  const pick = (rows, fallback = "") => {
+    if (!Array.isArray(rows) || !rows.length) return fallback;
+    const preferred = rows.find((v) => !/^unknown$/i.test(v));
+    return preferred || rows[0] || fallback;
+  };
+  const titleRows = takeAll(/^\s*Title:\s*(.+)\s*$/gim);
+  const authorRows = takeAll(/^\s*Author:\s*(.+)\s*$/gim);
+  const sourceRows = takeAll(/^\s*Source:\s*(.+)\s*$/gim);
+  const dateRows = takeAll(/^\s*Date:\s*(.+)\s*$/gim);
+  return {
+    title: pick(titleRows, ""),
+    author: pick(authorRows, ""),
+    source: pick(sourceRows, ""),
+    date: pick(dateRows, "")
+  };
+}
+
+function detectKnowledgeAbsorberInputKind(filePayload = {}) {
+  const name = cleanText(filePayload?.name).toLowerCase();
+  const mime = cleanText(filePayload?.type).toLowerCase();
+  if (name.endsWith(".pdf") || mime.includes("pdf")) return "pdf";
+  if (name.endsWith(".epub") || mime.includes("epub")) return "epub";
+  if (name.endsWith(".docx") || name.endsWith(".doc") || mime.includes("word")) return "word";
+  if (name.endsWith(".md") || name.endsWith(".txt") || mime.startsWith("text/")) return "text";
+  if (name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png") || name.endsWith(".bmp") || mime.startsWith("image/")) {
+    return "image";
+  }
+  return "generic";
+}
+
+function isKnowledgeAbsorberCandidateFile(filePayload = {}) {
+  const name = cleanText(filePayload?.name).toLowerCase();
+  const mime = cleanText(filePayload?.type).toLowerCase();
+  if (!name && !mime) return false;
+  if (
+    name.endsWith(".pdf")
+    || name.endsWith(".epub")
+    || name.endsWith(".txt")
+    || name.endsWith(".docx")
+    || name.endsWith(".doc")
+    || name.endsWith(".md")
+    || name.endsWith(".jpg")
+    || name.endsWith(".jpeg")
+    || name.endsWith(".png")
+    || name.endsWith(".bmp")
+  ) return true;
+  return mime.includes("pdf") || mime.includes("epub") || mime.includes("text/") || mime.includes("word");
+}
+
+async function runKnowledgeAbsorberIngest(inputValue, hooks = null, options = {}) {
+  const startedAt = Date.now();
+  if (!BOOK_PIPELINE_USE_KNOWLEDGE_ABSORBER) {
+    return {
+      used: false,
+      status: "disabled",
+      reason: "BOOK_PIPELINE_USE_KNOWLEDGE_ABSORBER=off",
+      elapsedMs: 0
+    };
+  }
+  const scriptPath = cleanText(KNOWLEDGE_ABSORBER_SCRIPT_PATH);
+  const outputPath = cleanText(KNOWLEDGE_ABSORBER_RAW_OUTPUT_PATH);
+  if (!scriptPath || !(await pathExists(scriptPath))) {
+    return {
+      used: false,
+      status: "skipped",
+      reason: "knowledge_absorber_script_missing",
+      elapsedMs: 0
+    };
+  }
+  if (!outputPath) {
+    return {
+      used: false,
+      status: "skipped",
+      reason: "knowledge_absorber_output_path_missing",
+      elapsedMs: 0
+    };
+  }
+  const pythonCmd = await resolvePythonCommand();
+  if (!pythonCmd) {
+    return {
+      used: false,
+      status: "skipped",
+      reason: "python_missing",
+      elapsedMs: 0
+    };
+  }
+  const timeoutMs = Math.max(60_000, toInt(options?.timeoutMs) || BOOK_PIPELINE_KA_TIMEOUT_MS);
+  const maxChars = Math.max(12_000, toInt(options?.maxChars) || BOOK_PIPELINE_INGEST_MAX_TEXT);
+  const inputKind = cleanText(options?.inputKind, "generic").toLowerCase();
+  const mdOutputPath = cleanText(KNOWLEDGE_ABSORBER_MD_OUTPUT_PATH);
+  const htmlOutputPath = cleanText(KNOWLEDGE_ABSORBER_HTML_OUTPUT_PATH);
+  return withKnowledgeAbsorberLock(async () => {
+    if (hooks && typeof hooks.onProgress === "function") {
+      hooks.onProgress({
+        step: "ingest_skill",
+        progress: 42,
+        message: `Running StudyAnalysis skill (knowledge-absorber, route=${inputKind || "generic"})`
+      });
+    }
+    await fs.mkdir(path.dirname(outputPath), { recursive: true }).catch(() => {});
+    try {
+      await execFileAsync(
+        pythonCmd,
+        [scriptPath, cleanText(inputValue)],
+        {
+          cwd: rootDir,
+          timeout: timeoutMs,
+          maxBuffer: 36 * 1024 * 1024
+        }
+      );
+    } catch (error) {
+      return {
+        used: false,
+        status: "error",
+        reason: cleanText(error?.message, "knowledge_absorber_exec_failed"),
+        elapsedMs: Date.now() - startedAt
+      };
+    }
+    const [raw, markdownRaw] = await Promise.all([
+      fs.readFile(outputPath, "utf8").catch(() => ""),
+      mdOutputPath ? fs.readFile(mdOutputPath, "utf8").catch(() => "") : Promise.resolve("")
+    ]);
+    const text = normalizeKnowledgeAbsorberOutput(raw, maxChars);
+    const markdownText = clampText(String(markdownRaw || "").trim(), maxChars);
+    const metadata = parseKnowledgeAbsorberMetadata(raw);
+    if (text.length < BOOK_PIPELINE_KA_MIN_CHARS) {
+      return {
+        used: false,
+        status: "fallback",
+        reason: `knowledge_absorber_output_too_short(${text.length})`,
+        elapsedMs: Date.now() - startedAt,
+        chars: text.length,
+        metadata,
+        inputKind,
+        markdownPath: mdOutputPath,
+        markdownChars: markdownText.length,
+        htmlPath: htmlOutputPath
+      };
+    }
+    let snapshotPath = "";
+    let markdownSnapshotPath = "";
+    try {
+      const snapshotDir = path.join(dataDir, "knowledge-absorber");
+      await fs.mkdir(snapshotDir, { recursive: true });
+      const snapshotBase = `${new Date().toISOString().replace(/[:.]/g, "-")}-${crypto.randomUUID().slice(0, 8)}`;
+      snapshotPath = path.join(snapshotDir, `${snapshotBase}.txt`);
+      await fs.writeFile(snapshotPath, text, "utf8");
+      if (markdownText) {
+        markdownSnapshotPath = path.join(snapshotDir, `${snapshotBase}.md`);
+        await fs.writeFile(markdownSnapshotPath, markdownText, "utf8");
+      }
+    } catch {}
+    return {
+      used: true,
+      status: "ok",
+      reason: "",
+      elapsedMs: Date.now() - startedAt,
+      chars: text.length,
+      inputKind,
+      outputPath,
+      htmlPath: htmlOutputPath,
+      markdownPath: mdOutputPath,
+      markdownChars: markdownText.length,
+      snapshotPath,
+      markdownSnapshotPath,
+      metadata,
+      text
+    };
+  });
 }
 
 function shouldUsePipelineImageProvider() {
@@ -2580,6 +2850,7 @@ function buildSilentWavBuffer(durationSeconds = 2) {
 function buildPipelineModuleHtml({
   bookId = "",
   bookTitle,
+  bookAuthor = "",
   moduleTitle,
   moduleSummary,
   keywords = [],
@@ -2683,6 +2954,7 @@ function buildPipelineModuleHtml({
     <section class="hero">
       <div class="chips">
         <span class="chip">${escapeHtml(bookTitle)}</span>
+        ${bookAuthor ? `<span class="chip">作者：${escapeHtml(bookAuthor)}</span>` : ""}
         <span class="chip">Gate ${escapeHtml(String(gateIndex))}</span>
         <span class="chip">Module ${escapeHtml(String(moduleIndex))}/${escapeHtml(String(moduleCount))}</span>
       </div>
@@ -3487,37 +3759,6 @@ function updateStudioJob(job, patch = {}) {
   broadcastStudioJob(job);
 }
 
-function chargeCreditsForStudioGeneration(sessionId, payload, options = {}) {
-  const record = getOrCreateBillingRecord(sessionId);
-  const reconciled = reconcileCreditsForRecord(record);
-  const estimatedCost = estimateGenerationCreditCostFromPayload(payload);
-  const spend = spendCreditsFromRecord(record, estimatedCost, "studio_generation");
-  const trackPending = options?.trackPending !== false;
-  let pendingChanged = false;
-  if (trackPending && spend.ok && toInt(spend?.charge?.amount) > 0) {
-    pendingChanged = upsertPendingCreditCharge(record, spend.charge);
-  }
-  if (reconciled || spend.ok || pendingChanged) {
-    schedulePersist();
-  }
-  if (!spend.ok) {
-    return {
-      ok: false,
-      need: spend.need,
-      available: spend.available,
-      credits: toPublicCreditSnapshot(record)
-    };
-  }
-  return {
-    ok: true,
-    charge: {
-      ...spend.charge,
-      estimatedCost
-    },
-    credits: toPublicCreditSnapshot(record)
-  };
-}
-
 function refundStudioJobCharge(sessionId, job, reason = "studio_generation_refund") {
   const charge = job?.creditCharge;
   if (!charge || charge.status === "refunded" || !toInt(charge.amount)) return null;
@@ -3536,21 +3777,142 @@ function refundStudioJobCharge(sessionId, job, reason = "studio_generation_refun
   return nextCharge;
 }
 
-function finalizeStudioJobCharge(sessionId, job) {
-  const charge = job?.creditCharge;
-  if (!charge || charge.status === "captured" || charge.status === "refunded") return null;
+function ensureStudioGenerationStartCredit(sessionId, minimumCredits = 1) {
   const record = getOrCreateBillingRecord(sessionId);
-  reconcileCreditsForRecord(record);
-  clearPendingCreditCharge(record, charge.id);
-  const nextCharge = {
-    ...charge,
-    status: "captured",
-    capturedAt: nowIso()
+  const reconciled = reconcileCreditsForRecord(record);
+  if (reconciled) schedulePersist();
+  const available = getCreditAvailable(record);
+  const need = Math.max(1, toInt(minimumCredits) || 1);
+  if (available < need) {
+    return {
+      ok: false,
+      need,
+      available,
+      credits: toPublicCreditSnapshot(record)
+    };
+  }
+  return {
+    ok: true,
+    available,
+    credits: toPublicCreditSnapshot(record)
   };
-  job.creditCharge = nextCharge;
-  job.creditSnapshot = toPublicCreditSnapshot(record);
-  schedulePersist();
-  return nextCharge;
+}
+
+function normalizeTokenUsageSummary(raw = {}) {
+  const row = raw && typeof raw === "object" ? raw : {};
+  const inputTokens = toInt(
+    row.inputTokens
+    ?? row.input_tokens
+    ?? row.promptTokens
+    ?? row.prompt_tokens
+  );
+  const outputTokens = toInt(
+    row.outputTokens
+    ?? row.output_tokens
+    ?? row.completionTokens
+    ?? row.completion_tokens
+  );
+  const totalRaw = toInt(
+    row.totalTokens
+    ?? row.total_tokens
+    ?? row.tokens
+  );
+  const totalTokens = Math.max(totalRaw, inputTokens + outputTokens);
+  const calls = toInt(row.calls ?? row.requestCount ?? row.requests);
+  return {
+    inputTokens,
+    outputTokens,
+    totalTokens,
+    calls
+  };
+}
+
+function estimateCreditsFromTokenUsage(usage = {}) {
+  const normalized = normalizeTokenUsageSummary(usage);
+  if (normalized.totalTokens <= 0) {
+    return {
+      requested: 0,
+      usage: normalized
+    };
+  }
+  const raw = Math.ceil((normalized.totalTokens / 1000) * creditsPer1kTokens);
+  const requested = Math.max(studioMinTokenCharge, Math.min(studioMaxTokenCharge, raw));
+  return {
+    requested,
+    usage: normalized
+  };
+}
+
+function settleStudioGenerationChargeFromUsage(
+  sessionId,
+  payload,
+  work,
+  reason = "studio_generation_tokens"
+) {
+  const record = getOrCreateBillingRecord(sessionId);
+  const reconciled = reconcileCreditsForRecord(record);
+  const estimatedCost = estimateGenerationCreditCostFromPayload(payload || {});
+  const tokenUsage = normalizeTokenUsageSummary(
+    work?.token_usage
+    || work?.tokenUsage
+    || {}
+  );
+  const usageBased = estimateCreditsFromTokenUsage(tokenUsage);
+  const requestedAmount = Math.max(0, toInt(usageBased.requested));
+  const availableBefore = getCreditAvailable(record);
+  const chargeable = Math.max(0, Math.min(requestedAmount, availableBefore));
+  let spend = null;
+  if (chargeable > 0) {
+    const spent = spendCreditsFromRecord(record, chargeable, reason);
+    if (spent?.ok) {
+      spend = spent;
+    }
+  }
+  if (reconciled || (spend && spend.ok)) {
+    schedulePersist();
+  }
+  const chargedAmount = spend?.ok ? Math.max(0, toInt(spend.charge?.amount)) : 0;
+  const unpaidAmount = Math.max(0, requestedAmount - chargedAmount);
+  const status = requestedAmount <= 0
+    ? "captured"
+    : (unpaidAmount > 0
+      ? (chargedAmount > 0 ? "partially_captured" : "unpaid")
+      : "captured");
+  const charge = {
+    id: sanitizeStripeString(spend?.charge?.id) || crypto.randomUUID(),
+    amount: chargedAmount,
+    requestedAmount,
+    unpaidAmount,
+    estimatedCost,
+    reason,
+    at: sanitizeStripeString(spend?.charge?.at) || nowIso(),
+    capturedAt: nowIso(),
+    status,
+    billedBy: "token_usage",
+    tokenUsage,
+    pricing: {
+      creditsPer1kTokens,
+      minCharge: studioMinTokenCharge,
+      maxCharge: studioMaxTokenCharge
+    }
+  };
+  return {
+    charge,
+    credits: toPublicCreditSnapshot(record),
+    tokenUsage
+  };
+}
+
+function settleStudioJobChargeFromUsage(sessionId, job, work, reason = "studio_generation_tokens") {
+  if (job?.creditCharge && sanitizeStripeString(job.creditCharge.status).toLowerCase() === "reserved") {
+    refundStudioJobCharge(sessionId, job, "studio_generation_reprice_token_usage");
+  }
+  const settled = settleStudioGenerationChargeFromUsage(sessionId, job?.payload || {}, work, reason);
+  if (job && typeof job === "object") {
+    job.creditCharge = settled.charge;
+    job.creditSnapshot = settled.credits;
+  }
+  return settled;
 }
 
 function resolveBookPipelineFilePayload(payload = {}) {
@@ -3567,6 +3929,113 @@ function resolveBookPipelineFilePayload(payload = {}) {
   };
 }
 
+async function enhanceBookPipelineFileSourceWithKnowledgeAbsorber(filePayload, source, hooks = null) {
+  const baseSource = source && typeof source === "object" ? { ...source } : {};
+  const baseContent = cleanText(baseSource?.content, cleanText(baseSource?.snippet));
+  const baseChars = baseContent.length;
+  const inputKind = detectKnowledgeAbsorberInputKind(filePayload);
+  if (!isKnowledgeAbsorberCandidateFile(filePayload)) {
+    return {
+      source: baseSource,
+      enhancer: {
+        used: false,
+        status: "skipped",
+        reason: "unsupported_file_for_knowledge_absorber",
+        baseChars,
+        inputKind
+      }
+    };
+  }
+  const extRaw = path.extname(cleanText(filePayload?.name)).toLowerCase();
+  const safeExt = /^[.][a-z0-9]{1,8}$/.test(extRaw) ? extRaw : ".txt";
+  const tempDir = path.join(dataDir, "tmp", "knowledge-absorber");
+  const tempPath = path.join(tempDir, `ingest-${Date.now()}-${crypto.randomUUID().slice(0, 8)}${safeExt}`);
+  let runResult = null;
+  try {
+    await fs.mkdir(tempDir, { recursive: true });
+    const buffer = Buffer.from(cleanText(filePayload?.contentBase64), "base64");
+    await fs.writeFile(tempPath, buffer);
+    runResult = await runKnowledgeAbsorberIngest(tempPath, hooks, {
+      maxChars: BOOK_PIPELINE_INGEST_MAX_TEXT,
+      timeoutMs: BOOK_PIPELINE_KA_TIMEOUT_MS,
+      inputKind
+    });
+  } catch (error) {
+    runResult = {
+      used: false,
+      status: "error",
+      reason: cleanText(error?.message, "knowledge_absorber_temp_file_failed"),
+      elapsedMs: 0,
+      inputKind
+    };
+  } finally {
+    await fs.unlink(tempPath).catch(() => {});
+  }
+  const enhancedText = cleanText(runResult?.text);
+  const extractedTitle = cleanText(runResult?.metadata?.title);
+  const extractedAuthor = cleanText(runResult?.metadata?.author);
+  const shouldAdopt = Boolean(runResult?.used && enhancedText.length >= Math.max(BOOK_PIPELINE_KA_MIN_CHARS, Math.floor(baseChars * 0.35)));
+  if (!shouldAdopt) {
+    const fallbackSource = {
+      ...baseSource,
+      title: cleanText(extractedTitle, cleanText(baseSource?.title, cleanText(filePayload?.name, "Uploaded Book"))),
+      author: cleanText(extractedAuthor, cleanText(baseSource?.author))
+    };
+    return {
+      source: fallbackSource,
+      enhancer: {
+        used: false,
+        status: cleanText(runResult?.status, "fallback"),
+        reason: cleanText(runResult?.reason, "knowledge_absorber_no_adoption"),
+        elapsedMs: toInt(runResult?.elapsedMs),
+        chars: toInt(runResult?.chars),
+        baseChars,
+        inputKind,
+        title: extractedTitle,
+        author: extractedAuthor,
+        outputPath: cleanText(runResult?.outputPath),
+        htmlPath: cleanText(runResult?.htmlPath),
+        markdownPath: cleanText(runResult?.markdownPath),
+        markdownChars: toInt(runResult?.markdownChars),
+        snapshotPath: cleanText(runResult?.snapshotPath),
+        markdownSnapshotPath: cleanText(runResult?.markdownSnapshotPath),
+        scriptPath: cleanText(KNOWLEDGE_ABSORBER_SCRIPT_PATH)
+      }
+    };
+  }
+  const mergedParsedBy = [cleanText(baseSource?.parsedBy), "skill.knowledge-absorber"]
+    .filter(Boolean)
+    .join("+");
+  return {
+    source: {
+      ...baseSource,
+      title: cleanText(extractedTitle, cleanText(baseSource?.title, cleanText(filePayload?.name, "Uploaded Book"))),
+      author: cleanText(extractedAuthor, cleanText(baseSource?.author)),
+      snippet: clampText(enhancedText, 1200),
+      content: clampText(enhancedText, BOOK_PIPELINE_INGEST_MAX_TEXT),
+      parsedBy: mergedParsedBy || "skill.knowledge-absorber"
+    },
+    enhancer: {
+      used: true,
+      status: "applied",
+      reason: "",
+      elapsedMs: toInt(runResult?.elapsedMs),
+      chars: enhancedText.length,
+      baseChars,
+      inputKind,
+      title: extractedTitle,
+      author: extractedAuthor,
+      outputPath: cleanText(runResult?.outputPath),
+      htmlPath: cleanText(runResult?.htmlPath),
+      markdownPath: cleanText(runResult?.markdownPath),
+      markdownChars: toInt(runResult?.markdownChars),
+      snapshotPath: cleanText(runResult?.snapshotPath),
+      markdownSnapshotPath: cleanText(runResult?.markdownSnapshotPath),
+      scriptPath: cleanText(KNOWLEDGE_ABSORBER_SCRIPT_PATH)
+    }
+  };
+}
+
 async function resolveBookPipelineSource(payload = {}, hooks = {}) {
   const filePayload = resolveBookPipelineFilePayload(payload);
   if (filePayload) {
@@ -3578,10 +4047,13 @@ async function resolveBookPipelineSource(payload = {}, hooks = {}) {
         maxPages: BOOK_PIPELINE_INGEST_MAX_PAGES
       }
     );
+    const enhanced = await enhanceBookPipelineFileSourceWithKnowledgeAbsorber(filePayload, source, hooks);
+    const finalSource = enhanced?.source || source;
     return {
-      source,
+      source: finalSource,
       mode: "file",
-      title: cleanText(payload?.title, cleanText(source?.title, filePayload.name))
+      title: cleanText(payload?.title, cleanText(finalSource?.title, filePayload.name)),
+      enhancer: enhanced?.enhancer || null
     };
   }
   const urlText = cleanText(payload?.url);
@@ -3600,6 +4072,7 @@ async function resolveBookPipelineSource(payload = {}, hooks = {}) {
   if (firstSource && (cleanText(firstSource?.content) || cleanText(firstSource?.snippet))) {
     const source = {
       title: cleanText(firstSource?.title, cleanText(payload?.title, "Uploaded Book")),
+      author: cleanText(firstSource?.author, cleanText(payload?.author)),
       url: cleanText(firstSource?.url),
       snippet: clampText(cleanText(firstSource?.snippet, firstSource?.content), 1200),
       content: clampText(cleanText(firstSource?.content, firstSource?.snippet), BOOK_PIPELINE_INGEST_MAX_TEXT)
@@ -3614,6 +4087,7 @@ async function resolveBookPipelineSource(payload = {}, hooks = {}) {
   if (inputText) {
     const source = {
       title: cleanText(payload?.title, "Uploaded Book Text"),
+      author: cleanText(payload?.author),
       url: "",
       snippet: clampText(inputText, 1200),
       content: clampText(inputText, BOOK_PIPELINE_INGEST_MAX_TEXT)
@@ -3627,7 +4101,7 @@ async function resolveBookPipelineSource(payload = {}, hooks = {}) {
   throw new Error("No readable book source found. Provide bookFile/file, url, sources, or input text.");
 }
 
-async function buildModulePipelineArtifacts({ work, moduleSlug, block, bookTitle }) {
+async function buildModulePipelineArtifacts({ work, moduleSlug, block, bookTitle, bookAuthor = "" }) {
   const moduleDir = path.join(rootDir, "book_experiences", cleanText(work?.book_id), moduleSlug);
   const codePath = path.join(moduleDir, "code.html");
   const moduleJsonPath = path.join(moduleDir, "module.json");
@@ -3660,6 +4134,7 @@ async function buildModulePipelineArtifacts({ work, moduleSlug, block, bookTitle
   const moduleHtml = buildPipelineModuleHtml({
     bookId: cleanText(work?.book_id),
     bookTitle,
+    bookAuthor,
     moduleTitle: cleanText(block?.title, `Knowledge Block ${moduleIndex}`),
     moduleSummary: cleanText(block?.summary, cleanText(block?.content).slice(0, 280)),
     keywords: Array.isArray(block?.keywords) ? block.keywords.slice(0, 8) : [],
@@ -3683,6 +4158,10 @@ async function buildModulePipelineArtifacts({ work, moduleSlug, block, bookTitle
   moduleMeta.book_pipeline = {
     version: 1,
     generated_at: nowIso(),
+    source_book: {
+      title: cleanText(bookTitle),
+      author: cleanText(bookAuthor)
+    },
     knowledge_block: {
       id: cleanText(block?.id),
       gate_index: toInt(block?.gateIndex),
@@ -3786,7 +4265,7 @@ async function detectPipelineModuleFailures({ work, moduleBlockMap }) {
   return failed;
 }
 
-async function verifyAndRepairPipelineModules({ work, moduleBlockMap, bookTitle }) {
+async function verifyAndRepairPipelineModules({ work, moduleBlockMap, bookTitle, bookAuthor = "" }) {
   const failed = await detectPipelineModuleFailures({ work, moduleBlockMap });
   if (!failed.length) {
     return { ok: true, failedCount: 0, repaired: 0, failedModules: [] };
@@ -3798,7 +4277,8 @@ async function verifyAndRepairPipelineModules({ work, moduleBlockMap, bookTitle 
         work,
         moduleSlug: row.moduleSlug,
         block: row.block,
-        bookTitle
+        bookTitle,
+        bookAuthor
       });
       repaired += 1;
     } catch {}
@@ -4103,6 +4583,7 @@ async function regenerateBookPipelineForWork({ work, target = "failed", moduleSl
     ? scopedRows
     : failedRows;
   const bookTitle = cleanText(safeWork?.title, cleanText(manifest?.title, "Playable Book"));
+  const bookAuthor = cleanText(manifest?.source_ingest?.author);
   const rebuilt = [];
   const rebuildErrors = [];
   await mapLimit(rowsToRebuild, Math.min(8, Math.max(1, rowsToRebuild.length)), async (row) => {
@@ -4111,7 +4592,8 @@ async function regenerateBookPipelineForWork({ work, target = "failed", moduleSl
         work: safeWork,
         moduleSlug: cleanText(row?.moduleSlug),
         block: row?.block || {},
-        bookTitle
+        bookTitle,
+        bookAuthor
       });
       rebuilt.push(result);
     } catch (error) {
@@ -4127,7 +4609,8 @@ async function regenerateBookPipelineForWork({ work, target = "failed", moduleSl
   const qa = await verifyAndRepairPipelineModules({
     work: safeWork,
     moduleBlockMap: verifyRows,
-    bookTitle
+    bookTitle,
+    bookAuthor
   });
   manifest.regeneration = {
     at: nowIso(),
@@ -4181,6 +4664,18 @@ async function runBookPipelineGenerationJob(job, sessionId) {
   const source = resolved.source || {};
   const sourceText = cleanText(source.content, cleanText(source.snippet));
   const parsedBy = cleanText(source?.parsedBy);
+  const sourceEnhancer = resolved?.enhancer && typeof resolved.enhancer === "object"
+    ? { ...resolved.enhancer }
+    : null;
+  const bookAuthor = cleanText(source?.author, cleanText(sourceEnhancer?.author));
+  const skeletonMdPath = cleanText(
+    sourceEnhancer?.markdownSnapshotPath,
+    cleanText(sourceEnhancer?.markdownPath)
+  );
+  const skeletonMdRaw = skeletonMdPath
+    ? await fs.readFile(skeletonMdPath, "utf8").catch(() => "")
+    : "";
+  const skeletonMdText = clampText(String(skeletonMdRaw || "").trim(), BOOK_PIPELINE_INGEST_MAX_TEXT);
   const requestedPipelineHtmlProvider = cleanText(job.payload?.pipelineHtmlProvider, cleanText(job.payload?.htmlProvider, "template")).toLowerCase();
   const pipelineHtmlProvider = ["template", "llm", "auto"].includes(requestedPipelineHtmlProvider)
     ? requestedPipelineHtmlProvider
@@ -4197,7 +4692,16 @@ async function runBookPipelineGenerationJob(job, sessionId) {
     status: "running",
     step: "planning",
     progress: 12,
-    message: `Parsed source${parsedBy ? ` via ${parsedBy}` : ""}. Estimated ${eta.etaMin}-${eta.etaMax} minutes; return around ${new Date(eta.returnAt).toLocaleTimeString()}.`
+    pipeline: {
+      ...(job.pipeline || {}),
+      type: "book_pipeline",
+      eta,
+      stage: "planning",
+      sourceMode: resolved.mode,
+      sourceParsedBy: parsedBy,
+      sourceEnhancer
+    },
+    message: `Parsed source${parsedBy ? ` via ${parsedBy}` : ""}${sourceEnhancer?.used ? " + StudyAnalysis skill" : ""}${bookAuthor ? ` (author: ${bookAuthor})` : ""}. Estimated ${eta.etaMin}-${eta.etaMax} minutes; return around ${new Date(eta.returnAt).toLocaleTimeString()}.`
   });
 
   const requestedBlocks = toInt(job.payload?.blockCount);
@@ -4232,6 +4736,9 @@ async function runBookPipelineGenerationJob(job, sessionId) {
       type: "book_pipeline",
       eta,
       stage: "knowledge_blocks",
+      sourceMode: resolved.mode,
+      sourceParsedBy: parsedBy,
+      sourceEnhancer,
       knowledgeBlockCount: knowledgeBlocks.length,
       knowledgeBlocksPreview: blockPreview,
       knowledgeBlockDiagnostics: splitDiagnostics
@@ -4253,17 +4760,27 @@ async function runBookPipelineGenerationJob(job, sessionId) {
       60000
     )
   };
+  const skeletonSource = skeletonMdText
+    ? {
+      title: `${resolved.title} · StudyAnalysis Skeleton (MD)`,
+      url: skeletonMdPath,
+      snippet: clampText(skeletonMdText.replace(/\s+/g, " ").trim(), 1200),
+      content: clampText(skeletonMdText, 90000)
+    }
+    : null;
   const generationPayload = {
     mode: "sources",
     input: cleanText(job.payload?.input, resolved.title),
     title: cleanText(job.payload?.title, resolved.title),
+    author: bookAuthor,
     moduleCount,
     maxModuleCount: BOOK_PIPELINE_MAX_MODULES,
     htmlProvider: pipelineHtmlProvider,
     requireLlmHtml: false,
     sources: [
       { title: source.title, url: source.url, snippet: source.snippet, content: sourceText },
-      blueprintSource
+      blueprintSource,
+      ...(skeletonSource ? [skeletonSource] : [])
     ],
     bookPipeline: true
   };
@@ -4304,7 +4821,8 @@ async function runBookPipelineGenerationJob(job, sessionId) {
       work,
       moduleSlug: row.moduleSlug,
       block: row.block,
-      bookTitle: cleanText(work?.title, cleanText(resolved?.title, "Playable Book"))
+      bookTitle: cleanText(work?.title, cleanText(resolved?.title, "Playable Book")),
+      bookAuthor
     });
   });
 
@@ -4318,6 +4836,15 @@ async function runBookPipelineGenerationJob(job, sessionId) {
         generated_at: nowIso(),
         eta,
         source_mode: resolved.mode,
+        source_ingest: {
+          parsed_by: parsedBy,
+          title: cleanText(source?.title),
+          author: bookAuthor,
+          input_kind: cleanText(sourceEnhancer?.inputKind),
+          skeleton_markdown_path: skeletonMdPath,
+          skeleton_markdown_chars: skeletonMdText.length,
+          enhancer: sourceEnhancer
+        },
         total_knowledge_blocks: knowledgeBlocks.length,
         split_diagnostics: splitDiagnostics,
         knowledge_blocks: knowledgeBlocks,
@@ -4342,7 +4869,8 @@ async function runBookPipelineGenerationJob(job, sessionId) {
     qaResult = await verifyAndRepairPipelineModules({
       work,
       moduleBlockMap,
-      bookTitle: cleanText(work?.title, cleanText(resolved?.title, "Playable Book"))
+      bookTitle: cleanText(work?.title, cleanText(resolved?.title, "Playable Book")),
+      bookAuthor
     });
     if (qaResult.ok) break;
     updateStudioJob(job, {
@@ -4372,7 +4900,10 @@ async function runBookPipelineGenerationJob(job, sessionId) {
   }
 
   await loadCatalog(true);
-  const capturedCharge = finalizeStudioJobCharge(sessionId, job);
+  const settled = settleStudioJobChargeFromUsage(sessionId, job, work, "studio_generation_tokens");
+  const chargedAmount = toInt(settled?.charge?.amount);
+  const requestedAmount = toInt(settled?.charge?.requestedAmount);
+  const unpaidAmount = toInt(settled?.charge?.unpaidAmount);
   updateStudioJob(job, {
     status: "done",
     step: "done",
@@ -4383,6 +4914,8 @@ async function runBookPipelineGenerationJob(job, sessionId) {
       type: "book_pipeline",
       stage: "done",
       sourceMode: resolved.mode,
+      sourceParsedBy: parsedBy,
+      sourceEnhancer,
       eta,
       qa: qaResult,
       knowledgeBlockCount: knowledgeBlocks.length,
@@ -4390,9 +4923,11 @@ async function runBookPipelineGenerationJob(job, sessionId) {
       knowledgeBlockDiagnostics: splitDiagnostics,
       easter
     },
-    creditCharge: capturedCharge || job.creditCharge || null,
-    creditSnapshot: job.creditSnapshot || null,
-    message: `Book pipeline completed. Charged ${toInt(capturedCharge?.amount || job?.creditCharge?.amount)} credits.`
+    creditCharge: settled?.charge || job.creditCharge || null,
+    creditSnapshot: settled?.credits || job.creditSnapshot || null,
+    message: unpaidAmount > 0
+      ? `Book pipeline completed. Charged ${chargedAmount}/${requestedAmount} credits (token-based, unpaid ${unpaidAmount}).`
+      : `Book pipeline completed. Charged ${chargedAmount} credits (token-based).`
   });
 }
 
@@ -4403,6 +4938,7 @@ async function runStudioGenerationJob(job, sessionId) {
       await runBookPipelineGenerationJob(job, sessionId);
       return;
     }
+    const usageAccumulator = normalizeTokenUsageSummary(job?.pipeline?.tokenUsage || {});
     const work = await playableContentEngine.generatePlayableBook(sessionId, job.payload, {
       onProgress: (event) => {
         updateStudioJob(job, {
@@ -4411,19 +4947,46 @@ async function runStudioGenerationJob(job, sessionId) {
           progress: Number.isFinite(Number(event?.progress)) ? Number(event.progress) : job.progress,
           message: typeof event?.message === "string" ? event.message : ""
         });
+      },
+      onUsage: (usage) => {
+        const normalized = normalizeTokenUsageSummary(usage);
+        usageAccumulator.inputTokens += normalized.inputTokens;
+        usageAccumulator.outputTokens += normalized.outputTokens;
+        usageAccumulator.totalTokens += normalized.totalTokens;
+        usageAccumulator.calls += normalized.calls || (normalized.totalTokens > 0 ? 1 : 0);
+        updateStudioJob(job, {
+          pipeline: {
+            ...(job.pipeline || {}),
+            tokenUsage: {
+              inputTokens: usageAccumulator.inputTokens,
+              outputTokens: usageAccumulator.outputTokens,
+              totalTokens: usageAccumulator.totalTokens,
+              calls: usageAccumulator.calls
+            }
+          }
+        });
       }
     });
     updateStudioJob(job, { status: "running", step: "publishing_catalog", progress: 97, message: "Refreshing runtime catalog" });
     await loadCatalog(true);
-    const capturedCharge = finalizeStudioJobCharge(sessionId, job);
+    const settled = settleStudioJobChargeFromUsage(sessionId, job, work, "studio_generation_tokens");
+    const chargedAmount = toInt(settled?.charge?.amount);
+    const requestedAmount = toInt(settled?.charge?.requestedAmount);
+    const unpaidAmount = toInt(settled?.charge?.unpaidAmount);
     updateStudioJob(job, {
       status: "done",
       step: "done",
       progress: 100,
       work,
-      creditCharge: capturedCharge || job.creditCharge || null,
-      creditSnapshot: job.creditSnapshot || null,
-      message: "Generation completed"
+      creditCharge: settled?.charge || job.creditCharge || null,
+      creditSnapshot: settled?.credits || job.creditSnapshot || null,
+      pipeline: {
+        ...(job.pipeline || {}),
+        tokenUsage: settled?.charge?.tokenUsage || normalizeTokenUsageSummary(work?.token_usage || {})
+      },
+      message: unpaidAmount > 0
+        ? `Generation completed. Charged ${chargedAmount}/${requestedAmount} credits (token-based, unpaid ${unpaidAmount}).`
+        : `Generation completed. Charged ${chargedAmount} credits (token-based).`
     });
   } catch (error) {
     const refundedCharge = refundStudioJobCharge(sessionId, job, "studio_generation_failed");
@@ -4784,21 +5347,20 @@ async function handleStudioApi(req, res, url, session) {
         rootWorkId: cleanText(baseWork.root_work_id, cleanText(baseWork.id)),
         modificationPrompt: prompt
       };
-      const charged = chargeCreditsForStudioGeneration(session.id, jobPayload);
-      if (!charged.ok) {
+      const startGate = ensureStudioGenerationStartCredit(session.id, 1);
+      if (!startGate.ok) {
         writeJson(res, 402, {
           ok: false,
           code: "INSUFFICIENT_CREDITS",
-          error: `Insufficient credits. Need ${charged.need}, available ${charged.available}.`,
-          need: charged.need,
-          available: charged.available,
-          credits: charged.credits
+          error: `Insufficient credits. Need ${startGate.need}, available ${startGate.available}.`,
+          need: startGate.need,
+          available: startGate.available,
+          credits: startGate.credits
         });
         return true;
       }
       const job = createStudioJob(session.id, jobPayload, {
-        creditCharge: charged.charge,
-        creditSnapshot: charged.credits
+        creditSnapshot: startGate.credits
       });
       updateStudioJob(job, {
         status: "queued",
@@ -4806,7 +5368,7 @@ async function handleStudioApi(req, res, url, session) {
         progress: 0,
         creditCharge: job.creditCharge || null,
         creditSnapshot: job.creditSnapshot || null,
-        message: `Modification job created (reserved ${toInt(charged.charge?.amount)} credits)`
+        message: "Modification job created. Credits will be settled after completion (token-based)."
       });
       runStudioGenerationJob(job, session.id).catch((error) => {
         updateStudioJob(job, {
@@ -4869,22 +5431,21 @@ async function handleStudioApi(req, res, url, session) {
         mode: "book_pipeline"
       });
       const eta = estimateBookPipelineFromPayload(payload);
-      const charged = chargeCreditsForStudioGeneration(session.id, payload);
-      if (!charged.ok) {
+      const startGate = ensureStudioGenerationStartCredit(session.id, 1);
+      if (!startGate.ok) {
         writeJson(res, 402, {
           ok: false,
           code: "INSUFFICIENT_CREDITS",
-          error: `Insufficient credits. Need ${charged.need}, available ${charged.available}.`,
-          need: charged.need,
-          available: charged.available,
+          error: `Insufficient credits. Need ${startGate.need}, available ${startGate.available}.`,
+          need: startGate.need,
+          available: startGate.available,
           eta,
-          credits: charged.credits
+          credits: startGate.credits
         });
         return true;
       }
       const job = createStudioJob(session.id, payload, {
-        creditCharge: charged.charge,
-        creditSnapshot: charged.credits,
+        creditSnapshot: startGate.credits,
         eta,
         pipeline: {
           type: "book_pipeline",
@@ -4904,7 +5465,7 @@ async function handleStudioApi(req, res, url, session) {
         },
         creditCharge: job.creditCharge || null,
         creditSnapshot: job.creditSnapshot || null,
-        message: `Book pipeline created. ETA ${eta.etaMin}-${eta.etaMax} min; check back around ${new Date(eta.returnAt).toLocaleTimeString()}.`
+        message: `Book pipeline created. ETA ${eta.etaMin}-${eta.etaMax} min; credits will be settled after completion (token-based).`
       });
       runStudioGenerationJob(job, session.id).catch((error) => {
         updateStudioJob(job, {
@@ -4925,49 +5486,32 @@ async function handleStudioApi(req, res, url, session) {
         writeJson(res, 400, { ok: false, error: body.__error });
         return true;
       }
-      const charged = chargeCreditsForStudioGeneration(session.id, body, { trackPending: false });
-      if (!charged.ok) {
+      const startGate = ensureStudioGenerationStartCredit(session.id, 1);
+      if (!startGate.ok) {
         writeJson(res, 402, {
           ok: false,
           code: "INSUFFICIENT_CREDITS",
-          error: `Insufficient credits. Need ${charged.need}, available ${charged.available}.`,
-          need: charged.need,
-          available: charged.available,
-          credits: charged.credits
+          error: `Insufficient credits. Need ${startGate.need}, available ${startGate.available}.`,
+          need: startGate.need,
+          available: startGate.available,
+          credits: startGate.credits
         });
         return true;
       }
       try {
         const work = await playableContentEngine.generatePlayableBook(session.id, body);
         await loadCatalog(true);
-        const record = getOrCreateBillingRecord(session.id);
-        const reconcileChanged = reconcileCreditsForRecord(record);
-        const pendingCleared = clearPendingCreditCharge(record, charged?.charge?.id);
-        if (reconcileChanged || pendingCleared) schedulePersist();
+        const settled = settleStudioGenerationChargeFromUsage(session.id, body, work, "studio_generation_sync_tokens");
         writeJson(res, 200, {
           ok: true,
           work,
-          creditCharge: {
-            ...(charged.charge || {}),
-            status: "captured",
-            capturedAt: nowIso()
-          },
-          credits: toPublicCreditSnapshot(record)
+          creditCharge: settled.charge,
+          credits: settled.credits
         });
       } catch (error) {
-        const record = getOrCreateBillingRecord(session.id);
-        refundCreditsToRecord(record, charged.charge, "studio_generation_failed_sync");
-        schedulePersist();
         writeJson(res, 500, {
           ok: false,
-          error: error?.message || "Generation failed",
-          creditCharge: {
-            ...(charged.charge || {}),
-            status: "refunded",
-            refundedAt: nowIso(),
-            refundReason: "studio_generation_failed_sync"
-          },
-          credits: toPublicCreditSnapshot(record)
+          error: error?.message || "Generation failed"
         });
       }
       return true;
@@ -4982,22 +5526,21 @@ async function handleStudioApi(req, res, url, session) {
       const payload = normalizeStudioJobPayload(body);
       const isPipeline = isBookPipelinePayload(payload);
       const eta = isPipeline ? estimateBookPipelineFromPayload(payload) : null;
-      const charged = chargeCreditsForStudioGeneration(session.id, payload);
-      if (!charged.ok) {
+      const startGate = ensureStudioGenerationStartCredit(session.id, 1);
+      if (!startGate.ok) {
         writeJson(res, 402, {
           ok: false,
           code: "INSUFFICIENT_CREDITS",
-          error: `Insufficient credits. Need ${charged.need}, available ${charged.available}.`,
-          need: charged.need,
-          available: charged.available,
+          error: `Insufficient credits. Need ${startGate.need}, available ${startGate.available}.`,
+          need: startGate.need,
+          available: startGate.available,
           eta,
-          credits: charged.credits
+          credits: startGate.credits
         });
         return true;
       }
       const job = createStudioJob(session.id, payload, {
-        creditCharge: charged.charge,
-        creditSnapshot: charged.credits,
+        creditSnapshot: startGate.credits,
         eta: eta || null,
         pipeline: isPipeline
           ? {
@@ -5022,8 +5565,8 @@ async function handleStudioApi(req, res, url, session) {
         creditCharge: job.creditCharge || null,
         creditSnapshot: job.creditSnapshot || null,
         message: isPipeline
-          ? `Book pipeline created. ETA ${eta?.etaMin}-${eta?.etaMax} min; check back around ${eta?.returnAt ? new Date(eta.returnAt).toLocaleTimeString() : "soon"}.`
-          : `Job created (reserved ${toInt(charged.charge?.amount)} credits)`
+          ? `Book pipeline created. ETA ${eta?.etaMin}-${eta?.etaMax} min; credits will be settled after completion (token-based).`
+          : "Job created. Credits will be settled after completion (token-based)."
       });
       runStudioGenerationJob(job, session.id).catch((error) => {
         updateStudioJob(job, {
@@ -7368,6 +7911,7 @@ server.listen(port, () => {
   console.log(`[studio] skills loaded: ${playableContentEngine.listSkills().length}`);
   console.log(`[studio] book pipeline image provider: ${BOOK_PIPELINE_IMAGE_PROVIDER} (nano script: ${READO_NANO_BANANA_SCRIPT ? "set" : "unset"})`);
   console.log(`[studio] book pipeline audio provider: ${BOOK_PIPELINE_AUDIO_PROVIDER} (elevenlabs: ${ELEVENLABS_API_KEY ? "set" : "unset"})`);
+  console.log(`[studio] book pipeline StudyAnalysis skill: ${BOOK_PIPELINE_USE_KNOWLEDGE_ABSORBER ? "on" : "off"} (knowledge-absorber script: ${KNOWLEDGE_ABSORBER_SCRIPT_PATH ? "set" : "unset"})`);
 });
 
 async function shutdown() {

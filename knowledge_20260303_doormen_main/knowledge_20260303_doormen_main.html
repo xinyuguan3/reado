@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>《寻找门卫》主要内容拆解</title>
+  <style>
+    :root {
+      --bg: #fdfbf7;
+      --text: #2c2c2c;
+      --muted: #6b6b6b;
+      --accent: #b91c1c;
+      --line: #d8d1c7;
+      --card: #fffdf8;
+    }
+    body {
+      margin: 0;
+      font-family: "Noto Serif SC", "Songti SC", "STSong", serif;
+      background: radial-gradient(circle at top right, #f7f2e8 0%, var(--bg) 45%);
+      color: var(--text);
+      line-height: 1.75;
+    }
+    .wrap {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 28px 20px 120px;
+    }
+    h1, h2, h3 {
+      line-height: 1.35;
+      color: #1f1f1f;
+    }
+    h1 {
+      font-size: 2rem;
+      border-bottom: 2px solid var(--line);
+      padding-bottom: 10px;
+    }
+    h2 {
+      margin-top: 34px;
+      font-size: 1.45rem;
+      border-left: 4px solid var(--accent);
+      padding-left: 10px;
+    }
+    h3 {
+      margin-top: 20px;
+      font-size: 1.16rem;
+    }
+    p, li { font-size: 1.03rem; }
+    .meta {
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+    .mnemonic-card {
+      background: #fff5bf;
+      border: 2px dashed #d4a73f;
+      padding: 12px 14px;
+      border-radius: 10px;
+      margin: 10px 0 16px;
+    }
+    .fission-section {
+      background: #fff1f1;
+      border-left: 5px solid var(--accent);
+      border-radius: 8px;
+      padding: 14px 16px;
+      margin: 10px 0;
+    }
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 14px 16px;
+    }
+    code, pre {
+      font-family: "SFMono-Regular", Menlo, Consolas, monospace;
+    }
+    pre {
+      background: #f6f1e8;
+      border: 1px solid #e6ddcf;
+      padding: 12px;
+      border-radius: 8px;
+      overflow-x: auto;
+    }
+    details {
+      background: #fffefb;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 12px;
+      margin: 8px 0;
+    }
+    summary { cursor: pointer; font-weight: 600; }
+    .search-hud {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      justify-content: center;
+      padding: 10px;
+      background: rgba(253, 251, 247, 0.93);
+      border-top: 1px solid var(--line);
+      backdrop-filter: blur(6px);
+    }
+    #search-input {
+      width: min(920px, 95vw);
+      height: 42px;
+      border: 1px solid #b8ab96;
+      border-radius: 10px;
+      padding: 0 12px;
+      font-size: 15px;
+      font-family: inherit;
+      background: #fffdf8;
+    }
+    .hidden { display: none !important; }
+    a { color: #8f1717; }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <main class="wrap" id="content-area">
+    <h1>《寻找门卫》主要内容拆解（导师笔记版）</h1>
+    <p class="meta">作者：叫我小杨同学的小码酱 ｜ 标签：社会学民族志、城市研究、阶级互动、组织与劳动、门卫-住户关系</p>
+
+    <h2>模块 0：核心摘要（TL;DR）</h2>
+    <p>一句话：这本书把“门卫”当成一把社会学手术刀，切开了现代城市中“空间很近、社会很远”的关系结构。</p>
+    <p>认知挂钩：像你每天都用的电梯按钮，人人看得见，却很少有人研究按钮背后的整套楼宇秩序系统。</p>
+    <p>真理锚点：英文版 <em>Doormen</em> 由芝加哥大学出版社于 2005 年出版，章节结构与中译本一致。</p>
+
+    <h2>模块 1：概念破冰（Concept Ice-breaking）</h2>
+    <div class="mnemonic-card">
+      门口三件事：近而不亲、熟而不私、帮而不越。
+    </div>
+    <p>你每天进出同一栋楼，门卫认识你的作息与偏好，你依赖他处理“麻烦时刻”；但彼此又保持明显社会距离。这就是全书核心张力。</p>
+    <pre>[住户私生活] --(依赖服务)--> [门卫判断]
+      ^                        |
+      |                        v
+ [地位焦虑] <---(礼貌/规训)-- [大厅秩序]</pre>
+
+    <h2>模块 2：深度解析（Deep Analysis）</h2>
+    <h3>全书总问题</h3>
+    <p>作者真正关心的是：当人们在物理上长期接近、在社会上却保持距离时，秩序如何被日常互动制造出来。</p>
+
+    <h3>逐章主线（8个台阶）</h3>
+    <ol>
+      <li>第一章：提出“空间接近/社会距离”总框架。</li>
+      <li>第二章：门卫岗位的进入机制（非正式网络、匹配、排斥）。</li>
+      <li>第三章：门卫劳动的“忙/闲并存”时间悖论。</li>
+      <li>第四章：围绕安全、性、访客管理的边界协商。</li>
+      <li>第五章：大厅中的地位展示、尊重和服务博弈。</li>
+      <li>第六章：奖金作为关系编码器（礼物、工资补丁、关系投资）。</li>
+      <li>第七章：工会与罢工，解释待遇与结构力量的复杂关系。</li>
+      <li>第八章：9·11 后规则强化，但关系性裁量仍是系统核心。</li>
+    </ol>
+
+    <h3>研究设计精华</h3>
+    <ul>
+      <li>作者处理了“只看见显眼门卫”的样本偏差问题。</li>
+      <li>附录给出抽样细节：648 网格、抽取 50 单元、287 栋有门卫公寓、约 1200 名门卫总体估算、212 访谈、63.1% 应答率。</li>
+      <li>这让全书不仅是好故事，也有较强可检验性。</li>
+    </ul>
+
+    <h3>Mermaid 认知地图</h3>
+    <div class="mermaid">
+flowchart TD
+    A["空间接近"] --> B["社会距离"]
+    B --> C["角色不确定"]
+    C --> D["日常协商"]
+    D --> E["服务与尊重交换"]
+    E --> F["大厅秩序稳定"]
+    D --> G["冲突:安全/性/访客"]
+    G --> H["边界重画"]
+    H --> F
+    E --> I["奖金与工会机制"]
+    I --> F
+    </div>
+
+    <h2>模块 3：深度裂变（Deep Fission）</h2>
+    <div class="fission-section">
+      <h3>颠覆常识的三点</h3>
+      <ol>
+        <li>门卫不是“低技能看门人”，而是高频情境判断者。</li>
+        <li>高级服务不自动导向亲密，反而常制造更细的社会距离。</li>
+        <li>工会与住户并非天然对立，某些情境下会形成关系性联盟。</li>
+      </ol>
+      <h3>核心矛盾</h3>
+      <ul>
+        <li>住户要个性化服务，但不愿承担高亲密成本。</li>
+        <li>门卫要职业尊严，却受限于服务角色期待。</li>
+        <li>制度追求统一规则，现场运行却依赖例外裁量。</li>
+      </ul>
+      <h3>🔍 搜索内化（校准后结论）</h3>
+      <ul>
+        <li>书中工资和规模参数属于 2000 年前后语境，不能直接当 2026 现况。</li>
+        <li>32BJ 近年官网口径为 185,000+ 会员，组织规模显著高于书中时代。</li>
+        <li>2022 NYC 住宅楼谈判新闻稿确认：若罢工将是 1991 年 12 天罢工后首次，与书中历史线索同向。</li>
+      </ul>
+    </div>
+
+    <h2>模块 4：实战指南（Actionable Guide）</h2>
+    <h3>如何高效阅读</h3>
+    <ol>
+      <li>先读第一章和附录，建立“问题+方法”双框架。</li>
+      <li>再读第三、四、五章，抓互动机制。</li>
+      <li>最后读第六、七、八章，连接制度与历史。</li>
+    </ol>
+
+    <h3>避坑指南</h3>
+    <ul>
+      <li>别把它当职业故事集，它是关系结构分析。</li>
+      <li>别只看趣闻，要追问机制链位置。</li>
+      <li>别用今天参数直接替代书中语境，先区分机制和参数。</li>
+    </ul>
+
+    <h3>ROI</h3>
+    <ul>
+      <li>学习者：同时学民族志写作和抽样意识。</li>
+      <li>管理者：理解一线服务为何必须保留裁量权。</li>
+      <li>普通读者：重看礼貌、服务、地位的日常运作。</li>
+    </ul>
+
+    <h2>模块 5：温故知新（Consolidation）</h2>
+    <h3>FAQ（8个）</h3>
+    <details><summary>1) 这是写纽约上层生活吗？</summary><p>它借高层公寓大厅，分析社会距离如何被持续生产。</p></details>
+    <details><summary>2) 门卫和保安有何差别？</summary><p>门卫包含安保、关系协调、服务分配和符号展示等复合功能。</p></details>
+    <details><summary>3) 为什么强调裁量而非规则？</summary><p>规则给边界，秩序运行靠现场判断。</p></details>
+    <details><summary>4) 奖金为何敏感？</summary><p>奖金同时承载礼物、义务、比较与权力信号。</p></details>
+    <details><summary>5) 工会章和微观互动怎么连起来？</summary><p>前者解释日常秩序，后者解释制度支撑与改写。</p></details>
+    <details><summary>6) 收入数据还能直接用吗？</summary><p>不建议，需按最新合同与通胀语境重估。</p></details>
+    <details><summary>7) 方法论最大贡献是什么？</summary><p>把民族志厚描与样本偏差控制并置。</p></details>
+    <details><summary>8) 最重要一句话？</summary><p>社会结构每天都在门口、走廊、电梯前被做出来。</p></details>
+
+    <h3>扪心自问（6道自测题）</h3>
+    <ol>
+      <li>为什么“空间接近”不会自动导向“社会亲密”？</li>
+      <li>门卫“忙与闲并存”如何产生？</li>
+      <li>“安全”在书中是功能、修辞，还是两者兼有？</li>
+      <li>奖金为何能同时强化关系与距离？</li>
+      <li>若取消门卫裁量权，大厅秩序会怎样？</li>
+      <li>这本书如何把微观互动连接到工会与治理？</li>
+    </ol>
+
+    <h3>藏经阁（参考资源）</h3>
+    <ul>
+      <li><a href="https://press.uchicago.edu/ucp/books/book/chicago/D/bo3640635.html" target="_blank">University of Chicago Press: Doormen</a></li>
+      <li><a href="https://www.seiu32bj.org/" target="_blank">SEIU 32BJ 官网</a></li>
+      <li><a href="https://www.seiu32bj.org/press-release/win-historic-first-post-pandemic-contract/" target="_blank">32BJ 2022 合同新闻稿</a></li>
+      <li><a href="https://sociology.columbia.edu/news/peter-bearman-elected-national-academy-medicine" target="_blank">Columbia Sociology: Peter Bearman</a></li>
+      <li><a href="https://epaper.gmw.cn/zhdsb/html/2022-12/14/nw.D110000zhdsb_20221214_3-10.htm" target="_blank">中译本信息交叉页</a></li>
+    </ul>
+  </main>
+
+  <div class="search-hud">
+    <input id="search-input" type="text" placeholder="搜索关键词（如：奖金、工会、安全、样本偏差）" />
+  </div>
+
+  <script>
+window.onload = function() {
+    const input = document.getElementById('search-input');
+    if(!input) return;
+    input.addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase().trim();
+        const contentArea = document.getElementById('content-area'); // 确保正文包裹在此ID中
+        const blocks = contentArea.querySelectorAll('p, li, blockquote, .fission-section, .mnemonic-card, details, .mermaid');
+
+        if(term.length === 0) {
+            blocks.forEach(el => el.classList.remove('hidden'));
+            document.querySelectorAll('h1, h2, h3').forEach(el => el.classList.remove('hidden'));
+            return;
+        }
+
+        blocks.forEach(el => el.classList.add('hidden'));
+        document.querySelectorAll('h1, h2, h3').forEach(el => el.classList.add('hidden'));
+
+        blocks.forEach(el => {
+            if(el.innerText.toLowerCase().includes(term)) {
+                el.classList.remove('hidden');
+            }
+        });
+    });
+};
+  </script>
+  <script>
+    mermaid.initialize({ startOnLoad: true, theme: 'base' });
+  </script>
+</body>
+</html>

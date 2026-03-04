@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1">
+   <head>
+      <meta name="dtb:uid" content="bookid"/>
+      <meta name="dtb:depth" content="0"/>
+      <meta name="dtb:totalPageCount" content="0"/>
+      <meta name="dtb:maxPageNumber" content="0"/>
+   </head>
+   <docTitle>
+      <text>UnKnown</text>
+   </docTitle>
+   <navMap>
+     <navPoint id="id1" playOrder="1">
+       <navLabel>
+         <text>序言</text>
+       </navLabel>
+       <content src="text00000.html#filepos0000000621"/>
+     </navPoint>
+     <navPoint id="id2" playOrder="2">
+       <navLabel>
+         <text>目录</text>
+       </navLabel>
+       <content src="text00000.html#filepos0000001033"/>
+     </navPoint>
+     <navPoint id="id3" playOrder="3">
+       <navLabel>
+         <text>前言</text>
+       </navLabel>
+       <content src="text00000.html#filepos0000001136"/>
+     </navPoint>
+     <navPoint id="id4" playOrder="4">
+       <navLabel>
+         <text>优秀读者与优秀作家</text>
+       </navLabel>
+       <content src="text00000.html#filepos0000002990"/>
+     </navPoint>
+     <navPoint id="id5" playOrder="5">
+       <navLabel>
+         <text>一：简。奥斯丁</text>
+       </navLabel>
+       <content src="text00000.html#filepos0000003814"/>
+     </navPoint>
+     <navPoint id="id6" playOrder="6">
+       <navLabel>
+         <text>二：狄更斯</text>
+       </navLabel>
+       <content src="text00000.html#filepos0000011024"/>
+     </navPoint>
+     <navPoint id="id7" playOrder="7">
+       <navLabel>
+         <text>三：福楼拜</text>
+       </navLabel>
+       <content src="text00000.html#filepos0000020088"/>
+     </navPoint>
+     <navPoint id="id8" playOrder="8">
+       <navLabel>
+         <text>四：斯蒂文森之《化生博士》</text>
+       </navLabel>
+       <content src="text00000.html#filepos0000026371"/>
+     </navPoint>
+     <navPoint id="id9" playOrder="9">
+       <navLabel>
+         <text>五：普鲁斯特</text>
+       </navLabel>
+       <content src="text00000.html#filepos0000030079"/>
+     </navPoint>
+     <navPoint id="id10" playOrder="10">
+       <navLabel>
+         <text>六：卡夫卡</text>
+       </navLabel>
+       <content src="text00000.html#filepos0000035744"/>
+     </navPoint>
+     <navPoint id="id11" playOrder="11">
+       <navLabel>
+         <text>七：尤利西斯</text>
+       </navLabel>
+       <content src="text00000.html#filepos0000040276"/>
+     </navPoint>
+   </navMap>
+</ncx>
