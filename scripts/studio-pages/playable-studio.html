@@ -479,6 +479,11 @@
       font-size: 15px;
       color: #f8fbff;
     }
+    #studio,
+    #my-library,
+    #public-library {
+      scroll-margin-top: 94px;
+    }
     .list {
       margin-top: 10px;
       display: grid;
@@ -979,7 +984,7 @@
   <reado-app-shell data-page="studio"></reado-app-shell>
 
   <main class="wrap">
-    <section class="panel studio-panel">
+    <section id="studio" class="panel studio-panel">
       <div class="stage-steps" aria-label="studio steps">
         <div class="stage-step active">Step 1: Generate Missions</div>
         <div class="stage-step">Step 2: Review Content</div>
@@ -1100,6 +1105,15 @@
         <div id="owned-books" class="books-grid"></div>
       </section>
 
+      <section id="public-library" class="block" style="margin-top:12px;" hidden>
+        <div class="progress-head">
+          <h3 class="section-title">Public Library</h3>
+          <span class="meta-line" style="margin:0;">浏览官方与社区已发布内容，支持试用与购买后打开</span>
+          <button id="refresh-public-btn" class="tiny" type="button">刷新</button>
+        </div>
+        <div id="public-books" class="books-grid"></div>
+      </section>
+
       <p id="meta-line" class="meta-line"></p>
       <p id="error-line" class="meta-line error"></p>
     </section>
@@ -1182,6 +1196,8 @@
     const logListEl = document.getElementById("log-list");
     const myWorksEl = document.getElementById("my-works");
     const refreshWorksBtn = document.getElementById("refresh-works-btn");
+    const publicBooksEl = document.getElementById("public-books");
+    const refreshPublicBtn = document.getElementById("refresh-public-btn");
     const sourceModalEl = document.getElementById("source-modal");
     const sourceModalTitleEl = document.getElementById("source-modal-title");
     const sourceModalLabelEl = document.getElementById("source-modal-label");
@@ -1215,6 +1231,7 @@
       selectedSources: [],
       pendingSources: [],
       myWorks: [],
+      publicWorks: [],
       job: null,
       clientLogs: [],
       currentStream: null,
@@ -1423,26 +1440,59 @@
     }
 
     function renderPublicBooks() {
-      // Public library is removed from Studio in the current product flow.
+      if (!publicBooksEl) return;
+      const rows = Array.isArray(state.publicWorks) ? state.publicWorks : [];
+      if (!rows.length) {
+        publicBooksEl.innerHTML = `<article class="item"><p>公共阅读库暂无可用内容。</p></article>`;
+        return;
+      }
+      const unlocked = readUnlockedBooks();
+      publicBooksEl.innerHTML = rows.map((work) => {
+        const safeBookId = String(work?.book_id || "").trim();
+        if (!safeBookId) return "";
+        const catalogBook = getCatalogBook(safeBookId);
+        const openHref = getWorkOpenHref(work);
+        const cover = String(work?.cover || catalogBook?.cover || "").trim();
+        const title = String(work?.title || catalogBook?.title || "Untitled").trim();
+        const desc = String(work?.subtitle || work?.hook || (Array.isArray(catalogBook?.highlights) ? catalogBook.highlights[0] : "") || "").trim();
+        const price = Math.max(0, Number(catalogBook?.price) || 0);
+        const isOwned = unlocked.has(safeBookId) || Boolean(work?.can_edit);
+        return `
+          <article class="book-card">
+            <img class="book-cover" src="${esc(cover)}" alt="${esc(title || "book")}" loading="lazy" />
+            <div class="book-body">
+              <h4 class="book-title">${esc(title || "Untitled")}</h4>
+              <p class="book-desc">${esc(desc || "可在公共阅读库中试用或购买后继续阅读。")}</p>
+              <div class="book-actions">
+                ${isOwned
+                  ? `<button class="tiny" data-act="open-public" data-id="${esc(safeBookId)}" data-href="${esc(openHref)}">打开</button>`
+                  : `<button class="tiny" data-act="trial-public" data-id="${esc(safeBookId)}">试用</button>
+                     <button class="tiny" data-act="purchase-public" data-id="${esc(safeBookId)}" data-title="${esc(title || safeBookId)}" data-price="${esc(String(price))}">购买</button>`}
+              </div>
+              ${isOwned ? `<p class="book-price">已拥有</p>` : `<p class="book-price">${price > 0 ? `${price} 💎` : "免费"}</p>`}
+            </div>
+          </article>`;
+      }).join("");
     }
 
-    async function purchaseBook(bookId) {
-      const book = getCatalogBook(bookId);
-      if (!book) return;
+    async function purchaseBook(bookId, options = {}) {
+      const safeBookId = String(bookId || "").trim();
+      if (!safeBookId) return;
+      const book = getCatalogBook(safeBookId);
+      const title = String(options?.title || book?.title || safeBookId).trim();
       const unlocked = readUnlockedBooks();
-      const safeBookId = String(book.id || "").trim();
       if (!safeBookId || unlocked.has(safeBookId)) return;
-      const price = Math.max(0, Number(book.price) || 0);
+      const price = Math.max(0, Number(options?.price ?? book?.price) || 0);
       if (price > 0 && window.ReadoUser?.spendGems) {
         const result = window.ReadoUser.spendGems(price, "book-purchase:" + safeBookId);
         if (!result?.ok) {
-          setError(`宝石不足，购买 ${book.title} 需要 ${price}。`);
+          setError(`宝石不足，购买 ${title} 需要 ${price}。`);
           return;
         }
       }
       unlocked.add(safeBookId);
       saveUnlockedBooks(unlocked);
-      setMeta(`已购买：${book.title}`);
+      setMeta(`已购买：${title}`);
       setError("");
       renderOwnedBooks();
       renderPublicBooks();
@@ -1536,6 +1586,68 @@
           const btn = event.target && event.target.closest ? event.target.closest('button[data-act="open-owned"]') : null;
           if (!btn) return;
           const href = btn.getAttribute("data-href") || "";
+          openBookHref(href);
+        });
+      }
+      if (publicBooksEl) {
+        publicBooksEl.addEventListener("click", async (event) => {
+          const btn = event.target && event.target.closest ? event.target.closest("button[data-act]") : null;
+          if (!btn) return;
+          const action = btn.getAttribute("data-act") || "";
+          const bookId = btn.getAttribute("data-id") || "";
+          if (!bookId) return;
+          if (action === "open-public") {
+            openBookHref(btn.getAttribute("data-href") || "");
+            return;
+          }
+          if (action === "trial-public") {
+            await openTrialModal(bookId);
+            return;
+          }
+          if (action === "purchase-public") {
+            const title = btn.getAttribute("data-title") || "";
+            const price = Number(btn.getAttribute("data-price") || 0);
+            await purchaseBook(bookId, { title, price });
+          }
+        });
+      }
+    }
+
+    function bindTrialModalActions() {
+      if (trialModalCloseEl) {
+        trialModalCloseEl.addEventListener("click", () => {
+          closeTrialModal();
+        });
+      }
+      if (trialModalEl) {
+        trialModalEl.addEventListener("click", (event) => {
+          if (event.target === trialModalEl) {
+            closeTrialModal();
+          }
+        });
+      }
+      if (trialModuleListEl) {
+        trialModuleListEl.addEventListener("click", (event) => {
+          const btn = event.target && event.target.closest ? event.target.closest('button[data-act="trial-module"]') : null;
+          if (!btn) return;
+          const bookId = String(btn.getAttribute("data-book-id") || "").trim();
+          const slug = String(btn.getAttribute("data-slug") || "").trim();
+          const href = String(btn.getAttribute("data-href") || "").trim();
+          if (!bookId || !href) return;
+          const unlocked = readUnlockedBooks().has(bookId);
+          if (!unlocked && slug) {
+            const tried = getTrialSet(bookId);
+            if (!tried.has(slug)) {
+              const ok = addTrialModule(bookId, slug);
+              if (!ok) {
+                setError("当前书籍试读次数已用完，请购买后继续。");
+                return;
+              }
+            }
+          }
+          const modules = Array.isArray(state.modulesByBookId[bookId]) ? state.modulesByBookId[bookId] : [];
+          renderTrialModal(bookId, modules);
+          renderPublicBooks();
           openBookHref(href);
         });
       }
@@ -2463,6 +2575,17 @@
       renderOwnedBooks();
     }
 
+    async function loadPublicLibrary() {
+      try {
+        const data = await request("GET", "/api/studio/library/public?limit=120");
+        state.publicWorks = Array.isArray(data?.items) ? data.items : [];
+      } catch (error) {
+        pushClientLog(t("studio.err_search_failed", "Search failed") + ": " + (error?.message || "unknown"), "library");
+        state.publicWorks = [];
+      }
+      renderPublicBooks();
+    }
+
     function renderMyWorks() {
       if (!myWorksEl) return;
       const rows = Array.isArray(state.myWorks) ? state.myWorks : [];
@@ -2513,6 +2636,7 @@
             await request("PATCH", "/api/studio/works/" + encodeURIComponent(id), { title: nextTitle });
             setMeta(t("studio.meta_rename_done", "Title updated."));
             await loadMyWorks();
+            await loadPublicLibrary();
           } catch (error) {
             setError(error?.message || t("studio.err_rename_failed", "Rename failed"));
           } finally {
@@ -2533,6 +2657,7 @@
             });
             setMeta(t("studio.meta_publish_done", "Visibility updated."));
             await loadMyWorks();
+            await loadPublicLibrary();
           } catch (error) {
             setError(error?.message || t("studio.err_publish_failed", "Publish failed"));
           } finally {
@@ -2551,6 +2676,7 @@
             await request("DELETE", "/api/studio/works/" + encodeURIComponent(id));
             setMeta(t("studio.meta_delete_done", "Book deleted."));
             await loadMyWorks();
+            await loadPublicLibrary();
           } catch (error) {
             setError(error?.message || t("studio.err_delete_failed", "Delete failed"));
           } finally {
@@ -2912,17 +3038,25 @@
     });
 
     bindLibraryActions();
+    bindTrialModalActions();
     setupDropZone();
     renderOwnedBooks();
+    renderPublicBooks();
     renderSearchResults();
     renderSelectedSources();
     renderKnowledgeBlocks();
     renderLogs();
     renderPipelineViewer();
     loadMyWorks().catch(() => {});
+    loadPublicLibrary().catch(() => {});
     if (refreshWorksBtn) {
       refreshWorksBtn.addEventListener("click", () => {
         loadMyWorks().catch(() => {});
+      });
+    }
+    if (refreshPublicBtn) {
+      refreshPublicBtn.addEventListener("click", () => {
+        loadPublicLibrary().catch(() => {});
       });
     }
     translateDom(document);

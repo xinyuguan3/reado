@@ -1319,7 +1319,7 @@ function injectKnowledgeMapBooks(html, books) {
       button.textContent = tr("map.view_shelf", "Shelf View");
     });
     if (mapShelfTitleEl) {
-      mapShelfTitleEl.textContent = tr("map.shelf_title", "Personal Library");
+      mapShelfTitleEl.textContent = tr("map.shelf_title", "Public Library");
     }
     if (mapShelfSubtitleEl) {
       mapShelfSubtitleEl.textContent = tr("map.shelf_subtitle", "Default view · Jump directly into book experiences");
@@ -3298,7 +3298,6 @@ function buildSharedShellScript() {
   { id: "knowledge-map", icon: "map", label: "个人书库", href: "/pages/gamified-learning-hub-dashboard-1.html" },
   { id: "mission", icon: "assignment", label: "任务中心", href: "/pages/simulator-library-level-selection-2.html" },
   { id: "studio", icon: "auto_awesome", label: "创作工坊", href: "/pages/playable-studio.html" },
-  { id: "blog", icon: "article", label: "博客", href: "/blog/" },
   { id: "ranking", icon: "leaderboard", label: "排行榜", href: "/pages/global-scholar-leaderboard.html" },
   { id: "market", icon: "storefront", label: "交易中心", href: "/pages/gamified-learning-hub-dashboard-3.html" },
   { id: "profile", icon: "person", label: "个人资料", href: "/pages/gamified-learning-hub-dashboard-2.html" }
@@ -5192,7 +5191,7 @@ function buildModuleToBookMap(books) {
 async function writePages(pages, books) {
   for (const page of pages) {
     if (page.slug === "gamified-learning-hub-dashboard-3") {
-      const redirectHtml = buildLegacyRedirectHtml("/pages/playable-studio.html#my-library", "正在进入我的书架…");
+      const redirectHtml = buildLegacyRedirectHtml("/pages/gamified-learning-hub-dashboard-1.html", "正在进入公共阅读库…");
       await fs.writeFile(path.join(pagesDir, `${page.slug}.html`), redirectHtml, "utf8");
       await fs.copyFile(page.imagePath, path.join(screenDir, `${page.slug}.png`));
       continue;

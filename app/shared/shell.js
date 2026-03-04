@@ -9,15 +9,13 @@ import { initReadoAutoTranslate } from "/shared/auto-translate.js";
 
 const ROUTES = [
   { id: "studio", icon: "auto_awesome", labelKey: "route.studio", label: "创作工坊", href: "/pages/playable-studio.html" },
-  { id: "blog", icon: "article", labelKey: "route.blog", label: "博客", href: "/blog/" },
+  { id: "public-library", icon: "auto_stories", labelKey: "route.public_library", label: "公共阅读库", href: "/pages/gamified-learning-hub-dashboard-1.html" },
   { id: "mission", icon: "assignment", labelKey: "route.mission", label: "任务中心", href: "/pages/simulator-library-level-selection-2.html" },
   { id: "ranking", icon: "leaderboard", labelKey: "route.ranking", label: "排行榜", href: "/pages/global-scholar-leaderboard.html" },
-  { id: "library", icon: "auto_stories", labelKey: "route.library", label: "我的书架", href: "/pages/playable-studio.html#my-library" },
   { id: "profile", icon: "person", labelKey: "route.profile", label: "个人资料", href: "/pages/gamified-learning-hub-dashboard-2.html" }
 ];
 const ICON_FALLBACK_MAP = {
   map: "🗺",
-  article: "📰",
   assignment: "✅",
   auto_awesome: "✨",
   leaderboard: "🏆",
@@ -2766,6 +2764,18 @@ function hideLegacyAppChrome(isLearningPage) {
   });
 }
 
+function resolveShellPageId(defaultPage, path, hash) {
+  const fallback = String(defaultPage || "other");
+  const pathname = String(path || "").trim();
+  if (pathname === "/pages/gamified-learning-hub-dashboard-1.html") {
+    return "public-library";
+  }
+  if (pathname === "/pages/playable-studio.html") {
+    return "studio";
+  }
+  return fallback;
+}
+
 class ReadoAppShell extends HTMLElement {
   connectedCallback() {
     if (this.dataset.ready === "1") return;
@@ -2778,8 +2788,8 @@ class ReadoAppShell extends HTMLElement {
     maybeMigrateLegacyMockUser();
     autoGrantDailyGemIfNeeded();
 
-    const page = this.dataset.page || "other";
     const path = window.location.pathname;
+    let page = resolveShellPageId(this.dataset.page || "other", path, window.location.hash);
     trackPageView(path);
     const isExperiencePage = path.startsWith("/experiences/");
     const isBookHubPage = path.startsWith("/books/");
@@ -3085,6 +3095,14 @@ class ReadoAppShell extends HTMLElement {
       applyIconFallback(nav);
     };
     renderNavLinks();
+    if (path === "/pages/playable-studio.html") {
+      window.addEventListener("hashchange", () => {
+        const nextPage = resolveShellPageId(this.dataset.page || "other", window.location.pathname, window.location.hash);
+        if (nextPage === page) return;
+        page = nextPage;
+        renderNavLinks();
+      });
+    }
     const weekly = document.createElement("section");
     weekly.className = "reado-shell-weekly";
     weekly.innerHTML = `
