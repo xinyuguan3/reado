@@ -1,0 +1,1 @@
+这是《Railway Pipeline Fallback Smoke Test》的知识块复盘。 本关重点：Chapter 2 Evidence.。 Chapter 2 Evidence. Data, examples, and counterexamples are needed to justify claims. 请重点记住：chapter、evidence、data、examples。 现在暂停 10 秒，回忆一个你可以马上使用的场景。

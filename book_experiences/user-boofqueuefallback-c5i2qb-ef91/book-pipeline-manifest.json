@@ -1,0 +1,172 @@
+{
+  "version": 1,
+  "generated_at": "2026-03-04T14:47:39.601Z",
+  "eta": {
+    "words": 12,
+    "pagesApprox": 1,
+    "ocrPagesApprox": 1,
+    "blockCount": 6,
+    "queueDepth": 0,
+    "parseSec": 1.5,
+    "parallelSec": 120,
+    "qaSec": 126,
+    "etaSec": 285,
+    "etaMin": 5,
+    "etaMax": 6,
+    "returnAt": "2026-03-04T14:52:22.034Z"
+  },
+  "source_mode": "file",
+  "source_ingest": {
+    "parsed_by": "ingest.text-basic",
+    "title": "ingest-1772635656747-624e4f60.txt",
+    "author": "Unknown",
+    "input_kind": "text",
+    "skeleton_markdown_path": "/Users/guanxinyu/.codex/skills/knowledge-absorber/config/raw_content_feishu.md",
+    "skeleton_markdown_chars": 429,
+    "planning": {
+      "strategy": "source_text(markdown_sections_0)",
+      "used_structured": false,
+      "section_count": 0,
+      "markdown_chars": 429,
+      "planning_text_chars": 62,
+      "preferred_chunk_count": 0
+    },
+    "enhancer": {
+      "used": false,
+      "status": "fallback",
+      "reason": "knowledge_absorber_output_too_short(62)",
+      "elapsedMs": 287,
+      "chars": 62,
+      "baseChars": 62,
+      "inputKind": "text",
+      "title": "ingest-1772635656747-624e4f60.txt",
+      "author": "Unknown",
+      "outputPath": "",
+      "htmlPath": "/Users/guanxinyu/.codex/skills/knowledge-absorber/config/raw_content.html",
+      "markdownPath": "/Users/guanxinyu/.codex/skills/knowledge-absorber/config/raw_content_feishu.md",
+      "markdownChars": 429,
+      "snapshotPath": "",
+      "markdownSnapshotPath": "",
+      "scriptPath": "/Users/guanxinyu/.codex/skills/knowledge-absorber/scripts/content_ingester.py",
+      "provider": "boof_fallback",
+      "boofUsed": false,
+      "boofRequired": true,
+      "queueDepth": 1,
+      "allowFallbackByQueue": true,
+      "boofStatus": "skipped",
+      "boofReason": "boof_script_missing",
+      "boofElapsedMs": 0,
+      "boofChars": 0,
+      "boofMarkdownPath": "",
+      "boofMarkdownChars": 0,
+      "boofOutputDir": "",
+      "boofCollectionName": "",
+      "boofScriptPath": "/tmp/missing-boof.sh"
+    }
+  },
+  "total_knowledge_blocks": 1,
+  "split_diagnostics": {
+    "minDensityScore": 0.48,
+    "targetBlocks": 6,
+    "candidates": 1,
+    "retained": 1,
+    "filteredOut": 0,
+    "averageDensityScore": 0.7961,
+    "filteredPreview": [],
+    "preferredChunkCount": 0,
+    "chunkStrategy": "word_chunk+rebalance",
+    "anchorCount": 1,
+    "anchorPreview": [
+      "Chapter 1 A. Chapter 2 B. Chapter 3 C. Evidence and reasoning."
+    ]
+  },
+  "knowledge_blocks": [
+    {
+      "id": "kb-01",
+      "index": 1,
+      "title": "Chapter 1 A.",
+      "content": "Chapter 1 A. Chapter 2 B. Chapter 3 C. Evidence and reasoning.",
+      "words": 12,
+      "summary": "Chapter 1 A. Chapter 2 B.",
+      "keywords": [
+        "chapter",
+        "evidence",
+        "reasoning"
+      ],
+      "density": {
+        "score": 0.7961,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 1,
+        "noveltyRatio": 0.9804,
+        "actionabilityRatio": 0
+      },
+      "anchor": "word-chunk-1",
+      "anchorType": "word_chunk",
+      "splitHint": "",
+      "gateIndex": 1
+    }
+  ],
+  "module_map": [
+    {
+      "module_slug": "u-boofqueuefallback-01-73e945",
+      "knowledge_block_id": "kb-01"
+    },
+    {
+      "module_slug": "u-boofqueuefallback-02-78a952",
+      "knowledge_block_id": "kb-01"
+    },
+    {
+      "module_slug": "u-boofqueuefallback-03-4f7194",
+      "knowledge_block_id": "kb-01"
+    }
+  ],
+  "easter_level": {
+    "id": "easter-boofqueuefallback",
+    "title": "BoofQueueFallback：沉浸式最终挑战",
+    "premise": "你将进入高压决策场景，综合运用全书知识完成关键选择。",
+    "scene": "场景包含 Chapter 1 A. 的联动挑战。",
+    "objective": "在资源受限与时间压力下做出最优决策，并解释依据。",
+    "stages": [
+      "信息筛选：识别噪音与关键证据",
+      "策略选择：在多个可行路径中做权衡",
+      "复盘反思：指出一次误判并修正策略"
+    ],
+    "rewards": [
+      "彩蛋通关纪念徽章",
+      "额外音频速记卡",
+      "连胜保护券"
+    ]
+  },
+  "artifacts": [
+    {
+      "moduleSlug": "u-boofqueuefallback-01-73e945",
+      "gateIndex": 1,
+      "quizCount": 10,
+      "quizQualityScore": 0.9632,
+      "quizQualityPassed": true,
+      "fragmentCount": 3,
+      "audioHref": "/experiences/media/u-boofqueuefallback-01-73e945/review.wav",
+      "ok": true
+    },
+    {
+      "moduleSlug": "u-boofqueuefallback-02-78a952",
+      "gateIndex": 2,
+      "quizCount": 10,
+      "quizQualityScore": 0.9632,
+      "quizQualityPassed": true,
+      "fragmentCount": 3,
+      "audioHref": "/experiences/media/u-boofqueuefallback-02-78a952/review.wav",
+      "ok": true
+    },
+    {
+      "moduleSlug": "u-boofqueuefallback-03-4f7194",
+      "gateIndex": 3,
+      "quizCount": 10,
+      "quizQualityScore": 0.9632,
+      "quizQualityPassed": true,
+      "fragmentCount": 3,
+      "audioHref": "/experiences/media/u-boofqueuefallback-03-4f7194/review.wav",
+      "ok": true
+    }
+  ]
+}

@@ -1,0 +1,192 @@
+{
+  "version": 1,
+  "generated_at": "2026-03-04T14:35:49.580Z",
+  "eta": {
+    "words": 75,
+    "pagesApprox": 1,
+    "ocrPagesApprox": 1,
+    "blockCount": 6,
+    "queueDepth": 0,
+    "parseSec": 1.5,
+    "parallelSec": 120,
+    "qaSec": 126,
+    "etaSec": 285,
+    "etaMin": 5,
+    "etaMax": 6,
+    "returnAt": "2026-03-04T14:36:33.239Z"
+  },
+  "source_mode": "text",
+  "source_ingest": {
+    "parsed_by": "",
+    "title": "Railway Pipeline Smoke Test",
+    "author": "Codex",
+    "input_kind": "",
+    "skeleton_markdown_path": "",
+    "skeleton_markdown_chars": 0,
+    "enhancer": null
+  },
+  "total_knowledge_blocks": 3,
+  "split_diagnostics": {
+    "minDensityScore": 0.48,
+    "targetBlocks": 6,
+    "candidates": 3,
+    "retained": 3,
+    "filteredOut": 0,
+    "averageDensityScore": 0.9333,
+    "filteredPreview": [],
+    "chunkStrategy": "heading+rebalance",
+    "anchorCount": 4,
+    "anchorPreview": [
+      "Chapter 1 Cognitive Framing. Evidence from 2024 and 2025 studies shows that reflection lo",
+      "Section 1.1 explains concept boundaries, assumptions, and failure modes. Section 1.2 prov",
+      "Chapter 2 Decision Practice. Learners must apply the model to scenario analysis, choose t",
+      "Chapter 3 Error Correction. Common mistakes include overgeneralization, missing constrain"
+    ]
+  },
+  "knowledge_blocks": [
+    {
+      "id": "kb-01",
+      "index": 1,
+      "title": "Chapter 1 Cognitive Framing.",
+      "content": "Chapter 1 Cognitive Framing. Evidence from 2024 and 2025 studies shows that reflection loops improve transfer.",
+      "words": 16,
+      "summary": "Chapter 1 Cognitive Framing. Evidence from 2024 and 2025 studies shows that reflection loops improve transfer.",
+      "keywords": [
+        "chapter",
+        "cognitive",
+        "framing",
+        "evidence",
+        "studies",
+        "shows"
+      ],
+      "density": {
+        "score": 1,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 1,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 1
+      },
+      "anchor": "Chapter 1",
+      "anchorType": "heading",
+      "splitHint": "",
+      "gateIndex": 1
+    },
+    {
+      "id": "kb-02",
+      "index": 2,
+      "title": "Chapter 2 Decision Practice.",
+      "content": "Chapter 2 Decision Practice. Learners must apply the model to scenario analysis, choose trade-offs, and justify steps with evidence.",
+      "words": 19,
+      "summary": "Chapter 2 Decision Practice. Learners must apply the model to scenario analysis, choose trade-offs, and justify steps with evidence.",
+      "keywords": [
+        "chapter",
+        "decision",
+        "practice",
+        "learners",
+        "must",
+        "apply"
+      ],
+      "density": {
+        "score": 1,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 1,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 1
+      },
+      "anchor": "Chapter 2",
+      "anchorType": "heading",
+      "splitHint": "",
+      "gateIndex": 2
+    },
+    {
+      "id": "kb-03",
+      "index": 3,
+      "title": "Chapter 3 Error Correction.",
+      "content": "Chapter 3 Error Correction. Common mistakes include overgeneralization, missing constraints, and weak causal links; correction requires explicit criteria, iteration, and verification.",
+      "words": 21,
+      "summary": "Chapter 3 Error Correction. Common mistakes include overgeneralization, missing constraints, and weak causal links; correction requires explicit criteria, iteration, and verification.",
+      "keywords": [
+        "correction",
+        "chapter",
+        "error",
+        "common",
+        "mistakes",
+        "include"
+      ],
+      "density": {
+        "score": 0.8,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 1,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0
+      },
+      "anchor": "Chapter 3",
+      "anchorType": "heading",
+      "splitHint": "",
+      "gateIndex": 3
+    }
+  ],
+  "module_map": [
+    {
+      "module_slug": "u-railway-pipeline-smoke-t-01-846bc6",
+      "knowledge_block_id": "kb-01"
+    },
+    {
+      "module_slug": "u-railway-pipeline-smoke-t-02-f731fc",
+      "knowledge_block_id": "kb-02"
+    },
+    {
+      "module_slug": "u-railway-pipeline-smoke-t-03-78bfeb",
+      "knowledge_block_id": "kb-03"
+    }
+  ],
+  "easter_level": {
+    "id": "easter-railway-pipeline-smoke-test",
+    "title": "Railway Pipeline Smoke Test：沉浸式最终挑战",
+    "premise": "你将进入高压决策场景，综合运用全书知识完成关键选择。",
+    "scene": "场景包含 Chapter 1 Cognitive Framing. / Chapter 2 Decision Practice. / Chapter 3 Error Correction. 的联动挑战。",
+    "objective": "在资源受限与时间压力下做出最优决策，并解释依据。",
+    "stages": [
+      "信息筛选：识别噪音与关键证据",
+      "策略选择：在多个可行路径中做权衡",
+      "复盘反思：指出一次误判并修正策略"
+    ],
+    "rewards": [
+      "彩蛋通关纪念徽章",
+      "额外音频速记卡",
+      "连胜保护券"
+    ]
+  },
+  "artifacts": [
+    {
+      "moduleSlug": "u-railway-pipeline-smoke-t-01-846bc6",
+      "gateIndex": 1,
+      "quizCount": 10,
+      "quizQualityScore": 0.9594,
+      "quizQualityPassed": true,
+      "fragmentCount": 3,
+      "audioHref": "/experiences/media/u-railway-pipeline-smoke-t-01-846bc6/review.wav",
+      "ok": true
+    },
+    {
+      "moduleSlug": "u-railway-pipeline-smoke-t-02-f731fc",
+      "gateIndex": 2,
+      "quizCount": 10,
+      "quizQualityScore": 0.9639,
+      "quizQualityPassed": true,
+      "fragmentCount": 3,
+      "audioHref": "/experiences/media/u-railway-pipeline-smoke-t-02-f731fc/review.wav",
+      "ok": true
+    },
+    {
+      "moduleSlug": "u-railway-pipeline-smoke-t-03-78bfeb",
+      "gateIndex": 3,
+      "quizCount": 10,
+      "quizQualityScore": 0.9578,
+      "quizQualityPassed": true,
+      "fragmentCount": 3,
+      "audioHref": "/experiences/media/u-railway-pipeline-smoke-t-03-78bfeb/review.wav",
+      "ok": true
+    }
+  ]
+}

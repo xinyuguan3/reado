@@ -1,0 +1,1 @@
+这是《Structured Parse Test》的知识块复盘。 本关重点：Chapter 2 Application Pick an approach, justify with evidence, test in a。 Chapter 2 Application Pick an approach, justify with evidence, test in a scenario, and run retrospective review. 请重点记住：chapter、application、pick、approach。 现在暂停 10 秒，回忆一个你可以马上使用的场景。

@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>《Datre书籍第一册：我们是DATRE-1（部分）》全量拆解笔记</title>
+  <style>
+    :root {
+      --bg: #fdfbf7;
+      --text: #2c2c2c;
+      --muted: #6b6b6b;
+      --accent: #b91c1c;
+      --card: #fffdf7;
+      --line: #e7dfcf;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Noto Serif SC", "Songti SC", "STSong", serif;
+      line-height: 1.75;
+    }
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 28px 20px 110px;
+    }
+    h1, h2, h3 {
+      line-height: 1.35;
+      color: #1f1f1f;
+    }
+    h1 {
+      margin-top: 0;
+      font-size: 2rem;
+    }
+    h2 {
+      margin-top: 2rem;
+      border-left: 4px solid var(--accent);
+      padding-left: 10px;
+      font-size: 1.45rem;
+    }
+    h3 {
+      margin-top: 1.2rem;
+      font-size: 1.1rem;
+    }
+    p, li { font-size: 1rem; }
+    .meta {
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      background: var(--card);
+      border-radius: 10px;
+      margin-bottom: 12px;
+    }
+    .muted { color: var(--muted); }
+    .mnemonic-card {
+      background: #fff8d6;
+      border: 2px dashed #d4a017;
+      border-radius: 12px;
+      padding: 14px;
+      margin: 12px 0;
+    }
+    .fission-section {
+      background: #fff0f0;
+      border-left: 6px solid #c62828;
+      padding: 14px 16px;
+      border-radius: 8px;
+      margin: 16px 0;
+    }
+    code, pre {
+      font-family: "JetBrains Mono", "Menlo", monospace;
+      font-size: 0.92rem;
+    }
+    pre {
+      background: #f5f0e6;
+      border: 1px solid #eadfcb;
+      border-radius: 10px;
+      padding: 12px;
+      overflow-x: auto;
+    }
+    details {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 10px;
+      margin: 8px 0;
+      background: #fff;
+    }
+    summary { cursor: pointer; font-weight: 600; }
+    .chip {
+      display: inline-block;
+      margin-right: 6px;
+      margin-bottom: 6px;
+      border: 1px solid #ccb79f;
+      border-radius: 999px;
+      padding: 2px 10px;
+      font-size: 0.85rem;
+      color: #4b3f34;
+      background: #fff;
+    }
+    .hud {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-top: 1px solid #d9cbb6;
+      background: rgba(253, 251, 247, 0.97);
+      backdrop-filter: blur(6px);
+      padding: 10px 14px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      z-index: 30;
+    }
+    .hud label {
+      white-space: nowrap;
+      color: #5a4a3f;
+      font-weight: 600;
+    }
+    .hud input {
+      width: 100%;
+      max-width: 560px;
+      border: 1px solid #cbb79c;
+      border-radius: 8px;
+      padding: 8px 10px;
+      background: #fff;
+      color: var(--text);
+    }
+    .hidden { display: none !important; }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <main class="wrap" id="content-area">
+    <h1>《Datre书籍第一册：我们是DATRE-1（部分）》全量拆解笔记</h1>
+
+    <div class="meta">
+      <div><strong>撰写：</strong>叫我小杨同学的小码酱</div>
+      <div><strong>原著作者：</strong>Aona（待校验；封面显示 <code>by Aona</code>）</div>
+      <div><strong>中文翻译：</strong>QingQing（待校验）</div>
+      <div><strong>输入范围：</strong>PDF 共 48 页（目录含 5 章；第 5 章后半缺失）</div>
+      <div class="muted" style="margin-top:8px;">
+        <span class="chip">Datre</span><span class="chip">通灵文本</span><span class="chip">形而上叙事</span><span class="chip">认知训练</span>
+      </div>
+    </div>
+
+    <h2>模块 0：核心摘要（TL;DR）</h2>
+    <p>这本书的核心，不是交付一份“宇宙事实手册”，而是逼读者从“依赖外部解释”转向“主动觉知与个体进化”。</p>
+    <p><strong>认知挂钩：</strong>作者把人类重复出生/死亡比作反复坐摩天轮，真正任务不是换一轮，而是学会下轮。</p>
+    <p><strong>真理锚点：</strong>遇到历史数字或自然科学断言时，必须与 2026 年公开证据交叉校验。</p>
+
+    <h2>模块 1：概念破冰（Concept Ice-breaking）</h2>
+    <div class="mnemonic-card">
+      <strong>巧记卡片</strong><br/>
+      问自己 → 看惯性 → 识别恐惧 → 放下重复 → 回到当下<br/>
+      口诀：<strong>问、看、辨、放、行</strong>
+    </div>
+    <p>书里“过河踩石头”的隐喻非常关键：人一旦把暂时安全感当成终局，规则就会越来越多，行动就会越来越少。</p>
+    <pre>存在焦虑(我是谁?)
+  -> 寻找解释
+  -> 依赖权威与规则
+  -> 形成惯例与重复
+  -> 失去主动觉知
+  -> 微小改变与自我观察
+  -> 个体进化</pre>
+
+    <h2>模块 2：深度解析（Deep Analysis）</h2>
+    <h3>章节级骨架（按目录顺序）</h3>
+    <p><strong>第1章 简介：</strong>核心是“先认识你是谁”，并把社会恐惧与制度依赖归为改变阻力。</p>
+    <p><strong>第2章 宇宙：</strong>构建“宇宙-泡泡-体验”模型，否定单一本源叙事，强调协作与体验。</p>
+    <p><strong>第3章 你们的泡泡：</strong>提出“几率与可能性”通过能量流与物质结构被实例化。</p>
+    <p><strong>第4章 心识：</strong>区分头脑、群体意识、心识与心念，给出创造力来源解释。</p>
+    <p><strong>第5章 一切万有（部分）：</strong>去神化与去标签化，强调语言习惯会反向塑造现实。</p>
+
+    <h3>每章三要素（核心命题/关键节点/逻辑关系）</h3>
+    <ul>
+      <li>第1章：命题是“自我追问即进化起点”；节点是过河隐喻、恐惧与组织、911 例证；关系是为第2章宇宙扩展铺地基。</li>
+      <li>第2章：命题是“多容器协作宇宙”；节点是多宇宙、反重复、时间叙事；关系是把宏观模型落到第3章泡泡运行。</li>
+      <li>第3章：命题是“泡泡中的概率实例化”；节点是完形概念、能量调整、专家/管道工类比；关系是导向第4章的认知机制。</li>
+      <li>第4章：命题是“头脑是处理器，心念是创新输入”；节点是梦境、心念连接、反公式学习；关系是上推第5章语言哲学。</li>
+      <li>第5章：命题是“术语不是终点”；节点是神/一切万有去执着、文字振动模式；关系是目前文本在此处未完结。</li>
+    </ul>
+
+    <h3>覆盖度声明（Mandatory）</h3>
+    <ul>
+      <li>已覆盖目录的 5 章全部入口与核心论证链。</li>
+      <li>第1-4章为高完整度细拆；第5章为结构级总结（输入文件后半缺失）。</li>
+      <li>存在 OCR 断词噪声，但主逻辑可稳定复原。</li>
+    </ul>
+
+    <h3>认知地图（Mermaid）</h3>
+    <div class="mermaid">
+flowchart TD
+A["章1：自我追问启动"] --> B["章2：宇宙容器叙事"]
+B --> C["章3：泡泡与可能性"]
+C --> D["章4：心识-头脑-心念机制"]
+D --> E["章5：去神化与去标签"]
+E --> F["行动：减少重复并提升觉知"]
+F --> A
+    </div>
+
+    <h2>模块 3：深度裂变（Deep Fission）</h2>
+    <div class="fission-section">
+      <p><strong>🔍 搜索内化：</strong>以下是可核验断言与 2026 证据的融合判断。</p>
+      <ul>
+        <li><strong>9/11 国家数：</strong>文本说 86 国；公开纪念机构常见口径为“90+ 国家”。应视为统计口径差异，不能当精确常数。</li>
+        <li><strong>太阳无磁场/非氢核聚变：</strong>与现代太阳物理证据冲突。此处应按象征性表达处理，不能替代天文学基础知识。</li>
+        <li><strong>人类影响不到真实地球：</strong>与 2026 气候证据冲突。若照单全收，会产生现实决策风险。</li>
+        <li><strong>梭罗时间比喻：</strong>语义上与《瓦尔登湖》经典句意接近，可作修辞锚点。</li>
+      </ul>
+    </div>
+    <p><strong>核爆级结论：</strong>这本书最大价值在“拆重复思维脚本”，而不是“提供外部世界的可验证事实”。</p>
+
+    <h2>模块 4：实战指南（Actionable Guide）</h2>
+    <ol>
+      <li>7天实践：按“章1识别重复→章2-3画泡泡图→章4做心念日志→章5删限制词”推进。</li>
+      <li>每次阅读后立刻落地一个微动作（例如调整一个固定习惯顺序）。</li>
+      <li>把“感受正确”与“事实正确”分开记录，避免混淆。</li>
+      <li>涉及科学/历史断言，必须做二次来源核验。</li>
+    </ol>
+    <p><strong>ROI：</strong>每天 30-40 分钟，主要收益是减少自动化重复、提高主动觉知和执行力。</p>
+
+    <h2>模块 5：温故知新（Consolidation）</h2>
+
+    <h3>FAQ（8个）</h3>
+    <details><summary>1. 这本书的主要用途是什么？</summary><p>用于认知重构与自我观察训练，而非科学事实速查。</p></details>
+    <details><summary>2. 我不接受通灵设定还能读吗？</summary><p>可以，把它当高密度隐喻文本使用即可。</p></details>
+    <details><summary>3. 第1章最关键一句是什么？</summary><p>“了解你是谁”，它决定了全书后续的解释方向。</p></details>
+    <details><summary>4. 第2章和第3章区别？</summary><p>第2章给宇宙框架，第3章给泡泡运行机制。</p></details>
+    <details><summary>5. 第4章为何占比最大？</summary><p>因为它直接定义“你要怎么在日常里操作认知变化”。</p></details>
+    <details><summary>6. 第5章目前能得出的核心点？</summary><p>语言标签会塑造模式，术语不是终点。</p></details>
+    <details><summary>7. 本书最危险的误读是什么？</summary><p>把形而上句子当作可直接执行的现实科学判断。</p></details>
+    <details><summary>8. 这份“部分版”下一步怎么补？</summary><p>补齐第5章后半，再做第二轮逐段比对与版本校正。</p></details>
+
+    <h3>扪心自问（自测题 8 题）</h3>
+    <ol>
+      <li>我当前最强的重复模式是什么？</li>
+      <li>我依赖了哪些外部解释来回避行动？</li>
+      <li>我是否区分了“想法复读”和“新输入”？</li>
+      <li>我最近一次微改变是否真的执行了 7 天？</li>
+      <li>我最常说的限制性词语是什么？</li>
+      <li>遇到可核验事实时，我是否有二次校验？</li>
+      <li>我在哪一章找到了可落地动作？</li>
+      <li>读完后，我今天立刻能做的一步是什么？</li>
+    </ol>
+
+    <h3>藏经阁（参考资源）</h3>
+    <ul>
+      <li><a href="https://www.911memorial.org/learn/resources-and-references/faq-about-911" target="_blank" rel="noreferrer">9/11 Memorial FAQ</a></li>
+      <li><a href="https://www.nyc.gov/site/911health/about/wtc-exposure-zone.page" target="_blank" rel="noreferrer">NYC 官方 9/11 数据页</a></li>
+      <li><a href="https://www.swpc.noaa.gov/phenomena/sunspot" target="_blank" rel="noreferrer">NOAA Sunspot</a></li>
+      <li><a href="https://science.nasa.gov/sun/facts/" target="_blank" rel="noreferrer">NASA Sun Facts</a></li>
+      <li><a href="https://science.nasa.gov/climate-change/evidence/" target="_blank" rel="noreferrer">NASA Climate Evidence</a></li>
+      <li><a href="https://www.gutenberg.org/files/205/205-h/205-h.htm" target="_blank" rel="noreferrer">Walden (Project Gutenberg)</a></li>
+    </ul>
+
+    <p class="muted">结语：把这本书当“认知解冻工具”，它会非常有用；把它当“事实百科”，你会持续碰撞。</p>
+  </main>
+
+  <div class="hud">
+    <label for="search-input">全文检索</label>
+    <input id="search-input" type="text" placeholder="输入关键词，正文按段过滤（严格过滤）" />
+  </div>
+
+  <script>
+window.onload = function() {
+    if (window.mermaid) {
+      window.mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    }
+    const input = document.getElementById('search-input');
+    if(!input) return;
+    input.addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase().trim();
+        const contentArea = document.getElementById('content-area'); // 确保正文包裹在此ID中
+        const blocks = contentArea.querySelectorAll('p, li, blockquote, .fission-section, .mnemonic-card, details, .mermaid');
+
+        if(term.length === 0) {
+            blocks.forEach(el => el.classList.remove('hidden'));
+            document.querySelectorAll('h1, h2, h3').forEach(el => el.classList.remove('hidden'));
+            return;
+        }
+
+        blocks.forEach(el => el.classList.add('hidden'));
+        document.querySelectorAll('h1, h2, h3').forEach(el => el.classList.add('hidden'));
+
+        blocks.forEach(el => {
+            if(el.innerText.toLowerCase().includes(term)) {
+                el.classList.remove('hidden');
+            }
+        });
+    });
+};
+</script>
+</body>
+</html>
