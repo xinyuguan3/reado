@@ -9485,11 +9485,74 @@ function enrichBookWithWorkMeta(book, sessionId) {
   return row;
 }
 
-function buildCatalogForSession(sessionId) {
+const SUPPORTED_UI_LANGS = ["zh-CN", "en-US", "ja-JP", "ko-KR", "fr-FR", "de-DE", "es-ES", "pt-BR", "ru-RU", "ar-SA", "hi-IN", "id-ID"];
+
+function normalizeUiLanguage(input) {
+  const text = String(input || "").trim();
+  if (!text) return "";
+  const normalized = text.replace(/_/g, "-");
+  const exact = SUPPORTED_UI_LANGS.find((code) => code.toLowerCase() === normalized.toLowerCase());
+  if (exact) return exact;
+  const short = normalized.split("-")[0].toLowerCase();
+  const match = SUPPORTED_UI_LANGS.find((code) => code.toLowerCase().startsWith(`${short}-`));
+  return match || "";
+}
+
+function isEnglishUiLanguage(language) {
+  return String(normalizeUiLanguage(language) || "").toLowerCase().startsWith("en");
+}
+
+function detectRequestLanguage(req, urlObj = null) {
+  try {
+    const queryLang = normalizeUiLanguage(urlObj?.searchParams?.get?.("lang") || "");
+    if (queryLang) return queryLang;
+  } catch {}
+  const cookies = parseCookies(req?.headers?.cookie || "");
+  const cookieLang = normalizeUiLanguage(cookies.get("reado_lang") || "");
+  if (cookieLang) return cookieLang;
+  const acceptLanguage = String(req?.headers?.["accept-language"] || "");
+  for (const token of acceptLanguage.split(",")) {
+    const candidate = normalizeUiLanguage(token.split(";")[0] || "");
+    if (candidate) return candidate;
+  }
+  return "en-US";
+}
+
+function localizeBookForLanguage(book, language = "") {
+  const row = book && typeof book === "object" ? { ...book } : null;
+  if (!row) return null;
+  const english = isEnglishUiLanguage(language);
+
+  if (english) {
+    row.title = cleanText(row.titleEn, row.title);
+    row.categoryLabel = cleanText(row.categoryLabelEn, row.categoryLabel);
+    row.categoryIncludes = cleanText(row.categoryIncludesEn, row.categoryIncludes);
+    row.categoryHint = cleanText(row.categoryHintEn, row.categoryHint);
+    row.tier = cleanText(row.tierEn, row.tier);
+    row.badgeTitle = cleanText(row.badgeTitleEn, row.badgeTitle);
+    if (Array.isArray(row.highlightsEn) && row.highlightsEn.length) {
+      row.highlights = row.highlightsEn.filter(Boolean);
+    }
+    row.cover = cleanText(row.coverEn, row.cover, row.coverZh);
+  } else {
+    row.cover = cleanText(row.coverZh, row.cover, row.coverEn);
+  }
+
+  if (Array.isArray(row.modules)) {
+    row.modules = row.modules.map((module) => ({
+      ...module,
+      title: english ? cleanText(module?.titleEn, module?.title) : cleanText(module?.title)
+    }));
+  }
+  return row;
+}
+
+function buildCatalogForSession(sessionId, language = "") {
   const base = catalog && typeof catalog === "object" ? catalog : { books: [] };
   const books = Array.isArray(base.books) ? base.books : [];
   const filtered = books
     .map((book) => enrichBookWithWorkMeta(book, sessionId) || (!isUserGeneratedBookId(book?.id) ? book : null))
+    .map((book) => localizeBookForLanguage(book, language))
     .filter(Boolean);
   return {
     ...base,
@@ -9586,8 +9649,8 @@ function buildLanguageBootstrapScript() {
 })();`;
 }
 
-function buildCatalogScript(sessionId) {
-  const scopedCatalog = buildCatalogForSession(sessionId);
+function buildCatalogScript(sessionId, language = "") {
+  const scopedCatalog = buildCatalogForSession(sessionId, language);
   return `${buildLanguageBootstrapScript()}
 (function(){
   if (typeof document === "undefined") return;
@@ -9616,19 +9679,37 @@ async function ensurePublicSampleWorks() {
   }
 }
 
-function buildDynamicBookPageHtml(book) {
+function buildDynamicBookPageHtml(book, language = "") {
+  const english = isEnglishUiLanguage(language);
+  const labels = english
+    ? {
+        chapter: "Chapter",
+        categoryDefault: "Book Module",
+        tierDefault: "Starter",
+        moduleCount: "visual reading chapters",
+        start: "Start from Chapter 1",
+        back: "Back to Personal Library"
+      }
+    : {
+        chapter: "第",
+        categoryDefault: "书籍模块",
+        tierDefault: "简餐级",
+        moduleCount: "个可视化阅读章节",
+        start: "从第一章开始",
+        back: "返回个人书库"
+      };
   const modulesHtml = book.modules.map((module) => `
       <a class="module-card" href="/experiences/${encodeURIComponent(module.slug)}.html">
         <img src="${escapeHtml(module.imageHref)}" alt="${escapeHtml(module.title)}" loading="lazy" />
         <div class="meta">
-          <p class="idx">第 ${module.index} 关</p>
+          <p class="idx">${english ? `${labels.chapter} ${module.index}` : `第 ${module.index} 关`}</p>
           <h3>${escapeHtml(module.title)}</h3>
         </div>
       </a>
   `).join("");
 
   return `<!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="${escapeHtml(english ? "en-US" : "zh-CN")}">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -9775,15 +9856,15 @@ function buildDynamicBookPageHtml(book) {
         <img src="${escapeHtml(book.cover)}" alt="${escapeHtml(book.title)}" loading="lazy" />
       </article>
       <article class="summary">
-        <span class="badge">${escapeHtml(book.categoryLabel || "书籍模块")} · ${escapeHtml(book.tier || "简餐级")}</span>
+        <span class="badge">${escapeHtml(book.categoryLabel || labels.categoryDefault)} · ${escapeHtml(book.tier || labels.tierDefault)}</span>
         <h1>${escapeHtml(book.title)}</h1>
-        <p class="sub">${escapeHtml(book.moduleCount)} 个可视化阅读章节</p>
+        <p class="sub">${escapeHtml(book.moduleCount)} ${escapeHtml(labels.moduleCount)}</p>
         <ul class="highlight">
           ${(Array.isArray(book.highlights) ? book.highlights : []).slice(0, 3).map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
         </ul>
         <div class="links">
-          <a href="${escapeHtml(book.firstModuleHref)}">从第一章开始</a>
-          <a href="/pages/gamified-learning-hub-dashboard-1.html">返回个人书库</a>
+          <a href="${escapeHtml(book.firstModuleHref)}">${escapeHtml(labels.start)}</a>
+          <a href="/pages/gamified-learning-hub-dashboard-1.html">${escapeHtml(labels.back)}</a>
         </div>
       </article>
     </section>
@@ -10017,7 +10098,11 @@ function buildPipelinePanelSnippet(module, pipelineMeta) {
 </aside>`;
 }
 
-function buildDynamicExperienceHtml(html, module, book, pipelineMeta = null) {
+function buildDynamicExperienceHtml(html, module, book, pipelineMeta = null, language = "") {
+  const english = isEnglishUiLanguage(language);
+  const labels = english
+    ? { prev: "Previous", next: "Next", navAria: "Module progress", bookFallback: "Book" }
+    : { prev: "上一页", next: "下一页", navAria: "章节进度", bookFallback: "书籍" };
   const shellSnippet = `
 <script src="/shared/book-catalog.js"></script>
 <script type="module" src="/shared/shell.js"></script>
@@ -10120,17 +10205,17 @@ function buildDynamicExperienceHtml(html, module, book, pipelineMeta = null) {
   }
 </style>
 <div class="reado-module-nav-wrap">
-  <nav class="reado-module-nav" aria-label="Module progress">
+  <nav class="reado-module-nav" aria-label="${escapeHtml(labels.navAria)}">
     ${prevHref
-      ? `<a class="nav-btn" href="${escapeHtml(prevHref)}">上一页</a>`
-      : `<button class="nav-btn disabled" type="button" disabled>上一页</button>`}
+      ? `<a class="nav-btn" href="${escapeHtml(prevHref)}">${escapeHtml(labels.prev)}</a>`
+      : `<button class="nav-btn disabled" type="button" disabled>${escapeHtml(labels.prev)}</button>`}
     <div class="meta">
-      <span class="book">${escapeHtml(book?.title || "Book")}</span>
+      <span class="book">${escapeHtml(book?.title || labels.bookFallback)}</span>
       <span class="idx">${escapeHtml(String(module?.index || 1))}/${escapeHtml(String(moduleCount))}</span>
     </div>
     ${nextHref
-      ? `<a class="nav-btn" href="${escapeHtml(nextHref)}">下一页</a>`
-      : `<button class="nav-btn disabled" type="button" disabled>下一页</button>`}
+      ? `<a class="nav-btn" href="${escapeHtml(nextHref)}">${escapeHtml(labels.next)}</a>`
+      : `<button class="nav-btn disabled" type="button" disabled>${escapeHtml(labels.next)}</button>`}
   </nav>
 </div>`;
   const pipelinePanelSnippet = "";
@@ -10166,14 +10251,15 @@ function buildDynamicExperienceHtml(html, module, book, pipelineMeta = null) {
   );
 }
 
-async function readDynamicPayloadForRequest(pathname, sessionId) {
-  const normalized = String(pathname || "");
+async function readDynamicPayloadForRequest(urlObj, sessionId, requestLanguage = "") {
+  const normalized = String(urlObj?.pathname || "");
+  const language = normalizeUiLanguage(requestLanguage) || "en-US";
   if (!normalized) return null;
 
   if (normalized === "/shared/book-catalog.js") {
     await loadCatalog();
     return {
-      buffer: Buffer.from(buildCatalogScript(sessionId), "utf8"),
+      buffer: Buffer.from(buildCatalogScript(sessionId, language), "utf8"),
       ext: ".js"
     };
   }
@@ -10186,10 +10272,10 @@ async function readDynamicPayloadForRequest(pathname, sessionId) {
     }
     const book = await runtimeBookCatalog.getBook(bookId);
     if (!book) return null;
-    const enrichedBook = enrichBookWithWorkMeta(book, sessionId);
+    const enrichedBook = localizeBookForLanguage(enrichBookWithWorkMeta(book, sessionId), language);
     if (!enrichedBook) return null;
     return {
-      buffer: Buffer.from(buildDynamicBookPageHtml(enrichedBook), "utf8"),
+      buffer: Buffer.from(buildDynamicBookPageHtml(enrichedBook, language), "utf8"),
       ext: ".html"
     };
   }
@@ -10197,18 +10283,22 @@ async function readDynamicPayloadForRequest(pathname, sessionId) {
   const experienceMatch = normalized.match(/^\/experiences\/([^/]+)\.html$/);
   if (experienceMatch) {
     const moduleSlug = decodeURIComponent(experienceMatch[1] || "").trim();
-    const loaded = await runtimeBookCatalog.readModuleHtml(moduleSlug);
+    const loaded = await runtimeBookCatalog.readModuleHtml(moduleSlug, { language });
     if (!loaded) return null;
     if (isUserGeneratedBookId(loaded.module.bookId) && !canSessionViewUserBook(sessionId, loaded.module.bookId)) {
       return null;
     }
     const book = await runtimeBookCatalog.getBook(loaded.module.bookId);
     if (!book) return null;
-    const enrichedBook = enrichBookWithWorkMeta(book, sessionId);
+    const enrichedBook = localizeBookForLanguage(enrichBookWithWorkMeta(book, sessionId), language);
     if (!enrichedBook) return null;
+    const localizedModule = (Array.isArray(enrichedBook.modules) ? enrichedBook.modules : []).find((item) => item?.slug === loaded.module.slug);
+    const moduleForRender = localizedModule
+      ? { ...loaded.module, title: cleanText(localizedModule.title, loaded.module.title) }
+      : loaded.module;
     const pipelineMeta = await readModulePipelineMeta(loaded.module);
     return {
-      buffer: Buffer.from(buildDynamicExperienceHtml(loaded.html, loaded.module, enrichedBook, pipelineMeta), "utf8"),
+      buffer: Buffer.from(buildDynamicExperienceHtml(loaded.html, moduleForRender, enrichedBook, pipelineMeta, language), "utf8"),
       ext: ".html"
     };
   }
@@ -11300,7 +11390,8 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    let payload = await readDynamicPayloadForRequest(url.pathname, session.id);
+    const requestLanguage = detectRequestLanguage(req, url);
+    let payload = await readDynamicPayloadForRequest(url, session.id, requestLanguage);
     if (!payload) {
       payload = await readFileForRequest(req.url || "/");
     }

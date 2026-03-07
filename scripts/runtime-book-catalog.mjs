@@ -179,122 +179,194 @@ const BOOK_META = {
   },
   "world-building-methods": {
     title: "《构建世界的多种方式》",
+    titleEn: "Ways of Building Worlds",
     price: 380,
     category: "science-knowledge",
     categoryHint: "从模型、叙事与系统视角理解“世界如何被构造”。",
+    categoryHintEn: "Understand how worlds are constructed through models, narratives, and systems.",
     tier: "简餐级",
+    tierEn: "Starter",
     tags: ["知识地图", "认知训练"],
     badgeTitle: "世界建构师",
+    badgeTitleEn: "World Builder",
     badgeIcon: "hub",
     highlights: [
       "同一现实可以被不同理论框架解释与重构。",
       "概念模型决定了你看见的问题类型和解法路径。",
       "叙事、制度与认知习惯共同塑造了“世界感”。"
+    ],
+    highlightsEn: [
+      "The same reality can be explained and reconstructed through different frameworks.",
+      "Conceptual models decide which problems you can see and how you solve them.",
+      "Narratives, institutions, and cognitive habits co-create our sense of world."
     ]
   },
   "golden-wing": {
     title: "《金翼》",
+    titleEn: "Golden Wing",
     price: 420,
     category: "science-knowledge",
     categoryHint: "在家族兴衰与社会网络中理解地方社会的运作逻辑。",
+    categoryHintEn: "Understand local society through family rise-and-fall and social networks.",
     tier: "简餐级",
+    tierEn: "Starter",
     tags: ["人类学", "社会观察"],
     badgeTitle: "乡土观察者",
+    badgeTitleEn: "Field Observer",
     badgeIcon: "groups",
     highlights: [
       "家族命运与社会结构、经济机会高度耦合。",
       "关系网络既能放大机会，也会放大脆弱性。",
       "微观家庭史能够折射宏观社会变迁。"
+    ],
+    highlightsEn: [
+      "Family fate is tightly coupled with social structure and economic opportunity.",
+      "Networks amplify both opportunities and vulnerabilities.",
+      "Micro family history can reveal macro social transformation."
     ]
   },
   "border-crossing-community": {
     title: "《跨越边界的社区》",
+    titleEn: "Communities Across Boundaries",
     price: 360,
     category: "science-knowledge",
     categoryHint: "观察流动人口社群如何在制度边界之间自组织。",
+    categoryHintEn: "Observe how migrant communities self-organize across institutional boundaries.",
     tier: "简餐级",
+    tierEn: "Starter",
     tags: ["城市研究", "社区"],
     badgeTitle: "边界行者",
+    badgeTitleEn: "Boundary Walker",
     badgeIcon: "travel_explore",
     highlights: [
       "社区形成依赖迁移链条、信任网络与资源互助。",
       "制度边界不会消失，而是被日常实践不断协商。",
       "空间布局、产业分工与身份认同彼此塑造。"
+    ],
+    highlightsEn: [
+      "Community formation depends on migration chains, trust networks, and mutual aid.",
+      "Institutional boundaries are negotiated through daily practices.",
+      "Spatial layout, labor division, and identity shape one another."
     ]
   },
   "secret-erotic-art-study": {
     title: "《秘戏图考》",
+    titleEn: "A Study of Secret Erotic Paintings",
     price: 360,
     category: "lifestyle-creativity",
     categoryHint: "通过图像与文本解读古代身体观与文化表达。",
+    categoryHintEn: "Interpret ancient body concepts and cultural expression through image-text reading.",
     tier: "简餐级",
+    tierEn: "Starter",
     tags: ["文化史", "视觉解读"],
     badgeTitle: "图像解码者",
+    badgeTitleEn: "Image Decoder",
     badgeIcon: "photo_library",
     highlights: [
       "图像不仅记录欲望，也承载时代规范与权力关系。",
       "审美风格变化映射了社会观念的转型轨迹。",
       "文本与图像互证能提升历史解释的密度。"
+    ],
+    highlightsEn: [
+      "Images record desire but also carry social norms and power relations.",
+      "Aesthetic shifts map broader changes in social ideas.",
+      "Cross-validating text and image increases interpretive depth."
     ]
   },
   "enslaved-people-deep-structure": {
     title: "《奴化的人：解码中国文化的深层结构》",
+    titleEn: "The Enslaved Mind: Decoding Deep Structures of Chinese Culture",
     price: 420,
     category: "science-knowledge",
     categoryHint: "从结构层面审视文化心理与社会组织机制。",
+    categoryHintEn: "Examine cultural psychology and social organization from a structural lens.",
     tier: "简餐级",
+    tierEn: "Starter",
     tags: ["文化分析", "社会心理"],
     badgeTitle: "结构透视者",
+    badgeTitleEn: "Structure Analyst",
     badgeIcon: "visibility",
     highlights: [
       "个体行为常被长期结构性规则所塑形。",
       "关系模式会在代际与制度中被重复强化。",
       "理解深层结构有助于解释表层冲突。"
+    ],
+    highlightsEn: [
+      "Individual behavior is often shaped by long-running structural rules.",
+      "Relational patterns are reinforced across generations and institutions.",
+      "Deep structure analysis explains many surface-level conflicts."
     ]
   },
   "cognitive-psychology": {
     title: "《认知心理学》",
+    titleEn: "Cognitive Psychology",
     price: 360,
     category: "personal-growth",
     categoryHint: "系统理解注意、记忆、思维与决策的心理机制。",
+    categoryHintEn: "Systematically understand mechanisms of attention, memory, thinking, and decisions.",
     tier: "简餐级",
+    tierEn: "Starter",
     tags: ["心理学", "思维模型"],
     badgeTitle: "认知升级者",
+    badgeTitleEn: "Cognition Upgrader",
     badgeIcon: "psychology",
     highlights: [
       "注意资源有限，选择机制决定信息进入深加工的概率。",
       "记忆不是仓库，而是可塑、会重构的系统。",
       "决策常受启发式与框架效应影响。"
+    ],
+    highlightsEn: [
+      "Attention is limited, and selection mechanisms control deep processing.",
+      "Memory is reconstructive and plastic, not static storage.",
+      "Decision-making is heavily affected by heuristics and framing."
     ]
   },
   "sociobiology": {
     title: "《社会生物学》",
+    titleEn: "Sociobiology",
     price: 420,
     category: "science-knowledge",
     categoryHint: "从进化视角理解合作、利他与群体行为。",
+    categoryHintEn: "Understand cooperation, altruism, and group behavior from an evolutionary perspective.",
     tier: "简餐级",
+    tierEn: "Starter",
     tags: ["进化", "社会科学"],
     badgeTitle: "进化分析师",
+    badgeTitleEn: "Evolution Analyst",
     badgeIcon: "biotech",
     highlights: [
       "社会行为可在生态压力与进化收益中被解释。",
       "合作与竞争并存，是多层级选择的结果。",
       "生物基础与社会结构之间存在持续互动。"
+    ],
+    highlightsEn: [
+      "Social behavior can be explained through ecological pressure and evolutionary payoff.",
+      "Cooperation and competition coexist across multi-level selection.",
+      "Biological foundations continuously interact with social structure."
     ]
   },
   "death-of-woman-wang": {
     title: "《王氏之死》",
+    titleEn: "The Death of Woman Wang",
     price: 380,
     category: "science-knowledge",
     categoryHint: "通过微观史叙事理解清代底层社会的秩序与命运。",
+    categoryHintEn: "Use microhistory to understand order and fate in Qing grassroots society.",
     tier: "简餐级",
+    tierEn: "Starter",
     tags: ["历史", "微观史"],
     badgeTitle: "微观史侦探",
+    badgeTitleEn: "Microhistory Detective",
     badgeIcon: "menu_book",
     highlights: [
       "个体命运常被制度、灾荒与地方权力结构共同决定。",
       "微观叙事能补足宏观历史难以呈现的真实细节。",
       "法律、伦理与生存策略在基层社会中持续博弈。"
+    ],
+    highlightsEn: [
+      "Individual fate is jointly shaped by institutions, disasters, and local power.",
+      "Microhistory recovers concrete details often lost in macro narratives.",
+      "Law, ethics, and survival strategies keep colliding at the grassroots."
     ]
   }
 };
@@ -448,6 +520,29 @@ function toPublicFileName(fileName) {
   return value;
 }
 
+function normalizeLocale(input) {
+  const value = String(input || "").trim().toLowerCase().replace(/_/g, "-");
+  if (!value) return "";
+  if (value === "en" || value.startsWith("en-")) return "en-US";
+  if (value === "zh" || value.startsWith("zh-")) return "zh-CN";
+  return "";
+}
+
+function isEnglishLocale(input) {
+  return normalizeLocale(input) === "en-US";
+}
+
+function parseCoverBase(rawBase) {
+  const base = toText(rawBase);
+  if (!base) return { bookRaw: "", locale: "" };
+  const match = base.match(/^(.*)\.(en|en-us|zh|zh-cn)$/i);
+  if (!match) return { bookRaw: base, locale: "" };
+  return {
+    bookRaw: toText(match[1]),
+    locale: normalizeLocale(match[2])
+  };
+}
+
 export class RuntimeBookCatalog {
   constructor({ rootDir, minRefreshMs = 2000 }) {
     this.rootDir = rootDir;
@@ -501,12 +596,14 @@ export class RuntimeBookCatalog {
       const richModules = modules.map((module, index) => ({
         slug: module.slug,
         title: module.title,
+        titleEn: toText(module.titleEn),
         index: index + 1,
         imageHref: `/assets/experiences/${module.slug}.png`,
         href: `/experiences/${module.slug}.html`,
         nextSlug: modules[index + 1]?.slug || "",
         prevSlug: modules[index - 1]?.slug || "",
         htmlPath: module.htmlPath,
+        htmlPathEn: module.htmlPathEn,
         moduleDirPath: module.moduleDirPath,
         screenPath: module.screenPath
       }));
@@ -514,24 +611,34 @@ export class RuntimeBookCatalog {
       if (richModules.length === 0) continue;
 
       const title = toText(bookMeta.title, titleFromBookId(bookId));
-      const cover = coverState.coverByBookId.get(bookId) || richModules[0].imageHref;
+      const titleEn = toText(bookMeta.titleEn);
+      const coverEn = coverState.coverByBookLocale.get(`${bookId}|en-US`) || "";
+      const coverZh = coverState.coverByBookLocale.get(`${bookId}|zh-CN`) || "";
+      const cover = coverState.coverByBookId.get(bookId) || coverZh || coverEn || richModules[0].imageHref;
 
       const book = {
         id: bookId,
         title,
+        titleEn,
         price: Number.isFinite(bookMeta.price) ? bookMeta.price : 0,
         category,
         categoryLabel: categoryMeta.label,
         categoryIncludes: categoryMeta.includes,
         categoryHint,
+        categoryHintEn: toText(bookMeta.categoryHintEn),
         categoryIcon: categoryMeta.icon,
         axis: categoryMeta.axis,
         tier: toText(bookMeta.tier, "简餐级"),
+        tierEn: toText(bookMeta.tierEn),
         tags: Array.isArray(bookMeta.tags) ? [...bookMeta.tags] : [],
         badgeTitle: toText(bookMeta.badgeTitle),
+        badgeTitleEn: toText(bookMeta.badgeTitleEn),
         badgeIcon: toText(bookMeta.badgeIcon),
         highlights: Array.isArray(bookMeta.highlights) ? [...bookMeta.highlights] : [],
+        highlightsEn: Array.isArray(bookMeta.highlightsEn) ? [...bookMeta.highlightsEn] : [],
         cover,
+        coverEn,
+        coverZh,
         moduleCount: richModules.length,
         hubHref: `/books/${bookId}.html`,
         firstModuleHref: richModules[0].href,
@@ -563,14 +670,21 @@ export class RuntimeBookCatalog {
         categoryLabel: book.categoryLabel,
         categoryIncludes: book.categoryIncludes,
         categoryHint: book.categoryHint,
+        categoryHintEn: book.categoryHintEn,
         categoryIcon: book.categoryIcon,
         axis: book.axis,
         tier: book.tier,
+        tierEn: book.tierEn,
         tags: book.tags,
         badgeTitle: book.badgeTitle,
+        badgeTitleEn: book.badgeTitleEn,
         badgeIcon: book.badgeIcon,
         highlights: book.highlights,
+        highlightsEn: book.highlightsEn,
         cover: book.cover,
+        coverEn: book.coverEn,
+        coverZh: book.coverZh,
+        titleEn: book.titleEn,
         moduleCount: book.moduleCount,
         hubHref: book.hubHref,
         firstModuleHref: book.firstModuleHref,
@@ -584,12 +698,14 @@ export class RuntimeBookCatalog {
       books,
       bookById,
       moduleBySlug,
-      coverAssetByPublicName: coverState.coverAssetByPublicName
+      coverAssetByPublicName: coverState.coverAssetByPublicName,
+      coverByBookLocale: coverState.coverByBookLocale
     };
   }
 
   async scanBookCovers() {
     const coverByBookId = new Map();
+    const coverByBookLocale = new Map();
     const coverAssetByPublicName = new Map();
     const sourceDirs = [this.coversDir, this.bookCoversDir];
 
@@ -608,18 +724,29 @@ export class RuntimeBookCatalog {
       for (const name of files) {
         const ext = path.extname(name).toLowerCase();
         if (!BOOK_COVER_EXTENSIONS.has(ext)) continue;
-        const base = path.basename(name, ext);
-        const bookId = resolveBookId(base);
+        const parsed = parseCoverBase(path.basename(name, ext));
+        const bookId = resolveBookId(parsed.bookRaw);
         if (!bookId) continue;
-        if (coverByBookId.has(bookId)) continue;
-        const publicName = `${bookId}${ext}`;
+        const locale = normalizeLocale(parsed.locale);
+        const localeSuffix = locale ? `.${locale === "en-US" ? "en" : "zh"}` : "";
+        const publicName = `${bookId}${localeSuffix}${ext}`;
         const publicPath = `/assets/book-covers/${publicName}`;
-        coverByBookId.set(bookId, publicPath);
-        coverAssetByPublicName.set(publicName, path.join(sourceDir, name));
+        const sourcePath = path.join(sourceDir, name);
+        if (!coverAssetByPublicName.has(publicName)) {
+          coverAssetByPublicName.set(publicName, sourcePath);
+        }
+        if (locale) {
+          const key = `${bookId}|${locale}`;
+          if (!coverByBookLocale.has(key)) {
+            coverByBookLocale.set(key, publicPath);
+          }
+        } else if (!coverByBookId.has(bookId)) {
+          coverByBookId.set(bookId, publicPath);
+        }
       }
     }
 
-    return { coverByBookId, coverAssetByPublicName };
+    return { coverByBookId, coverByBookLocale, coverAssetByPublicName };
   }
 
   async scanBookExperiences() {
@@ -679,17 +806,23 @@ export class RuntimeBookCatalog {
 
         const metaSlug = toText(moduleMeta?.slug);
         const titleFromMeta = toText(moduleMeta?.title);
+        const titleFromMetaEn = toText(moduleMeta?.title_en);
         const orderFromMeta = Number(moduleMeta?.order);
         const localOrder = Number.isFinite(orderFromMeta) ? orderFromMeta : moduleIndex + 1;
         const order = variantIndex * 1000 + localOrder;
         const slug = uniqueSlug(slugify(metaSlug || moduleDirName), usedSlugs, usedSlugs.size);
         const title = extractTitle(html, titleFromMeta || moduleDirName);
+        const htmlPathEn = path.join(moduleDirPath, "code.en.html");
+        const htmlEn = await fs.readFile(htmlPathEn, "utf8").catch(() => "");
+        const titleEn = toText(titleFromMetaEn, extractTitle(htmlEn, ""));
 
         collected.push({
           slug,
           title,
+          titleEn,
           order,
           htmlPath,
+          htmlPathEn: htmlEn ? htmlPathEn : "",
           moduleDirPath,
           screenPath
         });
@@ -719,10 +852,16 @@ export class RuntimeBookCatalog {
     return { ...row };
   }
 
-  async readModuleHtml(moduleSlug) {
+  async readModuleHtml(moduleSlug, options = {}) {
     const module = await this.getModule(moduleSlug);
     if (!module) return null;
-    const html = await fs.readFile(module.htmlPath, "utf8").catch(() => "");
+    const locale = normalizeLocale(options?.language);
+    const preferEn = isEnglishLocale(locale);
+    const preferredPath = preferEn && module.htmlPathEn ? module.htmlPathEn : module.htmlPath;
+    let html = await fs.readFile(preferredPath, "utf8").catch(() => "");
+    if (!html && preferredPath !== module.htmlPath) {
+      html = await fs.readFile(module.htmlPath, "utf8").catch(() => "");
+    }
     if (!html) return null;
     return { module, html };
   }
@@ -763,5 +902,20 @@ export class RuntimeBookCatalog {
       buffer,
       ext: path.extname(normalized).toLowerCase()
     };
+  }
+
+  async getBookCover(bookId, options = {}) {
+    const snapshot = await this.getSnapshot();
+    const normalizedBookId = toText(bookId);
+    if (!normalizedBookId) return "";
+    const locale = normalizeLocale(options?.language);
+    if (locale) {
+      const localized = snapshot.coverByBookLocale?.get(`${normalizedBookId}|${locale}`);
+      if (localized) return localized;
+    }
+    return snapshot.coverByBookId?.get(normalizedBookId)
+      || snapshot.coverByBookLocale?.get(`${normalizedBookId}|zh-CN`)
+      || snapshot.coverByBookLocale?.get(`${normalizedBookId}|en-US`)
+      || "";
   }
 }

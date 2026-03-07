@@ -1,0 +1,1553 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>解码中国文化的深层结构 — 孙隆基</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=ZCOOL+XiaoWei&family=Ma+Shan+Zheng&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+/* === SKELETON: styles will be filled in sections === */
+:root {
+  --ink: #1a1410;
+  --paper: #f5f0e8;
+  --paper-dark: #e8e0d0;
+  --vermillion: #c84031;
+  --vermillion-dark: #a02820;
+  --gold: #c5a356;
+  --gold-light: #dfc87a;
+  --jade: #5a8a72;
+  --jade-dark: #3d6b54;
+  --indigo: #2d4a6f;
+  --indigo-light: #4a6d94;
+  --smoke: #6b635a;
+  --bone: #ddd5c8;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: 'Noto Sans SC', sans-serif;
+  background: var(--ink);
+  color: var(--paper);
+  font-weight: 300;
+  line-height: 1.8;
+  overflow-x: hidden;
+}
+
+/* --- HERO SECTION --- */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 40%, rgba(200,64,49,0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 80% at 20% 80%, rgba(45,74,111,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 80% 20%, rgba(197,163,86,0.05) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.hero-seal {
+  width: 120px;
+  height: 120px;
+  border: 3px solid var(--vermillion);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Ma Shan Zheng', cursive;
+  font-size: 2.4rem;
+  color: var(--vermillion);
+  margin-bottom: 2rem;
+  position: relative;
+  opacity: 0;
+  transform: scale(0.8) rotate(-5deg);
+  animation: sealAppear 1.2s ease-out 0.3s forwards;
+}
+
+.hero-seal::after {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border: 1px solid var(--vermillion);
+  opacity: 0.5;
+}
+
+@keyframes sealAppear {
+  to { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+.hero-title {
+  font-family: 'ZCOOL XiaoWei', serif;
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  letter-spacing: 0.15em;
+  line-height: 1.3;
+  margin-bottom: 1rem;
+  opacity: 0;
+  animation: fadeUp 1s ease-out 0.6s forwards;
+}
+
+.hero-title .accent {
+  color: var(--vermillion);
+  display: inline-block;
+  position: relative;
+}
+
+.hero-subtitle {
+  font-family: 'Noto Serif SC', serif;
+  font-size: clamp(1rem, 2.2vw, 1.4rem);
+  color: var(--bone);
+  letter-spacing: 0.3em;
+  margin-bottom: 0.5rem;
+  opacity: 0;
+  animation: fadeUp 1s ease-out 0.9s forwards;
+}
+
+.hero-author {
+  font-size: 0.9rem;
+  color: var(--smoke);
+  letter-spacing: 0.2em;
+  margin-bottom: 3rem;
+  opacity: 0;
+  animation: fadeUp 1s ease-out 1.1s forwards;
+}
+
+.hero-scroll {
+  opacity: 0;
+  animation: fadeUp 1s ease-out 1.5s forwards;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--smoke);
+  font-size: 0.8rem;
+  letter-spacing: 0.15em;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.hero-scroll:hover { color: var(--gold); }
+
+.hero-scroll .arrow {
+  width: 1px;
+  height: 40px;
+  background: var(--smoke);
+  position: relative;
+  animation: scrollPulse 2s ease-in-out infinite;
+}
+
+@keyframes scrollPulse {
+  0%, 100% { opacity: 0.3; transform: scaleY(1); }
+  50% { opacity: 1; transform: scaleY(1.3); }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- FLOATING CHARACTERS --- */
+.float-chars {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.float-char {
+  position: absolute;
+  font-family: 'Ma Shan Zheng', cursive;
+  opacity: 0.04;
+  font-size: clamp(3rem, 8vw, 8rem);
+  color: var(--paper);
+  animation: drift 20s ease-in-out infinite;
+}
+
+@keyframes drift {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(3deg); }
+}
+
+/* --- INTRO SECTION --- */
+.intro {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 6rem 2rem;
+  text-align: center;
+}
+
+.intro-lead {
+  font-family: 'Noto Serif SC', serif;
+  font-size: clamp(1.1rem, 2vw, 1.35rem);
+  color: var(--bone);
+  line-height: 2.2;
+  margin-bottom: 2rem;
+}
+
+.intro-lead .hl {
+  color: var(--gold);
+  font-weight: 700;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin: 3rem 0;
+  color: var(--smoke);
+}
+
+.divider::before, .divider::after {
+  content: '';
+  width: 60px;
+  height: 1px;
+  background: var(--smoke);
+  opacity: 0.3;
+}
+
+.divider-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--vermillion);
+  transform: rotate(45deg);
+}
+
+/* --- CHAPTER SECTIONS --- */
+.chapter {
+  position: relative;
+  padding: 5rem 2rem;
+  overflow: hidden;
+}
+
+.chapter-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.chapter-number {
+  font-family: 'ZCOOL XiaoWei', serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.3em;
+  color: var(--vermillion);
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.8s ease-out;
+}
+
+.chapter-heading {
+  font-family: 'ZCOOL XiaoWei', serif;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  letter-spacing: 0.08em;
+  margin-bottom: 1rem;
+  line-height: 1.4;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.8s ease-out 0.1s;
+}
+
+.chapter-desc {
+  font-size: 1.05rem;
+  color: var(--bone);
+  max-width: 700px;
+  line-height: 2;
+  margin-bottom: 3rem;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.8s ease-out 0.2s;
+}
+
+.chapter.visible .chapter-number,
+.chapter.visible .chapter-heading,
+.chapter.visible .chapter-desc {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* --- CONCEPT CARDS --- */
+.concepts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.concept-card {
+  background: rgba(245,240,232,0.04);
+  border: 1px solid rgba(245,240,232,0.08);
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.6s ease-out;
+  cursor: default;
+}
+
+.concept-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 0;
+  transition: height 0.4s ease-out;
+}
+
+.concept-card:hover::before {
+  height: 100%;
+}
+
+.concept-card:nth-child(1)::before { background: var(--vermillion); }
+.concept-card:nth-child(2)::before { background: var(--gold); }
+.concept-card:nth-child(3)::before { background: var(--jade); }
+.concept-card:nth-child(4)::before { background: var(--indigo); }
+
+.concept-card:hover {
+  background: rgba(245,240,232,0.07);
+  border-color: rgba(245,240,232,0.15);
+  transform: translateY(-3px) !important;
+}
+
+.concept-card.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.concept-char {
+  font-family: 'Ma Shan Zheng', cursive;
+  font-size: 3rem;
+  line-height: 1;
+  margin-bottom: 1rem;
+  opacity: 0.8;
+}
+
+.concept-card:nth-child(1) .concept-char { color: var(--vermillion); }
+.concept-card:nth-child(2) .concept-char { color: var(--gold); }
+.concept-card:nth-child(3) .concept-char { color: var(--jade); }
+.concept-card:nth-child(4) .concept-char { color: var(--indigo); }
+
+.concept-title {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 0.8rem;
+}
+
+.concept-text {
+  font-size: 0.92rem;
+  color: var(--bone);
+  line-height: 1.9;
+}
+
+/* --- DIAGRAM SECTIONS --- */
+.diagram-section {
+  padding: 4rem 2rem;
+  display: flex;
+  justify-content: center;
+}
+
+.taiji-diagram {
+  position: relative;
+  width: min(500px, 80vw);
+  height: min(500px, 80vw);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.taiji-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(245,240,232,0.1);
+  animation: taiji-rotate 40s linear infinite;
+}
+
+.taiji-ring:nth-child(1) { width: 100%; height: 100%; }
+.taiji-ring:nth-child(2) { width: 75%; height: 75%; animation-direction: reverse; animation-duration: 30s; }
+.taiji-ring:nth-child(3) { width: 50%; height: 50%; animation-duration: 20s; }
+
+@keyframes taiji-rotate {
+  to { transform: rotate(360deg); }
+}
+
+.taiji-label {
+  position: absolute;
+  font-family: 'ZCOOL XiaoWei', serif;
+  font-size: clamp(1rem, 2.5vw, 1.4rem);
+  letter-spacing: 0.1em;
+  text-align: center;
+  transition: all 0.4s;
+}
+
+.taiji-label:hover {
+  transform: scale(1.1);
+}
+
+.taiji-label.top { top: 5%; left: 50%; transform: translateX(-50%); color: var(--vermillion); }
+.taiji-label.bottom { bottom: 5%; left: 50%; transform: translateX(-50%); color: var(--jade); }
+.taiji-label.left { left: 2%; top: 50%; transform: translateY(-50%); color: var(--gold); }
+.taiji-label.right { right: 2%; top: 50%; transform: translateY(-50%); color: var(--indigo-light); }
+
+.taiji-center {
+  font-family: 'Ma Shan Zheng', cursive;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  color: var(--paper);
+  z-index: 1;
+  text-shadow: 0 0 40px rgba(200,64,49,0.3);
+}
+
+.taiji-connector {
+  position: absolute;
+  background: rgba(245,240,232,0.06);
+}
+
+.taiji-connector.h { width: 80%; height: 1px; top: 50%; left: 10%; }
+.taiji-connector.v { height: 80%; width: 1px; left: 50%; top: 10%; }
+
+/* --- TIMELINE --- */
+.timeline-section {
+  padding: 5rem 2rem;
+}
+
+.timeline-title {
+  font-family: 'ZCOOL XiaoWei', serif;
+  font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+  text-align: center;
+  margin-bottom: 1rem;
+  letter-spacing: 0.1em;
+}
+
+.timeline-subtitle {
+  text-align: center;
+  color: var(--bone);
+  margin-bottom: 4rem;
+  font-size: 0.95rem;
+}
+
+.timeline {
+  position: relative;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: linear-gradient(to bottom, transparent, var(--vermillion), var(--gold), var(--jade), var(--indigo), transparent);
+  transform: translateX(-50%);
+}
+
+.timeline-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 3rem;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s ease-out;
+}
+
+.timeline-item.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.timeline-item:nth-child(even) { flex-direction: row-reverse; }
+
+.timeline-content {
+  width: calc(50% - 2rem);
+  padding: 1.5rem;
+  background: rgba(245,240,232,0.03);
+  border: 1px solid rgba(245,240,232,0.06);
+  position: relative;
+}
+
+.timeline-item:nth-child(odd) .timeline-content { text-align: right; margin-right: 2rem; }
+.timeline-item:nth-child(even) .timeline-content { text-align: left; margin-left: 2rem; }
+
+.timeline-dot {
+  position: absolute;
+  top: 1.5rem;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--vermillion);
+  background: var(--ink);
+}
+
+.timeline-item:nth-child(odd) .timeline-dot { right: -2rem; transform: translateX(50%); }
+.timeline-item:nth-child(even) .timeline-dot { left: -2rem; transform: translateX(-50%); }
+
+.timeline-era {
+  font-family: 'ZCOOL XiaoWei', serif;
+  font-size: 1.1rem;
+  color: var(--gold);
+  margin-bottom: 0.3rem;
+}
+
+.timeline-text {
+  font-size: 0.9rem;
+  color: var(--bone);
+  line-height: 1.8;
+}
+
+/* --- COMPARISON TABLE --- */
+.compare-section {
+  padding: 5rem 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 2rem;
+}
+
+.compare-table th,
+.compare-table td {
+  padding: 1.2rem 1.5rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(245,240,232,0.06);
+  font-size: 0.95rem;
+}
+
+.compare-table th {
+  font-family: 'ZCOOL XiaoWei', serif;
+  font-size: 1rem;
+  letter-spacing: 0.1em;
+  color: var(--paper);
+  font-weight: 400;
+}
+
+.compare-table th:nth-child(2) { color: var(--vermillion); }
+.compare-table th:nth-child(3) { color: var(--indigo-light); }
+
+.compare-table td {
+  color: var(--bone);
+  line-height: 1.7;
+}
+
+.compare-table td:first-child {
+  font-family: 'Noto Serif SC', serif;
+  color: var(--gold);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.compare-table tr {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.5s ease-out;
+}
+
+.compare-table tr.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* --- INTERACTIVE LAYERS --- */
+.layers-section {
+  padding: 5rem 2rem;
+  text-align: center;
+}
+
+.layers-diagram {
+  max-width: 600px;
+  margin: 3rem auto;
+  position: relative;
+}
+
+.layer {
+  padding: 1.5rem 2rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid rgba(245,240,232,0.1);
+  cursor: pointer;
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.layer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+
+.layer:hover, .layer.active {
+  border-color: rgba(245,240,232,0.25);
+}
+
+.layer:nth-child(1) { background: rgba(200,64,49,0.08); }
+.layer:nth-child(1):hover, .layer:nth-child(1).active { background: rgba(200,64,49,0.15); }
+.layer:nth-child(2) { background: rgba(197,163,86,0.06); }
+.layer:nth-child(2):hover, .layer:nth-child(2).active { background: rgba(197,163,86,0.12); }
+.layer:nth-child(3) { background: rgba(90,138,114,0.06); }
+.layer:nth-child(3):hover, .layer:nth-child(3).active { background: rgba(90,138,114,0.12); }
+.layer:nth-child(4) { background: rgba(45,74,111,0.06); }
+.layer:nth-child(4):hover, .layer:nth-child(4).active { background: rgba(45,74,111,0.12); }
+
+.layer-label {
+  font-family: 'ZCOOL XiaoWei', serif;
+  font-size: 1.2rem;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.3rem;
+}
+
+.layer-hint {
+  font-size: 0.85rem;
+  color: var(--smoke);
+}
+
+.layer-detail {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease, padding 0.5s ease;
+  text-align: left;
+  font-size: 0.92rem;
+  color: var(--bone);
+  line-height: 2;
+}
+
+.layer.active .layer-detail {
+  max-height: 500px;
+  padding-top: 1rem;
+}
+
+/* --- QUOTE BLOCKS --- */
+.quote-block {
+  max-width: 700px;
+  margin: 4rem auto;
+  padding: 2.5rem 3rem;
+  position: relative;
+  border-left: 3px solid var(--vermillion);
+  background: rgba(200,64,49,0.03);
+}
+
+.quote-text {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 1.15rem;
+  line-height: 2.2;
+  color: var(--paper);
+}
+
+.quote-source {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: var(--smoke);
+  letter-spacing: 0.1em;
+}
+
+/* --- CYCLE ANIMATION --- */
+.cycle-section {
+  padding: 5rem 2rem;
+  text-align: center;
+}
+
+.cycle-diagram {
+  max-width: 500px;
+  margin: 3rem auto;
+  position: relative;
+  aspect-ratio: 1;
+}
+
+.cycle-node {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  border: 1px solid;
+  font-family: 'ZCOOL XiaoWei', serif;
+  font-size: 1rem;
+  letter-spacing: 0.05em;
+  transition: all 0.3s;
+  cursor: default;
+}
+
+.cycle-node:hover {
+  transform: scale(1.1);
+  z-index: 2;
+}
+
+.cycle-node:nth-child(1) {
+  top: 0; left: 50%; transform: translateX(-50%);
+  border-color: var(--vermillion);
+  color: var(--vermillion);
+  background: rgba(200,64,49,0.08);
+}
+
+.cycle-node:nth-child(2) {
+  top: 50%; right: 0; transform: translateY(-50%);
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(197,163,86,0.08);
+}
+
+.cycle-node:nth-child(3) {
+  bottom: 0; left: 50%; transform: translateX(-50%);
+  border-color: var(--jade);
+  color: var(--jade);
+  background: rgba(90,138,114,0.08);
+}
+
+.cycle-node:nth-child(4) {
+  top: 50%; left: 0; transform: translateY(-50%);
+  border-color: var(--indigo-light);
+  color: var(--indigo-light);
+  background: rgba(45,74,111,0.08);
+}
+
+.cycle-node small {
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 0.7rem;
+  opacity: 0.7;
+  margin-top: 0.2rem;
+}
+
+.cycle-arrows {
+  position: absolute;
+  inset: 60px;
+  border: 1px dashed rgba(245,240,232,0.1);
+  border-radius: 50%;
+  animation: taiji-rotate 30s linear infinite;
+}
+
+.cycle-center-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Ma Shan Zheng', cursive;
+  font-size: 1.8rem;
+  color: var(--smoke);
+}
+
+/* --- INSIGHT CARDS --- */
+.insights-section {
+  padding: 5rem 2rem;
+}
+
+.insights-grid {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.insight-card {
+  padding: 2rem;
+  border: 1px solid rgba(245,240,232,0.06);
+  background: rgba(245,240,232,0.02);
+  transition: all 0.4s;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s ease-out;
+}
+
+.insight-card.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.insight-card:hover {
+  border-color: rgba(245,240,232,0.15);
+  background: rgba(245,240,232,0.05);
+}
+
+.insight-icon {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.insight-title {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 0.8rem;
+}
+
+.insight-text {
+  font-size: 0.9rem;
+  color: var(--bone);
+  line-height: 1.9;
+}
+
+/* --- NAVIGATION --- */
+.nav-dots {
+  position: fixed;
+  right: 1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  z-index: 100;
+}
+
+.nav-dot {
+  width: 8px;
+  height: 8px;
+  border: 1px solid var(--smoke);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+}
+
+.nav-dot:hover, .nav-dot.active {
+  background: var(--vermillion);
+  border-color: var(--vermillion);
+  transform: scale(1.3);
+}
+
+.nav-dot .nav-tooltip {
+  position: absolute;
+  right: 1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  font-size: 0.75rem;
+  color: var(--paper);
+  background: rgba(26,20,16,0.9);
+  padding: 0.3rem 0.8rem;
+  border: 1px solid rgba(245,240,232,0.1);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+.nav-dot:hover .nav-tooltip {
+  opacity: 1;
+}
+
+/* --- FOOTER --- */
+.footer {
+  padding: 4rem 2rem;
+  text-align: center;
+  border-top: 1px solid rgba(245,240,232,0.06);
+}
+
+.footer-text {
+  font-size: 0.85rem;
+  color: var(--smoke);
+  line-height: 1.8;
+}
+
+.footer-book {
+  font-family: 'Noto Serif SC', serif;
+  color: var(--bone);
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* --- SECTION BACKGROUNDS --- */
+.bg-pattern {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.03;
+  background-image:
+    repeating-linear-gradient(0deg, var(--paper) 0px, transparent 1px, transparent 60px),
+    repeating-linear-gradient(90deg, var(--paper) 0px, transparent 1px, transparent 60px);
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+  .timeline::before { left: 1rem; }
+  .timeline-item, .timeline-item:nth-child(even) { flex-direction: column; padding-left: 2.5rem; }
+  .timeline-content { width: 100% !important; text-align: left !important; margin: 0 !important; }
+  .timeline-dot { left: -2.5rem !important; right: auto !important; transform: translateX(50%) !important; }
+  .concepts-grid { grid-template-columns: 1fr; }
+  .nav-dots { display: none; }
+  .compare-table { font-size: 0.85rem; }
+  .compare-table th, .compare-table td { padding: 0.8rem; }
+  .cycle-node { width: 90px; height: 90px; font-size: 0.85rem; }
+}
+
+/* --- SCROLL REVEAL ANIMATION --- */
+.reveal {
+  opacity: 0;
+  transform: translateY(25px);
+  transition: all 0.8s ease-out;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* --- HORIZONTAL RULE VARIANT --- */
+.hr-ornament {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 3rem 0;
+  color: var(--smoke);
+  font-family: 'Ma Shan Zheng', cursive;
+  font-size: 1.2rem;
+  opacity: 0.3;
+}
+</style>
+</head>
+<body>
+
+<!-- NAVIGATION DOTS -->
+<nav class="nav-dots" id="navDots"></nav>
+
+<!-- === HERO === -->
+<section class="hero" id="sec-hero">
+  <div class="float-chars">
+    <span class="float-char" style="top:10%;left:8%;animation-delay:-3s">文</span>
+    <span class="float-char" style="top:60%;left:5%;animation-delay:-7s">化</span>
+    <span class="float-char" style="top:20%;right:10%;animation-delay:-11s">人</span>
+    <span class="float-char" style="top:70%;right:8%;animation-delay:-5s">心</span>
+    <span class="float-char" style="top:40%;left:15%;animation-delay:-15s">身</span>
+    <span class="float-char" style="top:80%;right:20%;animation-delay:-9s">仁</span>
+  </div>
+  <div class="hero-seal">深</div>
+  <h1 class="hero-title">解码中国文化的<br><span class="accent">深层结构</span></h1>
+  <p class="hero-subtitle">孙隆基 的文化解剖学</p>
+  <p class="hero-author">一部用结构主义方法透视中国文化密码的经典之作</p>
+  <div class="hero-scroll" onclick="document.getElementById('sec-intro').scrollIntoView({behavior:'smooth'})">
+    <span>向下探索</span>
+    <div class="arrow"></div>
+  </div>
+</section>
+
+<!-- === INTRO === -->
+<section class="intro" id="sec-intro">
+  <p class="intro-lead reveal">
+    每一种文化都在人的身上写入了一套<span class="hl">程序设计</span>。<br>
+    孙隆基将这套程序称为<span class="hl">"良知系统"</span>——<br>
+    它比宗教更深、比意识形态更广，<br>
+    是一个文化的<span class="hl">最为底层的结构</span>。
+  </p>
+  <div class="divider reveal"><div class="divider-dot"></div></div>
+  <p class="intro-lead reveal" style="font-size:1rem;color:var(--smoke)">
+    本书用结构主义方法，从日常生活的具体细节出发，<br>
+    揭示中国人行为背后共同的"文法"规则——<br>
+    如同语言中千变万化的句子，背后文法结构却是相同的。
+  </p>
+</section>
+
+<!-- === CHAPTER 1: 方法论 === -->
+<section class="chapter" id="sec-method">
+  <div class="bg-pattern"></div>
+  <div class="chapter-inner">
+    <div class="chapter-number">第一层 / LAYER ONE</div>
+    <h2 class="chapter-heading">认知的棱镜</h2>
+    <p class="chapter-desc">
+      任何分析框架都像暗室中的一盏灯——它照亮了某个角落的轮廓，
+      却不可避免地让其他角落陷入黑暗。唯物史观能看到"阶级"，
+      却无法看到跨越阶级的"文化"共性。
+    </p>
+    <div class="quote-block reveal">
+      <p class="quote-text">
+        中国自秦至清这一段长达两千多年的时期，与西方的中世纪，
+        都可以被归入"封建社会"一类。然而，这两个社会的全部内容难道就此说尽了吗？
+        为什么中国的专制是大一统的，而西方是地方分立的？
+        为什么前者的"封建"竟然延续了两千多年？
+      </p>
+      <p class="quote-source">—— 孙隆基《中国文化的深层结构》</p>
+    </div>
+    <div class="concepts-grid">
+      <div class="concept-card">
+        <div class="concept-char">照</div>
+        <div class="concept-title">认知的照明</div>
+        <div class="concept-text">
+          不同的"先定假设"决定了不同的认知意向，如同从不同角度照亮暗室——
+          每次照亮一组轮廓，也必然遮蔽另一组。
+        </div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-char">构</div>
+        <div class="concept-title">结构主义方法</div>
+        <div class="concept-text">
+          不追问"第一因"，而是从现象本身寻找内在关联性——
+          同一个结构在不同领域中的扩散及其形态。
+        </div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-char">法</div>
+        <div class="concept-title">文化的"文法"</div>
+        <div class="concept-text">
+          如同语言中可以造出无穷的句子，但文法结构是相同的——
+          中国人的行为再怎么千变万化，背后有共同的"文法"规则。
+        </div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-char">深</div>
+        <div class="concept-title">深层 vs 表层</div>
+        <div class="concept-text">
+          "表层结构"是变动的表象，"深层结构"是不变的底层逻辑。
+          每一次"革命"可能只是表层的震荡，深层却趋于稳定。
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="hr-ornament">道 可 道 非 常 道</div>
+
+<!-- === CHAPTER 2: 身与心 === -->
+<section class="chapter" id="sec-body-heart">
+  <div class="chapter-inner">
+    <div class="chapter-number">第二层 / LAYER TWO</div>
+    <h2 class="chapter-heading">"身"与"心"——太极的两仪</h2>
+    <p class="chapter-desc">
+      中国文化将"人"分为"身"与"心"。"身"是阴性的、静态的肉体存在；
+      "心"是阳性的、动态的，它必须"出乎己之身、及人之身"，
+      在人与人之间产生感通。
+    </p>
+  </div>
+
+  <div class="diagram-section">
+    <div class="taiji-diagram reveal">
+      <div class="taiji-ring"></div>
+      <div class="taiji-ring"></div>
+      <div class="taiji-ring"></div>
+      <div class="taiji-connector h"></div>
+      <div class="taiji-connector v"></div>
+      <div class="taiji-label top">心 — 阳·动态<br><small style="font-size:0.8rem;opacity:0.6">人伦·道德·情感</small></div>
+      <div class="taiji-label bottom">身 — 阴·静态<br><small style="font-size:0.8rem;opacity:0.6">肉体·饮食·安身</small></div>
+      <div class="taiji-label left">儒家<br><small style="font-size:0.8rem;opacity:0.6">"心学"正统</small></div>
+      <div class="taiji-label right">道家<br><small style="font-size:0.8rem;opacity:0.6">"身学"传统</small></div>
+      <div class="taiji-center">人</div>
+    </div>
+  </div>
+
+  <div class="chapter-inner">
+    <div class="concepts-grid">
+      <div class="concept-card">
+        <div class="concept-char">儒</div>
+        <div class="concept-title">儒家 = 心学</div>
+        <div class="concept-text">
+          儒家是"出乎己之身、及人之身"的心意感通之学。
+          "心"的表现就是人与人之间的互相照顾与关怀，
+          而照顾的对象恰恰是彼此的"身"。
+        </div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-char">道</div>
+        <div class="concept-title">道家 = 身学</div>
+        <div class="concept-text">
+          道家主张"一人"对抗"二人"关系，贡献了
+          房中术、养丹术、养生术。在缺乏个人主义的中国文化中，
+          道家为少数个体提供了有限的超脱方式。
+        </div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-char">养</div>
+        <div class="concept-title">"心"为"身"服务</div>
+        <div class="concept-text">
+          中国人的"心"被引导为"养"之用的仆役——
+          养自己的身体、养老人、养孩子。
+          "心"之活动的主导意向是"安心"，
+          即把心放在另一个"身"上。
+        </div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-char">食</div>
+        <div class="concept-title">民以食为天</div>
+        <div class="concept-text">
+          中国人以"口"来面对世界：吃亏、吃苦、吃得消、吃不开……
+          酷刑与烹调术相关联，"人口"而非"人头"来计算。
+          "有一口饭吃"即太平天下。
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="hr-ornament">仁 者 人 也</div>
+
+<!-- === CHAPTER 3: 二人关系 === -->
+<section class="chapter" id="sec-dyadic">
+  <div class="bg-pattern"></div>
+  <div class="chapter-inner">
+    <div class="chapter-number">第三层 / LAYER THREE</div>
+    <h2 class="chapter-heading">"二人"与"一人"——存在的定义</h2>
+    <p class="chapter-desc">
+      西方存在主义认为，一个人只有从社会角色中抽身，以"自我"为基地进行内省，
+      他的"存在"才开始实现。而中国人认为，"人"只有在社会关系中才能体现——
+      他是所有社会角色的总和。
+    </p>
+
+    <div class="quote-block reveal">
+      <p class="quote-text">
+        "人"，在中文里本身就是一个"二人"字——
+        只有在"二人"的对应关系中，才能对任何一方下定义。
+        传统中国的"五伦"——君臣、父子、夫妇、兄弟、朋友——
+        无不是这种"二人"的定义。
+      </p>
+      <p class="quote-source">—— 孙隆基</p>
+    </div>
+
+    <div class="compare-section" style="padding:2rem 0;max-width:100%">
+      <div class="timeline-title reveal">两种"人"的设计</div>
+      <div class="timeline-subtitle reveal">中西文化对个体存在的根本分歧</div>
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>维度</th>
+            <th>中国文化</th>
+            <th>西方文化</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>人的定义</td>
+            <td>社会角色的总和，由"二人"关系定义</td>
+            <td>独立的"自我"，从角色中抽身内省</td>
+          </tr>
+          <tr>
+            <td>个体状态</td>
+            <td>"孤男寡女"、"孤家寡人"是可悲的</td>
+            <td>独处是反思与自我实现的契机</td>
+          </tr>
+          <tr>
+            <td>天理</td>
+            <td>"仁"——"二人"之间的心意感通</td>
+            <td>"上帝"——超越世间的个人灵魂认同</td>
+          </tr>
+          <tr>
+            <td>成人标志</td>
+            <td>建立家庭、被"人伦"定义</td>
+            <td>自我独立、个体意识觉醒</td>
+          </tr>
+          <tr>
+            <td>利己</td>
+            <td>"自私"——任何自我定义都是不道德的</td>
+            <td>合理的个人权利与边界</td>
+          </tr>
+          <tr>
+            <td>情感表达</td>
+            <td>公式化、渠道化的"做人"方式</td>
+            <td>个体感受的自由抒发</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<div class="hr-ornament">己 所 不 欲 勿 施 於 人</div>
+
+<!-- === CHAPTER 4: 个体的非组织化 === -->
+<section class="chapter" id="sec-individual">
+  <div class="chapter-inner">
+    <div class="chapter-number">第四层 / LAYER FOUR</div>
+    <h2 class="chapter-heading">"人"的非组织化设计</h2>
+    <p class="chapter-desc">
+      中国文化对"人"的设计，使个体无力作自我组织。
+      一个永远停留在温暖胚胎中的"个体"——没有文化上的合法性与自觉性，
+      也谈不上"个人"的自我扩张、自我开展与自我完成。
+    </p>
+  </div>
+
+  <div class="layers-section">
+    <div class="layers-diagram">
+      <div class="layer" onclick="toggleLayer(this)">
+        <div class="layer-label" style="color:var(--vermillion)">非性化</div>
+        <div class="layer-hint">点击展开 &darr;</div>
+        <div class="layer-detail">
+          中国文化的设计使个体在"性"的发展上被系统性地跳过。
+          对待"正经"青少年来说，在生活中整个"生殖器阶段"被压缩甚至略过——
+          不是维多利亚式的"性压抑"（那还建立在对自身欲望的高度知觉上），
+          而是一种更根本的"去性化"：个体甚至不知道自己身上有这个独立的生活意向。
+          "性"不被当作自我探索，而只被当作"安身"与制造人口的服务。
+        </div>
+      </div>
+      <div class="layer" onclick="toggleLayer(this)">
+        <div class="layer-label" style="color:var(--gold)">口腔化倾向</div>
+        <div class="layer-hint">点击展开 &darr;</div>
+        <div class="layer-detail">
+          中国人是以"口"来面对世界的民族。被别人欺负了叫做"吃亏"，
+          受苦叫"吃苦"，撑不住叫"吃不消"，恨到极处是"恨不得把它一口吞下"。
+          酷刑的名称——剐（切肉丝）、醢（剁肉泥）、脍（连骨剁成肉块）、
+          烹（下油锅）——无不与中国式烹调相关。
+          "食"的满足在相当程度上替代了被压制的"性"。
+        </div>
+      </div>
+      <div class="layer" onclick="toggleLayer(this)">
+        <div class="layer-label" style="color:var(--jade)">逆来顺受</div>
+        <div class="layer-hint">点击展开 &darr;</div>
+        <div class="layer-detail">
+          一个与自己身上的"性"失去接触的人，基本上也是与整个"自我"失去接触。
+          这样的人格缺失了对个体"人格"的知觉，养成了"逆来顺受"的倾向。
+          中国人独有的平均主义精神："不敢为天下先"、
+          "一潭死水的生存策略"——将生存意向完全收缩到"身"这个皮囊的保存上。
+        </div>
+      </div>
+      <div class="layer" onclick="toggleLayer(this)">
+        <div class="layer-label" style="color:var(--indigo-light)">自我的缺席</div>
+        <div class="layer-hint">点击展开 &darr;</div>
+        <div class="layer-detail">
+          "人"是一个动态的发展过程——这样的观念在中国文化中是一个陌生之物。
+          中国人的"成长"只是"一人"之"身"的"髀骨渐长大"，
+          以及在"二人"关系中学会如何去"做好人"。
+          每一代对下一代的"教"，都是训练他在渠道化的"二人"关系中
+          不偏不倚地去"做好人"，而关于自己的"自我"——则从不讨论。
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="hr-ornament">天 下 大 势 分 久 必 合</div>
+
+<!-- === CHAPTER 5: 超稳定体系 === -->
+<section class="chapter" id="sec-cycle">
+  <div class="bg-pattern"></div>
+  <div class="chapter-inner">
+    <div class="chapter-number">第五层 / LAYER FIVE</div>
+    <h2 class="chapter-heading">"超稳定体系"——循环的宿命</h2>
+    <p class="chapter-desc">
+      在中国历史上，每一次"动"都不是一次"进步"，而是一场"乱"。
+      铲平主义与专制主义互为表里、双管齐进——
+      老百姓越平均，头上的国家就越专制。
+    </p>
+  </div>
+
+  <div class="cycle-section">
+    <div class="cycle-diagram reveal">
+      <div class="cycle-node">天下大乱<small>社会失序</small></div>
+      <div class="cycle-node">揭竿而起<small>农民战争</small></div>
+      <div class="cycle-node">天下大治<small>重建一统</small></div>
+      <div class="cycle-node">铲平主义<small>均贫富·专制</small></div>
+      <div class="cycle-arrows"></div>
+      <div class="cycle-center-text">超稳定</div>
+    </div>
+  </div>
+
+  <div class="chapter-inner">
+    <div class="quote-block reveal">
+      <p class="quote-text">
+        中国历代的农民战争其实都是"打乱"。
+        因此并不能用西方阶级斗争史的模式去套，
+        将它们说成是推动历史前进的动力。
+        恰恰相反，每一次农民战争的结果都是使社会越来越平均化——
+        而社会越平均，压在头上的国家就越专制。
+      </p>
+      <p class="quote-source">—— 孙隆基</p>
+    </div>
+  </div>
+
+  <div class="timeline-section">
+    <div class="timeline-title reveal">结构的循环</div>
+    <div class="timeline-subtitle reveal">从秦到共和国——深层结构的不变</div>
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-content">
+          <div class="timeline-dot"></div>
+          <div class="timeline-era">秦 — 一统天下</div>
+          <div class="timeline-text">中央集权专制主义的开端。"平天下"的理想第一次以国家机器的形式实现。</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-content">
+          <div class="timeline-dot"></div>
+          <div class="timeline-era">汉唐 — 世族地主</div>
+          <div class="timeline-text">尚有世族门阀制衡皇权。科举尚未成为唯一上升通道，社会尚存一定的多元性。</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-content">
+          <div class="timeline-dot"></div>
+          <div class="timeline-era">宋 — 平民社会</div>
+          <div class="timeline-text">世族地主基本消失，科举成为唯一进身之阶。社会越来越"平"，国家专制亦同步强化。</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-content">
+          <div class="timeline-dot"></div>
+          <div class="timeline-era">明清 — 专制巅峰</div>
+          <div class="timeline-text">专制主义达到传统水平的完善状态。社会上基本呈现"没有大富大贫之分"的格局。</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-content">
+          <div class="timeline-dot"></div>
+          <div class="timeline-era">现代 — 革命的悖论</div>
+          <div class="timeline-text">
+            土改铲平了最后的阶层差异，"铁饭碗"使人人一样。
+            专制在组织与集权方面达到史无前例的水平——
+            "表层结构"剧变，"深层结构"趋于更加稳定。
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="hr-ornament">国 家 与 社 会</div>
+
+<!-- === CHAPTER 6: 国家与社会 === -->
+<section class="chapter" id="sec-state">
+  <div class="chapter-inner">
+    <div class="chapter-number">第六层 / LAYER SIX</div>
+    <h2 class="chapter-heading">国家与社会——"心"对"身"的组织</h2>
+    <p class="chapter-desc">
+      中国社会是一个无力作自我组织、必须由国家去组织之物。
+      正如个人的"身"必须由他人的"心"去组织一样——
+      国家是"心"，社会是无力自主的"身"。
+    </p>
+
+    <div class="concepts-grid">
+      <div class="concept-card">
+        <div class="concept-char">养</div>
+        <div class="concept-title">"仁政"的逻辑</div>
+        <div class="concept-text">
+          "为政"就是对人民的"养"与"教"。
+          好政府让百姓"皆有所养"，
+          用"教化"使天下达到"鸡犬不惊"的安定状态。
+          所谓"解民于倒悬"，就是把百姓的"身"从痛苦中解下来。
+        </div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-char">散</div>
+        <div class="concept-title">"一盘散沙"</div>
+        <div class="concept-text">
+          一旦国家控制松动，社会立即陷入分崩离析。
+          老百姓的"人心"最多导致"爱国主义"与"统一运动"，
+          而不能导致"个人"权利之确立。
+          社群之间也只能是"一盘散沙"的状态。
+        </div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-char">封</div>
+        <div class="concept-title">空间有极限</div>
+        <div class="concept-text">
+          这个"超稳定"的天下必须将空间视为有限的——
+          如果空间不断延伸至无限，就必然会筑一道人为的长城，
+          以此为界将自己封锁起来。
+          "镇止民心"的意向排斥一切外来的"违风"。
+        </div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-char">均</div>
+        <div class="concept-title">铲平主义</div>
+        <div class="concept-text">
+          "我出不了头，你也不要出头"——
+          中国式的铲平主义并非为了公平，而是为了特权化。
+          "只许州官放火，不准百姓点灯"。
+          平等的实质是：所有人在专制者面前一样渺小。
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="hr-ornament">知 己 知 彼</div>
+
+<!-- === CHAPTER 7: 核心洞见 === -->
+<section class="chapter" id="sec-insights">
+  <div class="bg-pattern"></div>
+  <div class="chapter-inner">
+    <div class="chapter-number">终章 / EPILOGUE</div>
+    <h2 class="chapter-heading">孙隆基的核心洞见</h2>
+    <p class="chapter-desc">
+      这本书不是一份控诉书，而是一次"硬心肠的"自我反省——
+      将思考判断的功能从脑部中层上升到大脑皮层左半部。
+      以下是贯穿全书的关键命题。
+    </p>
+  </div>
+
+  <div class="insights-section">
+    <div class="insights-grid">
+      <div class="insight-card">
+        <div class="insight-icon" style="color:var(--vermillion)">&#9670;</div>
+        <div class="insight-title">文化密码写在"身"上</div>
+        <div class="insight-text">
+          中国文化对"人"的设计，其本质是在每一个人的"身"上编写文化密码。
+          要理解中国文化，就必须将这些密码逐件拆下来——
+          这个"非结构化"牵涉到整个人的自觉的重组。
+        </div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-icon" style="color:var(--gold)">&#9670;</div>
+        <div class="insight-title">"现代化"未必改变深层</div>
+        <div class="insight-text">
+          香港是最"现代化"的中国人社会，然而中国人对"食"的热衷，
+          是到了"现代化"才获得空前发扬。经济发展可以改变"表层结构"，
+          但"深层结构"可能纹丝不动，甚至借新条件获得强化。
+        </div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-icon" style="color:var(--jade)">&#9670;</div>
+        <div class="insight-title">安身 + 安心 = 反冒险</div>
+        <div class="insight-text">
+          对"安身"与"安心"的过分要求，压制了个人冒险进取的意向。
+          中国人从未横渡太平洋去发现新大陆——
+          如果做类似的事，要么是出于宗教狂热，要么是为了将光荣归于集体。
+        </div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-icon" style="color:var(--indigo-light)">&#9670;</div>
+        <div class="insight-title">个体 = 尚未诞生</div>
+        <div class="insight-text">
+          中国人的"个体"永远处于温暖的胚胎中，
+          没有文化上的合法性与自觉性。
+          "人"作为一个动态的发展过程——
+          这样的观念在中国文化中是一个陌生之物。
+        </div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-icon" style="color:var(--vermillion)">&#9670;</div>
+        <div class="insight-title">统治者与被统治者共谋</div>
+        <div class="insight-text">
+          铲平主义与专制主义是互相扶携、双管齐进的。
+          朱元璋以农民身份得了天下，
+          转身就将开国功臣杀得一干二净——
+          统治者与造反者使用同一套文化行为模式。
+        </div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-icon" style="color:var(--gold)">&#9670;</div>
+        <div class="insight-title">反生命的文明</div>
+        <div class="insight-text">
+          在别人表现自己的地方，中国人总是自我否定；
+          在别人发展自我的场合，中国人总是自我铲平。
+          别人都在养人才，唯独中国人会去铲掉自己的人才。
+          世界都在发展"情报网"，只有中国人对自己最不好。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chapter-inner" style="padding-top:2rem">
+    <div class="quote-block reveal">
+      <p class="quote-text">
+        不能"现代化"与否，中国"人"被设计的方式是否根本上有问题？
+        ——这是一个更基本的考虑。
+      </p>
+      <p class="quote-source">—— 孙隆基，1983年于纽约</p>
+    </div>
+  </div>
+</section>
+
+<!-- === FOOTER === -->
+<footer class="footer" id="sec-footer">
+  <div class="footer-book">《中国文化的深层结构》</div>
+  <p class="footer-text">
+    作者：孙隆基<br>
+    本页面基于原著内容制作，旨在以视觉化方式呈现书中核心思想<br>
+    鼓励读者阅读原著，获得完整的思考体验
+  </p>
+</footer>
+
+<script>
+// === SCROLL REVEAL ===
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+
+document.querySelectorAll('.reveal, .concept-card, .timeline-item, .compare-table tr, .insight-card, .chapter').forEach(el => {
+  observer.observe(el);
+});
+
+// Stagger concept cards
+document.querySelectorAll('.concepts-grid').forEach(grid => {
+  grid.querySelectorAll('.concept-card').forEach((card, i) => {
+    card.style.transitionDelay = `${i * 0.12}s`;
+  });
+});
+
+// Stagger insight cards
+document.querySelectorAll('.insight-card').forEach((card, i) => {
+  card.style.transitionDelay = `${i * 0.1}s`;
+});
+
+// Stagger table rows
+document.querySelectorAll('.compare-table tr').forEach((row, i) => {
+  row.style.transitionDelay = `${i * 0.08}s`;
+});
+
+// Stagger timeline items
+document.querySelectorAll('.timeline-item').forEach((item, i) => {
+  item.style.transitionDelay = `${i * 0.15}s`;
+});
+
+// === LAYER TOGGLE ===
+function toggleLayer(el) {
+  const wasActive = el.classList.contains('active');
+  document.querySelectorAll('.layer').forEach(l => l.classList.remove('active'));
+  if (!wasActive) el.classList.add('active');
+}
+
+// === NAVIGATION DOTS ===
+const sections = [
+  { id: 'sec-hero', label: '首页' },
+  { id: 'sec-intro', label: '引言' },
+  { id: 'sec-method', label: '认知棱镜' },
+  { id: 'sec-body-heart', label: '身与心' },
+  { id: 'sec-dyadic', label: '二人关系' },
+  { id: 'sec-individual', label: '个体设计' },
+  { id: 'sec-cycle', label: '超稳定体系' },
+  { id: 'sec-state', label: '国家与社会' },
+  { id: 'sec-insights', label: '核心洞见' },
+];
+
+const navContainer = document.getElementById('navDots');
+sections.forEach(s => {
+  const dot = document.createElement('div');
+  dot.className = 'nav-dot';
+  dot.innerHTML = `<span class="nav-tooltip">${s.label}</span>`;
+  dot.addEventListener('click', () => {
+    document.getElementById(s.id).scrollIntoView({ behavior: 'smooth' });
+  });
+  dot.dataset.section = s.id;
+  navContainer.appendChild(dot);
+});
+
+// Active dot tracking
+const sectionEls = sections.map(s => document.getElementById(s.id));
+const dotEls = navContainer.querySelectorAll('.nav-dot');
+
+const navObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const idx = sectionEls.indexOf(entry.target);
+      dotEls.forEach((d, i) => d.classList.toggle('active', i === idx));
+    }
+  });
+}, { threshold: 0.3 });
+
+sectionEls.forEach(el => { if (el) navObserver.observe(el); });
+</script>
+
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"75124c326cb447fe934cde04713ae013","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>

@@ -835,6 +835,13 @@ function applyHtmlLanguage() {
   document.documentElement.dir = RTL_LANGS.has(currentLanguage) ? "rtl" : "ltr";
 }
 
+function syncLanguageCookie(lang) {
+  try {
+    const normalized = normalizeLanguage(lang) || "en-US";
+    document.cookie = `reado_lang=${encodeURIComponent(normalized)}; Path=/; Max-Age=31536000; SameSite=Lax`;
+  } catch {}
+}
+
 export function listLanguages() {
   return LANGUAGES.slice();
 }
@@ -857,6 +864,7 @@ export function setLanguage(nextLang) {
     localStorage.setItem(LANGUAGE_EXPLICIT_KEY, "1");
   } catch {}
   applyHtmlLanguage();
+  syncLanguageCookie(normalized);
   for (const cb of listeners) {
     try {
       cb(normalized);
@@ -896,6 +904,7 @@ export function initReadoI18n() {
   window.__READO_I18N_READY__ = true;
   currentLanguage = detectLanguage();
   applyHtmlLanguage();
+  syncLanguageCookie(currentLanguage);
 }
 
 initReadoI18n();

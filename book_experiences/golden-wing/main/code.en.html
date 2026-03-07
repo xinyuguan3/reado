@@ -1,0 +1,1777 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>金翼 — 中国家族命运的社会学图鉴</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=ZCOOL+XiaoWei&family=Ma+Shan+Zheng&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+/* --- SKELETON: styles will be filled via Edit --- */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --ink: #1a1410;
+  --paper: #f4ede4;
+  --paper-dark: #e8ddd0;
+  --accent: #b44a2f;
+  --accent-light: #d4886e;
+  --gold: #c49a3c;
+  --gold-light: #e8d5a0;
+  --jade: #4a7c6f;
+  --jade-light: #8db8a8;
+  --river: #3a6b8c;
+  --river-light: #7bacc8;
+  --shadow: rgba(26,20,16,0.12);
+  --font-display: 'Ma Shan Zheng', cursive;
+  --font-serif: 'Noto Serif SC', serif;
+  --font-artistic: 'ZCOOL XiaoWei', serif;
+  --font-body: 'Noto Sans SC', sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* --- HERO SECTION --- */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--ink);
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.hero-bg .mountain {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 70%;
+}
+
+.mountain-layer {
+  position: absolute;
+  bottom: 0;
+  width: 120%;
+  left: -10%;
+}
+
+.mountain-layer.m1 {
+  height: 55%;
+  background: linear-gradient(175deg, transparent 30%, #1e2a1f 30.1%, #2a3d2c 60%, #1e2a1f);
+  clip-path: polygon(0% 100%, 5% 65%, 12% 55%, 20% 40%, 28% 50%, 35% 30%, 42% 45%, 50% 25%, 58% 38%, 65% 20%, 72% 35%, 78% 28%, 85% 42%, 92% 30%, 100% 50%, 100% 100%);
+  opacity: 0.5;
+}
+
+.mountain-layer.m2 {
+  height: 45%;
+  background: linear-gradient(170deg, transparent 20%, #2a3d2c 20.1%, #3a5e40 70%, #2a3d2c);
+  clip-path: polygon(0% 100%, 3% 70%, 10% 55%, 18% 65%, 25% 45%, 33% 55%, 40% 35%, 48% 50%, 55% 30%, 62% 45%, 70% 38%, 78% 52%, 85% 40%, 93% 55%, 100% 45%, 100% 100%);
+  opacity: 0.6;
+}
+
+.mountain-layer.m3 {
+  height: 32%;
+  background: linear-gradient(165deg, #3a5e40, #4a7c5a 50%, #3a5e40);
+  clip-path: polygon(0% 100%, 5% 60%, 15% 50%, 25% 65%, 35% 45%, 45% 55%, 55% 40%, 65% 55%, 75% 42%, 85% 58%, 95% 48%, 100% 60%, 100% 100%);
+  opacity: 0.4;
+}
+
+.hero-river {
+  position: absolute;
+  bottom: 5%;
+  left: 0; right: 0;
+  height: 8%;
+  background: linear-gradient(90deg, transparent, rgba(58,107,140,0.3) 20%, rgba(58,107,140,0.5) 50%, rgba(58,107,140,0.3) 80%, transparent);
+  animation: riverFlow 8s ease-in-out infinite;
+}
+
+@keyframes riverFlow {
+  0%,100% { transform: translateX(-2%); opacity: 0.6; }
+  50% { transform: translateX(2%); opacity: 0.8; }
+}
+
+.hero-mist {
+  position: absolute;
+  bottom: 15%;
+  left: 0; right: 0;
+  height: 30%;
+  background: linear-gradient(to top, rgba(244,237,228,0.08), transparent);
+  animation: mistFloat 12s ease-in-out infinite;
+}
+
+@keyframes mistFloat {
+  0%,100% { opacity: 0.4; transform: translateY(0); }
+  50% { opacity: 0.7; transform: translateY(-10px); }
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 2rem;
+}
+
+.hero-stamp {
+  display: inline-block;
+  width: 80px;
+  height: 80px;
+  border: 3px solid var(--accent);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 2rem;
+  transform: rotate(-8deg);
+  opacity: 0;
+  animation: stampIn 1s 0.5s ease-out forwards;
+}
+
+.hero-stamp span {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  color: var(--accent);
+  line-height: 1;
+}
+
+@keyframes stampIn {
+  0% { opacity: 0; transform: rotate(-8deg) scale(2); }
+  60% { opacity: 1; transform: rotate(-8deg) scale(0.95); }
+  100% { opacity: 1; transform: rotate(-8deg) scale(1); }
+}
+
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(4rem, 12vw, 9rem);
+  color: var(--paper);
+  letter-spacing: 0.15em;
+  line-height: 1.1;
+  opacity: 0;
+  animation: titleReveal 1.2s 0.8s ease-out forwards;
+  text-shadow: 0 0 60px rgba(196,154,60,0.3);
+}
+
+@keyframes titleReveal {
+  0% { opacity: 0; transform: translateY(30px); letter-spacing: 0.4em; }
+  100% { opacity: 1; transform: translateY(0); letter-spacing: 0.15em; }
+}
+
+.hero-subtitle {
+  font-family: var(--font-serif);
+  font-size: clamp(0.95rem, 2vw, 1.3rem);
+  color: var(--gold-light);
+  margin-top: 1.5rem;
+  letter-spacing: 0.2em;
+  font-weight: 400;
+  opacity: 0;
+  animation: fadeUp 1s 1.4s ease-out forwards;
+}
+
+.hero-meta {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: rgba(244,237,228,0.5);
+  margin-top: 1rem;
+  letter-spacing: 0.1em;
+  opacity: 0;
+  animation: fadeUp 1s 1.8s ease-out forwards;
+}
+
+@keyframes fadeUp {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.hero-scroll {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  opacity: 0;
+  animation: fadeUp 1s 2.5s ease-out forwards;
+}
+
+.hero-scroll span {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  color: rgba(244,237,228,0.4);
+  letter-spacing: 0.15em;
+  margin-bottom: 0.5rem;
+}
+
+.scroll-line {
+  width: 1px;
+  height: 40px;
+  background: linear-gradient(to bottom, var(--gold), transparent);
+  margin: 0 auto;
+  animation: scrollPulse 2s ease-in-out infinite;
+}
+
+@keyframes scrollPulse {
+  0%,100% { transform: scaleY(1); opacity: 0.6; }
+  50% { transform: scaleY(1.3); opacity: 1; }
+}
+
+/* --- NAVIGATION --- */
+.nav-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 0.8rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(244,237,228,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(26,20,16,0.08);
+  transform: translateY(-100%);
+  transition: transform 0.4s ease;
+}
+
+.nav-bar.visible { transform: translateY(0); }
+
+.nav-logo {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--ink);
+}
+
+.nav-links {
+  display: flex;
+  gap: 1.5rem;
+  list-style: none;
+}
+
+.nav-links a {
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  color: var(--ink);
+  text-decoration: none;
+  letter-spacing: 0.08em;
+  opacity: 0.6;
+  transition: opacity 0.3s;
+  font-weight: 500;
+}
+
+.nav-links a:hover, .nav-links a.active { opacity: 1; color: var(--accent); }
+
+/* --- SECTION COMMON --- */
+.section {
+  padding: 6rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.section-label {
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 500;
+  margin-bottom: 0.8rem;
+}
+
+.section-title {
+  font-family: var(--font-artistic);
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  color: var(--ink);
+  line-height: 1.3;
+  margin-bottom: 1.5rem;
+}
+
+.section-desc {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  line-height: 2;
+  color: rgba(26,20,16,0.75);
+  max-width: 680px;
+}
+
+/* --- INTRO SECTION --- */
+.intro {
+  padding: 8rem 2rem;
+  text-align: center;
+  position: relative;
+}
+
+.intro::before {
+  content: '';
+  position: absolute;
+  top: 3rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1px;
+  height: 60px;
+  background: linear-gradient(to bottom, transparent, var(--gold));
+}
+
+.intro .section-desc {
+  margin: 0 auto;
+  text-align: center;
+}
+
+.intro-quote {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 3.5vw, 2.5rem);
+  color: var(--ink);
+  margin: 3rem auto 1.5rem;
+  max-width: 700px;
+  line-height: 1.6;
+  position: relative;
+}
+
+.intro-quote::before {
+  content: '\201C';
+  position: absolute;
+  top: -0.5em;
+  left: -0.5em;
+  font-size: 4em;
+  color: var(--gold-light);
+  opacity: 0.4;
+  font-family: var(--font-serif);
+  line-height: 1;
+}
+
+.intro-attr {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+}
+
+/* --- CORE CONCEPT: BALANCE DIAGRAM --- */
+.balance-section {
+  padding: 6rem 2rem;
+  background: var(--ink);
+  color: var(--paper);
+  position: relative;
+  overflow: hidden;
+}
+
+.balance-section::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold) 50%, transparent);
+}
+
+.balance-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.balance-section .section-label { color: var(--gold); }
+.balance-section .section-title { color: var(--paper); }
+.balance-section .section-desc { color: rgba(244,237,228,0.7); margin: 0 auto 3rem; text-align: center; }
+
+.balance-diagram {
+  position: relative;
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 3rem 0;
+}
+
+.balance-visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.balance-node {
+  width: 160px;
+  padding: 1.5rem 1rem;
+  border: 1px solid rgba(244,237,228,0.15);
+  border-radius: 12px;
+  background: rgba(244,237,228,0.04);
+  transition: all 0.4s ease;
+  cursor: default;
+}
+
+.balance-node:hover {
+  border-color: var(--gold);
+  background: rgba(196,154,60,0.08);
+  transform: translateY(-4px);
+}
+
+.balance-node .bn-icon {
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.balance-node .bn-label {
+  font-family: var(--font-artistic);
+  font-size: 1.1rem;
+  color: var(--paper);
+  margin-bottom: 0.3rem;
+}
+
+.balance-node .bn-desc {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  color: rgba(244,237,228,0.5);
+  line-height: 1.5;
+}
+
+.balance-connector {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--gold);
+  opacity: 0.5;
+}
+
+/* --- FAMILY COMPARISON --- */
+.families {
+  padding: 6rem 2rem 4rem;
+}
+
+.families-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.families-header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.families-header .section-desc { margin: 0 auto; text-align: center; }
+
+.family-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+@media (max-width: 768px) {
+  .family-cards { grid-template-columns: 1fr; }
+}
+
+.family-card {
+  border-radius: 16px;
+  padding: 2.5rem;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.4s ease;
+}
+
+.family-card:hover { transform: translateY(-4px); }
+
+.family-card.huang {
+  background: linear-gradient(145deg, #2a3d2c, #1e2a1f);
+  color: var(--paper);
+}
+
+.family-card.zhang {
+  background: linear-gradient(145deg, #3a2a20, #2a1a14);
+  color: var(--paper);
+}
+
+.family-card::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 120px; height: 120px;
+  border-radius: 0 16px 0 100%;
+  opacity: 0.08;
+}
+
+.family-card.huang::before { background: var(--gold); }
+.family-card.zhang::before { background: var(--accent); }
+
+.fc-symbol {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.fc-name {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  margin-bottom: 0.3rem;
+}
+
+.fc-role {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  opacity: 0.5;
+  margin-bottom: 1.5rem;
+}
+
+.fc-traits {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.fc-traits li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-family: var(--font-serif);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  opacity: 0.85;
+}
+
+.fc-traits .trait-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-top: 0.5em;
+  flex-shrink: 0;
+}
+
+.huang .trait-dot { background: var(--gold); }
+.zhang .trait-dot { background: var(--accent-light); }
+
+.fc-fate {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(244,237,228,0.1);
+}
+
+.fc-fate-label {
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  opacity: 0.4;
+  margin-bottom: 0.5rem;
+}
+
+.fc-fate-text {
+  font-family: var(--font-artistic);
+  font-size: 1.15rem;
+  line-height: 1.6;
+}
+
+.fc-fate-bar {
+  margin-top: 1rem;
+  height: 3px;
+  border-radius: 2px;
+  overflow: hidden;
+  background: rgba(244,237,228,0.08);
+}
+
+.fc-fate-bar .bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 1.5s ease;
+}
+
+.huang .bar-fill { background: linear-gradient(90deg, var(--gold), var(--jade-light)); width: 0; }
+.zhang .bar-fill { background: linear-gradient(90deg, var(--accent), var(--accent-light)); width: 0; }
+
+.huang .bar-fill.animated { width: 90%; }
+.zhang .bar-fill.animated { width: 25%; }
+
+/* --- TIMELINE --- */
+.timeline-section {
+  padding: 6rem 2rem;
+  position: relative;
+}
+
+.timeline-section .section-label, .timeline-section .section-title {
+  text-align: center;
+}
+
+.timeline-section .section-desc {
+  text-align: center;
+  margin: 0 auto 4rem;
+}
+
+.timeline {
+  position: relative;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, transparent, var(--gold) 10%, var(--gold) 90%, transparent);
+  transform: translateX(-50%);
+}
+
+@media (max-width: 768px) {
+  .timeline::before { left: 20px; }
+}
+
+.tl-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 3rem;
+  position: relative;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.6s ease;
+}
+
+.tl-item.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.tl-item:nth-child(odd) { flex-direction: row; }
+.tl-item:nth-child(even) { flex-direction: row-reverse; }
+
+.tl-dot {
+  position: absolute;
+  left: 50%;
+  top: 0.5rem;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--paper);
+  border: 3px solid var(--gold);
+  transform: translateX(-50%);
+  z-index: 2;
+  transition: all 0.3s ease;
+}
+
+.tl-item:hover .tl-dot { background: var(--gold); transform: translateX(-50%) scale(1.3); }
+
+@media (max-width: 768px) {
+  .tl-dot { left: 20px; }
+  .tl-item, .tl-item:nth-child(even) { flex-direction: row; padding-left: 50px; }
+}
+
+.tl-content {
+  width: 42%;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 20px var(--shadow);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tl-content:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(26,20,16,0.15);
+}
+
+@media (max-width: 768px) {
+  .tl-content { width: 100%; }
+}
+
+.tl-item:nth-child(odd) .tl-content { margin-right: auto; }
+.tl-item:nth-child(even) .tl-content { margin-left: auto; }
+
+@media (max-width: 768px) {
+  .tl-item:nth-child(odd) .tl-content,
+  .tl-item:nth-child(even) .tl-content { margin-left: 0; margin-right: 0; }
+}
+
+.tl-year {
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+  margin-bottom: 0.3rem;
+}
+
+.tl-title {
+  font-family: var(--font-artistic);
+  font-size: 1.15rem;
+  margin-bottom: 0.5rem;
+  color: var(--ink);
+}
+
+.tl-text {
+  font-family: var(--font-serif);
+  font-size: 0.85rem;
+  line-height: 1.8;
+  color: rgba(26,20,16,0.65);
+}
+
+.tl-tag {
+  display: inline-block;
+  margin-top: 0.8rem;
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  padding: 0.25rem 0.6rem;
+  border-radius: 20px;
+  font-weight: 500;
+}
+
+.tl-tag.rise { background: rgba(74,124,111,0.1); color: var(--jade); }
+.tl-tag.fall { background: rgba(180,74,47,0.1); color: var(--accent); }
+.tl-tag.event { background: rgba(196,154,60,0.1); color: var(--gold); }
+.tl-tag.ritual { background: rgba(58,107,140,0.1); color: var(--river); }
+
+/* --- RITUALS GRID --- */
+.rituals-section {
+  padding: 6rem 2rem;
+  background: linear-gradient(180deg, var(--paper), var(--paper-dark));
+}
+
+.rituals-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.rituals-header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.rituals-header .section-desc { margin: 0 auto; text-align: center; }
+
+.rituals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.ritual-card {
+  background: white;
+  border-radius: 14px;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s ease;
+  cursor: default;
+  border: 1px solid rgba(26,20,16,0.04);
+}
+
+.ritual-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 40px rgba(26,20,16,0.1);
+}
+
+.ritual-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--gold);
+  transform: scaleX(0);
+  transition: transform 0.4s ease;
+}
+
+.ritual-card:hover::after { transform: scaleX(1); }
+
+.rc-icon {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.rc-category {
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 500;
+  margin-bottom: 0.4rem;
+}
+
+.rc-name {
+  font-family: var(--font-artistic);
+  font-size: 1.25rem;
+  color: var(--ink);
+  margin-bottom: 0.8rem;
+}
+
+.rc-desc {
+  font-family: var(--font-serif);
+  font-size: 0.85rem;
+  line-height: 1.8;
+  color: rgba(26,20,16,0.6);
+}
+
+.rc-symbol {
+  margin-top: 1rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid rgba(26,20,16,0.06);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  color: var(--jade);
+  font-weight: 500;
+}
+
+/* --- SOCIAL NETWORK SECTION --- */
+.network-section {
+  padding: 6rem 2rem;
+  background: var(--ink);
+  color: var(--paper);
+  position: relative;
+}
+
+.network-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.network-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.network-section .section-label { color: var(--gold); }
+.network-section .section-title { color: var(--paper); }
+.network-section .section-desc { color: rgba(244,237,228,0.7); margin: 0 auto; text-align: center; }
+
+.network-canvas {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  margin: 3rem auto 0;
+  aspect-ratio: 4/3;
+}
+
+.network-canvas svg {
+  width: 100%;
+  height: 100%;
+}
+
+.net-node {
+  cursor: default;
+  transition: all 0.3s ease;
+}
+
+.net-node:hover circle { r: 28; }
+.net-node text { font-family: 'Noto Sans SC', sans-serif; pointer-events: none; }
+
+.net-line {
+  stroke: rgba(244,237,228,0.12);
+  stroke-width: 1;
+  transition: stroke 0.3s ease;
+}
+
+.net-legend {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+
+.net-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  color: rgba(244,237,228,0.5);
+}
+
+.net-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+/* --- ECONOMIC FLOW --- */
+.economy-section {
+  padding: 6rem 2rem;
+}
+
+.economy-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.economy-header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.economy-header .section-desc { margin: 0 auto; text-align: center; }
+
+.econ-flow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 3rem;
+}
+
+.econ-node {
+  text-align: center;
+  padding: 1.5rem 1.2rem;
+  border-radius: 12px;
+  background: white;
+  border: 1px solid rgba(26,20,16,0.06);
+  min-width: 110px;
+  transition: all 0.3s ease;
+}
+
+.econ-node:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 20px var(--shadow);
+}
+
+.econ-node .en-icon { font-size: 1.8rem; margin-bottom: 0.5rem; }
+
+.econ-node .en-label {
+  font-family: var(--font-artistic);
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+
+.econ-node .en-sub {
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  color: rgba(26,20,16,0.4);
+  margin-top: 0.2rem;
+}
+
+.econ-arrow {
+  font-size: 1.2rem;
+  color: var(--gold);
+  opacity: 0.5;
+}
+
+.econ-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.5rem;
+}
+
+.econ-detail {
+  padding: 1.5rem;
+  border-left: 3px solid var(--gold);
+  background: rgba(196,154,60,0.04);
+  border-radius: 0 8px 8px 0;
+}
+
+.econ-detail h4 {
+  font-family: var(--font-artistic);
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.econ-detail p {
+  font-family: var(--font-serif);
+  font-size: 0.82rem;
+  line-height: 1.8;
+  color: rgba(26,20,16,0.6);
+}
+
+/* --- LAND SYSTEM --- */
+.land-section {
+  padding: 6rem 2rem;
+  background: linear-gradient(180deg, var(--paper-dark), var(--paper));
+}
+
+.land-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.land-diagram {
+  margin: 3rem auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  max-width: 500px;
+}
+
+.land-layer {
+  padding: 1.5rem 2rem;
+  position: relative;
+  text-align: left;
+  border-left: 3px solid;
+  transition: all 0.3s ease;
+}
+
+.land-layer:hover { transform: translateX(8px); }
+
+.land-layer.l1 {
+  border-color: var(--accent);
+  background: linear-gradient(90deg, rgba(180,74,47,0.06), transparent);
+}
+
+.land-layer.l2 {
+  border-color: var(--gold);
+  background: linear-gradient(90deg, rgba(196,154,60,0.06), transparent);
+}
+
+.land-layer.l3 {
+  border-color: var(--jade);
+  background: linear-gradient(90deg, rgba(74,124,111,0.06), transparent);
+}
+
+.ll-title {
+  font-family: var(--font-artistic);
+  font-size: 1.1rem;
+  margin-bottom: 0.3rem;
+}
+
+.ll-share {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.l1 .ll-share { color: var(--accent); }
+.l2 .ll-share { color: var(--gold); }
+.l3 .ll-share { color: var(--jade); }
+
+.ll-desc {
+  font-family: var(--font-serif);
+  font-size: 0.82rem;
+  color: rgba(26,20,16,0.55);
+  margin-top: 0.3rem;
+  line-height: 1.6;
+}
+
+/* --- INSIGHTS / CONCLUSION --- */
+.insights-section {
+  padding: 8rem 2rem;
+  background: var(--ink);
+  color: var(--paper);
+  text-align: center;
+  position: relative;
+}
+
+.insights-section::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold) 50%, transparent);
+}
+
+.insights-inner {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.insights-section .section-label { color: var(--gold); }
+
+.insight-quote {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 3.5vw, 2.6rem);
+  line-height: 1.6;
+  color: var(--paper);
+  margin: 2rem 0;
+  position: relative;
+}
+
+.insight-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin-top: 4rem;
+  text-align: left;
+}
+
+.insight-card {
+  padding: 1.8rem;
+  border: 1px solid rgba(244,237,228,0.1);
+  border-radius: 12px;
+  transition: all 0.4s ease;
+}
+
+.insight-card:hover {
+  border-color: var(--gold);
+  background: rgba(196,154,60,0.05);
+}
+
+.ic-num {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: var(--gold);
+  opacity: 0.4;
+  margin-bottom: 0.5rem;
+}
+
+.ic-title {
+  font-family: var(--font-artistic);
+  font-size: 1.1rem;
+  color: var(--paper);
+  margin-bottom: 0.5rem;
+}
+
+.ic-text {
+  font-family: var(--font-serif);
+  font-size: 0.82rem;
+  line-height: 1.8;
+  color: rgba(244,237,228,0.55);
+}
+
+/* --- FOOTER --- */
+.footer {
+  padding: 3rem 2rem;
+  background: var(--ink);
+  border-top: 1px solid rgba(244,237,228,0.06);
+  text-align: center;
+}
+
+.footer p {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  color: rgba(244,237,228,0.3);
+  line-height: 1.8;
+}
+
+.footer .footer-title {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  color: rgba(244,237,228,0.15);
+  margin-bottom: 0.5rem;
+}
+
+/* --- ANIMATIONS ON SCROLL --- */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+.reveal-delay-5 { transition-delay: 0.5s; }
+</style>
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav class="nav-bar" id="navbar">
+  <div class="nav-logo">金翼</div>
+  <ul class="nav-links">
+    <li><a href="#intro">缘起</a></li>
+    <li><a href="#families">两族</a></li>
+    <li><a href="#timeline">兴衰</a></li>
+    <li><a href="#rituals">礼俗</a></li>
+    <li><a href="#network">关系网</a></li>
+    <li><a href="#economy">经济</a></li>
+    <li><a href="#insights">启示</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg">
+    <div class="mountain">
+      <div class="mountain-layer m1"></div>
+      <div class="mountain-layer m2"></div>
+      <div class="mountain-layer m3"></div>
+    </div>
+    <div class="hero-river"></div>
+    <div class="hero-mist"></div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-stamp"><span>林</span></div>
+    <h1 class="hero-title">金翼</h1>
+    <p class="hero-subtitle">中国家族制度的社会学研究</p>
+    <p class="hero-meta">林耀华 著 &middot; 1944年初版 &middot; 福建乡村田野调查</p>
+  </div>
+  <div class="hero-scroll">
+    <span>向下探索</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- INTRO -->
+<section class="intro" id="intro">
+  <div class="section-label reveal">关于这本书</div>
+  <div class="section-title reveal reveal-delay-1">一部用小说写成的社会学经典</div>
+  <div class="section-desc reveal reveal-delay-2">
+    1934年冬，社会学家林耀华回到福建故乡，发现两个曾经门当户对的家族——黄家与张家——在短短二十余年间走向了截然不同的命运。一家兴旺发达、子孙满堂；另一家却衰败凋零、几近消亡。是什么力量决定了家族的沉浮？这不是"风水"，而是人际关系的网络——那根由习俗、责任、感情和欲望编织的无形之网。
+  </div>
+  <div class="intro-quote reveal reveal-delay-3">
+    人类生活就是在平衡与失调、均衡与不均衡之间摆动
+  </div>
+  <div class="intro-attr reveal reveal-delay-4">—— 林耀华</div>
+</section>
+
+<!-- CORE CONCEPT: BALANCE -->
+<section class="balance-section" id="balance">
+  <div class="balance-inner">
+    <div class="section-label reveal">核心理论</div>
+    <div class="section-title reveal reveal-delay-1">竹竿与橡皮带的比喻</div>
+    <div class="section-desc reveal reveal-delay-2">
+      林耀华用一个精妙的比喻阐释全书理论：人的社会关系如同一张由弹性橡皮带连接竹竿构成的网。每根竹竿代表一个人，每条橡皮带代表一种关系。拉断一根橡皮带，整个网便失衡；抽走一根竹竿，其他人也会痛苦跌倒。生活就是不断在平衡与失衡之间寻找新的均衡。
+    </div>
+    <div class="balance-visual reveal reveal-delay-3">
+      <div class="balance-node">
+        <div class="bn-icon">&#128508;</div>
+        <div class="bn-label">平衡</div>
+        <div class="bn-desc">家庭和睦，生意兴隆，关系网完整</div>
+      </div>
+      <div class="balance-connector">&#10230;</div>
+      <div class="balance-node">
+        <div class="bn-icon">&#9888;&#65039;</div>
+        <div class="bn-label">危机</div>
+        <div class="bn-desc">亲人离世、诉讼纠纷、外部冲击</div>
+      </div>
+      <div class="balance-connector">&#10230;</div>
+      <div class="balance-node">
+        <div class="bn-icon">&#128260;</div>
+        <div class="bn-label">重建</div>
+        <div class="bn-desc">新的纽带替代断裂的旧纽带</div>
+      </div>
+      <div class="balance-connector">&#10230;</div>
+      <div class="balance-node">
+        <div class="bn-icon">&#9878;&#65039;</div>
+        <div class="bn-label">新均衡</div>
+        <div class="bn-desc">在更高层次恢复稳定</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAMILY COMPARISON -->
+<section class="families" id="families">
+  <div class="families-inner">
+    <div class="families-header">
+      <div class="section-label reveal">两大家族</div>
+      <div class="section-title reveal reveal-delay-1">黄家与张家：两条截然不同的命运线</div>
+      <div class="section-desc reveal reveal-delay-2">
+        两个家族因姻亲联系、合伙经商而紧密相连。同样的起点，同样的时代背景，却走向了完全不同的结局。差别不在"风水"，而在人如何应对生活中每一次平衡的打破。
+      </div>
+    </div>
+    <div class="family-cards">
+      <div class="family-card huang reveal">
+        <div class="fc-symbol">&#127895;</div>
+        <div class="fc-name">黄东林家</div>
+        <div class="fc-role">金翼之家</div>
+        <ul class="fc-traits">
+          <li><span class="trait-dot"></span>卖花生起家，从茶馆到湖口店铺，从咸鱼贸易到福州钱庄</li>
+          <li><span class="trait-dot"></span>父亲早逝、兄长病故，一人扛起大家庭重担</li>
+          <li><span class="trait-dot"></span>赢得山林官司，建造村中最宏伟的新居</li>
+          <li><span class="trait-dot"></span>重视教育：送子入学、送子留洋，打破农村局限</li>
+          <li><span class="trait-dot"></span>善于在危机中重建关系网，不断扩展社会联系</li>
+        </ul>
+        <div class="fc-fate">
+          <div class="fc-fate-label">命运走势</div>
+          <div class="fc-fate-text">历经七灾八难，终至家业兴旺、子孙满堂、名望远播</div>
+          <div class="fc-fate-bar"><div class="bar-fill"></div></div>
+        </div>
+      </div>
+      <div class="family-card zhang reveal reveal-delay-2">
+        <div class="fc-symbol">&#128014;</div>
+        <div class="fc-name">张芬洲家</div>
+        <div class="fc-role">龙吐珠之宅</div>
+        <ul class="fc-traits">
+          <li><span class="trait-dot"></span>祖传医术，精明有远见，最先发现湖口商机</li>
+          <li><span class="trait-dot"></span>抢占"龙吐珠"风水宝地建新居，自私埋下裂痕</li>
+          <li><span class="trait-dot"></span>儿子茂德婚后安逸，不再进取</li>
+          <li><span class="trait-dot"></span>社会关系网逐渐萎缩，家族联结断裂</li>
+          <li><span class="trait-dot"></span>缺乏应对危机的弹性，依赖旧有格局</li>
+        </ul>
+        <div class="fc-fate">
+          <div class="fc-fate-label">命运走势</div>
+          <div class="fc-fate-text">由盛转衰，芬洲去世后家道中落，仅余寡妇与养子</div>
+          <div class="fc-fate-bar"><div class="bar-fill"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TIMELINE -->
+<section class="timeline-section" id="timeline">
+  <div class="section-label reveal">历史脉络</div>
+  <div class="section-title reveal reveal-delay-1">从辛亥革命到抗日战争：三十年家族编年史</div>
+  <div class="section-desc reveal reveal-delay-2">书中记录了1900年代至1930年代中国南方农村社会的变迁，每一个家庭事件都是时代洪流中的缩影。</div>
+  <div class="timeline">
+
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-content">
+        <div class="tl-year">约 1900s</div>
+        <div class="tl-title">东林的童年</div>
+        <div class="tl-text">四岁丧父，与祖父相依为命。祖父教他处世之道和古老传说，在金鸡山下的黄村长大。</div>
+        <span class="tl-tag event">起点</span>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-content">
+        <div class="tl-year">约 1906</div>
+        <div class="tl-title">茶馆卖花生</div>
+        <div class="tl-text">被兄长奚落的东林走出家门，在商道茶馆卖花生，结识了姐夫张芬洲，两人合伙在湖口镇开店。</div>
+        <span class="tl-tag rise">转机</span>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-content">
+        <div class="tl-year">约 1908</div>
+        <div class="tl-title">福州学商</div>
+        <div class="tl-text">22岁的东林首次去福州，建立咸鱼贸易网络，与天济钱庄开户，学会现代商业运作。</div>
+        <span class="tl-tag rise">扩展</span>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-content">
+        <div class="tl-year">约 1911</div>
+        <div class="tl-title">辛亥革命</div>
+        <div class="tl-text">清政府垮台，城里动乱波及乡村。黄太太背着幼子逃入深山，革命党路过黄村。</div>
+        <span class="tl-tag event">时代</span>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-content">
+        <div class="tl-year">约 1912</div>
+        <div class="tl-title">兄长病故</div>
+        <div class="tl-text">东明突然去世，留下妻儿。东林被迫合拢两家，一人承担全部责任。生活的网被狠狠拉扯。</div>
+        <span class="tl-tag fall">危机</span>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-content">
+        <div class="tl-year">约 1918</div>
+        <div class="tl-title">山林官司</div>
+        <div class="tl-text">东林为建新居砍伐花桥边的树木，与欧家族长阿水爆发激烈冲突，身陷囹圄，店铺遭土匪洗劫。</div>
+        <span class="tl-tag fall">大难</span>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-content">
+        <div class="tl-year">约 1919</div>
+        <div class="tl-title">赢得官司，建成新居</div>
+        <div class="tl-text">凭借一份关键的土地契约，东林在省最高法院胜诉。随后建成黄村最宏伟的三层新居——"金翼之家"。</div>
+        <span class="tl-tag rise">胜利</span>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-content">
+        <div class="tl-year">约 1920s</div>
+        <div class="tl-title">张家新居与茂德婚事</div>
+        <div class="tl-text">芬洲建成"龙吐珠"新居，为三子茂德与王家惠兰操办盛大婚礼。张家达到鼎盛时期。</div>
+        <span class="tl-tag ritual">礼仪</span>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-content">
+        <div class="tl-year">约 1920s</div>
+        <div class="tl-title">教育新路</div>
+        <div class="tl-text">东林坚持送幼子六哥上教会学校。父亲用竹棍赶着哭泣的孩子走上求学之路——这份坚持改变了家族命运。</div>
+        <span class="tl-tag rise">远见</span>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-content">
+        <div class="tl-year">1930s</div>
+        <div class="tl-title">两族分道扬镳</div>
+        <div class="tl-text">黄家持续扩展，东林名望日盛。张家却在芬洲去世后急剧衰落，房舍破败，仅余寡妇孤子。</div>
+        <span class="tl-tag fall">终局</span>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-content">
+        <div class="tl-year">1937</div>
+        <div class="tl-title">抗日战争爆发</div>
+        <div class="tl-text">日本入侵中国，飞机的轰鸣声中，年迈的东林保持冷静，意识到生活的真谛。个人命运汇入民族命运。</div>
+        <span class="tl-tag event">尾声</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- RITUALS -->
+<section class="rituals-section" id="rituals">
+  <div class="rituals-inner">
+    <div class="rituals-header">
+      <div class="section-label reveal">民俗与仪式</div>
+      <div class="section-title reveal reveal-delay-1">乡土中国的生活仪式</div>
+      <div class="section-desc reveal reveal-delay-2">
+        从出生到死亡，从播种到收获，林耀华详细记录了福建农村的每一种仪式。这些仪式不仅是习俗，更是维系社会关系网络的粘合剂。
+      </div>
+    </div>
+    <div class="rituals-grid">
+
+      <div class="ritual-card reveal">
+        <div class="rc-icon">&#128118;</div>
+        <div class="rc-category">人生礼仪</div>
+        <div class="rc-name">出生三朝</div>
+        <div class="rc-desc">新生儿第三天由祖母主持洗浴仪式，用红蛋绕头三圈，唱歌祈祷"小脑瓜长得像鸡蛋一样圆"。</div>
+        <div class="rc-symbol">红蛋 = 安宁 &middot; 面条 = 长寿</div>
+      </div>
+
+      <div class="ritual-card reveal reveal-delay-1">
+        <div class="rc-icon">&#127880;</div>
+        <div class="rc-category">人生礼仪</div>
+        <div class="rc-name">周岁抓周</div>
+        <div class="rc-desc">漆盘中放置印章、弓箭、笔砚、银圆、秤、花生、筷子等物。小孩抓起什么，预示未来人生。东林幼时抓起秤和银圆，果然成了商人。</div>
+        <div class="rc-symbol">秤 = 商人 &middot; 笔 = 读书人</div>
+      </div>
+
+      <div class="ritual-card reveal reveal-delay-2">
+        <div class="rc-icon">&#128141;</div>
+        <div class="rc-category">婚姻礼仪</div>
+        <div class="rc-name">六礼成婚</div>
+        <div class="rc-desc">从交换"八字"红帖、算命合命，到订婚宴、送喜饼、抬嫁妆、迎轿子、拜堂成亲——一场婚礼是两个家族社会关系的全面展演。</div>
+        <div class="rc-symbol">五子 = 花生、红枣、榛子、瓜子、龙眼</div>
+      </div>
+
+      <div class="ritual-card reveal reveal-delay-3">
+        <div class="rc-icon">&#127966;</div>
+        <div class="rc-category">丧葬风水</div>
+        <div class="rc-name">风水选墓</div>
+        <div class="rc-desc">风水先生用罗盘定方位，寻找"鼠朝食"等吉利地形。选中宝地意味着子孙兴旺。东林为祖父选墓地，花了二十年才完成安葬。</div>
+        <div class="rc-symbol">罗盘定位 &middot; 地形喻象</div>
+      </div>
+
+      <div class="ritual-card reveal reveal-delay-4">
+        <div class="rc-icon">&#127806;</div>
+        <div class="rc-category">岁时节令</div>
+        <div class="rc-name">墓祭节</div>
+        <div class="rc-desc">秋收前全族上坟祭祖。男女老幼聚于山顶坟前，跪拜、献食、烧纸钱，随后野餐。"祖公田"轮流耕种，是宗族凝聚力的物质基础。</div>
+        <div class="rc-symbol">秋祭 &middot; 宗族凝聚</div>
+      </div>
+
+      <div class="ritual-card reveal reveal-delay-5">
+        <div class="rc-icon">&#127877;</div>
+        <div class="rc-category">岁时节令</div>
+        <div class="rc-name">春节守岁</div>
+        <div class="rc-desc">祭灶王爷、贴对联、烧爆竹纪念驱逐海盗。除夕全家围炉守夜，孩子戴纸面具跳舞驱病。东林从火中取三块炭放入灶中，迎接新年。</div>
+        <div class="rc-symbol">炭火 = 家庭延续</div>
+      </div>
+
+      <div class="ritual-card reveal">
+        <div class="rc-icon">&#127858;</div>
+        <div class="rc-category">岁时节令</div>
+        <div class="rc-name">端午竞渡</div>
+        <div class="rc-desc">门挂菖蒲、额涂雄黄、食粽投江纪念屈原。闽江上龙舟竞赛连续数日，是少年们最兴奋的时刻。</div>
+        <div class="rc-symbol">雄黄驱邪 &middot; 龙舟竞渡</div>
+      </div>
+
+      <div class="ritual-card reveal reveal-delay-1">
+        <div class="rc-icon">&#128524;</div>
+        <div class="rc-category">岁时节令</div>
+        <div class="rc-name">冬至搓圆</div>
+        <div class="rc-desc">全家挤在小厨房里，用糯米面搓圆子——揉得越圆，家庭越幸福。轮流播动篮子，象征团团圆圆、代代相传。</div>
+        <div class="rc-symbol">圆 = 团圆 &middot; 传承</div>
+      </div>
+
+      <div class="ritual-card reveal reveal-delay-2">
+        <div class="rc-icon">&#127793;</div>
+        <div class="rc-category">农事仪式</div>
+        <div class="rc-name">庆丰会</div>
+        <div class="rc-desc">秋收完毕，全家与帮工举杯庆祝。糯米糕、糖和酒，庆贺一年辛勤换来的丰收。男女老幼各有分工，妇女的角色不可或缺。</div>
+        <div class="rc-symbol">劳动与休息的循环</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- SOCIAL NETWORK -->
+<section class="network-section" id="network">
+  <div class="network-inner">
+    <div class="network-header">
+      <div class="section-label reveal">人际关系</div>
+      <div class="section-title reveal reveal-delay-1">命运的网络：人与人的联结</div>
+      <div class="section-desc reveal reveal-delay-2">
+        每个人都是网上的一个节点。商业伙伴、姻亲、同学、同乡——这些关系决定了信息的流通、资源的获取、危机中的支援。黄家的成功，在于不断编织和修复这张网。
+      </div>
+    </div>
+    <div class="network-canvas reveal reveal-delay-3">
+      <svg viewBox="0 0 800 600" id="networkSvg">
+        <!-- Lines drawn by JS -->
+        <!-- Nodes -->
+      </svg>
+    </div>
+    <div class="net-legend reveal reveal-delay-4">
+      <div class="net-legend-item"><div class="net-legend-dot" style="background:var(--gold)"></div>黄家</div>
+      <div class="net-legend-item"><div class="net-legend-dot" style="background:var(--accent)"></div>张家</div>
+      <div class="net-legend-item"><div class="net-legend-dot" style="background:var(--river-light)"></div>商业伙伴</div>
+      <div class="net-legend-item"><div class="net-legend-dot" style="background:var(--jade-light)"></div>其他关系</div>
+    </div>
+  </div>
+</section>
+
+<!-- ECONOMIC FLOW -->
+<section class="economy-section" id="economy">
+  <div class="economy-inner">
+    <div class="economy-header">
+      <div class="section-label reveal">经济系统</div>
+      <div class="section-title reveal reveal-delay-1">咸鱼与稻米：闽江上的贸易之河</div>
+      <div class="section-desc reveal reveal-delay-2">
+        黄东林和张芬洲的商业帝国，建立在连接乡村与城市的贸易通道之上。稻米顺流而下，咸鱼逆流而上，钱庄票据在两地之间流转——这是一个自然经济向商业经济转型的微观图景。
+      </div>
+    </div>
+    <div class="econ-flow reveal reveal-delay-3">
+      <div class="econ-node">
+        <div class="en-icon">&#127834;</div>
+        <div class="en-label">黄村农田</div>
+        <div class="en-sub">稻米产出</div>
+      </div>
+      <div class="econ-arrow">&#10230;</div>
+      <div class="econ-node">
+        <div class="en-icon">&#127978;</div>
+        <div class="en-label">湖口店铺</div>
+        <div class="en-sub">交易枢纽</div>
+      </div>
+      <div class="econ-arrow">&#10230;</div>
+      <div class="econ-node">
+        <div class="en-icon">&#9973;</div>
+        <div class="en-label">闽江帆船</div>
+        <div class="en-sub">水路运输</div>
+      </div>
+      <div class="econ-arrow">&#10230;</div>
+      <div class="econ-node">
+        <div class="en-icon">&#127961;</div>
+        <div class="en-label">福州城</div>
+        <div class="en-sub">咸鱼·钱庄</div>
+      </div>
+    </div>
+    <div class="econ-detail-grid">
+      <div class="econ-detail reveal">
+        <h4>钱庄信用</h4>
+        <p>天济钱庄为东林开户，允许短期透支。从此无需现金即可在中亭街鱼店订货，两周结一次账。信用体系是商业扩张的关键。</p>
+      </div>
+      <div class="econ-detail reveal reveal-delay-1">
+        <h4>帆船网络</h4>
+        <p>约20条帆船定期往返湖口与福州。船主世代以此为生，与店家互为依赖。船运稻米下行，咸鱼上行，形成稳定的物流链条。</p>
+      </div>
+      <div class="econ-detail reveal reveal-delay-2">
+        <h4>搬运夫势力</h4>
+        <p>福州码头上的搬运夫分为不同团伙，各有势力范围，不可越界。从鱼店到货栈、从货栈到帆船，由不同苦力负责。</p>
+      </div>
+      <div class="econ-detail reveal reveal-delay-3">
+        <h4>三层租佃制</h4>
+        <p>地主占有"底盘"收一半租；"根的占有者"得四分之一；实际耕种的农民只得四分之一。层层剥削下的土地制度。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LAND SYSTEM -->
+<section class="land-section">
+  <div class="land-inner">
+    <div class="section-label reveal">土地制度</div>
+    <div class="section-title reveal reveal-delay-1">"撒根租佃制"：三层土地权利</div>
+    <div class="section-desc reveal reveal-delay-2" style="margin:0 auto">一块土地上可以同时存在三种权利人，收益按比例层层分配，构成了中国南方独特的土地关系。</div>
+    <div class="land-diagram">
+      <div class="land-layer l1 reveal reveal-delay-3">
+        <div class="ll-title">地主（底盘持有者）</div>
+        <div class="ll-share">收益 50%</div>
+        <div class="ll-desc">拥有土地所有权，在政府注册，向政府缴纳地税</div>
+      </div>
+      <div class="land-layer l2 reveal reveal-delay-4">
+        <div class="ll-title">自佃农（根的占有者）</div>
+        <div class="ll-share">收益 25%</div>
+        <div class="ll-desc">拥有永久占有权，如黄家兄弟。可将土地再租给二佃农</div>
+      </div>
+      <div class="land-layer l3 reveal reveal-delay-5">
+        <div class="ll-title">二佃农（实际耕种者）</div>
+        <div class="ll-share">收益 25%</div>
+        <div class="ll-desc">实际劳作者，仅获最少份额，有时还被迫缴纳"小税"</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INSIGHTS -->
+<section class="insights-section" id="insights">
+  <div class="insights-inner">
+    <div class="section-label reveal">全书启示</div>
+    <div class="insight-quote reveal reveal-delay-1">
+      我们今天可以将"上苍"理解为人类本身，将"命运"理解为人类社会
+    </div>
+    <div class="insight-cards">
+      <div class="insight-card reveal reveal-delay-2">
+        <div class="ic-num">壹</div>
+        <div class="ic-title">关系即命运</div>
+        <div class="ic-text">一个人的兴衰不取决于"风水"，而取决于他所编织的社会关系网络——亲缘、商缘、地缘、学缘交织在一起，构成了命运的经纬。</div>
+      </div>
+      <div class="insight-card reveal reveal-delay-3">
+        <div class="ic-num">贰</div>
+        <div class="ic-title">弹性决定存亡</div>
+        <div class="ic-text">黄家能在每次危机后重建平衡，张家却在失衡后一蹶不振。差别在于：当旧纽带断裂时，是否有能力建立新的联结。</div>
+      </div>
+      <div class="insight-card reveal reveal-delay-4">
+        <div class="ic-num">叁</div>
+        <div class="ic-title">教育改变命运</div>
+        <div class="ic-text">东林从打官司中痛悟教育的重要，用竹棍赶着孩子上学。这份对未来的投资，让黄家超越了农耕社会的局限。</div>
+      </div>
+      <div class="insight-card reveal reveal-delay-5">
+        <div class="ic-num">肆</div>
+        <div class="ic-title">仪式维系秩序</div>
+        <div class="ic-text">从出生的红蛋到死后的风水，每一种仪式都在确认和强化社会关系。仪式不是迷信，而是社会结构的可见形式。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-title">金翼</div>
+  <p>林耀华 著 &middot; 1944年纽约初版 &middot; 1947年伦敦修订版 &middot; 2015年商务印书馆</p>
+  <p style="margin-top:0.5rem;">本页面基于原著内容制作，旨在以视觉化方式呈现书中的社会学知识</p>
+</footer>
+
+<script>
+// --- Navigation show/hide ---
+const navbar = document.getElementById('navbar');
+let lastScroll = 0;
+window.addEventListener('scroll', () => {
+  const st = window.scrollY;
+  if (st > window.innerHeight * 0.8) {
+    navbar.classList.add('visible');
+  } else {
+    navbar.classList.remove('visible');
+  }
+  lastScroll = st;
+});
+
+// --- Active nav link ---
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav-links a');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => {
+    if (window.scrollY >= s.offsetTop - 200) current = s.id;
+  });
+  navLinks.forEach(a => {
+    a.classList.remove('active');
+    if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+  });
+});
+
+// --- Scroll reveal ---
+const revealEls = document.querySelectorAll('.reveal, .tl-item');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      // Animate fate bars
+      e.target.querySelectorAll('.bar-fill').forEach(b => b.classList.add('animated'));
+    }
+  });
+}, { threshold: 0.15 });
+revealEls.forEach(el => observer.observe(el));
+
+// --- Network graph ---
+(function drawNetwork() {
+  const svg = document.getElementById('networkSvg');
+  if (!svg) return;
+  const nodes = [
+    { id: 'dl', x: 400, y: 180, label: '黄东林', color: '#c49a3c', r: 30 },
+    { id: 'fz', x: 400, y: 420, label: '张芬洲', color: '#b44a2f', r: 26 },
+    { id: 'dm', x: 250, y: 140, label: '东明(兄)', color: '#c49a3c', r: 18 },
+    { id: 'ps', x: 280, y: 60, label: '潘氏(祖母)', color: '#c49a3c', r: 18 },
+    { id: 'ht', x: 540, y: 140, label: '黄太太', color: '#c49a3c', r: 20 },
+    { id: 'sg', x: 560, y: 60, label: '三哥', color: '#c49a3c', r: 18 },
+    { id: 'lg', x: 630, y: 140, label: '六哥', color: '#c49a3c', r: 16 },
+    { id: 'dg', x: 180, y: 220, label: '大哥(侄)', color: '#c49a3c', r: 17 },
+    { id: 'md', x: 300, y: 460, label: '茂德', color: '#b44a2f', r: 18 },
+    { id: 'mk', x: 500, y: 460, label: '茂魁', color: '#b44a2f', r: 16 },
+    { id: 'hl', x: 300, y: 540, label: '惠兰', color: '#b44a2f', r: 16 },
+    { id: 'wy', x: 120, y: 380, label: '王一阳', color: '#7bacc8', r: 18 },
+    { id: 'lg2', x: 680, y: 280, label: '郑卢国', color: '#7bacc8', r: 17 },
+    { id: 'tj', x: 130, y: 300, label: '天济钱庄', color: '#7bacc8', r: 18 },
+    { id: 'hk', x: 620, y: 350, label: '陈香凯', color: '#8db8a8', r: 16 },
+    { id: 'wl', x: 180, y: 500, label: '王立阳', color: '#7bacc8', r: 16 },
+    { id: 'yh', x: 520, y: 240, label: '玉衡(叔)', color: '#c49a3c', r: 16 },
+  ];
+
+  const edges = [
+    ['dl','fz'],['dl','dm'],['dl','ps'],['dl','ht'],['dl','sg'],['dl','lg'],['dl','dg'],
+    ['dl','wy'],['dl','lg2'],['dl','tj'],['dl','yh'],
+    ['fz','md'],['fz','mk'],['fz','dl'],
+    ['md','hl'],['md','mk'],
+    ['wy','tj'],['wy','lg2'],
+    ['sg','hk'],['sg','lg'],
+    ['dm','dg'],['dm','ps'],
+    ['ht','sg'],['ht','lg'],
+    ['wl','hl'],['wl','fz'],
+    ['dg','yh'],['yh','dl'],
+  ];
+
+  const nodeMap = {};
+  nodes.forEach(n => nodeMap[n.id] = n);
+
+  // Draw edges
+  edges.forEach(([a, b]) => {
+    const na = nodeMap[a], nb = nodeMap[b];
+    if (!na || !nb) return;
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', na.x); line.setAttribute('y1', na.y);
+    line.setAttribute('x2', nb.x); line.setAttribute('y2', nb.y);
+    line.classList.add('net-line');
+    svg.appendChild(line);
+  });
+
+  // Draw nodes
+  nodes.forEach(n => {
+    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    g.classList.add('net-node');
+
+    const circ = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circ.setAttribute('cx', n.x); circ.setAttribute('cy', n.y); circ.setAttribute('r', n.r);
+    circ.setAttribute('fill', n.color); circ.setAttribute('opacity', '0.85');
+    g.appendChild(circ);
+
+    const txt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    txt.setAttribute('x', n.x); txt.setAttribute('y', n.y + 4);
+    txt.setAttribute('text-anchor', 'middle');
+    txt.setAttribute('fill', '#fff');
+    txt.setAttribute('font-size', n.r > 24 ? '11' : '9');
+    txt.setAttribute('font-weight', '500');
+    txt.textContent = n.label;
+    g.appendChild(txt);
+
+    svg.appendChild(g);
+  });
+})();
+</script>
+
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"75124c326cb447fe934cde04713ae013","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>

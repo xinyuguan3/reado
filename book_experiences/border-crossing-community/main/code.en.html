@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>跨越边界的社区 — 北京"浙江村"的生活史</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<style>
+/* === RESET & BASE === */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{font-family:'Noto Sans SC',sans-serif;background:#1a1611;color:#e8dfd4;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+
+/* === CSS VARIABLES === */
+:root{
+--terra:#b85c38;--sand:#e8dfd4;--deep-red:#8b2f1a;--gold:#d4a853;
+--grey:#6b6b6b;--dark:#1a1611;--darker:#110f0a;--teal:#3a7d6e;
+--warm-white:#f5f0e8;--fabric-beige:#c4b39a;
+--serif:'Noto Serif SC',serif;--sans:'Noto Sans SC',sans-serif;
+--display:'Playfair Display',serif;
+}
+
+/* === FABRIC TEXTURE OVERLAY === */
+body::before{
+content:'';position:fixed;inset:0;z-index:9999;pointer-events:none;
+opacity:.03;
+background-image:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,.1) 2px,rgba(255,255,255,.1) 4px),
+repeating-linear-gradient(90deg,transparent,transparent 2px,rgba(255,255,255,.05) 2px,rgba(255,255,255,.05) 4px);
+}
+
+/* === GLOBAL TYPOGRAPHY === */
+h1,h2,h3{font-family:var(--serif);font-weight:700}
+p{line-height:1.9;font-weight:300}
+
+/* === SCROLL PROGRESS BAR === */
+.progress-bar{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--terra),var(--gold));z-index:10000;width:0;transition:none}
+
+/* === NAV DOTS === */
+.nav-dots{position:fixed;right:24px;top:50%;transform:translateY(-50%);z-index:9998;display:flex;flex-direction:column;gap:14px}
+.nav-dots .dot{width:10px;height:10px;border-radius:50%;border:1.5px solid rgba(232,223,212,.3);background:transparent;cursor:pointer;transition:all .4s ease;position:relative}
+.nav-dots .dot.active{background:var(--gold);border-color:var(--gold);transform:scale(1.3)}
+.nav-dots .dot::after{content:attr(data-label);position:absolute;right:22px;top:50%;transform:translateY(-50%);white-space:nowrap;font-size:11px;color:var(--sand);opacity:0;transition:opacity .3s;pointer-events:none;font-family:var(--sans)}
+.nav-dots .dot:hover::after{opacity:1}
+
+/* === SECTION BASE === */
+.section{min-height:100vh;position:relative;padding:80px 0}
+.container{max-width:1200px;margin:0 auto;padding:0 40px}
+
+/* === HERO === */
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:0;overflow:hidden;position:relative}
+.hero-bg{position:absolute;inset:0;
+background:
+radial-gradient(ellipse 80% 60% at 50% 40%,rgba(184,92,56,.08),transparent),
+radial-gradient(ellipse 60% 80% at 20% 80%,rgba(139,47,26,.06),transparent),
+radial-gradient(ellipse 50% 50% at 80% 20%,rgba(58,125,110,.04),transparent),
+linear-gradient(180deg,var(--darker),var(--dark) 60%,rgba(139,47,26,.08));
+}
+.hero-grain{position:absolute;inset:0;opacity:.04;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:128px 128px}
+.hero-content{position:relative;z-index:2;text-align:center;max-width:800px;padding:0 40px}
+.hero-eyebrow{font-family:var(--sans);font-size:13px;letter-spacing:6px;text-transform:uppercase;color:var(--gold);margin-bottom:40px;opacity:0;font-weight:400}
+.hero-title{font-size:clamp(48px,10vw,96px);font-weight:900;letter-spacing:.08em;line-height:1.15;margin-bottom:0;color:var(--sand)}
+.hero-char{display:inline-block;opacity:0;transform:translateY(40px)}
+.hero-line{width:60px;height:2px;background:var(--gold);margin:30px auto;opacity:0;transform:scaleX(0)}
+.hero-subtitle{font-family:var(--serif);font-size:clamp(18px,3vw,26px);color:var(--fabric-beige);margin-bottom:32px;opacity:0;letter-spacing:.15em;font-weight:400}
+.hero-intro{font-size:clamp(14px,1.8vw,17px);color:rgba(232,223,212,.6);max-width:600px;margin:0 auto;line-height:2;opacity:0}
+.hero-scroll-hint{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;opacity:0}
+.hero-scroll-hint span{font-size:11px;letter-spacing:3px;color:rgba(232,223,212,.3)}
+.scroll-arrow{width:1px;height:30px;background:linear-gradient(to bottom,rgba(212,168,83,.5),transparent);animation:scrollPulse 2s ease-in-out infinite}
+@keyframes scrollPulse{0%,100%{opacity:.3;transform:translateY(0)}50%{opacity:.8;transform:translateY(8px)}}
+@keyframes pulseRing{0%,100%{r:35;opacity:.15}50%{r:42;opacity:.08}}
+
+/* === SECTION SHARED === */
+.section-label{font-family:var(--display);font-size:72px;font-weight:700;color:rgba(184,92,56,.08);line-height:1;margin-bottom:-20px}
+.section-title{font-size:clamp(28px,5vw,48px);margin-bottom:20px;line-height:1.3;opacity:0;transform:translateY(20px)}
+.section-title .highlight{color:var(--gold);position:relative}
+.section-title .highlight::after{content:'';position:absolute;bottom:-2px;left:0;width:100%;height:2px;background:var(--gold);opacity:.3}
+.section-desc{font-size:16px;color:rgba(232,223,212,.5);max-width:600px;margin-bottom:60px;opacity:0}
+
+/* === WHAT IS SECTION === */
+.what-section{background:linear-gradient(180deg,var(--dark),rgba(26,22,17,.95))}
+.what-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;margin-bottom:60px;align-items:start}
+.what-map{position:relative}
+.stylized-map{width:100%;max-width:450px}
+.pulse-ring{animation:pulseRing 3s ease-in-out infinite}
+.what-info{display:flex;flex-direction:column;gap:20px}
+.what-card{padding:24px 28px;border-left:2px solid rgba(184,92,56,.2);background:rgba(255,255,255,.02);transition:all .4s;opacity:0;transform:translateX(30px)}
+.what-card:hover{border-left-color:var(--gold);background:rgba(255,255,255,.04)}
+.what-card-icon{color:var(--gold);font-size:12px;margin-bottom:6px}
+.what-card-label{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:rgba(232,223,212,.4);margin-bottom:6px}
+.what-card-value{font-family:var(--serif);font-size:22px;font-weight:700;margin-bottom:6px}
+.what-card-desc{font-size:13px;color:rgba(232,223,212,.45);line-height:1.6}
+.what-quote{font-family:var(--serif);font-size:18px;font-style:italic;color:var(--fabric-beige);text-align:center;padding:40px 0;border-top:1px solid rgba(232,223,212,.06);opacity:0}
+.quote-src{display:block;font-size:12px;font-style:normal;color:rgba(232,223,212,.3);margin-top:8px}
+
+/* === TIMELINE === */
+.timeline-section{background:linear-gradient(180deg,rgba(26,22,17,.95),var(--dark))}
+.timeline{position:relative;padding-left:60px}
+.timeline-track{position:absolute;left:24px;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,transparent,rgba(184,92,56,.3) 10%,rgba(184,92,56,.3) 90%,transparent)}
+.timeline-item{position:relative;margin-bottom:60px;opacity:0;transform:translateY(30px)}
+.tl-marker{position:absolute;left:-44px;top:8px;width:12px;height:12px;border-radius:50%;border:2px solid var(--terra);background:var(--dark);transition:all .4s;z-index:2}
+.timeline-item.active .tl-marker{background:var(--gold);border-color:var(--gold);box-shadow:0 0 20px rgba(212,168,83,.3)}
+.tl-year{font-family:var(--serif);font-size:14px;font-weight:700;color:var(--gold);letter-spacing:2px;margin-bottom:8px}
+.tl-card{background:rgba(255,255,255,.02);border:1px solid rgba(232,223,212,.06);padding:28px 32px;position:relative;transition:all .5s}
+.tl-card:hover{background:rgba(255,255,255,.04);border-color:rgba(184,92,56,.2)}
+.tl-card h3{font-size:22px;margin-bottom:12px;color:var(--sand)}
+.tl-card p{font-size:14px;color:rgba(232,223,212,.6);line-height:1.9}
+.tl-tag{display:inline-block;margin-top:14px;padding:3px 14px;font-size:11px;letter-spacing:2px;border:1px solid rgba(212,168,83,.2);color:var(--gold);font-family:var(--sans)}
+
+/* === MECHANISM === */
+.mechanism-section{background:linear-gradient(180deg,var(--dark),rgba(17,15,10,.98))}
+.mech-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.mech-card{background:rgba(255,255,255,.02);border:1px solid rgba(232,223,212,.05);padding:36px;position:relative;overflow:hidden;opacity:0;transform:translateY(20px)}
+.mech-card::before{content:'';position:absolute;top:0;left:0;width:100%;height:2px;background:linear-gradient(90deg,transparent,var(--terra),transparent);opacity:0;transition:opacity .5s}
+.mech-card:hover::before{opacity:1}
+.mech-card-large{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
+.mech-card-num{font-family:var(--display);font-size:14px;color:var(--gold);letter-spacing:2px;margin-bottom:14px;font-weight:700}
+.mech-card h3{font-family:var(--serif);font-size:22px;margin-bottom:14px;color:var(--sand)}
+.mech-card p{font-size:14px;color:rgba(232,223,212,.55);line-height:1.9;margin-bottom:10px}
+.mech-card em{color:var(--gold);font-style:normal;font-weight:500}
+.mech-diagram{position:relative;height:220px;display:flex;align-items:center;justify-content:center}
+.mech-node{position:absolute;padding:8px 16px;font-size:12px;border-radius:4px;font-family:var(--sans);letter-spacing:1px;z-index:2}
+.mech-node-center{background:var(--terra);color:var(--sand);font-weight:700;font-size:14px;left:50%;top:50%;transform:translate(-50%,-50%)}
+.mech-node-1{background:rgba(212,168,83,.15);border:1px solid rgba(212,168,83,.3);color:var(--gold);left:5%;top:10%}
+.mech-node-2{background:rgba(184,92,56,.15);border:1px solid rgba(184,92,56,.3);color:var(--terra);right:5%;top:10%}
+.mech-node-3{background:rgba(58,125,110,.15);border:1px solid rgba(58,125,110,.3);color:var(--teal);left:5%;bottom:10%}
+.mech-node-4{background:rgba(232,223,212,.08);border:1px solid rgba(232,223,212,.15);color:var(--sand);right:5%;bottom:10%}
+.mech-lines{position:absolute;inset:0;width:100%;height:100%;z-index:1}
+.mech-iceberg{text-align:center;margin-top:20px;padding:20px 0}
+.mech-ice-visible{font-size:13px;color:var(--gold);padding:10px;background:rgba(212,168,83,.08);border:1px solid rgba(212,168,83,.15);display:inline-block;margin-bottom:0}
+.mech-ice-line{height:1px;background:repeating-linear-gradient(90deg,rgba(232,223,212,.2),rgba(232,223,212,.2) 6px,transparent 6px,transparent 12px);margin:12px 0;position:relative}
+.mech-ice-line::after{content:'水面';position:absolute;right:0;top:-8px;font-size:10px;color:rgba(232,223,212,.25)}
+.mech-ice-hidden{font-size:16px;font-weight:700;font-family:var(--serif);color:var(--terra);padding:16px;background:rgba(184,92,56,.06);border:1px solid rgba(184,92,56,.1);display:inline-block}
+
+/* === DATA SECTION === */
+.data-section{background:linear-gradient(180deg,rgba(17,15,10,.98),var(--dark))}
+.data-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px}
+.data-card{background:rgba(255,255,255,.02);border:1px solid rgba(232,223,212,.05);padding:36px;text-align:center;opacity:0;transform:translateY(20px)}
+.data-card-wide{grid-column:span 2}
+.data-label{font-size:12px;letter-spacing:3px;color:rgba(232,223,212,.4);margin-bottom:24px;text-transform:uppercase;font-family:var(--sans)}
+.data-chart-bar{padding:20px 0}
+.bar-group{display:flex;align-items:flex-end;justify-content:center;gap:40px;height:260px}
+.bar-item{display:flex;flex-direction:column;align-items:center;gap:8px;flex:1;max-width:100px}
+.bar-fill{width:100%;background:linear-gradient(to top,var(--terra),var(--gold));border-radius:3px 3px 0 0;transition:height 1.5s cubic-bezier(.4,0,.2,1);min-height:4px}
+.bar-val{font-size:13px;font-weight:700;color:var(--sand);font-family:var(--serif);white-space:nowrap}
+.bar-year{font-size:11px;color:rgba(232,223,212,.4)}
+.data-big-number{font-family:var(--serif);font-size:48px;font-weight:900;margin:20px 0;display:flex;align-items:center;justify-content:center;gap:12px}
+.data-from{color:rgba(232,223,212,.4)}
+.data-arrow{color:var(--gold);font-size:24px}
+.data-to{color:var(--gold)}
+.data-counter{color:var(--gold)}
+.data-footnote{font-size:12px;color:rgba(232,223,212,.35);line-height:1.8}
+.data-journey{display:flex;align-items:flex-start;justify-content:center;gap:0;padding:20px 0;flex-wrap:nowrap}
+.journey-step{text-align:center;flex:1;min-width:0}
+.journey-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--terra);background:var(--dark);margin:0 auto 10px;transition:all .5s}
+.journey-dot.active{background:var(--gold);border-color:var(--gold);box-shadow:0 0 15px rgba(212,168,83,.3)}
+.journey-place{font-family:var(--serif);font-size:14px;font-weight:700;margin-bottom:4px;color:var(--sand)}
+.journey-desc{font-size:11px;color:rgba(232,223,212,.4);line-height:1.6}
+.journey-line{width:40px;min-width:20px;height:1px;background:rgba(184,92,56,.3);margin-top:6px;flex-shrink:1}
+
+/* === PORTRAITS === */
+.portraits-section{background:linear-gradient(180deg,var(--dark),rgba(26,22,17,.98))}
+.portrait-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.portrait-card{background:rgba(255,255,255,.02);border:1px solid rgba(232,223,212,.05);padding:32px;text-align:center;opacity:0;transform:translateY(20px);transition:all .5s}
+.portrait-card:hover{transform:translateY(-4px);border-color:rgba(184,92,56,.2);background:rgba(255,255,255,.04)}
+.portrait-avatar{width:72px;height:72px;border-radius:50%;margin:0 auto 18px;display:flex;align-items:center;justify-content:center}
+.portrait-avatar span{font-family:var(--serif);font-size:28px;font-weight:900;color:var(--sand)}
+.portrait-card h3{font-family:var(--serif);font-size:20px;margin-bottom:6px}
+.portrait-role{font-size:11px;letter-spacing:2px;color:var(--gold);margin-bottom:14px;font-family:var(--sans)}
+.portrait-card p{font-size:13px;color:rgba(232,223,212,.5);text-align:left;line-height:1.9}
+
+/* === QUOTES === */
+.quotes-section{background:linear-gradient(180deg,rgba(26,22,17,.98),rgba(17,15,10,.98));padding:120px 0}
+.quotes-flow{display:flex;flex-direction:column;gap:40px;max-width:800px;margin:0 auto}
+.quote-block{position:relative;padding:40px 48px 40px 80px;border-left:2px solid rgba(184,92,56,.2);background:rgba(255,255,255,.015);opacity:0;transform:translateX(-20px)}
+.quote-block:hover{border-left-color:var(--gold)}
+.quote-mark{position:absolute;left:24px;top:24px;font-family:var(--display);font-size:60px;color:rgba(184,92,56,.2);line-height:1}
+.quote-block p{font-family:var(--serif);font-size:clamp(16px,2vw,20px);line-height:2;color:rgba(232,223,212,.75);font-weight:400}
+.quote-block-accent{border-left-color:var(--gold);background:rgba(212,168,83,.03)}
+.quote-block-accent p{color:var(--sand)}
+.quote-transform{margin-top:20px;font-family:var(--sans);font-size:14px;color:var(--gold);letter-spacing:2px;font-weight:500}
+
+/* === SIGNIFICANCE === */
+.significance-section{background:linear-gradient(180deg,rgba(17,15,10,.98),var(--dark))}
+.sig-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:32px;margin-top:20px}
+.sig-item{padding:36px;border:1px solid rgba(232,223,212,.05);background:rgba(255,255,255,.015);position:relative;opacity:0;transform:translateY(20px);transition:all .5s}
+.sig-item:hover{border-color:rgba(184,92,56,.2);background:rgba(255,255,255,.03)}
+.sig-num{font-family:var(--serif);font-size:36px;color:rgba(184,92,56,.15);font-weight:900;margin-bottom:8px}
+.sig-item h3{font-family:var(--serif);font-size:20px;margin-bottom:12px;color:var(--sand)}
+.sig-item p{font-size:14px;color:rgba(232,223,212,.5);line-height:1.9}
+
+/* === FOOTER === */
+.site-footer{padding:80px 0 60px;text-align:center}
+.footer-line{width:40px;height:1px;background:var(--terra);margin:0 auto 40px;opacity:.4}
+.footer-book{font-family:var(--serif);font-size:18px;color:var(--sand);margin-bottom:8px}
+.footer-author{font-size:14px;color:var(--gold);margin-bottom:4px;letter-spacing:2px}
+.footer-pub{font-size:12px;color:rgba(232,223,212,.35);margin-bottom:24px}
+.footer-note{font-size:11px;color:rgba(232,223,212,.2);max-width:400px;margin:0 auto}
+
+/* === RESPONSIVE === */
+@media(max-width:1024px){
+.what-grid{grid-template-columns:1fr}
+.mech-card-large{grid-template-columns:1fr}
+.data-grid{grid-template-columns:1fr 1fr}
+.data-card-wide{grid-column:span 2}
+.portrait-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:768px){
+.container{padding:0 20px}
+.nav-dots{right:12px;gap:10px}
+.nav-dots .dot{width:8px;height:8px}
+.nav-dots .dot::after{display:none}
+.section{padding:60px 0}
+.section-label{font-size:48px}
+.what-grid{gap:30px}
+.timeline{padding-left:40px}
+.tl-marker{left:-24px}
+.timeline-track{left:14px}
+.tl-card{padding:20px}
+.mech-grid{grid-template-columns:1fr}
+.mech-card{padding:24px}
+.mech-card-large{grid-column:auto}
+.data-grid{grid-template-columns:1fr}
+.data-card-wide{grid-column:auto}
+.portrait-grid{grid-template-columns:1fr}
+.quote-block{padding:24px 24px 24px 60px}
+.quote-mark{left:12px;top:12px;font-size:40px}
+.bar-group{gap:20px}
+.data-journey{flex-wrap:wrap;gap:10px}
+.journey-line{width:20px;min-width:10px}
+.sig-grid{grid-template-columns:1fr}
+.hero-content{padding:0 20px}
+.mech-diagram{height:180px}
+.mech-node{font-size:10px;padding:5px 10px}
+}
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<nav class="nav-dots" id="navDots">
+<div class="dot active" data-label="开篇" data-target="hero"></div>
+<div class="dot" data-label="浙江村" data-target="what"></div>
+<div class="dot" data-label="时间线" data-target="timeline"></div>
+<div class="dot" data-label="运作" data-target="mechanism"></div>
+<div class="dot" data-label="数据" data-target="data"></div>
+<div class="dot" data-label="人物" data-target="portraits"></div>
+<div class="dot" data-label="思想" data-target="quotes"></div>
+<div class="dot" data-label="意义" data-target="significance"></div>
+</nav>
+
+<!-- HERO -->
+<section class="section hero" id="hero">
+<div class="hero-bg"></div>
+<div class="hero-grain"></div>
+<div class="hero-content">
+<div class="hero-eyebrow">项飙 · 人类学田野调查</div>
+<h1 class="hero-title">
+<span class="hero-char">跨</span><span class="hero-char">越</span><span class="hero-char">边</span><span class="hero-char">界</span><span class="hero-char">的</span><span class="hero-char">社</span><span class="hero-char">区</span>
+</h1>
+<div class="hero-line"></div>
+<p class="hero-subtitle">北京"浙江村"的生活史</p>
+<p class="hero-intro">在北京南三环外，曾有一个由10万温州人自发形成的"村落"。<br>他们没有北京户口，却在首都建起了一个跨越地理、制度与文化边界的全新社会空间。</p>
+<div class="hero-scroll-hint">
+<span>向下探索</span>
+<div class="scroll-arrow"></div>
+</div>
+</div>
+</section>
+
+<!-- WHAT IS -->
+<section class="section what-section" id="what">
+<div class="container">
+<div class="section-label">01</div>
+<h2 class="section-title what-title">什么是<span class="highlight">"浙江村"</span>？</h2>
+<div class="what-grid">
+<div class="what-map" id="mapCanvas">
+<svg viewBox="0 0 500 500" class="stylized-map">
+<!-- Stylized Beijing map -->
+<rect x="0" y="0" width="500" height="500" fill="none"/>
+<!-- Ring roads -->
+<circle cx="250" cy="220" r="60" fill="none" stroke="rgba(232,223,212,0.1)" stroke-width="1"/>
+<circle cx="250" cy="220" r="110" fill="none" stroke="rgba(232,223,212,0.1)" stroke-width="1"/>
+<circle cx="250" cy="220" r="170" fill="none" stroke="rgba(232,223,212,0.15)" stroke-width="1.5"/>
+<circle cx="250" cy="220" r="230" fill="none" stroke="rgba(232,223,212,0.08)" stroke-width="1"/>
+<!-- Tiananmen marker -->
+<circle cx="250" cy="220" r="6" fill="rgba(232,223,212,0.3)"/>
+<text x="250" y="205" text-anchor="middle" fill="rgba(232,223,212,0.5)" font-size="11" font-family="Noto Sans SC">天安门</text>
+<!-- South 3rd ring -->
+<path d="M80,350 Q250,380 420,350" fill="none" stroke="rgba(232,223,212,0.2)" stroke-width="1" stroke-dasharray="4,4"/>
+<text x="430" y="345" fill="rgba(232,223,212,0.3)" font-size="9" font-family="Noto Sans SC">南三环</text>
+<!-- Dahongmen / Zhejiangcun -->
+<circle cx="265" cy="370" r="35" fill="rgba(184,92,56,0.15)" stroke="var(--terra)" stroke-width="2" class="pulse-ring"/>
+<circle cx="265" cy="370" r="20" fill="rgba(184,92,56,0.3)" class="pulse-ring-inner"/>
+<circle cx="265" cy="370" r="5" fill="var(--gold)"/>
+<text x="265" y="420" text-anchor="middle" fill="var(--gold)" font-size="13" font-weight="700" font-family="Noto Serif SC">"浙江村"</text>
+<text x="265" y="438" text-anchor="middle" fill="rgba(232,223,212,0.5)" font-size="10" font-family="Noto Sans SC">大红门地区</text>
+<!-- Distance line -->
+<line x1="250" y1="228" x2="265" y2="363" stroke="rgba(212,168,83,0.3)" stroke-width="1" stroke-dasharray="3,5"/>
+<text x="280" y="300" fill="rgba(212,168,83,0.5)" font-size="9" font-family="Noto Sans SC" transform="rotate(5,280,300)">≈10公里</text>
+</svg>
+</div>
+<div class="what-info">
+<div class="what-card">
+<div class="what-card-icon">◈</div>
+<div class="what-card-label">地理位置</div>
+<div class="what-card-value">北京丰台区大红门</div>
+<div class="what-card-desc">城乡结合部，覆盖26个居委会与村委会</div>
+</div>
+<div class="what-card">
+<div class="what-card-icon">◈</div>
+<div class="what-card-label">高峰人口</div>
+<div class="what-card-value"><span class="counter" data-target="100000">0</span>人</div>
+<div class="what-card-desc">几乎全部来自温州地区</div>
+</div>
+<div class="what-card">
+<div class="what-card-icon">◈</div>
+<div class="what-card-label">主导产业</div>
+<div class="what-card-value">服装生产与销售</div>
+<div class="what-card-desc">从街边作坊到全国性流动经营网络</div>
+</div>
+<div class="what-card">
+<div class="what-card-icon">◈</div>
+<div class="what-card-label">独特性质</div>
+<div class="what-card-value">自发形成的聚居区</div>
+<div class="what-card-desc">非自然村落，非行政编制——一个"奇怪"的社区</div>
+</div>
+</div>
+</div>
+<p class="what-quote">"京城人不知南郊乡者有之，不知'浙江村'者无几。"<span class="quote-src">——丰台区政府文件</span></p>
+</div>
+</section>
+
+<!-- TIMELINE -->
+<section class="section timeline-section" id="timeline">
+<div class="container">
+<div class="section-label">02</div>
+<h2 class="section-title">浙江村的<span class="highlight">崛起</span></h2>
+<p class="section-desc">从文革后期的零星外出，到十万人的首都聚居区——一段惊人的自发城市化历程</p>
+<div class="timeline">
+<div class="timeline-track"></div>
+<div class="timeline-item" data-year="1984前">
+<div class="tl-marker"></div>
+<div class="tl-year">1984年前</div>
+<div class="tl-card">
+<h3>史前期</h3>
+<p>文革后期，温州人开始"趁乱"外出。"师傅带徒弟"的网络将年轻人带往西北——打家具、弹棉花、淘金沙。火车不都是免费坐的么！在家里也没有真活干，出去闯一闯。</p>
+<div class="tl-tag">萌芽</div>
+</div>
+</div>
+<div class="timeline-item" data-year="1984">
+<div class="tl-marker"></div>
+<div class="tl-year">1984</div>
+<div class="tl-card">
+<h3>来到北京</h3>
+<p>最初约200户温州人聚集在木樨园、马村一带。松紧腰带是他们的第一条"产业链"。没有执照，就摆地摊打"游击战"——城管来了就跑，走了再摆。一条裤子能赚七八元，是外地的一倍！</p>
+<div class="tl-tag">立足</div>
+</div>
+</div>
+<div class="timeline-item" data-year="1986">
+<div class="tl-marker"></div>
+<div class="tl-year">1986-1988</div>
+<div class="tl-card">
+<h3>登堂入室</h3>
+<p>温州人开始进入王府井等大商场包柜台，发明了"代销"模式。周年涛跑了工商局21趟，终于拿到执照。"无本生意"的秘诀是快速周转。这一时期开始雇"老司"（工人），人口迎来第一个增长高峰。</p>
+<div class="tl-tag">突破</div>
+</div>
+</div>
+<div class="timeline-item" data-year="1988">
+<div class="tl-marker"></div>
+<div class="tl-year">1988-1992</div>
+<div class="tl-card">
+<h3>全面扩张</h3>
+<p>形成了"全国性流动经营网络"——这才是"浙江村"真正的生命体系。布料市场、辅料市场、劳务市场、资金市场四大体系并立。俄罗斯人开始进村采购皮夹克，外贸生意风生水起。</p>
+<div class="tl-tag">爆发</div>
+</div>
+</div>
+<div class="timeline-item" data-year="1992">
+<div class="tl-marker"></div>
+<div class="tl-year">1992-1995</div>
+<div class="tl-card">
+<h3>乱中挣钱</h3>
+<p>"大院经济"兴起——陈胜江借高利贷盖院子，一次性收取半年房租。京温服装批发中心建立。但社区也出现了帮派势力，"大人物"与帮派形成复杂的共生关系。乱极了，却也是最赚钱的时期。</p>
+<div class="tl-tag">膨胀</div>
+</div>
+</div>
+<div class="timeline-item" data-year="1995">
+<div class="tl-marker"></div>
+<div class="tl-year">1995</div>
+<div class="tl-card">
+<h3>大清理风波</h3>
+<p>全国闻名的强制拆除行动。先是自拆，后是强拆。但三个月后……大院卷土重来。"要拆就让他拆。我们前两年不都是这样的？"——温州人对此轻描淡写，却以惊人的韧性重建了一切。</p>
+<div class="tl-tag">波折</div>
+</div>
+</div>
+<div class="timeline-item" data-year="1996">
+<div class="tl-marker"></div>
+<div class="tl-year">1996+</div>
+<div class="tl-card">
+<h3>新社会空间</h3>
+<p>重建后的"浙江村"更加隐蔽但更强韧。大院不再比谁门庭大，而是"藏在胡同里，偌大的院子开个小小的门"。网络化、分散化成为新策略。一种新的生活状态已不可逆转地形成了。</p>
+<div class="tl-tag">重生</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- MECHANISM -->
+<section class="section mechanism-section" id="mechanism">
+<div class="container">
+<div class="section-label">03</div>
+<h2 class="section-title">社区运作的<span class="highlight">秘密</span></h2>
+<p class="section-desc">项飙用近六年的田野调查，揭开了这个"不可思议"的社区背后的运作逻辑</p>
+<div class="mech-grid">
+<div class="mech-card mech-card-large">
+<div class="mech-card-num">核心</div>
+<h3>"系"的概念</h3>
+<p>项飙提出的最重要的分析概念。"系"不同于西方社会学中的"网络"（network）——它不是人和人之间外在的联系，而是中国人关于社会关系的一套<em>民间理论</em>。</p>
+<p>"系"是多种关系的综合体：亲缘、地缘、业缘交织在一起，形成多层次、动态的关系营造方式。它既是初级群体的面目，又承担着次级群体的功能。</p>
+<div class="mech-diagram">
+<div class="mech-node mech-node-center">个人</div>
+<div class="mech-node mech-node-1">亲缘</div>
+<div class="mech-node mech-node-2">地缘</div>
+<div class="mech-node mech-node-3">业缘</div>
+<div class="mech-node mech-node-4">信任</div>
+<svg class="mech-lines" viewBox="0 0 300 200">
+<line x1="150" y1="100" x2="50" y2="40" stroke="rgba(212,168,83,0.3)" stroke-width="1"/>
+<line x1="150" y1="100" x2="250" y2="40" stroke="rgba(184,92,56,0.3)" stroke-width="1"/>
+<line x1="150" y1="100" x2="50" y2="160" stroke="rgba(58,125,110,0.3)" stroke-width="1"/>
+<line x1="150" y1="100" x2="250" y2="160" stroke="rgba(232,223,212,0.2)" stroke-width="1"/>
+<line x1="50" y1="40" x2="250" y2="40" stroke="rgba(232,223,212,0.08)" stroke-width="1" stroke-dasharray="3,3"/>
+<line x1="50" y1="160" x2="250" y2="160" stroke="rgba(232,223,212,0.08)" stroke-width="1" stroke-dasharray="3,3"/>
+</svg>
+</div>
+</div>
+<div class="mech-card">
+<div class="mech-card-num">01</div>
+<h3>流动经营网络</h3>
+<p>我们所看到的社区，只是"巨大冰山露出海面的一角"。背后是遍布全国的经营网络：温州→北京→石家庄→东北→西北……货物、人员、资金在这个网络中不断流转。</p>
+<div class="mech-iceberg">
+<div class="mech-ice-visible">可见的社区</div>
+<div class="mech-ice-line"></div>
+<div class="mech-ice-hidden">全国性流动经营网络</div>
+</div>
+</div>
+<div class="mech-card">
+<div class="mech-card-num">02</div>
+<h3>大小相配</h3>
+<p>"大人物"与"小人物"形成独特的依存关系。大人物的权威不来自正式的制度授权，而来自"亲戚多、来得早、朋友多"。他们调解纠纷、协调资源，小人物则提供支持与信息。这不是简单的阶层分化，而是动态的互构。</p>
+</div>
+<div class="mech-card">
+<div class="mech-card-num">03</div>
+<h3>关系丛</h3>
+<p>每个人都处在多条"系"的交叉点上。亲友关系和生意关系不断分离又重合——分离带来效率，重合提供信任。"模糊化的关系使合作很容易启动"，但也使得内部难以形成正式的管理结构。</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- DATA INSIGHTS -->
+<section class="section data-section" id="data">
+<div class="container">
+<div class="section-label">04</div>
+<h2 class="section-title">数据<span class="highlight">洞察</span></h2>
+<div class="data-grid">
+<div class="data-card data-card-wide">
+<div class="data-label">人口爆发式增长</div>
+<div class="data-chart-bar">
+<div class="bar-group">
+<div class="bar-item">
+<div class="bar-fill" data-height="8" style="height:0"></div>
+<div class="bar-val">~200户</div>
+<div class="bar-year">1984</div>
+</div>
+<div class="bar-item">
+<div class="bar-fill" data-height="28" style="height:0"></div>
+<div class="bar-val">数千人</div>
+<div class="bar-year">1988</div>
+</div>
+<div class="bar-item">
+<div class="bar-fill" data-height="60" style="height:0"></div>
+<div class="bar-val">数万人</div>
+<div class="bar-year">1992</div>
+</div>
+<div class="bar-item">
+<div class="bar-fill" data-height="100" style="height:0"></div>
+<div class="bar-val">~10万人</div>
+<div class="bar-year">1995</div>
+</div>
+</div>
+</div>
+</div>
+<div class="data-card">
+<div class="data-label">服装利润飞跃</div>
+<div class="data-big-number">
+<span class="data-from">1:1</span>
+<span class="data-arrow">→</span>
+<span class="data-to">1:21</span>
+</div>
+<div class="data-footnote">年初投入与年末利润之比<br>1983年 → 1988年</div>
+</div>
+<div class="data-card">
+<div class="data-label">覆盖范围</div>
+<div class="data-big-number">
+<span class="data-counter" data-target="26">0</span>
+</div>
+<div class="data-footnote">个居委会 / 村委会<br>覆盖2个街道办事处与1个乡</div>
+</div>
+<div class="data-card data-card-wide">
+<div class="data-label">一件皮夹克的旅程</div>
+<div class="data-journey">
+<div class="journey-step">
+<div class="journey-dot"></div>
+<div class="journey-place">温州</div>
+<div class="journey-desc">原料采购<br>皮料、纽扣、拉链</div>
+</div>
+<div class="journey-line"></div>
+<div class="journey-step">
+<div class="journey-dot active"></div>
+<div class="journey-place">"浙江村"</div>
+<div class="journey-desc">加工生产<br>30㎡作坊日夜赶工</div>
+</div>
+<div class="journey-line"></div>
+<div class="journey-step">
+<div class="journey-dot"></div>
+<div class="journey-place">京温中心</div>
+<div class="journey-desc">批发销售<br>柜台、大商场</div>
+</div>
+<div class="journey-line"></div>
+<div class="journey-step">
+<div class="journey-dot"></div>
+<div class="journey-place">全国 / 外贸</div>
+<div class="journey-desc">流通网络<br>俄罗斯人进村采购</div>
+</div>
+</div>
+</div>
+<div class="data-card">
+<div class="data-label">大院投资规模</div>
+<div class="data-big-number">
+<span class="data-from" style="font-size:.5em">几万元</span>
+<span class="data-arrow">→</span>
+<span class="data-to" style="font-size:.7em">百万+</span>
+</div>
+<div class="data-footnote">高利贷月息2.8分<br>风险与暴利并存</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- PORTRAITS -->
+<section class="section portraits-section" id="portraits">
+<div class="container">
+<div class="section-label">05</div>
+<h2 class="section-title">人物<span class="highlight">群像</span></h2>
+<p class="section-desc">他们是"浙江村"故事的主角——来自项飙近六年田野调查中的真实人物</p>
+<div class="portrait-grid">
+<div class="portrait-card">
+<div class="portrait-avatar" style="background:linear-gradient(135deg,var(--terra),var(--deep-red))">
+<span>刘</span>
+</div>
+<h3>刘泽波</h3>
+<div class="portrait-role">先行者</div>
+<p>最早来北京的温州人之一。从摆地摊到包柜台，他的经历就是"浙江村"早期的缩影。"一条裤子能赚七八元"的消息沿着他的链条传回温州，引来了第一批200户。</p>
+</div>
+<div class="portrait-card">
+<div class="portrait-avatar" style="background:linear-gradient(135deg,var(--teal),#2a5d4e)">
+<span>周</span>
+</div>
+<h3>周家</h3>
+<div class="portrait-role">加工户家庭</div>
+<p>30平米的住房就是服装作坊。前院北侧四间小屋，一家人和几个"老司"日夜赶工。大姊负责裁剪，小姊夫跑市场。晚饭后继续干活到凌晨——20件皮夹克，一夜赶完。</p>
+</div>
+<div class="portrait-card">
+<div class="portrait-avatar" style="background:linear-gradient(135deg,var(--gold),#b8942e)">
+<span>姊</span>
+</div>
+<h3>小姊夫</h3>
+<div class="portrait-role">年轻经营者</div>
+<p>一天的生活：凌晨赶工缝制皮夹克，白天骑车去红桥市场跑货，傍晚和邻居聊行情，深夜和来对账的妇女核对数目。"形势好"的时候，晚饭能拖到10点。</p>
+</div>
+<div class="portrait-card">
+<div class="portrait-avatar" style="background:linear-gradient(135deg,#6b4c3b,#4a3528)">
+<span>万</span>
+</div>
+<h3>万佳友</h3>
+<div class="portrait-role">社区"大人物"</div>
+<p>试图为"浙江村"争取正名的人。组建"爱心小组"，策划为亚运会捐款——"就算1000人，每人捐100，也有10万了。"他想让社会知道："浙江村人也是愿意为国家作贡献的。"</p>
+</div>
+<div class="portrait-card">
+<div class="portrait-avatar" style="background:linear-gradient(135deg,#7a6b5a,#5a4d40)">
+<span>章</span>
+</div>
+<h3>章老师</h3>
+<div class="portrait-role">幼儿班教育者</div>
+<p>在"浙江村"办幼儿班，两间房月租1100元。孩子早上7点就来，有的晚上9、10点家长还不见来。"他们做生意的没规律，我们也要理解。"墙上贴着五彩缤纷的小动物。</p>
+</div>
+<div class="portrait-card">
+<div class="portrait-avatar" style="background:linear-gradient(135deg,var(--deep-red),#6b1a0a)">
+<span>陈</span>
+</div>
+<h3>陈胜江</h3>
+<div class="portrait-role">大院建造者</div>
+<p>借高利贷10万盖大院，月息2.8分。"我的信用和名声已经不好了——所以一定要先盖成再说，房子在那里了，什么事都好说了。"二大院刚完工，马上着手第三个。</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- QUOTES -->
+<section class="section quotes-section" id="quotes">
+<div class="container">
+<div class="section-label">06</div>
+<h2 class="section-title">核心<span class="highlight">思想</span></h2>
+<div class="quotes-flow">
+<blockquote class="quote-block">
+<div class="quote-mark">"</div>
+<p>人们的"不可思议"，不仅仅是少见多怪的问题，更重要的是因为"浙江村"这个事实和我们对社会的认识之间有距离。</p>
+</blockquote>
+<blockquote class="quote-block">
+<div class="quote-mark">"</div>
+<p>不是缺乏理性，而是过于理性。或者更精确地说，是固守了僵化的理性。</p>
+</blockquote>
+<blockquote class="quote-block">
+<div class="quote-mark">"</div>
+<p>发展主要来自不断的探索而不是完整的设计。设计可以仅凭理性，而探索是必须要有自信作为支撑的。</p>
+</blockquote>
+<blockquote class="quote-block">
+<div class="quote-mark">"</div>
+<p>我们所看到的社区，只是巨大冰山露出海面的一角而已。离开了社区背后的开放的体系，社区中的聚合行为将无法被理解。</p>
+</blockquote>
+<blockquote class="quote-block quote-block-accent">
+<div class="quote-mark">"</div>
+<p>从最顽强的事实出发，发现并试图解决真实的问题所在——这就是我的出发点。</p>
+<div class="quote-transform">从"支配的知识"→ 到"理解的知识"</div>
+</blockquote>
+</div>
+</div>
+</section>
+
+<!-- SIGNIFICANCE -->
+<section class="section significance-section" id="significance">
+<div class="container">
+<div class="section-label">07</div>
+<h2 class="section-title">为什么这本书<span class="highlight">重要</span>？</h2>
+<div class="sig-grid">
+<div class="sig-item">
+<div class="sig-num">壹</div>
+<h3>打破二元对立</h3>
+<p>挑战了"传统vs现代"的简单二分法。温州人用"土"办法、"土"关系在国际大都市立足——传统与现代不是对立的，而是在具体实践中相互交织。</p>
+</div>
+<div class="sig-item">
+<div class="sig-num">贰</div>
+<h3>重新理解"关系"</h3>
+<p>"关系"不是落后的残余，不是简单的"走后门"。它是一种有效的社会组织方式，是中国人关于社会的民间象征体系的典型表现。</p>
+</div>
+<div class="sig-item">
+<div class="sig-num">叁</div>
+<h3>非正式经济的力量</h3>
+<p>揭示了中国社会转型中"非正式经济"的巨大能量。没有正式制度保障的温州人，用自己的方式创造了一个完整的经济生态系统。</p>
+</div>
+<div class="sig-item">
+<div class="sig-num">肆</div>
+<h3>从日常行为出发</h3>
+<p>主张从人的具体行为出发理解社会，而非从概念和理论出发。"别人的理念成为尺子，而自己成为被量裁的对象"——项飙要打破这种知识的支配。</p>
+</div>
+<div class="sig-item">
+<div class="sig-num">伍</div>
+<h3>持久的现实启示</h3>
+<p>对今天的城市化、人口流动、社区治理仍有深刻启示。这个新的社会空间"不是暂时的过渡，更不是'变态'"——它是一种新的生活状态的可能。</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+<div class="container">
+<div class="footer-line"></div>
+<div class="footer-book">《跨越边界的社区：北京"浙江村"的生活史》</div>
+<div class="footer-author">项飙 著</div>
+<div class="footer-pub">生活·读书·新知三联书店 · 2000年</div>
+<div class="footer-note">本页内容基于书籍原文整理，旨在以可视化方式传播社会学知识</div>
+</div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+/* === SCROLL PROGRESS BAR === */
+window.addEventListener('scroll',()=>{
+const h=document.documentElement.scrollHeight-window.innerHeight;
+const p=(window.scrollY/h)*100;
+document.getElementById('progressBar').style.width=p+'%';
+});
+
+/* === NAV DOTS === */
+const dots=document.querySelectorAll('.nav-dots .dot');
+const sections=document.querySelectorAll('.section');
+dots.forEach(d=>{
+d.addEventListener('click',()=>{
+const t=document.getElementById(d.dataset.target);
+if(t)t.scrollIntoView({behavior:'smooth'});
+});
+});
+function updateDots(){
+let cur=0;
+sections.forEach((s,i)=>{
+const r=s.getBoundingClientRect();
+if(r.top<window.innerHeight/2)cur=i;
+});
+dots.forEach((d,i)=>{d.classList.toggle('active',i===cur)});
+}
+window.addEventListener('scroll',updateDots);
+
+/* === GSAP ANIMATIONS === */
+gsap.registerPlugin(ScrollTrigger);
+
+/* Hero entrance */
+const heroTL=gsap.timeline({delay:.3});
+heroTL.to('.hero-eyebrow',{opacity:1,duration:1,ease:'power2.out'})
+.to('.hero-char',{opacity:1,y:0,duration:.6,stagger:.08,ease:'power3.out'},'-=.5')
+.to('.hero-line',{opacity:1,scaleX:1,duration:.8,ease:'power2.inOut'},'-=.3')
+.to('.hero-subtitle',{opacity:1,duration:.8,ease:'power2.out'},'-=.4')
+.to('.hero-intro',{opacity:1,duration:1,ease:'power2.out'},'-=.3')
+.to('.hero-scroll-hint',{opacity:1,duration:1,ease:'power2.out'},'-=.3');
+
+/* What Is section */
+gsap.utils.toArray('.section-title').forEach(t=>{
+gsap.to(t,{
+scrollTrigger:{trigger:t,start:'top 80%'},
+opacity:1,y:0,duration:1,ease:'power2.out'
+});
+});
+gsap.utils.toArray('.section-desc').forEach(d=>{
+gsap.to(d,{
+scrollTrigger:{trigger:d,start:'top 85%'},
+opacity:1,duration:.8,ease:'power2.out'
+});
+});
+gsap.utils.toArray('.what-card').forEach((c,i)=>{
+gsap.to(c,{
+scrollTrigger:{trigger:c,start:'top 85%'},
+opacity:1,x:0,duration:.8,delay:i*.15,ease:'power2.out'
+});
+});
+gsap.to('.what-quote',{
+scrollTrigger:{trigger:'.what-quote',start:'top 85%'},
+opacity:1,duration:1,ease:'power2.out'
+});
+
+/* Timeline items */
+gsap.utils.toArray('.timeline-item').forEach((item,i)=>{
+gsap.to(item,{
+scrollTrigger:{trigger:item,start:'top 80%',
+onEnter:()=>item.classList.add('active'),
+},
+opacity:1,y:0,duration:.8,delay:i*.05,ease:'power2.out'
+});
+});
+
+/* Mechanism cards */
+gsap.utils.toArray('.mech-card').forEach((c,i)=>{
+gsap.to(c,{
+scrollTrigger:{trigger:c,start:'top 85%'},
+opacity:1,y:0,duration:.8,delay:i*.1,ease:'power2.out'
+});
+});
+
+/* Data cards */
+gsap.utils.toArray('.data-card').forEach((c,i)=>{
+gsap.to(c,{
+scrollTrigger:{trigger:c,start:'top 85%'},
+opacity:1,y:0,duration:.8,delay:i*.1,ease:'power2.out'
+});
+});
+
+/* Bar chart animation */
+ScrollTrigger.create({
+trigger:'.data-chart-bar',
+start:'top 80%',
+onEnter:()=>{
+document.querySelectorAll('.bar-fill').forEach(b=>{
+b.style.height=b.dataset.height+'%';
+});
+}
+});
+
+/* Animated counters */
+function animateCounter(el){
+const target=parseInt(el.dataset.target);
+const dur=2000;
+let start=0;
+const step=ts=>{
+if(!start)start=ts;
+const p=Math.min((ts-start)/dur,1);
+const ease=1-Math.pow(1-p,3);
+el.textContent=Math.floor(ease*target).toLocaleString();
+if(p<1)requestAnimationFrame(step);
+else el.textContent=target.toLocaleString();
+};
+requestAnimationFrame(step);
+}
+document.querySelectorAll('.counter,.data-counter').forEach(el=>{
+ScrollTrigger.create({
+trigger:el,start:'top 85%',
+onEnter:()=>animateCounter(el),
+once:true
+});
+});
+
+/* Portrait cards */
+gsap.utils.toArray('.portrait-card').forEach((c,i)=>{
+gsap.to(c,{
+scrollTrigger:{trigger:c,start:'top 85%'},
+opacity:1,y:0,duration:.7,delay:i*.08,ease:'power2.out'
+});
+});
+
+/* Quote blocks */
+gsap.utils.toArray('.quote-block').forEach((q,i)=>{
+gsap.to(q,{
+scrollTrigger:{trigger:q,start:'top 85%'},
+opacity:1,x:0,duration:.9,delay:i*.12,ease:'power2.out'
+});
+});
+
+/* Significance items */
+gsap.utils.toArray('.sig-item').forEach((s,i)=>{
+gsap.to(s,{
+scrollTrigger:{trigger:s,start:'top 85%'},
+opacity:1,y:0,duration:.8,delay:i*.1,ease:'power2.out'
+});
+});
+
+/* SVG map pulse */
+const pulseRings=document.querySelectorAll('.pulse-ring');
+pulseRings.forEach(r=>{
+gsap.to(r,{attr:{r:42},opacity:.06,duration:2,repeat:-1,yoyo:true,ease:'sine.inOut'});
+});
+
+/* Hero parallax */
+gsap.to('.hero-bg',{
+scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:true},
+y:150,ease:'none'
+});
+gsap.to('.hero-content',{
+scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:true},
+y:80,opacity:.3,ease:'none'
+});
+</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"75124c326cb447fe934cde04713ae013","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>
