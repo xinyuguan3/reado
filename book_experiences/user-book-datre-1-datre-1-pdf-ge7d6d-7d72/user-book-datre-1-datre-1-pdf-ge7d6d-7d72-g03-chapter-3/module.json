@@ -1,0 +1,42 @@
+{
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T14:02:18.622Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "Datre书籍-第1册 我们是DATRE-1（部分）.pdf",
+      "author": ""
+    },
+    "knowledge_block": {
+      "id": "kb-03",
+      "gate_index": 3,
+      "title": "概念 · 专注",
+      "summary": "问题：请问组成 Datre 的存在体，和为我们提供 “ 生命火花 ” 的存在体是一样的 吗？ DATRE ： 不 ！",
+      "words": 669,
+      "keywords": [
+        "概念",
+        "专注",
+        "知道",
+        "物质层",
+        "大宇宙",
+        "形式",
+        "完全",
+        "传导身体"
+      ],
+      "density": {
+        "score": 0.6038,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0.2152,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "scholar",
+      "theme_label": "Scholar Atlas",
+      "section_count": 5,
+      "generated_with": "template_runtime"
+    }
+  }
+}

@@ -1,0 +1,318 @@
+{
+  "version": 2,
+  "experience_mode": "visual_reading",
+  "generated_at": "2026-03-07T14:00:12.931Z",
+  "eta": {
+    "words": 50,
+    "pagesApprox": 1,
+    "ocrPagesApprox": 1,
+    "blockCount": 6,
+    "queueDepth": 1,
+    "parseSec": 1.5,
+    "parallelSec": 120,
+    "qaSec": 126,
+    "etaSec": 337,
+    "etaMin": 5,
+    "etaMax": 8,
+    "returnAt": "2026-03-07T14:05:49.916Z"
+  },
+  "source_mode": "text",
+  "source_ingest": {
+    "parsed_by": "",
+    "title": "Text Source Test",
+    "author": "",
+    "input_kind": "text",
+    "skeleton_markdown_path": "",
+    "skeleton_markdown_chars": 0,
+    "planning": {
+      "strategy": "source_text(no_markdown)",
+      "used_structured": false,
+      "section_count": 0,
+      "markdown_chars": 0,
+      "planning_text_chars": 111,
+      "preferred_chunk_count": 0
+    },
+    "enhancer": {
+      "provider": "book-reader",
+      "used": false,
+      "status": "fallback",
+      "reason": "book_reader_output_too_short(134)",
+      "elapsedMs": 54,
+      "chars": 134,
+      "baseChars": 111,
+      "inputKind": "text",
+      "sourceModeHint": "text",
+      "title": "",
+      "chunkCount": 1,
+      "totalChars": 0,
+      "chunking": {},
+      "outputPath": "/Users/guanxinyu/Documents/GitHub/reado/.data/tmp/book-reader/chunks-1772892012863-b37e41cc.json",
+      "markdownPath": "",
+      "markdownChars": 0,
+      "snapshotPath": "",
+      "chunksSnapshotPath": "",
+      "preferredChunks": [],
+      "scriptPath": "/Users/guanxinyu/Documents/GitHub/reado/studio_skills/book-reader/book-reader.sh"
+    }
+  },
+  "total_knowledge_blocks": 1,
+  "split_diagnostics": {
+    "minDensityScore": 0.48,
+    "targetBlocks": 6,
+    "candidates": 1,
+    "retained": 1,
+    "filteredOut": 0,
+    "averageDensityScore": 0.662,
+    "filteredPreview": [],
+    "preferredChunkCount": 0,
+    "chunkStrategy": "word_chunk+rebalance",
+    "anchorCount": 0,
+    "anchorPreview": [],
+    "visualOptimization": {
+      "applied": true,
+      "before": 1,
+      "after": 1,
+      "minKeep": 10,
+      "maxKeep": 12,
+      "dedupeDuplicatesRemoved": 0,
+      "dedupeRenamedParts": 0,
+      "averageVisualScore": 0.542
+    }
+  },
+  "knowledge_blocks": [
+    {
+      "id": "kb-01",
+      "gateIndex": 1,
+      "index": 1,
+      "title": "认知心理学强 · 记忆",
+      "summary": "认知心理学强调注意、记忆与决策偏差的相互作用。一个学习者如果只背结论，不做情境化练习，就很难迁移到真实决策场景。有效做法是：先识别触发条件，再建立反例，最后复盘失败信号。注意力是一种有限资源，环境线索会放大或削弱判断质量。",
+      "content": "认知心理学强调注意、记忆与决策偏差的相互作用。一个学习者如果只背结论，不做情境化练习，就很难迁移到真实决策场景。有效做法是：先识别触发条件，再建立反例，最后复盘失败信号。注意力是一种有限资源，环境线索会放大或削弱判断质量。",
+      "keywords": [
+        "认知心理学强",
+        "记忆",
+        "决策偏差",
+        "相互作用",
+        "一个学习者如",
+        "做情境化练习"
+      ],
+      "words": 50,
+      "density": {
+        "score": 0.662,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0.56
+      }
+    }
+  ],
+  "knowledge_model": {
+    "version": 1,
+    "generated_at": "2026-03-07T14:00:12.922Z",
+    "title": "Text Source Test",
+    "author": "",
+    "summary": "1 systems, 6 concepts, 0 relations.",
+    "parse_strategy": "source_text(no_markdown)",
+    "parse_structured": false,
+    "source_mode": "text",
+    "parser_provider": "book-reader",
+    "systems": [
+      {
+        "id": "kb-01",
+        "gate": 1,
+        "title": "认知心理学强 · 记忆",
+        "summary": "认知心理学强调注意、记忆与决策偏差的相互作用。一个学习者如果只背结论，不做情境化练习，就很难迁移到真实决策场景。有效做法是：先识别触发条件，再建立反例，最后复盘失败信号。注意力是一种有限资源，环境线索会放大或削弱判断质量。",
+        "keywords": [
+          "认知心理学强",
+          "记忆",
+          "决策偏差",
+          "相互作用",
+          "一个学习者如",
+          "做情境化练习"
+        ],
+        "words": 50
+      }
+    ],
+    "concepts": [
+      {
+        "id": "concept-01-topic",
+        "name": "一个学习者如",
+        "weight": 1,
+        "gate_refs": [
+          1
+        ]
+      },
+      {
+        "id": "concept-02-topic",
+        "name": "做情境化练习",
+        "weight": 1,
+        "gate_refs": [
+          1
+        ]
+      },
+      {
+        "id": "concept-03-topic",
+        "name": "决策偏差",
+        "weight": 1,
+        "gate_refs": [
+          1
+        ]
+      },
+      {
+        "id": "concept-04-topic",
+        "name": "相互作用",
+        "weight": 1,
+        "gate_refs": [
+          1
+        ]
+      },
+      {
+        "id": "concept-05-topic",
+        "name": "认知心理学强",
+        "weight": 1,
+        "gate_refs": [
+          1
+        ]
+      },
+      {
+        "id": "concept-06-topic",
+        "name": "记忆",
+        "weight": 1,
+        "gate_refs": [
+          1
+        ]
+      }
+    ],
+    "relations": [],
+    "state_variables": [
+      {
+        "id": "sv-01",
+        "label": "一个学习者如",
+        "source_concept_id": "concept-01-topic",
+        "range": [
+          0,
+          100
+        ],
+        "init": 50
+      },
+      {
+        "id": "sv-02",
+        "label": "做情境化练习",
+        "source_concept_id": "concept-02-topic",
+        "range": [
+          0,
+          100
+        ],
+        "init": 50
+      },
+      {
+        "id": "sv-03",
+        "label": "决策偏差",
+        "source_concept_id": "concept-03-topic",
+        "range": [
+          0,
+          100
+        ],
+        "init": 50
+      },
+      {
+        "id": "sv-04",
+        "label": "相互作用",
+        "source_concept_id": "concept-04-topic",
+        "range": [
+          0,
+          100
+        ],
+        "init": 50
+      },
+      {
+        "id": "sv-05",
+        "label": "认知心理学强",
+        "source_concept_id": "concept-05-topic",
+        "range": [
+          0,
+          100
+        ],
+        "init": 50
+      },
+      {
+        "id": "sv-06",
+        "label": "记忆",
+        "source_concept_id": "concept-06-topic",
+        "range": [
+          0,
+          100
+        ],
+        "init": 50
+      }
+    ],
+    "actions": [
+      {
+        "id": "act-01",
+        "label": "Apply 认知心理学强 · 记忆",
+        "target_system_id": "kb-01",
+        "expected_effect": "Drive 认知心理学强 / 记忆 from theory to scenario."
+      }
+    ],
+    "docs": [
+      {
+        "id": "__index__",
+        "path": "index.md",
+        "title": "index.md",
+        "kind": "index",
+        "markdown": "# Knowledge Model Index\n- title: Text Source Test\n- systems: 1\n- concepts: 6\n- relations: 0\n- source_mode: text\n- parse_strategy: source_text(no_markdown)\n- parser_provider: book-reader\n## Systems\n- [gate-01.md](gates/gate-01.md) · 认知心理学强 · 记忆\n## Concepts\n- 一个学习者如 (weight 1)\n- 做情境化练习 (weight 1)\n- 决策偏差 (weight 1)\n- 相互作用 (weight 1)\n- 认知心理学强 (weight 1)\n- 记忆 (weight 1)"
+      },
+      {
+        "id": "model-overview",
+        "path": "model/overview.md",
+        "title": "overview.md",
+        "kind": "model",
+        "markdown": "# Model Overview\n\n## Runtime Schema\n\n```json\n{\n  \"state_variables\": [\n    {\n      \"id\": \"sv-01\",\n      \"label\": \"一个学习者如\",\n      \"source_concept_id\": \"concept-01-topic\",\n      \"range\": [\n        0,\n        100\n      ],\n      \"init\": 50\n    },\n    {\n      \"id\": \"sv-02\",\n      \"label\": \"做情境化练习\",\n      \"source_concept_id\": \"concept-02-topic\",\n      \"range\": [\n        0,\n        100\n      ],\n      \"init\": 50\n    },\n    {\n      \"id\": \"sv-03\",\n      \"label\": \"决策偏差\",\n      \"source_concept_id\": \"concept-03-topic\",\n      \"range\": [\n        0,\n        100\n      ],\n      \"init\": 50\n    },\n    {\n      \"id\": \"sv-04\",\n      \"label\": \"相互作用\",\n      \"source_concept_id\": \"concept-04-topic\",\n      \"range\": [\n        0,\n        100\n      ],\n      \"init\": 50\n    },\n    {\n      \"id\": \"sv-05\",\n      \"label\": \"认知心理学强\",\n      \"source_concept_id\": \"concept-05-topic\",\n      \"range\": [\n        0,\n        100\n      ],\n      \"init\": 50\n    },\n    {\n      \"id\": \"sv-06\",\n      \"label\": \"记忆\",\n      \"source_concept_id\": \"concept-06-topic\",\n      \"range\": [\n        0,\n        100\n      ],\n      \"init\": 50\n    }\n  ],\n  \"actions\": [\n    {\n      \"id\": \"act-01\",\n      \"label\": \"Apply 认知心理学强 · 记忆\",\n      \"target_system_id\": \"kb-01\",\n      \"expected_effect\": \"Drive 认知心理学强 / 记忆 from theory to scenario.\"\n    }\n  ],\n  \"relation_count\": 0\n}\n```\n\n## Key Relations\n"
+      },
+      {
+        "id": "kb-01",
+        "path": "gates/gate-01.md",
+        "title": "gate-01.md",
+        "kind": "gate",
+        "gate": 1,
+        "markdown": "# Gate 01: 认知心理学强 · 记忆\n\n- id: kb-01\n- words: 50\n- keywords: 认知心理学强, 记忆, 决策偏差, 相互作用, 一个学习者如, 做情境化练习\n\n## Summary\n\n认知心理学强调注意、记忆与决策偏差的相互作用。一个学习者如果只背结论，不做情境化练习，就很难迁移到真实决策场景。有效做法是：先识别触发条件，再建立反例，最后复盘失败信号。注意力是一种有限资源，环境线索会放大或削弱判断质量。\n\n## Source Excerpt\n\n认知心理学强调注意、记忆与决策偏差的相互作用。一个学习者如果只背结论，不做情境化练习，就很难迁移到真实决策场景。有效做法是：先识别触发条件，再建立反例，最后复盘失败信号。注意力是一种有限资源，环境线索会放大或削弱判断质量。"
+      }
+    ]
+  },
+  "module_map": [
+    {
+      "module_slug": "user-book-text-source-test-ge4o6z-a1c8-g01-chapter-1",
+      "knowledge_block_id": "kb-01"
+    },
+    {
+      "module_slug": "user-book-text-source-test-ge4o6z-a1c8-g02-chapter-2",
+      "knowledge_block_id": "kb-01"
+    },
+    {
+      "module_slug": "user-book-text-source-test-ge4o6z-a1c8-g03-chapter-3",
+      "knowledge_block_id": "kb-01"
+    }
+  ],
+  "artifacts": [
+    {
+      "moduleSlug": "user-book-text-source-test-ge4o6z-a1c8-g01-chapter-1",
+      "gateIndex": 1,
+      "theme": "cognition",
+      "sectionCount": 1,
+      "ok": true
+    },
+    {
+      "moduleSlug": "user-book-text-source-test-ge4o6z-a1c8-g02-chapter-2",
+      "gateIndex": 2,
+      "theme": "cognition",
+      "sectionCount": 1,
+      "ok": true
+    },
+    {
+      "moduleSlug": "user-book-text-source-test-ge4o6z-a1c8-g03-chapter-3",
+      "gateIndex": 3,
+      "theme": "cognition",
+      "sectionCount": 1,
+      "ok": true
+    }
+  ]
+}

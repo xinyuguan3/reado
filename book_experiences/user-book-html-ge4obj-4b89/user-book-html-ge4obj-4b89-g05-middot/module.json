@@ -1,0 +1,40 @@
+{
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T14:00:13.095Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "金翼.html",
+      "author": ""
+    },
+    "knowledge_block": {
+      "id": "kb-06",
+      "gate_index": 5,
+      "title": "middot · 岁时节令",
+      "summary": "五子 = 花生、红枣、榛子、瓜子、龙眼 &#127966; 丧葬风水 风水选墓 风水先生用罗盘定方位，寻找\"鼠朝食\"等吉利地形。选中宝地意味着子孙兴旺。东林为祖父选墓地，花了二十年才完成安葬。 罗盘定位 &middot; 地形喻象 &#127806; 岁时节令 墓祭节 秋收前全族上坟祭祖。男女老幼聚于山顶坟前，跪拜、献食、烧纸钱，随后野餐。\"祖公田\"轮流耕种，是宗族凝聚力的物质基础。",
+      "words": 636,
+      "keywords": [
+        "middot",
+        "岁时节令",
+        "命运",
+        "黄家",
+        "咸鱼",
+        "收益"
+      ],
+      "density": {
+        "score": 0.7387,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0.7547,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "scholar",
+      "theme_label": "Scholar Atlas",
+      "section_count": 5,
+      "generated_with": "template_runtime"
+    }
+  }
+}

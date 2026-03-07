@@ -1325,7 +1325,7 @@
 
           <details id="knowledge-fold" class="block">
             <summary class="progress-head fold-summary">
-              <h3 class="section-title" data-i18n="studio.knowledge_blocks">Knowledge Blocks</h3>
+              <h3 class="section-title" data-i18n="studio.knowledge_blocks">Reading Chapters</h3>
               <div style="display:flex;align-items:center;gap:10px;">
                 <span id="knowledge-count" class="status-badge">0</span>
                 <span class="fold-toggle-text">
@@ -1390,7 +1390,7 @@
     <div class="pipeline-viewer-card" role="dialog" aria-modal="true" aria-labelledby="pipeline-viewer-title">
       <header class="pipeline-viewer-head">
         <div>
-          <h3 id="pipeline-viewer-title" class="pipeline-viewer-title">Knowledge Model Explorer</h3>
+          <h3 id="pipeline-viewer-title" class="pipeline-viewer-title">Reading Blueprint Explorer</h3>
           <p id="pipeline-viewer-sub" class="pipeline-viewer-sub">Loading…</p>
         </div>
         <div class="pipeline-viewer-actions">
@@ -1691,7 +1691,7 @@
               <h4 class="book-title">${esc(title || "Untitled")}</h4>
               <p class="book-desc">${esc(desc || "已生成，可随时继续学习。")}</p>
               <div class="book-actions">
-                <button class="tiny" data-act="open-owned" data-id="${esc(safeBookId)}" data-work-id="${esc(String(work?.id || ""))}" data-work-title="${esc(title || "Knowledge Model")}" data-href="${esc(openHref)}">${esc(openHref ? "打开" : "知识模型")}</button>
+                <button class="tiny" data-act="open-owned" data-id="${esc(safeBookId)}" data-work-id="${esc(String(work?.id || ""))}" data-work-title="${esc(title || "Reading Blueprint")}" data-href="${esc(openHref)}">${esc(openHref ? "打开" : "阅读蓝图")}</button>
                 <button class="tiny" data-act="publish-owned" data-work-id="${esc(String(work?.id || ""))}" data-is-public="${work?.is_public ? "1" : "0"}">${esc(work?.is_public ? "下架" : "上架")}</button>
                 <button class="tiny" data-act="delete-owned" data-work-id="${esc(String(work?.id || ""))}">${esc("删除")}</button>
               </div>
@@ -1888,13 +1888,13 @@
             openBookHref(href);
             return;
           }
-          const title = btn.getAttribute("data-work-title") || "Knowledge Model";
+          const title = btn.getAttribute("data-work-title") || "Reading Blueprint";
           if (!workId) {
-            setError("当前条目没有可用体验或知识模型。");
+            setError("当前条目没有可用体验或阅读蓝图。");
             return;
           }
           openPipelineViewerByWork(workId, title).catch((error) => {
-            setError(error?.message || "Failed to open knowledge model.");
+            setError(error?.message || "Failed to open reading blueprint.");
           });
         });
       }
@@ -2103,28 +2103,7 @@
 
     function detectBookPipelineIntent(sources) {
       const rows = Array.isArray(sources) ? sources : [];
-      if (!rows.length) return false;
-      let ingestCount = 0;
-      let bookLikeCount = 0;
-      for (const item of rows) {
-        const parsedBy = String(item?.parsedBy || "").toLowerCase();
-        const urlText = String(item?.url || "");
-        const uploadName = String(item?.__bookFile?.name || "").toLowerCase();
-        const fileToken = String(item?.__bookFileToken || item?.__bookFile?.fileToken || item?.fileToken || "").trim();
-        if (parsedBy.startsWith("ingest.")) ingestCount += 1;
-        if (
-          parsedBy.includes("pdf")
-          || parsedBy.includes("epub")
-          || /\.(pdf|epub)(?:$|[?#])/i.test(urlText)
-          || /\.(pdf|epub)$/.test(uploadName)
-          || Boolean(fileToken)
-        ) {
-          bookLikeCount += 1;
-        }
-      }
-      if (bookLikeCount > 0) return true;
-      if (ingestCount > 0) return true;
-      return false;
+      return rows.length > 0;
     }
 
     function pickBookFilePayload(sources) {
@@ -2160,7 +2139,7 @@
       if (!rows.length) return "";
       const lines = rows.slice(0, 12).map((row, idx) => {
         const gate = Number(row?.gateIndex || idx + 1);
-        const title = String(row?.title || ("Knowledge Block " + gate)).trim();
+        const title = String(row?.title || ("Reading Chapter " + gate)).trim();
         return `${gate}. ${title}`;
       });
       return lines.join("\n");
@@ -2258,7 +2237,7 @@
       }
       if (!knowledgeBlocksEl) return;
       if (!rows.length) {
-        knowledgeBlocksEl.innerHTML = `<div class="item"><p>${esc("No knowledge blocks yet. Upload a book source and start parsing/generation.")}</p></div>`;
+        knowledgeBlocksEl.innerHTML = `<div class="item"><p>${esc("No reading chapters yet. Upload a source and start parsing.")}</p></div>`;
         return;
       }
       if (knowledgeFoldEl instanceof HTMLDetailsElement) {
@@ -2361,7 +2340,6 @@
     }
 
     function buildViewerIndexMarkdown(data, rows) {
-      const model = getViewerKnowledgeModel(data);
       const docs = getViewerModelDocs(data);
       const indexDoc = docs.find((row) => String(row?.id || "").trim() === "__index__")
         || docs.find((row) => String(row?.path || "").trim().toLowerCase() === "index.md")
@@ -2372,12 +2350,10 @@
         ? data.splitDiagnostics
         : null;
       const lines = [];
-      lines.push("# Knowledge Model Index");
+      lines.push("# Reading Blueprint Index");
       lines.push("");
       lines.push(`- book_id: ${String(data?.bookId || "").trim()}`);
-      lines.push(`- systems: ${Number(model?.systems?.length || rows.length)}`);
-      lines.push(`- concepts: ${Number(model?.concepts?.length || 0)}`);
-      lines.push(`- relations: ${Number(model?.relations?.length || 0)}`);
+      lines.push(`- chapters: ${Number(rows.length || 0)}`);
       lines.push(`- generated_at: ${String(data?.generatedAt || data?.regeneration?.at || "").trim()}`);
       if (diagnostics) {
         lines.push(`- candidates: ${Number(diagnostics.candidates || rows.length)}`);
@@ -2386,7 +2362,7 @@
         lines.push(`- min_density_score: ${Number(diagnostics.minDensityScore || 0).toFixed(2)}`);
       }
       lines.push("");
-      lines.push("## System Files");
+      lines.push("## Chapter Files");
       lines.push("");
       for (const row of rows) {
         lines.push(`- ${row.path || ("gate-" + String(row.gate).padStart(2, "0") + ".md")} · ${row.title}`);
@@ -2394,7 +2370,7 @@
       lines.push("");
       lines.push("## Notes");
       lines.push("");
-      lines.push("Review this model before generating the interactive runtime.");
+      lines.push("Review this blueprint before generating the interactive runtime.");
       return lines.join("\n");
     }
 
@@ -2443,13 +2419,16 @@
       const model = getViewerKnowledgeModel(data);
       const rows = getViewerNormalizedRows(data);
       const total = Number(data?.totalKnowledgeBlocks || rows.length || 0);
-      const title = String(viewer.title || model?.title || data?.bookId || "Knowledge Model Explorer").trim();
+      const title = String(viewer.title || model?.title || data?.bookId || "Reading Blueprint Explorer").trim();
       if (pipelineViewerSubEl) {
+        const diagnostics = data?.splitDiagnostics && typeof data.splitDiagnostics === "object"
+          ? data.splitDiagnostics
+          : null;
+        const retained = Number(diagnostics?.retained || rows.length || 0);
+        const candidates = Number(diagnostics?.candidates || total || rows.length || 0);
         pipelineViewerSubEl.textContent = viewer.loading
-          ? "Loading knowledge model..."
-          : model
-            ? `${title} · ${Number(model?.systems?.length || rows.length)} systems / ${Number(model?.concepts?.length || 0)} concepts / ${Number(model?.relations?.length || 0)} relations`
-            : `${title} · ${rows.length}/${total} blocks`;
+          ? "Loading reading blueprint..."
+          : `${title} · ${rows.length}/${total} chapters · retained ${retained}/${candidates}`;
       }
       if (pipelineTabCodeEl) pipelineTabCodeEl.classList.toggle("active", viewer.tab === "code");
       if (pipelineTabPreviewEl) pipelineTabPreviewEl.classList.toggle("active", viewer.tab === "preview");
@@ -2472,7 +2451,7 @@
           const active = viewer.selectedId === row.id ? " active" : "";
           return `<button class="pipeline-tree-item${active}" data-viewer-id="${esc(row.id)}" type="button">📄 ${esc(row.path || ("gate-" + String(row.gate).padStart(2, "0") + ".md"))}<small>${esc(row.title)}</small></button>`;
         }).join("");
-        pipelineTreeListEl.innerHTML = `<button class="pipeline-tree-item${indexActive}" data-viewer-id="__index__" type="button">📄 index.md<small>Knowledge model overview</small></button>${rowsHtml}`;
+        pipelineTreeListEl.innerHTML = `<button class="pipeline-tree-item${indexActive}" data-viewer-id="__index__" type="button">📄 index.md<small>Reading blueprint overview</small></button>${rowsHtml}`;
         pipelineTreeListEl.querySelectorAll("button[data-viewer-id]").forEach((btn) => {
           btn.addEventListener("click", () => {
             state.pipelineViewer.selectedId = String(btn.getAttribute("data-viewer-id") || "__index__");
@@ -2493,15 +2472,18 @@
       if (pipelinePreviewEl) {
         pipelinePreviewEl.hidden = viewer.tab !== "preview";
         if (!selectedBlock) {
+          const diagnostics = data?.splitDiagnostics && typeof data.splitDiagnostics === "object"
+            ? data.splitDiagnostics
+            : null;
           pipelinePreviewEl.innerHTML = `
             <article class="pipeline-preview-card">
-              <h4>Knowledge Model Overview</h4>
+              <h4>Reading Blueprint Overview</h4>
               <div class="pipeline-preview-meta">
-                <span class="pipeline-chip">Systems ${esc(String(model?.systems?.length || rows.length))}</span>
-                <span class="pipeline-chip">Concepts ${esc(String(model?.concepts?.length || 0))}</span>
-                <span class="pipeline-chip">Relations ${esc(String(model?.relations?.length || 0))}</span>
+                <span class="pipeline-chip">Chapters ${esc(String(rows.length || 0))}</span>
+                <span class="pipeline-chip">Retained ${esc(String(Number(diagnostics?.retained || rows.length || 0)))}</span>
+                <span class="pipeline-chip">Filtered ${esc(String(Number(diagnostics?.filteredOut || 0)))}</span>
               </div>
-              <p class="pipeline-empty">Select a file from the left tree to inspect parsed markdown and structure.</p>
+              <p class="pipeline-empty">Select a file from the left tree to inspect parsed markdown and chapter structure.</p>
             </article>
           `;
         } else {
@@ -2571,7 +2553,7 @@
       state.pipelineViewer.generating = true;
       renderPipelineViewer();
       setError("");
-      setMeta("Starting interactive runtime generation from knowledge model...");
+      setMeta("Starting interactive runtime generation from reading blueprint...");
       try {
         const data = await request("POST", "/api/studio/works/" + encodeURIComponent(workId) + "/model/generate", {});
         const job = data?.job && typeof data.job === "object" ? data.job : null;
@@ -2580,7 +2562,7 @@
         applyJobSnapshot(job);
         attachJobStream(job.id);
       } catch (error) {
-        setError(error?.message || "Failed to generate from knowledge model.");
+        setError(error?.message || "Failed to generate from reading blueprint.");
       } finally {
         state.pipelineViewer.generating = false;
         renderPipelineViewer();
@@ -3275,7 +3257,7 @@
           <p>${esc("Mode: " + (item.html_generation_mode || "unknown") + (item.html_generation_error ? (" · " + item.html_generation_error) : ""))}</p>
           <div class="ops">
             <a class="tiny" href="${esc(item.book_href || "#")}" target="_blank" rel="noreferrer">${esc(t("studio.open_book", "Open Book"))}</a>
-            <button class="tiny" data-act="blocks" data-id="${esc(item.id)}">Knowledge Model</button>
+            <button class="tiny" data-act="blocks" data-id="${esc(item.id)}">Reading Blueprint</button>
             <button class="tiny" data-act="rename" data-id="${esc(item.id)}">${esc(t("studio.rename", "Rename"))}</button>
             <button class="tiny" data-act="publish" data-id="${esc(item.id)}">${esc(item.is_public ? t("studio.unpublish", "Unpublish") : t("studio.publish", "Publish to Library"))}</button>
             <button class="tiny" data-act="delete" data-id="${esc(item.id)}">${esc(t("studio.delete", "Delete"))}</button>
@@ -3290,9 +3272,9 @@
           if (!id || !row) return;
           btn.disabled = true;
           try {
-            await openPipelineViewerByWork(id, row.title || row.book_id || "Knowledge Model");
+            await openPipelineViewerByWork(id, row.title || row.book_id || "Reading Blueprint");
           } catch (error) {
-            setError(error?.message || "Failed to open knowledge model.");
+            setError(error?.message || "Failed to open reading blueprint.");
           } finally {
             btn.disabled = false;
           }
@@ -3372,7 +3354,7 @@
       renderLogs();
       const blocksDigest = buildKnowledgeBlocksDigest(state.job);
       renderKnowledgeBlocks();
-      if ((step === "knowledge_blocks" || step === "knowledge_model") && state.job?.id && state.viewerAutoOpenedJobId !== state.job.id) {
+      if ((step === "knowledge_blocks" || step === "knowledge_model" || step === "reading_blueprint") && state.job?.id && state.viewerAutoOpenedJobId !== state.job.id) {
         state.viewerAutoOpenedJobId = state.job.id;
         openPipelineViewerFromJob(state.job);
       }
@@ -3384,7 +3366,7 @@
         const etaText = eta && Number.isFinite(Number(eta.etaMin))
           ? `ETA ${Number(eta.etaMin)}-${Number(eta.etaMax || eta.etaMin)} min`
           : "";
-        setMeta([etaText, "Knowledge model blocks:", blocksDigest].filter(Boolean).join("\n"));
+        setMeta([etaText, "Reading chapters:", blocksDigest].filter(Boolean).join("\n"));
       }
 
       if (status === "error") {
@@ -3413,7 +3395,7 @@
         const href = "/books/" + encodeURIComponent(work.book_id || "") + ".html";
         const blocksDigestDone = buildKnowledgeBlocksDigest(state.job);
         const info = [
-          isKnowledgeModelDone ? "Knowledge model parsed successfully." : t("studio.info_done", "Generation completed"),
+          isKnowledgeModelDone ? "Reading blueprint parsed successfully." : t("studio.info_done", "Generation completed"),
           isKnowledgeModelDone ? "You can review the model and click Generate in the explorer to build the interactive runtime." : t("studio.info_book_url", "Book URL: {value}", { value: href }),
           t("studio.info_generation_mode", "Generation mode: {value}", { value: work.generation_mode || "unknown" }),
           t("studio.info_html_mode", "HTML mode: {value}", { value: work.html_generation_mode || "unknown" }),
@@ -3423,7 +3405,7 @@
           creditSnapshot && Number.isFinite(Number(creditSnapshot.available))
             ? `Credits available: ${Number(creditSnapshot.available)}`
             : "",
-          blocksDigestDone ? ("Knowledge model blocks:\n" + blocksDigestDone) : "",
+          blocksDigestDone ? ("Reading chapters:\n" + blocksDigestDone) : "",
           work.html_generation_error ? t("studio.info_html_error", "HTML generation issue: {value}", { value: work.html_generation_error }) : "",
           work.llm_error ? t("studio.info_fallback_reason", "Fallback reason: {value}", { value: work.llm_error }) : ""
         ].filter(Boolean).join("\n");
@@ -3432,7 +3414,7 @@
         loadMyWorks().catch(() => {});
         if (work?.id && state.viewerAutoOpenedJobId !== `${state.job.id}:done`) {
           state.viewerAutoOpenedJobId = `${state.job.id}:done`;
-          openPipelineViewerByWork(work.id, work.title || work.book_id || "Knowledge Model").catch(() => {});
+          openPipelineViewerByWork(work.id, work.title || work.book_id || "Reading Blueprint").catch(() => {});
         }
         if (!isKnowledgeModelDone && state.job.id && state.openedJobId !== state.job.id && href) {
           state.openedJobId = state.job.id;
@@ -3712,7 +3694,7 @@
     if (pipelineGenerateBtnEl) {
       pipelineGenerateBtnEl.addEventListener("click", () => {
         generateFromKnowledgeModelViewer().catch((error) => {
-          setError(error?.message || "Failed to generate from knowledge model.");
+          setError(error?.message || "Failed to generate from reading blueprint.");
         });
       });
     }

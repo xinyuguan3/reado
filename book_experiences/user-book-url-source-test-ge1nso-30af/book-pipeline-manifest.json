@@ -1,0 +1,318 @@
+{
+  "version": 2,
+  "experience_mode": "visual_reading",
+  "generated_at": "2026-03-07T13:57:52.447Z",
+  "eta": {
+    "words": 19,
+    "pagesApprox": 1,
+    "ocrPagesApprox": 1,
+    "blockCount": 6,
+    "queueDepth": 0,
+    "parseSec": 1.5,
+    "parallelSec": 120,
+    "qaSec": 126,
+    "etaSec": 285,
+    "etaMin": 5,
+    "etaMax": 6,
+    "returnAt": "2026-03-07T14:02:37.439Z"
+  },
+  "source_mode": "url",
+  "source_ingest": {
+    "parsed_by": "url.browser",
+    "title": "URL Source Test",
+    "author": "",
+    "input_kind": "url",
+    "skeleton_markdown_path": "",
+    "skeleton_markdown_chars": 0,
+    "planning": {
+      "strategy": "source_text(no_markdown)",
+      "used_structured": false,
+      "section_count": 0,
+      "markdown_chars": 0,
+      "planning_text_chars": 127,
+      "preferred_chunk_count": 0
+    },
+    "enhancer": {
+      "provider": "book-reader",
+      "used": false,
+      "status": "fallback",
+      "reason": "book_reader_output_too_short(151)",
+      "elapsedMs": 48,
+      "chars": 151,
+      "baseChars": 127,
+      "inputKind": "url",
+      "sourceModeHint": "url",
+      "title": "",
+      "chunkCount": 1,
+      "totalChars": 0,
+      "chunking": {},
+      "outputPath": "/Users/guanxinyu/Documents/GitHub/reado/.data/tmp/book-reader/chunks-1772891872391-c705211e.json",
+      "markdownPath": "",
+      "markdownChars": 0,
+      "snapshotPath": "",
+      "chunksSnapshotPath": "",
+      "preferredChunks": [],
+      "scriptPath": "/Users/guanxinyu/Documents/GitHub/reado/studio_skills/book-reader/book-reader.sh"
+    }
+  },
+  "total_knowledge_blocks": 1,
+  "split_diagnostics": {
+    "minDensityScore": 0.48,
+    "targetBlocks": 6,
+    "candidates": 1,
+    "retained": 1,
+    "filteredOut": 0,
+    "averageDensityScore": 0.55,
+    "filteredPreview": [],
+    "preferredChunkCount": 0,
+    "chunkStrategy": "word_chunk+rebalance",
+    "anchorCount": 0,
+    "anchorPreview": [],
+    "visualOptimization": {
+      "applied": true,
+      "before": 1,
+      "after": 1,
+      "minKeep": 10,
+      "maxKeep": 12,
+      "dedupeDuplicatesRemoved": 0,
+      "dedupeRenamedParts": 0,
+      "averageVisualScore": 0.43
+    }
+  },
+  "knowledge_blocks": [
+    {
+      "id": "kb-01",
+      "gateIndex": 1,
+      "index": 1,
+      "title": "domain · use",
+      "summary": "Example Domain This domain is for use in documentation examples without needing permission. Avoid use in operations.",
+      "content": "Example Domain This domain is for use in documentation examples without needing permission. Avoid use in operations. Learn more",
+      "keywords": [
+        "domain",
+        "use",
+        "example",
+        "documentation",
+        "examples",
+        "without"
+      ],
+      "words": 19,
+      "density": {
+        "score": 0.55,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0
+      }
+    }
+  ],
+  "knowledge_model": {
+    "version": 1,
+    "generated_at": "2026-03-07T13:57:52.440Z",
+    "title": "URL Source Test",
+    "author": "",
+    "summary": "1 systems, 6 concepts, 0 relations.",
+    "parse_strategy": "source_text(no_markdown)",
+    "parse_structured": false,
+    "source_mode": "url",
+    "parser_provider": "book-reader",
+    "systems": [
+      {
+        "id": "kb-01",
+        "gate": 1,
+        "title": "domain · use",
+        "summary": "Example Domain This domain is for use in documentation examples without needing permission. Avoid use in operations.",
+        "keywords": [
+          "domain",
+          "use",
+          "example",
+          "documentation",
+          "examples",
+          "without"
+        ],
+        "words": 19
+      }
+    ],
+    "concepts": [
+      {
+        "id": "concept-01-documentation",
+        "name": "documentation",
+        "weight": 1,
+        "gate_refs": [
+          1
+        ]
+      },
+      {
+        "id": "concept-02-domain",
+        "name": "domain",
+        "weight": 1,
+        "gate_refs": [
+          1
+        ]
+      },
+      {
+        "id": "concept-03-example",
+        "name": "example",
+        "weight": 1,
+        "gate_refs": [
+          1
+        ]
+      },
+      {
+        "id": "concept-04-examples",
+        "name": "examples",
+        "weight": 1,
+        "gate_refs": [
+          1
+        ]
+      },
+      {
+        "id": "concept-05-use",
+        "name": "use",
+        "weight": 1,
+        "gate_refs": [
+          1
+        ]
+      },
+      {
+        "id": "concept-06-without",
+        "name": "without",
+        "weight": 1,
+        "gate_refs": [
+          1
+        ]
+      }
+    ],
+    "relations": [],
+    "state_variables": [
+      {
+        "id": "sv-01",
+        "label": "documentation",
+        "source_concept_id": "concept-01-documentation",
+        "range": [
+          0,
+          100
+        ],
+        "init": 50
+      },
+      {
+        "id": "sv-02",
+        "label": "domain",
+        "source_concept_id": "concept-02-domain",
+        "range": [
+          0,
+          100
+        ],
+        "init": 50
+      },
+      {
+        "id": "sv-03",
+        "label": "example",
+        "source_concept_id": "concept-03-example",
+        "range": [
+          0,
+          100
+        ],
+        "init": 50
+      },
+      {
+        "id": "sv-04",
+        "label": "examples",
+        "source_concept_id": "concept-04-examples",
+        "range": [
+          0,
+          100
+        ],
+        "init": 50
+      },
+      {
+        "id": "sv-05",
+        "label": "use",
+        "source_concept_id": "concept-05-use",
+        "range": [
+          0,
+          100
+        ],
+        "init": 50
+      },
+      {
+        "id": "sv-06",
+        "label": "without",
+        "source_concept_id": "concept-06-without",
+        "range": [
+          0,
+          100
+        ],
+        "init": 50
+      }
+    ],
+    "actions": [
+      {
+        "id": "act-01",
+        "label": "Apply domain · use",
+        "target_system_id": "kb-01",
+        "expected_effect": "Drive domain / use from theory to scenario."
+      }
+    ],
+    "docs": [
+      {
+        "id": "__index__",
+        "path": "index.md",
+        "title": "index.md",
+        "kind": "index",
+        "markdown": "# Knowledge Model Index\n- title: URL Source Test\n- systems: 1\n- concepts: 6\n- relations: 0\n- source_mode: url\n- parse_strategy: source_text(no_markdown)\n- parser_provider: book-reader\n## Systems\n- [gate-01.md](gates/gate-01.md) · domain · use\n## Concepts\n- documentation (weight 1)\n- domain (weight 1)\n- example (weight 1)\n- examples (weight 1)\n- use (weight 1)\n- without (weight 1)"
+      },
+      {
+        "id": "model-overview",
+        "path": "model/overview.md",
+        "title": "overview.md",
+        "kind": "model",
+        "markdown": "# Model Overview\n\n## Runtime Schema\n\n```json\n{\n  \"state_variables\": [\n    {\n      \"id\": \"sv-01\",\n      \"label\": \"documentation\",\n      \"source_concept_id\": \"concept-01-documentation\",\n      \"range\": [\n        0,\n        100\n      ],\n      \"init\": 50\n    },\n    {\n      \"id\": \"sv-02\",\n      \"label\": \"domain\",\n      \"source_concept_id\": \"concept-02-domain\",\n      \"range\": [\n        0,\n        100\n      ],\n      \"init\": 50\n    },\n    {\n      \"id\": \"sv-03\",\n      \"label\": \"example\",\n      \"source_concept_id\": \"concept-03-example\",\n      \"range\": [\n        0,\n        100\n      ],\n      \"init\": 50\n    },\n    {\n      \"id\": \"sv-04\",\n      \"label\": \"examples\",\n      \"source_concept_id\": \"concept-04-examples\",\n      \"range\": [\n        0,\n        100\n      ],\n      \"init\": 50\n    },\n    {\n      \"id\": \"sv-05\",\n      \"label\": \"use\",\n      \"source_concept_id\": \"concept-05-use\",\n      \"range\": [\n        0,\n        100\n      ],\n      \"init\": 50\n    },\n    {\n      \"id\": \"sv-06\",\n      \"label\": \"without\",\n      \"source_concept_id\": \"concept-06-without\",\n      \"range\": [\n        0,\n        100\n      ],\n      \"init\": 50\n    }\n  ],\n  \"actions\": [\n    {\n      \"id\": \"act-01\",\n      \"label\": \"Apply domain · use\",\n      \"target_system_id\": \"kb-01\",\n      \"expected_effect\": \"Drive domain / use from theory to scenario.\"\n    }\n  ],\n  \"relation_count\": 0\n}\n```\n\n## Key Relations\n"
+      },
+      {
+        "id": "kb-01",
+        "path": "gates/gate-01.md",
+        "title": "gate-01.md",
+        "kind": "gate",
+        "gate": 1,
+        "markdown": "# Gate 01: domain · use\n\n- id: kb-01\n- words: 19\n- keywords: domain, use, example, documentation, examples, without\n\n## Summary\n\nExample Domain This domain is for use in documentation examples without needing permission. Avoid use in operations.\n\n## Source Excerpt\n\nExample Domain This domain is for use in documentation examples without needing permission. Avoid use in operations. Learn more"
+      }
+    ]
+  },
+  "module_map": [
+    {
+      "module_slug": "user-book-url-source-test-ge1nso-30af-g01-domain-use",
+      "knowledge_block_id": "kb-01"
+    },
+    {
+      "module_slug": "user-book-url-source-test-ge1nso-30af-g02-chapter-2",
+      "knowledge_block_id": "kb-01"
+    },
+    {
+      "module_slug": "user-book-url-source-test-ge1nso-30af-g03-chapter-3",
+      "knowledge_block_id": "kb-01"
+    }
+  ],
+  "artifacts": [
+    {
+      "moduleSlug": "user-book-url-source-test-ge1nso-30af-g01-domain-use",
+      "gateIndex": 1,
+      "theme": "scholar",
+      "sectionCount": 2,
+      "ok": true
+    },
+    {
+      "moduleSlug": "user-book-url-source-test-ge1nso-30af-g02-chapter-2",
+      "gateIndex": 2,
+      "theme": "scholar",
+      "sectionCount": 2,
+      "ok": true
+    },
+    {
+      "moduleSlug": "user-book-url-source-test-ge1nso-30af-g03-chapter-3",
+      "gateIndex": 3,
+      "theme": "scholar",
+      "sectionCount": 2,
+      "ok": true
+    }
+  ]
+}

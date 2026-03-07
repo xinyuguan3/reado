@@ -1,0 +1,42 @@
+{
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T14:02:18.622Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "Datre书籍-第1册 我们是DATRE-1（部分）.pdf",
+      "author": ""
+    },
+    "knowledge_block": {
+      "id": "kb-04",
+      "gate_index": 4,
+      "title": "宇宙 · 星球",
+      "summary": "个源头。 你们所有的宗教，似乎都认为这基于一个单独的源头。比如：你们的科学中有大 爆炸理论。你们认为：那儿有一个 “ 源头或神 ” 照顾着这一切。这只是你们地球的概 念，不是宇宙的观点。",
+      "words": 668,
+      "keywords": [
+        "宇宙",
+        "星球",
+        "渴望",
+        "独特",
+        "真正",
+        "扩展",
+        "形式",
+        "所有"
+      ],
+      "density": {
+        "score": 0.6093,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0.0359,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0.2515
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "scholar",
+      "theme_label": "Scholar Atlas",
+      "section_count": 5,
+      "generated_with": "template_runtime"
+    }
+  }
+}

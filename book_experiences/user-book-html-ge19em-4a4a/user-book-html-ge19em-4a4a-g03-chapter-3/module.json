@@ -1,0 +1,40 @@
+{
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T13:57:33.796Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "金翼.html",
+      "author": ""
+    },
+    "knowledge_block": {
+      "id": "kb-03",
+      "gate_index": 3,
+      "title": "危机 · 同样",
+      "summary": "&#128508; 平衡 家庭和睦，生意兴隆，关系网完整 &#10230; &#9888;&#65039; 危机 亲人离世、诉讼纠纷、外部冲击 &#10230; &#128260; 重建 新的纽带替代断裂的旧纽带 &#10230; &#9878;&#65039; 新均衡 在更高层次恢复稳定 两大家族 黄家与张家：两条截然不同的命运线 两个家族因姻亲联系、合伙经商而紧密相连。同样的起点，同样的时代背景，却走向了完全不同的结局。差别不在\"风水\"，而在人如何应对生活中每一次平衡的打破。 &#127895; 黄东林家 金翼之家 卖花生起家，从茶馆到湖口店铺，从咸鱼贸易到福州钱庄 父亲早逝、兄长病故，一人扛起大家庭重担 赢得山林官司，建造村中",
+      "words": 230,
+      "keywords": [
+        "危机",
+        "同样",
+        "命运走势",
+        "平衡",
+        "家庭",
+        "生意兴隆"
+      ],
+      "density": {
+        "score": 0.8,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 1,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "scholar",
+      "theme_label": "Scholar Atlas",
+      "section_count": 2,
+      "generated_with": "template_runtime"
+    }
+  }
+}

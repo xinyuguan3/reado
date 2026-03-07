@@ -1,0 +1,40 @@
+{
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T14:00:13.095Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "金翼.html",
+      "author": ""
+    },
+    "knowledge_block": {
+      "id": "kb-05",
+      "gate_index": 4,
+      "title": "middot · 人生礼仪",
+      "summary": "大难 约 赢得官司，建成新居 凭借一份关键的土地契约，东林在省最高法院胜诉。随后建成黄村最宏伟的三层新居——\"金翼之家\"。 胜利 约 1920s 张家新居与茂德婚事 芬洲建成\"龙吐珠\"新居，为三子茂德与王家惠兰操办盛大婚礼。张家达到鼎盛时期。",
+      "words": 246,
+      "keywords": [
+        "middot",
+        "人生礼仪",
+        "银圆",
+        "商人",
+        "大难",
+        "赢得官司"
+      ],
+      "density": {
+        "score": 0.6963,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0.5854,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "scholar",
+      "theme_label": "Scholar Atlas",
+      "section_count": 3,
+      "generated_with": "template_runtime"
+    }
+  }
+}

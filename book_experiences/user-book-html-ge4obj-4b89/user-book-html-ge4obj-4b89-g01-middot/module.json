@@ -1,0 +1,40 @@
+{
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T14:00:13.095Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "金翼.html",
+      "author": ""
+    },
+    "knowledge_block": {
+      "id": "kb-01",
+      "gate_index": 1,
+      "title": "金翼 · middot",
+      "summary": "金翼 — 中国家族命运的社会学图鉴 金翼 缘起 两族 兴衰 礼俗 关系网 经济 启示 林 金翼 中国家族制度的社会学研究 林耀华 著 &middot; 1944年初版 &middot; 福建乡村田野调查 向下探索 关于这本书 一部用小说写成的社会学经典 1934年冬，社会学家林耀华回到福建故乡，发现两个曾经门当户对的家族——黄家与张家——在短短二十余年间走向了截然不同的命运。一家兴旺发达、子孙满堂；另一家却衰败凋零、几近消亡。是什么力…",
+      "words": 84,
+      "keywords": [
+        "金翼",
+        "middot",
+        "国家族命运",
+        "学图鉴",
+        "缘起",
+        "两族"
+      ],
+      "density": {
+        "score": 0.7643,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0.8571,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "macro",
+      "theme_label": "Macro Dynamics",
+      "section_count": 1,
+      "generated_with": "template_runtime"
+    }
+  }
+}

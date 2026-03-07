@@ -1,0 +1,42 @@
+{
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T14:02:18.625Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "Datre书籍-第1册 我们是DATRE-1（部分）.pdf",
+      "author": ""
+    },
+    "knowledge_block": {
+      "id": "kb-12",
+      "gate_index": 11,
+      "title": "专家 · 知道",
+      "summary": "问题 ： Datre 表示他们来自于我们的泡泡之外 ， 因此不会影响泡泡之内的个体 ， 也 不会影响我们的进化。他们来到这里只是为了观察。但通过提供这些信息，还要调整 进入我们泡泡之内的能量，那么事实上，他们怎么没有影响我们？没有影响群体意识 或我们的进化呢？这不就是他们的目的吗？ DATRE ：这是一个副产品，不是目的 / 意图。如果我们袖手旁观，不将这些信息带 给那些迷恋入物质层 ， 忘了自己是谁的 “ 专家 ” （ 注 ：…",
+      "words": 811,
+      "keywords": [
+        "专家",
+        "知道",
+        "太阳",
+        "来到",
+        "离开",
+        "燃料",
+        "进化",
+        "如果"
+      ],
+      "density": {
+        "score": 0.5791,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0.0888,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0.0345
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "cognition",
+      "theme_label": "Cognitive Lens",
+      "section_count": 5,
+      "generated_with": "template_runtime"
+    }
+  }
+}

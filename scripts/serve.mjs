@@ -5823,6 +5823,18 @@ async function resolveBookPipelineFilePayload(payload = {}, sessionId = "") {
   return tokenPayload;
 }
 
+function buildPreferredChunksFromBookReaderRun(runResult = {}) {
+  const chunkRows = Array.isArray(runResult?.chunks) ? runResult.chunks : [];
+  return chunkRows.map((row, idx) => ({
+    content: cleanText(row?.content),
+    anchor: `## ${normalizeKnowledgeBlockTitle(cleanText(row?.title), `Knowledge Block ${idx + 1}`) || `Knowledge Block ${idx + 1}`}`,
+    anchorType: "book_reader_chunk",
+    blockTitle: normalizeKnowledgeBlockTitle(cleanText(row?.title), `Knowledge Block ${idx + 1}`) || `Knowledge Block ${idx + 1}`,
+    blockSummary: cleanText(row?.summary),
+    keywords: Array.isArray(row?.keywords) ? row.keywords.map((item) => cleanText(item)).filter(Boolean).slice(0, 12) : []
+  })).filter((row) => row.content.length >= 80);
+}
+
 async function enhanceBookPipelineFileSourceWithBookReaderPrimary(filePayload, source, hooks = null) {
   const baseSource = source && typeof source === "object" ? { ...source } : {};
   const baseContent = cleanText(baseSource?.content, cleanText(baseSource?.snippet));
@@ -5876,15 +5888,7 @@ async function enhanceBookPipelineFileSourceWithBookReaderPrimary(filePayload, s
     runResult?.used
     && enhancedText.length >= Math.max(BOOK_PIPELINE_BOOK_READER_MIN_CHARS, Math.floor(baseChars * 0.35))
   );
-  const chunkRows = Array.isArray(runResult?.chunks) ? runResult.chunks : [];
-  const preferredChunks = chunkRows.map((row, idx) => ({
-    content: cleanText(row?.content),
-    anchor: `## ${normalizeKnowledgeBlockTitle(cleanText(row?.title), `Knowledge Block ${idx + 1}`) || `Knowledge Block ${idx + 1}`}`,
-    anchorType: "book_reader_chunk",
-    blockTitle: normalizeKnowledgeBlockTitle(cleanText(row?.title), `Knowledge Block ${idx + 1}`) || `Knowledge Block ${idx + 1}`,
-    blockSummary: cleanText(row?.summary),
-    keywords: Array.isArray(row?.keywords) ? row.keywords.map((item) => cleanText(item)).filter(Boolean).slice(0, 12) : []
-  })).filter((row) => row.content.length >= 80);
+  const preferredChunks = buildPreferredChunksFromBookReaderRun(runResult);
 
   if (!shouldAdopt) {
     return {
@@ -5935,6 +5939,128 @@ async function enhanceBookPipelineFileSourceWithBookReaderPrimary(filePayload, s
       chars: enhancedText.length,
       baseChars,
       inputKind,
+      title: extractedTitle,
+      chunkCount: toInt(runResult?.chunkCount),
+      totalChars: toInt(runResult?.totalChars),
+      chunking: runResult?.chunking && typeof runResult.chunking === "object" ? runResult.chunking : {},
+      outputPath: cleanText(runResult?.outputPath),
+      markdownPath: cleanText(runResult?.markdownPath),
+      markdownChars: toInt(runResult?.markdownChars),
+      snapshotPath: cleanText(runResult?.snapshotPath),
+      chunksSnapshotPath: cleanText(runResult?.chunksSnapshotPath),
+      preferredChunks,
+      scriptPath: cleanText(BOOK_READER_SCRIPT_PATH)
+    }
+  };
+}
+
+async function enhanceBookPipelineTextSourceWithBookReaderPrimary(source, hooks = null, options = {}) {
+  const baseSource = source && typeof source === "object" ? { ...source } : {};
+  const baseText = cleanText(baseSource?.content, cleanText(baseSource?.snippet));
+  const baseChars = baseText.length;
+  const inputKind = cleanText(options?.inputKind, "text").toLowerCase() || "text";
+  const sourceName = cleanText(options?.sourceName, cleanText(baseSource?.title, "uploaded-text"));
+  if (baseChars < 24) {
+    return {
+      source: baseSource,
+      enhancer: {
+        provider: "book-reader",
+        used: false,
+        status: "skipped",
+        reason: "source_text_too_short",
+        baseChars,
+        inputKind,
+        sourceModeHint: cleanText(options?.sourceModeHint)
+      }
+    };
+  }
+  const tempDir = path.join(dataDir, "tmp", "book-reader");
+  const tempPath = path.join(tempDir, `ingest-${Date.now()}-${crypto.randomUUID().slice(0, 8)}.txt`);
+  let runResult = null;
+  try {
+    await fs.mkdir(tempDir, { recursive: true });
+    await fs.writeFile(tempPath, baseText, "utf8");
+    runResult = await runBookReaderIngest(tempPath, hooks, {
+      maxChars: BOOK_PIPELINE_INGEST_MAX_TEXT,
+      timeoutMs: BOOK_PIPELINE_BOOK_READER_TIMEOUT_MS,
+      inputKind,
+      sourceName: sourceName.endsWith(".txt") ? sourceName : `${sourceName}.txt`,
+      chunkChars: BOOK_PIPELINE_BOOK_READER_CHUNK_CHARS,
+      minChars: BOOK_PIPELINE_BOOK_READER_MIN_CHUNK_CHARS,
+      maxChunks: BOOK_PIPELINE_BOOK_READER_MAX_CHUNKS
+    });
+  } catch (error) {
+    runResult = {
+      used: false,
+      status: "error",
+      reason: cleanText(error?.message, "book_reader_text_temp_failed"),
+      elapsedMs: 0,
+      inputKind
+    };
+  } finally {
+    await fs.unlink(tempPath).catch(() => {});
+  }
+  const enhancedText = cleanText(runResult?.text);
+  const extractedTitle = cleanText(runResult?.bookTitle);
+  const adoptMinChars = inputKind === "text" || inputKind === "url"
+    ? Math.max(220, Math.floor(baseChars * 0.3))
+    : BOOK_PIPELINE_BOOK_READER_MIN_CHARS;
+  const shouldAdopt = Boolean(
+    runResult?.used
+    && enhancedText.length >= Math.max(adoptMinChars, Math.floor(baseChars * 0.35))
+  );
+  const preferredChunks = buildPreferredChunksFromBookReaderRun(runResult);
+  if (!shouldAdopt) {
+    return {
+      source: {
+        ...baseSource,
+        title: cleanText(extractedTitle, cleanText(baseSource?.title, sourceName))
+      },
+      enhancer: {
+        provider: "book-reader",
+        used: false,
+        status: cleanText(runResult?.status, "fallback"),
+        reason: cleanText(runResult?.reason, "book_reader_text_no_adoption"),
+        elapsedMs: toInt(runResult?.elapsedMs),
+        chars: toInt(runResult?.chars),
+        baseChars,
+        inputKind,
+        sourceModeHint: cleanText(options?.sourceModeHint),
+        title: extractedTitle,
+        chunkCount: toInt(runResult?.chunkCount),
+        totalChars: toInt(runResult?.totalChars),
+        chunking: runResult?.chunking && typeof runResult.chunking === "object" ? runResult.chunking : {},
+        outputPath: cleanText(runResult?.outputPath),
+        markdownPath: cleanText(runResult?.markdownPath),
+        markdownChars: toInt(runResult?.markdownChars),
+        snapshotPath: cleanText(runResult?.snapshotPath),
+        chunksSnapshotPath: cleanText(runResult?.chunksSnapshotPath),
+        preferredChunks,
+        scriptPath: cleanText(BOOK_READER_SCRIPT_PATH)
+      }
+    };
+  }
+  const mergedParsedBy = [cleanText(baseSource?.parsedBy), "skill.book-reader"]
+    .filter(Boolean)
+    .join("+");
+  return {
+    source: {
+      ...baseSource,
+      title: cleanText(extractedTitle, cleanText(baseSource?.title, sourceName)),
+      snippet: clampText(enhancedText, 1200),
+      content: clampText(enhancedText, BOOK_PIPELINE_INGEST_MAX_TEXT),
+      parsedBy: mergedParsedBy || "skill.book-reader"
+    },
+    enhancer: {
+      provider: "book-reader",
+      used: true,
+      status: "applied",
+      reason: "",
+      elapsedMs: toInt(runResult?.elapsedMs),
+      chars: enhancedText.length,
+      baseChars,
+      inputKind,
+      sourceModeHint: cleanText(options?.sourceModeHint),
       title: extractedTitle,
       chunkCount: toInt(runResult?.chunkCount),
       totalChars: toInt(runResult?.totalChars),
@@ -6214,10 +6340,35 @@ async function resolveBookPipelineSource(payload = {}, hooks = {}, sessionId = "
         finalSource = nativeSource && typeof nativeSource === "object"
           ? { ...nativeSource }
           : finalSource;
+        // Even when native parser is used (e.g. html/doc-like files), re-run through book-reader chunking.
+        const textEnhanced = await enhanceBookPipelineTextSourceWithBookReaderPrimary(
+          finalSource,
+          hooks,
+          {
+            inputKind: "text",
+            sourceName: cleanText(filePayload?.name, cleanText(finalSource?.title, "uploaded-book")),
+            sourceModeHint: "file_native_text_bridge"
+          }
+        );
+        if (textEnhanced?.source && typeof textEnhanced.source === "object") {
+          finalSource = { ...textEnhanced.source };
+        }
         if (enhanced?.enhancer && typeof enhanced.enhancer === "object") {
           enhanced.enhancer.nativeFallbackUsed = true;
           enhanced.enhancer.provider = "book-reader-native-fallback";
           enhanced.enhancer.nativeParsedBy = cleanText(nativeSource?.parsedBy);
+          enhanced.enhancer.textBridge = textEnhanced?.enhancer && typeof textEnhanced.enhancer === "object"
+            ? textEnhanced.enhancer
+            : null;
+          if (textEnhanced?.enhancer?.used) {
+            enhanced.enhancer.preferredChunks = Array.isArray(textEnhanced.enhancer.preferredChunks)
+              ? textEnhanced.enhancer.preferredChunks
+              : [];
+            enhanced.enhancer.chunkCount = toInt(textEnhanced.enhancer.chunkCount);
+            enhanced.enhancer.totalChars = toInt(textEnhanced.enhancer.totalChars);
+            enhanced.enhancer.markdownPath = cleanText(textEnhanced.enhancer.markdownPath, cleanText(enhanced.enhancer.markdownPath));
+            enhanced.enhancer.markdownChars = toInt(textEnhanced.enhancer.markdownChars) || toInt(enhanced.enhancer.markdownChars);
+          }
           const nativeText = cleanText(nativeSource?.content, cleanText(nativeSource?.snippet));
           const existingPreferred = Array.isArray(enhanced.enhancer.preferredChunks) ? enhanced.enhancer.preferredChunks : [];
           if (!existingPreferred.length && nativeText.length >= 1200) {
@@ -6276,44 +6427,83 @@ async function resolveBookPipelineSource(payload = {}, hooks = {}, sessionId = "
   }
   const urlText = cleanText(payload?.url);
   if (urlText) {
-    const source = await playableContentEngine.ingestUrlSource(
+    const sourceSeed = await playableContentEngine.ingestUrlSource(
       { url: urlText, title: cleanText(payload?.title) },
       hooks
     );
+    const enhanced = await enhanceBookPipelineTextSourceWithBookReaderPrimary(
+      sourceSeed,
+      hooks,
+      {
+        inputKind: "url",
+        sourceName: cleanText(sourceSeed?.title, urlText),
+        sourceModeHint: "url"
+      }
+    );
+    const source = enhanced?.source && typeof enhanced.source === "object"
+      ? { ...enhanced.source }
+      : sourceSeed;
     return {
       source,
       mode: "url",
-      title: cleanText(payload?.title, cleanText(source?.title, urlText))
+      title: cleanText(payload?.title, cleanText(source?.title, urlText)),
+      enhancer: enhanced?.enhancer || null
     };
   }
   const firstSource = Array.isArray(payload?.sources) ? payload.sources[0] : null;
   if (firstSource && (cleanText(firstSource?.content) || cleanText(firstSource?.snippet))) {
-    const source = {
+    const sourceSeed = {
       title: cleanText(firstSource?.title, cleanText(payload?.title, "Uploaded Book")),
       author: cleanText(firstSource?.author, cleanText(payload?.author)),
       url: cleanText(firstSource?.url),
       snippet: clampText(cleanText(firstSource?.snippet, firstSource?.content), 1200),
       content: clampText(cleanText(firstSource?.content, firstSource?.snippet), BOOK_PIPELINE_INGEST_MAX_TEXT)
     };
+    const enhanced = await enhanceBookPipelineTextSourceWithBookReaderPrimary(
+      sourceSeed,
+      hooks,
+      {
+        inputKind: "text",
+        sourceName: cleanText(sourceSeed?.title, "uploaded-source"),
+        sourceModeHint: "sources"
+      }
+    );
+    const source = enhanced?.source && typeof enhanced.source === "object"
+      ? { ...enhanced.source }
+      : sourceSeed;
     return {
       source,
       mode: "sources",
-      title: cleanText(payload?.title, source.title)
+      title: cleanText(payload?.title, source.title),
+      enhancer: enhanced?.enhancer || null
     };
   }
   const inputText = cleanText(payload?.input || payload?.contextText);
   if (inputText) {
-    const source = {
+    const sourceSeed = {
       title: cleanText(payload?.title, "Uploaded Book Text"),
       author: cleanText(payload?.author),
       url: "",
       snippet: clampText(inputText, 1200),
       content: clampText(inputText, BOOK_PIPELINE_INGEST_MAX_TEXT)
     };
+    const enhanced = await enhanceBookPipelineTextSourceWithBookReaderPrimary(
+      sourceSeed,
+      hooks,
+      {
+        inputKind: "text",
+        sourceName: cleanText(sourceSeed?.title, "uploaded-text"),
+        sourceModeHint: "text"
+      }
+    );
+    const source = enhanced?.source && typeof enhanced.source === "object"
+      ? { ...enhanced.source }
+      : sourceSeed;
     return {
       source,
       mode: "text",
-      title: cleanText(payload?.title, source.title)
+      title: cleanText(payload?.title, source.title),
+      enhancer: enhanced?.enhancer || null
     };
   }
   throw new Error("No readable book source found. Provide bookFile/file, url, sources, or input text.");
@@ -7490,13 +7680,13 @@ async function runBookPipelineGenerationJob(job, sessionId) {
   };
   updateStudioJob(job, {
     status: "running",
-    step: "knowledge_model",
+    step: "reading_blueprint",
     progress: parseOnlyModel ? 36 : 18,
     pipeline: {
       ...(job.pipeline || {}),
       type: pipelineType,
       eta,
-      stage: "knowledge_model",
+      stage: "reading_blueprint",
       parseOnlyModel,
       sourceMode: resolved.mode,
       sourceParsedBy: parsedBy,
@@ -7514,7 +7704,7 @@ async function runBookPipelineGenerationJob(job, sessionId) {
       knowledgeBlockDiagnostics: splitDiagnostics,
       knowledgeModel: knowledgeModelPreview
     },
-    message: `Knowledge model synthesized: ${knowledgeModelPreview.systemCount} systems / ${knowledgeModelPreview.conceptCount} concepts / ${knowledgeModelPreview.relationCount} relations.`
+    message: `Reading blueprint synthesized: ${knowledgeBlocks.length} chapters extracted for visual reading.`
   });
   if (parseOnlyModel) {
     const work = await createKnowledgeModelDraftWork({

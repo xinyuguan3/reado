@@ -1,0 +1,42 @@
+{
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T14:02:18.625Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "Datre书籍-第1册 我们是DATRE-1（部分）.pdf",
+      "author": ""
+    },
+    "knowledge_block": {
+      "id": "kb-17",
+      "gate_index": 16,
+      "title": "头脑 · 心念",
+      "summary": "开始体验这些不同了。这也是魔术出现的地方，这也是你开始看见 “ 不可思议 ” 的事 情发生的地方。 问题 ：心识的产生是否在物质产生之前？",
+      "words": 496,
+      "keywords": [
+        "头脑",
+        "心念",
+        "想法",
+        "地方",
+        "心识",
+        "如果",
+        "产生",
+        "小种子"
+      ],
+      "density": {
+        "score": 0.6323,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0.1935,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0.1694
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "scholar",
+      "theme_label": "Scholar Atlas",
+      "section_count": 5,
+      "generated_with": "template_runtime"
+    }
+  }
+}

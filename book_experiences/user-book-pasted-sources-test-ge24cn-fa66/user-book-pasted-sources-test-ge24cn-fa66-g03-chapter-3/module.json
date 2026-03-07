@@ -1,0 +1,40 @@
+{
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T13:58:13.902Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "Pasted Sources Test",
+      "author": ""
+    },
+    "knowledge_block": {
+      "id": "kb-01",
+      "gate_index": 3,
+      "title": "结构 · 非静态平衡",
+      "summary": "社会结构并非静态平衡，而是由迁徙、职业分工、代际冲突共同塑造的动态系统。要理解这类系统，必须把个体叙事放回制度背景中观察。",
+      "words": 28,
+      "keywords": [
+        "结构",
+        "非静态平衡",
+        "由迁徙",
+        "职业分工",
+        "动态系统",
+        "理解"
+      ],
+      "density": {
+        "score": 0.75,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 1
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "scholar",
+      "theme_label": "Scholar Atlas",
+      "section_count": 1,
+      "generated_with": "template_runtime"
+    }
+  }
+}

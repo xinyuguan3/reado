@@ -1,0 +1,42 @@
+{
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T14:02:18.625Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "Datre书籍-第1册 我们是DATRE-1（部分）.pdf",
+      "author": ""
+    },
+    "knowledge_block": {
+      "id": "kb-15",
+      "gate_index": 14,
+      "title": "地方 · 来讲",
+      "summary": "他们建立起了一种完全形态 - 一种非常不高兴的能量。如果你进入这种环境中 ， 就能马上发觉，然后调转脚步，去其它商店了。 而这些群体意识将会一直呆在那个商店里，其他的人不会觉察到任何不同，因为 他们感觉不出来。",
+      "words": 711,
+      "keywords": [
+        "地方",
+        "来讲",
+        "体验",
+        "东西",
+        "进入",
+        "无论",
+        "麻烦",
+        "也就是说"
+      ],
+      "density": {
+        "score": 0.6243,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0.2025,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0.1181
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "cognition",
+      "theme_label": "Cognitive Lens",
+      "section_count": 5,
+      "generated_with": "template_runtime"
+    }
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T14:02:18.622Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "Datre书籍-第1册 我们是DATRE-1（部分）.pdf",
+      "author": ""
+    },
+    "knowledge_block": {
+      "id": "kb-08",
+      "gate_index": 8,
+      "title": "摩天轮 · 事情",
+      "summary": "为自己是罪恶的。你不想要它们，我要消除罪恶，我要消除能量，我什么都不想要！ 所有你在这个星球上所获得的体验 ， 全部被你自己丢掉了 。",
+      "words": 711,
+      "keywords": [
+        "摩天轮",
+        "事情",
+        "全息图",
+        "重复",
+        "死亡",
+        "星球",
+        "体验",
+        "同样"
+      ],
+      "density": {
+        "score": 0.5916,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0.135,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0.0394
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "scholar",
+      "theme_label": "Scholar Atlas",
+      "section_count": 5,
+      "generated_with": "template_runtime"
+    }
+  }
+}

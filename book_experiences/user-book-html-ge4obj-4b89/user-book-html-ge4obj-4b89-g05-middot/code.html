@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>middot · 岁时节令 · 金翼.html</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b1220;
+      --bg2: #1a2333;
+      --accent: #f59e0b;
+      --accent2: #34d399;
+      --text: #e5edf8;
+      --soft: #9fb1c9;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+      background:
+        radial-gradient(1200px 540px at 85% -8%, color-mix(in srgb, var(--accent2) 24%, transparent), transparent 70%),
+        radial-gradient(980px 460px at -10% 14%, color-mix(in srgb, var(--accent) 24%, transparent), transparent 74%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+      color: var(--text);
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .05;
+      background-image: radial-gradient(circle at 1px 1px, #fff 1px, transparent 0);
+      background-size: 3px 3px;
+      z-index: 0;
+    }
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      z-index: 100;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+    .page { position: relative; z-index: 1; width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 20px 0 48px; }
+    .hero {
+      min-height: 74vh;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 22px;
+      background: linear-gradient(160deg, color-mix(in srgb, var(--bg2) 86%, transparent), color-mix(in srgb, var(--bg) 88%, transparent));
+      padding: 40px 34px;
+      display: grid;
+      align-content: center;
+      gap: 16px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.34);
+    }
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .hero h1 {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(32px, 5.4vw, 68px);
+      line-height: 1.16;
+      letter-spacing: .04em;
+      max-width: 15em;
+      text-wrap: balance;
+    }
+    .hero p {
+      max-width: 66ch;
+      line-height: 1.95;
+      color: color-mix(in srgb, var(--text) 85%, var(--soft));
+      font-size: 16px;
+    }
+    .chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip {
+      border: 1px solid color-mix(in srgb, var(--accent2) 44%, transparent);
+      color: color-mix(in srgb, var(--accent2) 88%, #fff);
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 12px;
+      background: rgba(255,255,255,.03);
+    }
+    .section { margin-top: 18px; border: 1px solid rgba(255,255,255,.13); border-radius: 18px; padding: 22px; background: rgba(2,6,18,.46); }
+    .section h2 {
+      margin-bottom: 12px;
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(22px, 2.8vw, 34px);
+      color: color-mix(in srgb, var(--accent) 86%, #fff);
+      letter-spacing: .03em;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1.1fr 1fr; gap: 14px; }
+    .concept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+    .concept-card {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      background: rgba(255,255,255,.03);
+      padding: 14px;
+      min-height: 128px;
+    }
+    .concept-token { font-size: 14px; letter-spacing: .14em; color: var(--accent2); text-transform: uppercase; margin-bottom: 7px; font-weight: 700; }
+    .concept-note { font-size: 14px; color: color-mix(in srgb, var(--text) 88%, var(--soft)); line-height: 1.8; }
+    .reading-map {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 10px;
+    }
+    .map-card {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      background: rgba(255,255,255,.03);
+      padding: 12px;
+      min-height: 148px;
+    }
+    .map-no {
+      font-size: 11px;
+      letter-spacing: .18em;
+      color: var(--accent);
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+    .map-card h3 {
+      font-size: 17px;
+      font-family: "Noto Serif SC", serif;
+      line-height: 1.45;
+      margin-bottom: 6px;
+    }
+    .map-card p {
+      font-size: 14px;
+      color: color-mix(in srgb, var(--text) 84%, var(--soft));
+      line-height: 1.85;
+    }
+    .atlas {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      min-height: 440px;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+    .atlas svg { width: 100%; max-width: 440px; height: auto; }
+    .timeline { display: grid; gap: 10px; }
+    .timeline-item {
+      border-left: 2px solid color-mix(in srgb, var(--accent) 66%, transparent);
+      padding: 10px 14px;
+      background: rgba(255,255,255,.02);
+      border-radius: 0 10px 10px 0;
+    }
+    .timeline-no { font-size: 11px; letter-spacing: .22em; color: var(--accent2); display: block; margin-bottom: 6px; }
+    .timeline-item h3 { font-size: 19px; font-family: "Noto Serif SC", serif; line-height: 1.45; margin-bottom: 7px; }
+    .timeline-item p { font-size: 14px; line-height: 1.9; color: color-mix(in srgb, var(--text) 84%, var(--soft)); }
+    .quote-wrap { display: grid; gap: 10px; }
+    .quote {
+      border-left: 2px solid color-mix(in srgb, var(--accent2) 80%, transparent);
+      padding: 10px 12px;
+      background: rgba(255,255,255,.02);
+      color: color-mix(in srgb, var(--text) 92%, #fff);
+      font-family: "Noto Serif SC", serif;
+      line-height: 1.9;
+    }
+    .takeaways { margin-top: 10px; list-style: none; display: grid; gap: 8px; }
+    .takeaways li {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      padding: 10px;
+      background: rgba(255,255,255,.02);
+      align-items: start;
+      line-height: 1.8;
+    }
+    .takeaways span {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: color-mix(in srgb, var(--accent2) 26%, transparent);
+      color: var(--accent2);
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+    .nav { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,.26);
+      border-radius: 999px;
+      padding: 8px 13px;
+      font-size: 12px;
+      color: var(--text);
+      background: rgba(255,255,255,.04);
+    }
+    .btn:hover { border-color: var(--accent2); color: var(--accent2); }
+    .dot-nav {
+      position: fixed;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: grid;
+      gap: 10px;
+      z-index: 50;
+    }
+    .dot-nav button {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.35);
+      background: transparent;
+      cursor: pointer;
+      transition: all .24s ease;
+    }
+    .dot-nav button.active { transform: scale(1.34); border-color: var(--accent); background: var(--accent); }
+    .reveal { opacity: 0; transform: translateY(16px); transition: opacity .55s ease, transform .55s ease; }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+    @media (max-width: 940px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .dot-nav { display: none; }
+      .hero { min-height: auto; padding: 30px 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+  <nav class="dot-nav" id="dotNav">
+    <button data-target="hero" class="active" aria-label="Hero"></button>
+    <button data-target="atlas" aria-label="Atlas"></button>
+    <button data-target="concepts" aria-label="Concepts"></button>
+    <button data-target="reading" aria-label="Reading"></button>
+    <button data-target="takeaways" aria-label="Takeaways"></button>
+  </nav>
+  <main class="page">
+    <section class="hero reveal in" id="hero">
+      <p class="eyebrow">Scholar Atlas · Gate 5</p>
+      <h1>middot · 岁时节令</h1>
+      <p>五子 = 花生、红枣、榛子、瓜子、龙眼 &amp;#127966; 丧葬风水 风水选墓 风水先生用罗盘定方位，寻找&quot;鼠朝食&quot;等吉利地形。选中宝地意味着子孙兴旺。东林为祖父选墓地，花了二十年才完成安葬。 罗盘定位 &amp;middot; 地形喻象 &amp;#127806; 岁时节令 墓祭节 秋收前全族上坟祭祖。男女老幼聚于山顶坟前，跪拜、献食、烧纸钱，随后野餐。&quot;祖公田&quot;轮流耕种，是宗族凝聚力的物质基础。</p>
+      <div class="chip-row">
+        <span class="chip">金翼.html</span>
+        
+        <span class="chip">Module 5/5</span>
+        <span class="tag">middot</span><span class="tag">岁时节令</span><span class="tag">命运</span><span class="tag">黄家</span><span class="tag">咸鱼</span><span class="tag">收益</span>
+      </div>
+    </section>
+
+    <section class="section reveal" id="atlas">
+      <h2>主题脉络与阅读地图</h2>
+      <p style="color:var(--soft);line-height:1.9;margin-bottom:10px;">先看章节主线，再进入细节。每个卡片都是一个可独立理解的知识片段。</p>
+      <div class="reading-map">
+      <article class="map-card reveal">
+        <p class="map-no">01</p>
+        <h3>五子 = 花生、红枣、榛子、瓜子、龙眼 &amp;#127966; 丧葬风水 风水选墓 风水先生用罗盘定方位，寻找&quot;鼠朝食&quot;等吉利地形。选中宝地意味着子孙兴旺。东林</h3>
+        <p>五子 = 花生、红枣、榛子、瓜子、龙眼 &amp;#127966; 丧葬风水 风水选墓 风水先生用罗盘定方位，寻找&quot;鼠朝食&quot;等吉利地形。选中宝地意味着子孙兴旺。东林为祖父选墓地，花了二十年才完成安葬。 罗盘定位 &amp;middot; 地形喻象 &amp;#127806; 岁时节令 墓祭节 秋收前全族上坟祭祖。男女老幼聚于山顶坟前，跪拜、献食、烧纸钱，随后野餐。&quot;祖公田&quot;轮流耕种，是宗族凝聚力的物质基础。 秋祭 &amp;middot; 宗族凝聚 &amp;#127877;</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">02</p>
+        <h3>雄黄驱邪 &amp;middot; 龙舟竞渡 &amp;#128524; 岁时节令 冬至搓圆 全家挤在小厨房里，用糯米面搓圆子——揉得越圆，家庭越幸福。轮流播动篮子，象征团</h3>
+        <p>雄黄驱邪 &amp;middot; 龙舟竞渡 &amp;#128524; 岁时节令 冬至搓圆 全家挤在小厨房里，用糯米面搓圆子——揉得越圆，家庭越幸福。轮流播动篮子，象征团团圆圆、代代相传。 圆 = 团圆 &amp;middot; 传承 &amp;#127793; 农事仪式 庆丰会 秋收完毕，全家与帮工举杯庆祝。糯米糕、糖和酒，庆贺一年辛勤换来的丰收。男女老幼各有分工，妇女的角色不可或缺。 劳动与休息的循环 人际关系 命运的网络：人与人的联结 每个人都是网上的一个节点</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">03</p>
+        <h3>&amp;#127834; 黄村农田 稻米产出 &amp;#10230; &amp;#127978; 湖口店铺 交易枢纽 &amp;#10230; &amp;#9973; 闽江帆船 水路运输 &amp;#</h3>
+        <p>&amp;#127834; 黄村农田 稻米产出 &amp;#10230; &amp;#127978; 湖口店铺 交易枢纽 &amp;#10230; &amp;#9973; 闽江帆船 水路运输 &amp;#10230; &amp;#127961; 福州城 咸鱼·钱庄 钱庄信用 天济钱庄为东林开户，允许短期透支。从此无需现金即可在中亭街鱼店订货，两周结一次账。信用体系是商业扩张的关键。 帆船网络 约20条帆船定期往返湖口与福州。船主世代以此为生，与店家互为依赖。船运稻米下行，咸鱼上行，形成稳定的</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">04</p>
+        <h3>土地制度 &quot;撒根租佃制&quot;：三层土地权利 一块土地上可以同时存在三种权利人，收益按比例层层分配，构成了中国南方独特的土地关系。</h3>
+        <p>土地制度 &quot;撒根租佃制&quot;：三层土地权利 一块土地上可以同时存在三种权利人，收益按比例层层分配，构成了中国南方独特的土地关系。 地主（底盘持有者） 收益 50% 拥有土地所有权，在政府注册，向政府缴纳地税 自佃农（根的占有者） 收益 25% 拥有永久占有权，如黄家兄弟。可将土地再租给二佃农 二佃农（实际耕种者） 收益 25% 实际劳作者，仅获最少份额，有时还被迫缴纳&quot;小税&quot; 全书启示 我们今天可以将&quot;上苍&quot;理解为人类本身，将&quot;命运&quot;理解为</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">05</p>
+        <h3>肆 仪式维系秩序 从出生的红蛋到死后的风水，每一种仪式都在确认和强化社会关系。仪式不是迷信，而是社会结构的可见形式。</h3>
+        <p>肆 仪式维系秩序 从出生的红蛋到死后的风水，每一种仪式都在确认和强化社会关系。仪式不是迷信，而是社会结构的可见形式。 金翼 林耀华 著 &amp;middot; 1944年纽约初版 &amp;middot; 1947年伦敦修订版 &amp;middot; 2015年商务印书馆 本页面基于原著内容制作，旨在以视觉化方式呈现书中的社会学知识</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="concepts">
+      <h2>核心概念与解释</h2>
+      <div class="concept-grid">
+      <article class="concept-card reveal">
+        <p class="concept-token">middot</p>
+        <p class="concept-note">罗盘定位 &amp;middot; 地形喻象 &amp;#127806; 岁时节令 墓祭节 秋收前全族上坟祭祖。男女老幼聚于山顶坟前，跪拜、献食、烧纸钱，随后野餐。&quot;祖公田&quot;轮流耕种，是宗族凝聚力的物质基础。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">岁时节令</p>
+        <p class="concept-note">罗盘定位 &amp;middot; 地形喻象 &amp;#127806; 岁时节令 墓祭节 秋收前全族上坟祭祖。男女老幼聚于山顶坟前，跪拜、献食、烧纸钱，随后野餐。&quot;祖公田&quot;轮流耕种，是宗族凝聚力的物质基础。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">命运</p>
+        <p class="concept-note">劳动与休息的循环 人际关系 命运的网络：人与人的联结 每个人都是网上的一个节点。商业伙伴、姻亲、同学、同乡——这些关系决定了信息的流通、资源的获取、危机中的支援。黄家的成功，在于不断编织和修复这张网。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">黄家</p>
+        <p class="concept-note">劳动与休息的循环 人际关系 命运的网络：人与人的联结 每个人都是网上的一个节点。商业伙伴、姻亲、同学、同乡——这些关系决定了信息的流通、资源的获取、危机中的支援。黄家的成功，在于不断编织和修复这张网。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">咸鱼</p>
+        <p class="concept-note">黄家 张家 商业伙伴 其他关系 经济系统 咸鱼与稻米：闽江上的贸易之河 黄东林和张芬洲的商业帝国，建立在连接乡村与城市的贸易通道之上。稻米顺流而下，咸鱼逆流而上，钱庄票据在两地之间流转——这是一个自然经济向商业经济转型的微观图景。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">收益</p>
+        <p class="concept-note">土地制度 &quot;撒根租佃制&quot;：三层土地权利 一块土地上可以同时存在三种权利人，收益按比例层层分配，构成了中国南方独特的土地关系。</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="reading-excerpts">
+      <h2>原文精读片段</h2>
+      <p style="color:var(--soft);line-height:1.9;margin-bottom:10px;">保留信息密度最高的段落，先读原句，再看后续路径与总结。</p>
+      <div class="reading-map">
+      <article class="map-card reveal">
+        <p class="map-no">EXCERPT 1</p>
+        <p>五子 = 花生、红枣、榛子、瓜子、龙眼 &amp;#127966; 丧葬风水 风水选墓 风水先生用罗盘定方位，寻找&quot;鼠朝食&quot;等吉利地形。选中宝地意味着子孙兴旺。东林为祖父选墓地，花了二十年才完成安葬。</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">EXCERPT 2</p>
+        <p>罗盘定位 &amp;middot; 地形喻象 &amp;#127806; 岁时节令 墓祭节 秋收前全族上坟祭祖。男女老幼聚于山顶坟前，跪拜、献食、烧纸钱，随后野餐。&quot;祖公田&quot;轮流耕种，是宗族凝聚力的物质基础。</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">EXCERPT 3</p>
+        <p>秋祭 &amp;middot; 宗族凝聚 &amp;#127877; 岁时节令 春节守岁 祭灶王爷、贴对联、烧爆竹纪念驱逐海盗。除夕全家围炉守夜，孩子戴纸面具跳舞驱病。东林从火中取三块炭放入灶中，迎接新年。</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">EXCERPT 4</p>
+        <p>炭火 = 家庭延续 &amp;#127858; 岁时节令 端午竞渡 门挂菖蒲、额涂雄黄、食粽投江纪念屈原。闽江上龙舟竞赛连续数日，是少年们最兴奋的时刻。</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">EXCERPT 5</p>
+        <p>雄黄驱邪 &amp;middot; 龙舟竞渡 &amp;#128524; 岁时节令 冬至搓圆 全家挤在小厨房里，用糯米面搓圆子——揉得越圆，家庭越幸福。轮流播动篮子，象征团团圆圆、代代相传。</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">EXCERPT 6</p>
+        <p>圆 = 团圆 &amp;middot; 传承 &amp;#127793; 农事仪式 庆丰会 秋收完毕，全家与帮工举杯庆祝。糯米糕、糖和酒，庆贺一年辛勤换来的丰收。男女老幼各有分工，妇女的角色不可或缺。</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="reading">
+      <h2>渐进式阅读路径</h2>
+      <div class="timeline">
+      <article class="timeline-item reveal">
+        <span class="timeline-no">01</span>
+        <h3>五子 = 花生、红枣、榛子、瓜子、龙眼 &amp;#127966; 丧葬风水 风水选墓 风水先生用罗盘定方位，寻找&quot;鼠朝食&quot;等吉利地形。选中宝地意味着子孙兴旺。东林</h3>
+        <p>五子 = 花生、红枣、榛子、瓜子、龙眼 &amp;#127966; 丧葬风水 风水选墓 风水先生用罗盘定方位，寻找&quot;鼠朝食&quot;等吉利地形。选中宝地意味着子孙兴旺。东林为祖父选墓地，花了二十年才完成安葬。 罗盘定位 &amp;middot; 地形喻象 &amp;#127806; 岁时节令 墓祭节 秋收前全族上坟祭祖。男女老幼聚于山顶坟前，跪拜、献食、烧纸钱，随后野餐。&quot;祖公田&quot;轮流耕种，是宗族凝聚力的物质基础。 秋祭 &amp;middot; 宗族凝聚 &amp;#127877; 岁时节令 春节守岁 祭灶王爷、贴对联、烧爆竹纪念驱逐海盗。除夕全家围炉守夜，孩子戴纸面具跳舞驱病。东林从火中取三块炭放入灶中，迎接新年。 炭火 = 家庭延续 &amp;#127858; 岁时节令 端午竞渡 门挂菖蒲、额涂雄黄、食粽投江纪念屈原。闽江上龙舟竞赛连续数日，是少年们最兴奋的时刻。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">02</span>
+        <h3>雄黄驱邪 &amp;middot; 龙舟竞渡 &amp;#128524; 岁时节令 冬至搓圆 全家挤在小厨房里，用糯米面搓圆子——揉得越圆，家庭越幸福。轮流播动篮子，象征团</h3>
+        <p>雄黄驱邪 &amp;middot; 龙舟竞渡 &amp;#128524; 岁时节令 冬至搓圆 全家挤在小厨房里，用糯米面搓圆子——揉得越圆，家庭越幸福。轮流播动篮子，象征团团圆圆、代代相传。 圆 = 团圆 &amp;middot; 传承 &amp;#127793; 农事仪式 庆丰会 秋收完毕，全家与帮工举杯庆祝。糯米糕、糖和酒，庆贺一年辛勤换来的丰收。男女老幼各有分工，妇女的角色不可或缺。 劳动与休息的循环 人际关系 命运的网络：人与人的联结 每个人都是网上的一个节点。商业伙伴、姻亲、同学、同乡——这些关系决定了信息的流通、资源的获取、危机中的支援。黄家的成功，在于不断编织和修复这张网。 黄家 张家 商业伙伴 其他关系 经济系统 咸鱼与稻米：闽江上的贸易之河 黄东林和张芬洲的商业帝国，建立在连接乡村与城市的贸易通道之上。稻米顺流而下，咸鱼逆流而上，钱庄票据在两地之间流转——这是一个自然经济向商业经济转型的微观图景。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">03</span>
+        <h3>&amp;#127834; 黄村农田 稻米产出 &amp;#10230; &amp;#127978; 湖口店铺 交易枢纽 &amp;#10230; &amp;#9973; 闽江帆船 水路运输 &amp;#</h3>
+        <p>&amp;#127834; 黄村农田 稻米产出 &amp;#10230; &amp;#127978; 湖口店铺 交易枢纽 &amp;#10230; &amp;#9973; 闽江帆船 水路运输 &amp;#10230; &amp;#127961; 福州城 咸鱼·钱庄 钱庄信用 天济钱庄为东林开户，允许短期透支。从此无需现金即可在中亭街鱼店订货，两周结一次账。信用体系是商业扩张的关键。 帆船网络 约20条帆船定期往返湖口与福州。船主世代以此为生，与店家互为依赖。船运稻米下行，咸鱼上行，形成稳定的物流链条。 搬运夫势力 福州码头上的搬运夫分为不同团伙，各有势力范围，不可越界。从鱼店到货栈、从货栈到帆船，由不同苦力负责。 三层租佃制 地主占有&quot;底盘&quot;收一半租；&quot;根的占有者&quot;得四分之一；实际耕种的农民只得四分之一。层层剥削下的土地制度。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">04</span>
+        <h3>土地制度 &quot;撒根租佃制&quot;：三层土地权利 一块土地上可以同时存在三种权利人，收益按比例层层分配，构成了中国南方独特的土地关系。</h3>
+        <p>土地制度 &quot;撒根租佃制&quot;：三层土地权利 一块土地上可以同时存在三种权利人，收益按比例层层分配，构成了中国南方独特的土地关系。 地主（底盘持有者） 收益 50% 拥有土地所有权，在政府注册，向政府缴纳地税 自佃农（根的占有者） 收益 25% 拥有永久占有权，如黄家兄弟。可将土地再租给二佃农 二佃农（实际耕种者） 收益 25% 实际劳作者，仅获最少份额，有时还被迫缴纳&quot;小税&quot; 全书启示 我们今天可以将&quot;上苍&quot;理解为人类本身，将&quot;命运&quot;理解为人类社会 壹 关系即命运 一个人的兴衰不取决于&quot;风水&quot;，而取决于他所编织的社会关系网络——亲缘、商缘、地缘、学缘交织在一起，构成了命运的经纬。 贰 弹性决定存亡 黄家能在每次危机后重建平衡，张家却在失衡后一蹶不振。差别在于：当旧纽带断裂时，是否有能力建立新的联结。 叁 教育改变命运 东林从打官司中痛悟教育的重要，用竹棍赶着孩子上学。这份对未来的投资，让黄家超越了农耕社会的局限。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">05</span>
+        <h3>肆 仪式维系秩序 从出生的红蛋到死后的风水，每一种仪式都在确认和强化社会关系。仪式不是迷信，而是社会结构的可见形式。</h3>
+        <p>肆 仪式维系秩序 从出生的红蛋到死后的风水，每一种仪式都在确认和强化社会关系。仪式不是迷信，而是社会结构的可见形式。 金翼 林耀华 著 &amp;middot; 1944年纽约初版 &amp;middot; 1947年伦敦修订版 &amp;middot; 2015年商务印书馆 本页面基于原著内容制作，旨在以视觉化方式呈现书中的社会学知识</p>
+      </article>
+    </div>
+      <div class="quote-wrap" style="margin-top:12px;"><blockquote class="quote reveal">“地主（底盘持有者） 收益 50% 拥有土地所有权，在政府注册，向政府缴纳地税 自佃农（根的占有者） 收益 25% 拥有永久占有权，如黄家兄弟。可将土地再租给二佃农 二佃农（实际耕种者） 收益 25% 实际劳作者，仅获最少份额，有时还被迫缴纳&quot;小税&quot; 全书启示 我们今天可以将&quot;上苍&quot;理解为人类本身，将&quot;命运&quot;理解为人类社会 壹 关系即命运 一个人的兴衰不取决于&quot;风水&quot;，而取决于他所编织的社会关系网络——亲缘、商缘、地缘、学缘交织在一起，构”</blockquote><blockquote class="quote reveal">“&amp;#127834; 黄村农田 稻米产出 &amp;#10230; &amp;#127978; 湖口店铺 交易枢纽 &amp;#10230; &amp;#9973; 闽江帆船 水路运输 &amp;#10230; &amp;#127961; 福州城 咸鱼·钱庄 钱庄信用 天济钱庄为东林开户，允许短期透支。从此无需现金即可在中亭街鱼店订货，两周结一次账。信用体系是商业扩张的关键。”</blockquote><blockquote class="quote reveal">“黄家 张家 商业伙伴 其他关系 经济系统 咸鱼与稻米：闽江上的贸易之河 黄东林和张芬洲的商业帝国，建立在连接乡村与城市的贸易通道之上。稻米顺流而下，咸鱼逆流而上，钱庄票据在两地之间流转——这是一个自然经济向商业经济转型的微观图景。”</blockquote></div>
+    </section>
+
+    <section class="section reveal" id="takeaways">
+      <h2>本关关键收获</h2>
+      <ul class="takeaways"><li><span>1</span>五子 = 花生、红枣、榛子、瓜子、龙眼 &amp;#127966; 丧葬风水 风水选墓 风水先生用罗盘定方位，寻找&quot;鼠朝食&quot;等吉利地形。选中宝地意味着子孙兴旺。东林</li><li><span>2</span>雄黄驱邪 &amp;middot; 龙舟竞渡 &amp;#128524; 岁时节令 冬至搓圆 全家挤在小厨房里，用糯米面搓圆子——揉得越圆，家庭越幸福。轮流播动篮子，象征团</li><li><span>3</span>&amp;#127834; 黄村农田 稻米产出 &amp;#10230; &amp;#127978; 湖口店铺 交易枢纽 &amp;#10230; &amp;#9973; 闽江帆船 水路运输 &amp;#</li><li><span>4</span>土地制度 &quot;撒根租佃制&quot;：三层土地权利 一块土地上可以同时存在三种权利人，收益按比例层层分配，构成了中国南方独特的土地关系。</li></ul>
+      <nav class="nav">
+        <a class="btn" href="/experiences/user-book-html-ge4obj-4b89-g04-middot.html">上一关</a>
+        
+      </nav>
+    </section>
+  </main>
+  <script>
+    (() => {
+      const progress = document.getElementById("progress");
+      const dots = Array.from(document.querySelectorAll("#dotNav button[data-target]"));
+      const sections = dots
+        .map((dot) => document.getElementById(dot.getAttribute("data-target")))
+        .filter(Boolean);
+      const reveals = Array.from(document.querySelectorAll(".reveal"));
+      const onScroll = () => {
+        const h = document.documentElement;
+        const total = Math.max(1, h.scrollHeight - window.innerHeight);
+        const pct = Math.max(0, Math.min(100, (window.scrollY / total) * 100));
+        if (progress) progress.style.width = pct + "%";
+      };
+      const io = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) entry.target.classList.add("in");
+        }
+      }, { threshold: .14 });
+      reveals.forEach((el) => io.observe(el));
+      const secIo = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const id = entry.target.id;
+          dots.forEach((dot) => dot.classList.toggle("active", dot.getAttribute("data-target") === id));
+        });
+      }, { threshold: .4 });
+      sections.forEach((s) => secIo.observe(s));
+      dots.forEach((dot) => {
+        dot.addEventListener("click", () => {
+          const target = document.getElementById(dot.getAttribute("data-target"));
+          if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+      window.addEventListener("scroll", onScroll, { passive: true });
+      onScroll();
+    })();
+  </script>
+</body>
+</html>
