@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>第八章 Over the Rainbow 飞越彩虹 一天早晨，一夜暴雨过后，一道宽阔绚 丽的彩虹横跨天际。在我去村子里的一个小水 坑洗衣服的路上 · 雨林里的消亡：一种语言和生活方式在巴布亚新几内亚的终结</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'"/>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #16120f;
+      --bg2: #2a1f18;
+      --accent: #d97706;
+      --accent2: #2dd4bf;
+      --text: #f5f1ea;
+      --soft: #c7b8a2;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+      background:
+        radial-gradient(1200px 540px at 85% -8%, color-mix(in srgb, var(--accent2) 24%, transparent), transparent 70%),
+        radial-gradient(980px 460px at -10% 14%, color-mix(in srgb, var(--accent) 24%, transparent), transparent 74%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+      color: var(--text);
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .05;
+      background-image: radial-gradient(circle at 1px 1px, #fff 1px, transparent 0);
+      background-size: 3px 3px;
+      z-index: 0;
+    }
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      z-index: 100;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+    .page { position: relative; z-index: 1; width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 20px 0 48px; }
+    .hero {
+      min-height: 74vh;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 22px;
+      background: linear-gradient(160deg, color-mix(in srgb, var(--bg2) 86%, transparent), color-mix(in srgb, var(--bg) 88%, transparent));
+      padding: 40px 34px;
+      display: grid;
+      align-content: center;
+      gap: 16px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.34);
+    }
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .hero h1 {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(32px, 5.4vw, 68px);
+      line-height: 1.16;
+      letter-spacing: .04em;
+      max-width: 15em;
+      text-wrap: balance;
+    }
+    .hero p {
+      max-width: 66ch;
+      line-height: 1.95;
+      color: color-mix(in srgb, var(--text) 85%, var(--soft));
+      font-size: 16px;
+    }
+    .chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip {
+      border: 1px solid color-mix(in srgb, var(--accent2) 44%, transparent);
+      color: color-mix(in srgb, var(--accent2) 88%, #fff);
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 12px;
+      background: rgba(255,255,255,.03);
+    }
+    .section { margin-top: 18px; border: 1px solid rgba(255,255,255,.13); border-radius: 18px; padding: 22px; background: rgba(2,6,18,.46); }
+    .section h2 {
+      margin-bottom: 12px;
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(22px, 2.8vw, 34px);
+      color: color-mix(in srgb, var(--accent) 86%, #fff);
+      letter-spacing: .03em;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1.1fr 1fr; gap: 14px; }
+    .concept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+    .concept-card {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      background: rgba(255,255,255,.03);
+      padding: 14px;
+      min-height: 128px;
+    }
+    .concept-token { font-size: 14px; letter-spacing: .14em; color: var(--accent2); text-transform: uppercase; margin-bottom: 7px; font-weight: 700; }
+    .concept-note { font-size: 14px; color: color-mix(in srgb, var(--text) 88%, var(--soft)); line-height: 1.8; }
+    .atlas {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      min-height: 440px;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+    .atlas svg { width: 100%; max-width: 440px; height: auto; }
+    .timeline { display: grid; gap: 10px; }
+    .timeline-item {
+      border-left: 2px solid color-mix(in srgb, var(--accent) 66%, transparent);
+      padding: 10px 14px;
+      background: rgba(255,255,255,.02);
+      border-radius: 0 10px 10px 0;
+    }
+    .timeline-no { font-size: 11px; letter-spacing: .22em; color: var(--accent2); display: block; margin-bottom: 6px; }
+    .timeline-item h3 { font-size: 19px; font-family: "Noto Serif SC", serif; line-height: 1.45; margin-bottom: 7px; }
+    .timeline-item p { font-size: 14px; line-height: 1.9; color: color-mix(in srgb, var(--text) 84%, var(--soft)); }
+    .quote-wrap { display: grid; gap: 10px; }
+    .quote {
+      border-left: 2px solid color-mix(in srgb, var(--accent2) 80%, transparent);
+      padding: 10px 12px;
+      background: rgba(255,255,255,.02);
+      color: color-mix(in srgb, var(--text) 92%, #fff);
+      font-family: "Noto Serif SC", serif;
+      line-height: 1.9;
+    }
+    .takeaways { margin-top: 10px; list-style: none; display: grid; gap: 8px; }
+    .takeaways li {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      padding: 10px;
+      background: rgba(255,255,255,.02);
+      align-items: start;
+      line-height: 1.8;
+    }
+    .takeaways span {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: color-mix(in srgb, var(--accent2) 26%, transparent);
+      color: var(--accent2);
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+    .nav { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,.26);
+      border-radius: 999px;
+      padding: 8px 13px;
+      font-size: 12px;
+      color: var(--text);
+      background: rgba(255,255,255,.04);
+    }
+    .btn:hover { border-color: var(--accent2); color: var(--accent2); }
+    .dot-nav {
+      position: fixed;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: grid;
+      gap: 10px;
+      z-index: 50;
+    }
+    .dot-nav button {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.35);
+      background: transparent;
+      cursor: pointer;
+      transition: all .24s ease;
+    }
+    .dot-nav button.active { transform: scale(1.34); border-color: var(--accent); background: var(--accent); }
+    .reveal { opacity: 0; transform: translateY(16px); transition: opacity .55s ease, transform .55s ease; }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+    @media (max-width: 940px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .dot-nav { display: none; }
+      .hero { min-height: auto; padding: 30px 22px; }
+    }
+  </style>
+<style id="reado-shell-preload-style">
+html.reado-shell-preload body:not(.reado-shell-applied) {
+  padding-top: 80px !important;
+}
+@media (min-width: 1024px) {
+  html.reado-shell-preload:not(.reado-shell-preload-learning) body:not(.reado-shell-applied) {
+    padding-left: 256px !important;
+  }
+}
+@media (min-width: 1200px) {
+  html.reado-shell-preload:not(.reado-shell-preload-learning) body:not(.reado-shell-applied) {
+    padding-right: clamp(280px, 24vw, 320px) !important;
+  }
+}
+html.reado-shell-preload body:not(.reado-shell-applied) > header:first-of-type,
+html.reado-shell-preload body:not(.reado-shell-applied) > nav:first-of-type,
+html.reado-shell-preload body:not(.reado-shell-applied) > aside:first-of-type,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex > nav,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex > aside,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex-1 > nav,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex-1 > aside,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex > .flex-1 > nav,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex > .flex-1 > aside {
+  display: none !important;
+}
+</style>
+<script id="reado-shell-preload-script">
+(() => {
+  const root = document.documentElement;
+  root.classList.add("reado-shell-preload");
+  const path = window.location.pathname || "";
+  if (path.startsWith("/experiences/") || path.startsWith("/books/")) {
+    root.classList.add("reado-shell-preload-learning");
+  }
+})();
+</script>
+</head>
+<body>
+<script src="/shared/book-catalog.js?v=1772888317077"></script>
+<script type="module" src="/shared/shell.js?v=1772888317077"></script>
+<reado-app-shell data-page="knowledge-map"></reado-app-shell>
+  <div class="progress" id="progress"></div>
+  <nav class="dot-nav" id="dotNav">
+    <button data-target="hero" class="active" aria-label="Hero"></button>
+    <button data-target="atlas" aria-label="Atlas"></button>
+    <button data-target="concepts" aria-label="Concepts"></button>
+    <button data-target="reading" aria-label="Reading"></button>
+    <button data-target="takeaways" aria-label="Takeaways"></button>
+  </nav>
+  <main class="page">
+    <section class="hero reveal in" id="hero">
+      <p class="eyebrow">Field Narrative · Gate 23</p>
+      <h1>第八章 Over the Rainbow 飞越彩虹 一天早晨，一夜暴雨过后，一道宽阔绚 丽的彩虹横跨天际。在我去村子里的一个小水 坑洗衣服的路上</h1>
+      <p>第八章 Over the Rainbow 飞越彩虹 一天早晨，一夜暴雨过后，一道宽阔绚 丽的彩虹横跨天际。在我去村子里的一个小水 坑洗衣服的路上，我抬头看到了它，我发现我 不知道彩虹用泰雅博语怎么说，于是就问了我 看到的第一个人一拉法尔，村里负责祷告的 人，我知道他的泰雅博语很流利一—“彩虹” 这个词是什么。 “Renbo。”他回答说，没有丝毫犹豫。</p>
+      <div class="chip-row">
+        <span class="chip">雨林里的消亡：一种语言和生活方式在巴布亚新几内亚的终结</span>
+        
+        <span class="chip">Module 23/24</span>
+        <span class="tag">彩虹</span><span class="tag">page</span><span class="tag">image</span><span class="tag">content</span><span class="tag">ocr</span><span class="tag">mamar</span>
+      </div>
+    </section>
+
+    <section class="section grid-2 reveal" id="atlas">
+      <article>
+        <h2>知识结构图谱</h2>
+        <p style="color:var(--soft);line-height:1.9;margin-bottom:10px;">围绕本关卡核心概念构建关系图。阅读时先抓主轴，再理解每个概念如何驱动判断与行动。</p>
+        <div class="quote-wrap"><blockquote class="quote reveal">“事实恰恰相反。在迦普恩，没有什么是属于集体的，没有什么 是被大家平等地共有共享的。所有的东西一每一片土地，每一株铁 树，每一株椰子棕榈树，每一棵芒果树，每一个锅、盘、斧、刀，被 丢弃的矛杆、坏掉的煤油灯，以及任何其他你能想到的一切一都是 属于某个特定的个人的。这也包括人们的名字和命名权，以及神话、 歌谣和治病时的唱诵等知识。村民们永远知道什么东西是归谁所有 的。他们得知道哪样东西属于谁才能心无旁地拿，或相对不受惩罚 地偷。他们积极地守卫”</blockquote><blockquote class="quote reveal">“万幸的是，这四种风被收人并定义在了德国传教士乔治·霍克 出版的《泰雅博语词汇简表》里。1937年，霍克在一个传教士同伴 的陪伴下来到迦普恩，成为少数几个实际造访过这个村子的白人。他 和他的同伴在迦普恩逗留了三个钟头。霍克拍了两张照片，收集了一 个词汇表。一年后，他出版了这份列表，还加了一句不耐烦的评语： “要过好久其他研究者才会“意外发现”迦普恩，也不过是因为这个 小小的村子所能产出学术价值的概率很小，以及通往这个语言孤岛的 第八章飞越”</blockquote><blockquote class="quote reveal">“让我感到惊讶的是，像表达彩虹这样一个动人又可爱的事物的 词，居然莫名其妙地从村里人的记忆中溜走了。我寻思着，我内心深 处暗暗想让泰雅博语里有一个美丽的词来表达这一美丽的现象，很难 相信整个村子的人居然会忘记一个词一一尤其是这个词。尤其是村里 人还跟我说，家长们会告诫孩子走在彩虹下面会蒙蔽你的头脑，让你 忘事，却没人能记起来“彩虹”是哪个词，这挺滑稽的。就好像迦普 1在泰雅博语和科帕语共享的词汇中，像mamor和mamar这样发音有微妙差”</blockquote></div>
+      </article>
+      <article class="atlas">
+        <svg viewBox="0 0 440 440" aria-label="concept atlas">
+          <defs>
+            <radialGradient id="g" cx="50%" cy="50%" r="56%">
+              <stop offset="0%" stop-color="#d97706" stop-opacity=".24"></stop>
+              <stop offset="100%" stop-color="#d97706" stop-opacity="0"></stop>
+            </radialGradient>
+          </defs>
+          <circle cx="220" cy="220" r="190" fill="none" stroke="rgba(255,255,255,.08)" stroke-dasharray="5 6"></circle>
+          <circle cx="220" cy="220" r="84" fill="url(#g)"></circle>
+          <circle cx="220" cy="220" r="10" fill="#d97706"></circle>
+          <text x="220" y="252" text-anchor="middle" fill="#f5f1ea" font-size="13">第八章 Over the Rainbow 飞越彩</text>
+          <g><line x1="220" y1="220" x2="370" y2="220" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="370" cy="220" r="8" fill="#2dd4bf"/><text x="382" y="224" fill="#f5f1ea" font-size="12">彩虹</text></g><g><line x1="220" y1="220" x2="266" y2="363" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="266" cy="363" r="8" fill="#2dd4bf"/><text x="278" y="367" fill="#f5f1ea" font-size="12">page</text></g><g><line x1="220" y1="220" x2="99" y2="308" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="99" cy="308" r="8" fill="#2dd4bf"/><text x="111" y="312" fill="#f5f1ea" font-size="12">image</text></g><g><line x1="220" y1="220" x2="99" y2="132" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="99" cy="132" r="8" fill="#2dd4bf"/><text x="111" y="136" fill="#f5f1ea" font-size="12">content</text></g><g><line x1="220" y1="220" x2="266" y2="77" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="266" cy="77" r="8" fill="#2dd4bf"/><text x="278" y="81" fill="#f5f1ea" font-size="12">ocr</text></g>
+        </svg>
+      </article>
+    </section>
+
+    <section class="section reveal" id="concepts">
+      <h2>核心概念与解释</h2>
+      <div class="concept-grid">
+      <article class="concept-card reveal">
+        <p class="concept-token">彩虹</p>
+        <p class="concept-note">第八章 Over the Rainbow 飞越彩虹 一天早晨，一夜暴雨过后，一道宽阔绚 丽的彩虹横跨天际。在我去村子里的一个小水 坑洗衣服的路上，我抬头看到了它，我发现我 不知道彩虹用泰雅博语怎么说，于是就问了我 看到的第一个人一拉法尔，村里负责祷告的 人，我知道他的泰雅博语很流利一—“彩虹” 这个词是什么。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">page</p>
+        <p class="concept-note">107 [PAGE 117 IMAGE 1 CONTENT (OCR)]: “二战”前在一个种植园做工时，莫内的父亲遇到了他的妻子，与那 些离开村子去当契约工，在外面娶了当地女人的村民不同，莫内的父 亲把妻子和两个孩子带回了迦普恩。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">image</p>
+        <p class="concept-note">107 [PAGE 117 IMAGE 1 CONTENT (OCR)]: “二战”前在一个种植园做工时，莫内的父亲遇到了他的妻子，与那 些离开村子去当契约工，在外面娶了当地女人的村民不同，莫内的父 亲把妻子和两个孩子带回了迦普恩。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">content</p>
+        <p class="concept-note">107 [PAGE 117 IMAGE 1 CONTENT (OCR)]: “二战”前在一个种植园做工时，莫内的父亲遇到了他的妻子，与那 些离开村子去当契约工，在外面娶了当地女人的村民不同，莫内的父 亲把妻子和两个孩子带回了迦普恩。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">ocr</p>
+        <p class="concept-note">107 [PAGE 117 IMAGE 1 CONTENT (OCR)]: “二战”前在一个种植园做工时，莫内的父亲遇到了他的妻子，与那 些离开村子去当契约工，在外面娶了当地女人的村民不同，莫内的父 亲把妻子和两个孩子带回了迦普恩。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">mamar</p>
+        <p class="concept-note">据这个年轻男子说，他小时候和鲁尼划木筏穿过红树林為湖。在 湖中间，一个木筏上满载着一群从邻村旺安来的女人，她们靠近 爷孙俩的时候，正在谈论彩虹。在旺安说的科帕语里，彩虹被叫作 mamor。年轻人记得，那些女人向鲁尼打招呼，问他泰雅博语里彩虹 是哪个词。鲁尼告诉他们是mamar。</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="reading">
+      <h2>渐进式阅读路径</h2>
+      <div class="timeline">
+      <article class="timeline-item reveal">
+        <span class="timeline-no">01</span>
+        <h3>第八章 Over the Rainbow 飞越彩虹 一天早晨，一夜暴雨过后，一道宽阔绚 丽的彩虹横跨天际。在我去村子里的一个小水 坑洗衣服的路上，我抬头看到</h3>
+        <p>第八章 Over the Rainbow 飞越彩虹 一天早晨，一夜暴雨过后，一道宽阔绚 丽的彩虹横跨天际。在我去村子里的一个小水 坑洗衣服的路上，我抬头看到了它，我发现我 不知道彩虹用泰雅博语怎么说，于是就问了我 看到的第一个人一拉法尔，村里负责祷告的 人，我知道他的泰雅博语很流利一—“彩虹” 这个词是什么。 “Renbo。”他回答说，没有丝毫犹豫。 “呢，不是。”我说，这一定是皮金语里的 词—泰雅博语里的词是另一个。 “哦。”他说。这样的话，他补充说，他 也不知道一并建议我去问一下他的父亲， 六十五岁的莫内。 莫内是一个有异域血统的村民。他的父亲 是迦普恩人，但他的母亲来自一个远方岛屿。 107 [PAGE 117 IMAGE 1 CONTENT (OCR)]: “二战”前在一个种植园做工时，莫内的父亲遇到了他的妻子，与那 些离开村子去当契约工，在外面娶了当地女人的村民不同，莫内的父 亲把妻子和两个孩子带回了迦普恩。 他的父母回来后没过多久就去世了（每个人都认为是死于巫术）。 尽管如此，我愿意这么想，莫内的母亲一定是一个温柔的女人，对她 孩子的成长产生过深远的影响。因为让莫内显得有异域风情的完全不 是他的外表（他看上去跟其他村里人没有什么两样），而在于他和他 妹妹都脾性温和，举止平静。我从来没有听过他俩威胁要打哪个人， 他俩也很少提高音量，甚至和孩子说话时也是如此。在发生冲突的情 境下，莫内会和对方据理力争。多年下来，这一策略让大家都把他视 为一个讲道理的人，一个你可以寻求合理建议和审慎观点的人。他也 很健谈，思维活跃。拉雅和鲁尼死后，我有关于泰雅博语的问题时， 就经常找莫内。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">02</span>
+        <h3>2009年初的一天，我看到彩虹的那个早晨，莫内坐在他早上常 坐的阳台某处，嚼着槟榔。我冲他说早上好，跟他说我有一个问题， “泰雅博语里的“彩虹”是哪个词？”</h3>
+        <p>2009年初的一天，我看到彩虹的那个早晨，莫内坐在他早上常 坐的阳台某处，嚼着槟榔。我冲他说早上好，跟他说我有一个问题， “泰雅博语里的“彩虹”是哪个词？” 我本来想着他可能会直接给出一个词，没想到莫内停顿了下 来，把一根手指放在下巴上。他在沉思。过了一会儿，他告诉我他 一时间记不起来是哪个词，他得好好想想。我觉得这很奇怪。尽管 另一方面，在雨林里，彩虹的确不常见。那一年我在村子里待了整 整九个月，也只见过一次。我在想，也许莫内只是暂时失忆，又或 者他有点措手不及，没有料到我会问起一个村民们没有机会经常用 到的词。 事实上莫内考虑“彩虹”花了好几天时间。一天下午，在去水坑 里洗衣服的路上，莫内把我叫去他家，告诉我“彩虹”在泰雅博语里 108 雨林里的消亡 [PAGE 118 IMAGE 1 CONTENT (OCR)]: 没有一个单独的词。“彩虹”是通过一个动词词组来表达的一akin tamtiek，意思是“云朵染上了色彩”。 对我来说这听上去合情合理，我就记了下来。 但当我向其他人重复这个词组来检验他们的反应时，无一例外， 我被鄙视了。“Emgiaman。”我问的每个人都以讥笑作为回应，用他 们最喜欢的表达方式—意思是“他在说谎”—来驳斥另一个人在 泰雅博语上的专业性。尽管没有人想得出来正确的说法是什么，他们 都告诉我他们知道莫内说的那个词组是错的。 之前我就遇到过几次这种集体内部的分歧。比如，大家会很不耐 烦地在泰雅博语里的“毛毛虫”这个词上产生分歧。还有风的问题。 在泰雅博语里，风有四种叫法：awar，Dgamai，mbunim和mbankap。 在这个问题上，所有村里的老人都意见一致。他们也认同通过吹来的 方向来对每一种风作出区分。然而，他们完全无法达成共识的是风吹 来的方向是哪里。一个老人很坚定地认为Dgamai风是从山上吹到迦 普恩南边的。有一个老妇人同样坚定地认为这个风是村子北边的海上 吹来的。类似地，有一些人认为awar风是从山上来的（也就是南 边），其他人则认为是从红树林湖（也就是北面）吹来的。每当 这个话题出现的时候，老人们就会彼此激烈争论，但他们从来解决 不了。 万幸的是，这四种风被收人并定义在了德国传教士乔治·霍克 出版的《泰雅博语词汇简表》里。1937年，霍克在一个传教士同伴 的陪伴下来到迦普恩，成为少数几个实际造访过这个村子的白人。他 和他的同伴在迦普恩逗留了三个钟头。霍克拍了两张照片，收集了一 个词汇表。一年后，他出版了这份列表，还加了一句不耐烦的评语： “要过好久其他研究者才会“意外发现”迦普恩，也不过是因为这个 小小的村子所能产出学术价值的概率很小，以及通往这个语言孤岛的 第八章飞越彩虹 109 [PAGE 119 IMAGE 1 CONTENT (OCR)]: 路线充满不便和艰难。”1 除了唐·雷考克从两个迦普恩村民（19</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">03</span>
+        <h3>然而不幸的是，“彩虹”不在霍克的列表里。</h3>
+        <p>然而不幸的是，“彩虹”不在霍克的列表里。 时光流逝，没人想得起来泰雅博语里的“彩虹”一词怎么说。村 里的老人向我解释说，他们的父母和亲戚警告过他们，让他们不要走 在彩虹下，因为如果走到彩虹下面，他们的思绪就会模糊混乱。尽管 他们记得这些告诫，却没有人记得起来他们的父母和亲戚是用哪个词 表达彩虹的。村里人告诉我，这个词ihait：它“藏起来”了。 终于，莫内的妻子（我的邻居达莫的母亲）索帕克做了一个梦， 梦到有一个死去的祖先在她耳边轻声说出了正确的“彩虹”这个词。 祖先揭示说，那个词是minuomb一一它的另一个意思是“又大又 utok”（“出现在云里的一面又大又圆的湖”）。 我把索帕克的启示告诉给村里其他的老人，他们不为所动。“Em giaman。”他们面无表情地喊道。 索帕克讲述她的梦之后几天，村里年纪最大的一个老人告诉我他 Georg Holtker,“Eine fragmentarische Worterliste der Gapun-Sprache Neuguineas,translated by Agnes Brandt.Anthropos 33(January-April1938）:279-282,quote from page 280. 110 雨林里的消亡 [PAGE 120 IMAGE 1 CONTENT (OCR)]: 记起这个词了一—是wagurmos。 其他人的判断可以想见，“Emgiaman。”他们都很庄重地说。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">04</span>
+        <h3>他们解释说wagurmos的意思是指夜里出现在天际的那一片白色星 星一这是泰雅博语里描述银河系的那个词，完全不是彩虹的意思。</h3>
+        <p>他们解释说wagurmos的意思是指夜里出现在天际的那一片白色星 星一这是泰雅博语里描述银河系的那个词，完全不是彩虹的意思。 很多人还借机贬低那个给出wagurmos这个词的老人的语言知识。他 们轻蔑地说，那个人也许年纪大，但他是一个lapunnating一意 思是他年纪大归大，但什么都没学到。人们说，他所有的只是bebi sens——婴儿的判断力。 几周过去了，沮丧气氛愈发浓厚。终于有一天，一个三十来岁的 男人来到我家，告诉我他记得有一次听过他的祖父老鲁尼说起过彩虹 这个词。 据这个年轻男子说，他小时候和鲁尼划木筏穿过红树林為湖。在 湖中间，一个木筏上满载着一群从邻村旺安来的女人，她们靠近 爷孙俩的时候，正在谈论彩虹。在旺安说的科帕语里，彩虹被叫作 mamor。年轻人记得，那些女人向鲁尼打招呼，问他泰雅博语里彩虹 是哪个词。鲁尼告诉他们是mamar。 我本来以为这是一个令人振奋的突破，结果mamar也被否决了。 我没告诉他们原因，希望搅动他们的记忆，于是我让老人们 回应。 事实上，这个词确实指的是一种香蕉。但任何一种语言里都有大 量同形异义词。比如，英语里的“mole”就有许多不同的意思：一种 爱挖洞的小型哺乳动物，皮肤上一块凸起的斑点，化学里的计量单位 等。与之相似地，mamar会不会也有不止一种意思？会不会也有彩虹 的意思？ 不是。鲁尼giaman。又或者那个说鲁尼这么说的年轻人是 第八章飞越彩虹 111 [PAGE 121 IMAGE 1 CONTENT (OCR)]: giaman。不管怎么说，都有人说谎了，村里的老人一致认为。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">05</span>
+        <h3>最后，一个月的争吵过去一—还是没能吵出一个让所有人满意的 词或表达，而且也对我坚持不懈向他们提问越发感到不耐烦一一村里 的老人不情不愿地同意说mamar一定</h3>
+        <p>最后，一个月的争吵过去一—还是没能吵出一个让所有人满意的 词或表达，而且也对我坚持不懈向他们提问越发感到不耐烦一一村里 的老人不情不愿地同意说mamar一定就是彩虹那个词啦，毕竞鲁尼 明确（这个时候有几个人还偷偷翻了个白眼）说过是这个。 我自己的结论是，mamar或许就是泰雅博语里正确表示彩虹的那 个词。泰雅博语和旺安村说的科帕语之间完全没有关联，尽管说这两 种语言的村子只隔着步行后再乘木筏总共两小时的距离。但说这两种 语言的人接触已久，他们共享一些相似的名词。！ 我告诉村民们我会把mamar作为泰雅博语里表示彩虹的词收进 我的词典。宣布之后，嘟声一片。 让我感到惊讶的是，像表达彩虹这样一个动人又可爱的事物的 词，居然莫名其妙地从村里人的记忆中溜走了。我寻思着，我内心深 处暗暗想让泰雅博语里有一个美丽的词来表达这一美丽的现象，很难 相信整个村子的人居然会忘记一个词一一尤其是这个词。尤其是村里 人还跟我说，家长们会告诫孩子走在彩虹下面会蒙蔽你的头脑，让你 忘事，却没人能记起来“彩虹”是哪个词，这挺滑稽的。就好像迦普 1在泰雅博语和科帕语共享的词汇中，像mamor和mamar这样发音有微妙差别的情况是 很常见的。举例如下： 泰雅博语发音 科帕语发音 crocodile（鳄鱼） cockatoo（凤头鹦鹉） kaimwa keimwa turtle（乌龟） pawp pup lorikeet（吸蜜鹦鹉） njerik njerin hook（钩子） pipingabu bibigabu 112 雨林里的消亡 [PAGE 122 IMAGE 1 CONTENT (OCR)]: 恩整个村的人一齐从彩虹下经过，然后集体失忆了一一结果记不起 “彩虹”这个词本身。 村里的老年人因为“彩虹”发生的口角让我意识到，无法就恰当 的泰雅博语达成一致是村里生活的一大特点，这促成了这门语言的衰 亡。我依旧感到震惊的是，村里说泰雅博语的老人那么激烈地（在我 看来，那么无缘无故地）否定讥笑各自的语言能力。早在1980年代 待在村子里的时候，我就不再试图在一群老年人中间讨论泰雅博语的 问题了，因为关于这一语言任何方面的讨论都不可避免地会导致争 论不休。他们最后可能会牢骚满腹地同意任何我问他们的问题，但 随后，他们总会跟我安排私下的时间，热心地否定其他人的知识和 观点。 迦普恩的每个人其实都知道，泰雅博语是一门很小的语言，除了 这里没有其他地方的人会说。但和其他地方的人不一样的是，迦普恩 人不把语言视为某个社群共享的财富。和村里的其他东西一样，语言 的知识被认为是私人财产。迦普恩的村民们会满脸疑惑地大摇其头， 困惑于西方人居然对他们这些生活在雨林里的人一直抱持刻板印象， 觉得他们会在一个社会主义式的极乐世界里，放弃所有权，慷概地共 享自然资源。 事实恰恰相反。在迦普恩，没有什么是属于集体的，没</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="takeaways">
+      <h2>本关关键收获</h2>
+      <ul class="takeaways"><li><span>1</span>第八章 Over the Rainbow 飞越彩虹 一天早晨，一夜暴雨过后，一道宽阔绚 丽的彩虹横跨天际。在我去村子里的一个小水 坑洗衣服的路上，我抬头看到</li><li><span>2</span>2009年初的一天，我看到彩虹的那个早晨，莫内坐在他早上常 坐的阳台某处，嚼着槟榔。我冲他说早上好，跟他说我有一个问题， “泰雅博语里的“彩虹”是哪个词？”</li><li><span>3</span>然而不幸的是，“彩虹”不在霍克的列表里。</li><li><span>4</span>他们解释说wagurmos的意思是指夜里出现在天际的那一片白色星 星一这是泰雅博语里描述银河系的那个词，完全不是彩虹的意思。</li></ul>
+      <nav class="nav">
+        <a class="btn" href="/experiences/u-book-edf803-22-d3e889.html">上一关</a>
+        <a class="btn" href="/experiences/u-book-edf803-24-386d65.html">下一关</a>
+      </nav>
+    </section>
+  </main>
+  <script>
+    (() => {
+      const progress = document.getElementById("progress");
+      const dots = Array.from(document.querySelectorAll("#dotNav button[data-target]"));
+      const sections = dots
+        .map((dot) => document.getElementById(dot.getAttribute("data-target")))
+        .filter(Boolean);
+      const reveals = Array.from(document.querySelectorAll(".reveal"));
+      const onScroll = () => {
+        const h = document.documentElement;
+        const total = Math.max(1, h.scrollHeight - window.innerHeight);
+        const pct = Math.max(0, Math.min(100, (window.scrollY / total) * 100));
+        if (progress) progress.style.width = pct + "%";
+      };
+      const io = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) entry.target.classList.add("in");
+        }
+      }, { threshold: .14 });
+      reveals.forEach((el) => io.observe(el));
+      const secIo = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const id = entry.target.id;
+          dots.forEach((dot) => dot.classList.toggle("active", dot.getAttribute("data-target") === id));
+        });
+      }, { threshold: .4 });
+      sections.forEach((s) => secIo.observe(s));
+      dots.forEach((dot) => {
+        dot.addEventListener("click", () => {
+          const target = document.getElementById(dot.getAttribute("data-target"));
+          if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+      window.addEventListener("scroll", onScroll, { passive: true });
+      onScroll();
+    })();
+  </script>
+
+
+<script>
+(() => {
+  
+  
+  
+})();
+</script>
+</body>
+</html>

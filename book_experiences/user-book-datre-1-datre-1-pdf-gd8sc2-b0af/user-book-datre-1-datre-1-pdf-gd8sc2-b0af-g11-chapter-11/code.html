@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>专家 · 这就是一种 · Datre书籍-第1册 我们是DATRE-1（部分）.pdf</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #111827;
+      --bg2: #1f2937;
+      --accent: #22c55e;
+      --accent2: #f97316;
+      --text: #f3f4f6;
+      --soft: #9ca3af;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+      background:
+        radial-gradient(1200px 540px at 85% -8%, color-mix(in srgb, var(--accent2) 24%, transparent), transparent 70%),
+        radial-gradient(980px 460px at -10% 14%, color-mix(in srgb, var(--accent) 24%, transparent), transparent 74%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+      color: var(--text);
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .05;
+      background-image: radial-gradient(circle at 1px 1px, #fff 1px, transparent 0);
+      background-size: 3px 3px;
+      z-index: 0;
+    }
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      z-index: 100;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+    .page { position: relative; z-index: 1; width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 20px 0 48px; }
+    .hero {
+      min-height: 74vh;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 22px;
+      background: linear-gradient(160deg, color-mix(in srgb, var(--bg2) 86%, transparent), color-mix(in srgb, var(--bg) 88%, transparent));
+      padding: 40px 34px;
+      display: grid;
+      align-content: center;
+      gap: 16px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.34);
+    }
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .hero h1 {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(32px, 5.4vw, 68px);
+      line-height: 1.16;
+      letter-spacing: .04em;
+      max-width: 15em;
+      text-wrap: balance;
+    }
+    .hero p {
+      max-width: 66ch;
+      line-height: 1.95;
+      color: color-mix(in srgb, var(--text) 85%, var(--soft));
+      font-size: 16px;
+    }
+    .chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip {
+      border: 1px solid color-mix(in srgb, var(--accent2) 44%, transparent);
+      color: color-mix(in srgb, var(--accent2) 88%, #fff);
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 12px;
+      background: rgba(255,255,255,.03);
+    }
+    .section { margin-top: 18px; border: 1px solid rgba(255,255,255,.13); border-radius: 18px; padding: 22px; background: rgba(2,6,18,.46); }
+    .section h2 {
+      margin-bottom: 12px;
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(22px, 2.8vw, 34px);
+      color: color-mix(in srgb, var(--accent) 86%, #fff);
+      letter-spacing: .03em;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1.1fr 1fr; gap: 14px; }
+    .concept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+    .concept-card {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      background: rgba(255,255,255,.03);
+      padding: 14px;
+      min-height: 128px;
+    }
+    .concept-token { font-size: 14px; letter-spacing: .14em; color: var(--accent2); text-transform: uppercase; margin-bottom: 7px; font-weight: 700; }
+    .concept-note { font-size: 14px; color: color-mix(in srgb, var(--text) 88%, var(--soft)); line-height: 1.8; }
+    .reading-map {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 10px;
+    }
+    .map-card {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      background: rgba(255,255,255,.03);
+      padding: 12px;
+      min-height: 148px;
+    }
+    .map-no {
+      font-size: 11px;
+      letter-spacing: .18em;
+      color: var(--accent);
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+    .map-card h3 {
+      font-size: 17px;
+      font-family: "Noto Serif SC", serif;
+      line-height: 1.45;
+      margin-bottom: 6px;
+    }
+    .map-card p {
+      font-size: 14px;
+      color: color-mix(in srgb, var(--text) 84%, var(--soft));
+      line-height: 1.85;
+    }
+    .atlas {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      min-height: 440px;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+    .atlas svg { width: 100%; max-width: 440px; height: auto; }
+    .timeline { display: grid; gap: 10px; }
+    .timeline-item {
+      border-left: 2px solid color-mix(in srgb, var(--accent) 66%, transparent);
+      padding: 10px 14px;
+      background: rgba(255,255,255,.02);
+      border-radius: 0 10px 10px 0;
+    }
+    .timeline-no { font-size: 11px; letter-spacing: .22em; color: var(--accent2); display: block; margin-bottom: 6px; }
+    .timeline-item h3 { font-size: 19px; font-family: "Noto Serif SC", serif; line-height: 1.45; margin-bottom: 7px; }
+    .timeline-item p { font-size: 14px; line-height: 1.9; color: color-mix(in srgb, var(--text) 84%, var(--soft)); }
+    .quote-wrap { display: grid; gap: 10px; }
+    .quote {
+      border-left: 2px solid color-mix(in srgb, var(--accent2) 80%, transparent);
+      padding: 10px 12px;
+      background: rgba(255,255,255,.02);
+      color: color-mix(in srgb, var(--text) 92%, #fff);
+      font-family: "Noto Serif SC", serif;
+      line-height: 1.9;
+    }
+    .takeaways { margin-top: 10px; list-style: none; display: grid; gap: 8px; }
+    .takeaways li {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      padding: 10px;
+      background: rgba(255,255,255,.02);
+      align-items: start;
+      line-height: 1.8;
+    }
+    .takeaways span {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: color-mix(in srgb, var(--accent2) 26%, transparent);
+      color: var(--accent2);
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+    .nav { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,.26);
+      border-radius: 999px;
+      padding: 8px 13px;
+      font-size: 12px;
+      color: var(--text);
+      background: rgba(255,255,255,.04);
+    }
+    .btn:hover { border-color: var(--accent2); color: var(--accent2); }
+    .dot-nav {
+      position: fixed;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: grid;
+      gap: 10px;
+      z-index: 50;
+    }
+    .dot-nav button {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.35);
+      background: transparent;
+      cursor: pointer;
+      transition: all .24s ease;
+    }
+    .dot-nav button.active { transform: scale(1.34); border-color: var(--accent); background: var(--accent); }
+    .reveal { opacity: 0; transform: translateY(16px); transition: opacity .55s ease, transform .55s ease; }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+    @media (max-width: 940px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .dot-nav { display: none; }
+      .hero { min-height: auto; padding: 30px 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+  <nav class="dot-nav" id="dotNav">
+    <button data-target="hero" class="active" aria-label="Hero"></button>
+    <button data-target="atlas" aria-label="Atlas"></button>
+    <button data-target="concepts" aria-label="Concepts"></button>
+    <button data-target="reading" aria-label="Reading"></button>
+    <button data-target="takeaways" aria-label="Takeaways"></button>
+  </nav>
+  <main class="page">
+    <section class="hero reveal in" id="hero">
+      <p class="eyebrow">Cognitive Lens · Gate 11</p>
+      <h1>专家 · 这就是一种</h1>
+      <p>问题 ： Datre 表示他们来自于我们的泡泡之外 ， 因此不会影响泡泡之内的个体 ， 也 不会影响我们的进化。他们来到这里只是为了观察。但通过提供这些信息，还要调整 进入我们泡泡之内的能量，那么事实上，他们怎么没有影响我们？没有影响群体意识 或我们的进化呢？这不就是他们的目的吗？ DATRE ：这是一个副产品，不是目的 / 意图。如果我们袖手旁观，不将这些信息带 给那些迷恋入物质层 ， 忘了自己是谁的 “ 专家 ” （ 注 ：…</p>
+      <div class="chip-row">
+        <span class="chip">Datre书籍-第1册 我们是DATRE-1（部分）.pdf</span>
+        
+        <span class="chip">Module 11/18</span>
+        <span class="tag">专家</span><span class="tag">这就是一种</span><span class="tag">伤害</span><span class="tag">现在</span><span class="tag">燃料</span><span class="tag">的颜色</span><span class="tag">颜色</span><span class="tag">泡泡之外</span>
+      </div>
+    </section>
+
+    <section class="section reveal" id="atlas">
+      <h2>主题脉络与阅读地图</h2>
+      <p style="color:var(--soft);line-height:1.9;margin-bottom:10px;">先看章节主线，再进入细节。每个卡片都是一个可独立理解的知识片段。</p>
+      <div class="reading-map">
+      <article class="map-card reveal">
+        <p class="map-no">01</p>
+        <h3>表示他们来自于我们的泡泡之外 ， 因此不会影响泡泡之内的个体 ， 也 不会影响我们的进化。他们来到这里只是为了观察。但通过提供这些信息，还要调整 进入我们泡</h3>
+        <p>表示他们来自于我们的泡泡之外 ， 因此不会影响泡泡之内的个体 ， 也 不会影响我们的进化。他们来到这里只是为了观察。但通过提供这些信息，还要调整 进入我们泡泡之内的能量，那么事实上，他们怎么没有影响我们？没有影响群体意识 或我们的进化呢？这不就是他们的目的吗？ 这是一个副产品，不是目的 / 意图。如果我们袖手旁观，不将这些信息带 给那些迷恋入物质层 ， 忘了自己是谁的 “ 专家 ” （ 注 ： 类似于赛斯讲的说法者 / 演讲者 ） ， </p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">02</p>
+        <h3>然后经过多年的生活 ， 如果有人对这个管道工说 ： “ 我们不能再让你和我们住在一 起了，因为我们的母亲生病了，她要搬过来住在客房中，好让我们照顾她 。</h3>
+        <p>然后经过多年的生活 ， 如果有人对这个管道工说 ： “ 我们不能再让你和我们住在一 起了，因为我们的母亲生病了，她要搬过来住在客房中，好让我们照顾她 。 ” 被下逐 客令，管道工生气了。现在，假如他是一个讲道理的人，理解你们的情况，他就会知 趣的离开。但是，假设没有这种情况，那么就只有等其它特殊的情况发生后，他才能 离开，否则他就会一直呆在这里。 现在，当 “ 诞生 / 重生 ” 来临时，最好让这些 “ 专家 ” “ 知道 ” 将会发生</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">03</p>
+        <h3>” 或者说 ： “ 哦？挺有趣的，这个传导内 容有点不一样 ， 是新的 ” － 但也就仅此而已 。</h3>
+        <p>” 或者说 ： “ 哦？挺有趣的，这个传导内 容有点不一样 ， 是新的 ” － 但也就仅此而已 。 可对 “ 专家 ” 来讲 ， 那儿总会有一些 特定的句子能够 “ 点醒 ” 他们 ： “ 天啊，这就是我一直知道但却忘记的内容 ！ ” － 于 是 … 寻找自我的旅程就开始了。 Druvalo Melchizedek 在教授神圣几何（生命之花 ） 。他指出太阳已经不再 有任何磁场了。基于数据，南极与北极之间没有检测到任何区别。太阳不再由氢</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">04</p>
+        <h3>你们把太阳当做一个颜色来看待 （注：光谱分析法是一种能测定较远天体元素的 方法 ） ， 但那是人眼所能检测到的颜色 。</h3>
+        <p>你们把太阳当做一个颜色来看待 （注：光谱分析法是一种能测定较远天体元素的 方法 ） ， 但那是人眼所能检测到的颜色 。 根据能量的强度 ， 那是你们把它感知成为颜色 。 假如你们无法看到颜色，那你该如何知道那是氢呢？你会知道这是氮吗？会知道那是 氧吗？或任何其它的东西？你们能把什么样的仪器放到太阳上去检测它是什么呢？你 们只能猜测。 太阳黑子是什么？他们会告诉你各种各样关于太阳黑子的内容，但太阳黑子只是 能量的爆发，并被人类的眼睛感知为</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">05</p>
+        <h3>离开物质容器后，我们就只有感知了。在我们的感知中，我们知道什么是太阳。</h3>
+        <p>离开物质容器后，我们就只有感知了。在我们的感知中，我们知道什么是太阳。 就好像我们知道你们天空中的所有小斑点是什么。 你们从物质层的角度猜测。你们的眼睛是奇妙的，因为它们能够感知到你们称之 的颜色。 但你们无法感知到我们所感知到的。我们能够感知能量。而在物质结构中，你们 没有任何能力或任何仪器能够感知原始能量。那是你们的物质容器所发展的方式。 所以关于太阳 ， 它可以是任何你们想推测的 。 因为每一个人的猜测都是一样好的 。</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="concepts">
+      <h2>核心概念与解释</h2>
+      <div class="concept-grid">
+      <article class="concept-card reveal">
+        <p class="concept-token">专家</p>
+        <p class="concept-note">这是一个副产品，不是目的 / 意图。如果我们袖手旁观，不将这些信息带 给那些迷恋入物质层 ， 忘了自己是谁的 “ 专家 ” （ 注 ： 类似于赛斯讲的说法者 / 演讲者 ） ， 这就是一种 “ 伤害 ” 。信息的带入主要是为了帮助那些来到这里的 “ 专家 ” ，他们来到 这里有着特殊的原因，不完成工作就不会离开。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">这就是一种</p>
+        <p class="concept-note">这是一个副产品，不是目的 / 意图。如果我们袖手旁观，不将这些信息带 给那些迷恋入物质层 ， 忘了自己是谁的 “ 专家 ” （ 注 ： 类似于赛斯讲的说法者 / 演讲者 ） ， 这就是一种 “ 伤害 ” 。信息的带入主要是为了帮助那些来到这里的 “ 专家 ” ，他们来到 这里有着特殊的原因，不完成工作就不会离开。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">伤害</p>
+        <p class="concept-note">这是一个副产品，不是目的 / 意图。如果我们袖手旁观，不将这些信息带 给那些迷恋入物质层 ， 忘了自己是谁的 “ 专家 ” （ 注 ： 类似于赛斯讲的说法者 / 演讲者 ） ， 这就是一种 “ 伤害 ” 。信息的带入主要是为了帮助那些来到这里的 “ 专家 ” ，他们来到 这里有着特殊的原因，不完成工作就不会离开。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">现在</p>
+        <p class="concept-note">” 被下逐 客令，管道工生气了。现在，假如他是一个讲道理的人，理解你们的情况，他就会知 趣的离开。但是，假设没有这种情况，那么就只有等其它特殊的情况发生后，他才能 离开，否则他就会一直呆在这里。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">燃料</p>
+        <p class="concept-note">Druvalo Melchizedek 在教授神圣几何（生命之花 ） 。他指出太阳已经不再 有任何磁场了。基于数据，南极与北极之间没有检测到任何区别。太阳不再由氢做为 燃料，而是由氦做为燃料来产生不同的光。你们认为呢？</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">的颜色</p>
+        <p class="concept-note">你们把太阳当做一个颜色来看待 （注：光谱分析法是一种能测定较远天体元素的 方法 ） ， 但那是人眼所能检测到的颜色 。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">颜色</p>
+        <p class="concept-note">你们把太阳当做一个颜色来看待 （注：光谱分析法是一种能测定较远天体元素的 方法 ） ， 但那是人眼所能检测到的颜色 。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">泡泡之外</p>
+        <p class="concept-note">表示他们来自于我们的泡泡之外 ， 因此不会影响泡泡之内的个体 ， 也 不会影响我们的进化。他们来到这里只是为了观察。但通过提供这些信息，还要调整 进入我们泡泡之内的能量，那么事实上，他们怎么没有影响我们？没有影响群体意识 或我们的进化呢？这不就是他们的目的吗？</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="reading-excerpts">
+      <h2>原文精读片段</h2>
+      <p style="color:var(--soft);line-height:1.9;margin-bottom:10px;">保留信息密度最高的段落，先读原句，再看后续路径与总结。</p>
+      <div class="reading-map">
+      <article class="map-card reveal">
+        <p class="map-no">EXCERPT 1</p>
+        <p>表示他们来自于我们的泡泡之外 ， 因此不会影响泡泡之内的个体 ， 也 不会影响我们的进化。他们来到这里只是为了观察。但通过提供这些信息，还要调整 进入我们泡泡之内的能量，那么事实上，他们怎么没有影响我们？没有影响群体意识 或我们的进化呢？这不就是他们的目的吗？</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">EXCERPT 2</p>
+        <p>这是一个副产品，不是目的 / 意图。如果我们袖手旁观，不将这些信息带 给那些迷恋入物质层 ， 忘了自己是谁的 “ 专家 ” （ 注 ： 类似于赛斯讲的说法者 / 演讲者 ） ， 这就是一种 “ 伤害 ” 。信息的带入主要是为了帮助那些来到这里的 “ 专家 ” ，他们来到 这里有着特殊的原因，不完成工作就不会离开。</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">EXCERPT 3</p>
+        <p>换句话说，就好像你家厨房的水管出了问题，然后你雇了一个管道修理工。这个 管道工无法在一天之内完成工作 ， 他说 ： “ 那儿缺失了一个零件 ， 我要去商店购买 ， 明 天再来 ” － 第 二 天他带着新零件来了 ， 结果却发现 ： “ 零件的型号怎么不对？</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">EXCERPT 4</p>
+        <p>” － 于 是他又说 ： “ 好吧 ， 我只好再去买 ， 明天再来 ” － 接下来 ， 因为逗留时间的延长 ， 你 开始与他聊天 ， 吃饭 ， 你们成为了朋友 。</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">EXCERPT 5</p>
+        <p>有一天管道工工作到很晚 ， 你问他 ： “ 你和家 人住在一起吗？</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">EXCERPT 6</p>
+        <p>” 他回答 ： “ 不，我一个人住 ” ；然后你又问 ： “ 这么晚了，那就留下 来在我家借住一晚吧 ” － 接着，他就搬到你家客房了。看， John 在笑，但这完全就 是我们观察到的样子。</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="reading">
+      <h2>渐进式阅读路径</h2>
+      <div class="timeline">
+      <article class="timeline-item reveal">
+        <span class="timeline-no">01</span>
+        <h3>表示他们来自于我们的泡泡之外 ， 因此不会影响泡泡之内的个体 ， 也 不会影响我们的进化。他们来到这里只是为了观察。但通过提供这些信息，还要调整 进入我们泡</h3>
+        <p>表示他们来自于我们的泡泡之外 ， 因此不会影响泡泡之内的个体 ， 也 不会影响我们的进化。他们来到这里只是为了观察。但通过提供这些信息，还要调整 进入我们泡泡之内的能量，那么事实上，他们怎么没有影响我们？没有影响群体意识 或我们的进化呢？这不就是他们的目的吗？ 这是一个副产品，不是目的 / 意图。如果我们袖手旁观，不将这些信息带 给那些迷恋入物质层 ， 忘了自己是谁的 “ 专家 ” （ 注 ： 类似于赛斯讲的说法者 / 演讲者 ） ， 这就是一种 “ 伤害 ” 。信息的带入主要是为了帮助那些来到这里的 “ 专家 ” ，他们来到 这里有着特殊的原因，不完成工作就不会离开。 换句话说，就好像你家厨房的水管出了问题，然后你雇了一个管道修理工。这个 管道工无法在一天之内完成工作 ， 他说 ： “ 那儿缺失了一个零件 ， 我要去商店购买 ， 明 天再来 ” － 第 二 天他带着新零件来了 ， 结果却发现 ： “ 零件的型号怎么不对？ ” － 于 是他又说 ： “ 好吧 ， 我只好再去买 ， 明天再来 ” － 接下来 ， 因为逗留时间的延长 ， 你 开始与他聊天 ， 吃饭 ， 你们成为了朋友 。 有一天管道工工作到很晚 ， 你问他 ： “ 你和家 人住在一起吗？ ” 他回答 ： “ 不，我一个人住 ” ；然后你又问 ： “ 这么晚了，那就留下 来在我家借住一晚吧 ” － 接着，他就搬到你家客房了。看， John 在笑，但这完全就 是我们观察到的样子。 这个管道工觉得你家非常舒适，他不想走了。他本来是来这里修水管的，可他却 忘记了一切，这里成为了他的家。这就是发生在来到这里的 “ 专家 ” 身上的事情。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">02</span>
+        <h3>然后经过多年的生活 ， 如果有人对这个管道工说 ： “ 我们不能再让你和我们住在一 起了，因为我们的母亲生病了，她要搬过来住在客房中，好让我们照顾她 。</h3>
+        <p>然后经过多年的生活 ， 如果有人对这个管道工说 ： “ 我们不能再让你和我们住在一 起了，因为我们的母亲生病了，她要搬过来住在客房中，好让我们照顾她 。 ” 被下逐 客令，管道工生气了。现在，假如他是一个讲道理的人，理解你们的情况，他就会知 趣的离开。但是，假设没有这种情况，那么就只有等其它特殊的情况发生后，他才能 离开，否则他就会一直呆在这里。 现在，当 “ 诞生 / 重生 ” 来临时，最好让这些 “ 专家 ” “ 知道 ” 将会发生什么，并 向他们解释那些情况 － 那些被他们忘记的 ， 在这个小泡泡之外的情况 。 如果你突然 把管道工扔到室外的雪地上 ， 还不告诉他们为什么 ， 这就是一种 “ 伤害 ” 。 同理 ， 这与 你把 “ 专家 ” 扔到雪地上是一样的。他们坐在雪上，不知道发生什么，完全迷失了。 这也比你突然把这个情况解释给管道工后，就直接将楼上的窗户打开，把他丢出 去的好。因为管道工 / “ 专家 ” 需要先回忆起 “ 他是谁 ” 。我知道这是一个非常简单的 类比 ， 但有时候 ， 我们不得不使用故事让你明白为什么 Datre 在这里 。 那些对这些传导内容不感兴趣的人，他们不会为此花费这么多精力。还有人会阅 读它，并说 ： “ 哦，这只是另一个通灵信息 ！</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">03</span>
+        <h3>” 或者说 ： “ 哦？挺有趣的，这个传导内 容有点不一样 ， 是新的 ” － 但也就仅此而已 。</h3>
+        <p>” 或者说 ： “ 哦？挺有趣的，这个传导内 容有点不一样 ， 是新的 ” － 但也就仅此而已 。 可对 “ 专家 ” 来讲 ， 那儿总会有一些 特定的句子能够 “ 点醒 ” 他们 ： “ 天啊，这就是我一直知道但却忘记的内容 ！ ” － 于 是 … 寻找自我的旅程就开始了。 Druvalo Melchizedek 在教授神圣几何（生命之花 ） 。他指出太阳已经不再 有任何磁场了。基于数据，南极与北极之间没有检测到任何区别。太阳不再由氢做为 燃料，而是由氦做为燃料来产生不同的光。你们认为呢？ 嗯 ， 问题中提到的 “ 做为燃料 ” 是我们觉得不适当的解释 。 太阳并没有使 用任何东西做为它的燃料。 你们所看到的太阳不是燃料，也不是气体，而是能量。那是太阳反射给你们的能 量。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">04</span>
+        <h3>你们把太阳当做一个颜色来看待 （注：光谱分析法是一种能测定较远天体元素的 方法 ） ， 但那是人眼所能检测到的颜色 。</h3>
+        <p>你们把太阳当做一个颜色来看待 （注：光谱分析法是一种能测定较远天体元素的 方法 ） ， 但那是人眼所能检测到的颜色 。 根据能量的强度 ， 那是你们把它感知成为颜色 。 假如你们无法看到颜色，那你该如何知道那是氢呢？你会知道这是氮吗？会知道那是 氧吗？或任何其它的东西？你们能把什么样的仪器放到太阳上去检测它是什么呢？你 们只能猜测。 太阳黑子是什么？他们会告诉你各种各样关于太阳黑子的内容，但太阳黑子只是 能量的爆发，并被人类的眼睛感知为颜色。 你看，这是一件非常有趣的事情，能看出你们是如何使用你们的物质身体的吗？ 探索物质身体是多么的迷人，并聚焦在你的体验中？那是相当有趣的。 当我们呆在一个物质容器中的时候，也是我们唯一一次能够觉察到这些事情的时 候。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">05</span>
+        <h3>离开物质容器后，我们就只有感知了。在我们的感知中，我们知道什么是太阳。</h3>
+        <p>离开物质容器后，我们就只有感知了。在我们的感知中，我们知道什么是太阳。 就好像我们知道你们天空中的所有小斑点是什么。 你们从物质层的角度猜测。你们的眼睛是奇妙的，因为它们能够感知到你们称之 的颜色。 但你们无法感知到我们所感知到的。我们能够感知能量。而在物质结构中，你们 没有任何能力或任何仪器能够感知原始能量。那是你们的物质容器所发展的方式。 所以关于太阳 ， 它可以是任何你们想推测的 。 因为每一个人的猜测都是一样好的 。</p>
+      </article>
+    </div>
+      <div class="quote-wrap" style="margin-top:12px;"><blockquote class="quote reveal">“这是一个副产品，不是目的 / 意图。如果我们袖手旁观，不将这些信息带 给那些迷恋入物质层 ， 忘了自己是谁的 “ 专家 ” （ 注 ： 类似于赛斯讲的说法者 / 演讲者 ） ， 这就是一种 “ 伤害 ” 。信息的带入主要是为了帮助那些来到这里的 “ 专家 ” ，他们来到 这里有着特殊的原因，不完成工作就不会离开。”</blockquote><blockquote class="quote reveal">“表示他们来自于我们的泡泡之外 ， 因此不会影响泡泡之内的个体 ， 也 不会影响我们的进化。他们来到这里只是为了观察。但通过提供这些信息，还要调整 进入我们泡泡之内的能量，那么事实上，他们怎么没有影响我们？没有影响群体意识 或我们的进化呢？这不就是他们的目的吗？”</blockquote><blockquote class="quote reveal">“换句话说，就好像你家厨房的水管出了问题，然后你雇了一个管道修理工。这个 管道工无法在一天之内完成工作 ， 他说 ： “ 那儿缺失了一个零件 ， 我要去商店购买 ， 明 天再来 ” － 第 二 天他带着新零件来了 ， 结果却发现 ： “ 零件的型号怎么不对？”</blockquote></div>
+    </section>
+
+    <section class="section reveal" id="takeaways">
+      <h2>本关关键收获</h2>
+      <ul class="takeaways"><li><span>1</span>表示他们来自于我们的泡泡之外 ， 因此不会影响泡泡之内的个体 ， 也 不会影响我们的进化。他们来到这里只是为了观察。但通过提供这些信息，还要调整 进入我们泡</li><li><span>2</span>然后经过多年的生活 ， 如果有人对这个管道工说 ： “ 我们不能再让你和我们住在一 起了，因为我们的母亲生病了，她要搬过来住在客房中，好让我们照顾她 。</li><li><span>3</span>” 或者说 ： “ 哦？挺有趣的，这个传导内 容有点不一样 ， 是新的 ” － 但也就仅此而已 。</li><li><span>4</span>你们把太阳当做一个颜色来看待 （注：光谱分析法是一种能测定较远天体元素的 方法 ） ， 但那是人眼所能检测到的颜色 。</li></ul>
+      <nav class="nav">
+        <a class="btn" href="/experiences/user-book-datre-1-datre-1-pdf-gd8sc2-b0af-g10-chapter-10.html">上一关</a>
+        <a class="btn" href="/experiences/user-book-datre-1-datre-1-pdf-gd8sc2-b0af-g12-chapter-12.html">下一关</a>
+      </nav>
+    </section>
+  </main>
+  <script>
+    (() => {
+      const progress = document.getElementById("progress");
+      const dots = Array.from(document.querySelectorAll("#dotNav button[data-target]"));
+      const sections = dots
+        .map((dot) => document.getElementById(dot.getAttribute("data-target")))
+        .filter(Boolean);
+      const reveals = Array.from(document.querySelectorAll(".reveal"));
+      const onScroll = () => {
+        const h = document.documentElement;
+        const total = Math.max(1, h.scrollHeight - window.innerHeight);
+        const pct = Math.max(0, Math.min(100, (window.scrollY / total) * 100));
+        if (progress) progress.style.width = pct + "%";
+      };
+      const io = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) entry.target.classList.add("in");
+        }
+      }, { threshold: .14 });
+      reveals.forEach((el) => io.observe(el));
+      const secIo = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const id = entry.target.id;
+          dots.forEach((dot) => dot.classList.toggle("active", dot.getAttribute("data-target") === id));
+        });
+      }, { threshold: .4 });
+      sections.forEach((s) => secIo.observe(s));
+      dots.forEach((dot) => {
+        dot.addEventListener("click", () => {
+          const target = document.getElementById(dot.getAttribute("data-target"));
+          if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+      window.addEventListener("scroll", onScroll, { passive: true });
+      onScroll();
+    })();
+  </script>
+</body>
+</html>

@@ -4,8 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>reado · Playable Studio</title>
-  <script type="module" src="/shared/shell.js?v=1772438225006"></script>
-  <script src="/shared/book-catalog.js?v=1772438225006"></script>
+  <script type="module" src="/shared/shell.js?v=1772888317077"></script>
+  <script src="/shared/book-catalog.js?v=1772888317077"></script>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap" media="print" onload="this.media='all'" />
   <style>
     :root {
@@ -37,18 +37,18 @@
       color: var(--text);
     }
     .wrap {
-      width: min(1280px, calc(100% - 30px));
+      width: min(1360px, calc(100% - 30px));
       margin: 0 auto;
       padding: 98px 0 36px;
       display: grid;
-      gap: 14px;
+      gap: 16px;
     }
     .panel {
       border: 1px solid var(--panel-line);
       background: var(--panel);
       border-radius: 22px;
       box-shadow: 0 18px 54px rgba(2, 8, 20, 0.5), inset 0 1px 0 rgba(96, 165, 250, 0.14);
-      padding: 26px;
+      padding: 24px;
       backdrop-filter: blur(10px);
     }
     .studio-panel {
@@ -66,22 +66,28 @@
     .stage-steps {
       position: relative;
       z-index: 1;
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      display: flex;
+      align-items: center;
       gap: 10px;
-      margin-bottom: 14px;
+      margin-bottom: 16px;
     }
     .stage-step {
       border: 1px solid rgba(93, 146, 255, 0.36);
-      border-radius: 14px;
-      background: rgba(3, 10, 28, 0.72);
-      color: #96afd9;
-      padding: 10px 12px;
-      font-size: 14px;
+      border-radius: 999px;
+      background: rgba(3, 10, 28, 0.65);
+      color: #9eb4d9;
+      padding: 9px 12px;
+      font-size: 13px;
       font-weight: 700;
       letter-spacing: 0.01em;
-      text-align: center;
+      text-align: left;
       line-height: 1.35;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-width: 0;
+      flex: 1 1 0;
     }
     .stage-step.active {
       border-color: rgba(82, 145, 255, 0.92);
@@ -89,14 +95,45 @@
       color: #fff;
       box-shadow: 0 10px 26px rgba(37, 99, 235, 0.34);
     }
+    .step-index {
+      width: 20px;
+      height: 20px;
+      border-radius: 999px;
+      border: 1px solid rgba(168, 204, 255, 0.45);
+      background: rgba(7, 18, 40, 0.75);
+      color: #cfe0ff;
+      font-size: 11px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 20px;
+    }
+    .stage-step.active .step-index {
+      border-color: rgba(255, 255, 255, 0.6);
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+    }
+    .step-label {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
     .hero-shell {
       position: relative;
       z-index: 1;
       border: 1px solid rgba(77, 132, 243, 0.3);
       border-radius: 18px;
       background: linear-gradient(145deg, rgba(4, 12, 30, 0.95), rgba(8, 22, 46, 0.85));
-      padding: 18px 18px 16px;
-      margin-bottom: 12px;
+      padding: 20px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(240px, 300px);
+      gap: 16px;
+      align-items: start;
+    }
+    .hero-main {
+      display: grid;
+      gap: 10px;
     }
     .hero-kicker {
       margin: 0 0 4px;
@@ -114,31 +151,102 @@
       color: #f8fbff;
     }
     .hero-sub {
-      margin-top: 6px;
+      margin: 0;
       text-align: left;
       font-size: 15px;
       color: #a8bee4;
       font-weight: 700;
       letter-spacing: 0;
     }
-    .intake-shell {
-      margin-top: 18px;
+    .hero-rail {
+      border: 1px solid rgba(93, 146, 255, 0.28);
+      border-radius: 14px;
+      background: rgba(8, 19, 41, 0.76);
+      padding: 12px;
       display: grid;
+      gap: 10px;
+      align-self: stretch;
+    }
+    .hero-rail-title {
+      margin: 0;
+      font-size: 12px;
+      color: #9fc5ff;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 800;
+    }
+    .hero-rail-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 8px;
+    }
+    .hero-rail-item {
+      border: 1px solid rgba(148, 163, 184, 0.24);
+      border-radius: 10px;
+      background: rgba(15, 28, 54, 0.8);
+      padding: 8px 10px;
+      font-size: 12px;
+      color: #cfddf8;
+      line-height: 1.45;
+    }
+    .hero-rail-item strong {
+      color: #eff6ff;
+      font-size: 13px;
+      margin-right: 6px;
+    }
+    .studio-layout {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.95fr);
       gap: 14px;
+      align-items: start;
+    }
+    .primary-column,
+    .secondary-column {
+      display: grid;
+      gap: 12px;
+      min-width: 0;
+    }
+    .section-shell {
+      border: 1px solid rgba(91, 141, 255, 0.28);
+      border-radius: 18px;
+      background: linear-gradient(160deg, rgba(7, 16, 38, 0.92), rgba(6, 13, 31, 0.9));
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+    }
+    .section-shell-title {
+      margin: 0;
+      font-size: 15px;
+      color: #f8fbff;
+      letter-spacing: -0.01em;
+    }
+    .section-shell-sub {
+      margin: -6px 0 0;
+      font-size: 12px;
+      color: #9fb5da;
+      line-height: 1.45;
+    }
+    .intake-shell {
+      display: grid;
+      gap: 12px;
     }
     .intake-primary {
       display: grid;
-      grid-template-columns: 1.1fr 1fr;
+      grid-template-columns: 1fr;
       gap: 12px;
     }
     .intake-card {
-      border: 1px solid var(--card-line);
+      border: 1px solid rgba(148, 163, 184, 0.24);
       border-radius: 18px;
-      background: linear-gradient(160deg, rgba(9, 20, 44, 0.95), rgba(8, 18, 38, 0.86));
+      background: linear-gradient(160deg, rgba(10, 22, 48, 0.9), rgba(8, 18, 38, 0.84));
       padding: 14px;
       display: grid;
       gap: 10px;
     }
+    .intake-card h2,
     .intake-card h3 {
       margin: 0;
       font-size: 15px;
@@ -169,6 +277,7 @@
       gap: 10px;
       padding: 12px 14px;
       cursor: pointer;
+      transition: background 180ms ease;
     }
     .fold-summary:hover {
       background: rgba(255, 255, 255, 0.03);
@@ -254,6 +363,12 @@
       color: #dbe8ff;
       background: transparent;
     }
+    .search-icon {
+      width: 16px;
+      height: 16px;
+      color: #89a8da;
+      flex: 0 0 auto;
+    }
     .go-btn {
       width: 46px;
       height: 46px;
@@ -272,7 +387,7 @@
       transform: translateY(-1px);
     }
     .generate-strip {
-      border: 1px solid rgba(148, 163, 184, 0.28);
+      border: 1px solid rgba(91, 141, 255, 0.42);
       border-radius: 16px;
       background: linear-gradient(135deg, rgba(15, 30, 62, 0.95), rgba(6, 14, 32, 0.96));
       padding: 12px 14px;
@@ -281,6 +396,10 @@
       justify-content: space-between;
       gap: 12px;
       flex-wrap: wrap;
+      position: sticky;
+      bottom: 12px;
+      z-index: 2;
+      box-shadow: 0 16px 32px rgba(1, 7, 20, 0.45);
     }
     .generate-copy {
       display: grid;
@@ -327,8 +446,70 @@
       margin-top: 14px;
       display: flex;
       gap: 12px;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+    }
+    .upload-hub-card {
+      padding: 16px;
+    }
+    .upload-hub-card .drop-zone {
+      padding: 24px 20px;
+      min-height: 240px;
+      display: grid;
+      align-content: center;
+      justify-items: center;
+      gap: 6px;
+    }
+    .upload-hub-card .drop-title {
+      font-size: 44px;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+    .upload-hub-card .drop-sub {
+      margin: 0;
+      font-size: 16px;
+      color: #aec2e6;
+      text-align: center;
+    }
+    .hub-methods {
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
       justify-content: center;
       flex-wrap: wrap;
+      gap: 10px;
+    }
+    .hub-method-btn {
+      border: 1px solid rgba(148, 163, 184, 0.38);
+      border-radius: 999px;
+      background: rgba(9, 17, 33, 0.72);
+      color: #dbe8ff;
+      padding: 10px 18px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+    }
+    .hub-method-btn:hover {
+      border-color: rgba(125, 165, 255, 0.78);
+      background: rgba(22, 38, 68, 0.86);
+      transform: translateY(-1px);
+    }
+    .hub-method-btn:disabled {
+      opacity: 0.58;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+      white-space: nowrap;
     }
     .source-modal {
       position: fixed;
@@ -447,16 +628,16 @@
     }
     .source-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr;
       gap: 12px;
-      margin-top: 14px;
+      margin-top: 2px;
     }
     .block {
-      border: 1px solid var(--card-line);
+      border: 1px solid rgba(148, 163, 184, 0.24);
       border-radius: 16px;
-      background: linear-gradient(160deg, rgba(8, 18, 40, 0.92), rgba(7, 15, 34, 0.88));
+      background: linear-gradient(160deg, rgba(8, 18, 40, 0.88), rgba(7, 15, 34, 0.82));
       padding: 12px;
-      min-height: 220px;
+      min-height: 180px;
     }
     details.block {
       min-height: 0;
@@ -469,6 +650,7 @@
     details.block .fold-body {
       padding: 0 12px 12px;
     }
+    .block h2,
     .block h3 {
       margin: 0;
       font-size: 15px;
@@ -614,6 +796,14 @@
       border-color: rgba(102, 157, 255, 0.74);
       background: rgba(34, 60, 116, 0.9);
     }
+    button:focus-visible,
+    a:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible,
+    summary:focus-visible {
+      outline: 2px solid rgba(125, 211, 252, 0.92);
+      outline-offset: 2px;
+    }
     .books-grid {
       margin-top: 10px;
       display: grid;
@@ -702,10 +892,9 @@
     }
     .error { color: var(--danger); }
     .progress-wrap {
-      margin-top: 12px;
-      border: 1px solid var(--card-line);
+      border: 1px solid rgba(91, 141, 255, 0.33);
       border-radius: 16px;
-      background: var(--card);
+      background: linear-gradient(160deg, rgba(11, 22, 48, 0.92), rgba(7, 16, 34, 0.86));
       padding: 12px;
       display: grid;
       gap: 8px;
@@ -725,6 +914,7 @@
       font-size: 12px;
       padding: 4px 10px;
       font-weight: 700;
+      white-space: nowrap;
     }
     .progress-track {
       width: 100%;
@@ -957,15 +1147,51 @@
       font-size: 13px;
       padding: 14px;
     }
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation: none !important;
+        transition: none !important;
+      }
+      .spinner {
+        border-top-color: rgba(148, 163, 184, 0.5);
+      }
+    }
     @media (max-width: 980px) {
+      .hero-shell {
+        grid-template-columns: 1fr;
+      }
+      .hero-rail {
+        order: -1;
+      }
+      .studio-layout {
+        grid-template-columns: 1fr;
+      }
       .intake-primary { grid-template-columns: 1fr; }
+      .upload-hub-card .drop-zone {
+        min-height: 200px;
+      }
+      .upload-hub-card .drop-title {
+        font-size: 30px;
+      }
+      .upload-hub-card .drop-sub {
+        font-size: 14px;
+      }
       .source-grid { grid-template-columns: 1fr; }
-      .stage-steps { grid-template-columns: 1fr; }
+      .stage-steps {
+        flex-direction: column;
+        align-items: stretch;
+      }
       .stage-step { text-align: left; }
+      .stage-step { justify-content: flex-start; }
       .generate-btn { width: 100%; min-width: 0; }
       .url-row { grid-template-columns: 1fr; }
       .search-row { grid-template-columns: 1fr; }
       .go-btn { width: 100%; }
+      .generate-strip {
+        position: static;
+      }
       .pipeline-viewer-card {
         width: 100%;
         max-height: 100vh;
@@ -986,126 +1212,146 @@
   <main class="wrap">
     <section id="studio" class="panel studio-panel">
       <div class="stage-steps" aria-label="studio steps">
-        <div class="stage-step active">Step 1: Generate Missions</div>
-        <div class="stage-step">Step 2: Review Content</div>
-        <div class="stage-step">Step 3: Finalize &amp; Publish</div>
+        <div class="stage-step active"><span class="step-index">1</span><span class="step-label">Generate Missions</span></div>
+        <div class="stage-step"><span class="step-index">2</span><span class="step-label">Review Content</span></div>
+        <div class="stage-step"><span class="step-index">3</span><span class="step-label">Finalize &amp; Publish</span></div>
       </div>
       <div class="hero-shell">
-        <p class="hero-kicker">Your Notebook</p>
-        <h1>Generate Playable Learning Missions from Sources</h1>
-        <p class="hero-sub">上传链接或文件，一步生成可读、可玩、可发布的书籍内容。</p>
+        <div class="hero-main">
+          <p class="hero-kicker">Your Notebook</p>
+          <h1>Generate Playable Learning Missions from Sources</h1>
+          <p class="hero-sub">上传链接或文件，一步生成可读、可玩、可发布的书籍内容。</p>
+        </div>
+        <aside class="hero-rail" aria-label="current focus">
+          <p class="hero-rail-title">Focus This Step</p>
+          <ul class="hero-rail-list">
+            <li class="hero-rail-item"><strong>1.</strong> 添加至少一个来源（链接或文件）。</li>
+            <li class="hero-rail-item"><strong>2.</strong> 核对「Selected Sources」后再生成。</li>
+            <li class="hero-rail-item"><strong>3.</strong> 在右侧追踪处理进度与知识块。</li>
+          </ul>
+        </aside>
       </div>
 
-      <div class="intake-shell">
-        <div class="intake-primary">
-          <section class="intake-card">
-            <h3 data-i18n="studio.website_section_title">Website URL</h3>
-            <p data-i18n="studio.website_section_desc">Paste one link and add it to your sources.</p>
-            <div class="url-row">
-              <input id="website-input" class="url-input" type="url" placeholder="https://example.com/article" />
-              <button id="website-btn" class="btn ghost" type="button" data-i18n="studio.add_url">Add URL</button>
-            </div>
-            <p class="url-hint" data-i18n="studio.url_hint">Supports article/doc/paper links. Missing protocol will auto-use https://</p>
-          </section>
-          <section class="intake-card">
-            <h3 data-i18n="studio.upload_section_title">Upload Files</h3>
-            <p data-i18n="studio.upload_section_desc">Upload PDF/EPUB/Markdown/TXT, or drag files into the area.</p>
-            <section id="drop-zone" class="drop-zone">
-              <p class="drop-title" data-i18n="studio.drop_title">Or drag and drop files</p>
-              <p class="drop-sub" data-i18n="studio.drop_sub">EPUB, TXT, Markdown, PDF, web text, and more</p>
-              <div class="drop-actions">
-                <button id="upload-btn" class="btn ghost" type="button"><span>⬆️ </span><span data-i18n="studio.upload">Upload</span></button>
-                <button id="paste-btn" class="btn ghost" type="button"><span>📋 </span><span data-i18n="studio.paste">Paste Text</span></button>
+      <div class="studio-layout">
+        <div class="primary-column">
+          <section class="section-shell">
+            <h2 class="section-shell-title">Step 1 · Add Source Materials</h2>
+            <p class="section-shell-sub">先完成来源输入，再点击主按钮生成，避免在多个模块之间频繁切换。</p>
+
+            <div class="intake-shell">
+              <div class="intake-primary">
+                <section class="intake-card upload-hub-card">
+                  <h3>拖放或添加来源</h3>
+                  <p>一个统一入口支持上传文件、粘贴网站链接、粘贴文本。</p>
+                  <section id="drop-zone" class="drop-zone">
+                    <p class="drop-title">或拖放文件</p>
+                    <p class="drop-sub">PDF、EPUB、Markdown、TXT、网页文本等</p>
+                    <div class="hub-methods">
+                      <button id="upload-btn" class="hub-method-btn" type="button" data-i18n="studio.upload">上传文件</button>
+                      <button id="website-entry-btn" class="hub-method-btn" type="button">粘贴网站链接</button>
+                      <button id="cloud-drive-btn" class="hub-method-btn" type="button" disabled title="Coming soon">云端硬盘</button>
+                      <button id="paste-btn" class="hub-method-btn" type="button" data-i18n="studio.paste">粘贴文字</button>
+                    </div>
+                  </section>
+                  <div class="sr-only" aria-hidden="true">
+                    <input id="website-input" class="url-input" type="url" placeholder="https://example.com/article" tabindex="-1" />
+                    <button id="website-btn" class="btn ghost" type="button" data-i18n="studio.add_url" tabindex="-1">Add URL</button>
+                  </div>
+                </section>
               </div>
-            </section>
+
+              <details id="search-fold" class="intake-card search-card fold-card">
+                <summary class="fold-summary">
+                  <span class="fold-title" data-i18n="studio.search_section_title">Web Search (Optional)</span>
+                  <span class="fold-toggle-text">
+                    <span class="closed-only" data-i18n="studio.expand_optional">展开</span>
+                    <span class="open-only" data-i18n="studio.collapse_optional">收起</span>
+                  </span>
+                </summary>
+                <div class="fold-body">
+                  <p data-i18n="studio.search_section_desc">Only use when you need extra sources.</p>
+                  <div class="search-row">
+                    <div class="search-box">
+                      <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path fill="currentColor" d="M10.5 3a7.5 7.5 0 1 1 4.744 13.307l4.224 4.224-1.414 1.414-4.224-4.224A7.5 7.5 0 0 1 10.5 3Zm0 2a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11Z" />
+                      </svg>
+                      <input id="search-input" type="text" placeholder="Search web sources (paper title, DOI, keywords)" data-i18n-placeholder="studio.search_placeholder" />
+                    </div>
+                    <button id="search-btn" class="go-btn" title="Search Sources" data-i18n-title="studio.search_btn_title">➜</button>
+                  </div>
+                </div>
+              </details>
+            </div>
+
+            <div class="source-grid">
+              <section id="search-results-section" class="block" hidden>
+                <h3 data-i18n="studio.search_results">Search Results</h3>
+                <div id="search-results" class="list"></div>
+              </section>
+              <section class="block">
+                <h3 data-i18n="studio.selected_sources">Selected Sources</h3>
+                <div id="selected-sources" class="list"></div>
+              </section>
+            </div>
+
+            <div class="generate-strip">
+              <div class="generate-copy">
+                <p class="generate-title" data-i18n="studio.generate_title">Generate</p>
+                <p id="generate-hint" class="generate-hint" data-i18n="studio.generate_need_source">Add a website URL or upload files first.</p>
+              </div>
+              <button id="generate-btn" class="btn primary generate-btn" data-i18n="studio.generate">Generate Visual Reading Experience</button>
+            </div>
+
+            <input
+              id="file-input"
+              type="file"
+              multiple
+              accept=".txt,.md,.markdown,.csv,.json,.html,.htm,.epub,.pdf,text/plain,text/markdown,text/csv,application/json,text/html,application/epub+zip,application/pdf"
+              hidden
+            />
           </section>
         </div>
 
-        <details id="search-fold" class="intake-card search-card fold-card">
-          <summary class="fold-summary">
-            <span class="fold-title" data-i18n="studio.search_section_title">Web Search (Optional)</span>
-            <span class="fold-toggle-text">
-              <span class="closed-only" data-i18n="studio.expand_optional">展开</span>
-              <span class="open-only" data-i18n="studio.collapse_optional">收起</span>
-            </span>
-          </summary>
-          <div class="fold-body">
-            <p data-i18n="studio.search_section_desc">Only use when you need extra sources.</p>
-            <div class="search-row">
-              <div class="search-box">
-                <span style="font-size:18px;color:#8fa3ca;">🔍</span>
-                <input id="search-input" type="text" placeholder="Search web sources (paper title, DOI, keywords)" data-i18n-placeholder="studio.search_placeholder" />
-              </div>
-              <button id="search-btn" class="go-btn" title="Search Sources" data-i18n-title="studio.search_btn_title">➜</button>
+        <aside class="secondary-column">
+          <section class="progress-wrap">
+            <div class="progress-head">
+              <h3 class="section-title" data-i18n="studio.progress">Processing Progress</h3>
+              <span id="status-badge" class="status-badge">idle</span>
             </div>
-          </div>
-        </details>
+            <div class="progress-track"><div id="progress-fill" class="progress-fill"></div></div>
+            <p id="progress-text" class="meta-line" style="margin-top:0;"></p>
+            <ul id="log-list" class="log-list"></ul>
+          </section>
 
-        <div class="generate-strip">
-          <div class="generate-copy">
-            <p class="generate-title" data-i18n="studio.generate_title">Generate</p>
-            <p id="generate-hint" class="generate-hint" data-i18n="studio.generate_need_source">Add a website URL or upload files first.</p>
-          </div>
-          <button id="generate-btn" class="btn primary generate-btn" data-i18n="studio.generate">Generate Visual Reading Experience</button>
-        </div>
+          <details id="knowledge-fold" class="block">
+            <summary class="progress-head fold-summary">
+              <h3 class="section-title" data-i18n="studio.knowledge_blocks">Knowledge Blocks</h3>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <span id="knowledge-count" class="status-badge">0</span>
+                <span class="fold-toggle-text">
+                  <span class="closed-only" data-i18n="studio.expand_optional">展开</span>
+                  <span class="open-only" data-i18n="studio.collapse_optional">收起</span>
+                </span>
+              </div>
+            </summary>
+            <div class="fold-body">
+              <p id="knowledge-diagnostics" class="meta-line" style="margin:8px 0 0;"></p>
+              <div id="knowledge-blocks" class="list knowledge-list"></div>
+            </div>
+          </details>
 
-        <input
-          id="file-input"
-          type="file"
-          multiple
-          accept=".txt,.md,.markdown,.csv,.json,.html,.htm,.epub,.pdf,text/plain,text/markdown,text/csv,application/json,text/html,application/epub+zip,application/pdf"
-          hidden
-        />
+          <section id="my-library" class="block">
+            <div class="progress-head">
+              <h3 class="section-title">个人书架</h3>
+              <span class="meta-line" style="margin:0;">上传文件并生成后，这里会逐步出现你的书</span>
+              <button id="refresh-works-btn" class="tiny" type="button" data-i18n="studio.refresh">Refresh</button>
+            </div>
+            <div id="owned-books" class="books-grid"></div>
+          </section>
+        </aside>
       </div>
 
-      <div class="source-grid">
-        <section id="search-results-section" class="block" hidden>
-          <h3 data-i18n="studio.search_results">Search Results</h3>
-          <div id="search-results" class="list"></div>
-        </section>
-        <section class="block">
-          <h3 data-i18n="studio.selected_sources">Selected Sources</h3>
-          <div id="selected-sources" class="list"></div>
-        </section>
-      </div>
-
-      <details id="knowledge-fold" class="block" style="margin-top:12px;">
-        <summary class="progress-head fold-summary">
-          <h3 class="section-title" data-i18n="studio.knowledge_blocks">Knowledge Blocks</h3>
-          <div style="display:flex;align-items:center;gap:10px;">
-            <span id="knowledge-count" class="status-badge">0</span>
-            <span class="fold-toggle-text">
-              <span class="closed-only" data-i18n="studio.expand_optional">展开</span>
-              <span class="open-only" data-i18n="studio.collapse_optional">收起</span>
-            </span>
-          </div>
-        </summary>
-        <div class="fold-body">
-          <p id="knowledge-diagnostics" class="meta-line" style="margin:8px 0 0;"></p>
-          <div id="knowledge-blocks" class="list knowledge-list"></div>
-        </div>
-      </details>
-
-      <section class="progress-wrap">
-        <div class="progress-head">
-          <h3 class="section-title" data-i18n="studio.progress">Processing Progress</h3>
-          <span id="status-badge" class="status-badge">idle</span>
-        </div>
-        <div class="progress-track"><div id="progress-fill" class="progress-fill"></div></div>
-        <p id="progress-text" class="meta-line" style="margin-top:0;"></p>
-        <ul id="log-list" class="log-list"></ul>
-      </section>
-
-      <section id="my-library" class="block" style="margin-top:12px;">
-        <div class="progress-head">
-          <h3 class="section-title">个人书架</h3>
-          <span class="meta-line" style="margin:0;">上传文件并生成后，这里会逐步出现你的书</span>
-          <button id="refresh-works-btn" class="tiny" type="button" data-i18n="studio.refresh">Refresh</button>
-        </div>
-        <div id="owned-books" class="books-grid"></div>
-      </section>
-
-      <section id="public-library" class="block" style="margin-top:12px;" hidden>
+      <section id="public-library" class="block" hidden>
         <div class="progress-head">
           <h3 class="section-title">Public Library</h3>
           <span class="meta-line" style="margin:0;">浏览官方与社区已发布内容，支持试用与购买后打开</span>
@@ -1177,6 +1423,7 @@
     const generateHintEl = document.getElementById("generate-hint");
     const websiteInput = document.getElementById("website-input");
     const uploadBtn = document.getElementById("upload-btn");
+    const websiteEntryBtn = document.getElementById("website-entry-btn");
     const websiteBtn = document.getElementById("website-btn");
     const pasteBtn = document.getElementById("paste-btn");
     const fileInput = document.getElementById("file-input");
@@ -1223,6 +1470,7 @@
     const pipelineCodeEl = document.getElementById("pipeline-code");
     const pipelinePreviewEl = document.getElementById("pipeline-preview");
     const ACTIVE_JOB_KEY = "reado_studio_active_job_id";
+    const SOURCE_DRAFT_KEY = "reado_studio_source_draft_v1";
     const AUTH_STATE_KEY = "reado_auth_state_v1";
     const PROFILE_SETUP_KEY = "reado_profile_setup_v1";
     const catalog = window.__READO_BOOK_CATALOG__ || {};
@@ -1300,11 +1548,13 @@
     function ensureReadyForGeneration() {
       const auth = readAuthState();
       if (!auth?.userId) {
+        persistSourceDraft();
         setMeta(t("studio.auth_required", "Please sign in before generating."));
         window.location.assign(buildAuthUrl());
         return false;
       }
       if (!hasProfileSetup(auth.userId)) {
+        persistSourceDraft();
         setMeta(t("studio.profile_required", "Please complete your profile before generating."));
         window.location.assign(buildProfileSetupUrl());
         return false;
@@ -1442,6 +1692,8 @@
               <p class="book-desc">${esc(desc || "已生成，可随时继续学习。")}</p>
               <div class="book-actions">
                 <button class="tiny" data-act="open-owned" data-id="${esc(safeBookId)}" data-work-id="${esc(String(work?.id || ""))}" data-work-title="${esc(title || "Knowledge Model")}" data-href="${esc(openHref)}">${esc(openHref ? "打开" : "知识模型")}</button>
+                <button class="tiny" data-act="publish-owned" data-work-id="${esc(String(work?.id || ""))}" data-is-public="${work?.is_public ? "1" : "0"}">${esc(work?.is_public ? "下架" : "上架")}</button>
+                <button class="tiny" data-act="delete-owned" data-work-id="${esc(String(work?.id || ""))}">${esc("删除")}</button>
               </div>
             </div>
           </article>`;
@@ -1591,15 +1843,51 @@
 
     function bindLibraryActions() {
       if (ownedBooksEl) {
-        ownedBooksEl.addEventListener("click", (event) => {
-          const btn = event.target && event.target.closest ? event.target.closest('button[data-act="open-owned"]') : null;
+        ownedBooksEl.addEventListener("click", async (event) => {
+          const btn = event.target && event.target.closest ? event.target.closest("button[data-act]") : null;
           if (!btn) return;
+          const action = btn.getAttribute("data-act") || "";
+          const workId = btn.getAttribute("data-work-id") || "";
+          if (action === "publish-owned") {
+            if (!workId) return;
+            const isPublic = btn.getAttribute("data-is-public") === "1";
+            btn.disabled = true;
+            try {
+              await request("PATCH", "/api/studio/works/" + encodeURIComponent(workId), {
+                is_public: !isPublic
+              });
+              setMeta(t("studio.meta_publish_done", "Visibility updated."));
+              await loadMyWorks();
+              await loadPublicLibrary();
+            } catch (error) {
+              setError(error?.message || t("studio.err_publish_failed", "Publish failed"));
+            } finally {
+              btn.disabled = false;
+            }
+            return;
+          }
+          if (action === "delete-owned") {
+            if (!workId) return;
+            if (!window.confirm(t("studio.confirm_delete", "Delete this playable book? This action cannot be undone."))) return;
+            btn.disabled = true;
+            try {
+              await request("DELETE", "/api/studio/works/" + encodeURIComponent(workId));
+              setMeta(t("studio.meta_delete_done", "Book deleted."));
+              await loadMyWorks();
+              await loadPublicLibrary();
+            } catch (error) {
+              setError(error?.message || t("studio.err_delete_failed", "Delete failed"));
+            } finally {
+              btn.disabled = false;
+            }
+            return;
+          }
+          if (action !== "open-owned") return;
           const href = btn.getAttribute("data-href") || "";
           if (href) {
             openBookHref(href);
             return;
           }
-          const workId = btn.getAttribute("data-work-id") || "";
           const title = btn.getAttribute("data-work-title") || "Knowledge Model";
           if (!workId) {
             setError("当前条目没有可用体验或知识模型。");
@@ -1822,12 +2110,14 @@
         const parsedBy = String(item?.parsedBy || "").toLowerCase();
         const urlText = String(item?.url || "");
         const uploadName = String(item?.__bookFile?.name || "").toLowerCase();
+        const fileToken = String(item?.__bookFileToken || item?.__bookFile?.fileToken || item?.fileToken || "").trim();
         if (parsedBy.startsWith("ingest.")) ingestCount += 1;
         if (
           parsedBy.includes("pdf")
           || parsedBy.includes("epub")
           || /\.(pdf|epub)(?:$|[?#])/i.test(urlText)
           || /\.(pdf|epub)$/.test(uploadName)
+          || Boolean(fileToken)
         ) {
           bookLikeCount += 1;
         }
@@ -1840,11 +2130,11 @@
     function pickBookFilePayload(sources) {
       const rows = Array.isArray(sources) ? sources : [];
       for (const row of rows) {
-        const file = row?.__bookFile && typeof row.__bookFile === "object" ? row.__bookFile : null;
-        if (!file) continue;
+        const file = row?.__bookFile && typeof row.__bookFile === "object" ? row.__bookFile : {};
         const fileToken = String(file?.fileToken || row?.fileToken || row?.__bookFileToken || "").trim();
-        const name = String(file?.name || "uploaded-book.pdf").trim() || "uploaded-book.pdf";
-        const type = String(file?.type || "application/octet-stream").trim() || "application/octet-stream";
+        const guessedName = String(row?.name || row?.title || "uploaded-book.pdf").trim();
+        const name = String(file?.name || guessedName || "uploaded-book.pdf").trim() || "uploaded-book.pdf";
+        const type = String(file?.type || row?.type || "application/octet-stream").trim() || "application/octet-stream";
         if (fileToken) {
           return {
             name,
@@ -2006,6 +2296,7 @@
         Number(row.gateIndex || row.gate_index || row.index || docRow?.gate || index + 1) || (index + 1)
       );
       const docMarkdown = String(docRow?.markdown || "").trim();
+      const contentExcerpt = String(row.content || "").replace(/\s+/g, " ").trim().slice(0, 2600);
       const summary = String(row.summary || row.content || "").trim().slice(0, 1200)
         || String(docMarkdown.split("\n").slice(0, 10).join(" ").replace(/\s+/g, " ")).trim().slice(0, 1200);
       return {
@@ -2017,6 +2308,7 @@
         keywords: Array.isArray(row.keywords) ? row.keywords.slice(0, 12) : [],
         words: Number(row.words || 0),
         summary,
+        contentExcerpt,
         densityScore: Number(row?.densityScore || row?.density?.score || 0),
         moduleSlug: String(moduleSlug || "").trim()
       };
@@ -2130,6 +2422,12 @@
       } else {
         lines.push("- (none)");
       }
+      if (block.contentExcerpt) {
+        lines.push("");
+        lines.push("## Source Excerpt");
+        lines.push("");
+        lines.push(block.contentExcerpt);
+      }
       return lines.join("\n");
     }
 
@@ -2216,6 +2514,7 @@
                 ${selectedBlock.path ? `<span class="pipeline-chip">${esc(selectedBlock.path)}</span>` : ""}
               </div>
               <p>${esc(selectedBlock.summary || "No summary available.")}</p>
+              ${selectedBlock.contentExcerpt ? `<p class="pipeline-empty">${esc(selectedBlock.contentExcerpt.slice(0, 320))}${selectedBlock.contentExcerpt.length > 320 ? "..." : ""}</p>` : ""}
               <div class="pipeline-kws">${selectedBlock.keywords.length ? selectedBlock.keywords.map((item) => `<span>${esc(item)}</span>`).join("") : `<span>(none)</span>`}</div>
               ${selectedBlock.moduleSlug ? `<a class="tiny" href="/experiences/${esc(encodeURIComponent(selectedBlock.moduleSlug))}.html" target="_blank" rel="noreferrer">Open mapped module</a>` : `<p class="pipeline-empty">No mapped module yet. Click Generate to build the interactive runtime.</p>`}
             </article>
@@ -2335,6 +2634,59 @@
 
     function sourceKey(item) {
       return (String(item.url || "") + "::" + String(item.title || "")).toLowerCase();
+    }
+
+    function sanitizeDraftSource(item) {
+      const row = item && typeof item === "object" ? JSON.parse(JSON.stringify(item)) : {};
+      if (typeof row.content === "string" && row.content.length > 280000) {
+        row.content = row.content.slice(0, 280000);
+      }
+      if (row.__bookFile && typeof row.__bookFile === "object") {
+        const fileToken = String(row.__bookFile.fileToken || "").trim();
+        row.__bookFile = {
+          name: String(row.__bookFile.name || "").trim(),
+          type: String(row.__bookFile.type || "").trim(),
+          fileToken,
+          contentBase64: fileToken ? "" : String(row.__bookFile.contentBase64 || "").trim().slice(0, 1200000)
+        };
+      }
+      return row;
+    }
+
+    function persistSourceDraft() {
+      try {
+        const rows = Array.isArray(state.selectedSources) ? state.selectedSources : [];
+        if (!rows.length) {
+          localStorage.removeItem(SOURCE_DRAFT_KEY);
+          return;
+        }
+        const payload = {
+          updatedAt: new Date().toISOString(),
+          selectedSources: rows.map((row) => sanitizeDraftSource(row))
+        };
+        localStorage.setItem(SOURCE_DRAFT_KEY, JSON.stringify(payload));
+      } catch {}
+    }
+
+    function restoreSourceDraft() {
+      try {
+        const raw = JSON.parse(localStorage.getItem(SOURCE_DRAFT_KEY) || "null");
+        if (!raw || typeof raw !== "object") return;
+        const updatedAt = Date.parse(String(raw.updatedAt || ""));
+        if (Number.isFinite(updatedAt) && (Date.now() - updatedAt) > 1000 * 60 * 60 * 24) {
+          localStorage.removeItem(SOURCE_DRAFT_KEY);
+          return;
+        }
+        const rows = Array.isArray(raw.selectedSources) ? raw.selectedSources : [];
+        if (!rows.length) return;
+        for (const row of rows) {
+          const key = sourceKey(row);
+          if (!key.trim()) continue;
+          if (state.selectedSources.some((item) => sourceKey(item) === key)) continue;
+          state.selectedSources.push(sanitizeDraftSource(row));
+        }
+        setMeta(t("studio.meta_restore_draft", "Restored your previous uploaded sources."));
+      } catch {}
     }
 
     function estimateModuleCountFromSources(sources) {
@@ -2538,6 +2890,7 @@
         selectedSourcesEl.innerHTML = `<div class="item"><p>${esc(t("studio.selected_empty", "No sources yet. Add a website URL or upload files first."))}</p></div>`;
         renderKnowledgeBlocks();
         updateGenerateCtaState();
+        persistSourceDraft();
         return;
       }
       const pendingHtml = pending.map((item) => {
@@ -2572,6 +2925,7 @@
       });
       renderKnowledgeBlocks();
       updateGenerateCtaState();
+      persistSourceDraft();
     }
 
     async function searchSources() {
@@ -2662,9 +3016,87 @@
       });
     }
 
+    async function startChunkedUpload(file, chunkBytes) {
+      const totalChunks = Math.max(1, Math.ceil(file.size / Math.max(1, chunkBytes)));
+      const data = await request("POST", "/api/studio/files/chunked/start", {
+        name: String(file?.name || "uploaded-book.bin"),
+        type: String(file?.type || "application/octet-stream"),
+        size: Number(file?.size || 0),
+        totalChunks
+      });
+      const uploadId = String(data?.uploadId || "").trim();
+      if (!uploadId) {
+        throw new Error("Chunk upload initialization failed.");
+      }
+      return {
+        uploadId,
+        chunkSize: Math.max(1024 * 1024, Number(data?.chunkSize || chunkBytes)),
+        totalChunks
+      };
+    }
+
+    function uploadChunkBinary(uploadId, index, blob, onProgress) {
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        const route = "/api/studio/files/chunked/" + encodeURIComponent(uploadId) + "/chunks/" + encodeURIComponent(String(index));
+        xhr.open("POST", route, true);
+        xhr.setRequestHeader("Content-Type", "application/octet-stream");
+        xhr.responseType = "json";
+        xhr.upload.onprogress = (event) => {
+          if (!event.lengthComputable) return;
+          if (typeof onProgress === "function") {
+            onProgress(Math.max(0, Math.min(1, event.loaded / Math.max(event.total, 1))));
+          }
+        };
+        xhr.onerror = () => reject(new Error("Chunk upload failed at part " + (index + 1)));
+        xhr.onload = () => {
+          const data = xhr.response && typeof xhr.response === "object"
+            ? xhr.response
+            : (() => {
+              try {
+                return JSON.parse(xhr.responseText || "{}");
+              } catch {
+                return {};
+              }
+            })();
+          if (xhr.status >= 200 && xhr.status < 300 && data?.ok !== false) {
+            resolve(data);
+            return;
+          }
+          reject(new Error((data && data.error) || ("Chunk upload failed with " + xhr.status)));
+        };
+        xhr.send(blob);
+      });
+    }
+
+    async function uploadFileChunked(file, onProgress) {
+      const fallbackChunkBytes = 6 * 1024 * 1024;
+      const started = await startChunkedUpload(file, fallbackChunkBytes);
+      const uploadId = String(started.uploadId || "").trim();
+      const chunkSize = Math.max(1024 * 1024, Number(started.chunkSize || fallbackChunkBytes));
+      const totalChunks = Math.max(1, Math.ceil(file.size / chunkSize));
+      for (let i = 0; i < totalChunks; i += 1) {
+        const start = i * chunkSize;
+        const end = Math.min(file.size, start + chunkSize);
+        const chunkBlob = file.slice(start, end);
+        await uploadChunkBinary(uploadId, i, chunkBlob, (ratio) => {
+          if (typeof onProgress !== "function") return;
+          const current = (i + Math.max(0, Math.min(1, ratio))) / Math.max(totalChunks, 1);
+          onProgress(Math.max(0, Math.min(0.96, current * 0.96)));
+        });
+        if (typeof onProgress === "function") {
+          onProgress(Math.max(0, Math.min(0.96, ((i + 1) / Math.max(totalChunks, 1)) * 0.96)));
+        }
+      }
+      const result = await request("POST", "/api/studio/files/chunked/" + encodeURIComponent(uploadId) + "/complete", {});
+      if (typeof onProgress === "function") onProgress(1);
+      return result;
+    }
+
     async function ingestFile(file, index, total, pendingId = "") {
-      const maxMb = 120;
+      const maxMb = 512;
       const binaryThresholdBytes = 8 * 1024 * 1024;
+      const chunkedThresholdBytes = 90 * 1024 * 1024;
       if (!file) return;
       if (file.size > maxMb * 1024 * 1024) {
         throw new Error(file.name + " exceeds " + maxMb + "MB");
@@ -2682,7 +3114,20 @@
       });
       let data = null;
       let contentBase64 = "";
-      if (file.size >= binaryThresholdBytes) {
+      if (file.size >= chunkedThresholdBytes) {
+        patchPendingSource(pendingId, {
+          status: t("studio.pending_uploading", "Uploading in chunked mode..."),
+          progress: baseStart + 8
+        });
+        data = await uploadFileChunked(file, (ratio) => {
+          const pct = baseStart + Math.round((100 / Math.max(total, 1)) * ratio * 0.78);
+          setProgress(pct, "Uploading chunks: " + file.name);
+          patchPendingSource(pendingId, {
+            status: t("studio.pending_uploading", "Uploading and parsing..."),
+            progress: pct
+          });
+        });
+      } else if (file.size >= binaryThresholdBytes) {
         patchPendingSource(pendingId, {
           status: t("studio.pending_uploading", "Uploading large file in binary mode..."),
           progress: baseStart + 8
@@ -3187,38 +3632,61 @@
       }
     }
 
-    searchBtn.addEventListener("click", searchSources);
-    searchInput.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") searchSources();
-    });
-    generateBtn.addEventListener("click", generatePlayable);
+    if (searchBtn) searchBtn.addEventListener("click", searchSources);
+    if (searchInput) {
+      searchInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") searchSources();
+      });
+    }
+    if (generateBtn) generateBtn.addEventListener("click", generatePlayable);
 
-    uploadBtn.addEventListener("click", () => {
-      fileInput.click();
-    });
-    fileInput.addEventListener("change", () => {
-      ingestFileList(fileInput.files).catch((error) => setError(error?.message || t("studio.err_file_import_failed", "File import failed")));
-      fileInput.value = "";
-    });
+    if (uploadBtn) {
+      uploadBtn.addEventListener("click", () => {
+        if (fileInput) fileInput.click();
+      });
+    }
+    if (fileInput) {
+      fileInput.addEventListener("change", () => {
+        ingestFileList(fileInput.files).catch((error) => setError(error?.message || t("studio.err_file_import_failed", "File import failed")));
+        fileInput.value = "";
+      });
+    }
 
-    websiteBtn.addEventListener("click", async () => {
-      if (websiteBtn.disabled) return;
-      websiteBtn.disabled = true;
-      try {
-        await ingestWebsiteUrl(websiteInput?.value || "");
-      } finally {
-        websiteBtn.disabled = false;
-      }
-    });
-    if (websiteInput) {
+    if (websiteBtn) {
+      websiteBtn.addEventListener("click", async () => {
+        if (websiteBtn.disabled) return;
+        websiteBtn.disabled = true;
+        try {
+          await ingestWebsiteUrl(websiteInput?.value || "");
+        } finally {
+          websiteBtn.disabled = false;
+        }
+      });
+    }
+    if (websiteInput && websiteBtn) {
       websiteInput.addEventListener("keydown", (event) => {
         if (event.key !== "Enter") return;
         event.preventDefault();
         websiteBtn.click();
       });
     }
+    if (websiteEntryBtn) {
+      websiteEntryBtn.addEventListener("click", async () => {
+        const url = await openSourceInputModal({
+          title: t("studio.website_section_title", "Website URL"),
+          label: t("studio.website_section_desc", "Paste one link and add it to your sources."),
+          placeholder: "https://example.com/article",
+          multiline: false,
+          confirmText: t("studio.add_url", "Add URL"),
+          cancelText: t("studio.modal_cancel", "Cancel")
+        });
+        if (!url) return;
+        if (websiteInput) websiteInput.value = url;
+        await ingestWebsiteUrl(url);
+      });
+    }
 
-    pasteBtn.addEventListener("click", async () => {
+    if (pasteBtn) pasteBtn.addEventListener("click", async () => {
       const text = await openSourceInputModal({
         title: t("studio.paste", "Paste Text"),
         label: t("studio.prompt_paste", "Paste text content for generation context"),
@@ -3287,6 +3755,7 @@
     bindLibraryActions();
     bindTrialModalActions();
     setupDropZone();
+    restoreSourceDraft();
     renderOwnedBooks();
     renderPublicBooks();
     renderSearchResults();

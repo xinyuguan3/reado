@@ -1,0 +1,42 @@
+{
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T13:17:33.521Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "Datre Visual V4",
+      "author": ""
+    },
+    "knowledge_block": {
+      "id": "kb-10",
+      "gate_index": 9,
+      "title": "是什么将宇宙区分开的？每一个宇宙，是否都保持了一定的频率范围呢",
+      "summary": "19 问题：是什么将宇宙区分开的？每一个宇宙，是否都保持了一定的频率范围呢？ DATRE ： 我不知道 。",
+      "words": 525,
+      "keywords": [
+        "datre",
+        "问题",
+        "完形概念",
+        "现在",
+        "金属罐",
+        "john",
+        "一生",
+        "东西"
+      ],
+      "density": {
+        "score": 0.6376,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0.1371,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0.2667
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "scholar",
+      "theme_label": "Scholar Atlas",
+      "section_count": 5,
+      "generated_with": "template_runtime"
+    }
+  }
+}

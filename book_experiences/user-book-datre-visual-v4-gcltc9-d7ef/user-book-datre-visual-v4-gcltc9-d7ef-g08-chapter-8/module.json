@@ -1,0 +1,42 @@
+{
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T13:17:33.520Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "Datre Visual V4",
+      "author": ""
+    },
+    "knowledge_block": {
+      "id": "kb-09",
+      "gate_index": 8,
+      "title": "在我们的观察中，我们就 “ 看着 ” 你们像这样说啊，说啊，说啊 ……",
+      "summary": "17 在我们的观察中，我们就 “ 看着 ” 你们像这样说啊，说啊，说啊 … 。可是，你们 却不知道自己到底在说什么！这是我们通过物质眼睛观察到的。人们不停说说说，却 从没有 “ 记录／觉知 ” 自己所说的话。 因此 ， “ 惯例 ” 是一种重复。重复做同样的事情可不是进化。进化是不断改变的 。",
+      "words": 523,
+      "keywords": [
+        "aona",
+        "datre",
+        "你们",
+        "你看",
+        "内容物",
+        "东西",
+        "但是",
+        "因此"
+      ],
+      "density": {
+        "score": 0.6395,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0.2294,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0.1606
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "scholar",
+      "theme_label": "Scholar Atlas",
+      "section_count": 5,
+      "generated_with": "template_runtime"
+    }
+  }
+}

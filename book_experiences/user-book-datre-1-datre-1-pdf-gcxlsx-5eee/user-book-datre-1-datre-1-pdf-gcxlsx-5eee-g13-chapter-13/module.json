@@ -1,0 +1,42 @@
+{
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T13:26:43.626Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "Datre书籍-第1册 我们是DATRE-1（部分）.pdf",
+      "author": ""
+    },
+    "knowledge_block": {
+      "id": "kb-15",
+      "gate_index": 13,
+      "title": "他们建立起了一种完全形态 - 一种非常不高兴的能量",
+      "summary": "31 他们建立起了一种完全形态 - 一种非常不高兴的能量。如果你进入这种环境中 ， 就能马上发觉，然后调转脚步，去其它商店了。 而这些群体意识将会一直呆在那个商店里，其他的人不会觉察到任何不同，因为 他们感觉不出来。",
+      "words": 516,
+      "keywords": [
+        "datre",
+        "问题",
+        "也就是说",
+        "但是",
+        "你看",
+        "然而",
+        "aona",
+        "一个敏感的人就能觉察到"
+      ],
+      "density": {
+        "score": 0.6407,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0.2326,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0.1628
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "cognition",
+      "theme_label": "Cognitive Lens",
+      "section_count": 5,
+      "generated_with": "template_runtime"
+    }
+  }
+}

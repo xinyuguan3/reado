@@ -1,0 +1,42 @@
+{
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T13:36:55.611Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "Datre书籍-第1册 我们是DATRE-1（部分）.pdf",
+      "author": ""
+    },
+    "knowledge_block": {
+      "id": "kb-02",
+      "gate_index": 2,
+      "title": "国家 · 进化",
+      "summary": "的规矩就被制定下来了，这些人想让别人告诉他如何去做。 站在河中的人想让别人过来帮助他，告诉他是应该往前还是应该往后？他们唯一 想要的：就是别人的帮助。",
+      "words": 603,
+      "keywords": [
+        "国家",
+        "进化",
+        "星球",
+        "帮助",
+        "为什么",
+        "多人",
+        "发生",
+        "打仗"
+      ],
+      "density": {
+        "score": 0.5984,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0.1194,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0.0929
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "scholar",
+      "theme_label": "Scholar Atlas",
+      "section_count": 5,
+      "generated_with": "template_runtime"
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T13:33:41.522Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "Datre书籍-第1册 我们是DATRE-1（部分）.pdf",
+      "author": ""
+    },
+    "knowledge_block": {
+      "id": "kb-13",
+      "gate_index": 12,
+      "title": "请问什么是 “ 心识泡泡",
+      "summary": "第 章 心识 问题 ：请问什么是 “ 心识泡泡 ” ？ DATRE ：心识泡泡中包含了所有能让你们去表达和体验的 “ 几率与可能性 ” 。",
+      "words": 519,
+      "keywords": [
+        "几率与可能性",
+        "但是",
+        "心识",
+        "现在",
+        "在现阶段",
+        "换句话说"
+      ],
+      "density": {
+        "score": 0.6849,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0.3237,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0.2697
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "scholar",
+      "theme_label": "Scholar Atlas",
+      "section_count": 5,
+      "generated_with": "template_runtime"
+    }
+  }
+}

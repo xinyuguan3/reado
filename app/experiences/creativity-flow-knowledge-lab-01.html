@@ -1,0 +1,1374 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>创造力心流：章节交互学习实验室</title>
+  <style>
+    :root {
+      --bg: #f5efe3;
+      --ink: #1d2a36;
+      --muted: #5f6f7f;
+      --panel: rgba(255, 250, 242, 0.9);
+      --line: rgba(29, 42, 54, 0.18);
+      --accent-a: #d95d39;
+      --accent-b: #2b6cb0;
+      --accent-c: #2f855a;
+      --accent-d: #805ad5;
+      --good: #2f855a;
+      --mid: #d69e2e;
+      --bad: #c53030;
+    }
+
+    * { box-sizing: border-box; }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 12% 12%, #fff4df 0%, rgba(255, 244, 223, 0) 40%),
+        radial-gradient(circle at 86% 80%, #d6ecff 0%, rgba(214, 236, 255, 0) 35%),
+        linear-gradient(140deg, #f7f0e3 0%, #ece8f8 52%, #e3f0e8 100%);
+      color: var(--ink);
+      font-family: "PingFang SC", "Noto Sans SC", "Hiragino Sans GB", sans-serif;
+    }
+
+    #app {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    #gameCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    #overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    #menuCard {
+      pointer-events: auto;
+      width: min(680px, 92vw);
+      padding: 24px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255, 249, 240, 0.86);
+      backdrop-filter: blur(6px);
+      box-shadow: 0 20px 56px rgba(46, 54, 73, 0.24);
+    }
+
+    #menuCard h1 {
+      margin: 0;
+      line-height: 1.25;
+      font-size: clamp(28px, 4.2vw, 44px);
+      letter-spacing: 0.2px;
+      color: #1b3244;
+    }
+
+    #menuCard p {
+      margin: 12px 0 0;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    .chipRow {
+      margin-top: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      border: 1px solid rgba(29, 42, 54, 0.16);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      color: #2f4a60;
+      background: rgba(255, 255, 255, 0.8);
+    }
+
+    #start-btn,
+    .action-btn,
+    #confirm-btn {
+      appearance: none;
+      border-radius: 12px;
+      border: 1px solid rgba(29, 42, 54, 0.2);
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 120ms ease, filter 120ms ease;
+      color: #0f2432;
+      background: rgba(255, 255, 255, 0.92);
+    }
+
+    #start-btn {
+      margin-top: 16px;
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 15px;
+      background: linear-gradient(120deg, #ffd08f, #f1a24f);
+      box-shadow: 0 12px 30px rgba(241, 162, 79, 0.35);
+    }
+
+    #actionWrap {
+      position: absolute;
+      left: 50%;
+      bottom: 14px;
+      width: min(980px, calc(100% - 20px));
+      transform: translateX(-50%);
+      z-index: 4;
+      display: grid;
+      gap: 8px;
+      pointer-events: auto;
+    }
+
+    #choiceGrid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(100px, 1fr));
+      gap: 8px;
+    }
+
+    .action-btn {
+      min-height: 52px;
+      padding: 8px 10px;
+      text-align: left;
+      font-size: 13px;
+      line-height: 1.3;
+      background: rgba(255, 255, 255, 0.88);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.65);
+    }
+
+    .action-btn[data-selected="true"] {
+      border-color: #1f6cb8;
+      box-shadow: 0 8px 20px rgba(49, 130, 206, 0.25);
+      background: linear-gradient(145deg, #ecf6ff, #d9eefe);
+    }
+
+    .action-btn:disabled {
+      opacity: 0.55;
+      cursor: default;
+    }
+
+    #confirm-btn {
+      min-height: 42px;
+      font-size: 14px;
+      padding: 8px 12px;
+      background: linear-gradient(120deg, #95d5ff, #6eb9f0);
+      border-color: rgba(16, 52, 84, 0.35);
+    }
+
+    #confirm-btn[data-tone="next"] {
+      background: linear-gradient(120deg, #b7efc5, #84d3a0);
+      border-color: rgba(27, 83, 53, 0.28);
+    }
+
+    #confirm-btn[data-tone="restart"] {
+      background: linear-gradient(120deg, #ffe4a7, #f7c469);
+      border-color: rgba(123, 84, 22, 0.35);
+    }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 760px) {
+      #choiceGrid {
+        grid-template-columns: 1fr;
+      }
+
+      .action-btn {
+        min-height: 48px;
+        font-size: 12px;
+      }
+    }
+  </style>
+<style id="reado-shell-preload-style">
+html.reado-shell-preload body:not(.reado-shell-applied) {
+  padding-top: 80px !important;
+}
+@media (min-width: 1024px) {
+  html.reado-shell-preload:not(.reado-shell-preload-learning) body:not(.reado-shell-applied) {
+    padding-left: 256px !important;
+  }
+}
+@media (min-width: 1200px) {
+  html.reado-shell-preload:not(.reado-shell-preload-learning) body:not(.reado-shell-applied) {
+    padding-right: clamp(280px, 24vw, 320px) !important;
+  }
+}
+html.reado-shell-preload body:not(.reado-shell-applied) > header:first-of-type,
+html.reado-shell-preload body:not(.reado-shell-applied) > nav:first-of-type,
+html.reado-shell-preload body:not(.reado-shell-applied) > aside:first-of-type,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex > nav,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex > aside,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex-1 > nav,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex-1 > aside,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex > .flex-1 > nav,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex > .flex-1 > aside {
+  display: none !important;
+}
+</style>
+<script id="reado-shell-preload-script">
+(() => {
+  const root = document.documentElement;
+  root.classList.add("reado-shell-preload");
+  const path = window.location.pathname || "";
+  if (path.startsWith("/experiences/") || path.startsWith("/books/")) {
+    root.classList.add("reado-shell-preload-learning");
+  }
+})();
+</script>
+</head>
+<body>
+<script src="/shared/book-catalog.js?v=1772888317077"></script>
+<script type="module" src="/shared/shell.js?v=1772888317077"></script>
+<reado-app-shell data-page="knowledge-map"></reado-app-shell>
+  <div id="app">
+    <canvas id="gameCanvas"></canvas>
+
+    <div id="overlay">
+      <div id="menuCard">
+        <h1>创造力心流：章节交互学习实验室</h1>
+        <p>
+          教育导向的互动模型：每章先做碎片化导读，再进入情境决策。
+          你将完成 4 个章节场景，建立“系统视角、心流调节、人格张力、长期创作策略”的结构化知识模型。
+        </p>
+        <div class="chipRow">
+          <span class="chip">← 选项A</span>
+          <span class="chip">Space 选项B</span>
+          <span class="chip">→ 选项C</span>
+          <span class="chip">Enter 提交/继续</span>
+          <span class="chip">A 从头重学</span>
+          <span class="chip">F 全屏</span>
+        </div>
+        <button id="start-btn" type="button">开始章节学习</button>
+      </div>
+    </div>
+
+    <div id="actionWrap" class="hidden">
+      <div id="choiceGrid">
+        <button class="action-btn" type="button" data-index="0"></button>
+        <button class="action-btn" type="button" data-index="1"></button>
+        <button class="action-btn" type="button" data-index="2"></button>
+      </div>
+      <button id="confirm-btn" type="button">提交选择 (Enter)</button>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      const canvas = document.getElementById("gameCanvas");
+      const ctx = canvas.getContext("2d");
+      const overlay = document.getElementById("overlay");
+      const menuCard = document.getElementById("menuCard");
+      const startBtn = document.getElementById("start-btn");
+      const actionWrap = document.getElementById("actionWrap");
+      const choiceButtons = [...document.querySelectorAll(".action-btn")];
+      const confirmBtn = document.getElementById("confirm-btn");
+
+      const chapters = [
+        {
+          id: "system-triangle",
+          title: "第2/6章 · 创造力系统三角",
+          color: "#d95d39",
+          guide: [
+            "导读碎片 1/3：创造力不是孤立天赋，而是“个体-领域-场域”三者联动。",
+            "导读碎片 2/3：好环境不是舒适，而是高标准反馈 + 可协作网络。",
+            "导读碎片 3/3：先把想法翻译成领域可评估语言，再争取守门人支持。"
+          ],
+          synthesis: "用“系统摩擦”看问题：卡住时先定位是个体能力、领域语言还是场域评审机制出问题。",
+          tasks: [
+            {
+              prompt: "你有一个新学习产品原型，但专家评审说“概念太空泛”。第一步应做什么？",
+              scene: "场景：团队很兴奋，但无法说明价值如何被验证。",
+              options: [
+                {
+                  label: "继续打磨功能，等产品完整再沟通",
+                  feedback: "这会让“领域语言”缺失持续扩大，创新难被识别。",
+                  transfer: "先定义 1 个可验证主张与 1 个反证条件。",
+                  effect: { modeling: -7, focus: -2, adaptation: -3 },
+                  mastery: 0
+                },
+                {
+                  label: "把想法转成评审标准，并邀请 3 位关键守门人给反馈",
+                  feedback: "正确。你在同步“领域标准 + 场域认可”，这是系统创造力关键动作。",
+                  transfer: "每个新点子都写“被谁评价、按什么评价、何时复评”。",
+                  effect: { modeling: 10, focus: 3, adaptation: 7 },
+                  mastery: 3
+                },
+                {
+                  label: "直接公开发布，靠用户热度倒逼专家接受",
+                  feedback: "短期可见度上升，但若评价框架未建立，热度难转化为稳定认可。",
+                  transfer: "传播前先明确“何为有效证据”。",
+                  effect: { modeling: -4, focus: 0, adaptation: -2 },
+                  mastery: 1
+                }
+              ]
+            },
+            {
+              prompt: "你在一个“没人挑战你”的团队里效率变低，最优调整是？",
+              scene: "场景：气氛友好但反馈单一，作品质量停滞。",
+              options: [
+                {
+                  label: "维持现状，避免高压影响情绪",
+                  feedback: "过度舒适会减少认知拉伸，难形成创造性突破。",
+                  transfer: "给自己设置“被否决率”目标，强制引入挑战。",
+                  effect: { modeling: -3, focus: -4, adaptation: -3 },
+                  mastery: 0
+                },
+                {
+                  label: "引入“高标准同行评议 + 安全讨论规则”",
+                  feedback: "正确。优秀环境既要标准高，也要允许试错与协作。",
+                  transfer: "建立“先评作品，后评人格”的反馈协议。",
+                  effect: { modeling: 8, focus: 4, adaptation: 6 },
+                  mastery: 3
+                },
+                {
+                  label: "换到完全陌生领域，靠压力逼自己成长",
+                  feedback: "跨域可用，但若无支持网络，可能只增加无效消耗。",
+                  transfer: "跨域时先补“导师 + 同行 + 评价标尺”。",
+                  effect: { modeling: 1, focus: -2, adaptation: 2 },
+                  mastery: 1
+                }
+              ]
+            },
+            {
+              prompt: "导师建议你先做“领域内的小创新”而不是颠覆式提案，如何理解？",
+              scene: "场景：你担心小步改进“不够酷”。",
+              options: [
+                {
+                  label: "坚持颠覆叙事，先抢注意力",
+                  feedback: "可能获得关注，但缺少可信累积，难穿越长期评审。",
+                  transfer: "把“叙事亮点”与“证据链”绑定发布。",
+                  effect: { modeling: -2, focus: -1, adaptation: -2 },
+                  mastery: 1
+                },
+                {
+                  label: "先做可验证的小步突破，逐步扩展影响",
+                  feedback: "正确。系统会优先认可“可解释、可复现、可传递”的进展。",
+                  transfer: "每次迭代保留“问题-方法-证据-局限”四联记录。",
+                  effect: { modeling: 9, focus: 4, adaptation: 5 },
+                  mastery: 3
+                },
+                {
+                  label: "等待更完美时机，暂不公开任何内容",
+                  feedback: "过度等待会错过反馈窗口，让学习速率下降。",
+                  transfer: "设定最晚公开节点，避免“完美拖延”。",
+                  effect: { modeling: -4, focus: -3, adaptation: -1 },
+                  mastery: 0
+                }
+              ]
+            }
+          ]
+        },
+        {
+          id: "flow-calibration",
+          title: "第5章 · 心流调节台",
+          color: "#2b6cb0",
+          guide: [
+            "导读碎片 1/3：心流来自“挑战-技能”动态匹配，而非持续放松。",
+            "导读碎片 2/3：创造者通常为工作本身投入，而不是先追逐外部奖赏。",
+            "导读碎片 3/3：心流可设计：明确目标、即时反馈、可分段难度。"
+          ],
+          synthesis: "把注意力看成可配置资源：通过任务切片与反馈频率，把工作推入可持续心流区间。",
+          tasks: [
+            {
+              prompt: "你反复拖延一个写作任务，常见原因是？",
+              scene: "场景：目标笼统，任务体积大，启动成本高。",
+              options: [
+                {
+                  label: "意志力不够，强迫自己连续 4 小时完成",
+                  feedback: "纯靠意志容易迅速耗竭，不能稳定进入心流。",
+                  transfer: "先把任务拆到 20 分钟可完成单位。",
+                  effect: { modeling: 0, focus: -7, adaptation: -2 },
+                  mastery: 0
+                },
+                {
+                  label: "把任务切成小闭环，并为每段设置即时反馈",
+                  feedback: "正确。你在降低启动阻力，并建立可见进展，心流更容易出现。",
+                  transfer: "每段结束回答：我刚推进了什么证据？",
+                  effect: { modeling: 4, focus: 10, adaptation: 4 },
+                  mastery: 3
+                },
+                {
+                  label: "先看别人如何做，等灵感足够再开始",
+                  feedback: "输入有用，但若替代输出，会持续回避关键挑战。",
+                  transfer: "输入后立即安排 1 次最小输出。",
+                  effect: { modeling: 1, focus: -3, adaptation: 1 },
+                  mastery: 1
+                }
+              ]
+            },
+            {
+              prompt: "你已熟练当前流程，开始无聊，最稳妥的升级方式是？",
+              scene: "场景：技能高于挑战，产出速度快但质量停滞。",
+              options: [
+                {
+                  label: "保持低难度，确保稳定完成",
+                  feedback: "只保完成率会让成长停滞，心流下降为机械执行。",
+                  transfer: "每周至少设置 1 个“略超能力”任务。",
+                  effect: { modeling: -1, focus: -4, adaptation: -5 },
+                  mastery: 0
+                },
+                {
+                  label: "提高难度并保留反馈频率，形成可控拉伸",
+                  feedback: "正确。挑战略高于技能时，最容易产生专注与学习增益。",
+                  transfer: "用 1-10 分给挑战打分，目标长期维持在 6-8。",
+                  effect: { modeling: 3, focus: 8, adaptation: 8 },
+                  mastery: 3
+                },
+                {
+                  label: "直接跳到最高难题，强行突破",
+                  feedback: "过高挑战会触发焦虑，反而中断学习循环。",
+                  transfer: "难度升级遵循“小步快反馈”。",
+                  effect: { modeling: 0, focus: -2, adaptation: -1 },
+                  mastery: 1
+                }
+              ]
+            },
+            {
+              prompt: "你只盯着点赞和收入，创作质量开始波动，如何修复？",
+              scene: "场景：外部指标牵引过强，内在动机下降。",
+              options: [
+                {
+                  label: "继续加大曝光，把结果做成唯一目标",
+                  feedback: "外部指标必要，但单一驱动会削弱长期创造韧性。",
+                  transfer: "保留结果目标，同时加 1 个过程目标。",
+                  effect: { modeling: -2, focus: -3, adaptation: -4 },
+                  mastery: 0
+                },
+                {
+                  label: "重建“过程指标 + 结果指标”双轨仪表盘",
+                  feedback: "正确。你把注意力重新锚定在可控过程，心流更稳定。",
+                  transfer: "每次复盘同时写“完成了什么”和“学到了什么”。",
+                  effect: { modeling: 5, focus: 8, adaptation: 6 },
+                  mastery: 3
+                },
+                {
+                  label: "先停更几周，等状态好再回归",
+                  feedback: "短休可用，但若没有结构化回归方案，会继续波动。",
+                  transfer: "休整期也保留最低频率练习。",
+                  effect: { modeling: 1, focus: 1, adaptation: 0 },
+                  mastery: 1
+                }
+              ]
+            }
+          ]
+        },
+        {
+          id: "paradox-personality",
+          title: "第3/4章 · 悖论人格平衡器",
+          color: "#2f855a",
+          guide: [
+            "导读碎片 1/3：高创造力人格往往不是“单一优点”，而是可切换的张力组合。",
+            "导读碎片 2/3：既要纪律也要玩心，既要独立也要协作。",
+            "导读碎片 3/3：关键不是“你是什么样”，而是“你何时切换到哪种状态”。"
+          ],
+          synthesis: "将人格当作“策略库”而非标签：在情境变化时主动切换策略，提高创造决策质量。",
+          tasks: [
+            {
+              prompt: "项目早期要探索方向，你最该强化哪组行为？",
+              scene: "场景：问题模糊，信息不足，时间有限。",
+              options: [
+                {
+                  label: "只做严格执行，避免任何发散",
+                  feedback: "早期过度收敛会错失关键可能性。",
+                  transfer: "探索阶段先放大选项，再收敛。",
+                  effect: { modeling: -2, focus: -1, adaptation: -6 },
+                  mastery: 0
+                },
+                {
+                  label: "先发散探索，再设边界收敛",
+                  feedback: "正确。创造过程需要“发散-收敛”双节奏。",
+                  transfer: "给探索设置时间盒，结束后立即做收敛评估。",
+                  effect: { modeling: 5, focus: 4, adaptation: 9 },
+                  mastery: 3
+                },
+                {
+                  label: "完全随机尝试，拒绝任何结构",
+                  feedback: "无结构探索难沉淀，学习价值会快速流失。",
+                  transfer: "每次尝试都记录假设与结果。",
+                  effect: { modeling: -3, focus: -4, adaptation: -2 },
+                  mastery: 0
+                }
+              ]
+            },
+            {
+              prompt: "团队评审时有人尖锐质疑你的方案，最优响应是？",
+              scene: "场景：情绪上头，讨论可能转向人身判断。",
+              options: [
+                {
+                  label: "立刻反击，先守住权威",
+                  feedback: "防御姿态会降低信息质量，错过有效反证。",
+                  transfer: "先复述对方担忧，再回应证据。",
+                  effect: { modeling: -4, focus: -2, adaptation: -4 },
+                  mastery: 0
+                },
+                {
+                  label: "区分“人”与“问题”，把质疑转为可验证清单",
+                  feedback: "正确。你把冲突转化为学习输入，体现高阶创造协作。",
+                  transfer: "评审中优先问：哪条证据会改变你的判断？",
+                  effect: { modeling: 7, focus: 3, adaptation: 8 },
+                  mastery: 3
+                },
+                {
+                  label: "完全顺从质疑，取消原方案",
+                  feedback: "过度迎合会丢失原创判断，不利于形成独特贡献。",
+                  transfer: "保留核心假设，同时升级证据质量。",
+                  effect: { modeling: -1, focus: -1, adaptation: 1 },
+                  mastery: 1
+                }
+              ]
+            },
+            {
+              prompt: "项目落地期临近，你该如何切换状态？",
+              scene: "场景：创意很多，但交付窗口变窄。",
+              options: [
+                {
+                  label: "继续大量发散，保持灵感优先",
+                  feedback: "落地期若不收敛，会导致执行崩盘。",
+                  transfer: "把“新增想法”放入下一迭代池。",
+                  effect: { modeling: -3, focus: -5, adaptation: -2 },
+                  mastery: 0
+                },
+                {
+                  label: "从探索者切换为执行者，聚焦关键路径",
+                  feedback: "正确。创造力也包含“完成作品”的纪律能力。",
+                  transfer: "列出“必须完成清单”并设置截止。",
+                  effect: { modeling: 5, focus: 9, adaptation: 5 },
+                  mastery: 3
+                },
+                {
+                  label: "减少目标，推迟交付以保持完美",
+                  feedback: "必要时可调范围，但“完美驱动拖延”是常见陷阱。",
+                  transfer: "定义“可发布质量”而非“理想质量”。",
+                  effect: { modeling: 1, focus: -2, adaptation: 0 },
+                  mastery: 1
+                }
+              ]
+            }
+          ]
+        },
+        {
+          id: "life-course",
+          title: "第7/8/9/14章 · 长期创造力路径",
+          color: "#805ad5",
+          guide: [
+            "导读碎片 1/3：创造力跨越生命周期，不同阶段策略不同。",
+            "导读碎片 2/3：童年好奇、成年网络、老年整合都可成为优势。",
+            "导读碎片 3/3：真正目标是把创造力嵌入日常，让生活更丰盈。"
+          ],
+          synthesis: "把创造力做成“长期系统”：好奇输入、深度产出、社会连接、意义复盘四轮并进。",
+          tasks: [
+            {
+              prompt: "你进入职业中期，事务变多，创作时间被挤压，首要动作是？",
+              scene: "场景：会议和杂事吞噬深度工作时段。",
+              options: [
+                {
+                  label: "等空闲再创作，先把杂事做完",
+                  feedback: "空闲通常不会自动出现，创造任务会长期后置。",
+                  transfer: "先锁定固定深度时段，再安排杂事。",
+                  effect: { modeling: -2, focus: -5, adaptation: -2 },
+                  mastery: 0
+                },
+                {
+                  label: "建立“不可谈判的深度时段”并保护边界",
+                  feedback: "正确。长期创造力依赖稳定节律，而非偶发激情。",
+                  transfer: "每周先排创作时段，再排协作时段。",
+                  effect: { modeling: 4, focus: 9, adaptation: 6 },
+                  mastery: 3
+                },
+                {
+                  label: "把创作全部外包，自己只做管理",
+                  feedback: "管理重要，但完全抽离会让核心创造能力退化。",
+                  transfer: "至少保留一个“亲自创作”的主线项目。",
+                  effect: { modeling: -1, focus: -1, adaptation: 0 },
+                  mastery: 1
+                }
+              ]
+            },
+            {
+              prompt: "你年资变高后，如何避免“经验固化”削弱创新？",
+              scene: "场景：你越来越擅长旧问题，但新问题变化更快。",
+              options: [
+                {
+                  label: "坚持成熟方法，拒绝新框架",
+                  feedback: "经验是资产，但僵化会让你错过新机会窗口。",
+                  transfer: "每季度刻意学习 1 个反直觉案例。",
+                  effect: { modeling: -4, focus: -1, adaptation: -6 },
+                  mastery: 0
+                },
+                {
+                  label: "做“经验整合 + 新手学习”双循环",
+                  feedback: "正确。高水平创造者会持续重构自己的知识结构。",
+                  transfer: "每月输出 1 份“我更新了什么认知”的笔记。",
+                  effect: { modeling: 8, focus: 4, adaptation: 8 },
+                  mastery: 3
+                },
+                {
+                  label: "频繁换题，避免在任何方向深耕",
+                  feedback: "只换不积累会削弱“领域深度”，难形成代表作。",
+                  transfer: "在主线深耕上叠加小比例跨域探索。",
+                  effect: { modeling: 0, focus: -2, adaptation: 1 },
+                  mastery: 1
+                }
+              ]
+            },
+            {
+              prompt: "你想让创造力提升生活质量，而非只变成压力，最佳做法是？",
+              scene: "场景：产出在增长，但幸福感下降。",
+              options: [
+                {
+                  label: "继续提高产量，把疲惫视为必要代价",
+                  feedback: "长期透支会反噬创造质量与生活意义。",
+                  transfer: "把恢复与反思纳入正式计划。",
+                  effect: { modeling: -1, focus: -4, adaptation: -4 },
+                  mastery: 0
+                },
+                {
+                  label: "同时设计“作品目标 + 生活意义目标”",
+                  feedback: "正确。书中强调创造力最终应服务于充实而丰盈的生活。",
+                  transfer: "每周回看：本周哪项创作让你更有意义感？",
+                  effect: { modeling: 6, focus: 6, adaptation: 7 },
+                  mastery: 3
+                },
+                {
+                  label: "把创造仅当副业，主业彻底剥离兴趣",
+                  feedback: "短期减压可能有效，但长期会削弱内在驱动力闭环。",
+                  transfer: "在主业里保留一块“创造改进区”。",
+                  effect: { modeling: 1, focus: 1, adaptation: -1 },
+                  mastery: 1
+                }
+              ]
+            }
+          ]
+        }
+      ];
+
+      const state = {
+        mode: "menu",
+        chapterIndex: 0,
+        guideIndex: 0,
+        taskIndex: 0,
+        selectedOption: 1,
+        feedback: null,
+        chapterScores: chapters.map(() => ({ earned: 0, max: 0 })),
+        metrics: {
+          modeling: 46,
+          focus: 44,
+          adaptation: 45
+        },
+        totalMastery: 0,
+        trail: [],
+        pulse: 0,
+        elapsed: 0
+      };
+
+      let viewport = { w: window.innerWidth, h: window.innerHeight };
+      let lastTs = performance.now();
+
+      function clamp(v, min, max) {
+        return Math.min(max, Math.max(min, v));
+      }
+
+      function resize() {
+        const dpr = window.devicePixelRatio || 1;
+        viewport = { w: window.innerWidth, h: window.innerHeight };
+        canvas.width = Math.floor(viewport.w * dpr);
+        canvas.height = Math.floor(viewport.h * dpr);
+        canvas.style.width = `${viewport.w}px`;
+        canvas.style.height = `${viewport.h}px`;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      function currentChapter() {
+        return chapters[state.chapterIndex];
+      }
+
+      function currentTask() {
+        const chapter = currentChapter();
+        return chapter.tasks[state.taskIndex];
+      }
+
+      function startCourse() {
+        state.mode = "guide";
+        state.chapterIndex = 0;
+        state.guideIndex = 0;
+        state.taskIndex = 0;
+        state.selectedOption = 1;
+        state.feedback = null;
+        state.totalMastery = 0;
+        state.trail = [];
+        state.metrics.modeling = 46;
+        state.metrics.focus = 44;
+        state.metrics.adaptation = 45;
+        state.chapterScores = chapters.map(() => ({ earned: 0, max: 0 }));
+        overlay.classList.add("hidden");
+        actionWrap.classList.remove("hidden");
+        syncActionUI();
+      }
+
+      function resetCourse() {
+        state.mode = "menu";
+        overlay.classList.remove("hidden");
+        actionWrap.classList.add("hidden");
+        state.feedback = null;
+        syncActionUI();
+      }
+
+      function syncActionUI() {
+        if (state.mode === "menu") {
+          return;
+        }
+
+        if (state.mode === "play") {
+          const task = currentTask();
+          choiceButtons.forEach((btn, idx) => {
+            const option = task.options[idx];
+            btn.textContent = `${idx === 0 ? "A" : idx === 1 ? "B" : "C"} · ${option.label}`;
+            btn.disabled = false;
+            btn.dataset.selected = idx === state.selectedOption ? "true" : "false";
+          });
+          document.getElementById("choiceGrid").classList.remove("hidden");
+          confirmBtn.textContent = "提交选择 (Enter)";
+          confirmBtn.dataset.tone = "submit";
+        } else {
+          choiceButtons.forEach((btn) => {
+            btn.disabled = true;
+            btn.dataset.selected = "false";
+          });
+          document.getElementById("choiceGrid").classList.add("hidden");
+
+          if (state.mode === "guide") {
+            confirmBtn.textContent = "进入本章问题 (Enter)";
+            confirmBtn.dataset.tone = "next";
+          } else if (state.mode === "feedback") {
+            confirmBtn.textContent = "下一题 / 下一章 (Enter)";
+            confirmBtn.dataset.tone = "next";
+          } else if (state.mode === "chapter_summary") {
+            confirmBtn.textContent = "继续下一章节 (Enter)";
+            confirmBtn.dataset.tone = "next";
+          } else if (state.mode === "final") {
+            confirmBtn.textContent = "从头重学 (A/Enter)";
+            confirmBtn.dataset.tone = "restart";
+          }
+        }
+      }
+
+      function selectOption(index) {
+        if (state.mode !== "play") return;
+        state.selectedOption = clamp(index, 0, 2);
+        syncActionUI();
+      }
+
+      function applyChoice() {
+        if (state.mode !== "play") return;
+        const chapter = currentChapter();
+        const task = currentTask();
+        const picked = task.options[state.selectedOption];
+
+        state.metrics.modeling = clamp(state.metrics.modeling + picked.effect.modeling, 0, 100);
+        state.metrics.focus = clamp(state.metrics.focus + picked.effect.focus, 0, 100);
+        state.metrics.adaptation = clamp(state.metrics.adaptation + picked.effect.adaptation, 0, 100);
+
+        state.chapterScores[state.chapterIndex].earned += picked.mastery;
+        state.chapterScores[state.chapterIndex].max += 3;
+        state.totalMastery += picked.mastery;
+
+        state.feedback = {
+          chapterTitle: chapter.title,
+          taskPrompt: task.prompt,
+          chosen: picked.label,
+          feedback: picked.feedback,
+          transfer: picked.transfer,
+          mastery: picked.mastery
+        };
+
+        state.trail.push({
+          chapter: chapter.title,
+          task: state.taskIndex + 1,
+          choice: picked.label,
+          mastery: picked.mastery,
+          transfer: picked.transfer
+        });
+        if (state.trail.length > 9) state.trail.shift();
+
+        state.mode = "feedback";
+        syncActionUI();
+      }
+
+      function nextStep() {
+        if (state.mode === "guide") {
+          const chapter = currentChapter();
+          if (state.guideIndex < chapter.guide.length - 1) {
+            state.guideIndex += 1;
+          } else {
+            state.mode = "play";
+          }
+          syncActionUI();
+          return;
+        }
+
+        if (state.mode === "feedback") {
+          const chapter = currentChapter();
+          if (state.taskIndex < chapter.tasks.length - 1) {
+            state.taskIndex += 1;
+            state.selectedOption = 1;
+            state.feedback = null;
+            state.mode = "play";
+          } else {
+            state.mode = "chapter_summary";
+          }
+          syncActionUI();
+          return;
+        }
+
+        if (state.mode === "chapter_summary") {
+          if (state.chapterIndex < chapters.length - 1) {
+            state.chapterIndex += 1;
+            state.guideIndex = 0;
+            state.taskIndex = 0;
+            state.selectedOption = 1;
+            state.feedback = null;
+            state.mode = "guide";
+          } else {
+            state.mode = "final";
+          }
+          syncActionUI();
+          return;
+        }
+
+        if (state.mode === "final") {
+          resetCourse();
+          return;
+        }
+      }
+
+      function handleKeyDown(event) {
+        const key = event.key;
+
+        if (key.toLowerCase() === "f") {
+          toggleFullscreen();
+          return;
+        }
+
+        if (key === "Escape" && document.fullscreenElement) {
+          document.exitFullscreen().catch(() => {});
+          return;
+        }
+
+        if (key.toLowerCase() === "a") {
+          resetCourse();
+          return;
+        }
+
+        if (state.mode === "menu") {
+          if (key === "Enter" || key === " ") {
+            event.preventDefault();
+            startCourse();
+          }
+          return;
+        }
+
+        if (state.mode === "play") {
+          if (key === "ArrowLeft") {
+            event.preventDefault();
+            selectOption(0);
+          } else if (key === " ") {
+            event.preventDefault();
+            selectOption(1);
+          } else if (key === "ArrowRight") {
+            event.preventDefault();
+            selectOption(2);
+          } else if (key === "Enter") {
+            event.preventDefault();
+            applyChoice();
+          }
+          return;
+        }
+
+        if (key === "Enter" || key === " ") {
+          event.preventDefault();
+          nextStep();
+        }
+      }
+
+      async function toggleFullscreen() {
+        if (!document.fullscreenElement) {
+          await document.documentElement.requestFullscreen().catch(() => {});
+        } else {
+          await document.exitFullscreen().catch(() => {});
+        }
+      }
+
+      function drawGradientField() {
+        const { w, h } = viewport;
+        const g = ctx.createLinearGradient(0, 0, w, h);
+        g.addColorStop(0, "#f8f1e4");
+        g.addColorStop(0.45, "#ebe7f5");
+        g.addColorStop(1, "#e4f0e8");
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, w, h);
+
+        const pulse = (Math.sin(state.pulse * 1.2) + 1) / 2;
+        ctx.save();
+        ctx.globalAlpha = 0.18 + pulse * 0.12;
+        ctx.fillStyle = "#d95d39";
+        ctx.beginPath();
+        ctx.arc(w * 0.15, h * 0.22, 130 + pulse * 30, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "#2b6cb0";
+        ctx.beginPath();
+        ctx.arc(w * 0.84, h * 0.78, 170 - pulse * 24, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "#2f855a";
+        ctx.beginPath();
+        ctx.arc(w * 0.78, h * 0.2, 92 + pulse * 12, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      function roundRect(x, y, w, h, r, fill, stroke) {
+        const rr = Math.min(r, w * 0.5, h * 0.5);
+        ctx.beginPath();
+        ctx.moveTo(x + rr, y);
+        ctx.arcTo(x + w, y, x + w, y + h, rr);
+        ctx.arcTo(x + w, y + h, x, y + h, rr);
+        ctx.arcTo(x, y + h, x, y, rr);
+        ctx.arcTo(x, y, x + w, y, rr);
+        ctx.closePath();
+        if (fill) {
+          ctx.fillStyle = fill;
+          ctx.fill();
+        }
+        if (stroke) {
+          ctx.strokeStyle = stroke;
+          ctx.stroke();
+        }
+      }
+
+      function wrapText(text, x, y, maxWidth, lineHeight, color, font) {
+        ctx.save();
+        if (font) ctx.font = font;
+        if (color) ctx.fillStyle = color;
+        const words = text.split("");
+        let line = "";
+        let yy = y;
+        for (let i = 0; i < words.length; i += 1) {
+          const test = line + words[i];
+          if (ctx.measureText(test).width > maxWidth && line) {
+            ctx.fillText(line, x, yy);
+            line = words[i];
+            yy += lineHeight;
+          } else {
+            line = test;
+          }
+        }
+        if (line) {
+          ctx.fillText(line, x, yy);
+          yy += lineHeight;
+        }
+        ctx.restore();
+        return yy;
+      }
+
+      function metricColor(value) {
+        if (value >= 70) return "#2f855a";
+        if (value >= 45) return "#d69e2e";
+        return "#c53030";
+      }
+
+      function drawMetricBar(x, y, w, name, value, accent) {
+        ctx.save();
+        ctx.fillStyle = "rgba(255,255,255,0.75)";
+        roundRect(x, y, w, 42, 10, "rgba(255,255,255,0.52)", "rgba(25,44,62,0.14)");
+
+        ctx.fillStyle = "#2c3e52";
+        ctx.font = "600 13px PingFang SC, Noto Sans SC, sans-serif";
+        ctx.fillText(name, x + 10, y + 16);
+
+        roundRect(x + 10, y + 20, w - 20, 12, 6, "rgba(34, 52, 72, 0.15)", null);
+        const fillW = ((w - 20) * value) / 100;
+        roundRect(x + 10, y + 20, fillW, 12, 6, accent, null);
+
+        ctx.fillStyle = metricColor(value);
+        ctx.font = "700 12px PingFang SC, Noto Sans SC, sans-serif";
+        ctx.fillText(`${value}`, x + w - 32, y + 16);
+        ctx.restore();
+      }
+
+      function drawTopHUD() {
+        if (state.mode === "menu") return;
+
+        const { w } = viewport;
+        const compact = w < 760;
+        const panelH = compact ? 132 : 84;
+        roundRect(16, 14, w - 32, panelH, 14, "rgba(255, 252, 246, 0.76)", "rgba(24, 40, 56, 0.16)");
+
+        ctx.fillStyle = "#233649";
+        ctx.font = compact
+          ? "700 15px PingFang SC, Noto Sans SC, sans-serif"
+          : "700 18px PingFang SC, Noto Sans SC, sans-serif";
+        ctx.fillText("创造力章节学习进度", 30, compact ? 36 : 42);
+
+        ctx.font = "600 12px PingFang SC, Noto Sans SC, sans-serif";
+        ctx.fillStyle = "#4c6073";
+        const chapterName = state.mode === "final" ? "学习总结" : currentChapter().title;
+        ctx.fillText(`当前章节：${chapterName}`, 30, compact ? 56 : 63);
+
+        const totalTasks = chapters.reduce((acc, c) => acc + c.tasks.length, 0);
+        const completedTasks = state.chapterScores.reduce((acc, c) => acc + Math.round(c.max / 3), 0);
+        ctx.fillText(`完成题目：${completedTasks}/${totalTasks}`, 30, compact ? 74 : 82);
+
+        if (compact) {
+          const gap = 6;
+          const cardW = Math.max(92, (w - 56 - gap * 2) / 3);
+          const y = 84;
+          drawMetricBar(22, y, cardW, "系统建模", state.metrics.modeling, "#d95d39");
+          drawMetricBar(22 + cardW + gap, y, cardW, "心流专注", state.metrics.focus, "#2b6cb0");
+          drawMetricBar(22 + (cardW + gap) * 2, y, cardW, "适应切换", state.metrics.adaptation, "#2f855a");
+        } else {
+          const cardW = 160;
+          drawMetricBar(w - 3 * (cardW + 10) - 24, 24, cardW, "系统建模", state.metrics.modeling, "#d95d39");
+          drawMetricBar(w - 2 * (cardW + 10) - 24, 24, cardW, "心流专注", state.metrics.focus, "#2b6cb0");
+          drawMetricBar(w - 1 * (cardW + 10) - 24, 24, cardW, "适应切换", state.metrics.adaptation, "#2f855a");
+        }
+      }
+
+      function drawMainPanel() {
+        const { w, h } = viewport;
+        const panelX = 18;
+        const compact = w < 760;
+        const panelY = compact ? 154 : 108;
+        const panelW = w - 36;
+        const panelH = h - (compact ? 242 : 196);
+
+        roundRect(panelX, panelY, panelW, panelH, 16, "rgba(255, 251, 244, 0.82)", "rgba(24, 40, 56, 0.18)");
+
+        if (state.mode === "guide") {
+          drawGuide(panelX, panelY, panelW, panelH);
+        } else if (state.mode === "play") {
+          drawTask(panelX, panelY, panelW, panelH);
+        } else if (state.mode === "feedback") {
+          drawFeedback(panelX, panelY, panelW, panelH);
+        } else if (state.mode === "chapter_summary") {
+          drawChapterSummary(panelX, panelY, panelW, panelH);
+        } else if (state.mode === "final") {
+          drawFinal(panelX, panelY, panelW, panelH);
+        }
+      }
+
+      function drawGuide(x, y, w, h) {
+        const chapter = currentChapter();
+        const textX = x + 28;
+        let yy = y + 44;
+
+        ctx.fillStyle = chapter.color;
+        ctx.font = "700 18px PingFang SC, Noto Sans SC, sans-serif";
+        ctx.fillText("碎片化导读", textX, yy);
+        yy += 28;
+
+        ctx.fillStyle = "#1f3246";
+        ctx.font = "700 28px PingFang SC, Noto Sans SC, sans-serif";
+        yy = wrapText(chapter.title, textX, yy, w - 56, 38, "#1f3246", "700 28px PingFang SC, Noto Sans SC, sans-serif");
+        yy += 8;
+
+        const guide = chapter.guide[state.guideIndex];
+        roundRect(textX, yy, w - 56, 170, 14, "rgba(255,255,255,0.72)", "rgba(36,58,78,0.14)");
+        yy = wrapText(guide, textX + 16, yy + 36, w - 88, 30, "#294256", "600 23px PingFang SC, Noto Sans SC, sans-serif");
+
+        ctx.font = "600 13px PingFang SC, Noto Sans SC, sans-serif";
+        ctx.fillStyle = "#5f7387";
+        ctx.fillText(`导读进度 ${state.guideIndex + 1}/${chapter.guide.length}`, textX + 16, y + h - 26);
+      }
+
+      function drawTask(x, y, w, h) {
+        const chapter = currentChapter();
+        const task = currentTask();
+        const textX = x + 28;
+        let yy = y + 38;
+
+        ctx.fillStyle = chapter.color;
+        ctx.font = "700 16px PingFang SC, Noto Sans SC, sans-serif";
+        ctx.fillText(`情境决策 ${state.taskIndex + 1}/${chapter.tasks.length}`, textX, yy);
+
+        yy += 28;
+        yy = wrapText(task.prompt, textX, yy, w - 56, 33, "#1f3449", "700 24px PingFang SC, Noto Sans SC, sans-serif");
+
+        roundRect(textX, yy + 10, w - 56, 96, 12, "rgba(233, 241, 250, 0.76)", "rgba(30, 57, 79, 0.14)");
+        wrapText(task.scene, textX + 14, yy + 42, w - 88, 24, "#3f576b", "600 18px PingFang SC, Noto Sans SC, sans-serif");
+
+        const choiceY = yy + 128;
+        ctx.fillStyle = "#3f556a";
+        ctx.font = "600 14px PingFang SC, Noto Sans SC, sans-serif";
+        ctx.fillText("当前选中：", textX, choiceY);
+
+        const selected = task.options[state.selectedOption];
+        roundRect(textX + 84, choiceY - 20, w - 140, 44, 10, "rgba(255,255,255,0.8)", "rgba(33,55,74,0.16)");
+        wrapText(selected.label, textX + 98, choiceY + 8, w - 170, 20, "#27435b", "600 14px PingFang SC, Noto Sans SC, sans-serif");
+
+        const tipY = y + h - 66;
+        ctx.fillStyle = "#5f748a";
+        ctx.font = "600 13px PingFang SC, Noto Sans SC, sans-serif";
+        ctx.fillText("操作：← A，Space B，→ C，Enter 提交", textX, tipY);
+      }
+
+      function drawFeedback(x, y, w, h) {
+        const f = state.feedback;
+        if (!f) return;
+
+        const textX = x + 28;
+        let yy = y + 38;
+
+        ctx.fillStyle = "#246b47";
+        ctx.font = "700 17px PingFang SC, Noto Sans SC, sans-serif";
+        ctx.fillText("即时反馈", textX, yy);
+
+        yy += 30;
+        yy = wrapText(`你选择了：${f.chosen}`, textX, yy, w - 56, 28, "#223a50", "700 21px PingFang SC, Noto Sans SC, sans-serif");
+
+        roundRect(textX, yy + 8, w - 56, 120, 12, "rgba(255,255,255,0.76)", "rgba(27,51,71,0.15)");
+        wrapText(f.feedback, textX + 14, yy + 44, w - 90, 25, "#335067", "600 17px PingFang SC, Noto Sans SC, sans-serif");
+
+        roundRect(textX, yy + 142, w - 56, 120, 12, "rgba(230, 245, 235, 0.78)", "rgba(37, 100, 65, 0.24)");
+        ctx.fillStyle = "#1f6a45";
+        ctx.font = "700 16px PingFang SC, Noto Sans SC, sans-serif";
+        ctx.fillText("迁移动作", textX + 14, yy + 168);
+        wrapText(f.transfer, textX + 14, yy + 194, w - 90, 24, "#25583e", "600 16px PingFang SC, Noto Sans SC, sans-serif");
+
+        const badgeColor = f.mastery === 3 ? "#2f855a" : f.mastery === 1 ? "#d69e2e" : "#c53030";
+        roundRect(textX, y + h - 70, 220, 38, 10, "rgba(255,255,255,0.8)", "rgba(27,47,67,0.15)");
+        ctx.fillStyle = badgeColor;
+        ctx.font = "700 14px PingFang SC, Noto Sans SC, sans-serif";
+        ctx.fillText(`本题掌握度 +${f.mastery}/3`, textX + 12, y + h - 46);
+
+        ctx.fillStyle = "#5f7387";
+        ctx.font = "600 13px PingFang SC, Noto Sans SC, sans-serif";
+        ctx.fillText("Enter 继续", w - 130, y + h - 46);
+      }
+
+      function drawChapterSummary(x, y, w, h) {
+        const chapter = currentChapter();
+        const score = state.chapterScores[state.chapterIndex];
+        const ratio = score.max > 0 ? Math.round((score.earned / score.max) * 100) : 0;
+        const textX = x + 28;
+
+        ctx.fillStyle = chapter.color;
+        ctx.font = "700 18px PingFang SC, Noto Sans SC, sans-serif";
+        ctx.fillText("章节复盘", textX, y + 40);
+
+        ctx.fillStyle = "#1f3449";
+        ctx.font = "700 26px PingFang SC, Noto Sans SC, sans-serif";
+        wrapText(chapter.title, textX, y + 78, w - 56, 34, "#1f3449", "700 26px PingFang SC, Noto Sans SC, sans-serif");
+
+        roundRect(textX, y + 132, w - 56, 120, 12, "rgba(255,255,255,0.74)", "rgba(28,48,68,0.16)");
+        ctx.fillStyle = "#284257";
+        ctx.font = "700 17px PingFang SC, Noto Sans SC, sans-serif";
+        ctx.fillText(`章节掌握度：${ratio}%`, textX + 14, y + 164);
+        wrapText(chapter.synthesis, textX + 14, y + 194, w - 90, 24, "#3a556a", "600 16px PingFang SC, Noto Sans SC, sans-serif");
+
+        roundRect(textX, y + 270, w - 56, h - 324, 12, "rgba(235, 245, 253, 0.72)", "rgba(31,67,98,0.16)");
+        ctx.fillStyle = "#2a4b63";
+        ctx.font = "700 16px PingFang SC, Noto Sans SC, sans-serif";
+        ctx.fillText("最近学习轨迹", textX + 14, y + 300);
+
+        ctx.font = "600 13px PingFang SC, Noto Sans SC, sans-serif";
+        ctx.fillStyle = "#476177";
+        const recent = state.trail.slice(-4);
+        for (let i = 0; i < recent.length; i += 1) {
+          const item = recent[i];
+          const line = `${item.chapter.split("·")[0]} · 题${item.task} · 掌握+${item.mastery} · ${item.transfer}`;
+          wrapText(line, textX + 14, y + 330 + i * 38, w - 94, 18, "#476177", "600 13px PingFang SC, Noto Sans SC, sans-serif");
+        }
+      }
+
+      function drawFinal(x, y, w, h) {
+        const textX = x + 28;
+        const overallMax = chapters.length * 3 * 3;
+        const ratio = Math.round((state.totalMastery / overallMax) * 100);
+
+        ctx.fillStyle = "#2f4a60";
+        ctx.font = "700 22px PingFang SC, Noto Sans SC, sans-serif";
+        ctx.fillText("结构化知识模型已完成", textX, y + 42);
+
+        ctx.fillStyle = "#536a7f";
+        ctx.font = "600 14px PingFang SC, Noto Sans SC, sans-serif";
+        ctx.fillText("你已经完成 4 个章节场景的导读-决策-反馈闭环。", textX, y + 68);
+
+        roundRect(textX, y + 92, w - 56, 108, 12, "rgba(255,255,255,0.8)", "rgba(27,49,70,0.14)");
+        ctx.fillStyle = "#1f3f56";
+        ctx.font = "700 18px PingFang SC, Noto Sans SC, sans-serif";
+        ctx.fillText(`综合掌握度：${ratio}%`, textX + 14, y + 126);
+        wrapText("下一步建议：将每章“迁移动作”落地为 7 天实验，记录证据与反例。", textX + 14, y + 156, w - 90, 24, "#3d5c73", "600 16px PingFang SC, Noto Sans SC, sans-serif");
+
+        const barY = y + 220;
+        const barW = w - 170;
+        const bars = [
+          { name: "系统建模", value: state.metrics.modeling, c: "#d95d39" },
+          { name: "心流专注", value: state.metrics.focus, c: "#2b6cb0" },
+          { name: "适应切换", value: state.metrics.adaptation, c: "#2f855a" }
+        ];
+
+        bars.forEach((bar, idx) => {
+          const yy = barY + idx * 70;
+          ctx.fillStyle = "#29465d";
+          ctx.font = "700 16px PingFang SC, Noto Sans SC, sans-serif";
+          ctx.fillText(bar.name, textX, yy + 18);
+
+          roundRect(textX + 130, yy, barW, 24, 10, "rgba(31, 54, 76, 0.15)", null);
+          roundRect(textX + 130, yy, (barW * bar.value) / 100, 24, 10, bar.c, null);
+          ctx.fillStyle = "#213b50";
+          ctx.font = "700 14px PingFang SC, Noto Sans SC, sans-serif";
+          ctx.fillText(`${bar.value}`, textX + 138 + barW, yy + 17);
+        });
+
+        roundRect(textX, y + h - 120, w - 56, 92, 12, "rgba(236, 244, 252, 0.78)", "rgba(33, 58, 80, 0.14)");
+        ctx.fillStyle = "#355268";
+        ctx.font = "600 14px PingFang SC, Noto Sans SC, sans-serif";
+        ctx.fillText("复训建议：A 重新开始，或回到书中对应章节做深度阅读。", textX + 14, y + h - 90);
+        ctx.fillText("对应章节：2/3/4/5/6/7/8/9/14。", textX + 14, y + h - 62);
+      }
+
+      function render() {
+        drawGradientField();
+        drawTopHUD();
+        if (state.mode !== "menu") {
+          drawMainPanel();
+        }
+      }
+
+      function update(dt) {
+        state.elapsed += dt;
+        state.pulse += dt;
+      }
+
+      function frame(ts) {
+        const dt = Math.min(0.05, (ts - lastTs) / 1000);
+        lastTs = ts;
+        update(dt);
+        render();
+        requestAnimationFrame(frame);
+      }
+
+      function renderGameToText() {
+        const chapter = state.mode === "menu" ? null : currentChapter();
+        const task = state.mode === "play" ? currentTask() : null;
+        const payload = {
+          mode: state.mode,
+          coordinate_system: "origin_top_left_x_right_y_down_units_px",
+          chapter: chapter
+            ? {
+                index: state.chapterIndex + 1,
+                total: chapters.length,
+                id: chapter.id,
+                title: chapter.title
+              }
+            : null,
+          task: task
+            ? {
+                index: state.taskIndex + 1,
+                total: chapter.tasks.length,
+                prompt: task.prompt,
+                selected_option: state.selectedOption,
+                options: task.options.map((opt, idx) => ({
+                  index: idx,
+                  label: opt.label
+                }))
+              }
+            : null,
+          guide_progress:
+            state.mode === "guide"
+              ? {
+                  index: state.guideIndex + 1,
+                  total: chapter.guide.length,
+                  text: chapter.guide[state.guideIndex]
+                }
+              : null,
+          feedback: state.feedback,
+          metrics: {
+            modeling: state.metrics.modeling,
+            focus: state.metrics.focus,
+            adaptation: state.metrics.adaptation
+          },
+          mastery: {
+            total_earned: state.totalMastery,
+            total_max: chapters.length * 3 * 3,
+            chapter_scores: state.chapterScores.map((s, idx) => ({
+              chapter: chapters[idx].title,
+              earned: s.earned,
+              max: s.max
+            }))
+          },
+          controls: {
+            left: "select option A",
+            space: "select option B / continue",
+            right: "select option C",
+            enter: "submit or continue",
+            a: "reset to menu",
+            f: "toggle fullscreen"
+          }
+        };
+        return JSON.stringify(payload, null, 2);
+      }
+
+      window.render_game_to_text = renderGameToText;
+
+      window.advanceTime = (ms) => {
+        const steps = Math.max(1, Math.round(ms / (1000 / 60)));
+        for (let i = 0; i < steps; i += 1) {
+          update(1 / 60);
+        }
+        render();
+      };
+
+      startBtn.addEventListener("click", startCourse);
+      confirmBtn.addEventListener("click", () => {
+        if (state.mode === "play") {
+          applyChoice();
+        } else {
+          nextStep();
+        }
+      });
+
+      choiceButtons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const idx = Number(btn.dataset.index || 0);
+          selectOption(idx);
+          applyChoice();
+        });
+      });
+
+      document.addEventListener("keydown", handleKeyDown);
+      window.addEventListener("resize", resize);
+
+      resize();
+      syncActionUI();
+      render();
+      requestAnimationFrame(frame);
+    })();
+  </script>
+
+
+<script>
+(() => {
+  
+  
+  
+})();
+</script>
+</body>
+</html>

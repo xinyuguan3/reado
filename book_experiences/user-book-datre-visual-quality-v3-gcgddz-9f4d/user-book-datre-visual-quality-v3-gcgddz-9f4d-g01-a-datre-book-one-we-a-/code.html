@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>A DATRE BOOK ONE We A re D A TRE -… · Datre Visual Quality V3</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b1220;
+      --bg2: #1a2333;
+      --accent: #f59e0b;
+      --accent2: #34d399;
+      --text: #e5edf8;
+      --soft: #9fb1c9;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+      background:
+        radial-gradient(1200px 540px at 85% -8%, color-mix(in srgb, var(--accent2) 24%, transparent), transparent 70%),
+        radial-gradient(980px 460px at -10% 14%, color-mix(in srgb, var(--accent) 24%, transparent), transparent 74%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+      color: var(--text);
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .05;
+      background-image: radial-gradient(circle at 1px 1px, #fff 1px, transparent 0);
+      background-size: 3px 3px;
+      z-index: 0;
+    }
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      z-index: 100;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+    .page { position: relative; z-index: 1; width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 20px 0 48px; }
+    .hero {
+      min-height: 74vh;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 22px;
+      background: linear-gradient(160deg, color-mix(in srgb, var(--bg2) 86%, transparent), color-mix(in srgb, var(--bg) 88%, transparent));
+      padding: 40px 34px;
+      display: grid;
+      align-content: center;
+      gap: 16px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.34);
+    }
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .hero h1 {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(32px, 5.4vw, 68px);
+      line-height: 1.16;
+      letter-spacing: .04em;
+      max-width: 15em;
+      text-wrap: balance;
+    }
+    .hero p {
+      max-width: 66ch;
+      line-height: 1.95;
+      color: color-mix(in srgb, var(--text) 85%, var(--soft));
+      font-size: 16px;
+    }
+    .chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip {
+      border: 1px solid color-mix(in srgb, var(--accent2) 44%, transparent);
+      color: color-mix(in srgb, var(--accent2) 88%, #fff);
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 12px;
+      background: rgba(255,255,255,.03);
+    }
+    .section { margin-top: 18px; border: 1px solid rgba(255,255,255,.13); border-radius: 18px; padding: 22px; background: rgba(2,6,18,.46); }
+    .section h2 {
+      margin-bottom: 12px;
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(22px, 2.8vw, 34px);
+      color: color-mix(in srgb, var(--accent) 86%, #fff);
+      letter-spacing: .03em;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1.1fr 1fr; gap: 14px; }
+    .concept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+    .concept-card {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      background: rgba(255,255,255,.03);
+      padding: 14px;
+      min-height: 128px;
+    }
+    .concept-token { font-size: 14px; letter-spacing: .14em; color: var(--accent2); text-transform: uppercase; margin-bottom: 7px; font-weight: 700; }
+    .concept-note { font-size: 14px; color: color-mix(in srgb, var(--text) 88%, var(--soft)); line-height: 1.8; }
+    .reading-map {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 10px;
+    }
+    .map-card {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      background: rgba(255,255,255,.03);
+      padding: 12px;
+      min-height: 148px;
+    }
+    .map-no {
+      font-size: 11px;
+      letter-spacing: .18em;
+      color: var(--accent);
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+    .map-card h3 {
+      font-size: 17px;
+      font-family: "Noto Serif SC", serif;
+      line-height: 1.45;
+      margin-bottom: 6px;
+    }
+    .map-card p {
+      font-size: 14px;
+      color: color-mix(in srgb, var(--text) 84%, var(--soft));
+      line-height: 1.85;
+    }
+    .atlas {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      min-height: 440px;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+    .atlas svg { width: 100%; max-width: 440px; height: auto; }
+    .timeline { display: grid; gap: 10px; }
+    .timeline-item {
+      border-left: 2px solid color-mix(in srgb, var(--accent) 66%, transparent);
+      padding: 10px 14px;
+      background: rgba(255,255,255,.02);
+      border-radius: 0 10px 10px 0;
+    }
+    .timeline-no { font-size: 11px; letter-spacing: .22em; color: var(--accent2); display: block; margin-bottom: 6px; }
+    .timeline-item h3 { font-size: 19px; font-family: "Noto Serif SC", serif; line-height: 1.45; margin-bottom: 7px; }
+    .timeline-item p { font-size: 14px; line-height: 1.9; color: color-mix(in srgb, var(--text) 84%, var(--soft)); }
+    .quote-wrap { display: grid; gap: 10px; }
+    .quote {
+      border-left: 2px solid color-mix(in srgb, var(--accent2) 80%, transparent);
+      padding: 10px 12px;
+      background: rgba(255,255,255,.02);
+      color: color-mix(in srgb, var(--text) 92%, #fff);
+      font-family: "Noto Serif SC", serif;
+      line-height: 1.9;
+    }
+    .takeaways { margin-top: 10px; list-style: none; display: grid; gap: 8px; }
+    .takeaways li {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      padding: 10px;
+      background: rgba(255,255,255,.02);
+      align-items: start;
+      line-height: 1.8;
+    }
+    .takeaways span {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: color-mix(in srgb, var(--accent2) 26%, transparent);
+      color: var(--accent2);
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+    .nav { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,.26);
+      border-radius: 999px;
+      padding: 8px 13px;
+      font-size: 12px;
+      color: var(--text);
+      background: rgba(255,255,255,.04);
+    }
+    .btn:hover { border-color: var(--accent2); color: var(--accent2); }
+    .dot-nav {
+      position: fixed;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: grid;
+      gap: 10px;
+      z-index: 50;
+    }
+    .dot-nav button {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.35);
+      background: transparent;
+      cursor: pointer;
+      transition: all .24s ease;
+    }
+    .dot-nav button.active { transform: scale(1.34); border-color: var(--accent); background: var(--accent); }
+    .reveal { opacity: 0; transform: translateY(16px); transition: opacity .55s ease, transform .55s ease; }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+    @media (max-width: 940px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .dot-nav { display: none; }
+      .hero { min-height: auto; padding: 30px 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+  <nav class="dot-nav" id="dotNav">
+    <button data-target="hero" class="active" aria-label="Hero"></button>
+    <button data-target="atlas" aria-label="Atlas"></button>
+    <button data-target="concepts" aria-label="Concepts"></button>
+    <button data-target="reading" aria-label="Reading"></button>
+    <button data-target="takeaways" aria-label="Takeaways"></button>
+  </nav>
+  <main class="page">
+    <section class="hero reveal in" id="hero">
+      <p class="eyebrow">Scholar Atlas · Gate 1</p>
+      <h1>A DATRE BOOK ONE We A re D A TRE -…</h1>
+      <p>A DATRE BOOK ONE We A re D A TRE -1 by Aona Datre 书籍第一册 我们是 DA TRE-1 翻译： QingQing A channel book of the same quality and depth of the ‘ Seth books ’ as channeled by Jane Roberts. Datre 的 发音 是 dot - ray ， 中文 发音 类似 于 “ 道…</p>
+      <div class="chip-row">
+        <span class="chip">Datre Visual Quality V3</span>
+        
+        <span class="chip">Module 1/18</span>
+        <span class="tag">datre</span><span class="tag">一开始</span><span class="tag">发音</span><span class="tag">现在</span><span class="tag">简介</span><span class="tag">通灵</span><span class="tag">那个</span><span class="tag">aona</span>
+      </div>
+    </section>
+
+    <section class="section reveal" id="atlas">
+      <h2>主题脉络与阅读地图</h2>
+      <p style="color:var(--soft);line-height:1.9;margin-bottom:10px;">先看章节主线，再进入细节。每个卡片都是一个可独立理解的知识片段。</p>
+      <div class="reading-map">
+      <article class="map-card reveal">
+        <p class="map-no">01</p>
+        <h3>A DATRE BOOK ONE We A re D A TRE -1 by Aona Datre 书籍第一册 我们是 DA TRE-1 翻译： QingQ</h3>
+        <p>A DATRE BOOK ONE We A re D A TRE -1 by Aona Datre 书籍第一册 我们是 DA TRE-1 翻译： QingQing A channel book of the same quality and depth of the ‘ Seth books ’ as channeled by Jane Roberts. Datre 的 发音 是 dot - ray ， 中文 发音 类似 于 “ 道 瑞</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">02</p>
+        <h3>” 和 “ 我为什么来这里？</h3>
+        <p>” 和 “ 我为什么来这里？ ” 的时候，他们就迈出了曾经在这个特殊的星球上，被 很多人探索过的旅程中 最伟大的第一步 。这是一场不断持续的个体进化旅程。 你们认为 “ 进化 ” 是这个星球上的物种进化。你们看着树木成长，动物长大，河 流，湖水，海洋，沙漠和群山不断改变和进化中 … 。 但是，你们却忘了观看这个星球 上最有趣的进化 - 那个 … 被称为 “ 人类 ” 的物种的进化 ， 他们不断改变着自己的物质 结构。这是一个你们无法从外</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">03</p>
+        <h3>现在，你们当中很多人带着极大的热情，开始愿意了解真正的自己了。你们开始 读书，开始从不同的通灵频道摄取信息。</h3>
+        <p>现在，你们当中很多人带着极大的热情，开始愿意了解真正的自己了。你们开始 读书，开始从不同的通灵频道摄取信息。 随着时间的流逝 ， “ 通灵 ” 这个词的称呼也在改变着。有一段时间，你们称它为 ： “ 女巫／媒介 ” ；然后你们又称它 ： “ 灵媒 ” - 现在，这个术语又变成了 “ 通灵 ” 。 一开始，所有的信息都是新的，有趣的，迷人的和令人困惑的。在这些信息中， 一直贯穿着一个最基本的，建立在 “ 爱 ” 上的主题。 当一个个体不断</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">04</p>
+        <h3>他 们开始选择阅读某些特定内容的书籍，只接触让他们感觉舒服的某些人。</h3>
+        <p>他 们开始选择阅读某些特定内容的书籍，只接触让他们感觉舒服的某些人。 打一个比方：假设他们现在想过一条小河。一开始，他们非常小心地踩上了河中 心的一块小石头。可接下来，就不愿意再迈动下一步了，因为 … 他们把这块石头当成 了自己的 “ 安全地带 ” 。 他们害怕迈动下一步 ， 同时 ， 也不愿意再回头了 。 走了这么远 ， 即使不舒服，他们也想呆在这块小石头上。</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">05</p>
+        <h3>在河中心站得越久，小石头也越来越不牢固。可他们还是害怕继续前进，于是， 不得不开始寻找帮助。</h3>
+        <p>在河中心站得越久，小石头也越来越不牢固。可他们还是害怕继续前进，于是， 不得不开始寻找帮助。 一群被吓坏的人想在河中心搭建一个安全的 “ 避难所 ” 。</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="concepts">
+      <h2>核心概念与解释</h2>
+      <div class="concept-grid">
+      <article class="concept-card reveal">
+        <p class="concept-token">datre</p>
+        <p class="concept-note">A DATRE BOOK ONE We A re D A TRE -1 by Aona Datre 书籍第一册 我们是 DA TRE-1 翻译： QingQing A channel book of the same quality and depth of the ‘ Seth books ’ as channeled by Jane Roberts.</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">一开始</p>
+        <p class="concept-note">一开始，所有的信息都是新的，有趣的，迷人的和令人困惑的。在这些信息中， 一直贯穿着一个最基本的，建立在 “ 爱 ” 上的主题。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">发音</p>
+        <p class="concept-note">Datre 的 发音 是 dot - ray ， 中文 发音 类似 于 “ 道 瑞 ” 。不过如 Datre 自己所说，他们对名字和发音并 不看重。只不过人类为了交流和识别的需要而想了 解 ， 所以他们这样为自己命名 ， 简单来说 ， 仅作为一 个识别符号。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">现在</p>
+        <p class="concept-note">现在，你们当中很多人带着极大的热情，开始愿意了解真正的自己了。你们开始 读书，开始从不同的通灵频道摄取信息。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">简介</p>
+        <p class="concept-note">I 目录 1 第 1 章 简介 DATRE ： 当这个星球上的男人和女人开始发出疑问 ： “ 我是谁？</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">通灵</p>
+        <p class="concept-note">现在，你们当中很多人带着极大的热情，开始愿意了解真正的自己了。你们开始 读书，开始从不同的通灵频道摄取信息。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">那个</p>
+        <p class="concept-note">但是，你们却忘了观看这个星球 上最有趣的进化 - 那个 … 被称为 “ 人类 ” 的物种的进化 ， 他们不断改变着自己的物质 结构。这是一个你们无法从外表看见的进化，那个 “ 居住 ” 在物质结构中的 “ 个体 ” 的进化。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">aona</p>
+        <p class="concept-note">A DATRE BOOK ONE We A re D A TRE -1 by Aona Datre 书籍第一册 我们是 DA TRE-1 翻译： QingQing A channel book of the same quality and depth of the ‘ Seth books ’ as channeled by Jane Roberts.</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="reading">
+      <h2>渐进式阅读路径</h2>
+      <div class="timeline">
+      <article class="timeline-item reveal">
+        <span class="timeline-no">01</span>
+        <h3>A DATRE BOOK ONE We A re D A TRE -1 by Aona Datre 书籍第一册 我们是 DA TRE-1 翻译： QingQ</h3>
+        <p>A DATRE BOOK ONE We A re D A TRE -1 by Aona Datre 书籍第一册 我们是 DA TRE-1 翻译： QingQing A channel book of the same quality and depth of the ‘ Seth books ’ as channeled by Jane Roberts. Datre 的 发音 是 dot - ray ， 中文 发音 类似 于 “ 道 瑞 ” 。不过如 Datre 自己所说，他们对名字和发音并 不看重。只不过人类为了交流和识别的需要而想了 解 ， 所以他们这样为自己命名 ， 简单来说 ， 仅作为一 个识别符号。 I 目录 1 第 1 章 简介 DATRE ： 当这个星球上的男人和女人开始发出疑问 ： “ 我是谁？ ” ， “ 我在这里做什 么？</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">02</span>
+        <h3>” 和 “ 我为什么来这里？</h3>
+        <p>” 和 “ 我为什么来这里？ ” 的时候，他们就迈出了曾经在这个特殊的星球上，被 很多人探索过的旅程中 最伟大的第一步 。这是一场不断持续的个体进化旅程。 你们认为 “ 进化 ” 是这个星球上的物种进化。你们看着树木成长，动物长大，河 流，湖水，海洋，沙漠和群山不断改变和进化中 … 。 但是，你们却忘了观看这个星球 上最有趣的进化 - 那个 … 被称为 “ 人类 ” 的物种的进化 ， 他们不断改变着自己的物质 结构。这是一个你们无法从外表看见的进化，那个 “ 居住 ” 在物质结构中的 “ 个体 ” 的进化。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">03</span>
+        <h3>现在，你们当中很多人带着极大的热情，开始愿意了解真正的自己了。你们开始 读书，开始从不同的通灵频道摄取信息。</h3>
+        <p>现在，你们当中很多人带着极大的热情，开始愿意了解真正的自己了。你们开始 读书，开始从不同的通灵频道摄取信息。 随着时间的流逝 ， “ 通灵 ” 这个词的称呼也在改变着。有一段时间，你们称它为 ： “ 女巫／媒介 ” ；然后你们又称它 ： “ 灵媒 ” - 现在，这个术语又变成了 “ 通灵 ” 。 一开始，所有的信息都是新的，有趣的，迷人的和令人困惑的。在这些信息中， 一直贯穿着一个最基本的，建立在 “ 爱 ” 上的主题。 当一个个体不断接触这样的内容后 ， 很快就建立起了一种基本的 “ 思维模式 ” 。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">04</span>
+        <h3>他 们开始选择阅读某些特定内容的书籍，只接触让他们感觉舒服的某些人。</h3>
+        <p>他 们开始选择阅读某些特定内容的书籍，只接触让他们感觉舒服的某些人。 打一个比方：假设他们现在想过一条小河。一开始，他们非常小心地踩上了河中 心的一块小石头。可接下来，就不愿意再迈动下一步了，因为 … 他们把这块石头当成 了自己的 “ 安全地带 ” 。 他们害怕迈动下一步 ， 同时 ， 也不愿意再回头了 。 走了这么远 ， 即使不舒服，他们也想呆在这块小石头上。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">05</span>
+        <h3>在河中心站得越久，小石头也越来越不牢固。可他们还是害怕继续前进，于是， 不得不开始寻找帮助。</h3>
+        <p>在河中心站得越久，小石头也越来越不牢固。可他们还是害怕继续前进，于是， 不得不开始寻找帮助。 一群被吓坏的人想在河中心搭建一个安全的 “ 避难所 ” 。</p>
+      </article>
+    </div>
+      <div class="quote-wrap" style="margin-top:12px;"><blockquote class="quote reveal">“A DATRE BOOK ONE We A re D A TRE -1 by Aona Datre 书籍第一册 我们是 DA TRE-1 翻译： QingQing A channel book of the same quality and depth of the ‘ Seth books ’ as channeled by Jane Roberts.”</blockquote><blockquote class="quote reveal">“Datre 的 发音 是 dot - ray ， 中文 发音 类似 于 “ 道 瑞 ” 。不过如 Datre 自己所说，他们对名字和发音并 不看重。只不过人类为了交流和识别的需要而想了 解 ， 所以他们这样为自己命名 ， 简单来说 ， 仅作为一 个识别符号。”</blockquote><blockquote class="quote reveal">“但是，你们却忘了观看这个星球 上最有趣的进化 - 那个 … 被称为 “ 人类 ” 的物种的进化 ， 他们不断改变着自己的物质 结构。这是一个你们无法从外表看见的进化，那个 “ 居住 ” 在物质结构中的 “ 个体 ” 的进化。”</blockquote></div>
+    </section>
+
+    <section class="section reveal" id="takeaways">
+      <h2>本关关键收获</h2>
+      <ul class="takeaways"><li><span>1</span>A DATRE BOOK ONE We A re D A TRE -1 by Aona Datre 书籍第一册 我们是 DA TRE-1 翻译： QingQ</li><li><span>2</span>” 和 “ 我为什么来这里？</li><li><span>3</span>现在，你们当中很多人带着极大的热情，开始愿意了解真正的自己了。你们开始 读书，开始从不同的通灵频道摄取信息。</li><li><span>4</span>他 们开始选择阅读某些特定内容的书籍，只接触让他们感觉舒服的某些人。</li></ul>
+      <nav class="nav">
+        <a class="btn" href="/books/user-book-datre-visual-quality-v3-gcgddz-9f4d.html">返回目录</a>
+        <a class="btn" href="/experiences/user-book-datre-visual-quality-v3-gcgddz-9f4d-g02-chapter-2.html">下一关</a>
+      </nav>
+    </section>
+  </main>
+  <script>
+    (() => {
+      const progress = document.getElementById("progress");
+      const dots = Array.from(document.querySelectorAll("#dotNav button[data-target]"));
+      const sections = dots
+        .map((dot) => document.getElementById(dot.getAttribute("data-target")))
+        .filter(Boolean);
+      const reveals = Array.from(document.querySelectorAll(".reveal"));
+      const onScroll = () => {
+        const h = document.documentElement;
+        const total = Math.max(1, h.scrollHeight - window.innerHeight);
+        const pct = Math.max(0, Math.min(100, (window.scrollY / total) * 100));
+        if (progress) progress.style.width = pct + "%";
+      };
+      const io = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) entry.target.classList.add("in");
+        }
+      }, { threshold: .14 });
+      reveals.forEach((el) => io.observe(el));
+      const secIo = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const id = entry.target.id;
+          dots.forEach((dot) => dot.classList.toggle("active", dot.getAttribute("data-target") === id));
+        });
+      }, { threshold: .4 });
+      sections.forEach((s) => secIo.observe(s));
+      dots.forEach((dot) => {
+        dot.addEventListener("click", () => {
+          const target = document.getElementById(dot.getAttribute("data-target"));
+          if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+      window.addEventListener("scroll", onScroll, { passive: true });
+      onScroll();
+    })();
+  </script>
+</body>
+</html>

@@ -88,7 +88,7 @@ const BOOK_META = {
     ]
   },
   "principles-for-navigating-big-debt-crises": {
-    title: "《置身事外》",
+    title: "《置身事内》",
     price: 720,
     category: "career-wealth",
     categoryHint: "在债务周期情景里练习宏观判断与风险管理思维。",
@@ -343,8 +343,8 @@ const BOOK_NAME_TO_ID = new Map([
   ["principles-for-navigating-big-debt-crises", "principles-for-navigating-big-debt-crises"],
   ["debt-crises", "principles-for-navigating-big-debt-crises"],
   ["置身事内", "principles-for-navigating-big-debt-crises"],
-  ["置身事外", "principles-for-navigating-big-debt-crises"],
-  ["《置身事外》", "principles-for-navigating-big-debt-crises"],
+  ["置身事内", "principles-for-navigating-big-debt-crises"],
+  ["《置身事内》", "principles-for-navigating-big-debt-crises"],
   ["zero-to-one", "zero-to-one"],
   ["zero-to-one-addon", "zero-to-one"],
   ["从零到一", "zero-to-one"],

@@ -1,0 +1,42 @@
+{
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T13:36:55.616Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "Datre书籍-第1册 我们是DATRE-1（部分）.pdf",
+      "author": ""
+    },
+    "knowledge_block": {
+      "id": "kb-16",
+      "gate_index": 15,
+      "title": "东西 · 如果",
+      "summary": "无论你怎么扫，地面上还是有很多灰。 试想一下：如果你每天都能使用一把新扫帚，那你的工作能做得有多好啊？",
+      "words": 581,
+      "keywords": [
+        "东西",
+        "如果",
+        "改变",
+        "小草",
+        "来讲",
+        "想象",
+        "眼睛",
+        "每天"
+      ],
+      "density": {
+        "score": 0.6195,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0.1239,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0.1928
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "scholar",
+      "theme_label": "Scholar Atlas",
+      "section_count": 5,
+      "generated_with": "template_runtime"
+    }
+  }
+}

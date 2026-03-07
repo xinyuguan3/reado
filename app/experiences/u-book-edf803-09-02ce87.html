@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>第六章 Dining in Gapun 在迦普恩吃饭 在迦普恩的生活里，不间断的赠予并不是 我发现很难适应的唯一方面。除此之外，我还 得习惯性生 · 雨林里的消亡：一种语言和生活方式在巴布亚新几内亚的终结</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'"/>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #16120f;
+      --bg2: #2a1f18;
+      --accent: #d97706;
+      --accent2: #2dd4bf;
+      --text: #f5f1ea;
+      --soft: #c7b8a2;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+      background:
+        radial-gradient(1200px 540px at 85% -8%, color-mix(in srgb, var(--accent2) 24%, transparent), transparent 70%),
+        radial-gradient(980px 460px at -10% 14%, color-mix(in srgb, var(--accent) 24%, transparent), transparent 74%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+      color: var(--text);
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .05;
+      background-image: radial-gradient(circle at 1px 1px, #fff 1px, transparent 0);
+      background-size: 3px 3px;
+      z-index: 0;
+    }
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      z-index: 100;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+    .page { position: relative; z-index: 1; width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 20px 0 48px; }
+    .hero {
+      min-height: 74vh;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 22px;
+      background: linear-gradient(160deg, color-mix(in srgb, var(--bg2) 86%, transparent), color-mix(in srgb, var(--bg) 88%, transparent));
+      padding: 40px 34px;
+      display: grid;
+      align-content: center;
+      gap: 16px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.34);
+    }
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .hero h1 {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(32px, 5.4vw, 68px);
+      line-height: 1.16;
+      letter-spacing: .04em;
+      max-width: 15em;
+      text-wrap: balance;
+    }
+    .hero p {
+      max-width: 66ch;
+      line-height: 1.95;
+      color: color-mix(in srgb, var(--text) 85%, var(--soft));
+      font-size: 16px;
+    }
+    .chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip {
+      border: 1px solid color-mix(in srgb, var(--accent2) 44%, transparent);
+      color: color-mix(in srgb, var(--accent2) 88%, #fff);
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 12px;
+      background: rgba(255,255,255,.03);
+    }
+    .section { margin-top: 18px; border: 1px solid rgba(255,255,255,.13); border-radius: 18px; padding: 22px; background: rgba(2,6,18,.46); }
+    .section h2 {
+      margin-bottom: 12px;
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(22px, 2.8vw, 34px);
+      color: color-mix(in srgb, var(--accent) 86%, #fff);
+      letter-spacing: .03em;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1.1fr 1fr; gap: 14px; }
+    .concept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+    .concept-card {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      background: rgba(255,255,255,.03);
+      padding: 14px;
+      min-height: 128px;
+    }
+    .concept-token { font-size: 14px; letter-spacing: .14em; color: var(--accent2); text-transform: uppercase; margin-bottom: 7px; font-weight: 700; }
+    .concept-note { font-size: 14px; color: color-mix(in srgb, var(--text) 88%, var(--soft)); line-height: 1.8; }
+    .atlas {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      min-height: 440px;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+    .atlas svg { width: 100%; max-width: 440px; height: auto; }
+    .timeline { display: grid; gap: 10px; }
+    .timeline-item {
+      border-left: 2px solid color-mix(in srgb, var(--accent) 66%, transparent);
+      padding: 10px 14px;
+      background: rgba(255,255,255,.02);
+      border-radius: 0 10px 10px 0;
+    }
+    .timeline-no { font-size: 11px; letter-spacing: .22em; color: var(--accent2); display: block; margin-bottom: 6px; }
+    .timeline-item h3 { font-size: 19px; font-family: "Noto Serif SC", serif; line-height: 1.45; margin-bottom: 7px; }
+    .timeline-item p { font-size: 14px; line-height: 1.9; color: color-mix(in srgb, var(--text) 84%, var(--soft)); }
+    .quote-wrap { display: grid; gap: 10px; }
+    .quote {
+      border-left: 2px solid color-mix(in srgb, var(--accent2) 80%, transparent);
+      padding: 10px 12px;
+      background: rgba(255,255,255,.02);
+      color: color-mix(in srgb, var(--text) 92%, #fff);
+      font-family: "Noto Serif SC", serif;
+      line-height: 1.9;
+    }
+    .takeaways { margin-top: 10px; list-style: none; display: grid; gap: 8px; }
+    .takeaways li {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      padding: 10px;
+      background: rgba(255,255,255,.02);
+      align-items: start;
+      line-height: 1.8;
+    }
+    .takeaways span {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: color-mix(in srgb, var(--accent2) 26%, transparent);
+      color: var(--accent2);
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+    .nav { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,.26);
+      border-radius: 999px;
+      padding: 8px 13px;
+      font-size: 12px;
+      color: var(--text);
+      background: rgba(255,255,255,.04);
+    }
+    .btn:hover { border-color: var(--accent2); color: var(--accent2); }
+    .dot-nav {
+      position: fixed;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: grid;
+      gap: 10px;
+      z-index: 50;
+    }
+    .dot-nav button {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.35);
+      background: transparent;
+      cursor: pointer;
+      transition: all .24s ease;
+    }
+    .dot-nav button.active { transform: scale(1.34); border-color: var(--accent); background: var(--accent); }
+    .reveal { opacity: 0; transform: translateY(16px); transition: opacity .55s ease, transform .55s ease; }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+    @media (max-width: 940px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .dot-nav { display: none; }
+      .hero { min-height: auto; padding: 30px 22px; }
+    }
+  </style>
+<style id="reado-shell-preload-style">
+html.reado-shell-preload body:not(.reado-shell-applied) {
+  padding-top: 80px !important;
+}
+@media (min-width: 1024px) {
+  html.reado-shell-preload:not(.reado-shell-preload-learning) body:not(.reado-shell-applied) {
+    padding-left: 256px !important;
+  }
+}
+@media (min-width: 1200px) {
+  html.reado-shell-preload:not(.reado-shell-preload-learning) body:not(.reado-shell-applied) {
+    padding-right: clamp(280px, 24vw, 320px) !important;
+  }
+}
+html.reado-shell-preload body:not(.reado-shell-applied) > header:first-of-type,
+html.reado-shell-preload body:not(.reado-shell-applied) > nav:first-of-type,
+html.reado-shell-preload body:not(.reado-shell-applied) > aside:first-of-type,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex > nav,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex > aside,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex-1 > nav,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex-1 > aside,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex > .flex-1 > nav,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex > .flex-1 > aside {
+  display: none !important;
+}
+</style>
+<script id="reado-shell-preload-script">
+(() => {
+  const root = document.documentElement;
+  root.classList.add("reado-shell-preload");
+  const path = window.location.pathname || "";
+  if (path.startsWith("/experiences/") || path.startsWith("/books/")) {
+    root.classList.add("reado-shell-preload-learning");
+  }
+})();
+</script>
+</head>
+<body>
+<script src="/shared/book-catalog.js?v=1772888317077"></script>
+<script type="module" src="/shared/shell.js?v=1772888317077"></script>
+<reado-app-shell data-page="knowledge-map"></reado-app-shell>
+  <div class="progress" id="progress"></div>
+  <nav class="dot-nav" id="dotNav">
+    <button data-target="hero" class="active" aria-label="Hero"></button>
+    <button data-target="atlas" aria-label="Atlas"></button>
+    <button data-target="concepts" aria-label="Concepts"></button>
+    <button data-target="reading" aria-label="Reading"></button>
+    <button data-target="takeaways" aria-label="Takeaways"></button>
+  </nav>
+  <main class="page">
+    <section class="hero reveal in" id="hero">
+      <p class="eyebrow">Field Narrative · Gate 9</p>
+      <h1>第六章 Dining in Gapun 在迦普恩吃饭 在迦普恩的生活里，不间断的赠予并不是 我发现很难适应的唯一方面。除此之外，我还 得习惯性生</h1>
+      <p>第六章 Dining in Gapun 在迦普恩吃饭 在迦普恩的生活里，不间断的赠予并不是 我发现很难适应的唯一方面。除此之外，我还 得习惯性生活匮乏、蚊子和泥土。然后就是花 大量时间做田野调查最艰难的一个部分，吃 当地食物。 对于任何这些不适，我实在无能为力。</p>
+      <div class="chip-row">
+        <span class="chip">雨林里的消亡：一种语言和生活方式在巴布亚新几内亚的终结</span>
+        
+        <span class="chip">Module 9/24</span>
+        <span class="tag">page</span><span class="tag">image</span><span class="tag">content</span><span class="tag">ocr</span><span class="tag">mum</span><span class="tag">首先</span>
+      </div>
+    </section>
+
+    <section class="section grid-2 reveal" id="atlas">
+      <article>
+        <h2>知识结构图谱</h2>
+        <p style="color:var(--soft);line-height:1.9;margin-bottom:10px;">围绕本关卡核心概念构建关系图。阅读时先抓主轴，再理解每个概念如何驱动判断与行动。</p>
+        <div class="quote-wrap"><blockquote class="quote reveal">“村民们制作西来工序之复杂，不禁让你宅异，人类到底是怎么发 现这玩意儿的。首先，大部分西米棕榈树一点都不诱人：它们的刺又 长又尖，就像仙人掌一样覆盖在枝干和树叶上。尽管如此，在遥远的 过去，曾经有人意识到，从这些身上都是刺的棕榈树的内部树皮里， 可以提取出可供食用的淀粉。但这类淀粉不容易获得。首先，村民一 定要把西米棕榈树砍倒，用大刀除去上面的刺。然后，用斧头在外面 的树皮上划一道狭长的口子。再用斧头和大刀劈开坚硬的树皮，渐渐 第六章在迦”</blockquote><blockquote class="quote reveal">“西米啫喱在泰雅博语里居然叫作mum（我说“居然”，因为在瑞 典语里，“好吃”这个词就是mums），上菜时就盛在又大又浅的盘子 或洗脸盆里（村里有户人家会定期给我吃，盛在一个不知他们从什么 地方弄来的方方正正的塑料洗脚盆里），黏黏的一坨。女人还会在一 坨这玩意儿上面放几片蔬菜叶和/或几只煮熟的幼虫和/或一小片煮 熟的鱼和/或一小块熟肉一一就像冰淇淋圣代上的一枚樱桃（不过， 这个画面再一次具有欺骗性质，因为它会暗示什么美味的东西）。上 面还”</blockquote><blockquote class="quote reveal">“食物状况也不在我的掌握范围之内。我没 77 [PAGE 87 IMAGE 1 CONTENT (OCR)]: 法带自己的食物去村里，因为这样做太贵也太费事。更重要的是， 这么做的话就会让我孤立于村里人，是在侮辱他们。和别人分享食 物是最基本的建立社会关系的方式。拒绝吃别人给你的食物是严重 的冒犯。法国美食家布里亚－萨瓦兰那句著名的烹饪格言一“告 诉我你吃了什么，我就能判断你是一个什么样的人”一—不只是在 讲个人口味，也有其社会意义。它意”</blockquote></div>
+      </article>
+      <article class="atlas">
+        <svg viewBox="0 0 440 440" aria-label="concept atlas">
+          <defs>
+            <radialGradient id="g" cx="50%" cy="50%" r="56%">
+              <stop offset="0%" stop-color="#d97706" stop-opacity=".24"></stop>
+              <stop offset="100%" stop-color="#d97706" stop-opacity="0"></stop>
+            </radialGradient>
+          </defs>
+          <circle cx="220" cy="220" r="190" fill="none" stroke="rgba(255,255,255,.08)" stroke-dasharray="5 6"></circle>
+          <circle cx="220" cy="220" r="84" fill="url(#g)"></circle>
+          <circle cx="220" cy="220" r="10" fill="#d97706"></circle>
+          <text x="220" y="252" text-anchor="middle" fill="#f5f1ea" font-size="13">第六章 Dining in Gapun 在迦普恩</text>
+          <g><line x1="220" y1="220" x2="370" y2="220" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="370" cy="220" r="8" fill="#2dd4bf"/><text x="382" y="224" fill="#f5f1ea" font-size="12">page</text></g><g><line x1="220" y1="220" x2="266" y2="363" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="266" cy="363" r="8" fill="#2dd4bf"/><text x="278" y="367" fill="#f5f1ea" font-size="12">image</text></g><g><line x1="220" y1="220" x2="99" y2="308" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="99" cy="308" r="8" fill="#2dd4bf"/><text x="111" y="312" fill="#f5f1ea" font-size="12">content</text></g><g><line x1="220" y1="220" x2="99" y2="132" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="99" cy="132" r="8" fill="#2dd4bf"/><text x="111" y="136" fill="#f5f1ea" font-size="12">ocr</text></g><g><line x1="220" y1="220" x2="266" y2="77" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="266" cy="77" r="8" fill="#2dd4bf"/><text x="278" y="81" fill="#f5f1ea" font-size="12">mum</text></g>
+        </svg>
+      </article>
+    </section>
+
+    <section class="section reveal" id="concepts">
+      <h2>核心概念与解释</h2>
+      <div class="concept-grid">
+      <article class="concept-card reveal">
+        <p class="concept-token">page</p>
+        <p class="concept-note">食物状况也不在我的掌握范围之内。我没 77 [PAGE 87 IMAGE 1 CONTENT (OCR)]: 法带自己的食物去村里，因为这样做太贵也太费事。更重要的是， 这么做的话就会让我孤立于村里人，是在侮辱他们。和别人分享食 物是最基本的建立社会关系的方式。拒绝吃别人给你的食物是严重 的冒犯。法国美食家布里亚－萨瓦兰那句著名的烹饪格言一“告 诉我你吃了什</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">image</p>
+        <p class="concept-note">食物状况也不在我的掌握范围之内。我没 77 [PAGE 87 IMAGE 1 CONTENT (OCR)]: 法带自己的食物去村里，因为这样做太贵也太费事。更重要的是， 这么做的话就会让我孤立于村里人，是在侮辱他们。和别人分享食 物是最基本的建立社会关系的方式。拒绝吃别人给你的食物是严重 的冒犯。法国美食家布里亚－萨瓦兰那句著名的烹饪格言一“告 诉我你吃了什</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">content</p>
+        <p class="concept-note">食物状况也不在我的掌握范围之内。我没 77 [PAGE 87 IMAGE 1 CONTENT (OCR)]: 法带自己的食物去村里，因为这样做太贵也太费事。更重要的是， 这么做的话就会让我孤立于村里人，是在侮辱他们。和别人分享食 物是最基本的建立社会关系的方式。拒绝吃别人给你的食物是严重 的冒犯。法国美食家布里亚－萨瓦兰那句著名的烹饪格言一“告 诉我你吃了什</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">ocr</p>
+        <p class="concept-note">食物状况也不在我的掌握范围之内。我没 77 [PAGE 87 IMAGE 1 CONTENT (OCR)]: 法带自己的食物去村里，因为这样做太贵也太费事。更重要的是， 这么做的话就会让我孤立于村里人，是在侮辱他们。和别人分享食 物是最基本的建立社会关系的方式。拒绝吃别人给你的食物是严重 的冒犯。法国美食家布里亚－萨瓦兰那句著名的烹饪格言一“告 诉我你吃了什</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">mum</p>
+        <p class="concept-note">西米啫喱在泰雅博语里居然叫作mum（我说“居然”，因为在瑞 典语里，“好吃”这个词就是mums），上菜时就盛在又大又浅的盘子 或洗脸盆里（村里有户人家会定期给我吃，盛在一个不知他们从什么 地方弄来的方方正正的塑料洗脚盆里），黏黏的一坨。女人还会在一 坨这玩意儿上面放几片蔬菜叶和/或几只煮熟的幼虫和/或一小片煮 熟的鱼和/或一小块熟肉一一就像冰淇淋圣代上的一枚</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">首先</p>
+        <p class="concept-note">村民们制作西来工序之复杂，不禁让你宅异，人类到底是怎么发 现这玩意儿的。首先，大部分西米棕榈树一点都不诱人：它们的刺又 长又尖，就像仙人掌一样覆盖在枝干和树叶上。尽管如此，在遥远的 过去，曾经有人意识到，从这些身上都是刺的棕榈树的内部树皮里， 可以提取出可供食用的淀粉。但这类淀粉不容易获得。首先，村民一 定要把西米棕榈树砍倒，用大刀除去上面的刺。然后，用斧头</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="reading">
+      <h2>渐进式阅读路径</h2>
+      <div class="timeline">
+      <article class="timeline-item reveal">
+        <span class="timeline-no">01</span>
+        <h3>第六章 Dining in Gapun 在迦普恩吃饭 在迦普恩的生活里，不间断的赠予并不是 我发现很难适应的唯一方面。除此之外，我还 得习惯性生活匮乏、蚊子</h3>
+        <p>第六章 Dining in Gapun 在迦普恩吃饭 在迦普恩的生活里，不间断的赠予并不是 我发现很难适应的唯一方面。除此之外，我还 得习惯性生活匮乏、蚊子和泥土。然后就是花 大量时间做田野调查最艰难的一个部分，吃 当地食物。 对于任何这些不适，我实在无能为力。 就性而言，村里人从来没有对我有什么非 分之想。尽管我觉得他们当中很多人挺诱人，但 我都已经死了，而且要担心要处理的事情实在太 多，更别提有什么浪漫艳遇了（就我所知，村里 人可能会把这当成恋尸癖，觉得恶心）。 对于蚊子和泥土，我所能做的就是咒骂自 已，怎么偏偏选择花那么多年时间去研究一门 在沼泽而不是在更轻松愉快的美丽热带海岛上 将要死去的语言。 食物状况也不在我的掌握范围之内。我没 77 [PAGE 87 IMAGE 1 CONTENT (OCR)]: 法带自己的食物去村里，因为这样做太贵也太费事。更重要的是， 这么做的话就会让我孤立于村里人，是在侮辱他们。和别人分享食 物是最基本的建立社会关系的方式。拒绝吃别人给你的食物是严重 的冒犯。法国美食家布里亚－萨瓦兰那句著名的烹饪格言一“告 诉我你吃了什么，我就能判断你是一个什么样的人”一—不只是在 讲个人口味，也有其社会意义。它意味着，如果我拒绝了你的食 物，我就是在拒绝你。 村里以及整个塞皮克河沿岸的主食是西米。西米是一年到头每天 都要吃的，理想的话至少一天吃两顿。一次是早上，一次是傍晚。它 的原材料是一种面粉，像潮湿的压在一起的玉米淀粉。把这种面粉压 平，在一个破锅片或煎锅上加热之后，可以做成有嚼劲的烙饼。也可 以揉成网球大小的一团扔进火里（出来的食物，外面是一层焦黑的 膜，里面是干燥的粉末，泰雅博语里管它叫munakokir，字面意思是 “西米头”）。也可以包进树叶放在火里烤，或者碾成竹筒形，再丢进 火里成形。 在英语里，它最常见也最受人喜爱的形式，通常被叫作西米布丁 或西米啫喱。然而，这两个说法太有误导性了，因为它们仿佛在暗示 （a）所说的这种食物有布丁或啫喱的黏稠度，（b）所谓的这种食物就 像布丁或啫喱一样诱人。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">02</span>
+        <h3>这两种暗示都错得离谱。这种被称为西米“布丁”或“啫喱”的 食物的质地实际上更像是烂泥或黏痰。它的黏性如此之好，以至于一 口还在你嘴巴里的时候，其余部分已经悬</h3>
+        <p>这两种暗示都错得离谱。这种被称为西米“布丁”或“啫喱”的 食物的质地实际上更像是烂泥或黏痰。它的黏性如此之好，以至于一 口还在你嘴巴里的时候，其余部分已经悬到喉咙里了，就像一口又长 又稠的痰挂在那儿似的。这甚至不是西方很多人视作食物应有的黏稠 度。当有什么稀溜溜的东西像鼻涕一样顺着嗓子眼儿滑下去时，我们 的反应是想吐出来，而不是吞下去。 西米啫喱也不诱人一—当然，除非你正好是一个塞皮克河沿岸村 78 雨林里的消亡 [PAGE 88 IMAGE 1 CONTENT (OCR)]: 子的人，生来就是吃这个长大的（婴儿刚出生几天后，迦普恩的村民 就开始喂他们吃西米啫喱）。它没有什么味道，这是它唯一不讨人嫌 的地方一除非做的时候在不干净的水里洗过，这样就能尝出家具抛 光料的味道。西米啫喱的颜色不一，从淡粉到深红乃至黑色都有，取 决于过滤时的水质。 西米啫喱在泰雅博语里居然叫作mum（我说“居然”，因为在瑞 典语里，“好吃”这个词就是mums），上菜时就盛在又大又浅的盘子 或洗脸盆里（村里有户人家会定期给我吃，盛在一个不知他们从什么 地方弄来的方方正正的塑料洗脚盆里），黏黏的一坨。女人还会在一 坨这玩意儿上面放几片蔬菜叶和/或几只煮熟的幼虫和/或一小片煮 熟的鱼和/或一小块熟肉一一就像冰淇淋圣代上的一枚樱桃（不过， 这个画面再一次具有欺骗性质，因为它会暗示什么美味的东西）。上 面还会浇几勺“汤”。汤的主要成分是椰奶（也就是椰肉磨碎后在冷 水里挤压出来的液体），mum上面的蔬菜或肉就是这里面煮出来的。 如果村民们有盐，他们会不吝惜地放很多给汤增味。除了过多的盐以 外，或一点盐都不放，迦普恩的菜里没有任何其他调料，没有香料， 或任何草本植物。不是因为没有这些东西一一毕竞世界各地厨房里用 的香料很多都产自雨林。即便如此，村里人还是不感兴趣。他们喜欢 让食物要不就寡淡无味，要不就咸得死人。 村民们制作西来工序之复杂，不禁让你宅异，人类到底是怎么发 现这玩意儿的。首先，大部分西米棕榈树一点都不诱人：它们的刺又 长又尖，就像仙人掌一样覆盖在枝干和树叶上。尽管如此，在遥远的 过去，曾经有人意识到，从这些身上都是刺的棕榈树的内部树皮里， 可以提取出可供食用的淀粉。但这类淀粉不容易获得。首先，村民一 定要把西米棕榈树砍倒，用大刀除去上面的刺。然后，用斧头在外面 的树皮上划一道狭长的口子。再用斧头和大刀劈开坚硬的树皮，渐渐 第六章在迦普恩吃饭 79 [PAGE 89 IMAGE 1 CONTENT (OCR)]: 弄出一个深长的切口，撑开，直到它像贝壳一样张开，这样棕榈树浅 色的内部就暴露在外了。 这时，村民就拿一个看上去介于锄头和大凿子之间的工具，开始 一点一点把棕榈树里面的部分往下削。他从树的底部开始削，一直往 上削到树冠。用这个工具削下来的内皮就像粗糙的粉色锯屑。 然后就轮到村民的</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">03</span>
+        <h3>然后挤压揉捏漏斗里的西米衬皮，释放出衬皮里包含的淀粉。淀粉混 着水沿着过滤网流下来，收集在棕榈叶做成的桶里。</h3>
+        <p>然后挤压揉捏漏斗里的西米衬皮，释放出衬皮里包含的淀粉。淀粉混 着水沿着过滤网流下来，收集在棕榈叶做成的桶里。 用这种方法把淀粉过滤后，西米衬皮就扔掉了。每一把西米衬皮 要洗四到五遍，确保彻底过滤。 西米淀粉和水混在一起经过滤网，淀粉沉到棕榈叶桶的底部，留 下水在上面。把水倒掉，留下来的就是稠密的湿湿的粉糕。女人把粉 糕用树叶和热灰盖上，灰里的热量提取了剩下的水。干了之后，西米 粉糕就被带回村里，用来制作村民的饭食。 从砍倒西米棕榈树到制作西米粉糕，整个过程耗时一整天，从早 上大约八点到下午三四点，需要两个人完成。这一天的劳作所得到的 原材料，通常只能加工完一半一另一半要第二天继续。两人一天的 劳作制成五到八个大的西米粉糕。这些西米可以让一个八口之家维持 四天的口粮，但取决于有多少西米要分给亲戚。 做西米啫喱要分出一堆西米粉，放进锅里用少量冷水调开。这 样就得到了滤掉剩余杂质（昆虫、刺、灰）的稀面糊。下一步，厨师 把大量烧开的水浇到面糊上，不停地大力搅拌。热气腾腾的水和搅拌 会让西米糊凝固成备受村民喜爱的黏稠的一大坨。把这一锅黏糊糊的 80 雨林里的消亡 [PAGE 90 IMAGE 1 CONTENT (OCR)]: 东西像太妃糖一样搅进上菜用的盆里就可以吃了。上面再撒点必不可 少的少许树叶、幼虫或小块肉和鱼一一瞧，祝你好胃口（voila，bon appetit）！ 1985年，我刚到迦普恩几小时后，就第一次吃到了mum，我都 快吐了。当我总算用匙子弄起了一点，看到那个粉粉黏黏的东西像鼻 涕一样从盆里拉长，我努力控制住我的反胃冲动。当它填满我的嘴 巴，开始往下滑进我的喉咙，我开始干呕。从沼泽跋涉了一路到了村 里，我就已经汗流淡背。但此刻，我的汗腺开始像喷泉一样喷涌，当 我意识到自己在村子里的第一顿饭就要吐，而我还要在这里待上至少 一年做研究，最后总算勉强吞了几小口，然后就说我已经饱了。 接下来的几周，我做了大量抑制反胃的练习，因为他们几乎每 一餐都给我吃mum。那个时候，我还不知道西米也有其他做法，也 不知道mum其实是一道名菜一相当于本村的菲力牛排，而其他菜 只能算是汉堡包。村里人当然是想让神秘白人贵客尝尝他们最引以 为傲的食物。当然，他们的神秘白人贵客吃了下去，因为他饥肠 ，他也发现在迦普恩，每户人家的菜单上除了这个就没有什么别 的可以吃了。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">04</span>
+        <h3>为什么当地人觉得是美食的食物通常在外人看来那么恶心？</h3>
+        <p>为什么当地人觉得是美食的食物通常在外人看来那么恶心？ 在瑞典，有一道被死忠粉奉为标准瑞典美食的菜是一种叫鲱鱼罐头 （surstromming）的东西。这个词字面翻译就是“酸鲱鱼”——但这里 的“酸”是腐烂鲱鱼的“酸”，不是柠檬味鲱鱼的“酸”。制作方法是 把捕来的新鲜鲱鱼放到浓盐水里，把血水泡出来，然后给鱼去头，取 出内脏，放到淡一些的盐水里，让它发酵几周，然后装罐封存，让它 在罐头里继续发酵。 第六章在迦普恩吃饭 81 [PAGE 91 IMAGE 1 CONTENT (OCR)]: 这一过程会让鱼腐烂，而且会把罐头撑得很紧。罐头不充许带 上飞机，因为有爆开的风险。不过，这样的禁令当然不会让行家们 望而却步，每年八月一年度鲱鱼罐头大赏的时候一—瑞典的报纸上 就会有一些令人忍俊不禁的报道，说生活在海外的爱好鲱鱼罐头的瑞 典人打开他们心爱的烂鲱鱼罐头时，被当地人举报到警方和卫生部门 那里。 把警察招来的原因是，腐烂的鱼闻上去特别像屎一婴儿的屎， 确切地说。 我尝过一次鲱鱼罐头，在我移居瑞典几年后。所有的外国人都 会尝一尝，这是迟早的事。他们的尝试是为了表现一种勇气，瑞典人 （他们中的大多数其实自己都没亲身靠近过这玩意儿）很喜欢用这玩 意儿来挑战非瑞典人。我闻到这鱼像屎一样的味道，但我还是照他们 说的尝了，从罐头里取出一块，乖乖地放在一片加了煮熟的土豆片和 生洋葱的薄脆饼干上。我把鲱鱼放进嘴巴里，想当然地寻思着闻起来 像屎不见得真的尝起来也像屎。 迦普恩也有美食。主要的一种是煮熟的褐领家雉蛋。褐领家雉属 于家雉科，一种野鸡大小的鸟，意思是“大脚”。这种鸟会用它们非 同寻常的大脚刮凑出一个腐烂植被构成的巨大鸟巢土堆，雌鸟会在里 面下蛋。被埋在土堆里后，蛋会孵化，破壳时，小鸟的爪子就会伸出 来。和出生时没有羽毛也不会保护自己的其他维鸟不同，褐领家雉破 壳而出时就已羽翼丰满，可以独立生存。 迦普恩的女人和女孩在雨林里发现这些鸟巢土堆时，会小心地拨 开表面，找到里面的鸟蛋，不弄碎它们脆弱的壳。鸟蛋很大一一大概 是鸭蛋的两倍大一—而且它们有一层好看的赭黄色的壳。村民们煮这 82 雨林里的消亡 [PAGE 92 IMAGE 1 CONTENT (OCR)]: 些蛋的方式和他们准备其他所有食物没有什么两样一一他们会把蛋煮 熟，通常上菜时会放在西米啫喱上，蛋壳剥去一部分，这样就能很容 易地用匙子食用。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">05</span>
+        <h3>所有这一切听上去无伤大雅。然而，问题在于，鸟蛋是被随机发 现的，它们也可能处在孵化到维鸟的任何阶段。</h3>
+        <p>所有这一切听上去无伤大雅。然而，问题在于，鸟蛋是被随机发 现的，它们也可能处在孵化到维鸟的任何阶段。 1986年我来到迦普恩长待时，女人们告诉我，褐领家雉蛋是一 道美食，她们会尽其所能给我找一颗让我尝尝鲜。我寻思着任何像蛋 的东西总归比煮熟的西米幼虫或红树林輸（这两样东西经常和他们 每天给我吃的mum放在一起）要可口，便热情地回复说我很期待。 一天下午，一个小孩到了我家，头上顶着一个铝盆，上面盖着一 片宽宽的kapiak（面包树）叶子，用来挡苍蝇叮里面的食物。就在把 盆递给我的时候，她嘟着说她的妈妈为我找到了一枚褐领家雉蛋， 而且放在了mum上。“哦好的。”我说。然后我揭开了叶子。 整个屋子仿佛向我压了过来。在满是粉色黏液的盆子中央放着一 枚蛋，在小女孩的母亲好心帮我打破的壳里，有一只巨大的成形的眼 晴在向上盯着我看。当我低头看到那只眼睛一又或者当那只眼晴向 上看着我时，我发誓我听到了电影《惊魂记》的淋浴场景里一样刺耳 的小提琴声。 我被吓到了。我得当机立断，因为我知道我至少得表现出要吃 这枚承诺已久的蛋的样子。扔掉是不可能了一一我得偷运进雨林里， 这也不行，因为我从来没有在没人看见的情况下独自一人行动过。 即便我能想方设法把它弄出我的房子，丢进雨林，我也怕有人最终 还是会发现蛋壳，然后就会查回到我身上。而且，我已经小题大做 地表示我多盼着可以吃到一枚褐领家雉蛋一现在我手头就有一枚 可以吃。我不能突然记起来我其实对蛋过敏，或假装得了疤疾或突 然脑出血。</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="takeaways">
+      <h2>本关关键收获</h2>
+      <ul class="takeaways"><li><span>1</span>第六章 Dining in Gapun 在迦普恩吃饭 在迦普恩的生活里，不间断的赠予并不是 我发现很难适应的唯一方面。除此之外，我还 得习惯性生活匮乏、蚊子</li><li><span>2</span>这两种暗示都错得离谱。这种被称为西米“布丁”或“啫喱”的 食物的质地实际上更像是烂泥或黏痰。它的黏性如此之好，以至于一 口还在你嘴巴里的时候，其余部分已经悬</li><li><span>3</span>然后挤压揉捏漏斗里的西米衬皮，释放出衬皮里包含的淀粉。淀粉混 着水沿着过滤网流下来，收集在棕榈叶做成的桶里。</li><li><span>4</span>为什么当地人觉得是美食的食物通常在外人看来那么恶心？</li></ul>
+      <nav class="nav">
+        <a class="btn" href="/experiences/u-book-edf803-08-ea2689.html">上一关</a>
+        <a class="btn" href="/experiences/u-book-edf803-10-e01881.html">下一关</a>
+      </nav>
+    </section>
+  </main>
+  <script>
+    (() => {
+      const progress = document.getElementById("progress");
+      const dots = Array.from(document.querySelectorAll("#dotNav button[data-target]"));
+      const sections = dots
+        .map((dot) => document.getElementById(dot.getAttribute("data-target")))
+        .filter(Boolean);
+      const reveals = Array.from(document.querySelectorAll(".reveal"));
+      const onScroll = () => {
+        const h = document.documentElement;
+        const total = Math.max(1, h.scrollHeight - window.innerHeight);
+        const pct = Math.max(0, Math.min(100, (window.scrollY / total) * 100));
+        if (progress) progress.style.width = pct + "%";
+      };
+      const io = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) entry.target.classList.add("in");
+        }
+      }, { threshold: .14 });
+      reveals.forEach((el) => io.observe(el));
+      const secIo = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const id = entry.target.id;
+          dots.forEach((dot) => dot.classList.toggle("active", dot.getAttribute("data-target") === id));
+        });
+      }, { threshold: .4 });
+      sections.forEach((s) => secIo.observe(s));
+      dots.forEach((dot) => {
+        dot.addEventListener("click", () => {
+          const target = document.getElementById(dot.getAttribute("data-target"));
+          if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+      window.addEventListener("scroll", onScroll, { passive: true });
+      onScroll();
+    })();
+  </script>
+
+
+<script>
+(() => {
+  
+  
+  
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+{
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T13:26:43.627Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "Datre书籍-第1册 我们是DATRE-1（部分）.pdf",
+      "author": ""
+    },
+    "knowledge_block": {
+      "id": "kb-18",
+      "gate_index": 16,
+      "title": "含在心念中的内容",
+      "summary": "38 含在心念中的内容 。 你能将心念解开到任何你想要的深度 ， 这都取决于你想做什么 。",
+      "words": 287,
+      "keywords": [
+        "但是",
+        "那么",
+        "因为",
+        "存在",
+        "思考",
+        "比如",
+        "目的",
+        "aona"
+      ],
+      "density": {
+        "score": 0.6336,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0.3345,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "scholar",
+      "theme_label": "Scholar Atlas",
+      "section_count": 5,
+      "generated_with": "template_runtime"
+    }
+  }
+}

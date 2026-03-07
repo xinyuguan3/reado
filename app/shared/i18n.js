@@ -203,7 +203,7 @@ const ZH = {
   "map.category.lifestyle.subtitle": "艺术设计 · 传记 · 文学虚构 · 生活美学",
   "map.book.wanli-fifteen": "《万历十五年》",
   "map.book.sapiens": "《人类简史》",
-  "map.book.principles-for-navigating-big-debt-crises": "《置身事外》",
+  "map.book.principles-for-navigating-big-debt-crises": "《置身事内》",
   "map.book.zero-to-one": "《从零到一》"
 };
 

@@ -1,0 +1,42 @@
+{
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T13:17:33.522Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "Datre Visual V4",
+      "author": ""
+    },
+    "knowledge_block": {
+      "id": "kb-19",
+      "gate_index": 17,
+      "title": "不，不行，你们不得不给它取个名字",
+      "summary": "40 受它们的存在呢？ 不，不行，你们不得不给它取个名字。",
+      "words": 337,
+      "keywords": [
+        "datre",
+        "john",
+        "问题",
+        "你看",
+        "使用",
+        "好吧",
+        "想法",
+        "源于"
+      ],
+      "density": {
+        "score": 0.6034,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0.2136,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "scholar",
+      "theme_label": "Scholar Atlas",
+      "section_count": 5,
+      "generated_with": "template_runtime"
+    }
+  }
+}

@@ -1,0 +1,823 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>寻找门卫：边界协商值班局</title>
+  <style>
+    :root {
+      --bg: #121a24;
+      --panel: rgba(16, 27, 40, 0.85);
+      --line: rgba(255, 255, 255, 0.14);
+      --text: #eaf3ff;
+      --muted: #96aec7;
+      --strict: #61a5fa;
+      --balanced: #70dd95;
+      --warm: #ffaf63;
+      --alert: #ff7f7f;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 10% 0%, #203247 0%, #0f1822 60%, #0a1017 100%);
+      font-family: "PingFang SC", "Noto Sans SC", "Helvetica Neue", sans-serif;
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    #app {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    #gameCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    #overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 3;
+    }
+
+    #menuCard {
+      pointer-events: auto;
+      width: min(560px, 92vw);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(8, 14, 22, 0.78);
+      backdrop-filter: blur(6px);
+      padding: 22px;
+      box-shadow: 0 20px 48px rgba(0, 0, 0, 0.34);
+    }
+
+    #menuCard h1 {
+      margin: 0;
+      font-size: clamp(24px, 3vw, 34px);
+      letter-spacing: 0.4px;
+      color: #f4f8ff;
+    }
+
+    #menuCard p {
+      margin: 10px 0 0;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    .chipRow {
+      margin-top: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      color: #c8ddf5;
+      background: rgba(11, 24, 39, 0.7);
+    }
+
+    #start-btn,
+    .action-btn {
+      appearance: none;
+      border: 1px solid rgba(255, 255, 255, 0.26);
+      color: #eef7ff;
+      border-radius: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 120ms ease, filter 120ms ease, background 120ms ease;
+    }
+
+    #start-btn {
+      margin-top: 16px;
+      width: 100%;
+      padding: 12px 16px;
+      font-size: 15px;
+      background: linear-gradient(135deg, #60a5fa, #3b82f6);
+      box-shadow: 0 12px 24px rgba(59, 130, 246, 0.28);
+    }
+
+    #start-btn:active,
+    .action-btn:active {
+      transform: translateY(1px) scale(0.995);
+      filter: brightness(0.95);
+    }
+
+    #actions {
+      position: absolute;
+      z-index: 4;
+      left: 50%;
+      bottom: 16px;
+      transform: translateX(-50%);
+      width: min(720px, calc(100% - 24px));
+      display: grid;
+      grid-template-columns: repeat(3, minmax(96px, 1fr));
+      gap: 8px;
+      pointer-events: auto;
+    }
+
+    .action-btn {
+      padding: 10px 8px;
+      font-size: 13px;
+      background: rgba(10, 20, 32, 0.72);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .action-btn[data-choice="strict"] {
+      box-shadow: inset 0 0 0 1px rgba(97, 165, 250, 0.35);
+    }
+
+    .action-btn[data-choice="balanced"] {
+      box-shadow: inset 0 0 0 1px rgba(112, 221, 149, 0.35);
+    }
+
+    .action-btn[data-choice="warm"] {
+      box-shadow: inset 0 0 0 1px rgba(255, 175, 99, 0.35);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 700px) {
+      #actions {
+        bottom: 8px;
+        gap: 6px;
+      }
+
+      .action-btn {
+        padding: 8px 6px;
+        font-size: 12px;
+        border-radius: 10px;
+      }
+    }
+  </style>
+<style id="reado-shell-preload-style">
+html.reado-shell-preload body:not(.reado-shell-applied) {
+  padding-top: 80px !important;
+}
+@media (min-width: 1024px) {
+  html.reado-shell-preload:not(.reado-shell-preload-learning) body:not(.reado-shell-applied) {
+    padding-left: 256px !important;
+  }
+}
+@media (min-width: 1200px) {
+  html.reado-shell-preload:not(.reado-shell-preload-learning) body:not(.reado-shell-applied) {
+    padding-right: clamp(280px, 24vw, 320px) !important;
+  }
+}
+html.reado-shell-preload body:not(.reado-shell-applied) > header:first-of-type,
+html.reado-shell-preload body:not(.reado-shell-applied) > nav:first-of-type,
+html.reado-shell-preload body:not(.reado-shell-applied) > aside:first-of-type,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex > nav,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex > aside,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex-1 > nav,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex-1 > aside,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex > .flex-1 > nav,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex > .flex-1 > aside {
+  display: none !important;
+}
+</style>
+<script id="reado-shell-preload-script">
+(() => {
+  const root = document.documentElement;
+  root.classList.add("reado-shell-preload");
+  const path = window.location.pathname || "";
+  if (path.startsWith("/experiences/") || path.startsWith("/books/")) {
+    root.classList.add("reado-shell-preload-learning");
+  }
+})();
+</script>
+</head>
+<body>
+<script src="/shared/book-catalog.js?v=1772888317077"></script>
+<script type="module" src="/shared/shell.js?v=1772888317077"></script>
+<reado-app-shell data-page="knowledge-map"></reado-app-shell>
+  <div id="app">
+    <canvas id="gameCanvas"></canvas>
+    <div id="overlay">
+      <div id="menuCard">
+        <h1>门卫值班：边界协商实验</h1>
+        <p>你是大楼门卫。目标是在 12 个事件内，维持大厅秩序，同时避免关系过冷或过界。</p>
+        <div class="chipRow">
+          <span class="chip">← 严格执规</span>
+          <span class="chip">Space 平衡裁量</span>
+          <span class="chip">→ 人情通融</span>
+          <span class="chip">F 全屏切换</span>
+        </div>
+        <button id="start-btn" type="button">开始值班</button>
+      </div>
+    </div>
+    <div id="actions" class="hidden">
+      <button class="action-btn" data-choice="strict" type="button">严格执规 (←)</button>
+      <button class="action-btn" data-choice="balanced" type="button">平衡裁量 (Space)</button>
+      <button class="action-btn" data-choice="warm" type="button">人情通融 (→)</button>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      const canvas = document.getElementById("gameCanvas");
+      const ctx = canvas.getContext("2d");
+      const overlay = document.getElementById("overlay");
+      const startBtn = document.getElementById("start-btn");
+      const menuCard = document.getElementById("menuCard");
+      const actionsWrap = document.getElementById("actions");
+      const actionButtons = [...document.querySelectorAll(".action-btn")];
+
+      const EVENT_POOL = [
+        {
+          id: "visitor-unannounced",
+          title: "陌生访客要求直上 18 楼",
+          detail: "住户未报备，访客称“我就五分钟”。",
+          ideal: "strict",
+          effects: {
+            strict: { order: +11, respect: -3, boundary: +9, score: 12, note: "守住了边界，但显得冷硬。" },
+            balanced: { order: +8, respect: +4, boundary: +2, score: 18, note: "先核验后放行，秩序与体面兼得。" },
+            warm: { order: -8, respect: +7, boundary: -16, score: 4, note: "人情加分，但安全边界被侵蚀。" },
+          },
+        },
+        {
+          id: "package-stack",
+          title: "高峰期快递堆积堵门",
+          detail: "三名住户同时催件，电梯口开始拥堵。",
+          ideal: "balanced",
+          effects: {
+            strict: { order: +7, respect: -4, boundary: +6, score: 10, note: "效率提升，但口气太硬。" },
+            balanced: { order: +10, respect: +5, boundary: +1, score: 18, note: "分流+解释，秩序稳定。" },
+            warm: { order: -6, respect: +8, boundary: -9, score: 7, note: "照顾情绪，却让流程失控。" },
+          },
+        },
+        {
+          id: "privacy-probe",
+          title: "住户打听邻居行踪",
+          detail: "“你知道 21A 今晚几点回来吗？”",
+          ideal: "strict",
+          effects: {
+            strict: { order: +9, respect: +1, boundary: +10, score: 15, note: "守住隐私底线，信任更稳。" },
+            balanced: { order: +5, respect: +3, boundary: +3, score: 14, note: "委婉拒绝，关系可持续。" },
+            warm: { order: -7, respect: -6, boundary: -18, score: -4, note: "越界泄露，秩序信誉双损。" },
+          },
+        },
+        {
+          id: "holiday-tip",
+          title: "节日奖金分配引发比较",
+          detail: "有人给得很高，有人分文未给，气氛微妙。",
+          ideal: "balanced",
+          effects: {
+            strict: { order: +4, respect: -5, boundary: +8, score: 8, note: "完全公事公办，情感连接不足。" },
+            balanced: { order: +8, respect: +6, boundary: 0, score: 19, note: "表达感谢但不绑架关系，距离稳定。" },
+            warm: { order: -4, respect: +9, boundary: -12, score: 9, note: "关系升温，但角色边界模糊。" },
+          },
+        },
+        {
+          id: "night-emergency",
+          title: "深夜住户求助临时照看儿童",
+          detail: "家里突发状况，住户请求你“帮看十分钟”。",
+          ideal: "warm",
+          effects: {
+            strict: { order: -5, respect: -9, boundary: +6, score: 0, note: "制度没错，但社交代价很高。" },
+            balanced: { order: +7, respect: +7, boundary: -2, score: 17, note: "协助并留痕，兼顾规则与人情。" },
+            warm: { order: +3, respect: +10, boundary: -8, score: 14, note: "关系提升，但需防角色无限延伸。" },
+          },
+        },
+        {
+          id: "union-rumor",
+          title: "工会谈判消息传开",
+          detail: "住户担心服务降级，门卫同事情绪波动。",
+          ideal: "balanced",
+          effects: {
+            strict: { order: +5, respect: -4, boundary: +7, score: 9, note: "只谈流程，忽视共识建设。" },
+            balanced: { order: +9, respect: +5, boundary: +1, score: 18, note: "透明沟通，维持合作秩序。" },
+            warm: { order: -3, respect: +6, boundary: -8, score: 8, note: "短期安抚有效，长期预期失焦。" },
+          },
+        },
+      ];
+
+      const STANCE_TO_X = { strict: 0.28, balanced: 0.5, warm: 0.72 };
+      const CHOICE_TO_LABEL = { strict: "严格执规", balanced: "平衡裁量", warm: "人情通融" };
+
+      const state = {
+        mode: "menu",
+        paused: false,
+        order: 72,
+        respect: 52,
+        boundary: 0,
+        score: 0,
+        handled: 0,
+        targetHandled: 12,
+        eventTimeLeft: 0,
+        eventTimerMax: 9,
+        activeEvent: null,
+        lastOutcome: "",
+        elapsed: 0,
+        doormanX: 0.5,
+        events: [],
+        seed: 20260303,
+      };
+
+      function clamp(n, min, max) {
+        return Math.min(max, Math.max(min, n));
+      }
+
+      function nextRand() {
+        state.seed = (state.seed * 1664525 + 1013904223) >>> 0;
+        return state.seed / 4294967296;
+      }
+
+      function resize() {
+        const dpr = window.devicePixelRatio || 1;
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        canvas.width = Math.floor(w * dpr);
+        canvas.height = Math.floor(h * dpr);
+        canvas.style.width = `${w}px`;
+        canvas.style.height = `${h}px`;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      function pickEvent() {
+        const idx = Math.floor(nextRand() * EVENT_POOL.length);
+        return EVENT_POOL[idx];
+      }
+
+      function resetRun() {
+        state.mode = "playing";
+        state.paused = false;
+        state.order = 72;
+        state.respect = 52;
+        state.boundary = 0;
+        state.score = 0;
+        state.handled = 0;
+        state.eventTimeLeft = 0;
+        state.activeEvent = null;
+        state.lastOutcome = "值班开始：近而不亲，帮而不越。";
+        state.elapsed = 0;
+        state.doormanX = 0.5;
+        state.events = [];
+        actionsWrap.classList.remove("hidden");
+        overlay.classList.add("hidden");
+      }
+
+      function startGame() {
+        resetRun();
+        render();
+      }
+
+      function finish(result) {
+        state.mode = "ended";
+        state.paused = false;
+        actionsWrap.classList.add("hidden");
+        overlay.classList.remove("hidden");
+        const success = result === "win";
+        const title = success ? "值班成功" : "秩序失衡";
+        const text = success
+          ? "你在亲近与距离之间保持了动态平衡。"
+          : "边界或秩序已失控，关系系统崩塌。";
+        menuCard.innerHTML = `
+          <h1>${title}</h1>
+          <p>${text}</p>
+          <div class="chipRow">
+            <span class="chip">处理事件：${state.handled}/${state.targetHandled}</span>
+            <span class="chip">秩序：${Math.round(state.order)}</span>
+            <span class="chip">尊重：${Math.round(state.respect)}</span>
+            <span class="chip">边界张力：${Math.round(state.boundary)}</span>
+            <span class="chip">分数：${Math.round(state.score)}</span>
+          </div>
+          <button id="start-btn" type="button">再来一局</button>
+        `;
+        const btn = menuCard.querySelector("#start-btn");
+        btn.addEventListener("click", startGame);
+      }
+
+      function normalizeBoundary() {
+        if (state.boundary > 0) return "偏冷/过度规训";
+        if (state.boundary < 0) return "偏暖/越界风险";
+        return "平衡";
+      }
+
+      function ensureEvent() {
+        if (state.activeEvent) return;
+        const event = pickEvent();
+        state.activeEvent = event;
+        state.eventTimeLeft = state.eventTimerMax;
+        state.events.push(event.id);
+      }
+
+      function applyPassiveDrift(dt) {
+        state.boundary *= 1 - dt * 0.1;
+        const pressure = Math.abs(state.boundary) * 0.03;
+        state.order = clamp(state.order - pressure * dt * 8, 0, 100);
+      }
+
+      function resolveChoice(choice, timedOut = false) {
+        if (!state.activeEvent || state.mode !== "playing") return;
+        const event = state.activeEvent;
+        const effect = timedOut
+          ? { order: -12, respect: -7, boundary: event.ideal === "strict" ? -6 : 6, score: -6, note: "犹豫过久，双方对角色期待失配。" }
+          : event.effects[choice];
+
+        state.order = clamp(state.order + effect.order, 0, 100);
+        state.respect = clamp(state.respect + effect.respect, 0, 100);
+        state.boundary = clamp(state.boundary + effect.boundary, -100, 100);
+        state.score = Math.max(0, state.score + effect.score + Math.max(0, state.order - 50) * 0.15);
+        state.handled += 1;
+        state.lastOutcome = `${timedOut ? "超时" : CHOICE_TO_LABEL[choice]}：${effect.note}`;
+        state.doormanX = STANCE_TO_X[timedOut ? "balanced" : choice];
+        state.activeEvent = null;
+        state.eventTimeLeft = 0;
+
+        if (state.handled >= state.targetHandled) {
+          finish("win");
+          return;
+        }
+
+        if (state.order <= 0 || state.respect <= 0 || Math.abs(state.boundary) >= 100) {
+          finish("lose");
+        }
+      }
+
+      function update(dt) {
+        if (state.mode !== "playing" || state.paused) return;
+        state.elapsed += dt;
+        ensureEvent();
+
+        state.eventTimeLeft -= dt;
+        if (state.eventTimeLeft <= 0) {
+          resolveChoice("balanced", true);
+          return;
+        }
+
+        applyPassiveDrift(dt);
+
+        if (state.order <= 0 || state.respect <= 0 || Math.abs(state.boundary) >= 100) {
+          finish("lose");
+        }
+      }
+
+      function drawBar(x, y, w, h, value, color, label) {
+        ctx.fillStyle = "rgba(255,255,255,0.08)";
+        ctx.fillRect(x, y, w, h);
+        ctx.fillStyle = color;
+        ctx.fillRect(x, y, w * clamp(value / 100, 0, 1), h);
+        ctx.strokeStyle = "rgba(255,255,255,0.2)";
+        ctx.strokeRect(x, y, w, h);
+        ctx.fillStyle = "#d6e8fb";
+        ctx.font = "13px PingFang SC, sans-serif";
+        ctx.fillText(`${label}: ${Math.round(value)}`, x + 8, y + h - 8);
+      }
+
+      function drawBoundaryGauge(cx, y, w, value) {
+        const left = cx - w / 2;
+        ctx.fillStyle = "rgba(255,255,255,0.08)";
+        ctx.fillRect(left, y, w, 16);
+        ctx.fillStyle = "rgba(255,255,255,0.4)";
+        ctx.fillRect(cx - 1, y - 4, 2, 24);
+        const ratio = (clamp(value, -100, 100) + 100) / 200;
+        const px = left + ratio * w;
+        const grad = ctx.createLinearGradient(left, 0, left + w, 0);
+        grad.addColorStop(0, "#ffaf63");
+        grad.addColorStop(0.5, "#70dd95");
+        grad.addColorStop(1, "#61a5fa");
+        ctx.fillStyle = grad;
+        ctx.fillRect(left, y, w, 16);
+        ctx.fillStyle = "#0c1520";
+        ctx.fillRect(left, y, w, 16);
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(px, y + 8, 7, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#d6e8fb";
+        ctx.font = "12px PingFang SC, sans-serif";
+        ctx.fillText(`边界张力: ${Math.round(value)} (${normalizeBoundary()})`, left, y - 8);
+      }
+
+      function drawLobby(w, h) {
+        const grad = ctx.createLinearGradient(0, 0, 0, h);
+        grad.addColorStop(0, "#182739");
+        grad.addColorStop(0.52, "#20364e");
+        grad.addColorStop(1, "#101a24");
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, w, h);
+
+        ctx.fillStyle = "rgba(255,255,255,0.05)";
+        for (let i = 0; i < 8; i++) {
+          const x = i * (w / 8);
+          ctx.fillRect(x, 0, 2, h * 0.68);
+        }
+
+        const floorY = h * 0.68;
+        const floorGrad = ctx.createLinearGradient(0, floorY, 0, h);
+        floorGrad.addColorStop(0, "#273b50");
+        floorGrad.addColorStop(1, "#132130");
+        ctx.fillStyle = floorGrad;
+        ctx.fillRect(0, floorY, w, h - floorY);
+
+        ctx.strokeStyle = "rgba(255,255,255,0.08)";
+        for (let i = 0; i <= 10; i++) {
+          const y = floorY + i * ((h - floorY) / 10);
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(w, y);
+          ctx.stroke();
+        }
+      }
+
+      function drawDoorman(w, h) {
+        const baseX = w * state.doormanX;
+        const baseY = h * 0.73;
+
+        ctx.save();
+        ctx.translate(baseX, baseY);
+        ctx.fillStyle = "rgba(0,0,0,0.28)";
+        ctx.beginPath();
+        ctx.ellipse(0, 54, 32, 10, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "#193a67";
+        ctx.fillRect(-18, 2, 36, 44);
+        ctx.fillStyle = "#254d7d";
+        ctx.fillRect(-18, 2, 36, 10);
+        ctx.fillStyle = "#d7e7fb";
+        ctx.fillRect(-4, 14, 8, 12);
+
+        ctx.fillStyle = "#efc8a2";
+        ctx.beginPath();
+        ctx.arc(0, -10, 13, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "#12263f";
+        ctx.beginPath();
+        ctx.arc(-4, -12, 1.8, 0, Math.PI * 2);
+        ctx.arc(4, -12, 1.8, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = "#12263f";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(-5, -5);
+        ctx.quadraticCurveTo(0, -2, 5, -5);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawEventCard(w, h) {
+        if (!state.activeEvent || state.mode !== "playing") return;
+        const cardW = Math.min(640, w - 36);
+        const cardX = (w - cardW) / 2;
+        const cardY = h * 0.12;
+
+        ctx.fillStyle = "rgba(10, 20, 32, 0.82)";
+        ctx.strokeStyle = "rgba(255,255,255,0.2)";
+        ctx.lineWidth = 1;
+        roundRect(cardX, cardY, cardW, 148, 14);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = "#f6fbff";
+        ctx.font = "700 22px PingFang SC, sans-serif";
+        ctx.fillText(state.activeEvent.title, cardX + 18, cardY + 34);
+        ctx.font = "14px PingFang SC, sans-serif";
+        ctx.fillStyle = "#c7d9ec";
+        ctx.fillText(state.activeEvent.detail, cardX + 18, cardY + 64);
+
+        const ratio = clamp(state.eventTimeLeft / state.eventTimerMax, 0, 1);
+        ctx.fillStyle = "rgba(255,255,255,0.12)";
+        ctx.fillRect(cardX + 18, cardY + 92, cardW - 36, 16);
+        ctx.fillStyle = ratio > 0.35 ? "#70dd95" : "#ff7f7f";
+        ctx.fillRect(cardX + 18, cardY + 92, (cardW - 36) * ratio, 16);
+        ctx.strokeStyle = "rgba(255,255,255,0.2)";
+        ctx.strokeRect(cardX + 18, cardY + 92, cardW - 36, 16);
+
+        ctx.fillStyle = "#d6e8fb";
+        ctx.font = "12px PingFang SC, sans-serif";
+        ctx.fillText(`倒计时 ${state.eventTimeLeft.toFixed(1)}s ｜ 理想处理：${CHOICE_TO_LABEL[state.activeEvent.ideal]}`, cardX + 18, cardY + 126);
+      }
+
+      function drawHud(w, h) {
+        const mobile = w < 700;
+        const feedbackHeight = mobile ? 82 : 72;
+        const feedbackY = Math.max(92, h - (mobile ? 176 : 112));
+
+        drawBar(18, 16, 220, 24, state.order, "#61a5fa", "大厅秩序");
+        drawBar(18, 48, 220, 24, state.respect, "#70dd95", "关系尊重");
+        drawBoundaryGauge(w * 0.5, 20, Math.min(420, w - 80), state.boundary);
+
+        ctx.fillStyle = "rgba(10, 20, 32, 0.78)";
+        roundRect(w - 230, 16, 212, 64, 12);
+        ctx.fill();
+        ctx.strokeStyle = "rgba(255,255,255,0.18)";
+        ctx.stroke();
+
+        ctx.fillStyle = "#d9ebff";
+        ctx.font = "13px PingFang SC, sans-serif";
+        ctx.fillText(`事件进度 ${state.handled}/${state.targetHandled}`, w - 214, 40);
+        ctx.fillText(`分数 ${Math.round(state.score)}  |  值班 ${state.elapsed.toFixed(0)}s`, w - 214, 62);
+
+        ctx.fillStyle = "rgba(10, 20, 32, 0.74)";
+        roundRect(18, feedbackY, w - 36, feedbackHeight, 12);
+        ctx.fill();
+        ctx.strokeStyle = "rgba(255,255,255,0.18)";
+        ctx.stroke();
+        ctx.fillStyle = "#dcecff";
+        ctx.font = "13px PingFang SC, sans-serif";
+        ctx.fillText(`最近反馈：${state.lastOutcome || "等待事件..."}`, 32, feedbackY + 34);
+        ctx.fillStyle = "#9ec0e4";
+        ctx.fillText("目标：维持‘近而不亲、熟而不私、帮而不越’。", 32, feedbackY + 56);
+
+        if (state.paused) {
+          ctx.fillStyle = "rgba(0,0,0,0.42)";
+          ctx.fillRect(0, 0, w, h);
+          ctx.fillStyle = "#ffffff";
+          ctx.font = "700 40px PingFang SC, sans-serif";
+          ctx.fillText("已暂停", w / 2 - 72, h / 2);
+        }
+      }
+
+      function roundRect(x, y, w, h, r) {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.arcTo(x + w, y, x + w, y + h, r);
+        ctx.arcTo(x + w, y + h, x, y + h, r);
+        ctx.arcTo(x, y + h, x, y, r);
+        ctx.arcTo(x, y, x + w, y, r);
+        ctx.closePath();
+      }
+
+      function render() {
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        drawLobby(w, h);
+        drawDoorman(w, h);
+        drawEventCard(w, h);
+        drawHud(w, h);
+      }
+
+      function handleChoice(choice) {
+        if (state.mode !== "playing" || state.paused) return;
+        resolveChoice(choice, false);
+      }
+
+      function toggleFullscreen() {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen?.().catch(() => {});
+        } else {
+          document.exitFullscreen?.().catch(() => {});
+        }
+      }
+
+      actionButtons.forEach((btn) => {
+        btn.addEventListener("click", () => handleChoice(btn.dataset.choice));
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "f" || event.key === "F") {
+          toggleFullscreen();
+          return;
+        }
+
+        if (event.key === "Escape" && document.fullscreenElement) {
+          document.exitFullscreen?.().catch(() => {});
+          return;
+        }
+
+        if (state.mode === "menu") {
+          if (["Enter", " ", "ArrowLeft", "ArrowRight"].includes(event.key)) startGame();
+          return;
+        }
+
+        if (state.mode === "ended") {
+          if (["Enter", " ", "r", "R"].includes(event.key)) startGame();
+          return;
+        }
+
+        if (event.key === "p" || event.key === "P") {
+          state.paused = !state.paused;
+          return;
+        }
+
+        if (event.key === "r" || event.key === "R") {
+          startGame();
+          return;
+        }
+
+        if (event.key === "ArrowLeft") {
+          handleChoice("strict");
+        } else if (event.key === "ArrowRight") {
+          handleChoice("warm");
+        } else if (event.key === " " || event.key === "Enter") {
+          event.preventDefault();
+          handleChoice("balanced");
+        }
+      });
+
+      startBtn.addEventListener("click", startGame);
+
+      window.addEventListener("resize", () => {
+        resize();
+        render();
+      });
+
+      window.addEventListener("fullscreenchange", () => {
+        resize();
+        render();
+      });
+
+      function gameLoop(now) {
+        if (!gameLoop.last) gameLoop.last = now;
+        const dt = Math.min(0.05, (now - gameLoop.last) / 1000);
+        gameLoop.last = now;
+        update(dt);
+        render();
+        requestAnimationFrame(gameLoop);
+      }
+
+      window.render_game_to_text = () => {
+        const payload = {
+          mode: state.mode,
+          paused: state.paused,
+          coordinate_system: "origin=(0,0) top-left; x increases right; y increases downward",
+          player: {
+            role: "doorman",
+            x: Number((window.innerWidth * state.doormanX).toFixed(1)),
+            y: Number((window.innerHeight * 0.73).toFixed(1)),
+            stance: state.doormanX < 0.4 ? "strict" : state.doormanX > 0.6 ? "warm" : "balanced",
+          },
+          metrics: {
+            order: Number(state.order.toFixed(1)),
+            respect: Number(state.respect.toFixed(1)),
+            boundary_tension: Number(state.boundary.toFixed(1)),
+            score: Number(state.score.toFixed(1)),
+          },
+          progress: {
+            handled_events: state.handled,
+            target_events: state.targetHandled,
+            elapsed_sec: Number(state.elapsed.toFixed(1)),
+          },
+          active_event: state.activeEvent
+            ? {
+                id: state.activeEvent.id,
+                title: state.activeEvent.title,
+                detail: state.activeEvent.detail,
+                ideal_response: state.activeEvent.ideal,
+                time_left_sec: Number(state.eventTimeLeft.toFixed(2)),
+              }
+            : null,
+          latest_feedback: state.lastOutcome,
+          controls: {
+            left: "strict",
+            right: "warm",
+            space: "balanced",
+            f: "toggle_fullscreen",
+            p: "pause",
+            r: "restart",
+          },
+        };
+        return JSON.stringify(payload);
+      };
+
+      window.advanceTime = (ms) => {
+        const step = 1000 / 60;
+        const steps = Math.max(1, Math.round(ms / step));
+        for (let i = 0; i < steps; i++) {
+          update(step / 1000);
+        }
+        render();
+      };
+
+      resize();
+      render();
+      requestAnimationFrame(gameLoop);
+    })();
+  </script>
+
+
+<script>
+(() => {
+  
+  
+  
+})();
+</script>
+</body>
+</html>

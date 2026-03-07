@@ -1,0 +1,42 @@
+{
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T13:36:55.616Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "Datre书籍-第1册 我们是DATRE-1（部分）.pdf",
+      "author": ""
+    },
+    "knowledge_block": {
+      "id": "kb-14",
+      "gate_index": 13,
+      "title": "思维形态 · 种子",
+      "summary": "你们还没有学会在心识中工作 ， 还没有解决这个问题 。 你们所知道的就是 ： 睡觉 ， 醒来，出生和死亡。",
+      "words": 593,
+      "keywords": [
+        "思维形态",
+        "种子",
+        "如果",
+        "自己",
+        "手术",
+        "振动",
+        "商店",
+        "睡觉"
+      ],
+      "density": {
+        "score": 0.579,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0.0405,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0.0944
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "scholar",
+      "theme_label": "Scholar Atlas",
+      "section_count": 5,
+      "generated_with": "template_runtime"
+    }
+  }
+}

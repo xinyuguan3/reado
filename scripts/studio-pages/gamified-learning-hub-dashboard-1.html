@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html class="dark" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>reado: 学习中心控制台</title>
+<script src="/shared/vendor/tailwindcss-cdn.js?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["'Source Han Sans SC'", "'Noto Sans CJK SC'", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+                    boxShadow: {
+                        'glow': '0 0 20px rgba(19, 91, 236, 0.5)',
+                        'card-dark': '0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3)',
+                    },
+                    backgroundImage: {
+                        'map-pattern': "url('data:image/svg+xml,%3Csvg width=\\'60\\' height=\\'60\\' viewBox=\\'0 0 60 60\\' xmlns=\\'http://www.w3.org/2000/svg\\'%3E%3Cg fill=\\'none\\' fill-rule=\\'evenodd\\'%3E%3Cg fill=\\'%231a2333\\' fill-opacity=\\'0.4\\'%3E%3Cpath d=\\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')",
+                    }
+                },
+            },
+        }
+    </script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@700&amp;display=swap" rel="stylesheet" media="print" onload="this.media='all'"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" media="print" onload="this.media='all'"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" media="print" onload="this.media='all'"/>
+<style type="text/tailwindcss">
+        body {
+            font-family: 'Noto Sans SC', 'Source Han Sans SC', sans-serif;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .glass-panel {
+            background: rgba(16, 22, 34, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .map-node-pulse {
+            animation: pulse-blue 2s infinite;
+        }
+        @keyframes pulse-blue {
+            0% { box-shadow: 0 0 0 0 rgba(19, 91, 236, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(19, 91, 236, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(19, 91, 236, 0); }
+        }
+        .logo-font {
+            font-family: 'Lexend', sans-serif;
+        }
+    </style>
+<style id="reado-shell-preload-style">
+html.reado-shell-preload body:not(.reado-shell-applied) {
+  padding-top: 80px !important;
+}
+@media (min-width: 1024px) {
+  html.reado-shell-preload:not(.reado-shell-preload-learning) body:not(.reado-shell-applied) {
+    padding-left: 256px !important;
+  }
+}
+@media (min-width: 1200px) {
+  html.reado-shell-preload:not(.reado-shell-preload-learning) body:not(.reado-shell-applied) {
+    padding-right: clamp(280px, 24vw, 320px) !important;
+  }
+}
+html.reado-shell-preload body:not(.reado-shell-applied) > header:first-of-type,
+html.reado-shell-preload body:not(.reado-shell-applied) > nav:first-of-type,
+html.reado-shell-preload body:not(.reado-shell-applied) > aside:first-of-type,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex > nav,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex > aside,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex-1 > nav,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex-1 > aside,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex > .flex-1 > nav,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex > .flex-1 > aside {
+  display: none !important;
+}
+</style>
+<script id="reado-shell-preload-script">
+(() => {
+  const root = document.documentElement;
+  root.classList.add("reado-shell-preload");
+  const path = window.location.pathname || "";
+  if (path.startsWith("/experiences/") || path.startsWith("/books/")) {
+    root.classList.add("reado-shell-preload-learning");
+  }
+})();
+</script>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-white h-screen overflow-hidden flex flex-col selection:bg-primary selection:text-white">
+<script src="/shared/book-catalog.js?v=1772549790452"></script>
+<script type="module" src="/shared/shell.js?v=1772549790452"></script>
+<reado-app-shell data-page="knowledge-map"></reado-app-shell>
+<header class="h-20 flex-none z-50 px-6 py-4 flex items-center justify-between glass-panel sticky top-0">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white shadow-glow">
+<span class="material-icons text-2xl">auto_stories</span>
+</div>
+<h1 class="text-2xl font-bold tracking-tight hidden md:block logo-font">reado</h1>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2 bg-background-dark/50 px-4 py-2 rounded-full border border-white/5">
+<span class="material-icons text-orange-500 text-xl">local_fire_department</span>
+<span class="font-bold text-orange-400">连续 15 天</span>
+</div>
+<div class="hidden md:flex items-center gap-2 bg-background-dark/50 px-4 py-2 rounded-full border border-white/5">
+<span class="material-icons text-primary text-xl">diamond</span>
+<span class="font-bold text-primary-300">2,450 宝石</span>
+</div>
+<div class="flex items-center gap-3 pl-4 border-l border-white/10">
+<div class="text-right hidden sm:block">
+<div class="text-sm font-bold">亚历克斯·陈</div>
+<div class="text-xs text-slate-400">42 级 资深学者</div>
+</div>
+<div class="relative">
+<div class="w-12 h-12 rounded-full p-0.5 bg-gradient-to-tr from-primary to-purple-500">
+<img alt="用户头像" class="w-full h-full rounded-full object-cover border-2 border-background-dark" src="/assets/remote-images/3ec2fbb52c0ab37789b9f619.png"/>
+</div>
+<div class="absolute -bottom-1 -right-1 bg-primary text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border border-background-dark">
+                    42
+                </div>
+</div>
+</div>
+</div>
+</header>
+<div class="flex-1 flex overflow-hidden relative">
+<nav class="w-20 md:w-64 flex-none flex flex-col gap-2 p-4 glass-panel z-40 hidden md:flex">
+<div class="flex flex-col gap-2">
+<a class="flex items-center gap-3 px-4 py-3 bg-primary/10 text-primary rounded-xl font-medium transition-colors border border-primary/20" href="/pages/gamified-learning-hub-dashboard-1.html">
+<span class="material-icons">map</span>
+<span class="hidden md:inline">公共阅读库</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-colors font-medium" href="/pages/simulator-library-level-selection-1.html">
+<span class="material-icons">backpack</span>
+<span class="hidden md:inline">道具仓库</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-colors font-medium" href="/pages/global-scholar-leaderboard.html">
+<span class="material-icons">leaderboard</span>
+<span class="hidden md:inline">排行榜</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-colors font-medium" href="/pages/gamified-learning-hub-dashboard-3.html">
+<span class="material-icons">storefront</span>
+<span class="hidden md:inline">交易中心</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-colors font-medium" href="/pages/gamified-learning-hub-dashboard-2.html">
+<span class="material-icons">person</span>
+<span class="hidden md:inline">个人资料</span>
+</a>
+</div>
+<div class="mt-auto">
+<div class="bg-gradient-to-br from-indigo-900/50 to-primary/20 p-5 rounded-2xl border border-white/5 relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-2 opacity-20 group-hover:opacity-40 transition-opacity">
+<span class="material-icons text-6xl">emoji_events</span>
+</div>
+<div class="relative z-10">
+<h3 class="text-sm font-bold text-white mb-1">每周挑战</h3>
+<p class="text-xs text-slate-300 mb-3">阅读 3 章节历史书</p>
+<div class="w-full bg-background-dark h-1.5 rounded-full overflow-hidden mb-2">
+<div class="bg-primary h-full w-2/3 rounded-full"></div>
+</div>
+<span class="text-xs text-primary-300 font-medium">已完成 2/3</span>
+</div>
+</div>
+</div>
+</nav>
+<main class="flex-1 relative bg-background-dark overflow-hidden">
+<div class="absolute inset-0 bg-map-pattern opacity-30"></div>
+<div class="absolute inset-0 bg-gradient-to-b from-background-dark/20 via-transparent to-background-dark/80 pointer-events-none z-10"></div>
+<div class="w-[140%] h-[140%] absolute -top-[20%] -left-[20%] flex items-center justify-center">
+<svg class="absolute inset-0 w-full h-full pointer-events-none opacity-40" xmlns="http://www.w3.org/2000/svg">
+<path d="M30% 35% L20% 50%" stroke="#334155" stroke-width="2"></path>
+</svg>
+
+</div>
+<div class="absolute left-[70%] top-[30%] flex flex-col items-center group cursor-pointer z-20">
+<div class="relative">
+<div class="w-16 h-16 rounded-xl rotate-45 bg-gradient-to-br from-cyan-600 to-blue-800 flex items-center justify-center shadow-lg hover:shadow-cyan-500/50 transition-all duration-300 map-node-pulse">
+<span class="material-icons text-3xl text-white -rotate-45">memory</span>
+</div>
+<div class="absolute -top-3 -right-3 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center border-2 border-background-dark text-xs font-bold text-white">
+                        !
+                    </div>
+</div>
+<div class="mt-6 bg-background-dark/80 px-3 py-1.5 rounded-lg border border-cyan-500/30 backdrop-blur text-center group-hover:bg-cyan-900/40 transition-colors">
+<div class="text-cyan-100 font-bold">认知/硬核</div>
+<div class="text-[10px] text-cyan-400 uppercase tracking-wider">科学普及 · 历史 · 哲学 · 社会学</div>
+</div>
+</div>
+<div class="absolute left-[30%] top-[35%] flex flex-col items-center group cursor-pointer z-20">
+<div class="w-16 h-16 rounded-full bg-slate-800 border-2 border-green-500 flex items-center justify-center opacity-90 hover:opacity-100 hover:scale-105 transition-all">
+<span class="material-icons text-3xl text-green-500">psychology</span>
+</div>
+<div class="mt-3 bg-background-dark/80 px-3 py-1.5 rounded-lg border border-white/10 backdrop-blur text-center">
+<div class="text-slate-300 font-bold group-hover:text-white">个人修炼</div>
+<div class="text-[10px] text-green-400 uppercase tracking-wider">心理学 · 自我提升 · 时间管理 · 思维模型</div>
+</div>
+</div>
+<div class="absolute left-[60%] top-[70%] flex flex-col items-center group opacity-60 z-10">
+<div class="w-14 h-14 rounded-lg bg-slate-900 border border-slate-700 flex items-center justify-center grayscale">
+<span class="material-icons text-2xl text-slate-500">account_balance</span>
+</div>
+<div class="mt-3">
+<div class="text-slate-500 font-bold text-sm">灵感/生活</div>
+<div class="flex items-center justify-center gap-1 text-[10px] text-slate-600">
+<span class="material-icons text-[10px]">lock</span> 艺术设计 · 传记 · 文学虚构 · 生活美学
+                    </div>
+</div>
+</div>
+<div class="absolute left-[20%] top-[50%] flex flex-col items-center group cursor-pointer z-20">
+<div class="w-14 h-14 rounded-full bg-indigo-900/50 border border-indigo-500/50 flex items-center justify-center hover:bg-indigo-900 hover:shadow-[0_0_15px_rgba(99,102,241,0.5)] transition-all">
+<span class="material-icons text-2xl text-indigo-300">rocket_launch</span>
+</div>
+<div class="mt-3 bg-background-dark/80 px-3 py-1.5 rounded-lg border border-white/10 backdrop-blur text-center">
+<div class="text-slate-300 font-bold text-sm group-hover:text-white">事业/财富</div>
+<div class="text-[10px] text-indigo-400 uppercase tracking-wider">经济金融 · 商业管理 · 职场技能 · 创业</div>
+</div>
+</div>
+</div>
+<button class="md:hidden absolute bottom-6 right-6 w-14 h-14 rounded-full bg-primary text-white shadow-glow flex items-center justify-center z-50">
+<span class="material-icons">play_arrow</span>
+</button>
+</main>
+<aside class="w-80 flex-none bg-background-dark border-l border-white/5 flex flex-col h-full z-40 hidden lg:flex">
+<div class="p-6 border-b border-white/5">
+<div class="flex items-center justify-between mb-4">
+<h2 class="font-bold text-lg text-white">全球排名</h2>
+<span class="text-xs text-primary bg-primary/10 px-2 py-1 rounded-lg">第 4 赛季</span>
+</div>
+<div class="bg-gradient-to-r from-slate-800 to-slate-900 rounded-xl p-4 border border-white/5 relative overflow-hidden">
+<div class="absolute -right-4 -top-4 w-20 h-20 bg-primary/20 rounded-full blur-2xl"></div>
+<div class="flex items-center justify-between relative z-10">
+<div class="flex flex-col">
+<span class="text-xs text-slate-400 uppercase tracking-wider font-medium">当前排名</span>
+<span class="text-2xl font-bold text-white">#1,248</span>
+</div>
+<div class="flex items-center gap-1 text-green-400 text-sm font-medium bg-green-500/10 px-2 py-1 rounded-lg">
+<span class="material-icons text-sm">arrow_upward</span>
+                        12
+                    </div>
+</div>
+<div class="mt-3 w-full bg-slate-700/50 h-1.5 rounded-full overflow-hidden">
+<div class="bg-green-500 h-full w-[65%] rounded-full shadow-[0_0_10px_rgba(34,197,94,0.5)]"></div>
+</div>
+<p class="text-[10px] text-slate-400 mt-2 text-right">全球前 5%</p>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-6 scrollbar-hide">
+<div class="flex items-center justify-between mb-4">
+<h2 class="font-bold text-lg text-white">进行中的任务</h2>
+<span class="bg-white/10 text-white text-xs px-2 py-1 rounded-full">3</span>
+</div>
+<div class="space-y-4">
+<div class="bg-slate-800/40 p-4 rounded-2xl border border-primary/30 hover:bg-slate-800/60 transition-colors group cursor-pointer relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
+<div class="flex gap-3 mb-3">
+<div class="w-12 h-16 bg-slate-700 rounded-lg flex-none overflow-hidden shadow-lg">
+<img alt="人类简史封面" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" src="/assets/remote-images/4232b6af196168e861963bb9.png"/>
+</div>
+<div class="flex-1">
+<h3 class="font-bold text-white text-sm leading-tight mb-1">人类简史：从动物到上帝</h3>
+<p class="text-xs text-slate-400">尤瓦尔·赫拉利</p>
+</div>
+</div>
+<div class="flex items-center justify-between text-xs mb-2">
+<span class="text-primary font-bold">等级 3 / 10</span>
+<span class="text-slate-400">30%</span>
+</div>
+<div class="w-full bg-background-dark h-2 rounded-full overflow-hidden mb-3">
+<div class="bg-primary h-full w-[30%] rounded-full shadow-glow"></div>
+</div>
+<button class="w-full py-2 bg-primary hover:bg-primary/90 text-white text-xs font-bold rounded-lg transition-colors flex items-center justify-center gap-2">
+<span>继续学习</span>
+<span class="material-icons text-sm">play_circle</span>
+</button>
+</div>
+<div class="bg-slate-800/20 p-4 rounded-2xl border border-white/5 hover:bg-slate-800/40 transition-colors group cursor-pointer">
+<div class="flex gap-3 mb-3">
+<div class="w-12 h-16 bg-slate-700 rounded-lg flex-none overflow-hidden shadow-lg">
+<img alt="原子习惯封面" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" src="/assets/remote-images/0a252e9fbc0b77221ba37fff.png"/>
+</div>
+<div class="flex-1">
+<h3 class="font-bold text-slate-200 text-sm leading-tight mb-1">原子习惯</h3>
+<p class="text-xs text-slate-500">詹姆斯·克利尔</p>
+</div>
+</div>
+<div class="flex items-center justify-between text-xs mb-2">
+<span class="text-slate-400 font-bold">等级 7 / 12</span>
+<span class="text-slate-500">58%</span>
+</div>
+<div class="w-full bg-background-dark h-2 rounded-full overflow-hidden">
+<div class="bg-slate-500 h-full w-[58%] rounded-full"></div>
+</div>
+</div>
+<div class="bg-slate-800/20 p-4 rounded-2xl border border-white/5 hover:bg-slate-800/40 transition-colors group cursor-pointer">
+<div class="flex gap-3 mb-3">
+<div class="w-12 h-16 bg-slate-700 rounded-lg flex-none overflow-hidden shadow-lg">
+<img alt="思考，快与慢封面" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" src="/assets/remote-images/a3e69cb31a0c82a56dbf1f57.png"/>
+</div>
+<div class="flex-1">
+<h3 class="font-bold text-slate-200 text-sm leading-tight mb-1">思考，快与慢</h3>
+<p class="text-xs text-slate-500">丹尼尔·卡尼曼</p>
+</div>
+</div>
+<div class="flex items-center justify-between text-xs mb-2">
+<span class="text-slate-400 font-bold">等级 1 / 15</span>
+<span class="text-slate-500">5%</span>
+</div>
+<div class="w-full bg-background-dark h-2 rounded-full overflow-hidden">
+<div class="bg-slate-500 h-full w-[5%] rounded-full"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="p-4 border-t border-white/5 bg-slate-900/50">
+<button class="w-full py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white text-sm font-medium rounded-xl transition-all flex items-center justify-center gap-2">
+<span class="material-icons text-sm">add_circle_outline</span>
+                探索新领域
+            </button>
+</div>
+</aside>
+</div>
+
+
+<script id="reado-map-category-script">
+(() => {
+  const fallbackBooks = [{"id":"wanli-fifteen","title":"《万历十五年》","cover":"/assets/book-covers/wanli-fifteen.jpg","category":"science-knowledge","categoryLabel":"认知/硬核","categoryHint":"开拓世界地图，解锁迷雾","moduleCount":5,"hubHref":"/books/wanli-fifteen.html","firstModuleHref":"/experiences/tax-reform-dilemma-1.html","moduleSlugs":["tax-reform-dilemma-1","tax-reform-dilemma-2","tax-reform-dilemma-3","tax-reform-dilemma-4","tax-reform-dilemma-5"]},{"id":"sapiens","title":"《人类简史》","cover":"/assets/book-covers/sapiens.jpg","category":"science-knowledge","categoryLabel":"认知/硬核","categoryHint":"开拓世界地图，解锁迷雾","moduleCount":8,"hubHref":"/books/sapiens.html","firstModuleHref":"/experiences/the-wheat-conquest-simulator.html","moduleSlugs":["the-wheat-conquest-simulator","human-domestication-dilemma-1","human-domestication-dilemma-2","bilingual-human-domestication-dilemma","bilingual-human-domestication-dilemma-4","bilingual-human-domestication-dilemma-1","bilingual-human-domestication-dilemma-2","bilingual-human-domestication-dilemma-3"]},{"id":"principles-for-navigating-big-debt-crises","title":"《置身事内》","cover":"/assets/book-covers/principles-for-navigating-big-debt-crises.jpg","category":"career-wealth","categoryLabel":"事业/财富","categoryHint":"获取金币和装备，通关职场副本","moduleCount":7,"hubHref":"/books/principles-for-navigating-big-debt-crises.html","firstModuleHref":"/experiences/the-beautiful-deleveraging-challenge.html","moduleSlugs":["the-beautiful-deleveraging-challenge","the-subway-dilemma","debt-cycle-impact-analysis","1994","experience-75","experience-76","experience-77"]},{"id":"zero-to-one","title":"《从零到一》","cover":"/assets/book-covers/zero-to-one.jpg","category":"career-wealth","categoryLabel":"事业/财富","categoryHint":"获取金币和装备，通关职场副本","moduleCount":8,"hubHref":"/books/zero-to-one.html","firstModuleHref":"/experiences/zero-to-one-the-monopolist-s-choice.html","moduleSlugs":["zero-to-one-the-monopolist-s-choice","zero-to-one-the-monopolist-s-choice-1","zero-to-one-the-monopolist-s-choice-2","zero-to-one-the-monopolist-s-choice-3","zero-to-one-the-monopolist-s-choice-4","zero-to-one-the-monopolist-s-choice-5","zero-to-one-the-monopolist-s-choice-6","zero-to-one-the-monopolist-s-choice-7"]}];
+  const catalog = window.__READO_BOOK_CATALOG__;
+  const hiddenBookIds = new Set([]);
+  const sourceBooks = Array.isArray(catalog?.books) && catalog.books.length > 0 ? catalog.books : fallbackBooks;
+  const books = sourceBooks.filter((book) => {
+    const bookId = String(book?.id || "").trim();
+    return bookId && !hiddenBookIds.has(bookId);
+  });
+  const storageKey = catalog?.storage?.unlockKey || "reado_unlocked_books_v1";
+  const filterStorageKey = "reado_knowledge_shelf_category_v1";
+  const i18n = window.ReadoI18n || {};
+
+  const interpolateText = (template, params) => {
+    let out = String(template || "");
+    const entries = params && typeof params === "object" ? Object.entries(params) : [];
+    for (const [key, value] of entries) {
+      out = out.replaceAll(`{${key}}`, String(value));
+    }
+    return out;
+  };
+
+  const tr = (key, fallback, params = null) => {
+    if (typeof i18n.t === "function") {
+      return i18n.t(key, fallback, params);
+    }
+    return interpolateText(fallback, params);
+  };
+
+  const main = document.querySelector("main");
+  if (!(main instanceof HTMLElement)) return;
+
+  const mapScene = document.createElement("div");
+  mapScene.id = "reado-map-scene";
+  mapScene.className = "absolute inset-0 overflow-hidden";
+  while (main.firstChild) {
+    mapScene.append(main.firstChild);
+  }
+  main.append(mapScene);
+
+  const ensureStyle = () => {
+    if (document.getElementById("reado-knowledge-view-style")) return;
+    const style = document.createElement("style");
+    style.id = "reado-knowledge-view-style";
+    style.textContent = [
+      "#reado-shelf-view { position: absolute; inset: 0; z-index: 70; overflow-y: auto; overflow-x: hidden; display: block; background: radial-gradient(1100px 420px at 15% -10%, rgba(37, 99, 235, 0.18), transparent), radial-gradient(900px 380px at 85% 0%, rgba(99, 102, 241, 0.2), transparent), linear-gradient(180deg, rgba(2, 6, 23, 0.8), rgba(2, 6, 23, 0.95)); }",
+      "#reado-shelf-view .reado-shelf-wrap { max-width: 1200px; margin: 0 auto; padding: 78px 18px 28px; }",
+      "#reado-shelf-view .reado-shelf-header { margin-bottom: 14px; }",
+      "#reado-shelf-view .reado-shelf-title { font-size: 28px; line-height: 1.2; font-weight: 900; color: #fff; letter-spacing: -0.02em; }",
+      "#reado-shelf-view .reado-shelf-sub { margin-top: 6px; color: #93c5fd; font-size: 12px; letter-spacing: 0.14em; font-weight: 700; text-transform: uppercase; }",
+      "#reado-shelf-view .reado-shelf-count { margin-top: 10px; color: #94a3b8; font-size: 12px; }",
+      "#reado-shelf-view .reado-shelf-status { margin-top: 6px; color: #67e8f9; font-size: 11px; min-height: 16px; }",
+      "#reado-shelf-view .reado-shelf-filter-row { margin: 14px 0 2px; display: flex; flex-wrap: wrap; gap: 8px; }",
+      "#reado-shelf-view .reado-shelf-filter-btn { border: 1px solid rgba(148, 163, 184, 0.3); background: rgba(15, 23, 42, 0.72); color: #cbd5e1; border-radius: 999px; padding: 7px 12px; font-size: 12px; font-weight: 700; letter-spacing: 0.02em; cursor: pointer; transition: all .18s ease; }",
+      "#reado-shelf-view .reado-shelf-filter-btn:hover { border-color: rgba(125, 211, 252, 0.65); color: #ecfeff; }",
+      "#reado-shelf-view .reado-shelf-filter-btn.active { border-color: rgba(59, 130, 246, 0.75); background: linear-gradient(135deg, rgba(37, 99, 235, 0.44), rgba(30, 64, 175, 0.4)); color: #fff; box-shadow: 0 0 18px rgba(37, 99, 235, 0.28); }",
+      "#reado-shelf-view .reado-shelf-filter-count { margin-left: 6px; font-size: 11px; color: #93c5fd; font-weight: 700; }",
+      "#reado-shelf-view .reado-shelf-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }",
+      "#reado-shelf-view .reado-shelf-card { border: 1px solid rgba(148, 163, 184, 0.22); background: rgba(15, 23, 42, 0.78); border-radius: 18px; overflow: hidden; box-shadow: 0 12px 30px rgba(2, 6, 23, 0.35); transition: border-color .18s ease, transform .18s ease; display: flex; flex-direction: column; }",
+      "#reado-shelf-view .reado-shelf-card:hover { border-color: rgba(59, 130, 246, 0.7); transform: translateY(-2px); }",
+      "#reado-shelf-view .reado-shelf-cover { height: 190px; border-bottom: 1px solid rgba(148, 163, 184, 0.16); background: rgba(2, 6, 23, 0.6); display: flex; align-items: center; justify-content: center; padding: 10px; }",
+      "#reado-shelf-view .reado-shelf-cover img { max-height: 100%; max-width: 100%; object-fit: contain; }",
+      "#reado-shelf-view .reado-shelf-body { padding: 12px; display: flex; flex-direction: column; gap: 8px; flex: 1; }",
+      "#reado-shelf-view .reado-shelf-cat { font-size: 10px; color: #7dd3fc; letter-spacing: .1em; font-weight: 800; text-transform: uppercase; }",
+      "#reado-shelf-view .reado-shelf-name { font-size: 15px; line-height: 1.35; color: #fff; font-weight: 800; min-height: 40px; }",
+      "#reado-shelf-view .reado-shelf-meta { font-size: 11px; color: #94a3b8; }",
+      "#reado-shelf-view .reado-shelf-hint { font-size: 11px; color: #cbd5e1; min-height: 32px; }",
+      "#reado-shelf-view .reado-shelf-admin { margin-top: 6px; display: flex; gap: 6px; }",
+      "#reado-shelf-view .reado-shelf-admin-btn { flex: 1; border: 1px solid rgba(148, 163, 184, 0.4); border-radius: 9px; padding: 7px; font-size: 11px; font-weight: 700; color: #e2e8f0; background: rgba(15, 23, 42, 0.6); cursor: pointer; transition: all .18s ease; }",
+      "#reado-shelf-view .reado-shelf-admin-btn:hover { border-color: rgba(125, 211, 252, 0.65); background: rgba(30, 41, 59, 0.9); }",
+      "#reado-shelf-view .reado-shelf-admin-btn[data-work-action='delete'] { border-color: rgba(248, 113, 113, 0.45); color: #fecaca; }",
+      "#reado-shelf-view .reado-shelf-admin-btn[data-work-action='delete']:hover { border-color: rgba(248, 113, 113, 0.75); background: rgba(69, 10, 10, 0.48); }",
+      "#reado-shelf-view .reado-shelf-admin-btn:disabled { opacity: .55; cursor: not-allowed; }",
+      "#reado-shelf-view .reado-shelf-visibility { font-size: 10px; color: #67e8f9; letter-spacing: .04em; }",
+      "#reado-shelf-view .reado-shelf-cta { margin-top: auto; border: 1px solid rgba(59, 130, 246, 0.45); background: linear-gradient(135deg, rgba(37, 99, 235, 0.3), rgba(30, 64, 175, 0.4)); color: #fff; border-radius: 10px; font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; padding: 10px; cursor: pointer; transition: all .18s ease; }",
+      "#reado-shelf-view .reado-shelf-cta:hover { border-color: rgba(96, 165, 250, 0.8); background: linear-gradient(135deg, rgba(59, 130, 246, 0.45), rgba(37, 99, 235, 0.5)); }",
+      "#reado-shelf-view .reado-shelf-empty { border: 1px solid rgba(148, 163, 184, 0.2); border-radius: 12px; background: rgba(15, 23, 42, 0.68); padding: 18px; color: #cbd5e1; font-size: 13px; text-align: center; }",
+      "@media (max-width: 900px) { #reado-shelf-view .reado-shelf-wrap { padding-top: 64px; } #reado-shelf-view .reado-shelf-title { font-size: 22px; } }"
+    ].join("\n");
+    document.head.append(style);
+  };
+  ensureStyle();
+
+  const removeCenterHub = () => {
+    const bySchoolIcon = Array.from(mapScene.querySelectorAll("span.material-icons"))
+      .find((el) => (el.textContent || "").trim() === "school");
+    const centerNode = bySchoolIcon?.closest(".absolute");
+    if (centerNode instanceof HTMLElement) {
+      centerNode.remove();
+      return;
+    }
+    const fallbackNode = Array.from(mapScene.querySelectorAll(".absolute"))
+      .find((node) => {
+        const text = (node.textContent || "").replace(/\s+/g, " ").trim();
+        return text.includes("中央档案馆") || text.includes("中央档案部") || text.includes("基地总部");
+      });
+    if (fallbackNode instanceof HTMLElement) {
+      fallbackNode.remove();
+    }
+    mapScene.querySelectorAll("svg path").forEach((pathEl) => {
+      const d = (pathEl.getAttribute("d") || "").replace(/\s+/g, " ").trim();
+      if (d.startsWith("M50% 50%")) {
+        pathEl.remove();
+      }
+    });
+  };
+  removeCenterHub();
+
+  const categories = [
+    {
+      id: "science-knowledge",
+      icon: "memory",
+      titleKey: "map.category.science.title",
+      titleFallback: "认知/硬核",
+      subtitleKey: "map.category.science.subtitle",
+      subtitleFallback: "科学普及 · 历史 · 哲学 · 社会学",
+      titleClass: "text-cyan-100 font-bold text-sm",
+      subtitleClass: "text-[10px] text-cyan-300 tracking-wider"
+    },
+    {
+      id: "personal-growth",
+      icon: "psychology",
+      titleKey: "map.category.personal.title",
+      titleFallback: "个人修炼",
+      subtitleKey: "map.category.personal.subtitle",
+      subtitleFallback: "心理学 · 自我提升 · 时间管理 · 思维模型",
+      titleClass: "text-emerald-100 font-bold text-sm",
+      subtitleClass: "text-[10px] text-emerald-300 tracking-wider"
+    },
+    {
+      id: "career-wealth",
+      icon: "rocket_launch",
+      titleKey: "map.category.career.title",
+      titleFallback: "事业/财富",
+      subtitleKey: "map.category.career.subtitle",
+      subtitleFallback: "经济金融 · 商业管理 · 职场技能 · 创业",
+      titleClass: "text-indigo-100 font-bold text-sm",
+      subtitleClass: "text-[10px] text-indigo-300 tracking-wider"
+    },
+    {
+      id: "lifestyle-creativity",
+      icon: "account_balance",
+      titleKey: "map.category.lifestyle.title",
+      titleFallback: "灵感/生活",
+      subtitleKey: "map.category.lifestyle.subtitle",
+      subtitleFallback: "艺术设计 · 传记 · 文学虚构 · 生活美学",
+      titleClass: "text-amber-100 font-bold text-sm",
+      subtitleClass: "text-[10px] text-amber-300 tracking-wider"
+    }
+  ];
+
+  const localizedBookTitleById = {
+    "wanli-fifteen": { key: "map.book.wanli-fifteen", fallback: "《万历十五年》" },
+    "sapiens": { key: "map.book.sapiens", fallback: "《人类简史》" },
+    "principles-for-navigating-big-debt-crises": { key: "map.book.principles-for-navigating-big-debt-crises", fallback: "《置身事内》" },
+    "zero-to-one": { key: "map.book.zero-to-one", fallback: "《从零到一》" }
+  };
+
+  const localizedCategoryById = {
+    "science-knowledge": {
+      labelKey: "map.category.science.title",
+      labelFallback: "认知/硬核",
+      hintKey: "map.category.science.subtitle",
+      hintFallback: "科学普及 · 历史 · 哲学 · 社会学"
+    },
+    "personal-growth": {
+      labelKey: "map.category.personal.title",
+      labelFallback: "个人修炼",
+      hintKey: "map.category.personal.subtitle",
+      hintFallback: "心理学 · 自我提升 · 时间管理 · 思维模型"
+    },
+    "career-wealth": {
+      labelKey: "map.category.career.title",
+      labelFallback: "事业/财富",
+      hintKey: "map.category.career.subtitle",
+      hintFallback: "经济金融 · 商业管理 · 职场技能 · 创业"
+    },
+    "lifestyle-creativity": {
+      labelKey: "map.category.lifestyle.title",
+      labelFallback: "灵感/生活",
+      hintKey: "map.category.lifestyle.subtitle",
+      hintFallback: "艺术设计 · 传记 · 文学虚构 · 生活美学"
+    }
+  };
+
+  const findNodeByIcon = (iconName) => {
+    const icon = Array.from(mapScene.querySelectorAll("span.material-icons"))
+      .find((el) => (el.textContent || "").trim() === iconName);
+    if (!icon) return null;
+    const node = icon.closest(".absolute");
+    return node instanceof HTMLElement ? node : null;
+  };
+
+  const applyCategoryMeta = (category, node) => {
+    if (!(node instanceof HTMLElement)) return;
+    const childDivs = Array.from(node.children).filter((child) => child.tagName === "DIV");
+    const metaBox = childDivs[childDivs.length - 1];
+    if (!metaBox) return;
+    metaBox.classList.add("bg-background-dark/80", "px-3", "py-1.5", "rounded-lg", "border", "border-white/10", "backdrop-blur", "text-center");
+    metaBox.innerHTML = `
+      <div class="${category.titleClass}">${tr(category.titleKey, category.titleFallback)}</div>
+      <div class="${category.subtitleClass}">${tr(category.subtitleKey, category.subtitleFallback)}</div>`;
+  };
+
+  categories.forEach((category) => {
+    const node = findNodeByIcon(category.icon);
+    if (!node) return;
+    const childDivs = Array.from(node.children).filter((child) => child.tagName === "DIV");
+    const iconBox = childDivs[0];
+    applyCategoryMeta(category, node);
+
+    node.classList.remove("opacity-60", "z-10");
+    node.classList.add("cursor-pointer", "z-20");
+    if (iconBox) {
+      iconBox.classList.remove("grayscale", "opacity-90");
+      iconBox.classList.add("hover:scale-105");
+      iconBox.style.opacity = "1";
+    }
+
+    const goToCategory = () => {
+      window.location.href = "/pages/simulator-library-level-selection-1.html?category=" + category.id;
+    };
+
+    node.addEventListener("click", goToCategory);
+    node.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        goToCategory();
+      }
+    });
+    node.setAttribute("role", "button");
+    node.setAttribute("tabindex", "0");
+  });
+
+  const shelfPanel = document.createElement("section");
+  shelfPanel.id = "reado-shelf-view";
+  shelfPanel.innerHTML = `
+    <div class="reado-shelf-wrap">
+      <div class="reado-shelf-header">
+        <h2 class="reado-shelf-title" data-map-shelf-title></h2>
+        <p class="reado-shelf-sub" data-map-shelf-subtitle></p>
+        <div class="reado-shelf-filter-row" data-shelf-filters role="tablist" aria-label="Book categories"></div>
+        <p class="reado-shelf-count" data-shelf-count></p>
+        <p class="reado-shelf-status" data-shelf-status></p>
+      </div>
+      <div class="reado-shelf-grid" data-shelf-grid></div>
+    </div>`;
+
+  main.append(shelfPanel);
+
+  const shelfGrid = shelfPanel.querySelector("[data-shelf-grid]");
+  const shelfCount = shelfPanel.querySelector("[data-shelf-count]");
+  const shelfStatus = shelfPanel.querySelector("[data-shelf-status]");
+  const shelfFilters = shelfPanel.querySelector("[data-shelf-filters]");
+  const mapShelfTitleEl = shelfPanel.querySelector("[data-map-shelf-title]");
+  const mapShelfSubtitleEl = shelfPanel.querySelector("[data-map-shelf-subtitle]");
+  const deletedBookIds = new Set();
+  let worksByBookId = new Map();
+  let worksLoaded = false;
+  let worksLoading = false;
+  let activeCategory = "all";
+
+  const getLocalizedBookTitle = (book) => {
+    if (!book || typeof book !== "object") return "";
+    const copy = localizedBookTitleById[String(book.id || "").trim()];
+    if (copy) {
+      return tr(copy.key, copy.fallback) || String(book.title || "");
+    }
+    return String(book.title || "");
+  };
+
+  const getLocalizedCategoryLabel = (book) => {
+    const categoryId = String(book?.category || "").trim();
+    const localized = localizedCategoryById[categoryId];
+    if (localized) {
+      return tr(localized.labelKey, localized.labelFallback);
+    }
+    return String(book?.categoryLabel || tr("map.category_default", "Book Module"));
+  };
+
+  const getLocalizedCategoryHint = (book) => {
+    const categoryId = String(book?.category || "").trim();
+    const localized = localizedCategoryById[categoryId];
+    if (localized) {
+      return tr(localized.hintKey, localized.hintFallback);
+    }
+    return String(book?.categoryHint || tr("map.hint_default", "Tap to enter and start the interactive journey."));
+  };
+
+  const getAvailableBooks = () => books.filter((book) => (
+    book
+    && book.id
+    && !deletedBookIds.has(book.id)
+    && (book.firstModuleHref || book.hubHref)
+  ));
+
+  const getCategoryLabelById = (categoryId) => {
+    const localized = localizedCategoryById[String(categoryId || "").trim()];
+    if (localized) {
+      return tr(localized.labelKey, localized.labelFallback);
+    }
+    const sampleBook = books.find((book) => String(book?.category || "") === String(categoryId || ""));
+    return String(sampleBook?.categoryLabel || tr("map.category_default", "Book Module"));
+  };
+
+  const normalizeCategory = (value) => {
+    const raw = String(value || "").trim();
+    if (!raw) return "all";
+    return raw;
+  };
+
+  const restoreActiveCategory = () => {
+    const saved = normalizeCategory(localStorage.getItem(filterStorageKey));
+    const existing = new Set(getAvailableBooks().map((book) => normalizeCategory(book.category)));
+    if (saved === "all" || existing.has(saved)) {
+      activeCategory = saved;
+      return;
+    }
+    activeCategory = "all";
+  };
+
+  const syncStaticCopy = () => {
+    if (mapShelfTitleEl) {
+      mapShelfTitleEl.textContent = tr("map.shelf_title", "Library Shelf");
+    }
+    if (mapShelfSubtitleEl) {
+      mapShelfSubtitleEl.textContent = tr("map.shelf_subtitle", "Shelf view only · Choose a category like in the bookstore");
+    }
+    categories.forEach((category) => {
+      const node = findNodeByIcon(category.icon);
+      if (node) applyCategoryMeta(category, node);
+    });
+  };
+
+  const renderCategoryFilters = () => {
+    if (!(shelfFilters instanceof HTMLElement)) return;
+    const available = getAvailableBooks();
+    const counts = new Map();
+    for (const book of available) {
+      const categoryId = normalizeCategory(book?.category);
+      if (!categoryId || categoryId === "all") continue;
+      counts.set(categoryId, (counts.get(categoryId) || 0) + 1);
+    }
+
+    const orderedIds = [
+      ...categories.map((item) => item.id),
+      ...Array.from(counts.keys()).filter((id) => !categories.some((item) => item.id === id))
+    ];
+    const options = [{ id: "all", label: tr("map.filter_all", "全部"), count: available.length }];
+    for (const categoryId of orderedIds) {
+      if (!counts.has(categoryId)) continue;
+      options.push({
+        id: categoryId,
+        label: getCategoryLabelById(categoryId),
+        count: counts.get(categoryId) || 0
+      });
+    }
+
+    if (!options.some((option) => option.id === activeCategory)) {
+      activeCategory = "all";
+    }
+
+    shelfFilters.innerHTML = options.map((option) => `
+      <button
+        type="button"
+        class="reado-shelf-filter-btn ${option.id === activeCategory ? "active" : ""}"
+        data-shelf-filter="${option.id}"
+        role="tab"
+        aria-selected="${option.id === activeCategory ? "true" : "false"}"
+      >${option.label}<span class="reado-shelf-filter-count">${option.count}</span></button>
+    `).join("");
+  };
+
+  const getUnlocked = () => {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(storageKey) || "[]");
+      return new Set(Array.isArray(parsed) ? parsed : []);
+    } catch {
+      return new Set();
+    }
+  };
+
+  const saveUnlocked = (set) => {
+    localStorage.setItem(storageKey, JSON.stringify([...set]));
+  };
+
+  const isUserBook = (bookId) => /^user-/i.test(String(bookId || "").trim());
+
+  const setShelfStatus = (message, isError = false) => {
+    if (!(shelfStatus instanceof HTMLElement)) return;
+    shelfStatus.textContent = message ? String(message) : "";
+    shelfStatus.style.color = isError ? "#fca5a5" : "#67e8f9";
+  };
+
+  const requestJson = async (method, href, payload) => {
+    const response = await fetch(href, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      credentials: "same-origin",
+      body: payload ? JSON.stringify(payload) : undefined
+    });
+    let data = {};
+    try {
+      data = await response.json();
+    } catch {}
+    if (!response.ok || data?.ok === false) {
+      throw new Error(data?.error || ("Request failed with " + response.status));
+    }
+    return data;
+  };
+
+  const loadMineWorks = async ({ force = false } = {}) => {
+    if (worksLoading) return;
+    if (worksLoaded && !force) return;
+    worksLoading = true;
+    try {
+      const data = await requestJson("GET", "/api/studio/works?scope=mine&limit=300");
+      const rows = Array.isArray(data?.works) ? data.works : [];
+      const next = new Map();
+      for (const row of rows) {
+        const bookId = String(row?.book_id || "").trim();
+        if (!bookId) continue;
+        next.set(bookId, row);
+      }
+      worksByBookId = next;
+      worksLoaded = true;
+      renderShelf();
+    } catch (error) {
+      setShelfStatus(
+        tr("map.manage_load_failed", "Failed to load book management data: {error}", {
+          error: error?.message || "unknown error"
+        }),
+        true
+      );
+    } finally {
+      worksLoading = false;
+    }
+  };
+
+  const createCard = (book, unlocked) => {
+    const isUnlocked = unlocked.has(book.id);
+    const work = worksByBookId.get(book.id);
+    const canManage = isUserBook(book.id) && work && work.can_edit !== false;
+    const isPublic = Boolean(work?.is_public);
+    const bookTitle = getLocalizedBookTitle(book);
+    const categoryLabel = getLocalizedCategoryLabel(book);
+    const categoryHint = getLocalizedCategoryHint(book);
+    const moduleCount = Number(book?.moduleCount) || 0;
+    const manageHtml = canManage
+      ? `
+          <div class="reado-shelf-visibility">${isPublic ? tr("map.manage_visible_public", "Published to Experience Library") : tr("map.manage_visible_private", "Private only")}</div>
+          <div class="reado-shelf-admin">
+            <button
+              type="button"
+              class="reado-shelf-admin-btn"
+              data-work-action="publish"
+              data-work-id="${work.id}"
+              data-book-id="${book.id}"
+              data-next-public="${isPublic ? "0" : "1"}"
+            >${isPublic ? tr("map.manage_unpublish", "Unpublish") : tr("map.manage_publish", "Publish")}</button>
+            <button
+              type="button"
+              class="reado-shelf-admin-btn"
+              data-work-action="delete"
+              data-work-id="${work.id}"
+              data-book-id="${book.id}"
+            >${tr("map.manage_delete", "Delete")}</button>
+          </div>`
+      : "";
+    return `
+      <article class="reado-shelf-card">
+        <div class="reado-shelf-cover">
+          <img src="${book.cover}" alt="${bookTitle}" loading="lazy" />
+        </div>
+        <div class="reado-shelf-body">
+          <div class="reado-shelf-cat">${categoryLabel || tr("map.category_default", "Book Module")}</div>
+          <div class="reado-shelf-name">${bookTitle}</div>
+          <div class="reado-shelf-meta">${tr("map.module_count", "{count} experience modules", { count: moduleCount })}</div>
+          <div class="reado-shelf-hint">${categoryHint || tr("map.hint_default", "Tap to enter and start the interactive journey.")}</div>
+          ${manageHtml}
+          <button type="button" class="reado-shelf-cta" data-book-id="${book.id}">
+            ${isUnlocked ? tr("map.cta_continue", "Continue") : tr("map.cta_start", "Start")}
+          </button>
+        </div>
+      </article>`;
+  };
+
+  const renderShelf = () => {
+    if (!(shelfGrid instanceof HTMLElement)) return;
+    const available = getAvailableBooks();
+    const filtered = activeCategory === "all"
+      ? available
+      : available.filter((book) => normalizeCategory(book?.category) === activeCategory);
+    const unlocked = getUnlocked();
+    renderCategoryFilters();
+    if (shelfCount instanceof HTMLElement) {
+      shelfCount.textContent = tr(
+        "map.shelf_count_filtered",
+        "{visible}/{total} books",
+        { visible: filtered.length, total: available.length }
+      );
+    }
+    if (filtered.length === 0) {
+      shelfGrid.innerHTML = `<div class="reado-shelf-empty">${tr("map.shelf_empty", "No books available yet. Please configure book_experiences modules first.")}</div>`;
+      return;
+    }
+    shelfGrid.innerHTML = filtered.map((book) => createCard(book, unlocked)).join("");
+  };
+
+  if (shelfFilters instanceof HTMLElement) {
+    shelfFilters.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+      const button = target.closest("button[data-shelf-filter]");
+      if (!(button instanceof HTMLButtonElement)) return;
+      const nextCategory = normalizeCategory(button.getAttribute("data-shelf-filter"));
+      if (nextCategory === activeCategory) return;
+      activeCategory = nextCategory || "all";
+      localStorage.setItem(filterStorageKey, activeCategory);
+      renderShelf();
+    });
+  }
+
+  if (shelfGrid instanceof HTMLElement) {
+    shelfGrid.addEventListener("click", async (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+      const actionButton = target.closest("button[data-work-action]");
+      if (actionButton instanceof HTMLButtonElement) {
+        const workId = actionButton.getAttribute("data-work-id");
+        const bookId = actionButton.getAttribute("data-book-id");
+        const action = actionButton.getAttribute("data-work-action");
+        if (!workId || !bookId || !action) return;
+        if (action === "delete") {
+          const confirmed = window.confirm(tr("map.confirm_delete", "Delete this playable book? This action cannot be undone."));
+          if (!confirmed) return;
+        }
+        actionButton.disabled = true;
+        try {
+          if (action === "publish") {
+            const shouldPublic = actionButton.getAttribute("data-next-public") === "1";
+            const data = await requestJson("PATCH", "/api/studio/works/" + encodeURIComponent(workId), {
+              is_public: shouldPublic
+            });
+            const current = worksByBookId.get(bookId) || {};
+            worksByBookId.set(bookId, {
+              ...current,
+              ...(data?.work || {}),
+              is_public: shouldPublic
+            });
+            setShelfStatus(
+              shouldPublic
+                ? tr("map.status_published", "Published to Experience Library.")
+                : tr("map.status_unpublished", "Unpublished from Experience Library.")
+            );
+            renderShelf();
+            return;
+          }
+
+          if (action === "delete") {
+            await requestJson("DELETE", "/api/studio/works/" + encodeURIComponent(workId));
+            deletedBookIds.add(bookId);
+            worksByBookId.delete(bookId);
+            const unlocked = getUnlocked();
+            if (unlocked.has(bookId)) {
+              unlocked.delete(bookId);
+              saveUnlocked(unlocked);
+            }
+            setShelfStatus(tr("map.status_deleted", "Playable book deleted."));
+            renderShelf();
+            return;
+          }
+        } catch (error) {
+          setShelfStatus(
+            tr("map.action_failed", "Action failed: {error}", {
+              error: error?.message || "unknown error"
+            }),
+            true
+          );
+        } finally {
+          actionButton.disabled = false;
+        }
+        return;
+      }
+
+      const button = target.closest("button[data-book-id]");
+      if (!(button instanceof HTMLElement)) return;
+      const bookId = button.getAttribute("data-book-id");
+      if (!bookId) return;
+      const book = books.find((item) => item.id === bookId);
+      if (!book) return;
+
+      const unlocked = getUnlocked();
+      if (!unlocked.has(bookId)) {
+        unlocked.add(bookId);
+        saveUnlocked(unlocked);
+      }
+
+      const forceFirst = ["wanli-fifteen","sapiens","zero-to-one","principles-for-navigating-big-debt-crises"].includes(book.id);
+      if (forceFirst) {
+        localStorage.removeItem("reado_book_last_" + bookId);
+      }
+      const last = localStorage.getItem("reado_book_last_" + bookId);
+      const canResume = !forceFirst && Boolean(last && Array.isArray(book.moduleSlugs) && book.moduleSlugs.includes(last));
+      const entryHref = canResume
+        ? "/experiences/" + last + ".html"
+        : (book.firstModuleHref || book.hubHref || "");
+      if (entryHref) {
+        window.location.href = entryHref;
+      }
+    });
+  }
+
+  mapScene.style.display = "none";
+  shelfPanel.style.display = "block";
+  main.classList.remove("cursor-move", "select-none");
+  restoreActiveCategory();
+  syncStaticCopy();
+  if (typeof i18n.onLanguageChange === "function") {
+    i18n.onLanguageChange(() => {
+      syncStaticCopy();
+      renderShelf();
+    });
+  }
+
+  renderShelf();
+  loadMineWorks().catch(() => {});
+})();
+</script>
+</body></html>

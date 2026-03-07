@@ -1,0 +1,42 @@
+{
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T13:17:33.520Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "Datre Visual V4",
+      "author": ""
+    },
+    "knowledge_block": {
+      "id": "kb-02",
+      "gate_index": 2,
+      "title": "的规矩就被制定下来了，这些人想让别人告诉他如何去做",
+      "summary": "2 的规矩就被制定下来了，这些人想让别人告诉他如何去做。 站在河中的人想让别人过来帮助他，告诉他是应该往前还是应该往后？他们唯一 想要的：就是别人的帮助。",
+      "words": 456,
+      "keywords": [
+        "你的",
+        "然而",
+        "的进化",
+        "真正的你",
+        "一个大师走在路中间",
+        "一件事就是寻求其它国家的帮助",
+        "不仅仅是帮助与你接触的人",
+        "不是靠改变自己的外表"
+      ],
+      "density": {
+        "score": 0.6798,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0.4211,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0.1228
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "scholar",
+      "theme_label": "Scholar Atlas",
+      "section_count": 5,
+      "generated_with": "template_runtime"
+    }
+  }
+}

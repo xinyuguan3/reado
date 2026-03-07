@@ -1,0 +1,42 @@
+{
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T13:36:55.612Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "Datre书籍-第1册 我们是DATRE-1（部分）.pdf",
+      "author": ""
+    },
+    "knowledge_block": {
+      "id": "kb-05",
+      "gate_index": 5,
+      "title": "形式 · 来讲",
+      "summary": "吗？ DATRE ： 那属于物质结构的领域 。",
+      "words": 635,
+      "keywords": [
+        "形式",
+        "来讲",
+        "体验",
+        "包含",
+        "宇宙",
+        "身体",
+        "大宇宙",
+        "东西"
+      ],
+      "density": {
+        "score": 0.6602,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0.2646,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0.2205
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "scholar",
+      "theme_label": "Scholar Atlas",
+      "section_count": 5,
+      "generated_with": "template_runtime"
+    }
+  }
+}

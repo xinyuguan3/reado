@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>开始体验这些不同了 · Datre书籍-第1册 我们是DATRE-1（部分）.pdf</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b1220;
+      --bg2: #1a2333;
+      --accent: #f59e0b;
+      --accent2: #34d399;
+      --text: #e5edf8;
+      --soft: #9fb1c9;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+      background:
+        radial-gradient(1200px 540px at 85% -8%, color-mix(in srgb, var(--accent2) 24%, transparent), transparent 70%),
+        radial-gradient(980px 460px at -10% 14%, color-mix(in srgb, var(--accent) 24%, transparent), transparent 74%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+      color: var(--text);
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .05;
+      background-image: radial-gradient(circle at 1px 1px, #fff 1px, transparent 0);
+      background-size: 3px 3px;
+      z-index: 0;
+    }
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      z-index: 100;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+    .page { position: relative; z-index: 1; width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 20px 0 48px; }
+    .hero {
+      min-height: 74vh;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 22px;
+      background: linear-gradient(160deg, color-mix(in srgb, var(--bg2) 86%, transparent), color-mix(in srgb, var(--bg) 88%, transparent));
+      padding: 40px 34px;
+      display: grid;
+      align-content: center;
+      gap: 16px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.34);
+    }
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .hero h1 {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(32px, 5.4vw, 68px);
+      line-height: 1.16;
+      letter-spacing: .04em;
+      max-width: 15em;
+      text-wrap: balance;
+    }
+    .hero p {
+      max-width: 66ch;
+      line-height: 1.95;
+      color: color-mix(in srgb, var(--text) 85%, var(--soft));
+      font-size: 16px;
+    }
+    .chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip {
+      border: 1px solid color-mix(in srgb, var(--accent2) 44%, transparent);
+      color: color-mix(in srgb, var(--accent2) 88%, #fff);
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 12px;
+      background: rgba(255,255,255,.03);
+    }
+    .section { margin-top: 18px; border: 1px solid rgba(255,255,255,.13); border-radius: 18px; padding: 22px; background: rgba(2,6,18,.46); }
+    .section h2 {
+      margin-bottom: 12px;
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(22px, 2.8vw, 34px);
+      color: color-mix(in srgb, var(--accent) 86%, #fff);
+      letter-spacing: .03em;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1.1fr 1fr; gap: 14px; }
+    .concept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+    .concept-card {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      background: rgba(255,255,255,.03);
+      padding: 14px;
+      min-height: 128px;
+    }
+    .concept-token { font-size: 14px; letter-spacing: .14em; color: var(--accent2); text-transform: uppercase; margin-bottom: 7px; font-weight: 700; }
+    .concept-note { font-size: 14px; color: color-mix(in srgb, var(--text) 88%, var(--soft)); line-height: 1.8; }
+    .reading-map {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 10px;
+    }
+    .map-card {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      background: rgba(255,255,255,.03);
+      padding: 12px;
+      min-height: 148px;
+    }
+    .map-no {
+      font-size: 11px;
+      letter-spacing: .18em;
+      color: var(--accent);
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+    .map-card h3 {
+      font-size: 17px;
+      font-family: "Noto Serif SC", serif;
+      line-height: 1.45;
+      margin-bottom: 6px;
+    }
+    .map-card p {
+      font-size: 14px;
+      color: color-mix(in srgb, var(--text) 84%, var(--soft));
+      line-height: 1.85;
+    }
+    .atlas {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      min-height: 440px;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+    .atlas svg { width: 100%; max-width: 440px; height: auto; }
+    .timeline { display: grid; gap: 10px; }
+    .timeline-item {
+      border-left: 2px solid color-mix(in srgb, var(--accent) 66%, transparent);
+      padding: 10px 14px;
+      background: rgba(255,255,255,.02);
+      border-radius: 0 10px 10px 0;
+    }
+    .timeline-no { font-size: 11px; letter-spacing: .22em; color: var(--accent2); display: block; margin-bottom: 6px; }
+    .timeline-item h3 { font-size: 19px; font-family: "Noto Serif SC", serif; line-height: 1.45; margin-bottom: 7px; }
+    .timeline-item p { font-size: 14px; line-height: 1.9; color: color-mix(in srgb, var(--text) 84%, var(--soft)); }
+    .quote-wrap { display: grid; gap: 10px; }
+    .quote {
+      border-left: 2px solid color-mix(in srgb, var(--accent2) 80%, transparent);
+      padding: 10px 12px;
+      background: rgba(255,255,255,.02);
+      color: color-mix(in srgb, var(--text) 92%, #fff);
+      font-family: "Noto Serif SC", serif;
+      line-height: 1.9;
+    }
+    .takeaways { margin-top: 10px; list-style: none; display: grid; gap: 8px; }
+    .takeaways li {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      padding: 10px;
+      background: rgba(255,255,255,.02);
+      align-items: start;
+      line-height: 1.8;
+    }
+    .takeaways span {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: color-mix(in srgb, var(--accent2) 26%, transparent);
+      color: var(--accent2);
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+    .nav { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,.26);
+      border-radius: 999px;
+      padding: 8px 13px;
+      font-size: 12px;
+      color: var(--text);
+      background: rgba(255,255,255,.04);
+    }
+    .btn:hover { border-color: var(--accent2); color: var(--accent2); }
+    .dot-nav {
+      position: fixed;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: grid;
+      gap: 10px;
+      z-index: 50;
+    }
+    .dot-nav button {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.35);
+      background: transparent;
+      cursor: pointer;
+      transition: all .24s ease;
+    }
+    .dot-nav button.active { transform: scale(1.34); border-color: var(--accent); background: var(--accent); }
+    .reveal { opacity: 0; transform: translateY(16px); transition: opacity .55s ease, transform .55s ease; }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+    @media (max-width: 940px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .dot-nav { display: none; }
+      .hero { min-height: auto; padding: 30px 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+  <nav class="dot-nav" id="dotNav">
+    <button data-target="hero" class="active" aria-label="Hero"></button>
+    <button data-target="atlas" aria-label="Atlas"></button>
+    <button data-target="concepts" aria-label="Concepts"></button>
+    <button data-target="reading" aria-label="Reading"></button>
+    <button data-target="takeaways" aria-label="Takeaways"></button>
+  </nav>
+  <main class="page">
+    <section class="hero reveal in" id="hero">
+      <p class="eyebrow">Scholar Atlas · Gate 15</p>
+      <h1>开始体验这些不同了</h1>
+      <p>36 开始体验这些不同了。这也是魔术出现的地方，这也是你开始看见 “ 不可思议 ” 的事 情发生的地方。 问题 ：心识的产生是否在物质产生之前？</p>
+      <div class="chip-row">
+        <span class="chip">Datre书籍-第1册 我们是DATRE-1（部分）.pdf</span>
+        
+        <span class="chip">Module 15/18</span>
+        <span class="tag">datre</span><span class="tag">问题</span><span class="tag">心念</span><span class="tag">但是</span><span class="tag">因此</span><span class="tag">诞生</span><span class="tag">起源</span><span class="tag">一个</span>
+      </div>
+    </section>
+
+    <section class="section reveal" id="atlas">
+      <h2>主题脉络与阅读地图</h2>
+      <p style="color:var(--soft);line-height:1.9;margin-bottom:10px;">先看章节主线，再进入细节。每个卡片都是一个可独立理解的知识片段。</p>
+      <div class="reading-map">
+      <article class="map-card reveal">
+        <p class="map-no">01</p>
+        <h3>36 开始体验这些不同了。这也是魔术出现的地方，这也是你开始看见 “ 不可思议 ” 的事 情发生的地方。</h3>
+        <p>36 开始体验这些不同了。这也是魔术出现的地方，这也是你开始看见 “ 不可思议 ” 的事 情发生的地方。 问题 ：心识的产生是否在物质产生之前？ DATRE ：不。在物质层，这不是一个可行的概念。没有心识，物质同样可以存在 。 意识是我们唯一可以用来解释的词语，以便能让你们看懂。 换句话说：石头，树木和星球等所有由粒子组成的东西，都包含了你们称之的意 识。 心识拥有完全不同的结构。很多人将心识与头脑中的想法混淆。因此，我们所说 的心识，</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">02</p>
+        <h3>头脑处理内容。头脑从群体意识或心识泡泡中获取内容，并处理它们。它做这 两 件事。头脑只是一个处理器。</h3>
+        <p>头脑处理内容。头脑从群体意识或心识泡泡中获取内容，并处理它们。它做这 两 件事。头脑只是一个处理器。 也许这能帮助你们理解清楚一点。 问题： 心念是否直接来自于宇宙心识 ？ DATRE ： 心念是独特的 。 正如开头所讲 ， 我们只能将心念描述为 ： 蒲公英的降落伞 小种子 。 它能进入任何它想去的地方 。</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">03</p>
+        <h3>心念补充自己本身，它 - “ 是 ” 。心念没有边界。心念 “ 起源 ” 于心念。</h3>
+        <p>心念补充自己本身，它 - “ 是 ” 。心念没有边界。心念 “ 起源 ” 于心念。 不要将 “ 起源 ” 与 “ 诞生 ” 混淆 ， 诞生属于物质结构 。 我们不得不使用 “ 诞生 ” 或 “ 出生 ” 这些词语 ， 因为它们是你们唯一能理解的 。 这也是为什么解释变得相当复杂 。 很多事情无法被解释 ， 你们的语言太受限制了 。 心念起源于心念 ； 心念以心念存在 。</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">04</p>
+        <h3>因此 ， 这儿有着明确的区别 。</h3>
+        <p>因此 ， 这儿有着明确的区别 。 问题 ： 假如某些想法突然从头脑中出现 ， 当中没有任何预兆 ， 与过去的想法也没 有任何关联 ， 请问这些想法属于心念吗 ？ DATRE ： 这是个比较复杂的问题 。 可能是 ， 也可能不是 。 37 你看 ， 你们的头脑电脑一直在运行中 。 你不需要点击 “ 关闭 ” 按钮才能关上你们 的头脑 。</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">05</p>
+        <h3>现在 ， 头脑可能正在将一些你完全没有觉知到的东西组合在一起 。</h3>
+        <p>现在 ， 头脑可能正在将一些你完全没有觉知到的东西组合在一起 。 那可能是一个心念。心念通常来自于一个全新的想法，而你能够不断持续地从这 个独特的想法中获取越来越多，越来越多的信息。 你能够辨识出来自于头脑中的想法。它与其它事物没有关联，你无法从头脑的想 法中获取更多信息。但是，你能从心念中获取灵感和新点子。 这是我们唯一能告诉你的区别，而你必须要成为那个靠自己解译的人。</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="concepts">
+      <h2>核心概念与解释</h2>
+      <div class="concept-grid">
+      <article class="concept-card reveal">
+        <p class="concept-token">datre</p>
+        <p class="concept-note">DATRE ：不。在物质层，这不是一个可行的概念。没有心识，物质同样可以存在 。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">问题</p>
+        <p class="concept-note">问题 ：心识的产生是否在物质产生之前？</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">心念</p>
+        <p class="concept-note">问题： 心念是否直接来自于宇宙心识 ？</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">但是</p>
+        <p class="concept-note">你能够辨识出来自于头脑中的想法。它与其它事物没有关联，你无法从头脑的想 法中获取更多信息。但是，你能从心念中获取灵感和新点子。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">因此</p>
+        <p class="concept-note">心识拥有完全不同的结构。很多人将心识与头脑中的想法混淆。因此，我们所说 的心识，是指这个泡泡里的内容。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">诞生</p>
+        <p class="concept-note">不要将 “ 起源 ” 与 “ 诞生 ” 混淆 ， 诞生属于物质结构 。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">起源</p>
+        <p class="concept-note">心念补充自己本身，它 - “ 是 ” 。心念没有边界。心念 “ 起源 ” 于心念。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">一个</p>
+        <p class="concept-note">DATRE ：不。在物质层，这不是一个可行的概念。没有心识，物质同样可以存在 。</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="reading">
+      <h2>渐进式阅读路径</h2>
+      <div class="timeline">
+      <article class="timeline-item reveal">
+        <span class="timeline-no">01</span>
+        <h3>36 开始体验这些不同了。这也是魔术出现的地方，这也是你开始看见 “ 不可思议 ” 的事 情发生的地方。</h3>
+        <p>36 开始体验这些不同了。这也是魔术出现的地方，这也是你开始看见 “ 不可思议 ” 的事 情发生的地方。 问题 ：心识的产生是否在物质产生之前？ DATRE ：不。在物质层，这不是一个可行的概念。没有心识，物质同样可以存在 。 意识是我们唯一可以用来解释的词语，以便能让你们看懂。 换句话说：石头，树木和星球等所有由粒子组成的东西，都包含了你们称之的意 识。 心识拥有完全不同的结构。很多人将心识与头脑中的想法混淆。因此，我们所说 的心识，是指这个泡泡里的内容。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">02</span>
+        <h3>头脑处理内容。头脑从群体意识或心识泡泡中获取内容，并处理它们。它做这 两 件事。头脑只是一个处理器。</h3>
+        <p>头脑处理内容。头脑从群体意识或心识泡泡中获取内容，并处理它们。它做这 两 件事。头脑只是一个处理器。 也许这能帮助你们理解清楚一点。 问题： 心念是否直接来自于宇宙心识 ？ DATRE ： 心念是独特的 。 正如开头所讲 ， 我们只能将心念描述为 ： 蒲公英的降落伞 小种子 。 它能进入任何它想去的地方 。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">03</span>
+        <h3>心念补充自己本身，它 - “ 是 ” 。心念没有边界。心念 “ 起源 ” 于心念。</h3>
+        <p>心念补充自己本身，它 - “ 是 ” 。心念没有边界。心念 “ 起源 ” 于心念。 不要将 “ 起源 ” 与 “ 诞生 ” 混淆 ， 诞生属于物质结构 。 我们不得不使用 “ 诞生 ” 或 “ 出生 ” 这些词语 ， 因为它们是你们唯一能理解的 。 这也是为什么解释变得相当复杂 。 很多事情无法被解释 ， 你们的语言太受限制了 。 心念起源于心念 ； 心念以心念存在 。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">04</span>
+        <h3>因此 ， 这儿有着明确的区别 。</h3>
+        <p>因此 ， 这儿有着明确的区别 。 问题 ： 假如某些想法突然从头脑中出现 ， 当中没有任何预兆 ， 与过去的想法也没 有任何关联 ， 请问这些想法属于心念吗 ？ DATRE ： 这是个比较复杂的问题 。 可能是 ， 也可能不是 。 37 你看 ， 你们的头脑电脑一直在运行中 。 你不需要点击 “ 关闭 ” 按钮才能关上你们 的头脑 。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">05</span>
+        <h3>现在 ， 头脑可能正在将一些你完全没有觉知到的东西组合在一起 。</h3>
+        <p>现在 ， 头脑可能正在将一些你完全没有觉知到的东西组合在一起 。 那可能是一个心念。心念通常来自于一个全新的想法，而你能够不断持续地从这 个独特的想法中获取越来越多，越来越多的信息。 你能够辨识出来自于头脑中的想法。它与其它事物没有关联，你无法从头脑的想 法中获取更多信息。但是，你能从心念中获取灵感和新点子。 这是我们唯一能告诉你的区别，而你必须要成为那个靠自己解译的人。</p>
+      </article>
+    </div>
+      <div class="quote-wrap" style="margin-top:12px;"><blockquote class="quote reveal">“问题 ： 假如某些想法突然从头脑中出现 ， 当中没有任何预兆 ， 与过去的想法也没 有任何关联 ， 请问这些想法属于心念吗 ？”</blockquote><blockquote class="quote reveal">“你能够辨识出来自于头脑中的想法。它与其它事物没有关联，你无法从头脑的想 法中获取更多信息。但是，你能从心念中获取灵感和新点子。”</blockquote><blockquote class="quote reveal">“那可能是一个心念。心念通常来自于一个全新的想法，而你能够不断持续地从这 个独特的想法中获取越来越多，越来越多的信息。”</blockquote></div>
+    </section>
+
+    <section class="section reveal" id="takeaways">
+      <h2>本关关键收获</h2>
+      <ul class="takeaways"><li><span>1</span>36 开始体验这些不同了。这也是魔术出现的地方，这也是你开始看见 “ 不可思议 ” 的事 情发生的地方。</li><li><span>2</span>头脑处理内容。头脑从群体意识或心识泡泡中获取内容，并处理它们。它做这 两 件事。头脑只是一个处理器。</li><li><span>3</span>心念补充自己本身，它 - “ 是 ” 。心念没有边界。心念 “ 起源 ” 于心念。</li><li><span>4</span>因此 ， 这儿有着明确的区别 。</li></ul>
+      <nav class="nav">
+        <a class="btn" href="/experiences/user-book-datre-1-datre-1-pdf-gcxlsx-5eee-g14-chapter-14.html">上一关</a>
+        <a class="btn" href="/experiences/user-book-datre-1-datre-1-pdf-gcxlsx-5eee-g16-chapter-16.html">下一关</a>
+      </nav>
+    </section>
+  </main>
+  <script>
+    (() => {
+      const progress = document.getElementById("progress");
+      const dots = Array.from(document.querySelectorAll("#dotNav button[data-target]"));
+      const sections = dots
+        .map((dot) => document.getElementById(dot.getAttribute("data-target")))
+        .filter(Boolean);
+      const reveals = Array.from(document.querySelectorAll(".reveal"));
+      const onScroll = () => {
+        const h = document.documentElement;
+        const total = Math.max(1, h.scrollHeight - window.innerHeight);
+        const pct = Math.max(0, Math.min(100, (window.scrollY / total) * 100));
+        if (progress) progress.style.width = pct + "%";
+      };
+      const io = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) entry.target.classList.add("in");
+        }
+      }, { threshold: .14 });
+      reveals.forEach((el) => io.observe(el));
+      const secIo = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const id = entry.target.id;
+          dots.forEach((dot) => dot.classList.toggle("active", dot.getAttribute("data-target") === id));
+        });
+      }, { threshold: .4 });
+      sections.forEach((s) => secIo.observe(s));
+      dots.forEach((dot) => {
+        dot.addEventListener("click", () => {
+          const target = document.getElementById(dot.getAttribute("data-target"));
+          if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+      window.addEventListener("scroll", onScroll, { passive: true });
+      onScroll();
+    })();
+  </script>
+</body>
+</html>

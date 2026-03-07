@@ -104,8 +104,8 @@ const BOOK_COVER_NAME_TO_ID = new Map([
   ["principles-for-navigating-big-debt-crises", "principles-for-navigating-big-debt-crises"],
   ["debt-crises", "principles-for-navigating-big-debt-crises"],
   ["置身事内", "principles-for-navigating-big-debt-crises"],
-  ["置身事外", "principles-for-navigating-big-debt-crises"],
-  ["《置身事外》", "principles-for-navigating-big-debt-crises"],
+  ["置身事内", "principles-for-navigating-big-debt-crises"],
+  ["《置身事内》", "principles-for-navigating-big-debt-crises"],
   ["zero-to-one", "zero-to-one"],
   ["zero-to-one-addon", "zero-to-one"],
   ["从零到一", "zero-to-one"],
@@ -174,7 +174,7 @@ const BOOK_BLUEPRINTS = [
   },
   {
     id: "principles-for-navigating-big-debt-crises",
-    title: "《置身事外》",
+    title: "《置身事内》",
     price: 720,
     category: "career-wealth",
     tier: "大餐级",
@@ -1006,7 +1006,7 @@ function injectKnowledgeMapBooks(html, books) {
   const snippet = `
 <script id="reado-map-category-script">
 (() => {
-  const fallbackBooks = [{"id":"wanli-fifteen","title":"《万历十五年》","cover":"/assets/book-covers/wanli-fifteen.jpg","category":"science-knowledge","categoryLabel":"认知/硬核","categoryHint":"开拓世界地图，解锁迷雾","moduleCount":5,"hubHref":"/books/wanli-fifteen.html","firstModuleHref":"/experiences/tax-reform-dilemma-1.html","moduleSlugs":["tax-reform-dilemma-1","tax-reform-dilemma-2","tax-reform-dilemma-3","tax-reform-dilemma-4","tax-reform-dilemma-5"]},{"id":"sapiens","title":"《人类简史》","cover":"/assets/book-covers/sapiens.jpg","category":"science-knowledge","categoryLabel":"认知/硬核","categoryHint":"开拓世界地图，解锁迷雾","moduleCount":8,"hubHref":"/books/sapiens.html","firstModuleHref":"/experiences/the-wheat-conquest-simulator.html","moduleSlugs":["the-wheat-conquest-simulator","human-domestication-dilemma-1","human-domestication-dilemma-2","bilingual-human-domestication-dilemma","bilingual-human-domestication-dilemma-4","bilingual-human-domestication-dilemma-1","bilingual-human-domestication-dilemma-2","bilingual-human-domestication-dilemma-3"]},{"id":"principles-for-navigating-big-debt-crises","title":"《置身事外》","cover":"/assets/book-covers/principles-for-navigating-big-debt-crises.jpg","category":"career-wealth","categoryLabel":"事业/财富","categoryHint":"获取金币和装备，通关职场副本","moduleCount":7,"hubHref":"/books/principles-for-navigating-big-debt-crises.html","firstModuleHref":"/experiences/the-beautiful-deleveraging-challenge.html","moduleSlugs":["the-beautiful-deleveraging-challenge","the-subway-dilemma","debt-cycle-impact-analysis","1994","experience-75","experience-76","experience-77"]},{"id":"zero-to-one","title":"《从零到一》","cover":"/assets/book-covers/zero-to-one.jpg","category":"career-wealth","categoryLabel":"事业/财富","categoryHint":"获取金币和装备，通关职场副本","moduleCount":8,"hubHref":"/books/zero-to-one.html","firstModuleHref":"/experiences/zero-to-one-the-monopolist-s-choice.html","moduleSlugs":["zero-to-one-the-monopolist-s-choice","zero-to-one-the-monopolist-s-choice-1","zero-to-one-the-monopolist-s-choice-2","zero-to-one-the-monopolist-s-choice-3","zero-to-one-the-monopolist-s-choice-4","zero-to-one-the-monopolist-s-choice-5","zero-to-one-the-monopolist-s-choice-6","zero-to-one-the-monopolist-s-choice-7"]}];
+  const fallbackBooks = [{"id":"wanli-fifteen","title":"《万历十五年》","cover":"/assets/book-covers/wanli-fifteen.jpg","category":"science-knowledge","categoryLabel":"认知/硬核","categoryHint":"开拓世界地图，解锁迷雾","moduleCount":5,"hubHref":"/books/wanli-fifteen.html","firstModuleHref":"/experiences/tax-reform-dilemma-1.html","moduleSlugs":["tax-reform-dilemma-1","tax-reform-dilemma-2","tax-reform-dilemma-3","tax-reform-dilemma-4","tax-reform-dilemma-5"]},{"id":"sapiens","title":"《人类简史》","cover":"/assets/book-covers/sapiens.jpg","category":"science-knowledge","categoryLabel":"认知/硬核","categoryHint":"开拓世界地图，解锁迷雾","moduleCount":8,"hubHref":"/books/sapiens.html","firstModuleHref":"/experiences/the-wheat-conquest-simulator.html","moduleSlugs":["the-wheat-conquest-simulator","human-domestication-dilemma-1","human-domestication-dilemma-2","bilingual-human-domestication-dilemma","bilingual-human-domestication-dilemma-4","bilingual-human-domestication-dilemma-1","bilingual-human-domestication-dilemma-2","bilingual-human-domestication-dilemma-3"]},{"id":"principles-for-navigating-big-debt-crises","title":"《置身事内》","cover":"/assets/book-covers/principles-for-navigating-big-debt-crises.jpg","category":"career-wealth","categoryLabel":"事业/财富","categoryHint":"获取金币和装备，通关职场副本","moduleCount":7,"hubHref":"/books/principles-for-navigating-big-debt-crises.html","firstModuleHref":"/experiences/the-beautiful-deleveraging-challenge.html","moduleSlugs":["the-beautiful-deleveraging-challenge","the-subway-dilemma","debt-cycle-impact-analysis","1994","experience-75","experience-76","experience-77"]},{"id":"zero-to-one","title":"《从零到一》","cover":"/assets/book-covers/zero-to-one.jpg","category":"career-wealth","categoryLabel":"事业/财富","categoryHint":"获取金币和装备，通关职场副本","moduleCount":8,"hubHref":"/books/zero-to-one.html","firstModuleHref":"/experiences/zero-to-one-the-monopolist-s-choice.html","moduleSlugs":["zero-to-one-the-monopolist-s-choice","zero-to-one-the-monopolist-s-choice-1","zero-to-one-the-monopolist-s-choice-2","zero-to-one-the-monopolist-s-choice-3","zero-to-one-the-monopolist-s-choice-4","zero-to-one-the-monopolist-s-choice-5","zero-to-one-the-monopolist-s-choice-6","zero-to-one-the-monopolist-s-choice-7"]}];
   const catalog = window.__READO_BOOK_CATALOG__;
   const hiddenBookIds = new Set(${JSON.stringify(shelfHiddenBookIds)});
   const sourceBooks = Array.isArray(catalog?.books) && catalog.books.length > 0 ? catalog.books : fallbackBooks;
@@ -1159,7 +1159,7 @@ function injectKnowledgeMapBooks(html, books) {
   const localizedBookTitleById = {
     "wanli-fifteen": { key: "map.book.wanli-fifteen", fallback: "《万历十五年》" },
     "sapiens": { key: "map.book.sapiens", fallback: "《人类简史》" },
-    "principles-for-navigating-big-debt-crises": { key: "map.book.principles-for-navigating-big-debt-crises", fallback: "《置身事外》" },
+    "principles-for-navigating-big-debt-crises": { key: "map.book.principles-for-navigating-big-debt-crises", fallback: "《置身事内》" },
     "zero-to-one": { key: "map.book.zero-to-one", fallback: "《从零到一》" }
   };
 
@@ -4934,7 +4934,7 @@ class ReadoAppShell extends HTMLElement {
             <button class="reado-task-btn" data-href="/books/sapiens.html">继续学习</button>
           </article>
           <article class="reado-task">
-            <p class="reado-task-title">置身事外：债务周期</p>
+            <p class="reado-task-title">置身事内：债务周期</p>
             <p class="reado-task-sub">等级 2 / 10 · 20%</p>
             <div class="reado-task-line"><span style="width:20%"></span></div>
           </article>
@@ -5399,10 +5399,10 @@ async function main() {
   await writeRemoteImageAssets();
   await writeCustomBookCovers(customCovers);
   await writeSharedAssets(books);
-  await writeStudioCustomPages();
   await writePages(pages, books);
   await writeGemCenterPage();
   await writeAnalyticsDashboardPage();
+  await writeStudioCustomPages();
   await writeBookPages(books);
   await writeExperiencePages(experiences, moduleToBook);
   await writeSeoPages(pages);

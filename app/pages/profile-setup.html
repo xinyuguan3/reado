@@ -398,7 +398,6 @@
       try {
         const full = new URL(value, window.location.origin);
         if (full.origin !== window.location.origin) return FALLBACK_NEXT;
-        if (full.pathname === "/pages/playable-studio.html") return FALLBACK_NEXT;
         return full.pathname + full.search + full.hash;
       } catch {
         return FALLBACK_NEXT;

@@ -1,0 +1,42 @@
+{
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T13:35:25.322Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "Datre书籍-第1册 我们是DATRE-1（部分）.pdf",
+      "author": ""
+    },
+    "knowledge_block": {
+      "id": "kb-10",
+      "gate_index": 10,
+      "title": "完形概念 · 金属罐",
+      "summary": "问题：是什么将宇宙区分开的？每一个宇宙，是否都保持了一定的频率范围呢？ DATRE ： 我不知道 。",
+      "words": 680,
+      "keywords": [
+        "完形概念",
+        "金属罐",
+        "东西",
+        "事情",
+        "一生",
+        "现在",
+        "是的",
+        "完形概念群"
+      ],
+      "density": {
+        "score": 0.6076,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0.2882
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "scholar",
+      "theme_label": "Scholar Atlas",
+      "section_count": 5,
+      "generated_with": "template_runtime"
+    }
+  }
+}

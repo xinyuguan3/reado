@@ -1,0 +1,39 @@
+{
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T13:33:41.519Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "Datre书籍-第1册 我们是DATRE-1（部分）.pdf",
+      "author": ""
+    },
+    "knowledge_block": {
+      "id": "kb-01",
+      "gate_index": 1,
+      "title": "一开始 · 发音",
+      "summary": "A DATRE BOOK ONE We A re D A TRE -1 by Aona Datre 书籍第一册 我们是 DA TRE-1 翻译： QingQing A channel book of the same quality and depth of the ‘ Seth books ’ as channeled by Jane Roberts. Datre 的 发音 是 dot - ray ， 中文 发音 类似 于 “ 道…",
+      "words": 387,
+      "keywords": [
+        "一开始",
+        "发音",
+        "现在",
+        "简介",
+        "通灵"
+      ],
+      "density": {
+        "score": 0.611,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0.186,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0.0724
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "scholar",
+      "theme_label": "Scholar Atlas",
+      "section_count": 5,
+      "generated_with": "template_runtime"
+    }
+  }
+}

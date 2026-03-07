@@ -235,7 +235,7 @@
     }
     .intake-primary {
       display: grid;
-      grid-template-columns: 1.1fr 1fr;
+      grid-template-columns: 1fr;
       gap: 12px;
     }
     .intake-card {
@@ -448,6 +448,68 @@
       gap: 12px;
       justify-content: flex-start;
       flex-wrap: wrap;
+    }
+    .upload-hub-card {
+      padding: 16px;
+    }
+    .upload-hub-card .drop-zone {
+      padding: 24px 20px;
+      min-height: 240px;
+      display: grid;
+      align-content: center;
+      justify-items: center;
+      gap: 6px;
+    }
+    .upload-hub-card .drop-title {
+      font-size: 44px;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+    .upload-hub-card .drop-sub {
+      margin: 0;
+      font-size: 16px;
+      color: #aec2e6;
+      text-align: center;
+    }
+    .hub-methods {
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .hub-method-btn {
+      border: 1px solid rgba(148, 163, 184, 0.38);
+      border-radius: 999px;
+      background: rgba(9, 17, 33, 0.72);
+      color: #dbe8ff;
+      padding: 10px 18px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+    }
+    .hub-method-btn:hover {
+      border-color: rgba(125, 165, 255, 0.78);
+      background: rgba(22, 38, 68, 0.86);
+      transform: translateY(-1px);
+    }
+    .hub-method-btn:disabled {
+      opacity: 0.58;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+      white-space: nowrap;
     }
     .source-modal {
       position: fixed;
@@ -1107,6 +1169,15 @@
         grid-template-columns: 1fr;
       }
       .intake-primary { grid-template-columns: 1fr; }
+      .upload-hub-card .drop-zone {
+        min-height: 200px;
+      }
+      .upload-hub-card .drop-title {
+        font-size: 30px;
+      }
+      .upload-hub-card .drop-sub {
+        font-size: 14px;
+      }
       .source-grid { grid-template-columns: 1fr; }
       .stage-steps {
         flex-direction: column;
@@ -1169,26 +1240,23 @@
 
             <div class="intake-shell">
               <div class="intake-primary">
-                <section class="intake-card">
-                  <h3 data-i18n="studio.website_section_title">Website URL</h3>
-                  <p data-i18n="studio.website_section_desc">Paste one link and add it to your sources.</p>
-                  <div class="url-row">
-                    <input id="website-input" class="url-input" type="url" placeholder="https://example.com/article" />
-                    <button id="website-btn" class="btn ghost" type="button" data-i18n="studio.add_url">Add URL</button>
-                  </div>
-                  <p class="url-hint" data-i18n="studio.url_hint">Supports article/doc/paper links. Missing protocol will auto-use https://</p>
-                </section>
-                <section class="intake-card">
-                  <h3 data-i18n="studio.upload_section_title">Upload Files</h3>
-                  <p data-i18n="studio.upload_section_desc">Upload PDF/EPUB/Markdown/TXT, or drag files into the area.</p>
+                <section class="intake-card upload-hub-card">
+                  <h3>拖放或添加来源</h3>
+                  <p>一个统一入口支持上传文件、粘贴网站链接、粘贴文本。</p>
                   <section id="drop-zone" class="drop-zone">
-                    <p class="drop-title" data-i18n="studio.drop_title">Or drag and drop files</p>
-                    <p class="drop-sub" data-i18n="studio.drop_sub">EPUB, TXT, Markdown, PDF, web text, and more</p>
-                    <div class="drop-actions">
-                      <button id="upload-btn" class="btn ghost" type="button" data-i18n="studio.upload">Upload</button>
-                      <button id="paste-btn" class="btn ghost" type="button" data-i18n="studio.paste">Paste Text</button>
+                    <p class="drop-title">或拖放文件</p>
+                    <p class="drop-sub">PDF、EPUB、Markdown、TXT、网页文本等</p>
+                    <div class="hub-methods">
+                      <button id="upload-btn" class="hub-method-btn" type="button" data-i18n="studio.upload">上传文件</button>
+                      <button id="website-entry-btn" class="hub-method-btn" type="button">粘贴网站链接</button>
+                      <button id="cloud-drive-btn" class="hub-method-btn" type="button" disabled title="Coming soon">云端硬盘</button>
+                      <button id="paste-btn" class="hub-method-btn" type="button" data-i18n="studio.paste">粘贴文字</button>
                     </div>
                   </section>
+                  <div class="sr-only" aria-hidden="true">
+                    <input id="website-input" class="url-input" type="url" placeholder="https://example.com/article" tabindex="-1" />
+                    <button id="website-btn" class="btn ghost" type="button" data-i18n="studio.add_url" tabindex="-1">Add URL</button>
+                  </div>
                 </section>
               </div>
 
@@ -1355,6 +1423,7 @@
     const generateHintEl = document.getElementById("generate-hint");
     const websiteInput = document.getElementById("website-input");
     const uploadBtn = document.getElementById("upload-btn");
+    const websiteEntryBtn = document.getElementById("website-entry-btn");
     const websiteBtn = document.getElementById("website-btn");
     const pasteBtn = document.getElementById("paste-btn");
     const fileInput = document.getElementById("file-input");
@@ -1401,6 +1470,7 @@
     const pipelineCodeEl = document.getElementById("pipeline-code");
     const pipelinePreviewEl = document.getElementById("pipeline-preview");
     const ACTIVE_JOB_KEY = "reado_studio_active_job_id";
+    const SOURCE_DRAFT_KEY = "reado_studio_source_draft_v1";
     const AUTH_STATE_KEY = "reado_auth_state_v1";
     const PROFILE_SETUP_KEY = "reado_profile_setup_v1";
     const catalog = window.__READO_BOOK_CATALOG__ || {};
@@ -1478,11 +1548,13 @@
     function ensureReadyForGeneration() {
       const auth = readAuthState();
       if (!auth?.userId) {
+        persistSourceDraft();
         setMeta(t("studio.auth_required", "Please sign in before generating."));
         window.location.assign(buildAuthUrl());
         return false;
       }
       if (!hasProfileSetup(auth.userId)) {
+        persistSourceDraft();
         setMeta(t("studio.profile_required", "Please complete your profile before generating."));
         window.location.assign(buildProfileSetupUrl());
         return false;
@@ -1620,6 +1692,8 @@
               <p class="book-desc">${esc(desc || "已生成，可随时继续学习。")}</p>
               <div class="book-actions">
                 <button class="tiny" data-act="open-owned" data-id="${esc(safeBookId)}" data-work-id="${esc(String(work?.id || ""))}" data-work-title="${esc(title || "Knowledge Model")}" data-href="${esc(openHref)}">${esc(openHref ? "打开" : "知识模型")}</button>
+                <button class="tiny" data-act="publish-owned" data-work-id="${esc(String(work?.id || ""))}" data-is-public="${work?.is_public ? "1" : "0"}">${esc(work?.is_public ? "下架" : "上架")}</button>
+                <button class="tiny" data-act="delete-owned" data-work-id="${esc(String(work?.id || ""))}">${esc("删除")}</button>
               </div>
             </div>
           </article>`;
@@ -1769,15 +1843,51 @@
 
     function bindLibraryActions() {
       if (ownedBooksEl) {
-        ownedBooksEl.addEventListener("click", (event) => {
-          const btn = event.target && event.target.closest ? event.target.closest('button[data-act="open-owned"]') : null;
+        ownedBooksEl.addEventListener("click", async (event) => {
+          const btn = event.target && event.target.closest ? event.target.closest("button[data-act]") : null;
           if (!btn) return;
+          const action = btn.getAttribute("data-act") || "";
+          const workId = btn.getAttribute("data-work-id") || "";
+          if (action === "publish-owned") {
+            if (!workId) return;
+            const isPublic = btn.getAttribute("data-is-public") === "1";
+            btn.disabled = true;
+            try {
+              await request("PATCH", "/api/studio/works/" + encodeURIComponent(workId), {
+                is_public: !isPublic
+              });
+              setMeta(t("studio.meta_publish_done", "Visibility updated."));
+              await loadMyWorks();
+              await loadPublicLibrary();
+            } catch (error) {
+              setError(error?.message || t("studio.err_publish_failed", "Publish failed"));
+            } finally {
+              btn.disabled = false;
+            }
+            return;
+          }
+          if (action === "delete-owned") {
+            if (!workId) return;
+            if (!window.confirm(t("studio.confirm_delete", "Delete this playable book? This action cannot be undone."))) return;
+            btn.disabled = true;
+            try {
+              await request("DELETE", "/api/studio/works/" + encodeURIComponent(workId));
+              setMeta(t("studio.meta_delete_done", "Book deleted."));
+              await loadMyWorks();
+              await loadPublicLibrary();
+            } catch (error) {
+              setError(error?.message || t("studio.err_delete_failed", "Delete failed"));
+            } finally {
+              btn.disabled = false;
+            }
+            return;
+          }
+          if (action !== "open-owned") return;
           const href = btn.getAttribute("data-href") || "";
           if (href) {
             openBookHref(href);
             return;
           }
-          const workId = btn.getAttribute("data-work-id") || "";
           const title = btn.getAttribute("data-work-title") || "Knowledge Model";
           if (!workId) {
             setError("当前条目没有可用体验或知识模型。");
@@ -2000,12 +2110,14 @@
         const parsedBy = String(item?.parsedBy || "").toLowerCase();
         const urlText = String(item?.url || "");
         const uploadName = String(item?.__bookFile?.name || "").toLowerCase();
+        const fileToken = String(item?.__bookFileToken || item?.__bookFile?.fileToken || item?.fileToken || "").trim();
         if (parsedBy.startsWith("ingest.")) ingestCount += 1;
         if (
           parsedBy.includes("pdf")
           || parsedBy.includes("epub")
           || /\.(pdf|epub)(?:$|[?#])/i.test(urlText)
           || /\.(pdf|epub)$/.test(uploadName)
+          || Boolean(fileToken)
         ) {
           bookLikeCount += 1;
         }
@@ -2018,11 +2130,11 @@
     function pickBookFilePayload(sources) {
       const rows = Array.isArray(sources) ? sources : [];
       for (const row of rows) {
-        const file = row?.__bookFile && typeof row.__bookFile === "object" ? row.__bookFile : null;
-        if (!file) continue;
+        const file = row?.__bookFile && typeof row.__bookFile === "object" ? row.__bookFile : {};
         const fileToken = String(file?.fileToken || row?.fileToken || row?.__bookFileToken || "").trim();
-        const name = String(file?.name || "uploaded-book.pdf").trim() || "uploaded-book.pdf";
-        const type = String(file?.type || "application/octet-stream").trim() || "application/octet-stream";
+        const guessedName = String(row?.name || row?.title || "uploaded-book.pdf").trim();
+        const name = String(file?.name || guessedName || "uploaded-book.pdf").trim() || "uploaded-book.pdf";
+        const type = String(file?.type || row?.type || "application/octet-stream").trim() || "application/octet-stream";
         if (fileToken) {
           return {
             name,
@@ -2184,6 +2296,7 @@
         Number(row.gateIndex || row.gate_index || row.index || docRow?.gate || index + 1) || (index + 1)
       );
       const docMarkdown = String(docRow?.markdown || "").trim();
+      const contentExcerpt = String(row.content || "").replace(/\s+/g, " ").trim().slice(0, 2600);
       const summary = String(row.summary || row.content || "").trim().slice(0, 1200)
         || String(docMarkdown.split("\n").slice(0, 10).join(" ").replace(/\s+/g, " ")).trim().slice(0, 1200);
       return {
@@ -2195,6 +2308,7 @@
         keywords: Array.isArray(row.keywords) ? row.keywords.slice(0, 12) : [],
         words: Number(row.words || 0),
         summary,
+        contentExcerpt,
         densityScore: Number(row?.densityScore || row?.density?.score || 0),
         moduleSlug: String(moduleSlug || "").trim()
       };
@@ -2308,6 +2422,12 @@
       } else {
         lines.push("- (none)");
       }
+      if (block.contentExcerpt) {
+        lines.push("");
+        lines.push("## Source Excerpt");
+        lines.push("");
+        lines.push(block.contentExcerpt);
+      }
       return lines.join("\n");
     }
 
@@ -2394,6 +2514,7 @@
                 ${selectedBlock.path ? `<span class="pipeline-chip">${esc(selectedBlock.path)}</span>` : ""}
               </div>
               <p>${esc(selectedBlock.summary || "No summary available.")}</p>
+              ${selectedBlock.contentExcerpt ? `<p class="pipeline-empty">${esc(selectedBlock.contentExcerpt.slice(0, 320))}${selectedBlock.contentExcerpt.length > 320 ? "..." : ""}</p>` : ""}
               <div class="pipeline-kws">${selectedBlock.keywords.length ? selectedBlock.keywords.map((item) => `<span>${esc(item)}</span>`).join("") : `<span>(none)</span>`}</div>
               ${selectedBlock.moduleSlug ? `<a class="tiny" href="/experiences/${esc(encodeURIComponent(selectedBlock.moduleSlug))}.html" target="_blank" rel="noreferrer">Open mapped module</a>` : `<p class="pipeline-empty">No mapped module yet. Click Generate to build the interactive runtime.</p>`}
             </article>
@@ -2513,6 +2634,59 @@
 
     function sourceKey(item) {
       return (String(item.url || "") + "::" + String(item.title || "")).toLowerCase();
+    }
+
+    function sanitizeDraftSource(item) {
+      const row = item && typeof item === "object" ? JSON.parse(JSON.stringify(item)) : {};
+      if (typeof row.content === "string" && row.content.length > 280000) {
+        row.content = row.content.slice(0, 280000);
+      }
+      if (row.__bookFile && typeof row.__bookFile === "object") {
+        const fileToken = String(row.__bookFile.fileToken || "").trim();
+        row.__bookFile = {
+          name: String(row.__bookFile.name || "").trim(),
+          type: String(row.__bookFile.type || "").trim(),
+          fileToken,
+          contentBase64: fileToken ? "" : String(row.__bookFile.contentBase64 || "").trim().slice(0, 1200000)
+        };
+      }
+      return row;
+    }
+
+    function persistSourceDraft() {
+      try {
+        const rows = Array.isArray(state.selectedSources) ? state.selectedSources : [];
+        if (!rows.length) {
+          localStorage.removeItem(SOURCE_DRAFT_KEY);
+          return;
+        }
+        const payload = {
+          updatedAt: new Date().toISOString(),
+          selectedSources: rows.map((row) => sanitizeDraftSource(row))
+        };
+        localStorage.setItem(SOURCE_DRAFT_KEY, JSON.stringify(payload));
+      } catch {}
+    }
+
+    function restoreSourceDraft() {
+      try {
+        const raw = JSON.parse(localStorage.getItem(SOURCE_DRAFT_KEY) || "null");
+        if (!raw || typeof raw !== "object") return;
+        const updatedAt = Date.parse(String(raw.updatedAt || ""));
+        if (Number.isFinite(updatedAt) && (Date.now() - updatedAt) > 1000 * 60 * 60 * 24) {
+          localStorage.removeItem(SOURCE_DRAFT_KEY);
+          return;
+        }
+        const rows = Array.isArray(raw.selectedSources) ? raw.selectedSources : [];
+        if (!rows.length) return;
+        for (const row of rows) {
+          const key = sourceKey(row);
+          if (!key.trim()) continue;
+          if (state.selectedSources.some((item) => sourceKey(item) === key)) continue;
+          state.selectedSources.push(sanitizeDraftSource(row));
+        }
+        setMeta(t("studio.meta_restore_draft", "Restored your previous uploaded sources."));
+      } catch {}
     }
 
     function estimateModuleCountFromSources(sources) {
@@ -2716,6 +2890,7 @@
         selectedSourcesEl.innerHTML = `<div class="item"><p>${esc(t("studio.selected_empty", "No sources yet. Add a website URL or upload files first."))}</p></div>`;
         renderKnowledgeBlocks();
         updateGenerateCtaState();
+        persistSourceDraft();
         return;
       }
       const pendingHtml = pending.map((item) => {
@@ -2750,6 +2925,7 @@
       });
       renderKnowledgeBlocks();
       updateGenerateCtaState();
+      persistSourceDraft();
     }
 
     async function searchSources() {
@@ -2840,9 +3016,87 @@
       });
     }
 
+    async function startChunkedUpload(file, chunkBytes) {
+      const totalChunks = Math.max(1, Math.ceil(file.size / Math.max(1, chunkBytes)));
+      const data = await request("POST", "/api/studio/files/chunked/start", {
+        name: String(file?.name || "uploaded-book.bin"),
+        type: String(file?.type || "application/octet-stream"),
+        size: Number(file?.size || 0),
+        totalChunks
+      });
+      const uploadId = String(data?.uploadId || "").trim();
+      if (!uploadId) {
+        throw new Error("Chunk upload initialization failed.");
+      }
+      return {
+        uploadId,
+        chunkSize: Math.max(1024 * 1024, Number(data?.chunkSize || chunkBytes)),
+        totalChunks
+      };
+    }
+
+    function uploadChunkBinary(uploadId, index, blob, onProgress) {
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        const route = "/api/studio/files/chunked/" + encodeURIComponent(uploadId) + "/chunks/" + encodeURIComponent(String(index));
+        xhr.open("POST", route, true);
+        xhr.setRequestHeader("Content-Type", "application/octet-stream");
+        xhr.responseType = "json";
+        xhr.upload.onprogress = (event) => {
+          if (!event.lengthComputable) return;
+          if (typeof onProgress === "function") {
+            onProgress(Math.max(0, Math.min(1, event.loaded / Math.max(event.total, 1))));
+          }
+        };
+        xhr.onerror = () => reject(new Error("Chunk upload failed at part " + (index + 1)));
+        xhr.onload = () => {
+          const data = xhr.response && typeof xhr.response === "object"
+            ? xhr.response
+            : (() => {
+              try {
+                return JSON.parse(xhr.responseText || "{}");
+              } catch {
+                return {};
+              }
+            })();
+          if (xhr.status >= 200 && xhr.status < 300 && data?.ok !== false) {
+            resolve(data);
+            return;
+          }
+          reject(new Error((data && data.error) || ("Chunk upload failed with " + xhr.status)));
+        };
+        xhr.send(blob);
+      });
+    }
+
+    async function uploadFileChunked(file, onProgress) {
+      const fallbackChunkBytes = 6 * 1024 * 1024;
+      const started = await startChunkedUpload(file, fallbackChunkBytes);
+      const uploadId = String(started.uploadId || "").trim();
+      const chunkSize = Math.max(1024 * 1024, Number(started.chunkSize || fallbackChunkBytes));
+      const totalChunks = Math.max(1, Math.ceil(file.size / chunkSize));
+      for (let i = 0; i < totalChunks; i += 1) {
+        const start = i * chunkSize;
+        const end = Math.min(file.size, start + chunkSize);
+        const chunkBlob = file.slice(start, end);
+        await uploadChunkBinary(uploadId, i, chunkBlob, (ratio) => {
+          if (typeof onProgress !== "function") return;
+          const current = (i + Math.max(0, Math.min(1, ratio))) / Math.max(totalChunks, 1);
+          onProgress(Math.max(0, Math.min(0.96, current * 0.96)));
+        });
+        if (typeof onProgress === "function") {
+          onProgress(Math.max(0, Math.min(0.96, ((i + 1) / Math.max(totalChunks, 1)) * 0.96)));
+        }
+      }
+      const result = await request("POST", "/api/studio/files/chunked/" + encodeURIComponent(uploadId) + "/complete", {});
+      if (typeof onProgress === "function") onProgress(1);
+      return result;
+    }
+
     async function ingestFile(file, index, total, pendingId = "") {
-      const maxMb = 120;
+      const maxMb = 512;
       const binaryThresholdBytes = 8 * 1024 * 1024;
+      const chunkedThresholdBytes = 90 * 1024 * 1024;
       if (!file) return;
       if (file.size > maxMb * 1024 * 1024) {
         throw new Error(file.name + " exceeds " + maxMb + "MB");
@@ -2860,7 +3114,20 @@
       });
       let data = null;
       let contentBase64 = "";
-      if (file.size >= binaryThresholdBytes) {
+      if (file.size >= chunkedThresholdBytes) {
+        patchPendingSource(pendingId, {
+          status: t("studio.pending_uploading", "Uploading in chunked mode..."),
+          progress: baseStart + 8
+        });
+        data = await uploadFileChunked(file, (ratio) => {
+          const pct = baseStart + Math.round((100 / Math.max(total, 1)) * ratio * 0.78);
+          setProgress(pct, "Uploading chunks: " + file.name);
+          patchPendingSource(pendingId, {
+            status: t("studio.pending_uploading", "Uploading and parsing..."),
+            progress: pct
+          });
+        });
+      } else if (file.size >= binaryThresholdBytes) {
         patchPendingSource(pendingId, {
           status: t("studio.pending_uploading", "Uploading large file in binary mode..."),
           progress: baseStart + 8
@@ -3365,38 +3632,61 @@
       }
     }
 
-    searchBtn.addEventListener("click", searchSources);
-    searchInput.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") searchSources();
-    });
-    generateBtn.addEventListener("click", generatePlayable);
+    if (searchBtn) searchBtn.addEventListener("click", searchSources);
+    if (searchInput) {
+      searchInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") searchSources();
+      });
+    }
+    if (generateBtn) generateBtn.addEventListener("click", generatePlayable);
 
-    uploadBtn.addEventListener("click", () => {
-      fileInput.click();
-    });
-    fileInput.addEventListener("change", () => {
-      ingestFileList(fileInput.files).catch((error) => setError(error?.message || t("studio.err_file_import_failed", "File import failed")));
-      fileInput.value = "";
-    });
+    if (uploadBtn) {
+      uploadBtn.addEventListener("click", () => {
+        if (fileInput) fileInput.click();
+      });
+    }
+    if (fileInput) {
+      fileInput.addEventListener("change", () => {
+        ingestFileList(fileInput.files).catch((error) => setError(error?.message || t("studio.err_file_import_failed", "File import failed")));
+        fileInput.value = "";
+      });
+    }
 
-    websiteBtn.addEventListener("click", async () => {
-      if (websiteBtn.disabled) return;
-      websiteBtn.disabled = true;
-      try {
-        await ingestWebsiteUrl(websiteInput?.value || "");
-      } finally {
-        websiteBtn.disabled = false;
-      }
-    });
-    if (websiteInput) {
+    if (websiteBtn) {
+      websiteBtn.addEventListener("click", async () => {
+        if (websiteBtn.disabled) return;
+        websiteBtn.disabled = true;
+        try {
+          await ingestWebsiteUrl(websiteInput?.value || "");
+        } finally {
+          websiteBtn.disabled = false;
+        }
+      });
+    }
+    if (websiteInput && websiteBtn) {
       websiteInput.addEventListener("keydown", (event) => {
         if (event.key !== "Enter") return;
         event.preventDefault();
         websiteBtn.click();
       });
     }
+    if (websiteEntryBtn) {
+      websiteEntryBtn.addEventListener("click", async () => {
+        const url = await openSourceInputModal({
+          title: t("studio.website_section_title", "Website URL"),
+          label: t("studio.website_section_desc", "Paste one link and add it to your sources."),
+          placeholder: "https://example.com/article",
+          multiline: false,
+          confirmText: t("studio.add_url", "Add URL"),
+          cancelText: t("studio.modal_cancel", "Cancel")
+        });
+        if (!url) return;
+        if (websiteInput) websiteInput.value = url;
+        await ingestWebsiteUrl(url);
+      });
+    }
 
-    pasteBtn.addEventListener("click", async () => {
+    if (pasteBtn) pasteBtn.addEventListener("click", async () => {
       const text = await openSourceInputModal({
         title: t("studio.paste", "Paste Text"),
         label: t("studio.prompt_paste", "Paste text content for generation context"),
@@ -3465,6 +3755,7 @@
     bindLibraryActions();
     bindTrialModalActions();
     setupDropZone();
+    restoreSourceDraft();
     renderOwnedBooks();
     renderPublicBooks();
     renderSearchResults();

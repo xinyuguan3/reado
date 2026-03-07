@@ -1,0 +1,42 @@
+{
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T13:17:33.521Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "Datre Visual V4",
+      "author": ""
+    },
+    "knowledge_block": {
+      "id": "kb-17",
+      "gate_index": 15,
+      "title": "开始体验这些不同了。这也是魔术出现的地方，这也是你开始看见 “ 不可…",
+      "summary": "36 开始体验这些不同了。这也是魔术出现的地方，这也是你开始看见 “ 不可思议 ” 的事 情发生的地方。 问题 ：心识的产生是否在物质产生之前？",
+      "words": 352,
+      "keywords": [
+        "datre",
+        "问题",
+        "心念",
+        "但是",
+        "因此",
+        "诞生",
+        "起源",
+        "一个"
+      ],
+      "density": {
+        "score": 0.667,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0.3409,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0.1591
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "scholar",
+      "theme_label": "Scholar Atlas",
+      "section_count": 5,
+      "generated_with": "template_runtime"
+    }
+  }
+}

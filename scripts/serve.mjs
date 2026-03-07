@@ -237,9 +237,14 @@ const STUDIO_JOB_RETENTION_MS = 45 * 60 * 1000;
 const STUDIO_MAX_UPLOAD_JSON_BYTES = Math.max(32 * 1024 * 1024, toInt(process.env.READO_STUDIO_MAX_UPLOAD_JSON_BYTES || 220 * 1024 * 1024));
 const STUDIO_FILE_TOKEN_TTL_MS = Math.max(10 * 60 * 1000, toInt(process.env.READO_STUDIO_FILE_TOKEN_TTL_MS || 6 * 60 * 60 * 1000) || 6 * 60 * 60 * 1000);
 const STUDIO_FILE_TOKEN_DIR = path.join(dataDir, "tmp", "studio-file-tokens");
+const STUDIO_CHUNK_UPLOAD_TTL_MS = Math.max(20 * 60 * 1000, toInt(process.env.READO_STUDIO_CHUNK_UPLOAD_TTL_MS || 2 * 60 * 60 * 1000) || 2 * 60 * 60 * 1000);
+const STUDIO_CHUNK_MAX_BYTES = Math.max(2 * 1024 * 1024, toInt(process.env.READO_STUDIO_CHUNK_MAX_BYTES || 12 * 1024 * 1024) || 12 * 1024 * 1024);
+const STUDIO_CHUNK_RECOMMENDED_BYTES = Math.max(1024 * 1024, Math.min(STUDIO_CHUNK_MAX_BYTES - 512 * 1024, toInt(process.env.READO_STUDIO_CHUNK_RECOMMENDED_BYTES || 6 * 1024 * 1024) || 6 * 1024 * 1024));
+const STUDIO_CHUNK_UPLOAD_DIR = path.join(dataDir, "tmp", "studio-chunk-uploads");
 const studioFileTokens = new Map();
+const studioChunkUploads = new Map();
 const BOOK_PIPELINE_MIN_BLOCKS = 6;
-const BOOK_PIPELINE_MAX_BLOCKS = 36;
+const BOOK_PIPELINE_MAX_BLOCKS = 96;
 const BOOK_PIPELINE_QA_RETRIES = 2;
 const BOOK_PIPELINE_MICRO_TASKS = 10;
 const BOOK_PIPELINE_MICRO_SECONDS = 30;
@@ -248,13 +253,13 @@ const BOOK_PIPELINE_QUIZ_MIN_SCORE = Math.max(0.45, Math.min(0.95, Number(proces
 const BOOK_PIPELINE_QUIZ_REWRITE_RETRIES = Math.max(0, Math.min(4, toInt(process.env.READO_BOOK_PIPELINE_QUIZ_REWRITE_RETRIES || 2) || 2));
 const BOOK_PIPELINE_MAX_MODULES = Math.max(
   BOOK_PIPELINE_MIN_BLOCKS,
-  Math.min(BOOK_PIPELINE_MAX_BLOCKS, toInt(process.env.READO_BOOK_PIPELINE_MAX_MODULES || 24) || 24)
+  Math.min(BOOK_PIPELINE_MAX_BLOCKS, toInt(process.env.READO_BOOK_PIPELINE_MAX_MODULES || 60) || 60)
 );
 const BOOK_PIPELINE_QUIZ_WORKERS = Math.max(1, toInt(process.env.READO_BOOK_PIPELINE_WORKERS_QUIZ || 8) || 8);
 const BOOK_PIPELINE_ASSET_WORKERS = Math.max(1, toInt(process.env.READO_BOOK_PIPELINE_WORKERS_ASSET || 4) || 4);
 const BOOK_PIPELINE_AUDIO_WORKERS = Math.max(1, toInt(process.env.READO_BOOK_PIPELINE_WORKERS_AUDIO || 4) || 4);
 const BOOK_PIPELINE_EASTER_WORKERS = Math.max(1, toInt(process.env.READO_BOOK_PIPELINE_WORKERS_EASTER || 2) || 2);
-const BOOK_PIPELINE_INGEST_MAX_TEXT = Math.max(80_000, toInt(process.env.READO_BOOK_PIPELINE_INGEST_MAX_TEXT || 260_000) || 260_000);
+const BOOK_PIPELINE_INGEST_MAX_TEXT = Math.max(80_000, toInt(process.env.READO_BOOK_PIPELINE_INGEST_MAX_TEXT || 680_000) || 680_000);
 const BOOK_PIPELINE_INGEST_MAX_PAGES = Math.max(24, toInt(process.env.READO_BOOK_PIPELINE_INGEST_MAX_PAGES || 520) || 520);
 const BOOK_PIPELINE_IMAGE_PROVIDER = String(process.env.READO_BOOK_PIPELINE_IMAGE_PROVIDER || "auto")
   .trim()
@@ -305,7 +310,7 @@ const BOOK_PIPELINE_BOOK_READER_MAX_CHUNKS = Math.max(6, Math.min(220, toInt(pro
 const BOOK_PIPELINE_USE_BOOF = String(
   process.env.READO_BOOK_PIPELINE_USE_BOOF
   || process.env.READO_BOOK_PIPELINE_ENABLE_BOOF
-  || "on"
+  || "off"
 ).trim().toLowerCase() !== "off";
 const BOOK_PIPELINE_REQUIRE_BOOF = String(
   process.env.READO_BOOK_PIPELINE_REQUIRE_BOOF
@@ -351,7 +356,7 @@ const KNOWLEDGE_ABSORBER_HTML_OUTPUT_PATH = KNOWLEDGE_ABSORBER_RAW_OUTPUT_PATH
 const BOOK_PIPELINE_USE_KNOWLEDGE_ABSORBER = String(
   process.env.READO_BOOK_PIPELINE_USE_KNOWLEDGE_ABSORBER
   || process.env.READO_BOOK_PIPELINE_ENABLE_KNOWLEDGE_ABSORBER
-  || "on"
+  || "off"
 ).trim().toLowerCase() !== "off";
 const BOOK_PIPELINE_KA_TIMEOUT_MS = Math.max(60_000, toInt(process.env.READO_BOOK_PIPELINE_KA_TIMEOUT_MS || 8 * 60 * 1000) || 8 * 60 * 1000);
 const BOOK_PIPELINE_KA_MIN_CHARS = Math.max(600, toInt(process.env.READO_BOOK_PIPELINE_KA_MIN_CHARS || 1800) || 1800);
@@ -1851,18 +1856,73 @@ function extractConceptKeywords(text, maxCount = 6) {
     "that", "this", "with", "from", "have", "were", "which", "about", "into", "their", "there", "then", "than",
     "the", "and", "for", "are", "was", "you", "your", "our", "but", "not", "can", "will", "would", "should",
     "page", "pages", "image", "images", "content", "ocr", "error", "processing", "stream", "endobj", "flate", "flatedecode",
-    "我们", "你们", "他们", "以及", "因为", "所以", "可以", "需要", "然后", "通过", "这个", "那个", "一个"
+    "datre", "aona", "book", "chapter", "section", "knowledge", "chunk",
+    "我们", "你们", "他们", "以及", "因为", "所以", "可以", "需要", "然后", "通过", "这个", "那个", "一个", "问题", "回答", "这里", "那里", "什么", "如何", "就是", "不是",
+    "现在", "但是", "那么", "你看", "请问", "因此", "比如", "然后", "也许", "的话", "可以说"
   ]);
   const counts = new Map();
-  const matches = String(text || "").toLowerCase().match(/[a-z][a-z0-9-]{2,}|[\u4e00-\u9fff]{2,}/g) || [];
-  for (const token of matches) {
-    if (stopWords.has(token)) continue;
+  const source = String(text || "").toLowerCase();
+  const latinTokens = source.match(/[a-z][a-z0-9-]{2,24}/g) || [];
+  for (const token of latinTokens) {
+    if (stopWords.has(token) || /^\d+$/.test(token)) continue;
     counts.set(token, (counts.get(token) || 0) + 1);
+  }
+  const cjkRuns = source.match(/[\u4e00-\u9fff]{2,}/g) || [];
+  for (const run of cjkRuns) {
+    const parts = run
+      .split(/[的一是在和与及并就不我你他她们也而都很这那个着了将会中上下要能可还吗呢吧啊]/g)
+      .map((item) => item.trim())
+      .filter((item) => item.length >= 2 && item.length <= 6);
+    const tokens = parts.length ? parts : [run.slice(0, Math.min(6, run.length))];
+    for (const token of tokens) {
+      if (stopWords.has(token) || /^\d+$/.test(token)) continue;
+      counts.set(token, (counts.get(token) || 0) + 1);
+    }
   }
   return [...counts.entries()]
     .sort((a, b) => b[1] - a[1])
     .slice(0, Math.max(1, Math.min(20, toInt(maxCount) || 6)))
     .map(([token]) => token);
+}
+
+function normalizeKeywordTokenForPipeline(token = "") {
+  const cleaned = cleanText(token)
+    .toLowerCase()
+    .replace(/["'“”‘’`~!@#$%^&*()_+=\[\]{};:,./<>?\\|]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!cleaned) return "";
+  if (/^\d+$/.test(cleaned)) return "";
+  const compact = cleaned.replace(/\s+/g, "");
+  if (!compact) return "";
+  if (compact.length < 2 || compact.length > 14) return "";
+  if (/^(datre|aona|chapter|section|book|knowledge|chunk|问题|回答|我们|你们|他们)$/.test(compact)) return "";
+  if (/^(一个|这个|那个|什么|如何|因为|所以|然后|可以|需要)$/.test(compact)) return "";
+  if (compact.length > 6 && /(一个|这个|那个|我们|你们|他们|现在|但是|然后|因为|所以|就是|不是|那么|也许|请问|问题)/.test(compact)) return "";
+  return compact;
+}
+
+function normalizeKeywordsForPipeline(rawKeywords = [], content = "", maxCount = 10) {
+  const seeded = Array.isArray(rawKeywords) ? rawKeywords : [];
+  const deduped = [];
+  const seen = new Set();
+  for (const item of seeded) {
+    const token = normalizeKeywordTokenForPipeline(item);
+    if (!token || seen.has(token)) continue;
+    seen.add(token);
+    deduped.push(token);
+    if (deduped.length >= maxCount) break;
+  }
+  if (deduped.length >= Math.min(4, maxCount)) return deduped.slice(0, maxCount);
+  const extracted = extractConceptKeywords(content, Math.max(maxCount, 12));
+  for (const item of extracted) {
+    const token = normalizeKeywordTokenForPipeline(item);
+    if (!token || seen.has(token)) continue;
+    seen.add(token);
+    deduped.push(token);
+    if (deduped.length >= maxCount) break;
+  }
+  return deduped.slice(0, maxCount);
 }
 
 function computeDensityScore(text) {
@@ -2354,6 +2414,16 @@ function splitKnowledgeBlocksFromText(text, opts = {}) {
       .sort((a, b) => Number(b?.density?.score || 0) - Number(a?.density?.score || 0))
       .slice(0, Math.min(withScores.length, Math.max(3, Math.floor(withScores.length * 0.9))));
   }
+  const seenContentKeys = new Set();
+  retained = retained.filter((item) => {
+    const contentHead = cleanText(item?.content).slice(0, 280);
+    const summaryHead = cleanText(item?.summary).slice(0, 180);
+    const key = normalizeBookReaderSentenceKey(`${summaryHead} ${contentHead}`);
+    if (!key) return true;
+    if (seenContentKeys.has(key)) return false;
+    seenContentKeys.add(key);
+    return true;
+  });
   const normalized = retained
     .sort((a, b) => a.index - b.index)
     .map((item, idx) => ({ ...item, gateIndex: idx + 1 }));
@@ -3115,27 +3185,118 @@ function normalizeBoofMarkdown(raw = "", maxChars = BOOK_PIPELINE_INGEST_MAX_TEX
   );
 }
 
+function normalizeBookReaderSentenceKey(text = "") {
+  return cleanText(text)
+    .toLowerCase()
+    .replace(/^(?:问题|question|q|答|answer|a|datre|aona)\s*[:：-]?\s*/i, "")
+    .replace(/\b(?:page|p\.)\s*\d{1,4}\b/gi, " ")
+    .replace(/\d+/g, " ")
+    .replace(/[^a-z\u4e00-\u9fff]+/g, "")
+    .slice(0, 120);
+}
+
+function cleanBookReaderChunkText(text = "") {
+  let next = cleanText(stripOcrArtifactsForPipeline(text));
+  if (!next) return "";
+  next = next
+    .replace(/第\s*[0-9一二三四五六七八九十百千]+\s*章[^。！？\n]{0,40}\.{3,}\s*[0-9]{1,4}/g, " ")
+    .replace(/\btable\s+of\s+contents?\b[\s:：-]*/gi, " ")
+    .replace(/\bcontents?\b[\s:：-]*/gi, " ")
+    .replace(/(?:^|\s)目录(?:\s|$)/g, " ")
+    .replace(/\b(?:page|p\.)\s*[0-9]{1,4}\b/gi, " ")
+    .replace(/(?:^|\s)[0-9]{1,4}(?:\s|$)/g, " ")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+  const sentences = splitSentencesForPipeline(next);
+  if (sentences.length >= 3) {
+    const seen = new Set();
+    const uniq = [];
+    for (const line of sentences) {
+      const normalizedLine = stripLeadingPageMarker(cleanText(line))
+        .replace(/^(?:问题|question|q|答|answer|a|datre|aona)\s*[:：-]?\s*/i, "")
+        .replace(/^[“"'\-–—\s]+/, "")
+        .replace(/\s+/g, " ")
+        .trim();
+      if (!normalizedLine || normalizedLine.length < 14) continue;
+      const digits = (normalizedLine.match(/\d/g) || []).length;
+      if (digits / Math.max(1, normalizedLine.length) > 0.24) continue;
+      const key = normalizeBookReaderSentenceKey(normalizedLine);
+      if (!key || seen.has(key)) continue;
+      seen.add(key);
+      uniq.push(normalizedLine);
+      if (uniq.length >= 40) break;
+    }
+    if (uniq.length >= 2) {
+      next = uniq.join(" ").trim();
+    }
+  }
+  return next;
+}
+
+function inferBookReaderChunkTitle(rawTitle = "", content = "", index = 1, seedKeywords = []) {
+  const defaultTitle = `Knowledge Block ${Math.max(1, toInt(index) || 1)}`;
+  const titleRaw = normalizeKnowledgeBlockTitle(cleanText(rawTitle), "");
+  const titleLooksWeak = !titleRaw
+    || /^knowledge\s*chunk\s*\d+$/i.test(titleRaw)
+    || /^knowledge\s*section\s*\d+$/i.test(titleRaw)
+    || /^section\s*\d+$/i.test(titleRaw)
+    || /^[0-9]{1,4}$/.test(titleRaw)
+    || /^(?:datre|aona)\b/i.test(titleRaw);
+  let next = titleRaw;
+  const cleanedContent = cleanBookReaderChunkText(cleanText(content));
+  if (titleLooksWeak) {
+    const chapterMatch = cleanedContent.match(/第[一二三四五六七八九十百千0-9]+章[^。！？；;\n]{0,24}/);
+    const chapterEnMatch = cleanedContent.match(/(?:chapter|part|section)\s*[0-9ivxlcdm]+[^.!?;]{0,24}/i);
+    const normalizedKeywords = normalizeKeywordsForPipeline(seedKeywords, cleanedContent, 6);
+    const keywordTitle = normalizedKeywords.length >= 2
+      ? `${normalizedKeywords[0]} · ${normalizedKeywords[1]}`
+      : (normalizedKeywords[0] || "");
+    const sentenceRows = splitSentencesForPipeline(cleanedContent)
+      .map((line) => stripLeadingPageMarker(cleanText(line)))
+      .map((line) => line.replace(/^(?:问题|question|q|答|answer|a|datre|aona)\s*[:：-]?\s*/i, ""))
+      .map((line) => line.replace(/^[“"'\-–—\s]+/, "").trim())
+      .filter((line) => line.length >= 10);
+    const preferredSentence = sentenceRows.find((line) => !/^(?:问题|datre|aona)\s*[:：]/i.test(line))
+      || sentenceRows[0]
+      || cleanedContent.slice(0, 80);
+    next = cleanText(
+      chapterMatch?.[0],
+      cleanText(chapterEnMatch?.[0], cleanText(keywordTitle, preferredSentence))
+    );
+    if (/^(?:但是|然后|那么|也就是说|你看|现在|因此|于是)[，,。.\s]/.test(next) && keywordTitle) {
+      next = keywordTitle;
+    }
+  }
+  return sanitizeTitleForVisualReading(next, cleanedContent, index) || defaultTitle;
+}
+
 function normalizeBookReaderChunks(rawChunks = []) {
   const rows = Array.isArray(rawChunks) ? rawChunks : [];
   const out = [];
   for (let i = 0; i < rows.length; i += 1) {
     const row = rows[i] && typeof rows[i] === "object" ? rows[i] : {};
-    const title = normalizeKnowledgeBlockTitle(cleanText(row?.title), `Knowledge Block ${i + 1}`) || `Knowledge Block ${i + 1}`;
-    const summary = cleanText(stripOcrArtifactsForPipeline(cleanText(row?.summary))).slice(0, 420);
-    const content = cleanText(stripOcrArtifactsForPipeline(cleanText(row?.content)));
+    const content = cleanBookReaderChunkText(cleanText(row?.content));
     if (content.length < 80) continue;
-    const keywords = Array.isArray(row?.keywords)
-      ? row.keywords.map((item) => cleanText(item)).filter(Boolean).slice(0, 12)
-      : extractConceptKeywords(`${title} ${summary} ${content}`, 10);
+    const extractedKeywords = normalizeKeywordsForPipeline([], content, 12);
+    const seededKeywords = normalizeKeywordsForPipeline(row?.keywords, content, 12);
+    const keywords = [...new Set([...extractedKeywords, ...seededKeywords])].slice(0, 12);
+    const title = inferBookReaderChunkTitle(cleanText(row?.title), content, i + 1, keywords);
+    const summary = cleanText(
+      cleanBookReaderChunkText(cleanText(row?.summary)),
+      splitSentencesForPipeline(content).slice(0, 2).join(" ")
+    ).slice(0, 420);
+    const finalKeywords = keywords.length
+      ? keywords
+      : normalizeKeywordsForPipeline([], `${title} ${summary} ${content}`, 10);
     const coreIdeas = Array.isArray(row?.core_ideas)
-      ? row.core_ideas.map((item) => cleanText(stripOcrArtifactsForPipeline(item))).filter(Boolean).slice(0, 6)
+      ? row.core_ideas.map((item) => cleanBookReaderChunkText(item)).filter(Boolean).slice(0, 6)
       : [];
     out.push({
       chunkId: cleanText(row?.chunk_id, `kb-${String(out.length + 1).padStart(3, "0")}`),
       title,
       summary,
       content,
-      keywords,
+      keywords: finalKeywords,
       coreIdeas,
       charCount: Math.max(content.length, toInt(row?.char_count)),
       estimatedReadingMinutes: Math.max(1, toInt(row?.estimated_reading_minutes) || Math.ceil(Math.max(content.length, 1) / 650))
@@ -3915,8 +4076,32 @@ function resolveVisualReadingTheme({ bookTitle = "", moduleTitle = "", keywords 
   };
 }
 
+function normalizeVisualNarrativeSentence(sentence = "") {
+  return cleanText(sentence)
+    .replace(/^(?:问题|question|q|答|answer|a|datre|aona)\s*[:：-]?\s*/i, "")
+    .replace(/^(?:\d{1,4}\s*[-–—:：.]?\s*)+/, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function dedupeNarrativeSentences(sentences = [], maxItems = 40) {
+  const rows = Array.isArray(sentences) ? sentences : [];
+  const out = [];
+  const seen = new Set();
+  for (const raw of rows) {
+    const line = normalizeVisualNarrativeSentence(raw);
+    if (!line || line.length < 14) continue;
+    const key = normalizeBookReaderSentenceKey(line);
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    out.push(line);
+    if (out.length >= Math.max(8, toInt(maxItems) || 40)) break;
+  }
+  return out;
+}
+
 function buildNarrativeSlices(content = "", maxSlices = 5) {
-  const sentences = splitSentencesForPipeline(content);
+  const sentences = dedupeNarrativeSentences(splitSentencesForPipeline(content), 42);
   if (!sentences.length) return [];
   const sliceCount = Math.max(2, Math.min(maxSlices, Math.ceil(sentences.length / 3)));
   const chunk = Math.max(1, Math.ceil(sentences.length / sliceCount));
@@ -3948,7 +4133,7 @@ function buildConceptNotes(keywords = [], sentences = [], fallback = "") {
 }
 
 function pickReadingQuotes(sentences = [], maxCount = 3) {
-  return [...(Array.isArray(sentences) ? sentences : [])]
+  return [...dedupeNarrativeSentences(Array.isArray(sentences) ? sentences : [], 24)]
     .sort((a, b) => b.length - a.length)
     .slice(0, Math.max(1, Math.min(4, toInt(maxCount) || 3)))
     .map((line) => cleanText(line).slice(0, 220))
@@ -3970,11 +4155,12 @@ function buildPipelineModuleHtml({
   prevSlug = "",
   nextSlug = ""
 }) {
-  const content = cleanText(moduleContent, cleanText(moduleSummary));
-  const sentences = splitSentencesForPipeline(content);
+  const content = cleanBookReaderChunkText(cleanText(moduleContent, cleanText(moduleSummary)));
+  const sentences = dedupeNarrativeSentences(splitSentencesForPipeline(content), 56);
   const slices = buildNarrativeSlices(content, 5);
   const concepts = buildConceptNotes(keywords, sentences, moduleSummary);
   const quotes = pickReadingQuotes(sentences, 3);
+  const excerpts = sentences.slice(0, 6);
   const takeaways = slices.slice(0, 4).map((item, idx) => ({
     idx: idx + 1,
     text: cleanText(item?.title, item?.text).slice(0, 140)
@@ -4012,14 +4198,22 @@ function buildPipelineModuleHtml({
   const takeawayHtml = takeaways.length
     ? takeaways.map((item) => `<li><span>${escapeHtml(String(item.idx))}</span>${escapeHtml(item.text)}</li>`).join("")
     : `<li><span>1</span>${escapeHtml(cleanText(moduleSummary, moduleTitle))}</li>`;
-  const orbitNodes = concepts.slice(0, 5);
-  const orbitHtml = orbitNodes.length
-    ? orbitNodes.map((item, idx) => {
-        const angle = (Math.PI * 2 * idx) / orbitNodes.length;
-        const x = Math.round(220 + Math.cos(angle) * 150);
-        const y = Math.round(220 + Math.sin(angle) * 150);
-        return `<g><line x1="220" y1="220" x2="${x}" y2="${y}" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="${x}" cy="${y}" r="8" fill="${escapeHtml(palette.accent2 || "#34d399")}"/><text x="${x + 12}" y="${y + 4}" fill="${escapeHtml(palette.text || "#e2e8f0")}" font-size="12">${escapeHtml(item.token)}</text></g>`;
-      }).join("")
+  const readingMapHtml = (slices.length ? slices : [{ index: 1, title: moduleTitle, text: moduleSummary }])
+    .slice(0, 6)
+    .map((item, idx) => `
+      <article class="map-card reveal">
+        <p class="map-no">${escapeHtml(String(idx + 1).padStart(2, "0"))}</p>
+        <h3>${escapeHtml(cleanText(item?.title, `Section ${idx + 1}`))}</h3>
+        <p>${escapeHtml(cleanText(item?.text).slice(0, 220))}</p>
+      </article>
+    `).join("");
+  const excerptHtml = excerpts.length
+    ? excerpts.map((line, idx) => `
+      <article class="map-card reveal">
+        <p class="map-no">EXCERPT ${escapeHtml(String(idx + 1))}</p>
+        <p>${escapeHtml(cleanText(line).slice(0, 260))}</p>
+      </article>
+    `).join("")
     : "";
 
   return `<!doctype html>
@@ -4132,6 +4326,36 @@ function buildPipelineModuleHtml({
     }
     .concept-token { font-size: 14px; letter-spacing: .14em; color: var(--accent2); text-transform: uppercase; margin-bottom: 7px; font-weight: 700; }
     .concept-note { font-size: 14px; color: color-mix(in srgb, var(--text) 88%, var(--soft)); line-height: 1.8; }
+    .reading-map {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 10px;
+    }
+    .map-card {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      background: rgba(255,255,255,.03);
+      padding: 12px;
+      min-height: 148px;
+    }
+    .map-no {
+      font-size: 11px;
+      letter-spacing: .18em;
+      color: var(--accent);
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+    .map-card h3 {
+      font-size: 17px;
+      font-family: "Noto Serif SC", serif;
+      line-height: 1.45;
+      margin-bottom: 6px;
+    }
+    .map-card p {
+      font-size: 14px;
+      color: color-mix(in srgb, var(--text) 84%, var(--soft));
+      line-height: 1.85;
+    }
     .atlas {
       border: 1px solid rgba(255,255,255,.14);
       border-radius: 12px;
@@ -4246,27 +4470,10 @@ function buildPipelineModuleHtml({
       </div>
     </section>
 
-    <section class="section grid-2 reveal" id="atlas">
-      <article>
-        <h2>知识结构图谱</h2>
-        <p style="color:var(--soft);line-height:1.9;margin-bottom:10px;">围绕本关卡核心概念构建关系图。阅读时先抓主轴，再理解每个概念如何驱动判断与行动。</p>
-        <div class="quote-wrap">${quoteHtml}</div>
-      </article>
-      <article class="atlas">
-        <svg viewBox="0 0 440 440" aria-label="concept atlas">
-          <defs>
-            <radialGradient id="g" cx="50%" cy="50%" r="56%">
-              <stop offset="0%" stop-color="${escapeHtml(palette.accent || "#f59e0b")}" stop-opacity=".24"></stop>
-              <stop offset="100%" stop-color="${escapeHtml(palette.accent || "#f59e0b")}" stop-opacity="0"></stop>
-            </radialGradient>
-          </defs>
-          <circle cx="220" cy="220" r="190" fill="none" stroke="rgba(255,255,255,.08)" stroke-dasharray="5 6"></circle>
-          <circle cx="220" cy="220" r="84" fill="url(#g)"></circle>
-          <circle cx="220" cy="220" r="10" fill="${escapeHtml(palette.accent || "#f59e0b")}"></circle>
-          <text x="220" y="252" text-anchor="middle" fill="${escapeHtml(palette.text || "#e5edf8")}" font-size="13">${escapeHtml(cleanText(moduleTitle).slice(0, 24))}</text>
-          ${orbitHtml}
-        </svg>
-      </article>
+    <section class="section reveal" id="atlas">
+      <h2>主题脉络与阅读地图</h2>
+      <p style="color:var(--soft);line-height:1.9;margin-bottom:10px;">先看章节主线，再进入细节。每个卡片都是一个可独立理解的知识片段。</p>
+      <div class="reading-map">${readingMapHtml}</div>
     </section>
 
     <section class="section reveal" id="concepts">
@@ -4274,9 +4481,16 @@ function buildPipelineModuleHtml({
       <div class="concept-grid">${conceptCardsHtml}</div>
     </section>
 
+    <section class="section reveal" id="reading-excerpts">
+      <h2>原文精读片段</h2>
+      <p style="color:var(--soft);line-height:1.9;margin-bottom:10px;">保留信息密度最高的段落，先读原句，再看后续路径与总结。</p>
+      <div class="reading-map">${excerptHtml || readingMapHtml}</div>
+    </section>
+
     <section class="section reveal" id="reading">
       <h2>渐进式阅读路径</h2>
       <div class="timeline">${timelineHtml}</div>
+      <div class="quote-wrap" style="margin-top:12px;">${quoteHtml}</div>
     </section>
 
     <section class="section reveal" id="takeaways">
@@ -5359,6 +5573,223 @@ async function loadStudioFilePayloadFromToken(fileToken = "", sessionId = "") {
   };
 }
 
+function sanitizeStudioChunkUploadId(value = "") {
+  const text = cleanText(value);
+  if (!text) return "";
+  return /^[a-z0-9_-]{10,128}$/i.test(text) ? text : "";
+}
+
+async function cleanupExpiredStudioChunkUploads(nowMs = Date.now()) {
+  const stale = [];
+  for (const [uploadId, entry] of studioChunkUploads.entries()) {
+    const expiresAtMs = Date.parse(cleanText(entry?.expiresAt));
+    if (!Number.isFinite(expiresAtMs) || expiresAtMs <= nowMs) {
+      stale.push({ uploadId, dirPath: cleanText(entry?.dirPath) });
+    }
+  }
+  for (const row of stale) {
+    studioChunkUploads.delete(row.uploadId);
+    if (row.dirPath) {
+      await fs.rm(row.dirPath, { recursive: true, force: true }).catch(() => {});
+    }
+  }
+}
+
+async function createStudioChunkUploadSession(sessionId = "", payload = {}) {
+  const ownerSessionId = cleanText(sessionId);
+  if (!ownerSessionId) throw new Error("Missing session for chunk upload.");
+  await cleanupExpiredStudioChunkUploads();
+  const name = sanitizeStudioUploadName(payload?.name, "uploaded-book.bin");
+  const type = cleanText(payload?.type, "application/octet-stream");
+  const size = Math.max(1, toInt(payload?.size));
+  const totalChunks = Math.max(1, Math.min(5000, toInt(payload?.totalChunks)));
+  const uploadId = `u-${Date.now().toString(36)}-${crypto.randomUUID().replace(/-/g, "").slice(0, 12)}`;
+  const dirPath = path.join(STUDIO_CHUNK_UPLOAD_DIR, uploadId);
+  await fs.mkdir(dirPath, { recursive: true });
+  const expiresAt = new Date(Date.now() + STUDIO_CHUNK_UPLOAD_TTL_MS).toISOString();
+  studioChunkUploads.set(uploadId, {
+    uploadId,
+    ownerSessionId,
+    name,
+    type,
+    size,
+    totalChunks,
+    received: {},
+    dirPath,
+    createdAt: nowIso(),
+    updatedAt: nowIso(),
+    expiresAt
+  });
+  return {
+    uploadId,
+    name,
+    type,
+    size,
+    totalChunks,
+    chunkSize: STUDIO_CHUNK_RECOMMENDED_BYTES,
+    expiresAt
+  };
+}
+
+async function loadStudioChunkUpload(uploadId = "", sessionId = "") {
+  const safeUploadId = sanitizeStudioChunkUploadId(uploadId);
+  if (!safeUploadId) {
+    throw new Error("Invalid upload id.");
+  }
+  await cleanupExpiredStudioChunkUploads();
+  const entry = studioChunkUploads.get(safeUploadId);
+  if (!entry) {
+    throw new Error("Upload session expired. Please upload again.");
+  }
+  const ownerSessionId = cleanText(entry?.ownerSessionId);
+  const requesterSessionId = cleanText(sessionId);
+  if (ownerSessionId && requesterSessionId && ownerSessionId !== requesterSessionId) {
+    throw new Error("Upload session does not belong to current session.");
+  }
+  return entry;
+}
+
+async function writeStudioChunkPart(entry, chunkIndex = 0, buffer = null) {
+  const idx = Math.max(0, toInt(chunkIndex));
+  const chunkBuffer = Buffer.isBuffer(buffer) ? buffer : null;
+  if (!chunkBuffer || !chunkBuffer.length) {
+    throw new Error("Chunk payload is empty.");
+  }
+  if (idx >= Math.max(1, toInt(entry?.totalChunks))) {
+    throw new Error("Chunk index out of range.");
+  }
+  const dirPath = cleanText(entry?.dirPath);
+  if (!dirPath) throw new Error("Upload session directory missing.");
+  await fs.mkdir(dirPath, { recursive: true });
+  const partPath = path.join(dirPath, `${idx}.part`);
+  await fs.writeFile(partPath, chunkBuffer);
+  const nextReceived = entry.received && typeof entry.received === "object" ? { ...entry.received } : {};
+  nextReceived[String(idx)] = chunkBuffer.length;
+  const updatedEntry = {
+    ...entry,
+    received: nextReceived,
+    updatedAt: nowIso(),
+    expiresAt: new Date(Date.now() + STUDIO_CHUNK_UPLOAD_TTL_MS).toISOString()
+  };
+  studioChunkUploads.set(cleanText(entry?.uploadId), updatedEntry);
+  return updatedEntry;
+}
+
+async function collectStudioChunkUploadBuffer(entry) {
+  const dirPath = cleanText(entry?.dirPath);
+  if (!dirPath) throw new Error("Upload session directory missing.");
+  const totalChunks = Math.max(1, toInt(entry?.totalChunks));
+  const mergedPath = path.join(dirPath, "merged.bin");
+  await fs.unlink(mergedPath).catch(() => {});
+  let mergedSize = 0;
+  for (let i = 0; i < totalChunks; i += 1) {
+    const partPath = path.join(dirPath, `${i}.part`);
+    const chunk = await fs.readFile(partPath).catch(() => null);
+    if (!chunk || !chunk.length) {
+      throw new Error(`Missing upload chunk ${i + 1}/${totalChunks}.`);
+    }
+    mergedSize += chunk.length;
+    await fs.appendFile(mergedPath, chunk);
+  }
+  const buffer = await fs.readFile(mergedPath).catch(() => null);
+  if (!buffer || !buffer.length) {
+    throw new Error("Merged upload file is empty.");
+  }
+  if (toInt(entry?.size) > 0 && Math.abs(buffer.length - toInt(entry?.size)) > Math.max(64 * 1024, Math.ceil(toInt(entry?.size) * 0.08))) {
+    throw new Error("Merged upload size mismatch.");
+  }
+  return buffer;
+}
+
+async function destroyStudioChunkUpload(uploadId = "") {
+  const safeUploadId = sanitizeStudioChunkUploadId(uploadId);
+  if (!safeUploadId) return;
+  const entry = studioChunkUploads.get(safeUploadId);
+  studioChunkUploads.delete(safeUploadId);
+  const dirPath = cleanText(entry?.dirPath);
+  if (dirPath) {
+    await fs.rm(dirPath, { recursive: true, force: true }).catch(() => {});
+  }
+}
+
+async function ingestStudioBinaryBufferForSession(sessionId = "", filePayload = {}) {
+  const fileName = sanitizeStudioUploadName(filePayload?.name, "uploaded-book.bin");
+  const fileType = cleanText(filePayload?.type, "application/octet-stream");
+  const rawBody = Buffer.isBuffer(filePayload?.buffer) ? filePayload.buffer : null;
+  if (!rawBody || !rawBody.length) {
+    throw new Error("Uploaded file is empty.");
+  }
+  const ingestEvents = [];
+  let source = null;
+  let ingestError = "";
+  try {
+    source = await playableContentEngine.ingestFileSource(
+      {
+        name: fileName,
+        type: fileType,
+        buffer: rawBody
+      },
+      {
+        onProgress: (event) => {
+          ingestEvents.push({
+            at: event?.at || nowIso(),
+            step: event?.step || "",
+            progress: Number.isFinite(Number(event?.progress)) ? Number(event.progress) : null,
+            message: event?.message || ""
+          });
+        }
+      }
+    );
+  } catch (error) {
+    ingestError = cleanText(error?.message, "file_ingest_parser_failed");
+    ingestEvents.push({
+      at: nowIso(),
+      step: "ingesting_file",
+      progress: 86,
+      message: `Parser fallback to token-only mode: ${ingestError}`
+    });
+  }
+  let fileTokenMeta = null;
+  try {
+    fileTokenMeta = await storeStudioFileTokenForSession(sessionId, {
+      name: fileName,
+      type: fileType,
+      buffer: rawBody
+    });
+  } catch (error) {
+    ingestEvents.push({
+      at: nowIso(),
+      step: "ingesting_file",
+      progress: 98,
+      message: `File token cache failed: ${cleanText(error?.message, "unknown")}`
+    });
+  }
+  const fallbackSource = {
+    title: fileName,
+    url: "",
+    snippet: "",
+    content: "",
+    parsedBy: "ingest.file-token-only",
+    ingestError
+  };
+  const sourceWithToken = fileTokenMeta
+    ? {
+        ...((source && typeof source === "object") ? source : fallbackSource),
+        fileToken: cleanText(fileTokenMeta?.token),
+        fileTokenExpiresAt: cleanText(fileTokenMeta?.expiresAt),
+        fileSizeBytes: toInt(fileTokenMeta?.size)
+      }
+    : ((source && typeof source === "object") ? source : fallbackSource);
+  return {
+    ok: true,
+    source: sourceWithToken,
+    fileToken: cleanText(fileTokenMeta?.token),
+    fileTokenExpiresAt: cleanText(fileTokenMeta?.expiresAt),
+    fileSizeBytes: toInt(fileTokenMeta?.size),
+    events: ingestEvents
+  };
+}
+
 function resolveBookPipelineFileTokenFromPayload(payload = {}) {
   const file = payload?.bookFile && typeof payload.bookFile === "object"
     ? payload.bookFile
@@ -6294,13 +6725,14 @@ function normalizeManifestKnowledgeBlock(block, index = 0) {
   const gate = Math.max(1, toInt(row.gateIndex || row.gate_index || row.index || index + 1) || (index + 1));
   const content = cleanText(row.content);
   const summary = cleanText(row.summary, content.slice(0, 320)).slice(0, 1200);
-  const title = cleanText(
+  const titleSeed = cleanText(
     row.title,
     cleanText(splitSentencesForPipeline(content)[0], `Knowledge Block ${gate}`).slice(0, 90)
   );
+  const title = sanitizeTitleForVisualReading(titleSeed, `${summary} ${content}`, gate);
   const keywords = Array.isArray(row.keywords) && row.keywords.length
-    ? row.keywords.slice(0, 12).map((item) => cleanText(item)).filter(Boolean)
-    : extractConceptKeywords(`${title} ${summary} ${content}`, 8);
+    ? normalizeKeywordsForPipeline(row.keywords, `${title} ${summary} ${content}`, 12)
+    : normalizeKeywordsForPipeline([], `${title} ${summary} ${content}`, 8);
   const density = row.density && typeof row.density === "object"
     ? row.density
     : computeDensityScore(`${summary} ${content}`);
@@ -6334,11 +6766,19 @@ function sanitizeTitleForVisualReading(title = "", fallbackText = "", gateIndex 
     .replace(/\[PAGE[^\]]+\]/gi, " ")
     .replace(/\bIMAGE\s+CONTENT\s*\(OCR\)\b/gi, " ")
     .replace(/\bOCR\b/gi, " ")
+    .replace(/^(?:\d{1,4}\s*[-–—:：.]?\s*)+/, "")
+    .replace(/^(?:问题\s*[:：]\s*)+/i, "")
+    .replace(/^(?:datre|aona)\s*[:：-]?\s*/i, "")
     .replace(/\s+/g, " ")
     .trim();
+  next = next.replace(/^[“"'‘’\[(【]+/, "").replace(/[”"'’\])】]+$/g, "").trim();
   const chapterMatch = next.match(/第[一二三四五六七八九十百0-9]+章[^，。！？\s]{0,24}/);
   if (chapterMatch && chapterMatch[0]) {
     next = chapterMatch[0].trim();
+  }
+  if (/[?？]/.test(next) && next.length > 18) {
+    const lead = next.split(/[?？]/)[0];
+    next = cleanText(lead, next).trim();
   }
   if (!next || next.length < 4) {
     const first = cleanText(splitSentencesForPipeline(fallbackText)[0], cleanText(fallbackText));
@@ -6347,6 +6787,34 @@ function sanitizeTitleForVisualReading(title = "", fallbackText = "", gateIndex 
   next = next.replace(/[，。！？;；:：,.\-—\s]+$/g, "").trim();
   if (next.length > 36) next = `${next.slice(0, 34).trim()}…`;
   return next || `Knowledge Block ${gateIndex}`;
+}
+
+function buildVisualReadingTitleFromBlock(block = {}, index = 0) {
+  const gate = Math.max(1, toInt(index) + 1);
+  const content = cleanText(block?.content);
+  const summary = cleanText(block?.summary);
+  let visualTitle = sanitizeTitleForVisualReading(
+    cleanText(block?.title),
+    `${summary} ${content}`,
+    gate
+  );
+  const tooVerbose = visualTitle.length > 24 || /[。！？?!]/.test(visualTitle);
+  const noisyLead = /^["'“”]|^(?:datre|aona)\s*[:：]/i.test(visualTitle);
+  if (!(tooVerbose || noisyLead)) return visualTitle;
+  const chapterMatch = content.match(/第[一二三四五六七八九十百千0-9]+章[^\s，。！？]{0,20}/);
+  const summarySentence = cleanText(summary.split(/[。！？.!?]/)[0], summary.slice(0, 60));
+  const keywords = Array.isArray(block?.keywords)
+    ? block.keywords.map((item) => cleanText(item)).filter(Boolean)
+    : [];
+  const keywordTitle = keywords.length >= 2
+    ? `${keywords[0]} · ${keywords[1]}`
+    : (keywords[0] || "");
+  visualTitle = sanitizeTitleForVisualReading(
+    cleanText(chapterMatch?.[0], keywordTitle, summarySentence, visualTitle),
+    content || summary,
+    gate
+  );
+  return visualTitle;
 }
 
 function computeVisualBlockScore(block = {}) {
@@ -6460,11 +6928,7 @@ function optimizeKnowledgeBlocksForVisualReading(blocks = [], options = {}) {
   const minKeep = Math.max(6, Math.min(24, toInt(options?.minKeep) || 8));
   const maxKeep = Math.max(minKeep, Math.min(32, toInt(options?.maxKeep) || 16));
   const scored = list.map((row, idx) => {
-    const visualTitle = sanitizeTitleForVisualReading(
-      cleanText(row?.title),
-      `${cleanText(row?.summary)} ${cleanText(row?.content)}`,
-      idx + 1
-    );
+    const visualTitle = buildVisualReadingTitleFromBlock(row, idx);
     return {
       ...row,
       title: visualTitle,
@@ -6842,11 +7306,7 @@ async function runBookPipelineGenerationJob(job, sessionId) {
     ? " + book-reader"
     : (sourceEnhancer?.provider === "book-reader-native-fallback"
       ? " + book-reader(native fallback)"
-    : (sourceEnhancer?.provider === "boof"
-      ? " + BOOF"
-      : (sourceEnhancer?.provider === "boof_fallback"
-        ? " + fallback parser"
-        : (sourceEnhancer?.used ? " + parser skill" : ""))));
+      : "");
   const bookAuthor = cleanText(source?.author, cleanText(sourceEnhancer?.author));
   const skeletonMdPath = cleanText(
     sourceEnhancer?.markdownSnapshotPath,
@@ -6935,8 +7395,16 @@ async function runBookPipelineGenerationJob(job, sessionId) {
   });
 
   const requestedMinScore = Number(job.payload?.minDensityScore);
+  const preferredChunkCount = Array.isArray(planningInput.preferredChunks) ? planningInput.preferredChunks.length : 0;
+  const strategyIsBookReader = cleanText(planningInput?.strategy).toLowerCase() === "book_reader_chunks";
+  const splitTargetBlocks = requestedBlocks
+    || (
+      strategyIsBookReader && preferredChunkCount >= BOOK_PIPELINE_MIN_BLOCKS
+        ? Math.min(BOOK_PIPELINE_MAX_BLOCKS, Math.max(BOOK_PIPELINE_MIN_BLOCKS, preferredChunkCount))
+        : toInt(eta.blockCount)
+    );
   const splitResult = splitKnowledgeBlocksFromText(planningInput.text, {
-    targetBlocks: requestedBlocks || eta.blockCount,
+    targetBlocks: splitTargetBlocks,
     minScore: Number.isFinite(requestedMinScore) ? requestedMinScore : BOOK_PIPELINE_DENSITY_MIN_SCORE,
     returnDiagnostics: true,
     preferredChunks: planningInput.preferredChunks
@@ -6945,14 +7413,18 @@ async function runBookPipelineGenerationJob(job, sessionId) {
   const splitDiagnostics = splitResult?.diagnostics && typeof splitResult.diagnostics === "object"
     ? splitResult.diagnostics
     : null;
-  const visualMaxKeep = Math.max(
-    12,
-    Math.min(
-      BOOK_PIPELINE_MAX_MODULES,
-      toInt(job.payload?.maxModuleCount) || toInt(job.payload?.moduleCount) || toInt(job.payload?.blockCount) || toInt(eta.blockCount)
-    )
-  );
-  const visualMinKeep = Math.max(10, Math.min(visualMaxKeep, Math.ceil(visualMaxKeep * 0.72)));
+  const visualDesiredCount = toInt(job.payload?.maxModuleCount)
+    || toInt(job.payload?.moduleCount)
+    || toInt(job.payload?.blockCount)
+    || (
+      strategyIsBookReader && preferredChunkCount >= BOOK_PIPELINE_MIN_BLOCKS
+        ? Math.round(preferredChunkCount * 0.9)
+        : toInt(eta.blockCount)
+    );
+  const visualMaxKeep = Math.max(12, Math.min(BOOK_PIPELINE_MAX_MODULES, visualDesiredCount || BOOK_PIPELINE_MIN_BLOCKS));
+  const visualMinKeep = strategyIsBookReader
+    ? Math.max(10, Math.min(visualMaxKeep, Math.ceil(visualMaxKeep * 0.82)))
+    : Math.max(10, Math.min(visualMaxKeep, Math.ceil(visualMaxKeep * 0.72)));
   const visualOptimization = optimizeKnowledgeBlocksForVisualReading(rawKnowledgeBlocks, {
     minKeep: visualMinKeep,
     maxKeep: visualMaxKeep
@@ -8180,6 +8652,79 @@ async function handleStudioApi(req, res, url, session) {
       return true;
     }
 
+    if (method === "POST" && route === "/api/studio/files/chunked/start") {
+      const body = await parseJsonBody(req, 128 * 1024).catch((error) => ({ __error: error?.message || "Invalid body" }));
+      if (body.__error) {
+        writeJson(res, 400, { ok: false, error: body.__error });
+        return true;
+      }
+      try {
+        const size = Math.max(1, toInt(body?.size));
+        const totalChunks = Math.max(1, Math.min(5000, toInt(body?.totalChunks)));
+        if (size > 2 * 1024 * 1024 * 1024) {
+          writeJson(res, 400, { ok: false, error: "File too large for chunked upload (max 2GB)." });
+          return true;
+        }
+        const upload = await createStudioChunkUploadSession(session.id, {
+          name: body?.name,
+          type: body?.type,
+          size,
+          totalChunks
+        });
+        writeJson(res, 200, { ok: true, ...upload });
+      } catch (error) {
+        writeJson(res, 500, { ok: false, error: cleanText(error?.message, "chunked_upload_start_failed") });
+      }
+      return true;
+    }
+
+    const chunkPartMatch = route.match(/^\/api\/studio\/files\/chunked\/([^/]+)\/chunks\/([0-9]+)$/);
+    if (method === "POST" && chunkPartMatch) {
+      const uploadId = decodeURIComponent(chunkPartMatch[1] || "").trim();
+      const chunkIndex = toInt(chunkPartMatch[2]);
+      const rawBody = await parseRawBody(req, STUDIO_CHUNK_MAX_BYTES).catch((error) => ({ __error: error?.message || "Invalid body" }));
+      if (rawBody?.__error) {
+        writeJson(res, 400, { ok: false, error: rawBody.__error });
+        return true;
+      }
+      try {
+        const upload = await loadStudioChunkUpload(uploadId, session.id);
+        const updated = await writeStudioChunkPart(upload, chunkIndex, rawBody);
+        const receivedCount = Object.keys(updated.received || {}).length;
+        writeJson(res, 200, {
+          ok: true,
+          uploadId: cleanText(updated.uploadId),
+          chunkIndex,
+          receivedChunks: receivedCount,
+          totalChunks: toInt(updated.totalChunks),
+          expiresAt: cleanText(updated.expiresAt)
+        });
+      } catch (error) {
+        writeJson(res, 400, { ok: false, error: cleanText(error?.message, "chunk_upload_failed") });
+      }
+      return true;
+    }
+
+    const chunkCompleteMatch = route.match(/^\/api\/studio\/files\/chunked\/([^/]+)\/complete$/);
+    if (method === "POST" && chunkCompleteMatch) {
+      const uploadId = decodeURIComponent(chunkCompleteMatch[1] || "").trim();
+      try {
+        const upload = await loadStudioChunkUpload(uploadId, session.id);
+        const mergedBuffer = await collectStudioChunkUploadBuffer(upload);
+        const result = await ingestStudioBinaryBufferForSession(session.id, {
+          name: cleanText(upload?.name, "uploaded-book.bin"),
+          type: cleanText(upload?.type, "application/octet-stream"),
+          buffer: mergedBuffer
+        });
+        await destroyStudioChunkUpload(uploadId);
+        writeJson(res, 200, result);
+      } catch (error) {
+        await destroyStudioChunkUpload(uploadId).catch(() => {});
+        writeJson(res, 500, { ok: false, error: cleanText(error?.message, "chunk_upload_complete_failed") });
+      }
+      return true;
+    }
+
     if (method === "POST" && route === "/api/studio/files/ingest-binary") {
       const fileName = sanitizeStudioUploadName(
         url.searchParams.get("name")
@@ -8198,75 +8743,16 @@ async function handleStudioApi(req, res, url, session) {
         writeJson(res, 400, { ok: false, error: rawBody.__error });
         return true;
       }
-      const ingestEvents = [];
-      let source = null;
-      let ingestError = "";
       try {
-        source = await playableContentEngine.ingestFileSource(
-          {
-            name: fileName,
-            type: fileType,
-            buffer: rawBody
-          },
-          {
-            onProgress: (event) => {
-              ingestEvents.push({
-                at: event?.at || nowIso(),
-                step: event?.step || "",
-                progress: Number.isFinite(Number(event?.progress)) ? Number(event.progress) : null,
-                message: event?.message || ""
-              });
-            }
-          }
-        );
-      } catch (error) {
-        ingestError = cleanText(error?.message, "file_ingest_parser_failed");
-        ingestEvents.push({
-          at: nowIso(),
-          step: "ingesting_file",
-          progress: 86,
-          message: `Parser fallback to token-only mode: ${ingestError}`
-        });
-      }
-      let fileTokenMeta = null;
-      try {
-        fileTokenMeta = await storeStudioFileTokenForSession(session.id, {
+        const result = await ingestStudioBinaryBufferForSession(session.id, {
           name: fileName,
           type: fileType,
           buffer: rawBody
         });
+        writeJson(res, 200, result);
       } catch (error) {
-        ingestEvents.push({
-          at: nowIso(),
-          step: "ingesting_file",
-          progress: 98,
-          message: `File token cache failed: ${cleanText(error?.message, "unknown")}`
-        });
+        writeJson(res, 500, { ok: false, error: cleanText(error?.message, "file_ingest_failed") });
       }
-      const fallbackSource = {
-        title: fileName,
-        url: "",
-        snippet: "",
-        content: "",
-        parsedBy: "ingest.file-token-only",
-        ingestError
-      };
-      const sourceWithToken = fileTokenMeta
-        ? {
-            ...((source && typeof source === "object") ? source : fallbackSource),
-            fileToken: cleanText(fileTokenMeta?.token),
-            fileTokenExpiresAt: cleanText(fileTokenMeta?.expiresAt),
-            fileSizeBytes: toInt(fileTokenMeta?.size)
-          }
-        : ((source && typeof source === "object") ? source : fallbackSource);
-      writeJson(res, 200, {
-        ok: true,
-        source: sourceWithToken,
-        fileToken: cleanText(fileTokenMeta?.token),
-        fileTokenExpiresAt: cleanText(fileTokenMeta?.expiresAt),
-        fileSizeBytes: toInt(fileTokenMeta?.size),
-        events: ingestEvents
-      });
       return true;
     }
 
@@ -8793,11 +9279,11 @@ function enrichBookWithWorkMeta(book, sessionId) {
     .map((line) => String(line).slice(0, 130))
     .slice(0, 3);
   if (!row.highlights.length) {
-    row.highlights = ["Interactive mission generated from source materials."];
+    row.highlights = ["Visual reading chapters generated from your uploaded source."];
   }
   row.category = row.category || "science-knowledge";
   row.categoryLabel = row.categoryLabel || "Knowledge";
-  row.categoryHint = row.categoryHint || "Train understanding through interactive decisions.";
+  row.categoryHint = row.categoryHint || "Deep-reading visual chapters for high-density understanding.";
   row.tier = row.tier || "Custom";
   row.moduleCount = Number.isFinite(Number(work.module_count)) ? Number(work.module_count) : row.moduleCount;
   if (Array.isArray(row.modules)) {
@@ -9101,12 +9587,12 @@ function buildDynamicBookPageHtml(book) {
       <article class="summary">
         <span class="badge">${escapeHtml(book.categoryLabel || "书籍模块")} · ${escapeHtml(book.tier || "简餐级")}</span>
         <h1>${escapeHtml(book.title)}</h1>
-        <p class="sub">${escapeHtml(book.moduleCount)} 个互动关卡</p>
+        <p class="sub">${escapeHtml(book.moduleCount)} 个可视化阅读章节</p>
         <ul class="highlight">
           ${(Array.isArray(book.highlights) ? book.highlights : []).slice(0, 3).map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
         </ul>
         <div class="links">
-          <a href="${escapeHtml(book.firstModuleHref)}">从第一关开始</a>
+          <a href="${escapeHtml(book.firstModuleHref)}">从第一章开始</a>
           <a href="/pages/gamified-learning-hub-dashboard-1.html">返回个人书库</a>
         </div>
       </article>
@@ -9457,7 +9943,7 @@ function buildDynamicExperienceHtml(html, module, book, pipelineMeta = null) {
       : `<button class="nav-btn disabled" type="button" disabled>下一页</button>`}
   </nav>
 </div>`;
-  const pipelinePanelSnippet = buildPipelinePanelSnippet(module, pipelineMeta);
+  const pipelinePanelSnippet = "";
 
   const completionSnippet = `
 <script>

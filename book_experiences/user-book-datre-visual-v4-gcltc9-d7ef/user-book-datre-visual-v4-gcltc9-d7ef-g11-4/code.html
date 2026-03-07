@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>第 4 章 心识 问题 ：请问什么是 “ 心识泡泡 ” · Datre Visual V4</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b1220;
+      --bg2: #1a2333;
+      --accent: #f59e0b;
+      --accent2: #34d399;
+      --text: #e5edf8;
+      --soft: #9fb1c9;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+      background:
+        radial-gradient(1200px 540px at 85% -8%, color-mix(in srgb, var(--accent2) 24%, transparent), transparent 70%),
+        radial-gradient(980px 460px at -10% 14%, color-mix(in srgb, var(--accent) 24%, transparent), transparent 74%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+      color: var(--text);
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .05;
+      background-image: radial-gradient(circle at 1px 1px, #fff 1px, transparent 0);
+      background-size: 3px 3px;
+      z-index: 0;
+    }
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      z-index: 100;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+    .page { position: relative; z-index: 1; width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 20px 0 48px; }
+    .hero {
+      min-height: 74vh;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 22px;
+      background: linear-gradient(160deg, color-mix(in srgb, var(--bg2) 86%, transparent), color-mix(in srgb, var(--bg) 88%, transparent));
+      padding: 40px 34px;
+      display: grid;
+      align-content: center;
+      gap: 16px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.34);
+    }
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .hero h1 {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(32px, 5.4vw, 68px);
+      line-height: 1.16;
+      letter-spacing: .04em;
+      max-width: 15em;
+      text-wrap: balance;
+    }
+    .hero p {
+      max-width: 66ch;
+      line-height: 1.95;
+      color: color-mix(in srgb, var(--text) 85%, var(--soft));
+      font-size: 16px;
+    }
+    .chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip {
+      border: 1px solid color-mix(in srgb, var(--accent2) 44%, transparent);
+      color: color-mix(in srgb, var(--accent2) 88%, #fff);
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 12px;
+      background: rgba(255,255,255,.03);
+    }
+    .section { margin-top: 18px; border: 1px solid rgba(255,255,255,.13); border-radius: 18px; padding: 22px; background: rgba(2,6,18,.46); }
+    .section h2 {
+      margin-bottom: 12px;
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(22px, 2.8vw, 34px);
+      color: color-mix(in srgb, var(--accent) 86%, #fff);
+      letter-spacing: .03em;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1.1fr 1fr; gap: 14px; }
+    .concept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+    .concept-card {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      background: rgba(255,255,255,.03);
+      padding: 14px;
+      min-height: 128px;
+    }
+    .concept-token { font-size: 14px; letter-spacing: .14em; color: var(--accent2); text-transform: uppercase; margin-bottom: 7px; font-weight: 700; }
+    .concept-note { font-size: 14px; color: color-mix(in srgb, var(--text) 88%, var(--soft)); line-height: 1.8; }
+    .reading-map {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 10px;
+    }
+    .map-card {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      background: rgba(255,255,255,.03);
+      padding: 12px;
+      min-height: 148px;
+    }
+    .map-no {
+      font-size: 11px;
+      letter-spacing: .18em;
+      color: var(--accent);
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+    .map-card h3 {
+      font-size: 17px;
+      font-family: "Noto Serif SC", serif;
+      line-height: 1.45;
+      margin-bottom: 6px;
+    }
+    .map-card p {
+      font-size: 14px;
+      color: color-mix(in srgb, var(--text) 84%, var(--soft));
+      line-height: 1.85;
+    }
+    .atlas {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      min-height: 440px;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+    .atlas svg { width: 100%; max-width: 440px; height: auto; }
+    .timeline { display: grid; gap: 10px; }
+    .timeline-item {
+      border-left: 2px solid color-mix(in srgb, var(--accent) 66%, transparent);
+      padding: 10px 14px;
+      background: rgba(255,255,255,.02);
+      border-radius: 0 10px 10px 0;
+    }
+    .timeline-no { font-size: 11px; letter-spacing: .22em; color: var(--accent2); display: block; margin-bottom: 6px; }
+    .timeline-item h3 { font-size: 19px; font-family: "Noto Serif SC", serif; line-height: 1.45; margin-bottom: 7px; }
+    .timeline-item p { font-size: 14px; line-height: 1.9; color: color-mix(in srgb, var(--text) 84%, var(--soft)); }
+    .quote-wrap { display: grid; gap: 10px; }
+    .quote {
+      border-left: 2px solid color-mix(in srgb, var(--accent2) 80%, transparent);
+      padding: 10px 12px;
+      background: rgba(255,255,255,.02);
+      color: color-mix(in srgb, var(--text) 92%, #fff);
+      font-family: "Noto Serif SC", serif;
+      line-height: 1.9;
+    }
+    .takeaways { margin-top: 10px; list-style: none; display: grid; gap: 8px; }
+    .takeaways li {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      padding: 10px;
+      background: rgba(255,255,255,.02);
+      align-items: start;
+      line-height: 1.8;
+    }
+    .takeaways span {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: color-mix(in srgb, var(--accent2) 26%, transparent);
+      color: var(--accent2);
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+    .nav { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,.26);
+      border-radius: 999px;
+      padding: 8px 13px;
+      font-size: 12px;
+      color: var(--text);
+      background: rgba(255,255,255,.04);
+    }
+    .btn:hover { border-color: var(--accent2); color: var(--accent2); }
+    .dot-nav {
+      position: fixed;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: grid;
+      gap: 10px;
+      z-index: 50;
+    }
+    .dot-nav button {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.35);
+      background: transparent;
+      cursor: pointer;
+      transition: all .24s ease;
+    }
+    .dot-nav button.active { transform: scale(1.34); border-color: var(--accent); background: var(--accent); }
+    .reveal { opacity: 0; transform: translateY(16px); transition: opacity .55s ease, transform .55s ease; }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+    @media (max-width: 940px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .dot-nav { display: none; }
+      .hero { min-height: auto; padding: 30px 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+  <nav class="dot-nav" id="dotNav">
+    <button data-target="hero" class="active" aria-label="Hero"></button>
+    <button data-target="atlas" aria-label="Atlas"></button>
+    <button data-target="concepts" aria-label="Concepts"></button>
+    <button data-target="reading" aria-label="Reading"></button>
+    <button data-target="takeaways" aria-label="Takeaways"></button>
+  </nav>
+  <main class="page">
+    <section class="hero reveal in" id="hero">
+      <p class="eyebrow">Scholar Atlas · Gate 11</p>
+      <h1>第 4 章 心识 问题 ：请问什么是 “ 心识泡泡 ”</h1>
+      <p>27 第 4 章 心识 问题 ：请问什么是 “ 心识泡泡 ” ？ DATRE ：心识泡泡中包含了所有能让你们去表达和体验的 “ 几率与可能性 ” 。</p>
+      <div class="chip-row">
+        <span class="chip">Datre Visual V4</span>
+        
+        <span class="chip">Module 11/18</span>
+        <span class="tag">几率与可能性</span><span class="tag">datre</span><span class="tag">但是</span><span class="tag">心识</span><span class="tag">现在</span><span class="tag">问题</span><span class="tag">在现阶段</span><span class="tag">换句话说</span>
+      </div>
+    </section>
+
+    <section class="section reveal" id="atlas">
+      <h2>主题脉络与阅读地图</h2>
+      <p style="color:var(--soft);line-height:1.9;margin-bottom:10px;">先看章节主线，再进入细节。每个卡片都是一个可独立理解的知识片段。</p>
+      <div class="reading-map">
+      <article class="map-card reveal">
+        <p class="map-no">01</p>
+        <h3>27 第 4 章 心识 问题 ：请问什么是 “ 心识泡泡 ” ？</h3>
+        <p>27 第 4 章 心识 问题 ：请问什么是 “ 心识泡泡 ” ？ DATRE ：心识泡泡中包含了所有能让你们去表达和体验的 “ 几率与可能性 ” 。 换句话说 ， 根据你们的运作方式 ， 为了让这个星球上的每一个人理解发生了什么 ， 你们必须从一个单独的来源处获取不同的 “ 几率与可能性 ” 。 心识泡泡围绕着你们的星球 ， “ 几率与可能性 ” 都包含其中 。 你们根本没有办法用 掉所有的 “ 几率与可能性 ” ，它们远远超越了你们的</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">02</p>
+        <h3>换句话说，如果你选择了一个能在 3005 年运作的 “ 几率与可能性 ” ，并将它带入 现在，你能用它来做什么呢？</h3>
+        <p>换句话说，如果你选择了一个能在 3005 年运作的 “ 几率与可能性 ” ，并将它带入 现在，你能用它来做什么呢？ 你不得不通过物质结构将它 “ 发展 ” 出来。这并不表示你不理解它，物质身体不 理解，或在物质身体中的其他人不理解。 在现阶段，你对你的体验有了一定程度的了解，并声称：你的发现远远领先了这 个时代。这个星球上的很多个体都无法理解它。 是的，但是，如果你还在理解物质结构，那么 …… 你还是没有延伸到 “ 几率与可 能性 ” </p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">03</p>
+        <h3>因此，要跟你们解释清楚很难。</h3>
+        <p>因此，要跟你们解释清楚很难。 从现在开始，我们试着解释：头脑和 “ 几率与可能性 ” 。 问题 ： Datre 能告诉我们更多关于心识的信息吗？ 28 DATRE ：心识包含在这个泡泡中，就像你们每天呼吸的空气。 心识与群体意识的区别是：心识泡泡中的内容是用来被你们 “ 使用 ” 的。 那儿还有经过头脑处理的 “ 想法 ” ，组成了群体意识。它们都在一起。</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">04</p>
+        <h3>现在，看看被你们称之的空气。空气中有很多组成部分。除了你们知道的那些， 还有多少你们不知道的呢？</h3>
+        <p>现在，看看被你们称之的空气。空气中有很多组成部分。除了你们知道的那些， 还有多少你们不知道的呢？ - 还有上亿个组成部分。 但是，因为你们无法看到它们，无法用金属仪器检测出来，对你们来讲，它们就 不存在。这很好，没什么关系。 但是你要知道：那儿的每一样 “ 事物 ” 都是为了让你们享受，理解和体验的。 这也是你们睡觉时所做的事；这也是为什么你们能做出各种各样奇怪的梦，你们 在那儿进行了很多不同的探索。 醒来时，头脑试着告诉你：你在梦境中</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">05</p>
+        <h3>当你们出体 ， 在梦境中时 ， 你与 “ 真正的你 ” 连接 ， 那儿有很多很多美妙的事情 。</h3>
+        <p>当你们出体 ， 在梦境中时 ， 你与 “ 真正的你 ” 连接 ， 那儿有很多很多美妙的事情 。 这也是为什么有人醒来时脸上带着傻傻的笑容 ， 因为他们曾经历了一场很好的体验 。 - “ 哎呀，我们又回到物质层了，一天又开始了 ” 。 问题 ：心识存在于大宇宙中吗？</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="concepts">
+      <h2>核心概念与解释</h2>
+      <div class="concept-grid">
+      <article class="concept-card reveal">
+        <p class="concept-token">几率与可能性</p>
+        <p class="concept-note">DATRE ：心识泡泡中包含了所有能让你们去表达和体验的 “ 几率与可能性 ” 。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">datre</p>
+        <p class="concept-note">DATRE ：心识泡泡中包含了所有能让你们去表达和体验的 “ 几率与可能性 ” 。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">但是</p>
+        <p class="concept-note">是的，但是，如果你还在理解物质结构，那么 …… 你还是没有延伸到 “ 几率与可 能性 ” 之外。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">心识</p>
+        <p class="concept-note">27 第 4 章 心识 问题 ：请问什么是 “ 心识泡泡 ” ？</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">现在</p>
+        <p class="concept-note">换句话说，如果你选择了一个能在 3005 年运作的 “ 几率与可能性 ” ，并将它带入 现在，你能用它来做什么呢？</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">问题</p>
+        <p class="concept-note">27 第 4 章 心识 问题 ：请问什么是 “ 心识泡泡 ” ？</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">在现阶段</p>
+        <p class="concept-note">在现阶段，有一些 “ 几率与可能性 ” 完全超出了你们的理解范围。不得不这样， 因为你们的发展基于某种程度的理解之上，否则就无法发展得更快了。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">换句话说</p>
+        <p class="concept-note">换句话说 ， 根据你们的运作方式 ， 为了让这个星球上的每一个人理解发生了什么 ， 你们必须从一个单独的来源处获取不同的 “ 几率与可能性 ” 。</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="reading">
+      <h2>渐进式阅读路径</h2>
+      <div class="timeline">
+      <article class="timeline-item reveal">
+        <span class="timeline-no">01</span>
+        <h3>27 第 4 章 心识 问题 ：请问什么是 “ 心识泡泡 ” ？</h3>
+        <p>27 第 4 章 心识 问题 ：请问什么是 “ 心识泡泡 ” ？ DATRE ：心识泡泡中包含了所有能让你们去表达和体验的 “ 几率与可能性 ” 。 换句话说 ， 根据你们的运作方式 ， 为了让这个星球上的每一个人理解发生了什么 ， 你们必须从一个单独的来源处获取不同的 “ 几率与可能性 ” 。 心识泡泡围绕着你们的星球 ， “ 几率与可能性 ” 都包含其中 。 你们根本没有办法用 掉所有的 “ 几率与可能性 ” ，它们远远超越了你们的想象。 在现阶段，有一些 “ 几率与可能性 ” 完全超出了你们的理解范围。不得不这样， 因为你们的发展基于某种程度的理解之上，否则就无法发展得更快了。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">02</span>
+        <h3>换句话说，如果你选择了一个能在 3005 年运作的 “ 几率与可能性 ” ，并将它带入 现在，你能用它来做什么呢？</h3>
+        <p>换句话说，如果你选择了一个能在 3005 年运作的 “ 几率与可能性 ” ，并将它带入 现在，你能用它来做什么呢？ 你不得不通过物质结构将它 “ 发展 ” 出来。这并不表示你不理解它，物质身体不 理解，或在物质身体中的其他人不理解。 在现阶段，你对你的体验有了一定程度的了解，并声称：你的发现远远领先了这 个时代。这个星球上的很多个体都无法理解它。 是的，但是，如果你还在理解物质结构，那么 …… 你还是没有延伸到 “ 几率与可 能性 ” 之外。 你们必须觉知：从这个星球上的物质层 “ 诞生 ” 时开始，你们做出的所有进步， 都是选取心识泡泡中 “ 几率与可能性 ” 的结果。 在你们的日常生活中，你们将头脑和心识（思考）互相交替使用，很容易混淆。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">03</span>
+        <h3>因此，要跟你们解释清楚很难。</h3>
+        <p>因此，要跟你们解释清楚很难。 从现在开始，我们试着解释：头脑和 “ 几率与可能性 ” 。 问题 ： Datre 能告诉我们更多关于心识的信息吗？ 28 DATRE ：心识包含在这个泡泡中，就像你们每天呼吸的空气。 心识与群体意识的区别是：心识泡泡中的内容是用来被你们 “ 使用 ” 的。 那儿还有经过头脑处理的 “ 想法 ” ，组成了群体意识。它们都在一起。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">04</span>
+        <h3>现在，看看被你们称之的空气。空气中有很多组成部分。除了你们知道的那些， 还有多少你们不知道的呢？</h3>
+        <p>现在，看看被你们称之的空气。空气中有很多组成部分。除了你们知道的那些， 还有多少你们不知道的呢？ - 还有上亿个组成部分。 但是，因为你们无法看到它们，无法用金属仪器检测出来，对你们来讲，它们就 不存在。这很好，没什么关系。 但是你要知道：那儿的每一样 “ 事物 ” 都是为了让你们享受，理解和体验的。 这也是你们睡觉时所做的事；这也是为什么你们能做出各种各样奇怪的梦，你们 在那儿进行了很多不同的探索。 醒来时，头脑试着告诉你：你在梦境中体验了什么。但是，它无法做出相关的联 系，因此就只能告诉你一堆 “ 垃圾 ” 。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">05</span>
+        <h3>当你们出体 ， 在梦境中时 ， 你与 “ 真正的你 ” 连接 ， 那儿有很多很多美妙的事情 。</h3>
+        <p>当你们出体 ， 在梦境中时 ， 你与 “ 真正的你 ” 连接 ， 那儿有很多很多美妙的事情 。 这也是为什么有人醒来时脸上带着傻傻的笑容 ， 因为他们曾经历了一场很好的体验 。 - “ 哎呀，我们又回到物质层了，一天又开始了 ” 。 问题 ：心识存在于大宇宙中吗？</p>
+      </article>
+    </div>
+      <div class="quote-wrap" style="margin-top:12px;"><blockquote class="quote reveal">“换句话说 ， 根据你们的运作方式 ， 为了让这个星球上的每一个人理解发生了什么 ， 你们必须从一个单独的来源处获取不同的 “ 几率与可能性 ” 。”</blockquote><blockquote class="quote reveal">“在现阶段，有一些 “ 几率与可能性 ” 完全超出了你们的理解范围。不得不这样， 因为你们的发展基于某种程度的理解之上，否则就无法发展得更快了。”</blockquote><blockquote class="quote reveal">“你们必须觉知：从这个星球上的物质层 “ 诞生 ” 时开始，你们做出的所有进步， 都是选取心识泡泡中 “ 几率与可能性 ” 的结果。”</blockquote></div>
+    </section>
+
+    <section class="section reveal" id="takeaways">
+      <h2>本关关键收获</h2>
+      <ul class="takeaways"><li><span>1</span>27 第 4 章 心识 问题 ：请问什么是 “ 心识泡泡 ” ？</li><li><span>2</span>换句话说，如果你选择了一个能在 3005 年运作的 “ 几率与可能性 ” ，并将它带入 现在，你能用它来做什么呢？</li><li><span>3</span>因此，要跟你们解释清楚很难。</li><li><span>4</span>现在，看看被你们称之的空气。空气中有很多组成部分。除了你们知道的那些， 还有多少你们不知道的呢？</li></ul>
+      <nav class="nav">
+        <a class="btn" href="/experiences/user-book-datre-visual-v4-gcltc9-d7ef-g10-datre.html">上一关</a>
+        <a class="btn" href="/experiences/user-book-datre-visual-v4-gcltc9-d7ef-g12-chapter-12.html">下一关</a>
+      </nav>
+    </section>
+  </main>
+  <script>
+    (() => {
+      const progress = document.getElementById("progress");
+      const dots = Array.from(document.querySelectorAll("#dotNav button[data-target]"));
+      const sections = dots
+        .map((dot) => document.getElementById(dot.getAttribute("data-target")))
+        .filter(Boolean);
+      const reveals = Array.from(document.querySelectorAll(".reveal"));
+      const onScroll = () => {
+        const h = document.documentElement;
+        const total = Math.max(1, h.scrollHeight - window.innerHeight);
+        const pct = Math.max(0, Math.min(100, (window.scrollY / total) * 100));
+        if (progress) progress.style.width = pct + "%";
+      };
+      const io = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) entry.target.classList.add("in");
+        }
+      }, { threshold: .14 });
+      reveals.forEach((el) => io.observe(el));
+      const secIo = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const id = entry.target.id;
+          dots.forEach((dot) => dot.classList.toggle("active", dot.getAttribute("data-target") === id));
+        });
+      }, { threshold: .4 });
+      sections.forEach((s) => secIo.observe(s));
+      dots.forEach((dot) => {
+        dot.addEventListener("click", () => {
+          const target = document.getElementById(dot.getAttribute("data-target"));
+          if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+      window.addEventListener("scroll", onScroll, { passive: true });
+      onScroll();
+    })();
+  </script>
+</body>
+</html>

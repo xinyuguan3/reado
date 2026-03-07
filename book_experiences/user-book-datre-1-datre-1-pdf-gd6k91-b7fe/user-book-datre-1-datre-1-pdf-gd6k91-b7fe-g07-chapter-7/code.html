@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>，然后才能做其它的事 · Datre书籍-第1册 我们是DATRE-1（部分）.pdf</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b1220;
+      --bg2: #1a2333;
+      --accent: #f59e0b;
+      --accent2: #34d399;
+      --text: #e5edf8;
+      --soft: #9fb1c9;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+      background:
+        radial-gradient(1200px 540px at 85% -8%, color-mix(in srgb, var(--accent2) 24%, transparent), transparent 70%),
+        radial-gradient(980px 460px at -10% 14%, color-mix(in srgb, var(--accent) 24%, transparent), transparent 74%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+      color: var(--text);
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .05;
+      background-image: radial-gradient(circle at 1px 1px, #fff 1px, transparent 0);
+      background-size: 3px 3px;
+      z-index: 0;
+    }
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      z-index: 100;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+    .page { position: relative; z-index: 1; width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 20px 0 48px; }
+    .hero {
+      min-height: 74vh;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 22px;
+      background: linear-gradient(160deg, color-mix(in srgb, var(--bg2) 86%, transparent), color-mix(in srgb, var(--bg) 88%, transparent));
+      padding: 40px 34px;
+      display: grid;
+      align-content: center;
+      gap: 16px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.34);
+    }
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .hero h1 {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(32px, 5.4vw, 68px);
+      line-height: 1.16;
+      letter-spacing: .04em;
+      max-width: 15em;
+      text-wrap: balance;
+    }
+    .hero p {
+      max-width: 66ch;
+      line-height: 1.95;
+      color: color-mix(in srgb, var(--text) 85%, var(--soft));
+      font-size: 16px;
+    }
+    .chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip {
+      border: 1px solid color-mix(in srgb, var(--accent2) 44%, transparent);
+      color: color-mix(in srgb, var(--accent2) 88%, #fff);
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 12px;
+      background: rgba(255,255,255,.03);
+    }
+    .section { margin-top: 18px; border: 1px solid rgba(255,255,255,.13); border-radius: 18px; padding: 22px; background: rgba(2,6,18,.46); }
+    .section h2 {
+      margin-bottom: 12px;
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(22px, 2.8vw, 34px);
+      color: color-mix(in srgb, var(--accent) 86%, #fff);
+      letter-spacing: .03em;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1.1fr 1fr; gap: 14px; }
+    .concept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+    .concept-card {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      background: rgba(255,255,255,.03);
+      padding: 14px;
+      min-height: 128px;
+    }
+    .concept-token { font-size: 14px; letter-spacing: .14em; color: var(--accent2); text-transform: uppercase; margin-bottom: 7px; font-weight: 700; }
+    .concept-note { font-size: 14px; color: color-mix(in srgb, var(--text) 88%, var(--soft)); line-height: 1.8; }
+    .reading-map {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 10px;
+    }
+    .map-card {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      background: rgba(255,255,255,.03);
+      padding: 12px;
+      min-height: 148px;
+    }
+    .map-no {
+      font-size: 11px;
+      letter-spacing: .18em;
+      color: var(--accent);
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+    .map-card h3 {
+      font-size: 17px;
+      font-family: "Noto Serif SC", serif;
+      line-height: 1.45;
+      margin-bottom: 6px;
+    }
+    .map-card p {
+      font-size: 14px;
+      color: color-mix(in srgb, var(--text) 84%, var(--soft));
+      line-height: 1.85;
+    }
+    .atlas {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      min-height: 440px;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+    .atlas svg { width: 100%; max-width: 440px; height: auto; }
+    .timeline { display: grid; gap: 10px; }
+    .timeline-item {
+      border-left: 2px solid color-mix(in srgb, var(--accent) 66%, transparent);
+      padding: 10px 14px;
+      background: rgba(255,255,255,.02);
+      border-radius: 0 10px 10px 0;
+    }
+    .timeline-no { font-size: 11px; letter-spacing: .22em; color: var(--accent2); display: block; margin-bottom: 6px; }
+    .timeline-item h3 { font-size: 19px; font-family: "Noto Serif SC", serif; line-height: 1.45; margin-bottom: 7px; }
+    .timeline-item p { font-size: 14px; line-height: 1.9; color: color-mix(in srgb, var(--text) 84%, var(--soft)); }
+    .quote-wrap { display: grid; gap: 10px; }
+    .quote {
+      border-left: 2px solid color-mix(in srgb, var(--accent2) 80%, transparent);
+      padding: 10px 12px;
+      background: rgba(255,255,255,.02);
+      color: color-mix(in srgb, var(--text) 92%, #fff);
+      font-family: "Noto Serif SC", serif;
+      line-height: 1.9;
+    }
+    .takeaways { margin-top: 10px; list-style: none; display: grid; gap: 8px; }
+    .takeaways li {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      padding: 10px;
+      background: rgba(255,255,255,.02);
+      align-items: start;
+      line-height: 1.8;
+    }
+    .takeaways span {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: color-mix(in srgb, var(--accent2) 26%, transparent);
+      color: var(--accent2);
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+    .nav { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,.26);
+      border-radius: 999px;
+      padding: 8px 13px;
+      font-size: 12px;
+      color: var(--text);
+      background: rgba(255,255,255,.04);
+    }
+    .btn:hover { border-color: var(--accent2); color: var(--accent2); }
+    .dot-nav {
+      position: fixed;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: grid;
+      gap: 10px;
+      z-index: 50;
+    }
+    .dot-nav button {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.35);
+      background: transparent;
+      cursor: pointer;
+      transition: all .24s ease;
+    }
+    .dot-nav button.active { transform: scale(1.34); border-color: var(--accent); background: var(--accent); }
+    .reveal { opacity: 0; transform: translateY(16px); transition: opacity .55s ease, transform .55s ease; }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+    @media (max-width: 940px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .dot-nav { display: none; }
+      .hero { min-height: auto; padding: 30px 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+  <nav class="dot-nav" id="dotNav">
+    <button data-target="hero" class="active" aria-label="Hero"></button>
+    <button data-target="atlas" aria-label="Atlas"></button>
+    <button data-target="concepts" aria-label="Concepts"></button>
+    <button data-target="reading" aria-label="Reading"></button>
+    <button data-target="takeaways" aria-label="Takeaways"></button>
+  </nav>
+  <main class="page">
+    <section class="hero reveal in" id="hero">
+      <p class="eyebrow">Scholar Atlas · Gate 7</p>
+      <h1>，然后才能做其它的事</h1>
+      <p>DATRE ： 我不知道 。 我们知道那儿有很多 ， 因为我们已经联系过很多了 。</p>
+      <div class="chip-row">
+        <span class="chip">Datre书籍-第1册 我们是DATRE-1（部分）.pdf</span>
+        
+        <span class="chip">Module 7/18</span>
+        <span class="tag">事件</span><span class="tag">宇宙时间</span><span class="tag">换句话说</span><span class="tag">全息图</span>
+      </div>
+    </section>
+
+    <section class="section reveal" id="atlas">
+      <h2>主题脉络与阅读地图</h2>
+      <p style="color:var(--soft);line-height:1.9;margin-bottom:10px;">先看章节主线，再进入细节。每个卡片都是一个可独立理解的知识片段。</p>
+      <div class="reading-map">
+      <article class="map-card reveal">
+        <p class="map-no">01</p>
+        <h3>我们知道那儿有很多 ， 因为我们已经联系过很多了 。</h3>
+        <p>我们知道那儿有很多 ， 因为我们已经联系过很多了 。 但我们现 在不在别的地方，我们在这里。你说这有什么关系呢？你们甚至还没有从这第一个宇 宙中走出来。当你了解这第一个宇宙中有什么的时候，就可以进入另外一个你想进入 的宇宙中了。 但是首先，你得先理解你自己的泡泡宇宙。 我们不知这将会花费多少个 万古永存的时间。这将由你们自己来决定。 你渴望要一个物质结构，现在进来了，解铃还须系铃人，你要靠你自己出去。 如 果你能把自己再 “ 弄 ” 出</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">02</p>
+        <h3>好吧 ， 你们的泡泡是一个物质泡泡 。</h3>
+        <p>好吧 ， 你们的泡泡是一个物质泡泡 。 你们的泡泡又在一个大宇宙中 ， 而这 个大宇宙是非物质的。这就该让你自己去思考了。我不知道你想得到什么样的答案， 因为 两 种情况都有。 宇宙中的存在 - 宇宙的概念 ， 完全在你们的理解之外 ， 你现在甚至都无法理解自 己所在的这个泡泡。 这个宇宙是个 “ 实验 ” 场地吗？ 体验也是唯一一个最接近的 ， 我们可以用来描述的词 。 请问 “ 宇宙时间 ” 是由宇宙中的 “ 存在体 ” 操控的吗？</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">03</p>
+        <h3>我们观察宇宙中发生了什么事情 ， 而这些观察的 “ 事件 ” ， 就是我们所说的 “ 宇宙时间 ” 。我们观察什么事情发生了。</h3>
+        <p>我们观察宇宙中发生了什么事情 ， 而这些观察的 “ 事件 ” ， 就是我们所说的 “ 宇宙时间 ” 。我们观察什么事情发生了。 无论在任何形式下 ， 如果有 “ 事件 ” 需要与 “ 宇宙时间 ” 互相连接 ， 那么 “ 能量 ” 就会被引入。由 “ 事件 ” 来决定这些能量的运作方式。这些 “ 事件 ” 将会根据所发生 的事情，通过不同的方式来使用这些能量。我们不会控制任何事物，但我们会引导能 量。如果那儿有连接的必要，我们就会把能量</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">04</p>
+        <h3>它们无法在底部正中 央相遇，那就无法相遇吧，就是这样。因此，在你们的体验中，也会发生很多不同的 事情，而你只是观察发生了什么而已。</h3>
+        <p>它们无法在底部正中 央相遇，那就无法相遇吧，就是这样。因此，在你们的体验中，也会发生很多不同的 事情，而你只是观察发生了什么而已。 为什么宇宙中的存在体对物质层非常感兴趣？ 我们在 “ 观看 ” ，因为这是从来没有发生过的事情。物质结构的进化已经 超出了我们的预料。这都是由于想你们长时间逗留在物质层所引起的。 你的意思是不是说：物质层的体验并没有像原本计划好的那样发展？那么 原本的计划是什么呢？ 原本的计划是 ： 你能够 “ 一次性 ”</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">05</p>
+        <h3>你本应以 “ 全息图 ” 的形式生活在物质层 ， 直到 “ 完成 ” 和 “ 理 解 ” 所有的事物。然而，在你们还没有完全理解之前，却不停要求改变物质层。</h3>
+        <p>你本应以 “ 全息图 ” 的形式生活在物质层 ， 直到 “ 完成 ” 和 “ 理 解 ” 所有的事物。然而，在你们还没有完全理解之前，却不停要求改变物质层。你们 的要求越来越多，越来越多 … 换句话说，你想要这个，还想要那个。你们不停渴望， 要这样，要那样。因此物质层也在不停改变，改变，改变 … 。 然后你还把 “ 死亡 ” 加入这场游戏中，因为你想重新开始。你想重新来过，以便 能找到一个减少 “ 全息图 ” 的办法，一个用来摆脱物质结</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="concepts">
+      <h2>核心概念与解释</h2>
+      <div class="concept-grid">
+      <article class="concept-card reveal">
+        <p class="concept-token">事件</p>
+        <p class="concept-note">我们观察宇宙中发生了什么事情 ， 而这些观察的 “ 事件 ” ， 就是我们所说的 “ 宇宙时间 ” 。我们观察什么事情发生了。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">宇宙时间</p>
+        <p class="concept-note">请问 “ 宇宙时间 ” 是由宇宙中的 “ 存在体 ” 操控的吗？</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">换句话说</p>
+        <p class="concept-note">换句话说，假设你的面前有一个设计好的 U 型凹槽。现在，你手中各拿一个球， 分别把球放到 U 型凹槽上左右 两 边的开口处，然后松手，让球在 U 型凹槽的底部正中 间相遇。当你松手释放球的时候，如果右手的能量比左手强，那么右边的球就会很快 先到达低端，这样 两 个球就无法在底部正中间相遇。推动这些球的能量来自于你的身 体 - 一个能量中央来源 。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">全息图</p>
+        <p class="concept-note">你本应以 “ 全息图 ” 的形式生活在物质层 ， 直到 “ 完成 ” 和 “ 理 解 ” 所有的事物。然而，在你们还没有完全理解之前，却不停要求改变物质层。你们 的要求越来越多，越来越多 … 换句话说，你想要这个，还想要那个。你们不停渴望， 要这样，要那样。因此物质层也在不停改变，改变，改变 … 。</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="reading-excerpts">
+      <h2>原文精读片段</h2>
+      <p style="color:var(--soft);line-height:1.9;margin-bottom:10px;">保留信息密度最高的段落，先读原句，再看后续路径与总结。</p>
+      <div class="reading-map">
+      <article class="map-card reveal">
+        <p class="map-no">EXCERPT 1</p>
+        <p>我们知道那儿有很多 ， 因为我们已经联系过很多了 。</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">EXCERPT 2</p>
+        <p>但我们现 在不在别的地方，我们在这里。你说这有什么关系呢？你们甚至还没有从这第一个宇 宙中走出来。当你了解这第一个宇宙中有什么的时候，就可以进入另外一个你想进入 的宇宙中了。</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">EXCERPT 3</p>
+        <p>但是首先，你得先理解你自己的泡泡宇宙。</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">EXCERPT 4</p>
+        <p>我们不知这将会花费多少个 万古永存的时间。这将由你们自己来决定。</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">EXCERPT 5</p>
+        <p>你渴望要一个物质结构，现在进来了，解铃还须系铃人，你要靠你自己出去。</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">EXCERPT 6</p>
+        <p>如 果你能把自己再 “ 弄 ” 出来了，就可以做其它想做的事情了。可一旦你决定进入这个 物质层，就要靠自己解决这个问题，然后才能做其它的事。</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="reading">
+      <h2>渐进式阅读路径</h2>
+      <div class="timeline">
+      <article class="timeline-item reveal">
+        <span class="timeline-no">01</span>
+        <h3>我们知道那儿有很多 ， 因为我们已经联系过很多了 。</h3>
+        <p>我们知道那儿有很多 ， 因为我们已经联系过很多了 。 但我们现 在不在别的地方，我们在这里。你说这有什么关系呢？你们甚至还没有从这第一个宇 宙中走出来。当你了解这第一个宇宙中有什么的时候，就可以进入另外一个你想进入 的宇宙中了。 但是首先，你得先理解你自己的泡泡宇宙。 我们不知这将会花费多少个 万古永存的时间。这将由你们自己来决定。 你渴望要一个物质结构，现在进来了，解铃还须系铃人，你要靠你自己出去。 如 果你能把自己再 “ 弄 ” 出来了，就可以做其它想做的事情了。可一旦你决定进入这个 物质层，就要靠自己解决这个问题，然后才能做其它的事。 当 Datre 说宇宙的时候，是指物质宇宙还是非物质宇宙？</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">02</span>
+        <h3>好吧 ， 你们的泡泡是一个物质泡泡 。</h3>
+        <p>好吧 ， 你们的泡泡是一个物质泡泡 。 你们的泡泡又在一个大宇宙中 ， 而这 个大宇宙是非物质的。这就该让你自己去思考了。我不知道你想得到什么样的答案， 因为 两 种情况都有。 宇宙中的存在 - 宇宙的概念 ， 完全在你们的理解之外 ， 你现在甚至都无法理解自 己所在的这个泡泡。 这个宇宙是个 “ 实验 ” 场地吗？ 体验也是唯一一个最接近的 ， 我们可以用来描述的词 。 请问 “ 宇宙时间 ” 是由宇宙中的 “ 存在体 ” 操控的吗？ 我们不控制任何事物。我们只是观察。我们 “ 观看 ” 。我们保持觉知，但 不会控制 。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">03</span>
+        <h3>我们观察宇宙中发生了什么事情 ， 而这些观察的 “ 事件 ” ， 就是我们所说的 “ 宇宙时间 ” 。我们观察什么事情发生了。</h3>
+        <p>我们观察宇宙中发生了什么事情 ， 而这些观察的 “ 事件 ” ， 就是我们所说的 “ 宇宙时间 ” 。我们观察什么事情发生了。 无论在任何形式下 ， 如果有 “ 事件 ” 需要与 “ 宇宙时间 ” 互相连接 ， 那么 “ 能量 ” 就会被引入。由 “ 事件 ” 来决定这些能量的运作方式。这些 “ 事件 ” 将会根据所发生 的事情，通过不同的方式来使用这些能量。我们不会控制任何事物，但我们会引导能 量。如果那儿有连接的必要，我们就会把能量引入进去。这都取决于能量的使用，取 决于 “ 连接 ” 或 “ 事件 ” 或 “ 其它事情 ” 所发生的 “ 地点 ” 。 我们不是谈论事物 ， 我们 只是观察什么会发生。 换句话说，假设你的面前有一个设计好的 U 型凹槽。现在，你手中各拿一个球， 分别把球放到 U 型凹槽上左右 两 边的开口处，然后松手，让球在 U 型凹槽的底部正中 间相遇。当你松手释放球的时候，如果右手的能量比左手强，那么右边的球就会很快 先到达低端，这样 两 个球就无法在底部正中间相遇。推动这些球的能量来自于你的身 体 - 一个能量中央来源 。 游戏的目的是让 两 个球在 U 型凹槽的底部正中央相遇 。 但是 ， 如果它们无法同时相遇，会发生什么事情呢？ ……… 没什么大事会发生。也没有什么 悲惨的悲剧会发生 ， 因为 ： 一切都是体验 - 每一件事都是体验 。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">04</span>
+        <h3>它们无法在底部正中 央相遇，那就无法相遇吧，就是这样。因此，在你们的体验中，也会发生很多不同的 事情，而你只是观察发生了什么而已。</h3>
+        <p>它们无法在底部正中 央相遇，那就无法相遇吧，就是这样。因此，在你们的体验中，也会发生很多不同的 事情，而你只是观察发生了什么而已。 为什么宇宙中的存在体对物质层非常感兴趣？ 我们在 “ 观看 ” ，因为这是从来没有发生过的事情。物质结构的进化已经 超出了我们的预料。这都是由于想你们长时间逗留在物质层所引起的。 你的意思是不是说：物质层的体验并没有像原本计划好的那样发展？那么 原本的计划是什么呢？ 原本的计划是 ： 你能够 “ 一次性 ” 完成这场游戏 。 换句话说 ， 你能够完整 地经历所有的体验并结束它 。 可是 ， 你们却一直被其它的东西所吸引 ， 逗留在物质层 。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">05</span>
+        <h3>你本应以 “ 全息图 ” 的形式生活在物质层 ， 直到 “ 完成 ” 和 “ 理 解 ” 所有的事物。然而，在你们还没有完全理解之前，却不停要求改变物质层。</h3>
+        <p>你本应以 “ 全息图 ” 的形式生活在物质层 ， 直到 “ 完成 ” 和 “ 理 解 ” 所有的事物。然而，在你们还没有完全理解之前，却不停要求改变物质层。你们 的要求越来越多，越来越多 … 换句话说，你想要这个，还想要那个。你们不停渴望， 要这样，要那样。因此物质层也在不停改变，改变，改变 … 。 然后你还把 “ 死亡 ” 加入这场游戏中，因为你想重新开始。你想重新来过，以便 能找到一个减少 “ 全息图 ” 的办法，一个用来摆脱物质结构的办法。 你躺下来死亡，然后又获得一个新的身体。当你死亡后，就把所有的 “ 事物 ” 都 “ 切开 ” 了。你丢弃了以往所有的 “ 体验 ” ，不想携带它们。 当你死亡时，你说 ： “ 这些体验我都不想要了，把它们拿走 ！</p>
+      </article>
+    </div>
+      <div class="quote-wrap" style="margin-top:12px;"><blockquote class="quote reveal">“无论在任何形式下 ， 如果有 “ 事件 ” 需要与 “ 宇宙时间 ” 互相连接 ， 那么 “ 能量 ” 就会被引入。由 “ 事件 ” 来决定这些能量的运作方式。这些 “ 事件 ” 将会根据所发生 的事情，通过不同的方式来使用这些能量。我们不会控制任何事物，但我们会引导能 量。如果那儿有连接的必要，我们就会把能量引入进去。这都取决于能量的使用，取 决于 “ 连接 ” 或 “ 事件 ” 或 “ 其它事情 ” 所发生的 “ 地点 ” 。”</blockquote><blockquote class="quote reveal">“换句话说，假设你的面前有一个设计好的 U 型凹槽。现在，你手中各拿一个球， 分别把球放到 U 型凹槽上左右 两 边的开口处，然后松手，让球在 U 型凹槽的底部正中 间相遇。当你松手释放球的时候，如果右手的能量比左手强，那么右边的球就会很快 先到达低端，这样 两 个球就无法在底部正中间相遇。推动这些球的能量来自于你的身 体 - 一个能量中央来源 。”</blockquote><blockquote class="quote reveal">“但我们现 在不在别的地方，我们在这里。你说这有什么关系呢？你们甚至还没有从这第一个宇 宙中走出来。当你了解这第一个宇宙中有什么的时候，就可以进入另外一个你想进入 的宇宙中了。”</blockquote></div>
+    </section>
+
+    <section class="section reveal" id="takeaways">
+      <h2>本关关键收获</h2>
+      <ul class="takeaways"><li><span>1</span>我们知道那儿有很多 ， 因为我们已经联系过很多了 。</li><li><span>2</span>好吧 ， 你们的泡泡是一个物质泡泡 。</li><li><span>3</span>我们观察宇宙中发生了什么事情 ， 而这些观察的 “ 事件 ” ， 就是我们所说的 “ 宇宙时间 ” 。我们观察什么事情发生了。</li><li><span>4</span>它们无法在底部正中 央相遇，那就无法相遇吧，就是这样。因此，在你们的体验中，也会发生很多不同的 事情，而你只是观察发生了什么而已。</li></ul>
+      <nav class="nav">
+        <a class="btn" href="/experiences/user-book-datre-1-datre-1-pdf-gd6k91-b7fe-g06-chapter-6.html">上一关</a>
+        <a class="btn" href="/experiences/user-book-datre-1-datre-1-pdf-gd6k91-b7fe-g08-chapter-8.html">下一关</a>
+      </nav>
+    </section>
+  </main>
+  <script>
+    (() => {
+      const progress = document.getElementById("progress");
+      const dots = Array.from(document.querySelectorAll("#dotNav button[data-target]"));
+      const sections = dots
+        .map((dot) => document.getElementById(dot.getAttribute("data-target")))
+        .filter(Boolean);
+      const reveals = Array.from(document.querySelectorAll(".reveal"));
+      const onScroll = () => {
+        const h = document.documentElement;
+        const total = Math.max(1, h.scrollHeight - window.innerHeight);
+        const pct = Math.max(0, Math.min(100, (window.scrollY / total) * 100));
+        if (progress) progress.style.width = pct + "%";
+      };
+      const io = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) entry.target.classList.add("in");
+        }
+      }, { threshold: .14 });
+      reveals.forEach((el) => io.observe(el));
+      const secIo = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const id = entry.target.id;
+          dots.forEach((dot) => dot.classList.toggle("active", dot.getAttribute("data-target") === id));
+        });
+      }, { threshold: .4 });
+      sections.forEach((s) => secIo.observe(s));
+      dots.forEach((dot) => {
+        dot.addEventListener("click", () => {
+          const target = document.getElementById(dot.getAttribute("data-target"));
+          if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+      window.addEventListener("scroll", onScroll, { passive: true });
+      onScroll();
+    })();
+  </script>
+</body>
+</html>

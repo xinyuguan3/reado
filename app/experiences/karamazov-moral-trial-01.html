@@ -1,0 +1,943 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>卡拉马佐夫：良心审判</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2310121c'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-size='18' fill='%23f4d99c'%3EK%3C/text%3E%3C/svg%3E" />
+  <style>
+    :root { color-scheme: light; }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #0c111c;
+      font-family: "Trebuchet MS", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    #stage {
+      width: 100%;
+      height: 100%;
+      display: block;
+      touch-action: manipulation;
+      cursor: pointer;
+      background: radial-gradient(circle at 18% 14%, #2e1b28 0%, #120f1f 52%, #0b0f19 100%);
+    }
+  </style>
+<style id="reado-shell-preload-style">
+html.reado-shell-preload body:not(.reado-shell-applied) {
+  padding-top: 80px !important;
+}
+@media (min-width: 1024px) {
+  html.reado-shell-preload:not(.reado-shell-preload-learning) body:not(.reado-shell-applied) {
+    padding-left: 256px !important;
+  }
+}
+@media (min-width: 1200px) {
+  html.reado-shell-preload:not(.reado-shell-preload-learning) body:not(.reado-shell-applied) {
+    padding-right: clamp(280px, 24vw, 320px) !important;
+  }
+}
+html.reado-shell-preload body:not(.reado-shell-applied) > header:first-of-type,
+html.reado-shell-preload body:not(.reado-shell-applied) > nav:first-of-type,
+html.reado-shell-preload body:not(.reado-shell-applied) > aside:first-of-type,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex > nav,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex > aside,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex-1 > nav,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex-1 > aside,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex > .flex-1 > nav,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex > .flex-1 > aside {
+  display: none !important;
+}
+</style>
+<script id="reado-shell-preload-script">
+(() => {
+  const root = document.documentElement;
+  root.classList.add("reado-shell-preload");
+  const path = window.location.pathname || "";
+  if (path.startsWith("/experiences/") || path.startsWith("/books/")) {
+    root.classList.add("reado-shell-preload-learning");
+  }
+})();
+</script>
+</head>
+<body>
+<script src="/shared/book-catalog.js?v=1772888317077"></script>
+<script type="module" src="/shared/shell.js?v=1772888317077"></script>
+<reado-app-shell data-page="knowledge-map"></reado-app-shell>
+  <canvas id="stage" aria-label="卡拉马佐夫：良心审判"></canvas>
+
+  <script>
+    (() => {
+      const canvas = document.getElementById("stage");
+      const ctx = canvas.getContext("2d");
+
+      const SCENES = [
+        {
+          chapter: "第一幕",
+          title: "修道院会面",
+          prompt: "父亲与米嘉在修道院当众冲突。你作为阿辽沙，先把注意力放在哪一边？",
+          choices: [
+            {
+              label: "先劝米嘉退让",
+              detail: "压住爆发，避免现场升级。",
+              delta: { passion: -8, reason: 5, faith: 3, suspicion: -2, empathy: 4 }
+            },
+            {
+              label: "公开指责父亲",
+              detail: "为正义发声，但彻底撕裂关系。",
+              delta: { passion: 7, reason: -4, faith: -2, suspicion: 4, empathy: 1 }
+            },
+            {
+              label: "保持沉默观察",
+              detail: "先收集信息，再判断立场。",
+              delta: { passion: -1, reason: 4, faith: 1, suspicion: 2, empathy: -2 }
+            }
+          ]
+        },
+        {
+          chapter: "第二幕",
+          title: "格露莘卡之夜",
+          prompt: "情感纠葛把所有人都推向失控边缘。你如何应对这场嫉妒？",
+          choices: [
+            {
+              label: "劝米嘉暂避",
+              detail: "把“夺回爱人”的冲动变成冷静等待。",
+              delta: { passion: -7, reason: 4, faith: 2, suspicion: -1, empathy: 3 }
+            },
+            {
+              label: "帮他立刻追过去",
+              detail: "行动迅猛，但风险激增。",
+              delta: { passion: 9, reason: -5, faith: -1, suspicion: 5, empathy: 0 }
+            },
+            {
+              label: "转去安抚卡嘉",
+              detail: "先止住另一侧伤害。",
+              delta: { passion: -3, reason: 2, faith: 4, suspicion: 1, empathy: 5 }
+            }
+          ]
+        },
+        {
+          chapter: "第三幕",
+          title: "反叛与信仰",
+          prompt: "伊万提出“若无上帝，一切皆可”。你给出哪种回应？",
+          choices: [
+            {
+              label: "正面辩论逻辑",
+              detail: "以理性对理性。",
+              delta: { passion: -2, reason: 8, faith: -1, suspicion: -1, empathy: 1 }
+            },
+            {
+              label: "讲苦难中的爱",
+              detail: "强调行动中的慈悲。",
+              delta: { passion: -1, reason: 1, faith: 8, suspicion: -2, empathy: 4 }
+            },
+            {
+              label: "回避争论",
+              detail: "保全关系，但放任观念扩散。",
+              delta: { passion: 1, reason: -3, faith: -2, suspicion: 4, empathy: 0 }
+            }
+          ]
+        },
+        {
+          chapter: "第四幕",
+          title: "弑父之夜",
+          prompt: "命案发生后，舆论立刻锁定米嘉。你如何介入？",
+          choices: [
+            {
+              label: "追查斯乜尔加科夫",
+              detail: "将焦点从“谁最愤怒”转向“谁最可疑”。",
+              delta: { passion: -3, reason: 7, faith: 2, suspicion: -6, empathy: 1 }
+            },
+            {
+              label: "先替米嘉喊冤",
+              detail: "态度坚定，但证据不足。",
+              delta: { passion: 4, reason: -2, faith: 1, suspicion: 3, empathy: 3 }
+            },
+            {
+              label: "跟随官方口径",
+              detail: "快速稳定秩序，但可能错判。",
+              delta: { passion: -4, reason: 0, faith: -2, suspicion: 8, empathy: -4 }
+            }
+          ]
+        },
+        {
+          chapter: "第五幕",
+          title: "法庭与错案",
+          prompt: "审判日，检察官叙事强势推进。你选择怎样影响旁听者？",
+          choices: [
+            {
+              label: "组织证词链",
+              detail: "把细节拼回完整因果。",
+              delta: { passion: -2, reason: 9, faith: 0, suspicion: -5, empathy: 2 }
+            },
+            {
+              label: "诉诸道德激情",
+              detail: "呼唤良知，但容易被反咬“表演”。",
+              delta: { passion: 6, reason: -2, faith: 3, suspicion: 3, empathy: 3 }
+            },
+            {
+              label: "劝众人接受判决",
+              detail: "优先秩序，牺牲真相。",
+              delta: { passion: -4, reason: -3, faith: -2, suspicion: 7, empathy: -5 }
+            }
+          ]
+        },
+        {
+          chapter: "第六幕",
+          title: "梦魇与崩溃",
+          prompt: "伊万陷入梦魇边缘。你会怎么做？",
+          choices: [
+            {
+              label: "逼他直面真相",
+              detail: "短痛换来可能的证词。",
+              delta: { passion: 2, reason: 6, faith: 1, suspicion: -2, empathy: -1 }
+            },
+            {
+              label: "陪他度过黑夜",
+              detail: "先稳住灵魂，再谈供述。",
+              delta: { passion: -2, reason: 2, faith: 5, suspicion: -1, empathy: 6 }
+            },
+            {
+              label: "暂时切断联系",
+              detail: "避免连带风险，但错过窗口。",
+              delta: { passion: -1, reason: -2, faith: -2, suspicion: 4, empathy: -6 }
+            }
+          ]
+        },
+        {
+          chapter: "尾声",
+          title: "巨石旁的演说",
+          prompt: "在伊柳沙葬礼，你要给孩子们留下怎样的结语？",
+          choices: [
+            {
+              label: "记住彼此的善",
+              detail: "用共同记忆抵抗虚无。",
+              delta: { passion: -2, reason: 2, faith: 5, suspicion: -2, empathy: 6 }
+            },
+            {
+              label: "只讲现实残酷",
+              detail: "诚实但寒冷。",
+              delta: { passion: 1, reason: 2, faith: -4, suspicion: 3, empathy: -4 }
+            },
+            {
+              label: "鼓动复仇",
+              detail: "用愤怒维持团结。",
+              delta: { passion: 8, reason: -5, faith: -3, suspicion: 6, empathy: -5 }
+            }
+          ]
+        }
+      ];
+
+      const STATE = {
+        mode: "menu",
+        paused: false,
+        sceneIndex: 0,
+        selectedChoice: 0,
+        passion: 52,
+        reason: 48,
+        faith: 56,
+        suspicion: 38,
+        empathy: 50,
+        tension: 30,
+        log: [],
+        ending: "",
+        epilogue: "",
+        elapsed: 0,
+        hint: "按 Space 开始，左右选择，Space 确认。",
+        seed: 19,
+        motes: []
+      };
+
+      const UI = {
+        layout: null,
+        buttons: []
+      };
+
+      function clamp(v, min, max) {
+        return Math.max(min, Math.min(max, v));
+      }
+
+      function rand() {
+        STATE.seed = (STATE.seed * 1664525 + 1013904223) >>> 0;
+        return STATE.seed / 4294967295;
+      }
+
+      function pushLog(line) {
+        STATE.log.unshift(line);
+        if (STATE.log.length > 8) STATE.log.length = 8;
+      }
+
+      function initMotes() {
+        const r = UI.layout ? UI.layout.center : { x: 0, y: 0, w: 600, h: 360 };
+        const arr = [];
+        for (let i = 0; i < 60; i += 1) {
+          arr.push({
+            x: r.x + rand() * r.w,
+            y: r.y + rand() * r.h,
+            vx: -8 + rand() * 16,
+            vy: -8 + rand() * 16,
+            r: 1.2 + rand() * 2.8
+          });
+        }
+        STATE.motes = arr;
+      }
+
+      function resize() {
+        const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        canvas.width = Math.round(w * dpr);
+        canvas.height = Math.round(h * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        const pad = w < 860 ? 12 : 18;
+        const topH = w < 860 ? 160 : 160;
+        const centerH = h - topH - 176 - pad * 2;
+        UI.layout = {
+          pad,
+          mobile: w < 860,
+          top: { x: pad, y: pad, w: w - pad * 2, h: topH },
+          center: { x: pad, y: pad + topH + 8, w: w - pad * 2, h: Math.max(190, centerH) },
+          bottom: { x: pad, y: h - 176 - pad, w: w - pad * 2, h: 176 }
+        };
+        initMotes();
+      }
+
+      function resetRun() {
+        STATE.mode = "play";
+        STATE.paused = false;
+        STATE.sceneIndex = 0;
+        STATE.selectedChoice = 0;
+        STATE.passion = 52;
+        STATE.reason = 48;
+        STATE.faith = 56;
+        STATE.suspicion = 38;
+        STATE.empathy = 50;
+        STATE.tension = 30;
+        STATE.log = [];
+        STATE.ending = "";
+        STATE.epilogue = "";
+        STATE.hint = "选择一个行动方向，推进剧情。";
+        pushLog("故事开始：修道院会面");
+      }
+
+      function restartMenu() {
+        STATE.mode = "menu";
+        STATE.paused = false;
+        STATE.sceneIndex = 0;
+        STATE.selectedChoice = 0;
+        STATE.ending = "";
+        STATE.epilogue = "";
+        STATE.hint = "按 Space 开始，左右选择，Space 确认。";
+      }
+
+      function currentScene() {
+        const idx = clamp(STATE.sceneIndex, 0, SCENES.length - 1);
+        return SCENES[idx];
+      }
+
+      function applyChoice(choiceIndex) {
+        if (STATE.mode !== "play" || STATE.paused) return;
+
+        const scene = currentScene();
+        const choice = scene.choices[choiceIndex];
+        if (!choice) return;
+
+        STATE.passion = clamp(STATE.passion + choice.delta.passion, 0, 100);
+        STATE.reason = clamp(STATE.reason + choice.delta.reason, 0, 100);
+        STATE.faith = clamp(STATE.faith + choice.delta.faith, 0, 100);
+        STATE.suspicion = clamp(STATE.suspicion + choice.delta.suspicion, 0, 100);
+        STATE.empathy = clamp(STATE.empathy + choice.delta.empathy, 0, 100);
+
+        STATE.tension = clamp(
+          55 + (STATE.passion - STATE.reason) * 0.45 + (STATE.suspicion - STATE.faith) * 0.38,
+          0,
+          100
+        );
+
+        pushLog(`${scene.chapter}·${scene.title} -> ${choice.label}`);
+
+        if (STATE.sceneIndex >= SCENES.length - 1) {
+          computeEnding();
+          STATE.mode = "result";
+          STATE.hint = "按 R 返回菜单，或 Space 再玩一次。";
+          return;
+        }
+
+        STATE.sceneIndex += 1;
+        STATE.selectedChoice = 0;
+        STATE.hint = "剧情推进。继续做出下一步选择。";
+      }
+
+      function computeEnding() {
+        const truth = STATE.reason * 0.85 + STATE.faith * 0.7 + STATE.empathy * 0.6 - STATE.suspicion * 0.75;
+        const heat = STATE.passion * 0.8 - STATE.reason * 0.4;
+
+        if (truth > 62 && STATE.suspicion <= 45 && STATE.empathy >= 52) {
+          STATE.ending = "结局A：苦难中的共同记忆";
+          STATE.epilogue = "你没有逆转全部悲剧，但把“仇恨循环”改成了“记忆与责任”。孩子们记住了彼此，也记住了善。";
+        } else if (STATE.suspicion >= 72 || truth < 20) {
+          STATE.ending = "结局B：错案被时代钉死";
+          STATE.epilogue = "法庭获得了秩序，却失去了真相。所有人都活着，却都被同一桩谎言慢慢腐蚀。";
+        } else if (heat > 34 && STATE.reason < 45) {
+          STATE.ending = "结局C：激情吞没理性";
+          STATE.epilogue = "每个人都在说爱，最终却只留下伤害。你见证了“卡拉马佐夫式冲动”如何把人推向悬崖。";
+        } else {
+          STATE.ending = "结局D：未完成的救赎";
+          STATE.epilogue = "你守住了一部分真相，也失去了一部分人。故事没有完结，只是把问题交给了下一代。";
+        }
+      }
+
+      function togglePause() {
+        if (STATE.mode !== "play") return;
+        STATE.paused = !STATE.paused;
+      }
+
+      function toggleFullscreen() {
+        if (document.fullscreenElement) {
+          document.exitFullscreen().catch(() => {});
+        } else {
+          canvas.requestFullscreen?.().catch(() => {});
+        }
+      }
+
+      function addButton(id, x, y, w, h, label, active = false) {
+        const fill = active ? "rgba(244,214,145,0.88)" : "rgba(24,34,54,0.8)";
+        const stroke = active ? "rgba(255,242,209,0.95)" : "rgba(138,168,212,0.46)";
+        drawRoundRect(x, y, w, h, 10, fill, stroke);
+        ctx.fillStyle = active ? "#1f1a11" : "#d6e8ff";
+        ctx.font = "bold 15px Trebuchet MS";
+        ctx.textAlign = "center";
+        ctx.fillText(label, x + w * 0.5, y + h * 0.62);
+        UI.buttons.push({ id, x, y, w, h });
+      }
+
+      function drawRoundRect(x, y, w, h, r, fill, stroke) {
+        const radius = Math.min(r, w * 0.5, h * 0.5);
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.arcTo(x + w, y, x + w, y + h, radius);
+        ctx.arcTo(x + w, y + h, x, y + h, radius);
+        ctx.arcTo(x, y + h, x, y, radius);
+        ctx.arcTo(x, y, x + w, y, radius);
+        ctx.closePath();
+        if (fill) {
+          ctx.fillStyle = fill;
+          ctx.fill();
+        }
+        if (stroke) {
+          ctx.strokeStyle = stroke;
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        }
+      }
+
+      function drawText(text, x, y, color, font, align = "left") {
+        ctx.fillStyle = color;
+        ctx.font = font;
+        ctx.textAlign = align;
+        ctx.fillText(text, x, y);
+      }
+
+      function wrapText(text, x, y, maxWidth, lineHeight, color, font) {
+        ctx.fillStyle = color;
+        ctx.font = font;
+        const words = String(text).split("");
+        let line = "";
+        let cursorY = y;
+
+        for (let i = 0; i < words.length; i += 1) {
+          const test = line + words[i];
+          if (ctx.measureText(test).width > maxWidth && line) {
+            ctx.fillText(line, x, cursorY);
+            line = words[i];
+            cursorY += lineHeight;
+          } else {
+            line = test;
+          }
+        }
+
+        if (line) ctx.fillText(line, x, cursorY);
+        return cursorY;
+      }
+
+      function drawBackground() {
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+
+        const g = ctx.createLinearGradient(0, 0, 0, h);
+        g.addColorStop(0, "#1f1523");
+        g.addColorStop(0.45, "#141523");
+        g.addColorStop(1, "#0b101a");
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, w, h);
+
+        for (let i = 0; i < 14; i += 1) {
+          const y = ((STATE.elapsed * 9 + i * 64) % (h + 80)) - 40;
+          ctx.strokeStyle = `rgba(115,146,188,${(0.05 + (i % 4) * 0.02).toFixed(3)})`;
+          ctx.beginPath();
+          ctx.moveTo(-20, y);
+          ctx.bezierCurveTo(w * 0.32, y + 12, w * 0.68, y - 10, w + 20, y + 6);
+          ctx.stroke();
+        }
+      }
+
+      function drawMotes() {
+        for (const m of STATE.motes) {
+          const alpha = 0.22 + (m.r / 6);
+          ctx.fillStyle = `rgba(255,201,132,${alpha.toFixed(3)})`;
+          ctx.beginPath();
+          ctx.arc(m.x, m.y, m.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      function drawTopPanel() {
+        const r = UI.layout.top;
+        drawRoundRect(r.x, r.y, r.w, r.h, 14, "rgba(11,18,31,0.78)", "rgba(133,168,215,0.35)");
+
+        if (UI.layout.mobile) {
+          drawText("卡拉马佐夫：良心审判", r.x + 12, r.y + 28, "#eff5ff", "bold 20px Trebuchet MS");
+          drawText(
+            `进度 ${clamp(STATE.sceneIndex + (STATE.mode === "result" ? 1 : 0), 0, SCENES.length)}/${SCENES.length}`,
+            r.x + 12,
+            r.y + 50,
+            "#b9d2f4",
+            "14px Trebuchet MS"
+          );
+        } else {
+          drawText("卡拉马佐夫：良心审判", r.x + 16, r.y + 34, "#eff5ff", "bold 28px Trebuchet MS");
+          drawText(
+            `进度 ${clamp(STATE.sceneIndex + (STATE.mode === "result" ? 1 : 0), 0, SCENES.length)}/${SCENES.length}`,
+            r.x + r.w - 16,
+            r.y + 34,
+            "#b9d2f4",
+            "16px Trebuchet MS",
+            "right"
+          );
+        }
+
+        const meter = [
+          ["激情", STATE.passion, "#e68484"],
+          ["理性", STATE.reason, "#7cc6ff"],
+          ["信仰", STATE.faith, "#a8df9a"],
+          ["嫌疑", STATE.suspicion, "#f1b66e"],
+          ["共情", STATE.empathy, "#ccb0ff"]
+        ];
+
+        const col = UI.layout.mobile ? 3 : 5;
+        const cellW = (r.w - 20 - (col - 1) * 10) / col;
+        const rowGap = UI.layout.mobile ? 30 : 36;
+        for (let i = 0; i < meter.length; i += 1) {
+          const row = Math.floor(i / col);
+          const c = i % col;
+          const x = r.x + 10 + c * (cellW + 10);
+          const y = r.y + (UI.layout.mobile ? 58 : 48) + row * rowGap;
+          const bw = cellW;
+          drawRoundRect(x, y, bw, 26, 7, "rgba(23,36,56,0.72)", "rgba(103,141,190,0.26)");
+          drawRoundRect(x + 2, y + 2, Math.max(8, (bw - 4) * (meter[i][1] / 100)), 22, 6, meter[i][2], null);
+          drawText(`${meter[i][0]} ${meter[i][1]}`, x + 8, y + 18, "#f2f7ff", UI.layout.mobile ? "12px Trebuchet MS" : "13px Trebuchet MS");
+        }
+
+        drawText(`张力 ${STATE.tension.toFixed(0)} · ${STATE.hint}`, r.x + 14, r.y + r.h - 10, "#acc9ec", UI.layout.mobile ? "13px Trebuchet MS" : "14px Trebuchet MS");
+      }
+
+      function drawMenu() {
+        const r = UI.layout.center;
+        const cardW = Math.min(860, r.w - 14);
+        const cardH = UI.layout.mobile ? Math.min(470, r.h - 10) : Math.min(410, r.h - 12);
+        const x = r.x + (r.w - cardW) * 0.5;
+        const y = r.y + (r.h - cardH) * 0.5;
+
+        drawRoundRect(x, y, cardW, cardH, 16, "rgba(9,15,26,0.84)", "rgba(145,181,225,0.44)");
+        drawText("你是阿辽沙。", x + 28, y + 56, "#eef6ff", "bold 36px Trebuchet MS");
+        wrapText(
+          "在七个关键节点中做选择，影响激情、理性、信仰与嫌疑的走向。你无法阻止所有悲剧，但可以决定这场故事留下的是复仇，还是记忆与责任。",
+          x + 28,
+          y + 102,
+          cardW - 56,
+          30,
+          "#bcd6f4",
+          "20px Trebuchet MS"
+        );
+        if (UI.layout.mobile) {
+          drawText("键盘：←/→ 选择 · Space 确认", x + 28, y + cardH - 132, "#9dbbe0", "13px Trebuchet MS");
+          drawText("P 暂停 · R 菜单 · F 全屏", x + 28, y + cardH - 106, "#9dbbe0", "13px Trebuchet MS");
+          drawText("移动端：点击选项卡即可推进剧情", x + 28, y + cardH - 80, "#9dbbe0", "13px Trebuchet MS");
+        } else {
+          drawText("键盘：←/→选择，Space确认，P暂停，R重开，F全屏", x + 28, y + cardH - 84, "#9dbbe0", "16px Trebuchet MS");
+          drawText("移动端：点击选项卡即可推进剧情", x + 28, y + cardH - 56, "#9dbbe0", "16px Trebuchet MS");
+        }
+
+        const pulse = 0.6 + (Math.sin(STATE.elapsed * 4) + 1) * 0.14;
+        const bw = UI.layout.mobile ? 240 : 240;
+        const bh = UI.layout.mobile ? 44 : 54;
+        const bx = x + cardW - bw - 30;
+        const by = y + cardH - bh - (UI.layout.mobile ? 14 : 24);
+        drawRoundRect(bx, by, bw, bh, 12, `rgba(246,213,143,${pulse.toFixed(3)})`, "rgba(255,241,205,0.95)");
+        drawText("开始审判", bx + bw * 0.5, by + (UI.layout.mobile ? 29 : 35), "#18150f", UI.layout.mobile ? "bold 16px Trebuchet MS" : "bold 24px Trebuchet MS", "center");
+        UI.buttons.push({ id: "start", x: bx, y: by, w: bw, h: bh });
+      }
+
+      function drawPlay() {
+        const scene = currentScene();
+        const r = UI.layout.center;
+        drawRoundRect(r.x, r.y, r.w, r.h, 16, "rgba(9,15,26,0.76)", "rgba(129,163,205,0.35)");
+
+        drawText(`${scene.chapter} · ${scene.title}`, r.x + 18, r.y + 34, "#eff6ff", "bold 26px Trebuchet MS");
+        wrapText(scene.prompt, r.x + 18, r.y + 70, r.w - 36, 28, "#bed6f2", "19px Trebuchet MS");
+
+        const choicesTop = r.y + (UI.layout.mobile ? 122 : 138);
+        const gap = 10;
+        const rowH = UI.layout.mobile ? 42 : 52;
+
+        for (let i = 0; i < scene.choices.length; i += 1) {
+          const c = scene.choices[i];
+          const y = choicesTop + i * (rowH + gap);
+          const active = i === STATE.selectedChoice;
+
+          drawRoundRect(
+            r.x + 14,
+            y,
+            r.w - 28,
+            rowH,
+            10,
+            active ? "rgba(238,206,140,0.86)" : "rgba(21,33,52,0.76)",
+            active ? "rgba(255,237,190,0.98)" : "rgba(119,154,197,0.36)"
+          );
+
+          drawText(c.label, r.x + 24, y + rowH * 0.56, active ? "#1a160f" : "#e6f1ff", UI.layout.mobile ? "bold 15px Trebuchet MS" : "bold 18px Trebuchet MS");
+          if (!UI.layout.mobile) {
+            drawText(c.detail, r.x + r.w - 22, y + rowH * 0.56, active ? "#4b3f26" : "#a9c7e9", "14px Trebuchet MS", "right");
+          }
+
+          UI.buttons.push({ id: `choice-${i}`, x: r.x + 14, y, w: r.w - 28, h: rowH });
+        }
+
+        const brothersY = r.y + r.h - 42;
+        const lx = r.x + 24;
+        drawText("三兄弟张力图：", lx, brothersY - 10, "#9ec0e8", "14px Trebuchet MS");
+        drawNode(lx + 90, brothersY, "米嘉", STATE.passion, "#e68484");
+        drawNode(lx + 180, brothersY, "伊万", STATE.reason, "#7cc6ff");
+        drawNode(lx + 270, brothersY, "阿辽沙", STATE.faith, "#a8df9a");
+
+        const by = UI.layout.bottom.y + UI.layout.bottom.h - 50;
+        if (UI.layout.mobile) {
+          const gap = 6;
+          const startX = UI.layout.bottom.x + 8;
+          const btnW = Math.floor((UI.layout.bottom.w - 16 - gap * 3) / 4);
+          addButton("confirm", startX, by, btnW, 36, "确认");
+          addButton("pause", startX + (btnW + gap) * 1, by, btnW, 36, STATE.paused ? "继续" : "暂停");
+          addButton("restart", startX + (btnW + gap) * 2, by, btnW, 36, "菜单");
+          addButton("full", startX + (btnW + gap) * 3, by, btnW, 36, "全屏");
+        } else {
+          addButton("confirm", UI.layout.bottom.x + 12, by, 108, 36, "确认");
+          addButton("pause", UI.layout.bottom.x + 128, by, 92, 36, STATE.paused ? "继续" : "暂停");
+          addButton("restart", UI.layout.bottom.x + 228, by, 92, 36, "菜单");
+          addButton("full", UI.layout.bottom.x + 328, by, 116, 36, "全屏");
+        }
+      }
+
+      function drawNode(x, y, name, value, color) {
+        const r = 9 + value * 0.1;
+        ctx.fillStyle = color;
+        ctx.globalAlpha = 0.28;
+        ctx.beginPath();
+        ctx.arc(x, y, r + 8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fill();
+
+        drawText(`${name} ${Math.round(value)}`, x + r + 8, y + 4, "#dcecff", "13px Trebuchet MS");
+      }
+
+      function drawBottomPanel() {
+        const r = UI.layout.bottom;
+        drawRoundRect(r.x, r.y, r.w, r.h, 14, "rgba(9,15,26,0.78)", "rgba(131,166,209,0.34)");
+
+        drawText("近期决策", r.x + 12, r.y + 28, "#e9f4ff", "bold 18px Trebuchet MS");
+        for (let i = 0; i < STATE.log.length; i += 1) {
+          const y = r.y + 52 + i * 18;
+          if (y > r.y + r.h - 56) break;
+          drawText(`- ${STATE.log[i]}`, r.x + 12, y, "#adc9ea", "14px Trebuchet MS");
+        }
+      }
+
+      function drawResult() {
+        const r = UI.layout.center;
+        drawRoundRect(r.x, r.y, r.w, r.h, 16, "rgba(9,15,26,0.8)", "rgba(144,180,223,0.45)");
+
+        drawText("审判结束", r.x + 20, r.y + 48, "#edf6ff", "bold 40px Trebuchet MS");
+        drawText(STATE.ending, r.x + 20, r.y + 96, "#f4d99c", "bold 28px Trebuchet MS");
+
+        wrapText(STATE.epilogue, r.x + 20, r.y + 138, r.w - 40, 34, "#bdd6f3", "22px Trebuchet MS");
+
+        drawRoundRect(r.x + 20, r.y + r.h - 128, r.w - 40, 100, 12, "rgba(21,33,52,0.74)", "rgba(122,155,196,0.36)");
+        drawText(
+          `最终状态：激情 ${STATE.passion} · 理性 ${STATE.reason} · 信仰 ${STATE.faith} · 嫌疑 ${STATE.suspicion} · 共情 ${STATE.empathy}`,
+          r.x + 34,
+          r.y + r.h - 88,
+          "#d4e8ff",
+          "16px Trebuchet MS"
+        );
+        drawText("按 Space 再来一次，或按 R 回到菜单。", r.x + 34, r.y + r.h - 58, "#9ec0e8", "16px Trebuchet MS");
+
+        addButton("again", r.x + r.w - 280, r.y + r.h - 76, 120, 40, "再玩一次", true);
+        addButton("restart", r.x + r.w - 148, r.y + r.h - 76, 120, 40, "回菜单");
+      }
+
+      function drawHUD() {
+        const text = STATE.mode === "menu"
+          ? "Space 开始 · F 全屏"
+          : "←/→ 选择 · Space 确认 · P 暂停 · R 菜单 · F 全屏";
+        drawText(text, 14, window.innerHeight - 10, "rgba(167,196,232,0.88)", "14px Trebuchet MS");
+      }
+
+      function drawPauseOverlay() {
+        if (!STATE.paused || STATE.mode !== "play") return;
+        const w = 260;
+        const h = 86;
+        const x = (window.innerWidth - w) * 0.5;
+        const y = (window.innerHeight - h) * 0.5;
+        drawRoundRect(x, y, w, h, 12, "rgba(8,12,20,0.88)", "rgba(163,199,236,0.55)");
+        drawText("已暂停", x + w * 0.5, y + 38, "#eef7ff", "bold 30px Trebuchet MS", "center");
+        drawText("按 P 或点击继续", x + w * 0.5, y + 64, "#b7d4ef", "14px Trebuchet MS", "center");
+      }
+
+      function render() {
+        UI.buttons = [];
+        drawBackground();
+        drawMotes();
+        drawTopPanel();
+
+        if (STATE.mode === "menu") {
+          drawMenu();
+        } else if (STATE.mode === "play") {
+          drawPlay();
+          drawBottomPanel();
+        } else {
+          drawResult();
+          drawBottomPanel();
+        }
+
+        drawHUD();
+        drawPauseOverlay();
+      }
+
+      function handleButton(id) {
+        if (id === "start" || id === "again") {
+          resetRun();
+          return;
+        }
+        if (id === "restart") {
+          restartMenu();
+          return;
+        }
+        if (id === "pause") {
+          togglePause();
+          return;
+        }
+        if (id === "confirm") {
+          applyChoice(STATE.selectedChoice);
+          return;
+        }
+        if (id === "full") {
+          toggleFullscreen();
+          return;
+        }
+        if (id.startsWith("choice-")) {
+          const idx = Number(id.slice(7));
+          STATE.selectedChoice = idx;
+          applyChoice(idx);
+        }
+      }
+
+      function onPointer(event) {
+        const rect = canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+
+        for (let i = UI.buttons.length - 1; i >= 0; i -= 1) {
+          const b = UI.buttons[i];
+          if (x >= b.x && x <= b.x + b.w && y >= b.y && y <= b.y + b.h) {
+            handleButton(b.id);
+            return;
+          }
+        }
+
+        if (STATE.mode === "menu") {
+          resetRun();
+        }
+      }
+
+      function onKeyDown(event) {
+        const key = event.key;
+
+        if (((key === "ArrowUp") && (STATE.mode === "menu" || STATE.mode === "result")) || key === "f" || key === "F") {
+          event.preventDefault();
+          toggleFullscreen();
+          return;
+        }
+
+        if ((key === "Escape" || ((key === "ArrowDown") && (STATE.mode === "menu" || STATE.mode === "result"))) && document.fullscreenElement) {
+          event.preventDefault();
+          document.exitFullscreen().catch(() => {});
+          return;
+        }
+
+        if (key === "r" || key === "R" || key === "b" || key === "B") {
+          event.preventDefault();
+          restartMenu();
+          return;
+        }
+
+        if (key === "p" || key === "P" || key === "a" || key === "A") {
+          event.preventDefault();
+          togglePause();
+          return;
+        }
+
+        if (STATE.mode === "menu") {
+          if (key === " " || key === "Enter" || key === "Spacebar") {
+            event.preventDefault();
+            resetRun();
+          }
+          return;
+        }
+
+        if (STATE.mode === "result") {
+          if (key === " " || key === "Enter" || key === "Spacebar") {
+            event.preventDefault();
+            resetRun();
+          }
+          return;
+        }
+
+        if (STATE.mode !== "play" || STATE.paused) return;
+
+        if (key === "ArrowLeft") {
+          event.preventDefault();
+          STATE.selectedChoice = (STATE.selectedChoice + 2) % 3;
+        } else if (key === "ArrowRight") {
+          event.preventDefault();
+          STATE.selectedChoice = (STATE.selectedChoice + 1) % 3;
+        } else if (key === " " || key === "Enter" || key === "Spacebar") {
+          event.preventDefault();
+          applyChoice(STATE.selectedChoice);
+        }
+      }
+
+      function updateMotes(dt) {
+        const r = UI.layout.center;
+        const speed = STATE.paused ? 0.4 : 1;
+
+        for (const m of STATE.motes) {
+          m.x += m.vx * dt * speed;
+          m.y += m.vy * dt * speed;
+          m.vx += Math.sin(STATE.elapsed * 0.8 + m.y * 0.01) * dt * 0.7;
+          m.vy += Math.cos(STATE.elapsed * 0.9 + m.x * 0.01) * dt * 0.7;
+
+          if (m.x < r.x || m.x > r.x + r.w) m.vx *= -1;
+          if (m.y < r.y || m.y > r.y + r.h) m.vy *= -1;
+
+          m.x = clamp(m.x, r.x, r.x + r.w);
+          m.y = clamp(m.y, r.y, r.y + r.h);
+        }
+      }
+
+      function update(dt) {
+        STATE.elapsed += dt;
+        updateMotes(dt);
+      }
+
+      function loop(ts) {
+        if (!loop.last) loop.last = ts;
+        const dt = clamp((ts - loop.last) / 1000, 0, 0.05);
+        loop.last = ts;
+
+        update(dt);
+        render();
+        requestAnimationFrame(loop);
+      }
+      loop.last = 0;
+
+      function renderGameToText() {
+        const scene = currentScene();
+        const payload = {
+          coordinate_system: "Canvas origin at top-left (0,0); x increases right; y increases down.",
+          mode: STATE.mode,
+          paused: STATE.paused,
+          scene_index: STATE.sceneIndex,
+          scene_total: SCENES.length,
+          scene: {
+            chapter: scene.chapter,
+            title: scene.title,
+            prompt: scene.prompt,
+            selected_choice_index: STATE.selectedChoice,
+            choices: scene.choices.map((c, idx) => ({ index: idx, label: c.label }))
+          },
+          stats: {
+            passion: STATE.passion,
+            reason: STATE.reason,
+            faith: STATE.faith,
+            suspicion: STATE.suspicion,
+            empathy: STATE.empathy,
+            tension: Number(STATE.tension.toFixed(1))
+          },
+          ending: {
+            title: STATE.ending,
+            epilogue: STATE.epilogue
+          },
+          hint: STATE.hint,
+          recent_log: STATE.log,
+          entities: STATE.motes.slice(0, 24).map((m) => ({ x: Math.round(m.x), y: Math.round(m.y), r: Number(m.r.toFixed(2)) })),
+          ui_buttons: UI.buttons.map((b) => ({ id: b.id, x: Math.round(b.x), y: Math.round(b.y), w: Math.round(b.w), h: Math.round(b.h) })),
+          fullscreen: Boolean(document.fullscreenElement),
+          controls: {
+            keyboard: ["ArrowLeft/ArrowRight select", "Space/Enter confirm", "P pause", "R restart", "F fullscreen"],
+            touch: ["Tap choice card", "Tap confirm/pause/restart/fullscreen"]
+          }
+        };
+
+        return JSON.stringify(payload);
+      }
+
+      window.render_game_to_text = renderGameToText;
+      window.advanceTime = (ms) => {
+        const steps = Math.max(1, Math.round(ms / (1000 / 60)));
+        for (let i = 0; i < steps; i += 1) {
+          update(1 / 60);
+        }
+        render();
+      };
+
+      window.addEventListener("resize", resize);
+      window.addEventListener("keydown", onKeyDown, { passive: false });
+      canvas.addEventListener("click", onPointer);
+      canvas.addEventListener("touchstart", (event) => {
+        const touch = event.changedTouches && event.changedTouches[0];
+        if (!touch) return;
+        onPointer({ clientX: touch.clientX, clientY: touch.clientY });
+      }, { passive: true });
+
+      resize();
+      requestAnimationFrame(loop);
+    })();
+  </script>
+
+
+<script>
+(() => {
+  
+  
+  
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>一切万有 · 现在 · Datre书籍-第1册 我们是DATRE-1（部分）.pdf</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b1220;
+      --bg2: #1a2333;
+      --accent: #f59e0b;
+      --accent2: #34d399;
+      --text: #e5edf8;
+      --soft: #9fb1c9;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+      background:
+        radial-gradient(1200px 540px at 85% -8%, color-mix(in srgb, var(--accent2) 24%, transparent), transparent 70%),
+        radial-gradient(980px 460px at -10% 14%, color-mix(in srgb, var(--accent) 24%, transparent), transparent 74%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+      color: var(--text);
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .05;
+      background-image: radial-gradient(circle at 1px 1px, #fff 1px, transparent 0);
+      background-size: 3px 3px;
+      z-index: 0;
+    }
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      z-index: 100;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+    .page { position: relative; z-index: 1; width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 20px 0 48px; }
+    .hero {
+      min-height: 74vh;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 22px;
+      background: linear-gradient(160deg, color-mix(in srgb, var(--bg2) 86%, transparent), color-mix(in srgb, var(--bg) 88%, transparent));
+      padding: 40px 34px;
+      display: grid;
+      align-content: center;
+      gap: 16px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.34);
+    }
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .hero h1 {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(32px, 5.4vw, 68px);
+      line-height: 1.16;
+      letter-spacing: .04em;
+      max-width: 15em;
+      text-wrap: balance;
+    }
+    .hero p {
+      max-width: 66ch;
+      line-height: 1.95;
+      color: color-mix(in srgb, var(--text) 85%, var(--soft));
+      font-size: 16px;
+    }
+    .chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip {
+      border: 1px solid color-mix(in srgb, var(--accent2) 44%, transparent);
+      color: color-mix(in srgb, var(--accent2) 88%, #fff);
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 12px;
+      background: rgba(255,255,255,.03);
+    }
+    .section { margin-top: 18px; border: 1px solid rgba(255,255,255,.13); border-radius: 18px; padding: 22px; background: rgba(2,6,18,.46); }
+    .section h2 {
+      margin-bottom: 12px;
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(22px, 2.8vw, 34px);
+      color: color-mix(in srgb, var(--accent) 86%, #fff);
+      letter-spacing: .03em;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1.1fr 1fr; gap: 14px; }
+    .concept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+    .concept-card {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      background: rgba(255,255,255,.03);
+      padding: 14px;
+      min-height: 128px;
+    }
+    .concept-token { font-size: 14px; letter-spacing: .14em; color: var(--accent2); text-transform: uppercase; margin-bottom: 7px; font-weight: 700; }
+    .concept-note { font-size: 14px; color: color-mix(in srgb, var(--text) 88%, var(--soft)); line-height: 1.8; }
+    .reading-map {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 10px;
+    }
+    .map-card {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      background: rgba(255,255,255,.03);
+      padding: 12px;
+      min-height: 148px;
+    }
+    .map-no {
+      font-size: 11px;
+      letter-spacing: .18em;
+      color: var(--accent);
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+    .map-card h3 {
+      font-size: 17px;
+      font-family: "Noto Serif SC", serif;
+      line-height: 1.45;
+      margin-bottom: 6px;
+    }
+    .map-card p {
+      font-size: 14px;
+      color: color-mix(in srgb, var(--text) 84%, var(--soft));
+      line-height: 1.85;
+    }
+    .atlas {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      min-height: 440px;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+    .atlas svg { width: 100%; max-width: 440px; height: auto; }
+    .timeline { display: grid; gap: 10px; }
+    .timeline-item {
+      border-left: 2px solid color-mix(in srgb, var(--accent) 66%, transparent);
+      padding: 10px 14px;
+      background: rgba(255,255,255,.02);
+      border-radius: 0 10px 10px 0;
+    }
+    .timeline-no { font-size: 11px; letter-spacing: .22em; color: var(--accent2); display: block; margin-bottom: 6px; }
+    .timeline-item h3 { font-size: 19px; font-family: "Noto Serif SC", serif; line-height: 1.45; margin-bottom: 7px; }
+    .timeline-item p { font-size: 14px; line-height: 1.9; color: color-mix(in srgb, var(--text) 84%, var(--soft)); }
+    .quote-wrap { display: grid; gap: 10px; }
+    .quote {
+      border-left: 2px solid color-mix(in srgb, var(--accent2) 80%, transparent);
+      padding: 10px 12px;
+      background: rgba(255,255,255,.02);
+      color: color-mix(in srgb, var(--text) 92%, #fff);
+      font-family: "Noto Serif SC", serif;
+      line-height: 1.9;
+    }
+    .takeaways { margin-top: 10px; list-style: none; display: grid; gap: 8px; }
+    .takeaways li {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      padding: 10px;
+      background: rgba(255,255,255,.02);
+      align-items: start;
+      line-height: 1.8;
+    }
+    .takeaways span {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: color-mix(in srgb, var(--accent2) 26%, transparent);
+      color: var(--accent2);
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+    .nav { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,.26);
+      border-radius: 999px;
+      padding: 8px 13px;
+      font-size: 12px;
+      color: var(--text);
+      background: rgba(255,255,255,.04);
+    }
+    .btn:hover { border-color: var(--accent2); color: var(--accent2); }
+    .dot-nav {
+      position: fixed;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: grid;
+      gap: 10px;
+      z-index: 50;
+    }
+    .dot-nav button {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.35);
+      background: transparent;
+      cursor: pointer;
+      transition: all .24s ease;
+    }
+    .dot-nav button.active { transform: scale(1.34); border-color: var(--accent); background: var(--accent); }
+    .reveal { opacity: 0; transform: translateY(16px); transition: opacity .55s ease, transform .55s ease; }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+    @media (max-width: 940px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .dot-nav { display: none; }
+      .hero { min-height: auto; padding: 30px 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+  <nav class="dot-nav" id="dotNav">
+    <button data-target="hero" class="active" aria-label="Hero"></button>
+    <button data-target="atlas" aria-label="Atlas"></button>
+    <button data-target="concepts" aria-label="Concepts"></button>
+    <button data-target="reading" aria-label="Reading"></button>
+    <button data-target="takeaways" aria-label="Takeaways"></button>
+  </nav>
+  <main class="page">
+    <section class="hero reveal in" id="hero">
+      <p class="eyebrow">Scholar Atlas · Gate 18</p>
+      <h1>一切万有 · 现在</h1>
+      <p>在那儿坐着 ？ ” 从我们的理解上看，那样的人才是能够发现治愈办法的人；那样的人才是有新点 子的人。</p>
+      <div class="chip-row">
+        <span class="chip">Datre书籍-第1册 我们是DATRE-1（部分）.pdf</span>
+        
+        <span class="chip">Module 18/18</span>
+        <span class="tag">一切万有</span><span class="tag">现在</span><span class="tag">ceo</span><span class="tag">你看</span><span class="tag">apart</span><span class="tag">falls</span><span class="tag">isness</span>
+      </div>
+    </section>
+
+    <section class="section reveal" id="atlas">
+      <h2>主题脉络与阅读地图</h2>
+      <p style="color:var(--soft);line-height:1.9;margin-bottom:10px;">先看章节主线，再进入细节。每个卡片都是一个可独立理解的知识片段。</p>
+      <div class="reading-map">
+      <article class="map-card reveal">
+        <p class="map-no">01</p>
+        <h3>” 从我们的理解上看，那样的人才是能够发现治愈办法的人；那样的人才是有新点 子的人。</h3>
+        <p>” 从我们的理解上看，那样的人才是能够发现治愈办法的人；那样的人才是有新点 子的人。 而不是那些与大家一起坐在实验室里的人。在人群中，这很难做到，除非这个人 是大家公认的：孤独者。 孤独者才是那个获取心念的人，而不是那些坐在群体中的人。在群体中，你们能 获得的就是群体意识中的想法。没有其它的办法，因为在一个充满了群体意识的屋子 中，根本没有允许心念进入的空隙。 是孤独者，让自己离开，并对心念开放。你要让自己离开群体意识，才能与心念 连接</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">02</p>
+        <h3>” DATRE ： 你看 ， 所有的这些术语 ， 一切万有是多少年前被引入的呢？它是用来扩大 神这个观念的。它能让你扩展思维，超越那个看起来像人，却比任何一</h3>
+        <p>” DATRE ： 你看 ， 所有的这些术语 ， 一切万有是多少年前被引入的呢？它是用来扩大 神这个观念的。它能让你扩展思维，超越那个看起来像人，却比任何一个人都要厉害 的神。 所以一切万有概念的提出是为了扩大你们的观念，让你们知道一切万有是比这个 星球上的一切还要多的。只是在现阶段，扩展达到一切万有是你们目前所能看到的。 换句话说，假如一切万有这个概念没有被发明出来，也许你们现在就不会想登上 火箭进入你们的火星。 你看，不同概念的提出</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">03</p>
+        <h3>你们所做的，就是试图把宇宙的思维模式附加到神的概念之上 － 不，这是行不 通的。你要觉知到，宇宙不仅仅只是一个，那儿还有许多。</h3>
+        <p>你们所做的，就是试图把宇宙的思维模式附加到神的概念之上 － 不，这是行不 通的。你要觉知到，宇宙不仅仅只是一个，那儿还有许多。 或让我们以非常简单的方式讲：假如你有一个大概 英亩的小农场，还有一些 一个人就能操作的现代化设备。 现在，让我们假设那一个人就是神，而那 英亩地是这个星球。 现在，那儿有一个更大的公司想收购所有这样的小农庄，以生产各种产品。这个 公司里有很多能确保适当操作的工作人员。 所有不同的工作人员都被分配到这些不同的农场</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">04</p>
+        <h3>总之 ， 是 那些参与工作的人在维持这些操作平稳地进行。</h3>
+        <p>总之 ， 是 那些参与工作的人在维持这些操作平稳地进行。 因此，当你们试图把神这个术语融入这样的关系中时，这就行不通了。 现在，你们不需要涉及一切万有，不需要涉及神，不需要涉及任何东西，甚至在 日常生活中，这样的涉及都只是一个习惯。 如果你开始与观念（完形概念）或想法点子工作，甚至当你看待事物的方式与别 人的观点相反时，你也不需要涉及一切万有或神或其它任何这类的词语。 当你看待一个事物，在你还没有觉知到它本应 “ 是 ” 的程度（本质）</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">05</p>
+        <h3>你们甚至没有觉察到这一点：如果你经常使用一个给定的单词或符号，你就能真 的创造出一个怪物。因为重复会强化那个特定的振动模式。</h3>
+        <p>你们甚至没有觉察到这一点：如果你经常使用一个给定的单词或符号，你就能真 的创造出一个怪物。因为重复会强化那个特定的振动模式。 所以当你与完形概念工作时，你就会消除某些特定的文字或符号模式。然后，当 你开始使用完形概念与想法点子时，总有一天你会意识到：原来你已经不再使用那些 术语了！ 这些文字或符号就像周围的一切，它只是一个习惯，而习惯需要时间来改变。 但是，只要你能变得觉知到一个习惯，你就能在每次使用这个习惯之前留意到自 己。总有一天，</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="concepts">
+      <h2>核心概念与解释</h2>
+      <div class="concept-grid">
+      <article class="concept-card reveal">
+        <p class="concept-token">一切万有</p>
+        <p class="concept-note">第 章 一切万有 本章的前半部分内容来自 [Datre 传导 - － 神就是能量 ] － 因本书是 [Datre 传 导对话 ] 摘抄的合集本。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">现在</p>
+        <p class="concept-note">换句话说，假如一切万有这个概念没有被发明出来，也许你们现在就不会想登上 火箭进入你们的火星。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">ceo</p>
+        <p class="concept-note">他们可能有一个 CEO ， 但 CEO 通常不会做太多 ， 除了试图避免给出答案 。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">你看</p>
+        <p class="concept-note">” DATRE ： 你看 ， 所有的这些术语 ， 一切万有是多少年前被引入的呢？它是用来扩大 神这个观念的。它能让你扩展思维，超越那个看起来像人，却比任何一个人都要厉害 的神。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">apart</p>
+        <p class="concept-note">我想试图以 Datre 的方式去理解这句话 ： “ 当我们进入一切万有无限的本质 时，所有的一切都崩溃瓦解（ falls apart ）了 。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">falls</p>
+        <p class="concept-note">我想试图以 Datre 的方式去理解这句话 ： “ 当我们进入一切万有无限的本质 时，所有的一切都崩溃瓦解（ falls apart ）了 。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">isness</p>
+        <p class="concept-note">我们在不同的文章中使用了 “ 是 ” 这个术语 （ Isness － “ 是 ” 的状态 ） ，但你们却把它当做了另外一个表示神的概念。</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="reading-excerpts">
+      <h2>原文精读片段</h2>
+      <p style="color:var(--soft);line-height:1.9;margin-bottom:10px;">保留信息密度最高的段落，先读原句，再看后续路径与总结。</p>
+      <div class="reading-map">
+      <article class="map-card reveal">
+        <p class="map-no">EXCERPT 1</p>
+        <p>” 从我们的理解上看，那样的人才是能够发现治愈办法的人；那样的人才是有新点 子的人。</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">EXCERPT 2</p>
+        <p>而不是那些与大家一起坐在实验室里的人。在人群中，这很难做到，除非这个人 是大家公认的：孤独者。</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">EXCERPT 3</p>
+        <p>孤独者才是那个获取心念的人，而不是那些坐在群体中的人。在群体中，你们能 获得的就是群体意识中的想法。没有其它的办法，因为在一个充满了群体意识的屋子 中，根本没有允许心念进入的空隙。</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">EXCERPT 4</p>
+        <p>是孤独者，让自己离开，并对心念开放。你要让自己离开群体意识，才能与心念 连接。</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">EXCERPT 5</p>
+        <p>第 章 一切万有 本章的前半部分内容来自 [Datre 传导 - － 神就是能量 ] － 因本书是 [Datre 传 导对话 ] 摘抄的合集本。</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">EXCERPT 6</p>
+        <p>我想试图以 Datre 的方式去理解这句话 ： “ 当我们进入一切万有无限的本质 时，所有的一切都崩溃瓦解（ falls apart ）了 。</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="reading">
+      <h2>渐进式阅读路径</h2>
+      <div class="timeline">
+      <article class="timeline-item reveal">
+        <span class="timeline-no">01</span>
+        <h3>” 从我们的理解上看，那样的人才是能够发现治愈办法的人；那样的人才是有新点 子的人。</h3>
+        <p>” 从我们的理解上看，那样的人才是能够发现治愈办法的人；那样的人才是有新点 子的人。 而不是那些与大家一起坐在实验室里的人。在人群中，这很难做到，除非这个人 是大家公认的：孤独者。 孤独者才是那个获取心念的人，而不是那些坐在群体中的人。在群体中，你们能 获得的就是群体意识中的想法。没有其它的办法，因为在一个充满了群体意识的屋子 中，根本没有允许心念进入的空隙。 是孤独者，让自己离开，并对心念开放。你要让自己离开群体意识，才能与心念 连接。 第 章 一切万有 本章的前半部分内容来自 [Datre 传导 - － 神就是能量 ] － 因本书是 [Datre 传 导对话 ] 摘抄的合集本。 我想试图以 Datre 的方式去理解这句话 ： “ 当我们进入一切万有无限的本质 时，所有的一切都崩溃瓦解（ falls apart ）了 。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">02</span>
+        <h3>” DATRE ： 你看 ， 所有的这些术语 ， 一切万有是多少年前被引入的呢？它是用来扩大 神这个观念的。它能让你扩展思维，超越那个看起来像人，却比任何一</h3>
+        <p>” DATRE ： 你看 ， 所有的这些术语 ， 一切万有是多少年前被引入的呢？它是用来扩大 神这个观念的。它能让你扩展思维，超越那个看起来像人，却比任何一个人都要厉害 的神。 所以一切万有概念的提出是为了扩大你们的观念，让你们知道一切万有是比这个 星球上的一切还要多的。只是在现阶段，扩展达到一切万有是你们目前所能看到的。 换句话说，假如一切万有这个概念没有被发明出来，也许你们现在就不会想登上 火箭进入你们的火星。 你看，不同概念的提出能够扩大你的觉知进入不同领域的理解。所以当你们使用 “ 一切万有 ” 这个词语时，那只是表示另一个更大的神。 但 “ 一切万有 ” 这个词只是你们现在所有的，并不是真的必要。你不需要涉及任 何神或一切万有或任何其它 。 我们在不同的文章中使用了 “ 是 ” 这个术语 （ Isness － “ 是 ” 的状态 ） ，但你们却把它当做了另外一个表示神的概念。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">03</span>
+        <h3>你们所做的，就是试图把宇宙的思维模式附加到神的概念之上 － 不，这是行不 通的。你要觉知到，宇宙不仅仅只是一个，那儿还有许多。</h3>
+        <p>你们所做的，就是试图把宇宙的思维模式附加到神的概念之上 － 不，这是行不 通的。你要觉知到，宇宙不仅仅只是一个，那儿还有许多。 或让我们以非常简单的方式讲：假如你有一个大概 英亩的小农场，还有一些 一个人就能操作的现代化设备。 现在，让我们假设那一个人就是神，而那 英亩地是这个星球。 现在，那儿有一个更大的公司想收购所有这样的小农庄，以生产各种产品。这个 公司里有很多能确保适当操作的工作人员。 所有不同的工作人员都被分配到这些不同的农场中工作。 他们可能有一个 CEO ， 但 CEO 通常不会做太多 ， 除了试图避免给出答案 。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">04</span>
+        <h3>总之 ， 是 那些参与工作的人在维持这些操作平稳地进行。</h3>
+        <p>总之 ， 是 那些参与工作的人在维持这些操作平稳地进行。 因此，当你们试图把神这个术语融入这样的关系中时，这就行不通了。 现在，你们不需要涉及一切万有，不需要涉及神，不需要涉及任何东西，甚至在 日常生活中，这样的涉及都只是一个习惯。 如果你开始与观念（完形概念）或想法点子工作，甚至当你看待事物的方式与别 人的观点相反时，你也不需要涉及一切万有或神或其它任何这类的词语。 当你看待一个事物，在你还没有觉知到它本应 “ 是 ” 的程度（本质）时，你所看 到的就是文字振动带给你的印象。 你们报纸上的文字与符号振动，如果你们不断使用某种词语和模式，它们就会变 成真的。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">05</span>
+        <h3>你们甚至没有觉察到这一点：如果你经常使用一个给定的单词或符号，你就能真 的创造出一个怪物。因为重复会强化那个特定的振动模式。</h3>
+        <p>你们甚至没有觉察到这一点：如果你经常使用一个给定的单词或符号，你就能真 的创造出一个怪物。因为重复会强化那个特定的振动模式。 所以当你与完形概念工作时，你就会消除某些特定的文字或符号模式。然后，当 你开始使用完形概念与想法点子时，总有一天你会意识到：原来你已经不再使用那些 术语了！ 这些文字或符号就像周围的一切，它只是一个习惯，而习惯需要时间来改变。 但是，只要你能变得觉知到一个习惯，你就能在每次使用这个习惯之前留意到自 己。总有一天，习惯就会被改掉。</p>
+      </article>
+    </div>
+      <div class="quote-wrap" style="margin-top:12px;"><blockquote class="quote reveal">“孤独者才是那个获取心念的人，而不是那些坐在群体中的人。在群体中，你们能 获得的就是群体意识中的想法。没有其它的办法，因为在一个充满了群体意识的屋子 中，根本没有允许心念进入的空隙。”</blockquote><blockquote class="quote reveal">“” DATRE ： 你看 ， 所有的这些术语 ， 一切万有是多少年前被引入的呢？它是用来扩大 神这个观念的。它能让你扩展思维，超越那个看起来像人，却比任何一个人都要厉害 的神。”</blockquote><blockquote class="quote reveal">“所以一切万有概念的提出是为了扩大你们的观念，让你们知道一切万有是比这个 星球上的一切还要多的。只是在现阶段，扩展达到一切万有是你们目前所能看到的。”</blockquote></div>
+    </section>
+
+    <section class="section reveal" id="takeaways">
+      <h2>本关关键收获</h2>
+      <ul class="takeaways"><li><span>1</span>” 从我们的理解上看，那样的人才是能够发现治愈办法的人；那样的人才是有新点 子的人。</li><li><span>2</span>” DATRE ： 你看 ， 所有的这些术语 ， 一切万有是多少年前被引入的呢？它是用来扩大 神这个观念的。它能让你扩展思维，超越那个看起来像人，却比任何一</li><li><span>3</span>你们所做的，就是试图把宇宙的思维模式附加到神的概念之上 － 不，这是行不 通的。你要觉知到，宇宙不仅仅只是一个，那儿还有许多。</li><li><span>4</span>总之 ， 是 那些参与工作的人在维持这些操作平稳地进行。</li></ul>
+      <nav class="nav">
+        <a class="btn" href="/experiences/user-book-datre-1-datre-1-pdf-gd6k91-b7fe-g17-chapter-17.html">上一关</a>
+        
+      </nav>
+    </section>
+  </main>
+  <script>
+    (() => {
+      const progress = document.getElementById("progress");
+      const dots = Array.from(document.querySelectorAll("#dotNav button[data-target]"));
+      const sections = dots
+        .map((dot) => document.getElementById(dot.getAttribute("data-target")))
+        .filter(Boolean);
+      const reveals = Array.from(document.querySelectorAll(".reveal"));
+      const onScroll = () => {
+        const h = document.documentElement;
+        const total = Math.max(1, h.scrollHeight - window.innerHeight);
+        const pct = Math.max(0, Math.min(100, (window.scrollY / total) * 100));
+        if (progress) progress.style.width = pct + "%";
+      };
+      const io = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) entry.target.classList.add("in");
+        }
+      }, { threshold: .14 });
+      reveals.forEach((el) => io.observe(el));
+      const secIo = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const id = entry.target.id;
+          dots.forEach((dot) => dot.classList.toggle("active", dot.getAttribute("data-target") === id));
+        });
+      }, { threshold: .4 });
+      sections.forEach((s) => secIo.observe(s));
+      dots.forEach((dot) => {
+        dot.addEventListener("click", () => {
+          const target = document.getElementById(dot.getAttribute("data-target"));
+          if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+      window.addEventListener("scroll", onScroll, { passive: true });
+      onScroll();
+    })();
+  </script>
+</body>
+</html>

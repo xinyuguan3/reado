@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>婦人王氏之死 — 视觉科普体验</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<script src="/shared/vendor/tailwindcss-cdn.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        ink: { 50:'#f7f3ed',100:'#ede5d5',200:'#ddd2b8',300:'#cdbfa0',400:'#b0a080',500:'#8a7d60',600:'#4a3f2c',700:'#2e2518',800:'#1a1610',900:'#0d0b08',950:'#060504' },
+        blood: { 400:'#e8695e',500:'#d4504a',600:'#8b1a1a',700:'#6e1212' },
+        jade: { 400:'#6ea87e',500:'#3d6b4a',600:'#2a4e34' },
+        parchment: { 50:'#fffcf5',100:'#f5ead5',200:'#e0d4be' }
+      },
+      fontFamily: {
+        serif: ['"Noto Serif SC"','serif'],
+        sans: ['"Noto Sans SC"','sans-serif'],
+        display: ['"ZCOOL XiaoWei"','"Noto Serif SC"','serif']
+      }
+    }
+  }
+}
+</script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#0d0b08;color:#ede5d5;font-family:'Noto Serif SC',serif;overflow-x:hidden}
+  ::selection{background:#8b1a1a;color:#faf6ee}
+  ::-webkit-scrollbar{width:4px}
+  ::-webkit-scrollbar-track{background:#1a1610}
+  ::-webkit-scrollbar-thumb{background:#8a7d60;border-radius:2px}
+  .noise{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;opacity:.035;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  #progress-bar{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,#8b1a1a,#e8695e);z-index:10000;width:0%;transition:width .1s}
+  .section-divider{height:1px;background:linear-gradient(90deg,transparent,#6b5b3e,transparent);margin:0 auto;max-width:600px}
+  .seal{width:60px;height:60px;border:2px solid #8b1a1a;border-radius:4px;display:flex;align-items:center;justify-content:center;color:#e8695e;font-family:'ZCOOL XiaoWei',serif;font-size:14px;writing-mode:vertical-rl;transform:rotate(2deg);letter-spacing:4px;opacity:.7}
+  .quote-block{border-left:2px solid #8b1a1a;padding-left:1.5rem;font-style:italic;color:#cdbfa0}
+  .card-hover{transition:all .5s cubic-bezier(.23,1,.32,1)}
+  .card-hover:hover{transform:translateY(-4px);box-shadow:0 20px 60px rgba(0,0,0,.5)}
+  .vertical-text{writing-mode:vertical-rl;text-orientation:mixed}
+  .fade-up{opacity:0;transform:translateY(40px)}
+  .fade-in{opacity:0}
+  .timeline-dot{width:12px;height:12px;border-radius:50%;border:2px solid #8b1a1a;background:#1a1610;position:relative;z-index:2}
+  .timeline-dot.active{background:#8b1a1a;box-shadow:0 0 20px rgba(139,26,26,.5)}
+  @keyframes flicker{0%,100%{opacity:.7}50%{opacity:.9}}
+  .lantern{animation:flicker 3s ease-in-out infinite}
+  @keyframes snowfall{0%{transform:translateY(-10px) rotate(0deg);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateY(100vh) rotate(360deg);opacity:0}}
+  .snow-particle{position:absolute;width:3px;height:3px;background:rgba(255,255,255,.6);border-radius:50%;animation:snowfall linear infinite}
+  .dream-text{background:linear-gradient(180deg,#ede5d5,#b0a080);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .ink-wash{background:#0d0b08;background-image:radial-gradient(ellipse at 30% 20%,rgba(45,37,24,.3),transparent 60%),radial-gradient(ellipse at 70% 80%,rgba(45,37,24,.2),transparent 50%)}
+  .hero-title{font-size:clamp(3rem,8vw,7rem);line-height:1.15;letter-spacing:.15em}
+  @media(max-width:768px){.hero-title{letter-spacing:.08em}.vertical-text{writing-mode:horizontal-tb}}
+</style>
+<style id="reado-shell-preload-style">
+html.reado-shell-preload body:not(.reado-shell-applied) {
+  padding-top: 80px !important;
+}
+@media (min-width: 1024px) {
+  html.reado-shell-preload:not(.reado-shell-preload-learning) body:not(.reado-shell-applied) {
+    padding-left: 256px !important;
+  }
+}
+@media (min-width: 1200px) {
+  html.reado-shell-preload:not(.reado-shell-preload-learning) body:not(.reado-shell-applied) {
+    padding-right: clamp(280px, 24vw, 320px) !important;
+  }
+}
+html.reado-shell-preload body:not(.reado-shell-applied) > header:first-of-type,
+html.reado-shell-preload body:not(.reado-shell-applied) > nav:first-of-type,
+html.reado-shell-preload body:not(.reado-shell-applied) > aside:first-of-type,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex > nav,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex > aside,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex-1 > nav,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex-1 > aside,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex > .flex-1 > nav,
+html.reado-shell-preload body:not(.reado-shell-applied) > .flex > .flex-1 > aside {
+  display: none !important;
+}
+</style>
+<script id="reado-shell-preload-script">
+(() => {
+  const root = document.documentElement;
+  root.classList.add("reado-shell-preload");
+  const path = window.location.pathname || "";
+  if (path.startsWith("/experiences/") || path.startsWith("/books/")) {
+    root.classList.add("reado-shell-preload-learning");
+  }
+})();
+</script>
+</head>
+<body class="ink-wash">
+<script src="/shared/book-catalog.js?v=1772888317077"></script>
+<script type="module" src="/shared/shell.js?v=1772888317077"></script>
+<reado-app-shell data-page="knowledge-map"></reado-app-shell>
+<div class="noise"></div>
+<div id="progress-bar"></div>
+
+<!-- ===== HERO ===== -->
+<section id="hero" class="relative min-h-screen flex items-center justify-center overflow-hidden">
+  <div class="absolute inset-0 bg-gradient-to-b from-ink-950 via-ink-900 to-ink-800 opacity-90"></div>
+  <div class="absolute inset-0" style="background:radial-gradient(circle at 50% 40%,rgba(139,26,26,.08) 0%,transparent 60%)"></div>
+  <div class="relative z-10 text-center px-6 max-w-4xl mx-auto">
+    <div class="flex justify-center mb-8 fade-in">
+      <div class="seal">史景遷</div>
+    </div>
+    <h1 class="hero-title font-display text-parchment-50 mb-6" style="text-shadow:0 0 80px rgba(139,26,26,.2)">
+      婦人王氏之死
+    </h1>
+    <p class="text-ink-300 text-lg md:text-xl tracking-widest mb-4 fade-up font-sans font-light">一部关于被遗忘的人们的微观历史</p>
+    <p class="text-ink-400 text-sm tracking-wider fade-up font-sans">The Death of Woman Wang &middot; Jonathan D. Spence</p>
+    <div class="mt-12 fade-up">
+      <p class="text-ink-400 text-xs tracking-widest uppercase font-sans">向下滚动</p>
+      <div class="mt-3 mx-auto w-px h-12 bg-gradient-to-b from-ink-400 to-transparent"></div>
+    </div>
+  </div>
+  <div class="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-ink-900 to-transparent"></div>
+</section>
+
+<!-- ===== INTRO ===== -->
+<section class="py-24 md:py-32 px-6">
+  <div class="max-w-3xl mx-auto">
+    <p class="text-ink-300 text-lg md:text-xl leading-relaxed fade-up">
+      十七世纪六七十年代，山东省南部一个名叫<strong class="text-parchment-100">郯城</strong>的小县城，正在经历着无尽的苦难。饥荒、地震、战争、洪水接踵而至，人口从二十万骤降至六万。
+    </p>
+    <p class="text-ink-400 mt-8 leading-relaxed fade-up">
+      耶鲁大学历史学家<strong class="text-ink-200">史景遷</strong>（Jonathan D. Spence）用三种截然不同的史料——县志、官箴和小说——拼凑出这个角落里普通人的生与死。在所有的故事中，最令人心碎的，是一个连名字都没有留下的女人：王氏。
+    </p>
+    <div class="quote-block mt-12 fade-up">
+      <p class="text-ink-200 text-lg leading-relaxed">
+        「要从过去召唤出那些穷人和为人遗忘者的生活，总是困难的。」
+      </p>
+      <p class="text-ink-500 mt-3 text-sm font-sans">——史景遷</p>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider fade-in"></div>
+
+<!-- ===== CATASTROPHE TIMELINE ===== -->
+<section id="catastrophe" class="py-24 md:py-32 px-6">
+  <div class="max-w-5xl mx-auto">
+    <div class="text-center mb-16">
+      <p class="text-blood-500 text-sm tracking-widest font-sans mb-3 fade-up">第一章</p>
+      <h2 class="text-3xl md:text-5xl font-display text-parchment-100 fade-up">灾难编年</h2>
+      <p class="text-ink-400 mt-4 max-w-xl mx-auto fade-up font-sans text-sm">从1622年到1668年，郯城经历了近半个世纪不间断的灾祸。每一次，都有人失去一切。</p>
+    </div>
+    <!-- Timeline -->
+    <div class="relative mt-16">
+      <div class="absolute left-6 md:left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-ink-600 to-transparent md:-translate-x-px"></div>
+
+      <div class="space-y-12 md:space-y-16">
+        <!-- 1622 -->
+        <div class="timeline-item fade-up relative flex items-start md:items-center">
+          <div class="hidden md:block md:w-1/2 md:pr-12 md:text-right">
+            <span class="text-blood-400 font-sans text-sm tracking-wider">1622</span>
+            <h3 class="text-parchment-100 text-xl mt-1">白莲教起事</h3>
+            <p class="text-ink-400 text-sm mt-2 leading-relaxed">教徒许诺「金山银山、油泉酒井」，诱骗成千上万农民离家。最终不是陈尸山野，就是死于政府军之手。</p>
+          </div>
+          <div class="absolute left-6 md:left-1/2 md:-translate-x-1.5"><div class="timeline-dot active"></div></div>
+          <div class="pl-14 md:hidden">
+            <span class="text-blood-400 font-sans text-sm tracking-wider">1622</span>
+            <h3 class="text-parchment-100 text-lg mt-1">白莲教起事</h3>
+            <p class="text-ink-400 text-sm mt-2 leading-relaxed">教徒许诺「金山银山、油泉酒井」，诱骗成千上万农民离家。</p>
+          </div>
+          <div class="hidden md:block md:w-1/2 md:pl-12"></div>
+        </div>
+        <!-- 1640 -->
+        <div class="timeline-item fade-up relative flex items-start md:items-center">
+          <div class="hidden md:block md:w-1/2 md:pr-12"></div>
+          <div class="absolute left-6 md:left-1/2 md:-translate-x-1.5"><div class="timeline-dot active"></div></div>
+          <div class="pl-14 md:pl-0 md:w-1/2 md:ml-auto md:pl-12">
+            <span class="text-blood-400 font-sans text-sm tracking-wider">1640</span>
+            <h3 class="text-parchment-100 text-lg md:text-xl mt-1">蝗灾与人相食</h3>
+            <p class="text-ink-400 text-sm mt-2 leading-relaxed">大群蝗虫蠕动进入人们衣服，爬下烟囱，压熄炉火。饥荒中，百姓以谚语合理化绝望：</p>
+            <p class="text-blood-400 text-sm mt-2 italic">「兄食其弟，夫食其妻」</p>
+          </div>
+        </div>
+        <!-- 1641 -->
+        <div class="timeline-item fade-up relative flex items-start md:items-center">
+          <div class="hidden md:block md:w-1/2 md:pr-12 md:text-right">
+            <span class="text-blood-400 font-sans text-sm tracking-wider">1641</span>
+            <h3 class="text-parchment-100 text-xl mt-1">盗匪劫城</h3>
+            <p class="text-ink-400 text-sm mt-2 leading-relaxed">数千人盗匪从沂州南下，劫掠李家庄和马头镇，围攻郯城县城。姚氏被拖出家门时诅咒不已，直到被砍杀。</p>
+          </div>
+          <div class="absolute left-6 md:left-1/2 md:-translate-x-1.5"><div class="timeline-dot active"></div></div>
+          <div class="pl-14 md:hidden">
+            <span class="text-blood-400 font-sans text-sm tracking-wider">1641</span>
+            <h3 class="text-parchment-100 text-lg mt-1">盗匪劫城</h3>
+            <p class="text-ink-400 text-sm mt-2 leading-relaxed">数千人盗匪从沂州南下，劫掠集镇，围攻县城。</p>
+          </div>
+          <div class="hidden md:block md:w-1/2 md:pl-12"></div>
+        </div>
+        <!-- 1643 -->
+        <div class="timeline-item fade-up relative flex items-start md:items-center">
+          <div class="hidden md:block md:w-1/2 md:pr-12"></div>
+          <div class="absolute left-6 md:left-1/2 md:-translate-x-1.5"><div class="timeline-dot active" style="width:16px;height:16px;border-width:3px"></div></div>
+          <div class="pl-14 md:pl-0 md:w-1/2 md:ml-auto md:pl-12">
+            <span class="text-blood-400 font-sans text-sm tracking-wider">1643</span>
+            <h3 class="text-parchment-100 text-lg md:text-xl mt-1">满洲铁骑屠城</h3>
+            <p class="text-ink-400 text-sm mt-2 leading-relaxed">阿巴泰率军攻破郯城。「共杀数万余人。街衢宅巷，尸相枕藉。」掠走白银二十二万余两、人民三十六万九千口。</p>
+            <div class="mt-3 p-3 bg-ink-800/50 border border-ink-700/50 rounded text-xs text-ink-300 font-sans">
+              掠夺清单：黄金12,250两 · 白银220,000+两 · 缎匹52,230匹 · 俘获人口369,000人
+            </div>
+          </div>
+        </div>
+        <!-- 1668 -->
+        <div class="timeline-item fade-up relative flex items-start md:items-center">
+          <div class="hidden md:block md:w-1/2 md:pr-12 md:text-right">
+            <span class="text-blood-400 font-sans text-sm tracking-wider">1668</span>
+            <h3 class="text-parchment-100 text-xl mt-1">大地震</h3>
+            <p class="text-ink-400 text-sm mt-2 leading-relaxed">七月二十五日傍晚，地震袭击郯城。城墙、庙宇、数以千计的民房倒塌。水柱喷向空中高达二十尺。近九千人丧命——而郯城人口不及沂州一半。</p>
+          </div>
+          <div class="absolute left-6 md:left-1/2 md:-translate-x-1.5"><div class="timeline-dot active" style="width:16px;height:16px;border-width:3px"></div></div>
+          <div class="pl-14 md:hidden">
+            <span class="text-blood-400 font-sans text-sm tracking-wider">1668</span>
+            <h3 class="text-parchment-100 text-lg mt-1">大地震</h3>
+            <p class="text-ink-400 text-sm mt-2 leading-relaxed">近九千人丧命。郯城人口不及沂州一半，死亡人数却接近沂州。</p>
+          </div>
+          <div class="hidden md:block md:w-1/2 md:pl-12"></div>
+        </div>
+      </div>
+    </div>
+    <!-- Population Chart -->
+    <div class="mt-24 fade-up">
+      <h3 class="text-center text-parchment-100 text-xl md:text-2xl font-display mb-3">人口崩塌</h3>
+      <p class="text-center text-ink-400 text-sm font-sans mb-8">郯城可服徭役男丁数变化（据《郯城县志》）</p>
+      <div id="chart-population" style="width:100%;height:360px"></div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider fade-in"></div>
+
+<!-- ===== THREE SOURCES ===== -->
+<section id="sources" class="py-24 md:py-32 px-6">
+  <div class="max-w-5xl mx-auto">
+    <div class="text-center mb-16">
+      <p class="text-blood-500 text-sm tracking-widest font-sans mb-3 fade-up">第二章</p>
+      <h2 class="text-3xl md:text-5xl font-display text-parchment-100 fade-up">三扇窗户</h2>
+      <p class="text-ink-400 mt-4 max-w-xl mx-auto fade-up font-sans text-sm">史景遷用三种截然不同的史料，拼凑出一个被遗忘县城的面貌</p>
+    </div>
+    <div class="grid md:grid-cols-3 gap-6 md:gap-8">
+      <!-- Source 1 -->
+      <div class="card-hover fade-up bg-ink-800/40 border border-ink-700/40 rounded-lg p-6 md:p-8 backdrop-blur-sm">
+        <div class="text-blood-500 text-xs tracking-widest font-sans mb-4">史 料 一</div>
+        <h3 class="text-parchment-100 text-xl mb-2 font-display">《郯城县志》</h3>
+        <p class="text-ink-400 text-xs font-sans mb-4">馮可參 · 1673年</p>
+        <p class="text-ink-300 text-sm leading-relaxed">被罢官的前知县冯可参，穷困潦倒地留在郯城，靠教书和编修县志维生。他编纂了一部「真实的凄凉记录」，不为礼节或怀旧所动。</p>
+        <div class="mt-6 text-ink-500 text-xs font-sans">关键词：灾异记录 · 人口统计 · 贞烈传</div>
+      </div>
+      <!-- Source 2 -->
+      <div class="card-hover fade-up bg-ink-800/40 border border-ink-700/40 rounded-lg p-6 md:p-8 backdrop-blur-sm">
+        <div class="text-blood-500 text-xs tracking-widest font-sans mb-4">史 料 二</div>
+        <h3 class="text-parchment-100 text-xl mb-2 font-display">《福惠全书》</h3>
+        <p class="text-ink-400 text-xs font-sans mb-4">黃六鴻 · 1694年序</p>
+        <p class="text-ink-300 text-sm leading-relaxed">1670至1672年间的郯城知县。格外敏锐的观察者，重视细节，对准确有一种偏执——记录某一事件发生的正确时刻、确切金额和参与者身份。</p>
+        <div class="mt-6 text-ink-500 text-xs font-sans">关键词：行政细节 · 税收记录 · 司法案例</div>
+      </div>
+      <!-- Source 3 -->
+      <div class="card-hover fade-up bg-ink-800/40 border border-ink-700/40 rounded-lg p-6 md:p-8 backdrop-blur-sm">
+        <div class="text-blood-500 text-xs tracking-widest font-sans mb-4">史 料 三</div>
+        <h3 class="text-parchment-100 text-xl mb-2 font-display">蒲松龄的世界</h3>
+        <p class="text-ink-400 text-xs font-sans mb-4">《聊斋志异》 · 约1670年代</p>
+        <p class="text-ink-300 text-sm leading-relaxed">蒲松龄住在淄川县，与郯城只隔一排土匪出没的山丘。他在1670至1671年路过郯城，用虚构的小说探究县志和官箴无法触及的领域：寂寞、渴望与梦想。</p>
+        <div class="mt-6 text-ink-500 text-xs font-sans">关键词：想象力 · 心灵图像 · 人间百态</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider fade-in"></div>
+
+<!-- ===== TAX BURDEN ===== -->
+<section id="tax" class="py-24 md:py-32 px-6">
+  <div class="max-w-5xl mx-auto">
+    <div class="text-center mb-16">
+      <p class="text-blood-500 text-sm tracking-widest font-sans mb-3 fade-up">第三章</p>
+      <h2 class="text-3xl md:text-5xl font-display text-parchment-100 fade-up">赋税之重</h2>
+    </div>
+    <div class="grid md:grid-cols-2 gap-12 items-start">
+      <div class="fade-up">
+        <div class="space-y-6">
+          <div class="flex items-start gap-4">
+            <span class="text-blood-500 text-2xl font-display mt-1">壹</span>
+            <div>
+              <h4 class="text-parchment-100 font-sans font-medium">基本税率</h4>
+              <p class="text-ink-400 text-sm mt-1">男丁税：每年120文（0.12两）· 耕地税：每亩15.7文</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-4">
+            <span class="text-blood-500 text-2xl font-display mt-1">贰</span>
+            <div>
+              <h4 class="text-parchment-100 font-sans font-medium">连续十三年拖欠</h4>
+              <p class="text-ink-400 text-sm mt-1">到1670年，郯城已连续十三年无法完成税收配额。</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-4">
+            <span class="text-blood-500 text-2xl font-display mt-1">叁</span>
+            <div>
+              <h4 class="text-parchment-100 font-sans font-medium">层层盘剥</h4>
+              <p class="text-ink-400 text-sm mt-1">官银匠在纯度上做假、额外收手续费、踢倒熔炉——连缴税都是一场噩梦。</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-4">
+            <span class="text-blood-500 text-2xl font-display mt-1">肆</span>
+            <div>
+              <h4 class="text-parchment-100 font-sans font-medium">包揽制度</h4>
+              <p class="text-ink-400 text-sm mt-1">有科名的地主豁免徭役，穷人把土地挂在特权家庭名下以求庇护——结果无后台者负担更重。</p>
+            </div>
+          </div>
+        </div>
+        <div class="quote-block mt-10">
+          <p class="text-ink-200 leading-relaxed">「乡人望城市如地狱，见差役如厉鬼。」</p>
+          <p class="text-ink-500 text-sm mt-2 font-sans">——黄六鸿《福惠全书》</p>
+        </div>
+      </div>
+      <div class="fade-up">
+        <h4 class="text-parchment-100 text-center mb-2 font-sans text-sm">郯城年度税收分配（约14,400两）</h4>
+        <div id="chart-tax" style="width:100%;height:340px"></div>
+        <div class="mt-6 p-4 bg-ink-800/40 border border-ink-700/30 rounded text-xs text-ink-400 font-sans">
+          <p class="text-ink-300 font-medium mb-2">隐藏的税负清单</p>
+          <div class="grid grid-cols-2 gap-2">
+            <span>芦苇税</span><span>渔民税</span>
+            <span>盐课</span><span>小贩税</span>
+            <span>当铺税（每间5两/年）</span><span>牲口交易税</span>
+            <span>烟草酒类税</span><span>火耗费</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider fade-in"></div>
+
+<!-- ===== WOMEN'S WORLD ===== -->
+<section id="women" class="py-24 md:py-32 px-6">
+  <div class="max-w-5xl mx-auto">
+    <div class="text-center mb-16">
+      <p class="text-blood-500 text-sm tracking-widest font-sans mb-3 fade-up">第四章</p>
+      <h2 class="text-3xl md:text-5xl font-display text-parchment-100 fade-up">女性的命运</h2>
+      <p class="text-ink-400 mt-4 max-w-2xl mx-auto fade-up font-sans text-sm">《大清律》规定：妇人改嫁者，夫家财产及原有妆奁，并听前夫之家为主。这条本意鼓励守节的法律，却让亲戚们逼迫寡妇改嫁——以夺取遗产。</p>
+    </div>
+
+    <!-- Model Widows vs Reality -->
+    <div class="grid md:grid-cols-2 gap-8 mb-16">
+      <div class="fade-up bg-ink-800/30 border border-ink-700/30 rounded-lg p-6">
+        <h3 class="text-parchment-100 text-lg mb-4 font-display">县志中的「模范寡妇」</h3>
+        <div class="space-y-4 text-sm text-ink-300">
+          <div class="flex gap-3"><span class="text-blood-400 shrink-0">李氏</span><span>守寡后送一子务农、一子读书——靠织布供子受教育，儿子考中举人，是郯城一个世纪中仅有的五人之一。</span></div>
+          <div class="flex gap-3"><span class="text-blood-400 shrink-0">杜氏</span><span>丈夫与叔伯皆被清军杀害。一人抚养二子、三侄、二侄女长大。</span></div>
+          <div class="flex gap-3"><span class="text-blood-400 shrink-0">高氏</span><span>丈夫被杀后，抱着五岁儿子从城墙跳下，向东逃逸，险些溺死于沭河。族人逼嫁谋产，她「毁容破面」向县衙泣诉。守节三十余年。</span></div>
+        </div>
+      </div>
+      <div class="fade-up bg-ink-800/30 border border-ink-700/30 rounded-lg p-6">
+        <h3 class="text-parchment-100 text-lg mb-4 font-display">蒲松龄笔下的女性</h3>
+        <div class="space-y-4 text-sm text-ink-300">
+          <div class="flex gap-3"><span class="text-jade-400 shrink-0">小二</span><span>白莲教女弟子。骑纸鹤逃离，经营玻璃灯笼厂，驱蝗救村，储备野菜救荒——把一个村庄二百多户带向繁荣。</span></div>
+          <div class="flex gap-3"><span class="text-jade-400 shrink-0">细柳</span><span>智慧继母。精通相人术，预见丈夫之死。将叛逆继子罚去放猪后教育成才——考中进士。用假金块教训亲子戒赌。</span></div>
+          <div class="flex gap-3"><span class="text-jade-400 shrink-0">张妻</span><span>面对满洲士兵，挖坑设陷、引诱两名蒙古兵落入陷阱后放火焚烧。「巧计六出，不失身于悍兵。」</span></div>
+        </div>
+      </div>
+    </div>
+    <!-- Women's price chart -->
+    <div class="fade-up">
+      <h3 class="text-center text-parchment-100 text-lg md:text-xl font-display mb-2">蒲松龄笔下的女性「价码」</h3>
+      <p class="text-center text-ink-500 text-xs font-sans mb-6">据《聊斋志异》各篇故事中的描述</p>
+      <div id="chart-women" style="width:100%;height:300px"></div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider fade-in"></div>
+
+<!-- ===== PENG'S CASE ===== -->
+<section id="peng" class="py-24 md:py-32 px-6">
+  <div class="max-w-3xl mx-auto">
+    <div class="text-center mb-16">
+      <p class="text-blood-500 text-sm tracking-widest font-sans mb-3 fade-up">第五章</p>
+      <h2 class="text-3xl md:text-5xl font-display text-parchment-100 fade-up">寡妇保卫战</h2>
+      <p class="text-ink-400 mt-4 fade-up font-sans text-sm">彭氏的丈夫陈太祯于1669年病故，留下一点钱、一块地、一匹马和一头牛。接下来发生的事，是一个关于法律、贪婪与暴力的故事。</p>
+    </div>
+
+    <div class="space-y-8">
+      <div class="fade-up flex gap-4 items-start">
+        <div class="shrink-0 w-8 h-8 rounded-full bg-ink-700 flex items-center justify-center text-blood-400 text-xs font-sans font-bold">1</div>
+        <div>
+          <h4 class="text-parchment-100">堂侄夺产</h4>
+          <p class="text-ink-300 text-sm mt-1 leading-relaxed">丈夫的堂侄三兄弟——陈国瑞、陈国相、陈国连——开始骚扰。老三牵走了她的牛，勒索三两银子。老二不请自来，企图把她赶走，威胁道：「我教你些好看的。」</p>
+        </div>
+      </div>
+      <div class="fade-up flex gap-4 items-start">
+        <div class="shrink-0 w-8 h-8 rounded-full bg-ink-700 flex items-center justify-center text-blood-400 text-xs font-sans font-bold">2</div>
+        <div>
+          <h4 class="text-parchment-100">「为父报仇」的骗局</h4>
+          <p class="text-ink-300 text-sm mt-1 leading-relaxed">陈国相编造故事：声称其父是被陈连的父亲所杀。他打算假装酒后冲动，杀死10岁的陈连。《大清律》确有「子为父报仇」的条款——但二十七年的追溯期和殃及儿子，都不在法律认可的范围内。</p>
+        </div>
+      </div>
+      <div class="fade-up flex gap-4 items-start">
+        <div class="shrink-0 w-8 h-8 rounded-full bg-blood-600 flex items-center justify-center text-parchment-50 text-xs font-sans font-bold">3</div>
+        <div>
+          <h4 class="text-parchment-100">观音殿前的谋杀</h4>
+          <p class="text-ink-300 text-sm mt-1 leading-relaxed">1670年7月6日。陈国相带着一根沉重的洗衣木棒进入村塾。老师不在，他坐在桌上问孩子们老师去了哪里。然后抓住陈连，把他拖出教室——就在象征慈悲的观音殿前，用棒子将10岁的男孩打死。</p>
+        </div>
+      </div>
+      <div class="fade-up flex gap-4 items-start">
+        <div class="shrink-0 w-8 h-8 rounded-full bg-ink-700 flex items-center justify-center text-blood-400 text-xs font-sans font-bold">4</div>
+        <div>
+          <h4 class="text-parchment-100">结局</h4>
+          <p class="text-ink-300 text-sm mt-1 leading-relaxed">私塾学童作证他到教室时是清醒的。三兄弟对「父亲遇害地点」说法不一。知县讽刺道：陈太祯很幸运，在近三十年的时间内，都未曾在侄子喝醉时撞上他。陈国相被判绞刑。<span class="text-ink-500">彭氏没有拿回她的牛或钱。她的孩子死了。</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider fade-in"></div>
+
+<!-- ===== WANG SHI'S STORY ===== -->
+<section id="wangshi" class="py-24 md:py-32 px-6 relative">
+  <div class="max-w-4xl mx-auto">
+    <div class="text-center mb-16">
+      <p class="text-blood-500 text-sm tracking-widest font-sans mb-3 fade-up">第六章</p>
+      <h2 class="text-4xl md:text-6xl font-display text-parchment-100 fade-up">王氏</h2>
+      <p class="text-ink-400 mt-4 max-w-xl mx-auto fade-up font-sans text-sm">她没有名字。我们不知道她的生日。我们知道的，只有她如何死去。</p>
+    </div>
+
+    <!-- Her situation -->
+    <div class="fade-up max-w-2xl mx-auto mb-16">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+        <div class="bg-ink-800/40 border border-ink-700/30 rounded p-4">
+          <p class="text-blood-400 text-2xl font-display">孤</p>
+          <p class="text-ink-400 text-xs font-sans mt-1">无活着的亲戚</p>
+        </div>
+        <div class="bg-ink-800/40 border border-ink-700/30 rounded p-4">
+          <p class="text-blood-400 text-2xl font-display">贫</p>
+          <p class="text-ink-400 text-xs font-sans mt-1">一间房 饭锅一口</p>
+        </div>
+        <div class="bg-ink-800/40 border border-ink-700/30 rounded p-4">
+          <p class="text-blood-400 text-2xl font-display">缚</p>
+          <p class="text-ink-400 text-xs font-sans mt-1">缠足 行走艰难</p>
+        </div>
+        <div class="bg-ink-800/40 border border-ink-700/30 rounded p-4">
+          <p class="text-blood-400 text-2xl font-display">独</p>
+          <p class="text-ink-400 text-xs font-sans mt-1">白天独守空屋</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- The escape -->
+    <div class="fade-up max-w-3xl mx-auto mb-16">
+      <h3 class="text-parchment-100 text-xl font-display mb-6 text-center">逃 亡</h3>
+      <p class="text-ink-300 text-sm leading-relaxed mb-6">
+        1671年的某个时刻，王氏跟另一个男人跑了。我们不知道他的名字，也不知道两人打算到哪里。从地图上看，他们有三条可能的路线：
+      </p>
+      <div class="grid md:grid-cols-3 gap-4 mb-8">
+        <div class="bg-ink-800/30 border border-ink-700/30 rounded p-4 text-center">
+          <p class="text-ink-200 text-sm">西南</p>
+          <p class="text-ink-400 text-xs mt-1">越过边境到邳州</p>
+        </div>
+        <div class="bg-ink-800/30 border border-ink-700/30 rounded p-4 text-center">
+          <p class="text-ink-200 text-sm">东北</p>
+          <p class="text-ink-400 text-xs mt-1">八里到郯城县城，沿驿路南下或北上</p>
+        </div>
+        <div class="bg-ink-800/30 border border-ink-700/30 rounded p-4 text-center">
+          <p class="text-ink-200 text-sm">西北</p>
+          <p class="text-ink-400 text-xs mt-1">八里到马头镇，再到费县和邹县</p>
+        </div>
+      </div>
+      <p class="text-ink-300 text-sm leading-relaxed">
+        无论选哪条路，由于王氏的小脚，他们必须慢慢地走。路上的世界混杂着算命的、卖艺的、逃兵、小贩、难民——一个流浪者的次文化，有它自己的规则和剥削。
+      </p>
+      <div class="mt-6 p-4 bg-blood-700/10 border border-blood-600/20 rounded">
+        <p class="text-blood-400 text-xs font-sans">《大清律》: 逃妻杖一百。通奸杖八十至一百。丈夫当场捉奸并杀害妻子和奸夫，法律认可为正当行为。</p>
+      </div>
+    </div>
+
+    <!-- Return -->
+    <div class="fade-up max-w-3xl mx-auto mb-16">
+      <h3 class="text-parchment-100 text-xl font-display mb-6 text-center">归 来</h3>
+      <p class="text-ink-300 text-sm leading-relaxed mb-4">
+        情人抛弃了她。王氏独自返回归昌老家，但她不敢面对丈夫。她躲进了附近的三官庙——供奉天、水、地三种力量的道教庙宇。庙里唯一的居民是一位道士，他收留了她。
+      </p>
+      <p class="text-ink-300 text-sm leading-relaxed mb-4">
+        邻居高某来上香时发现了她。「你是神庙，如何容留妇人？」高某和道士商量后，把王氏带到她公公处。老人给二人斟了茶，叹道：「这样淫妇，我也没奈何。」然后叫人把她带回儿子的住处。
+      </p>
+      <p class="text-ink-300 text-sm leading-relaxed">
+        任某没有休妻，没有卖掉她，没有向任何人报告。他买了一张新草席，铺在他们的草床上。
+      </p>
+    </div>
+
+    <!-- The last night -->
+    <div class="fade-up max-w-3xl mx-auto mb-16 relative">
+      <h3 class="text-parchment-100 text-2xl md:text-3xl font-display mb-8 text-center">最后的夜晚</h3>
+      <p class="text-ink-200 leading-relaxed mb-6">
+        1672年一月底的一个傍晚。天在下雪。两人坐在家里。任吩咐王氏帮他补衣服，她就在灯旁缝补那件外衣。邻居可以看见从任家发出的灯光。
+      </p>
+      <p class="text-ink-300 leading-relaxed mb-6">
+        稍晚，他们听到两个人吵架，虽然听不清楚在吵什么，但可以听到声音中的怒意。灯灭后，他们依然在听。
+      </p>
+      <p class="text-ink-300 leading-relaxed mb-6">
+        王氏脱掉外套、裤子和笨重的鞋子。她在小脚上穿了一双磨损的<span class="text-blood-400">软底红布睡鞋</span>。她的夹衫是蓝的，还有一件白单裤。她把这些衣服放在草席上。她入睡时，任在一旁等待。
+      </p>
+    </div>
+
+    <!-- THE DREAM -->
+    <div class="fade-up max-w-3xl mx-auto mb-16 py-12 relative">
+      <div class="absolute inset-0 bg-gradient-to-b from-ink-900/0 via-ink-800/50 to-ink-900/0 rounded-lg"></div>
+      <div class="relative z-10 px-6">
+        <p class="text-center text-ink-500 text-xs tracking-widest font-sans mb-6">以蒲松龄作品中的意象拼贴而成</p>
+        <h3 class="text-center text-2xl md:text-3xl font-display dream-text mb-10">她最后的梦</h3>
+        <div class="space-y-6 text-ink-200 leading-loose text-sm md:text-base" style="font-style:italic">
+          <p>现在是冬天，但这里很温暖。冬天，绿色的湖水上，莲花盛开，花香飘向风中的她。有人试着去采，但当船接近时，莲花就漂走了。</p>
+          <p>她看到冬天的山上开满了花，房间亮得耀眼，一条白色的石头路通向大门，红色的花瓣散落在白石上，一枝开花的树枝伸入窗户。</p>
+          <p>她可以看到自己是多么的漂亮，脸上的皱纹消失了，手像牙一样洁白、整齐无瑕。她试着微笑，皓齿刚好露出，她检视着唇角和眼角。</p>
+          <p>天空中点缀着祥云，一艘多彩的船只向她漂近。桨手挥动羽毛时，一阵微风吹起，穿过云层。除了微风的窃窃声，没有别的声音。四周都是云层，像棉花般扑向她，软软的浮在脚下。她向上望去，看见群星逼近眼际。从云层的夹缝中，她看到大小如豆子般的城市。</p>
+          <p class="text-ink-400">在她前面是一排阶梯，阶梯像水晶一样闪亮着，她的影像映照在每一级阶梯上，像在镜子里一样。清澈的水流过白沙。</p>
+          <p class="text-ink-500" style="transition:color 1s">然后——</p>
+          <p class="text-blood-400/70">他衣衫褴褛地站在她面前，流着鼻涕对她微笑。「俏佳人爱我吗？」他打她。群众挤近观看。她想要回话，但满嘴塞满泥巴。她被钉住了，被缠在身上的蛇钉得动弹不得，她奋力挣扎，身体在水中踢打——</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Death -->
+    <div class="fade-up max-w-3xl mx-auto">
+      <p class="text-ink-200 leading-relaxed mb-6">
+        当任的双手紧紧掐着王氏的脖子时，她从床上弹了起来，但挣不掉任的手。他的双手紧紧掐在她喉咙上，并且用力跪在她肚子上。她的双腿奋力踢打，把睡垫都踢成稀烂，她的内脏也裂开了，她的双脚把垫子下面的稻草也踢烂了，但他一直不松手。
+      </p>
+      <p class="text-blood-400 text-center my-10 text-lg font-display">
+        王氏死时，邻居们没有一个听到一点异声。
+      </p>
+      <p class="text-ink-300 leading-relaxed mb-6">
+        郯城依然下着雪。任抱起妻子的尸体，用她的蓝色夹衫包着她的肩膀。他打开门，抱着她穿过森林，打算把尸体留在邻居高家门前，嫁祸于他。但一只狗叫了起来。更夫鸣锣示警。他把尸体丢在雪中，回到空荡荡的家，锁上门，上床睡去。
+      </p>
+      <div class="text-center my-12 py-8 border-y border-ink-700/30">
+        <p class="text-ink-200 text-lg leading-relaxed font-display">
+          王氏的尸体整夜都蜷缩在雪堆里。<br>当她被人发现时，看起来就像活人一样——<br>因为酷寒在她死去的脸颊上，<br><span class="text-blood-400">保留住一份鲜活的颜色。</span>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider fade-in"></div>
+
+<!-- ===== THE TRIAL ===== -->
+<section id="trial" class="py-24 md:py-32 px-6">
+  <div class="max-w-4xl mx-auto">
+    <div class="text-center mb-16">
+      <p class="text-blood-500 text-sm tracking-widest font-sans mb-3 fade-up">第七章</p>
+      <h2 class="text-3xl md:text-5xl font-display text-parchment-100 fade-up">审判四日</h2>
+    </div>
+    <div class="grid md:grid-cols-2 gap-6">
+      <div class="fade-up bg-ink-800/30 border border-ink-700/30 rounded-lg p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="text-blood-400 font-sans font-bold text-lg">第一日</span>
+          <span class="text-ink-500 text-xs font-sans">告状</span>
+        </div>
+        <p class="text-ink-300 text-sm leading-relaxed">任与其父到县衙告状，指控邻居高某与王氏有奸情并杀害了她。正式控词：「吹灯睡了。只听得门响……只见我妻子前走，高某持刀在后。」黄六鸿派捕快逮捕高某夫妇。</p>
+      </div>
+      <div class="fade-up bg-ink-800/30 border border-ink-700/30 rounded-lg p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="text-blood-400 font-sans font-bold text-lg">第二日</span>
+          <span class="text-ink-500 text-xs font-sans">审讯</span>
+        </div>
+        <p class="text-ink-300 text-sm leading-relaxed">任跪东侧，高跪西侧。高妻曹氏提供关键不在场证明：那天深夜她正在蒸年糕，听到门外锣响，出去发现更夫在门楼下避寒烤火。她丈夫一直在沉睡。黄六鸿将任姓父子收监，释放高某夫妇。</p>
+      </div>
+      <div class="fade-up bg-ink-800/30 border border-ink-700/30 rounded-lg p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="text-blood-400 font-sans font-bold text-lg">第三日</span>
+          <span class="text-ink-500 text-xs font-sans">验尸</span>
+        </div>
+        <p class="text-ink-300 text-sm leading-relaxed">黄六鸿骑马到归昌。他注意到任家极为简陋，草床上近乎全新的席垫上有裂缝。命老妇检视王氏尸体——发现脖子和腹部大块瘀伤。更夫承认午夜曾看到有人在林子里走动。</p>
+      </div>
+      <div class="fade-up bg-ink-800/30 border border-blood-600/30 rounded-lg p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="text-blood-400 font-sans font-bold text-lg">第四日</span>
+          <span class="text-ink-500 text-xs font-sans">破案</span>
+        </div>
+        <p class="text-ink-300 text-sm leading-relaxed">黄六鸿命人将任姓父子在城隍庙大殿中分别绑在柱子上。他当众向城隍祈祷：「神昨夜告我致死情由，已悉之矣。」然后留两人独处过夜。暗中安排家仆偷听。最终，真相大白——任亲手掐死了自己的妻子。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider fade-in"></div>
+
+<!-- ===== METHODOLOGY ===== -->
+<section id="method" class="py-24 md:py-32 px-6">
+  <div class="max-w-3xl mx-auto text-center">
+    <p class="text-blood-500 text-sm tracking-widest font-sans mb-3 fade-up">尾声</p>
+    <h2 class="text-3xl md:text-5xl font-display text-parchment-100 mb-8 fade-up">历史的方法</h2>
+    <div class="text-left space-y-8">
+      <div class="fade-up">
+        <h4 class="text-parchment-100 font-sans font-medium mb-2">微观历史的开创</h4>
+        <p class="text-ink-300 text-sm leading-relaxed">史景遷不写帝王将相。他关注的是那些「在所有看得见的财富、影响力和权力分配上都失利」的边缘人物——农夫、农场工人和他们的妻子。</p>
+      </div>
+      <div class="fade-up">
+        <h4 class="text-parchment-100 font-sans font-medium mb-2">文学与史学的融合</h4>
+        <p class="text-ink-300 text-sm leading-relaxed">大胆地使用蒲松龄的虚构小说来填补历史档案的空白。王氏临死前的梦境，由蒲松龄数十篇作品中的意象「蒙太奇」拼贴而成——这种手法在当时的美国汉学界引起争议，但从今天文化史研究的立场来看，显现了作者的创意和先见之明。</p>
+      </div>
+      <div class="fade-up">
+        <h4 class="text-parchment-100 font-sans font-medium mb-2">石头的隐喻</h4>
+        <p class="text-ink-300 text-sm leading-relaxed">史景遷在序言的结尾写道：王氏对他而言，就像人们在退潮的海水中从群石中捡起的一颗石头，知道很快地随着石头在太阳下晒干，遍布在其上的色彩会褪色消逝。但在这个个案里，色彩和纹理没有消退——</p>
+      </div>
+    </div>
+    <div class="quote-block mt-12 text-left fade-up">
+      <p class="text-ink-200 text-lg leading-relaxed">「不时地，我知道是石头本身在传热给握持它的血肉之躯。」</p>
+      <p class="text-ink-500 text-sm mt-2 font-sans">——史景遷，《婦人王氏之死》序言</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="py-20 px-6 border-t border-ink-800">
+  <div class="max-w-3xl mx-auto text-center">
+    <div class="flex justify-center mb-6"><div class="seal">王氏</div></div>
+    <p class="text-ink-500 text-sm font-sans leading-relaxed">
+      本页内容基于<strong class="text-ink-400">史景遷（Jonathan D. Spence）</strong>所著<br>
+      <em>The Death of Woman Wang</em>（《婦人王氏之死》）<br>
+      麦田出版社中文译本 · 李孝悌校译
+    </p>
+    <p class="text-ink-600 text-xs font-sans mt-6">
+      「许多女人像她一样，就像许多县跟郯城一样，被动地受着苦，付他们的税，然而回报却很少。」
+    </p>
+    <div class="mt-10 section-divider"></div>
+    <p class="text-ink-700 text-xs font-sans mt-6">视觉科普体验 · 数据可视化呈现</p>
+  </div>
+</footer>
+
+<script>
+// ===== GSAP & ScrollTrigger Setup =====
+gsap.registerPlugin(ScrollTrigger);
+
+// Progress bar
+window.addEventListener('scroll', () => {
+  const h = document.documentElement;
+  const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+  document.getElementById('progress-bar').style.width = pct + '%';
+});
+
+// Fade-up animations
+gsap.utils.toArray('.fade-up').forEach(el => {
+  gsap.to(el, {
+    opacity: 1, y: 0, duration: 0.9, ease: 'power3.out',
+    scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' }
+  });
+});
+gsap.utils.toArray('.fade-in').forEach(el => {
+  gsap.to(el, {
+    opacity: 1, duration: 1.2, ease: 'power2.out',
+    scrollTrigger: { trigger: el, start: 'top 90%', toggleActions: 'play none none none' }
+  });
+});
+
+// Hero entrance
+gsap.from('#hero .hero-title', { opacity: 0, y: 60, duration: 1.4, delay: 0.3, ease: 'power3.out' });
+gsap.from('#hero .seal', { opacity: 0, scale: 0.8, rotation: -10, duration: 1, delay: 0.1, ease: 'back.out(1.7)' });
+
+// ===== ECharts Common =====
+const cTxt = '#cdbfa0';
+const cAxis = '#4a3f2c';
+const cBg = 'transparent';
+function chartFont(s) { return { fontFamily: '"Noto Sans SC", sans-serif', fontSize: s || 11, color: cTxt }; }
+
+// ===== Population Chart =====
+const popDom = document.getElementById('chart-population');
+if (popDom) {
+  const popChart = echarts.init(popDom, null, { renderer: 'svg' });
+  const popOpt = {
+    backgroundColor: cBg,
+    tooltip: {
+      backgroundColor: '#1a1610', borderColor: '#4a3f2c', textStyle: { color: '#ede5d5', fontFamily: '"Noto Sans SC"', fontSize: 12 },
+      formatter: p => `<strong>${p.name}</strong><br/>可服徭役男丁：<span style="color:#e8695e;font-weight:700">${p.value.toLocaleString()}</span>人`
+    },
+    grid: { left: 60, right: 30, top: 30, bottom: 50 },
+    xAxis: {
+      type: 'category',
+      data: ['明末\n(约1620)', '1640\n饥荒', '1641\n盗匪', '1641后\n瘟疫', '1643\n屠城后', '1646\n清初', '1668\n地震后', '1670'],
+      axisLine: { lineStyle: { color: cAxis } },
+      axisLabel: { ...chartFont(10), interval: 0 },
+      axisTick: { show: false }
+    },
+    yAxis: {
+      type: 'value', name: '男丁数', nameTextStyle: chartFont(10), splitLine: { lineStyle: { color: '#2e2518', type: 'dashed' } },
+      axisLine: { show: false }, axisLabel: chartFont(10), axisTick: { show: false }
+    },
+    series: [{
+      type: 'bar',
+      data: [
+        { value: 40002, itemStyle: { color: '#6b5b3e' } },
+        { value: 36462, itemStyle: { color: '#6b5b3e' } },
+        { value: 33688, itemStyle: { color: '#8b1a1a' } },
+        { value: 32898, itemStyle: { color: '#8b1a1a' } },
+        { value: 9881, itemStyle: { color: '#e8695e' } },
+        { value: 9927, itemStyle: { color: '#d4504a' } },
+        { value: 9498, itemStyle: { color: '#d4504a' } },
+        { value: 9498, itemStyle: { color: '#d4504a' } }
+      ],
+      barWidth: '50%',
+      label: { show: true, position: 'top', ...chartFont(10), formatter: p => p.value > 30000 ? (p.value/1000).toFixed(1)+'k' : p.value.toLocaleString() },
+      markLine: {
+        silent: true,
+        data: [{ yAxis: 9881, label: { formatter: '屠城后仅存\n约1/4人口', ...chartFont(10), position: 'insideEndTop' }, lineStyle: { color: '#8b1a1a', type: 'dashed' } }]
+      }
+    }],
+    animationDuration: 1500, animationEasing: 'cubicOut'
+  };
+  ScrollTrigger.create({
+    trigger: popDom, start: 'top 80%',
+    onEnter: () => { popChart.setOption(popOpt); },
+    once: true
+  });
+  window.addEventListener('resize', () => popChart.resize());
+}
+
+// ===== Tax Chart =====
+const taxDom = document.getElementById('chart-tax');
+if (taxDom) {
+  const taxChart = echarts.init(taxDom, null, { renderer: 'svg' });
+  const taxOpt = {
+    backgroundColor: cBg,
+    tooltip: {
+      backgroundColor: '#1a1610', borderColor: '#4a3f2c', textStyle: { color: '#ede5d5', fontFamily: '"Noto Sans SC"', fontSize: 12 },
+      formatter: p => `${p.marker} ${p.name}<br/><strong style="color:#e8695e">${p.value.toLocaleString()} 两</strong> (${p.percent}%)`
+    },
+    legend: { show: false },
+    series: [{
+      type: 'pie', radius: ['40%', '70%'], center: ['50%', '50%'],
+      avoidLabelOverlap: true,
+      itemStyle: { borderRadius: 3, borderColor: '#1a1610', borderWidth: 2 },
+      label: { color: cTxt, fontFamily: '"Noto Sans SC"', fontSize: 11, formatter: '{b}\n{d}%' },
+      labelLine: { lineStyle: { color: '#4a3f2c' } },
+      emphasis: { itemStyle: { shadowBlur: 20, shadowColor: 'rgba(0,0,0,.5)' } },
+      data: [
+        { value: 7300, name: '上缴户部', itemStyle: { color: '#8b1a1a' } },
+        { value: 3360, name: '驿站经费', itemStyle: { color: '#d4504a' } },
+        { value: 1125, name: '官员薪俸', itemStyle: { color: '#6b5b3e' } },
+        { value: 1500, name: '军事开支', itemStyle: { color: '#4a3f2c' } },
+        { value: 600, name: '祭典考试', itemStyle: { color: '#2a4e34' } },
+        { value: 515, name: '监狱维护等', itemStyle: { color: '#3d6b4a' } }
+      ]
+    }],
+    animationDuration: 1200, animationEasing: 'cubicOut'
+  };
+  ScrollTrigger.create({
+    trigger: taxDom, start: 'top 80%',
+    onEnter: () => { taxChart.setOption(taxOpt); },
+    once: true
+  });
+  window.addEventListener('resize', () => taxChart.resize());
+}
+
+// ===== Women Price Chart =====
+const wDom = document.getElementById('chart-women');
+if (wDom) {
+  const wChart = echarts.init(wDom, null, { renderer: 'svg' });
+  const wOpt = {
+    backgroundColor: cBg,
+    tooltip: {
+      backgroundColor: '#1a1610', borderColor: '#4a3f2c', textStyle: { color: '#ede5d5', fontFamily: '"Noto Sans SC"', fontSize: 12 },
+      formatter: p => `${p.name}<br/><strong style="color:#e8695e">${p.value} 两白银</strong>`
+    },
+    grid: { left: 130, right: 40, top: 10, bottom: 30 },
+    xAxis: {
+      type: 'value', name: '两（白银）', nameTextStyle: chartFont(10),
+      splitLine: { lineStyle: { color: '#2e2518', type: 'dashed' } },
+      axisLine: { lineStyle: { color: cAxis } }, axisLabel: chartFont(10), axisTick: { show: false }
+    },
+    yAxis: {
+      type: 'category',
+      data: ['普通妻子','丑陋婢女为妻','年轻歌女','一夜名妓','普通妾室','永远拥有美女'],
+      axisLine: { lineStyle: { color: cAxis } }, axisLabel: { ...chartFont(11) }, axisTick: { show: false },
+      inverse: true
+    },
+    series: [{
+      type: 'bar',
+      data: [
+        { value: 3, itemStyle: { color: '#3d6b4a' } },
+        { value: 10, itemStyle: { color: '#5a8a6a' } },
+        { value: 200, itemStyle: { color: '#6b5b3e' } },
+        { value: 15, itemStyle: { color: '#b0a080' } },
+        { value: 100, itemStyle: { color: '#d4504a' } },
+        { value: 1000, itemStyle: { color: '#8b1a1a' } }
+      ],
+      barWidth: '55%',
+      label: { show: true, position: 'right', ...chartFont(11), formatter: '{c} 两' }
+    }],
+    animationDuration: 1200, animationEasing: 'cubicOut'
+  };
+  ScrollTrigger.create({
+    trigger: wDom, start: 'top 80%',
+    onEnter: () => { wChart.setOption(wOpt); },
+    once: true
+  });
+  window.addEventListener('resize', () => wChart.resize());
+}
+
+// ===== Parallax on hero =====
+gsap.to('#hero', {
+  scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true },
+  backgroundPositionY: '30%', opacity: 0.3
+});
+</script>
+
+
+<script>
+(() => {
+  
+  
+  
+})();
+</script>
+</body>
+</html>

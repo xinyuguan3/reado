@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>有 两 个方式 · Datre书籍-第1册 我们是DATRE-1（部分）.pdf</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b1220;
+      --bg2: #1a2333;
+      --accent: #f59e0b;
+      --accent2: #34d399;
+      --text: #e5edf8;
+      --soft: #9fb1c9;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+      background:
+        radial-gradient(1200px 540px at 85% -8%, color-mix(in srgb, var(--accent2) 24%, transparent), transparent 70%),
+        radial-gradient(980px 460px at -10% 14%, color-mix(in srgb, var(--accent) 24%, transparent), transparent 74%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+      color: var(--text);
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .05;
+      background-image: radial-gradient(circle at 1px 1px, #fff 1px, transparent 0);
+      background-size: 3px 3px;
+      z-index: 0;
+    }
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      z-index: 100;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+    .page { position: relative; z-index: 1; width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 20px 0 48px; }
+    .hero {
+      min-height: 74vh;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 22px;
+      background: linear-gradient(160deg, color-mix(in srgb, var(--bg2) 86%, transparent), color-mix(in srgb, var(--bg) 88%, transparent));
+      padding: 40px 34px;
+      display: grid;
+      align-content: center;
+      gap: 16px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.34);
+    }
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .hero h1 {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(32px, 5.4vw, 68px);
+      line-height: 1.16;
+      letter-spacing: .04em;
+      max-width: 15em;
+      text-wrap: balance;
+    }
+    .hero p {
+      max-width: 66ch;
+      line-height: 1.95;
+      color: color-mix(in srgb, var(--text) 85%, var(--soft));
+      font-size: 16px;
+    }
+    .chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip {
+      border: 1px solid color-mix(in srgb, var(--accent2) 44%, transparent);
+      color: color-mix(in srgb, var(--accent2) 88%, #fff);
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 12px;
+      background: rgba(255,255,255,.03);
+    }
+    .section { margin-top: 18px; border: 1px solid rgba(255,255,255,.13); border-radius: 18px; padding: 22px; background: rgba(2,6,18,.46); }
+    .section h2 {
+      margin-bottom: 12px;
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(22px, 2.8vw, 34px);
+      color: color-mix(in srgb, var(--accent) 86%, #fff);
+      letter-spacing: .03em;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1.1fr 1fr; gap: 14px; }
+    .concept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+    .concept-card {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      background: rgba(255,255,255,.03);
+      padding: 14px;
+      min-height: 128px;
+    }
+    .concept-token { font-size: 14px; letter-spacing: .14em; color: var(--accent2); text-transform: uppercase; margin-bottom: 7px; font-weight: 700; }
+    .concept-note { font-size: 14px; color: color-mix(in srgb, var(--text) 88%, var(--soft)); line-height: 1.8; }
+    .reading-map {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 10px;
+    }
+    .map-card {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      background: rgba(255,255,255,.03);
+      padding: 12px;
+      min-height: 148px;
+    }
+    .map-no {
+      font-size: 11px;
+      letter-spacing: .18em;
+      color: var(--accent);
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+    .map-card h3 {
+      font-size: 17px;
+      font-family: "Noto Serif SC", serif;
+      line-height: 1.45;
+      margin-bottom: 6px;
+    }
+    .map-card p {
+      font-size: 14px;
+      color: color-mix(in srgb, var(--text) 84%, var(--soft));
+      line-height: 1.85;
+    }
+    .atlas {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      min-height: 440px;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+    .atlas svg { width: 100%; max-width: 440px; height: auto; }
+    .timeline { display: grid; gap: 10px; }
+    .timeline-item {
+      border-left: 2px solid color-mix(in srgb, var(--accent) 66%, transparent);
+      padding: 10px 14px;
+      background: rgba(255,255,255,.02);
+      border-radius: 0 10px 10px 0;
+    }
+    .timeline-no { font-size: 11px; letter-spacing: .22em; color: var(--accent2); display: block; margin-bottom: 6px; }
+    .timeline-item h3 { font-size: 19px; font-family: "Noto Serif SC", serif; line-height: 1.45; margin-bottom: 7px; }
+    .timeline-item p { font-size: 14px; line-height: 1.9; color: color-mix(in srgb, var(--text) 84%, var(--soft)); }
+    .quote-wrap { display: grid; gap: 10px; }
+    .quote {
+      border-left: 2px solid color-mix(in srgb, var(--accent2) 80%, transparent);
+      padding: 10px 12px;
+      background: rgba(255,255,255,.02);
+      color: color-mix(in srgb, var(--text) 92%, #fff);
+      font-family: "Noto Serif SC", serif;
+      line-height: 1.9;
+    }
+    .takeaways { margin-top: 10px; list-style: none; display: grid; gap: 8px; }
+    .takeaways li {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      padding: 10px;
+      background: rgba(255,255,255,.02);
+      align-items: start;
+      line-height: 1.8;
+    }
+    .takeaways span {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: color-mix(in srgb, var(--accent2) 26%, transparent);
+      color: var(--accent2);
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+    .nav { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,.26);
+      border-radius: 999px;
+      padding: 8px 13px;
+      font-size: 12px;
+      color: var(--text);
+      background: rgba(255,255,255,.04);
+    }
+    .btn:hover { border-color: var(--accent2); color: var(--accent2); }
+    .dot-nav {
+      position: fixed;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: grid;
+      gap: 10px;
+      z-index: 50;
+    }
+    .dot-nav button {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.35);
+      background: transparent;
+      cursor: pointer;
+      transition: all .24s ease;
+    }
+    .dot-nav button.active { transform: scale(1.34); border-color: var(--accent); background: var(--accent); }
+    .reveal { opacity: 0; transform: translateY(16px); transition: opacity .55s ease, transform .55s ease; }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+    @media (max-width: 940px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .dot-nav { display: none; }
+      .hero { min-height: auto; padding: 30px 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+  <nav class="dot-nav" id="dotNav">
+    <button data-target="hero" class="active" aria-label="Hero"></button>
+    <button data-target="atlas" aria-label="Atlas"></button>
+    <button data-target="concepts" aria-label="Concepts"></button>
+    <button data-target="reading" aria-label="Reading"></button>
+    <button data-target="takeaways" aria-label="Takeaways"></button>
+  </nav>
+  <main class="page">
+    <section class="hero reveal in" id="hero">
+      <p class="eyebrow">Scholar Atlas · Gate 5</p>
+      <h1>有 两 个方式</h1>
+      <p>吗？ DATRE ： 那属于物质结构的领域 。</p>
+      <div class="chip-row">
+        <span class="chip">Datre书籍-第1册 我们是DATRE-1（部分）.pdf</span>
+        
+        <span class="chip">Module 5/18</span>
+        <span class="tag">东西</span><span class="tag">但是</span><span class="tag">星球存在形式</span><span class="tag">是你的身体</span><span class="tag">一一</span>
+      </div>
+    </section>
+
+    <section class="section reveal" id="atlas">
+      <h2>主题脉络与阅读地图</h2>
+      <p style="color:var(--soft);line-height:1.9;margin-bottom:10px;">先看章节主线，再进入细节。每个卡片都是一个可独立理解的知识片段。</p>
+      <div class="reading-map">
+      <article class="map-card reveal">
+        <p class="map-no">01</p>
+        <h3>能看见颜色的 ， 是你的身体 。</h3>
+        <p>能看见颜色的 ， 是你的身体 。 能听见声音的 ， 也 是你的身体。在大宇宙中，我们没有身体，因此如何听到或看到 “ 东西 ” 呢？ 你无法用物质眼睛来 “ 感知 ” 大宇宙，不是这样工作的。你们拥有感知，但它与 眼睛不同。 我知道，我们喜欢进入这个物质身体。对我来讲，这是一场非常有趣的体验。比 如：通过物质身体，我能看到你所看到的，听到你所听到的。但是，对你们来讲，你 们太习惯这一切了，甚至对物质身体产生了厌倦。 可对我们这些偶尔才能</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">02</p>
+        <h3>但是，只有你们这个泡泡中有这些概念。当你想进入另外一个 “ 星球存在形式 ” 中探索时，也许这就是你希望带去的概念之一。</h3>
+        <p>但是，只有你们这个泡泡中有这些概念。当你想进入另外一个 “ 星球存在形式 ” 中探索时，也许这就是你希望带去的概念之一。 一个 “ 星球存在形式 ” 或 “ 现实世界 ” 的创建，基于你们的群体意识。 如果你能 将这样的概念带入那个 “ 星球存在形式 ” 的群体意识中 ， 如果 “ 群体意识 ” 说 ： “ 好吧 ， 我想看到颜色和听到声音 ” ，那么你们就会 “ 看到 ” 和 “ 听到 ” 。 这 两 个概念绝对是你们想带入下一个探索</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">03</p>
+        <h3>要回答这个问题有 两 个方式。你看，一切万有都包含在你们这个泡泡宇宙中。这 个泡泡中含有很多很多的存在形式和不同阶段的进化。因此你们将这个星球，和所有 包含</h3>
+        <p>要回答这个问题有 两 个方式。你看，一切万有都包含在你们这个泡泡宇宙中。这 个泡泡中含有很多很多的存在形式和不同阶段的进化。因此你们将这个星球，和所有 包含在这个泡泡内的 “ 东西 ” ， 称为宇宙 。 而对我们来讲 ， 一个宇宙中包含了很多的泡 泡。在这些宇宙之外，还有其他的宇宙。 提及过很多次 ： 大宇宙中的存在体不需要记忆 。 这是因为 “ 所有的主 意，体验和知识 ” 与你们一起存在于宇宙中？还是说：那些 “ 知识 ” 是你们用</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">04</p>
+        <h3>我们诞生 （ 起源 ） ， 就是我们 。</h3>
+        <p>我们诞生 （ 起源 ） ， 就是我们 。 我们不需要期待将来或抓住 过去不放。如果你能在物质星球上做到这一点，将会拥有一场宏伟的体验。 唯 一一 个 能够导致结果的原因，就是你在当下所做的事。 这是你们无法想象的。你无法想象，在这个星球上，有人就是这么生活的。他们 住在物质身体内，但却活在当下。你无法想象如何活在当下，因为你们的头脑总是做 两 件事：不是想着未来就是想着过去。 有多少次坐下来吃饭的时候，你却不知道自己在吃什么呢？你们很少</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">05</p>
+        <h3>你们的问题是 ： 你们的专注力是分散的 。</h3>
+        <p>你们的问题是 ： 你们的专注力是分散的 。 你们的注意力可供维持的时间非常短暂 。 你说你没有足够的时间，因此节外生枝，把自己牵扯入无数其它方向的念头中，希望 能把事情做完。结果却导致：你将自己放入了一个完全不需要的巨大压力中。你们担 心那些根本就不可能会发生的事情。在所有花费的时间中，你没有做真正的自己。你 不让自己去体验那些：你本应来这里体验的事情。因此 … 你们自然无法理解我们所说 的。 每个宇宙中都包含了很多泡泡 ， 宇宙本身也</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="concepts">
+      <h2>核心概念与解释</h2>
+      <div class="concept-grid">
+      <article class="concept-card reveal">
+        <p class="concept-token">东西</p>
+        <p class="concept-note">能听见声音的 ， 也 是你的身体。在大宇宙中，我们没有身体，因此如何听到或看到 “ 东西 ” 呢？</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">但是</p>
+        <p class="concept-note">我知道，我们喜欢进入这个物质身体。对我来讲，这是一场非常有趣的体验。比 如：通过物质身体，我能看到你所看到的，听到你所听到的。但是，对你们来讲，你 们太习惯这一切了，甚至对物质身体产生了厌倦。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">星球存在形式</p>
+        <p class="concept-note">但是，只有你们这个泡泡中有这些概念。当你想进入另外一个 “ 星球存在形式 ” 中探索时，也许这就是你希望带去的概念之一。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">是你的身体</p>
+        <p class="concept-note">能看见颜色的 ， 是你的身体 。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">一一</p>
+        <p class="concept-note">唯 一一 个 能够导致结果的原因，就是你在当下所做的事。</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="reading-excerpts">
+      <h2>原文精读片段</h2>
+      <p style="color:var(--soft);line-height:1.9;margin-bottom:10px;">保留信息密度最高的段落，先读原句，再看后续路径与总结。</p>
+      <div class="reading-map">
+      <article class="map-card reveal">
+        <p class="map-no">EXCERPT 1</p>
+        <p>能看见颜色的 ， 是你的身体 。</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">EXCERPT 2</p>
+        <p>能听见声音的 ， 也 是你的身体。在大宇宙中，我们没有身体，因此如何听到或看到 “ 东西 ” 呢？</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">EXCERPT 3</p>
+        <p>你无法用物质眼睛来 “ 感知 ” 大宇宙，不是这样工作的。你们拥有感知，但它与 眼睛不同。</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">EXCERPT 4</p>
+        <p>我知道，我们喜欢进入这个物质身体。对我来讲，这是一场非常有趣的体验。比 如：通过物质身体，我能看到你所看到的，听到你所听到的。但是，对你们来讲，你 们太习惯这一切了，甚至对物质身体产生了厌倦。</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">EXCERPT 5</p>
+        <p>可对我们这些偶尔才能够进入物质结构中的 “ 人 ” ，是非常非常美妙的体验 。</p>
+      </article>
+    
+      <article class="map-card reveal">
+        <p class="map-no">EXCERPT 6</p>
+        <p>（我 只能靠每次讨论的主题，才能下来体验一下）还有一些讨论的主题，我是完全被排斥 在外的。但是，我很喜欢下来，因为你们有优美的声音和美丽的颜色。虽然你们认为 那是理所当然的，但对我来讲，只有我进入身体时，才能体会到。这对我们当中的其 他存在体来讲，也是一样的。这就是为什么能够有一个使用的身体是非常有趣的。</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="reading">
+      <h2>渐进式阅读路径</h2>
+      <div class="timeline">
+      <article class="timeline-item reveal">
+        <span class="timeline-no">01</span>
+        <h3>能看见颜色的 ， 是你的身体 。</h3>
+        <p>能看见颜色的 ， 是你的身体 。 能听见声音的 ， 也 是你的身体。在大宇宙中，我们没有身体，因此如何听到或看到 “ 东西 ” 呢？ 你无法用物质眼睛来 “ 感知 ” 大宇宙，不是这样工作的。你们拥有感知，但它与 眼睛不同。 我知道，我们喜欢进入这个物质身体。对我来讲，这是一场非常有趣的体验。比 如：通过物质身体，我能看到你所看到的，听到你所听到的。但是，对你们来讲，你 们太习惯这一切了，甚至对物质身体产生了厌倦。 可对我们这些偶尔才能够进入物质结构中的 “ 人 ” ，是非常非常美妙的体验 。 （我 只能靠每次讨论的主题，才能下来体验一下）还有一些讨论的主题，我是完全被排斥 在外的。但是，我很喜欢下来，因为你们有优美的声音和美丽的颜色。虽然你们认为 那是理所当然的，但对我来讲，只有我进入身体时，才能体会到。这对我们当中的其 他存在体来讲，也是一样的。这就是为什么能够有一个使用的身体是非常有趣的。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">02</span>
+        <h3>但是，只有你们这个泡泡中有这些概念。当你想进入另外一个 “ 星球存在形式 ” 中探索时，也许这就是你希望带去的概念之一。</h3>
+        <p>但是，只有你们这个泡泡中有这些概念。当你想进入另外一个 “ 星球存在形式 ” 中探索时，也许这就是你希望带去的概念之一。 一个 “ 星球存在形式 ” 或 “ 现实世界 ” 的创建，基于你们的群体意识。 如果你能 将这样的概念带入那个 “ 星球存在形式 ” 的群体意识中 ， 如果 “ 群体意识 ” 说 ： “ 好吧 ， 我想看到颜色和听到声音 ” ，那么你们就会 “ 看到 ” 和 “ 听到 ” 。 这 两 个概念绝对是你们想带入下一个探索领域的。当然，那个探索领域还是 “ 星 球的存在形式 ” 。 站在我们的宇宙观点上看，是否一个 “ 宇宙存在体 ” ，多多少少都意味着 ， 他们带有最高的频率范围？ 我不知道你指的是不是你们的泡泡宇宙，这个星球内的存在形式？</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">03</span>
+        <h3>要回答这个问题有 两 个方式。你看，一切万有都包含在你们这个泡泡宇宙中。这 个泡泡中含有很多很多的存在形式和不同阶段的进化。因此你们将这个星球，和所有 包含</h3>
+        <p>要回答这个问题有 两 个方式。你看，一切万有都包含在你们这个泡泡宇宙中。这 个泡泡中含有很多很多的存在形式和不同阶段的进化。因此你们将这个星球，和所有 包含在这个泡泡内的 “ 东西 ” ， 称为宇宙 。 而对我们来讲 ， 一个宇宙中包含了很多的泡 泡。在这些宇宙之外，还有其他的宇宙。 提及过很多次 ： 大宇宙中的存在体不需要记忆 。 这是因为 “ 所有的主 意，体验和知识 ” 与你们一起存在于宇宙中？还是说：那些 “ 知识 ” 是你们用来使用 的？比如：从空无中创造？ 在物质结构中的人是无法轻易理解 “ 存在 ” 的概念的 。 你们无法理解 ： 你 是可以自我包容的。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">04</span>
+        <h3>我们诞生 （ 起源 ） ， 就是我们 。</h3>
+        <p>我们诞生 （ 起源 ） ， 就是我们 。 我们不需要期待将来或抓住 过去不放。如果你能在物质星球上做到这一点，将会拥有一场宏伟的体验。 唯 一一 个 能够导致结果的原因，就是你在当下所做的事。 这是你们无法想象的。你无法想象，在这个星球上，有人就是这么生活的。他们 住在物质身体内，但却活在当下。你无法想象如何活在当下，因为你们的头脑总是做 两 件事：不是想着未来就是想着过去。 有多少次坐下来吃饭的时候，你却不知道自己在吃什么呢？你们很少去注意放入 嘴巴里的食物。也许只是尝了第一口，就不会再去注意了。很多次，那些吃工作午餐 或晚餐的人，只是把食物塞入嘴巴中，却从来没有品尝过。 分钟后，你去问他们吃 了什么，他们都不记得了。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">05</span>
+        <h3>你们的问题是 ： 你们的专注力是分散的 。</h3>
+        <p>你们的问题是 ： 你们的专注力是分散的 。 你们的注意力可供维持的时间非常短暂 。 你说你没有足够的时间，因此节外生枝，把自己牵扯入无数其它方向的念头中，希望 能把事情做完。结果却导致：你将自己放入了一个完全不需要的巨大压力中。你们担 心那些根本就不可能会发生的事情。在所有花费的时间中，你没有做真正的自己。你 不让自己去体验那些：你本应来这里体验的事情。因此 … 你们自然无法理解我们所说 的。 每个宇宙中都包含了很多泡泡 ， 宇宙本身也是一个容器 。 那儿需要一些能够与你们一起运作的 “ 东西 ” ，也需要一些 “ 边界线 ” 。所有的宇宙和</p>
+      </article>
+    </div>
+      <div class="quote-wrap" style="margin-top:12px;"><blockquote class="quote reveal">“（我 只能靠每次讨论的主题，才能下来体验一下）还有一些讨论的主题，我是完全被排斥 在外的。但是，我很喜欢下来，因为你们有优美的声音和美丽的颜色。虽然你们认为 那是理所当然的，但对我来讲，只有我进入身体时，才能体会到。这对我们当中的其 他存在体来讲，也是一样的。这就是为什么能够有一个使用的身体是非常有趣的。”</blockquote><blockquote class="quote reveal">“要回答这个问题有 两 个方式。你看，一切万有都包含在你们这个泡泡宇宙中。这 个泡泡中含有很多很多的存在形式和不同阶段的进化。因此你们将这个星球，和所有 包含在这个泡泡内的 “ 东西 ” ， 称为宇宙 。”</blockquote><blockquote class="quote reveal">“有多少次坐下来吃饭的时候，你却不知道自己在吃什么呢？你们很少去注意放入 嘴巴里的食物。也许只是尝了第一口，就不会再去注意了。很多次，那些吃工作午餐 或晚餐的人，只是把食物塞入嘴巴中，却从来没有品尝过。”</blockquote></div>
+    </section>
+
+    <section class="section reveal" id="takeaways">
+      <h2>本关关键收获</h2>
+      <ul class="takeaways"><li><span>1</span>能看见颜色的 ， 是你的身体 。</li><li><span>2</span>但是，只有你们这个泡泡中有这些概念。当你想进入另外一个 “ 星球存在形式 ” 中探索时，也许这就是你希望带去的概念之一。</li><li><span>3</span>要回答这个问题有 两 个方式。你看，一切万有都包含在你们这个泡泡宇宙中。这 个泡泡中含有很多很多的存在形式和不同阶段的进化。因此你们将这个星球，和所有 包含</li><li><span>4</span>我们诞生 （ 起源 ） ， 就是我们 。</li></ul>
+      <nav class="nav">
+        <a class="btn" href="/experiences/user-book-datre-1-datre-1-pdf-gd6k91-b7fe-g04-chapter-4.html">上一关</a>
+        <a class="btn" href="/experiences/user-book-datre-1-datre-1-pdf-gd6k91-b7fe-g06-chapter-6.html">下一关</a>
+      </nav>
+    </section>
+  </main>
+  <script>
+    (() => {
+      const progress = document.getElementById("progress");
+      const dots = Array.from(document.querySelectorAll("#dotNav button[data-target]"));
+      const sections = dots
+        .map((dot) => document.getElementById(dot.getAttribute("data-target")))
+        .filter(Boolean);
+      const reveals = Array.from(document.querySelectorAll(".reveal"));
+      const onScroll = () => {
+        const h = document.documentElement;
+        const total = Math.max(1, h.scrollHeight - window.innerHeight);
+        const pct = Math.max(0, Math.min(100, (window.scrollY / total) * 100));
+        if (progress) progress.style.width = pct + "%";
+      };
+      const io = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) entry.target.classList.add("in");
+        }
+      }, { threshold: .14 });
+      reveals.forEach((el) => io.observe(el));
+      const secIo = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const id = entry.target.id;
+          dots.forEach((dot) => dot.classList.toggle("active", dot.getAttribute("data-target") === id));
+        });
+      }, { threshold: .4 });
+      sections.forEach((s) => secIo.observe(s));
+      dots.forEach((dot) => {
+        dot.addEventListener("click", () => {
+          const target = document.getElementById(dot.getAttribute("data-target"));
+          if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+      window.addEventListener("scroll", onScroll, { passive: true });
+      onScroll();
+    })();
+  </script>
+</body>
+</html>

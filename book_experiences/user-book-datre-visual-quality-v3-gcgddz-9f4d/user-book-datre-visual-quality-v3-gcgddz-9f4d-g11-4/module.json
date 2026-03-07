@@ -1,0 +1,42 @@
+{
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T13:13:19.574Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "Datre Visual Quality V3",
+      "author": ""
+    },
+    "knowledge_block": {
+      "id": "kb-13",
+      "gate_index": 11,
+      "title": "第 4 章 心识 问题 ：请问什么是 “ 心识泡泡 ”",
+      "summary": "27 第 4 章 心识 问题 ：请问什么是 “ 心识泡泡 ” ？ DATRE ：心识泡泡中包含了所有能让你们去表达和体验的 “ 几率与可能性 ” 。",
+      "words": 453,
+      "keywords": [
+        "几率与可能性",
+        "datre",
+        "但是",
+        "心识",
+        "现在",
+        "问题",
+        "在现阶段",
+        "换句话说"
+      ],
+      "density": {
+        "score": 0.7072,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0.5298,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0.1236
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "scholar",
+      "theme_label": "Scholar Atlas",
+      "section_count": 5,
+      "generated_with": "template_runtime"
+    }
+  }
+}
