@@ -1,0 +1,1127 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>基因之河：章节互动知识模型</title>
+  <style>
+    :root {
+      color-scheme: light;
+    }
+
+    * { box-sizing: border-box; }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #0d1724;
+      font-family: "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+    }
+
+    #stage {
+      width: 100%;
+      height: 100%;
+      display: block;
+      touch-action: manipulation;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="stage" aria-label="基因之河章节互动知识模型"></canvas>
+
+  <script>
+    (() => {
+      const canvas = document.getElementById("stage");
+      const ctx = canvas.getContext("2d");
+
+      const CHAPTERS = [
+        {
+          id: "intro",
+          title: "导论与序言",
+          anchor: "生命是信息延续",
+          lead: [
+            "碎片导读 1/2：道金斯把生命比作一条 DNA 之河。个体是暂时的河岸，信息流才是长时段主体。",
+            "碎片导读 2/2：本模块的目标不是背句子，而是用情境决策理解：复制、筛选、继承如何共同塑造生命系统。"
+          ],
+          tasks: [
+            {
+              prompt: "如果要用一句话解释“基因之河”，哪句最贴近本书主线？",
+              options: [
+                {
+                  label: "生命主要靠个体意志推进，基因只做记录。",
+                  correct: false,
+                  points: 1,
+                  feedback: "书中强调的是信息延续与筛选机制，不是个体意志主导。"
+                },
+                {
+                  label: "个体会死亡，但可复制的信息在代际中持续流动。",
+                  correct: true,
+                  points: 4,
+                  feedback: "正确：这是“河流”隐喻的核心。"
+                },
+                {
+                  label: "进化主要是随机事件堆积，与复制成功率关系不大。",
+                  correct: false,
+                  points: 1,
+                  feedback: "随机变异存在，但筛选标准仍是复制成功率。"
+                }
+              ],
+              takeaway: "关键词：复制子、载体、代际延续。"
+            },
+            {
+              prompt: "当我们比较“神话解释”与“证据解释”时，本章支持哪种学习方法？",
+              options: [
+                {
+                  label: "只看叙事是否动人，不需检验。",
+                  correct: false,
+                  points: 1,
+                  feedback: "可讲述不等于可验证。"
+                },
+                {
+                  label: "基于可检验证据，允许模型被修正。",
+                  correct: true,
+                  points: 4,
+                  feedback: "正确：科学解释依赖证据并可被更新。"
+                },
+                {
+                  label: "所有解释都等价，因此无需比较。",
+                  correct: false,
+                  points: 1,
+                  feedback: "本书明确反对“都一样”的相对化立场。"
+                }
+              ],
+              takeaway: "方法论：证据优先，模型可迭代。"
+            }
+          ],
+          modelNodes: ["DNA 信息流", "代际复制", "证据解释"]
+        },
+        {
+          id: "digital-river",
+          title: "数字之河",
+          anchor: "复制子-载体模型",
+          lead: [
+            "碎片导读：本章强调遗传信息的“数字性”有利于高保真复制，误差少、可累积。",
+            "你将通过“流程排序”理解复制与选择如何形成稳定传承。"
+          ],
+          tasks: [
+            {
+              prompt: "下列哪条流程最符合“数字之河”的机制？",
+              options: [
+                {
+                  label: "复制 → 变异 → 选择 → 保留",
+                  correct: true,
+                  points: 4,
+                  feedback: "正确：复制先发生，变异提供差异，选择决定保留。"
+                },
+                {
+                  label: "选择 → 复制 → 保留 → 变异",
+                  correct: false,
+                  points: 1,
+                  feedback: "没有复制与差异，选择无从进行。"
+                },
+                {
+                  label: "变异 → 保留 → 选择 → 复制",
+                  correct: false,
+                  points: 1,
+                  feedback: "顺序打乱会误解机制因果。"
+                }
+              ],
+              takeaway: "复制提供连续性，变异提供材料，选择提供方向。"
+            },
+            {
+              prompt: "为什么“数字化编码”更有利于长期进化？",
+              options: [
+                {
+                  label: "因为它让每代个体完全相同。",
+                  correct: false,
+                  points: 1,
+                  feedback: "进化并不追求“完全相同”，而是可复制且允许有限误差。"
+                },
+                {
+                  label: "因为它在保持稳定复制的同时允许小幅可筛选差异。",
+                  correct: true,
+                  points: 4,
+                  feedback: "正确：高保真 + 可变异，才有累计改进。"
+                },
+                {
+                  label: "因为它能让环境变化停止。",
+                  correct: false,
+                  points: 1,
+                  feedback: "编码不改变环境，只改变系统应对环境的能力。"
+                }
+              ],
+              takeaway: "机制平衡：稳定传递与有限变异并存。"
+            }
+          ],
+          modelNodes: ["高保真复制", "可筛选差异", "流程因果链"]
+        },
+        {
+          id: "africa-descendants",
+          title: "非洲人及其后代",
+          anchor: "共同祖先与谱系",
+          lead: [
+            "碎片导读：本章把“非洲夏娃”放在证据语境中，讨论共同祖先与谱系推断。",
+            "你将通过判断题区分“能回答的问题”和“不能回答的问题”。"
+          ],
+          tasks: [
+            {
+              prompt: "关于“共同祖先”最稳妥的表述是？",
+              options: [
+                {
+                  label: "说明当时只有一个女性活着。",
+                  correct: false,
+                  points: 1,
+                  feedback: "错误：共同祖先不等于“当时只剩一人”。"
+                },
+                {
+                  label: "说明现存某条遗传谱系可追溯到同一女性节点。",
+                  correct: true,
+                  points: 4,
+                  feedback: "正确：这是谱系收敛，不是人口清零。"
+                },
+                {
+                  label: "说明所有历史文化叙事都被证伪。",
+                  correct: false,
+                  points: 1,
+                  feedback: "科学结论针对可检验命题，不直接覆盖全部文化叙事。"
+                }
+              ],
+              takeaway: "共同祖先是谱系结构结论，不是神话替换口号。"
+            },
+            {
+              prompt: "线粒体谱系证据“不能”直接回答哪类问题？",
+              options: [
+                {
+                  label: "某条母系线在现代人群中的连贯性。",
+                  correct: false,
+                  points: 1,
+                  feedback: "这是它擅长回答的问题。"
+                },
+                {
+                  label: "全人类所有性状与行为的完整起源细节。",
+                  correct: true,
+                  points: 4,
+                  feedback: "正确：单一谱系证据有边界，不能包办全部问题。"
+                },
+                {
+                  label: "不同人群存在共同祖先的可能性。",
+                  correct: false,
+                  points: 1,
+                  feedback: "它可以支持共同祖先框架。"
+                }
+              ],
+              takeaway: "证据有解释力，也有边界。"
+            }
+          ],
+          modelNodes: ["谱系树", "共同祖先", "证据边界"]
+        },
+        {
+          id: "gradualism",
+          title: "循序渐进",
+          anchor: "小步改进的累积",
+          lead: [
+            "碎片导读：本章反驳“半个器官无用”的直觉，用连续可用的小改进解释复杂结构形成。",
+            "你将扮演“进化设计师”，每回合选一项小改进。"
+          ],
+          tasks: [
+            {
+              prompt: "若某视觉结构只有 3% 提升，你会如何判断其进化意义？",
+              options: [
+                {
+                  label: "提升太小，可忽略不计。",
+                  correct: false,
+                  points: 1,
+                  feedback: "在长期筛选中，小优势可被放大和累积。"
+                },
+                {
+                  label: "只要可重复带来生存/繁殖优势，就可能被保留。",
+                  correct: true,
+                  points: 4,
+                  feedback: "正确：渐进改进的关键是“可用且可保留”。"
+                },
+                {
+                  label: "必须一次性达到完整器官形态才有意义。",
+                  correct: false,
+                  points: 1,
+                  feedback: "这正是本章要反驳的误解。"
+                }
+              ],
+              takeaway: "渐进演化依赖“每一步都不过亏”。"
+            },
+            {
+              prompt: "下列哪种叙述最符合“循序渐进”逻辑？",
+              options: [
+                {
+                  label: "复杂器官通常由可工作的中间态逐步累积而来。",
+                  correct: true,
+                  points: 4,
+                  feedback: "正确：中间态不是“废品”，而是阶段性解。"
+                },
+                {
+                  label: "中间态一定完全无功能。",
+                  correct: false,
+                  points: 1,
+                  feedback: "若完全无功能，难以被选择保留。"
+                },
+                {
+                  label: "进化只靠偶发大跃迁。",
+                  correct: false,
+                  points: 1,
+                  feedback: "大变动可以存在，但不是主导解释。"
+                }
+              ],
+              takeaway: "复杂性可由连续可行路径生成。"
+            }
+          ],
+          modelNodes: ["中间态可用", "累积优势", "连续路径"]
+        },
+        {
+          id: "utility",
+          title: "效用函数",
+          anchor: "选择是优化问题",
+          lead: [
+            "碎片导读：本章把行为看作约束下的优化，核心是“什么被系统奖励，什么被系统淘汰”。",
+            "你将通过情境选择理解“短期收益”与“长期适应”的张力。"
+          ],
+          tasks: [
+            {
+              prompt: "某策略短期收益高但明显破坏合作网络，你会如何判断？",
+              options: [
+                {
+                  label: "只要当下收益高，就一定是最优策略。",
+                  correct: false,
+                  points: 1,
+                  feedback: "忽视长期适应成本会导致总体失败。"
+                },
+                {
+                  label: "要比较长期复制成功率，而非单回合收益。",
+                  correct: true,
+                  points: 4,
+                  feedback: "正确：效用函数要看长期可持续性。"
+                },
+                {
+                  label: "演化不涉及优化，因此无需比较。",
+                  correct: false,
+                  points: 1,
+                  feedback: "自然选择本质上就是筛选机制。"
+                }
+              ],
+              takeaway: "指标设计决定策略方向。"
+            },
+            {
+              prompt: "在亲缘选择/博弈框架下，合作何时更易出现？",
+              options: [
+                {
+                  label: "当互动可重复、回报可追踪、惩罚可执行时。",
+                  correct: true,
+                  points: 4,
+                  feedback: "正确：稳定机制能让合作成为高效策略。"
+                },
+                {
+                  label: "只要个体有善意，不需要制度条件。",
+                  correct: false,
+                  points: 1,
+                  feedback: "善意重要，但机制决定可持续性。"
+                },
+                {
+                  label: "合作与环境结构无关。",
+                  correct: false,
+                  points: 1,
+                  feedback: "环境和规则塑造收益矩阵。"
+                }
+              ],
+              takeaway: "合作是机制产物，不仅是道德愿望。"
+            }
+          ],
+          modelNodes: ["长期效用", "合作条件", "收益矩阵"]
+        },
+        {
+          id: "replication-bomb",
+          title: "复制炸弹",
+          anchor: "扩张与约束",
+          lead: [
+            "碎片导读：复制成功会推动指数扩张，但系统总受资源与结构约束。",
+            "本章任务是识别“扩张优势”与“系统稳定”之间的平衡点。"
+          ],
+          tasks: [
+            {
+              prompt: "如果某复制策略疯狂扩张但导致环境崩溃，长期结果通常是？",
+              options: [
+                {
+                  label: "一直赢下去，因为扩张速度最快。",
+                  correct: false,
+                  points: 1,
+                  feedback: "短期优势可能触发系统反噬。"
+                },
+                {
+                  label: "可能先快后崩，最终削弱自身复制基础。",
+                  correct: true,
+                  points: 4,
+                  feedback: "正确：系统约束会反过来塑造可行策略。"
+                },
+                {
+                  label: "与资源上限无关。",
+                  correct: false,
+                  points: 1,
+                  feedback: "资源上限是关键变量。"
+                }
+              ],
+              takeaway: "复制成功不等于无限扩张。"
+            },
+            {
+              prompt: "哪种方案更接近“长期稳定复制”？",
+              options: [
+                {
+                  label: "最大化当期产出，不考虑系统承载。",
+                  correct: false,
+                  points: 1,
+                  feedback: "会提高系统性风险。"
+                },
+                {
+                  label: "在扩张与承载之间维持动态平衡。",
+                  correct: true,
+                  points: 4,
+                  feedback: "正确：这是本章的核心教育目标。"
+                },
+                {
+                  label: "完全停止复制行为。",
+                  correct: false,
+                  points: 1,
+                  feedback: "停止复制并不能解释演化系统。"
+                }
+              ],
+              takeaway: "核心冲突：短期增益 vs 长期韧性。"
+            }
+          ],
+          modelNodes: ["指数扩张", "承载约束", "动态平衡"]
+        }
+      ];
+
+      const state = {
+        mode: "menu",
+        paused: false,
+        chapterIndex: 0,
+        phase: "lead",
+        leadIndex: 0,
+        taskIndex: 0,
+        focusOption: 0,
+        selectedOption: -1,
+        score: 0,
+        chapterResults: CHAPTERS.map((chapter) => ({
+          correct: 0,
+          total: chapter.tasks.length,
+          points: 0,
+          finished: false,
+        })),
+        feedbackLine: "",
+        takeaway: "",
+        cursorPulse: 0,
+        elapsed: 0,
+        lastInputHint: "按 Space 开始学习",
+      };
+
+      const ui = {
+        optionRects: [],
+        continueRect: null,
+      };
+
+      function resetLearning() {
+        state.mode = "learning";
+        state.paused = false;
+        state.chapterIndex = 0;
+        state.phase = "lead";
+        state.leadIndex = 0;
+        state.taskIndex = 0;
+        state.focusOption = 0;
+        state.selectedOption = -1;
+        state.score = 0;
+        state.feedbackLine = "";
+        state.takeaway = "";
+        state.lastInputHint = "左右选择，Space 确认，Enter 继续";
+        state.chapterResults = CHAPTERS.map((chapter) => ({
+          correct: 0,
+          total: chapter.tasks.length,
+          points: 0,
+          finished: false,
+        }));
+      }
+
+      function activeChapter() {
+        return CHAPTERS[state.chapterIndex];
+      }
+
+      function activeTask() {
+        const chapter = activeChapter();
+        if (!chapter) return null;
+        return chapter.tasks[state.taskIndex] || null;
+      }
+
+      function resize() {
+        const dpr = window.devicePixelRatio || 1;
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        canvas.width = Math.floor(w * dpr);
+        canvas.height = Math.floor(h * dpr);
+        canvas.style.width = `${w}px`;
+        canvas.style.height = `${h}px`;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        render();
+      }
+
+      function clamp(num, min, max) {
+        return Math.max(min, Math.min(max, num));
+      }
+
+      function toggleFullscreen() {
+        if (document.fullscreenElement) {
+          document.exitFullscreen().catch(() => {});
+        } else {
+          canvas.requestFullscreen().catch(() => {});
+        }
+      }
+
+      function moveOption(dir) {
+        if (state.mode !== "learning" || state.paused || state.phase !== "task") return;
+        const task = activeTask();
+        if (!task) return;
+        const len = task.options.length;
+        state.focusOption = (state.focusOption + dir + len) % len;
+      }
+
+      function submitOption() {
+        if (state.mode !== "learning" || state.paused || state.phase !== "task") return;
+        const chapter = activeChapter();
+        const task = activeTask();
+        if (!chapter || !task) return;
+
+        const picked = task.options[state.focusOption];
+        if (!picked) return;
+
+        state.selectedOption = state.focusOption;
+        state.phase = "feedback";
+        state.feedbackLine = picked.feedback;
+        state.takeaway = task.takeaway;
+        state.score += picked.points;
+
+        const result = state.chapterResults[state.chapterIndex];
+        if (result) {
+          result.points += picked.points;
+          if (picked.correct) {
+            result.correct += 1;
+          }
+        }
+      }
+
+      function nextStep() {
+        if (state.mode === "menu") {
+          resetLearning();
+          return;
+        }
+
+        if (state.mode === "complete") {
+          resetLearning();
+          return;
+        }
+
+        if (state.mode !== "learning" || state.paused) return;
+
+        const chapter = activeChapter();
+        if (!chapter) return;
+
+        if (state.phase === "lead") {
+          state.leadIndex += 1;
+          if (state.leadIndex >= chapter.lead.length) {
+            state.phase = "task";
+            state.leadIndex = chapter.lead.length - 1;
+            state.taskIndex = 0;
+            state.focusOption = 0;
+            state.selectedOption = -1;
+          }
+          return;
+        }
+
+        if (state.phase === "feedback") {
+          state.taskIndex += 1;
+          state.selectedOption = -1;
+          state.focusOption = 0;
+          if (state.taskIndex >= chapter.tasks.length) {
+            state.phase = "chapter-summary";
+            const result = state.chapterResults[state.chapterIndex];
+            if (result) result.finished = true;
+          } else {
+            state.phase = "task";
+          }
+          return;
+        }
+
+        if (state.phase === "chapter-summary") {
+          state.chapterIndex += 1;
+          if (state.chapterIndex >= CHAPTERS.length) {
+            state.mode = "complete";
+            state.phase = "final";
+            state.chapterIndex = CHAPTERS.length - 1;
+          } else {
+            state.phase = "lead";
+            state.leadIndex = 0;
+            state.taskIndex = 0;
+            state.focusOption = 0;
+            state.selectedOption = -1;
+          }
+        }
+      }
+
+      function togglePause() {
+        if (state.mode !== "learning") return;
+        state.paused = !state.paused;
+      }
+
+      function onKeyDown(event) {
+        const key = event.key;
+
+        // Aliases for deterministic Playwright client keys:
+        // A => pause/resume, B => reset, ArrowUp => fullscreen toggle, ArrowDown => exit fullscreen.
+        if (key === "a" || key === "A") {
+          event.preventDefault();
+          togglePause();
+          return;
+        }
+
+        if (key === "b" || key === "B") {
+          event.preventDefault();
+          state.mode = "menu";
+          state.paused = false;
+          state.lastInputHint = "已重置。按 Space 开始学习";
+          return;
+        }
+
+        if (key === "ArrowUp") {
+          event.preventDefault();
+          toggleFullscreen();
+          return;
+        }
+
+        if (key === "ArrowDown" && document.fullscreenElement) {
+          event.preventDefault();
+          document.exitFullscreen().catch(() => {});
+          return;
+        }
+
+        if (key === "f" || key === "F") {
+          event.preventDefault();
+          toggleFullscreen();
+          return;
+        }
+
+        if (key === "Escape" && document.fullscreenElement) {
+          document.exitFullscreen().catch(() => {});
+          return;
+        }
+
+        if (key === "r" || key === "R") {
+          event.preventDefault();
+          state.mode = "menu";
+          state.paused = false;
+          state.lastInputHint = "已重置。按 Space 开始学习";
+          return;
+        }
+
+        if (key === "p" || key === "P") {
+          event.preventDefault();
+          togglePause();
+          return;
+        }
+
+        if (key === "ArrowLeft") {
+          event.preventDefault();
+          moveOption(-1);
+          return;
+        }
+
+        if (key === "ArrowRight") {
+          event.preventDefault();
+          moveOption(1);
+          return;
+        }
+
+        if (key === " " || key === "Spacebar") {
+          event.preventDefault();
+          if (state.mode === "learning" && state.phase === "task") {
+            submitOption();
+          } else {
+            nextStep();
+          }
+          return;
+        }
+
+        if (key === "Enter") {
+          event.preventDefault();
+          nextStep();
+        }
+      }
+
+      function onCanvasClick(event) {
+        const rect = canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+
+        if (state.mode === "menu" || state.mode === "complete") {
+          nextStep();
+          return;
+        }
+
+        if (state.mode !== "learning" || state.paused) return;
+
+        if (state.phase === "task") {
+          for (let i = 0; i < ui.optionRects.length; i += 1) {
+            const r = ui.optionRects[i];
+            if (x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h) {
+              state.focusOption = i;
+              submitOption();
+              return;
+            }
+          }
+        }
+
+        if (ui.continueRect) {
+          const r = ui.continueRect;
+          if (x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h) {
+            nextStep();
+          }
+        }
+      }
+
+      function drawRoundedRect(x, y, w, h, r, fill, stroke) {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.arcTo(x + w, y, x + w, y + h, r);
+        ctx.arcTo(x + w, y + h, x, y + h, r);
+        ctx.arcTo(x, y + h, x, y, r);
+        ctx.arcTo(x, y, x + w, y, r);
+        ctx.closePath();
+        if (fill) {
+          ctx.fillStyle = fill;
+          ctx.fill();
+        }
+        if (stroke) {
+          ctx.strokeStyle = stroke;
+          ctx.stroke();
+        }
+      }
+
+      function drawWrappedText(text, x, y, maxWidth, lineHeight, color = "#ecf5ff", font = "16px PingFang SC") {
+        ctx.fillStyle = color;
+        ctx.font = font;
+
+        const segments = String(text).split(/\n/g);
+        let cursorY = y;
+        for (const segment of segments) {
+          const chars = [...segment];
+          let line = "";
+          for (const ch of chars) {
+            const testLine = line + ch;
+            if (ctx.measureText(testLine).width > maxWidth && line) {
+              ctx.fillText(line, x, cursorY);
+              line = ch;
+              cursorY += lineHeight;
+            } else {
+              line = testLine;
+            }
+          }
+          if (line) {
+            ctx.fillText(line, x, cursorY);
+            cursorY += lineHeight;
+          }
+        }
+        return cursorY;
+      }
+
+      function drawBackground(w, h) {
+        const g = ctx.createLinearGradient(0, 0, 0, h);
+        g.addColorStop(0, "#13283b");
+        g.addColorStop(0.55, "#0f1e2e");
+        g.addColorStop(1, "#0a1622");
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, w, h);
+
+        const flowCount = 28;
+        for (let i = 0; i < flowCount; i += 1) {
+          const t = state.elapsed * 0.18 + i * 0.27;
+          const px = ((Math.sin(t * 1.13) + 1) * 0.5) * w;
+          const py = (i / flowCount) * h + ((state.elapsed * 24 + i * 33) % h) * 0.03;
+          const alpha = 0.12 + ((Math.sin(t * 2.3) + 1) * 0.5) * 0.15;
+          ctx.fillStyle = `rgba(104,180,255,${alpha.toFixed(3)})`;
+          ctx.beginPath();
+          ctx.arc(px, py % h, 2 + (i % 3), 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      function drawTimeline(x, y, w, h) {
+        drawRoundedRect(x, y, w, h, 18, "rgba(8,14,24,0.64)", "rgba(165,205,236,0.2)");
+
+        ctx.fillStyle = "#d9ecff";
+        ctx.font = "bold 16px PingFang SC";
+        ctx.fillText("章节地图", x + 18, y + 28);
+
+        const stepY = (h - 80) / CHAPTERS.length;
+        for (let i = 0; i < CHAPTERS.length; i += 1) {
+          const cy = y + 52 + i * stepY;
+          const chapter = CHAPTERS[i];
+          const isCurrent = state.mode !== "menu" && i === state.chapterIndex;
+          const done = state.chapterResults[i]?.finished;
+
+          ctx.beginPath();
+          ctx.arc(x + 22, cy, 8, 0, Math.PI * 2);
+          ctx.fillStyle = done ? "#69d98a" : isCurrent ? "#80c2ff" : "#264961";
+          ctx.fill();
+
+          ctx.font = isCurrent ? "bold 14px PingFang SC" : "13px PingFang SC";
+          ctx.fillStyle = done ? "#d9ffe5" : isCurrent ? "#e8f6ff" : "#a4c3d8";
+          ctx.fillText(chapter.title, x + 38, cy + 5);
+
+          if (i < CHAPTERS.length - 1) {
+            ctx.strokeStyle = "rgba(126,176,210,0.35)";
+            ctx.beginPath();
+            ctx.moveTo(x + 22, cy + 10);
+            ctx.lineTo(x + 22, cy + stepY - 10);
+            ctx.stroke();
+          }
+        }
+      }
+
+      function drawMenu(mainX, mainY, mainW, mainH) {
+        drawRoundedRect(mainX, mainY, mainW, mainH, 22, "rgba(7,12,20,0.72)", "rgba(173,218,245,0.24)");
+
+        ctx.fillStyle = "#f2f9ff";
+        ctx.font = "bold 34px PingFang SC";
+        ctx.fillText("《基因之河》章节互动知识模型", mainX + 34, mainY + 60);
+
+        let cy = drawWrappedText(
+          "目标：通过“碎片导读 + 情境交互”理解 6 个章节主线。\n每章不是拼手速，而是做判断并拿到结构化反馈。",
+          mainX + 34,
+          mainY + 106,
+          mainW - 68,
+          30,
+          "#c7deef",
+          "18px PingFang SC"
+        );
+
+        cy += 20;
+        ctx.fillStyle = "#9ec5df";
+        ctx.font = "15px PingFang SC";
+        ctx.fillText("操作：←/→ 选择选项，Space 确认，Enter 继续，P 暂停，R 重开，F 全屏", mainX + 34, cy);
+
+        const pulse = 0.45 + (Math.sin(state.cursorPulse * 3.3) + 1) * 0.25;
+        drawRoundedRect(mainX + 34, mainY + mainH - 86, 320, 50, 13, `rgba(99,181,255,${pulse.toFixed(3)})`, "rgba(220,243,255,0.45)");
+        ctx.fillStyle = "#072034";
+        ctx.font = "bold 19px PingFang SC";
+        ctx.fillText("按 Space / Enter 开始", mainX + 56, mainY + mainH - 53);
+      }
+
+      function drawLearning(mainX, mainY, mainW, mainH) {
+        const chapter = activeChapter();
+        if (!chapter) return;
+
+        drawRoundedRect(mainX, mainY, mainW, mainH, 22, "rgba(7,12,20,0.76)", "rgba(173,218,245,0.24)");
+
+        ctx.fillStyle = "#f2f9ff";
+        ctx.font = "bold 26px PingFang SC";
+        ctx.fillText(`${state.chapterIndex + 1}. ${chapter.title}`, mainX + 28, mainY + 46);
+
+        ctx.fillStyle = "#97b8cf";
+        ctx.font = "15px PingFang SC";
+        ctx.fillText(`核心锚点：${chapter.anchor}`, mainX + 30, mainY + 72);
+
+        const progress = state.chapterResults[state.chapterIndex];
+        ctx.fillStyle = "#c7e4f8";
+        ctx.fillText(`总分 ${state.score} | 本章正确 ${progress.correct}/${progress.total}`, mainX + mainW - 280, mainY + 46);
+
+        ui.optionRects = [];
+        ui.continueRect = null;
+
+        if (state.phase === "lead") {
+          drawRoundedRect(mainX + 26, mainY + 94, mainW - 52, mainH - 190, 16, "rgba(20,39,56,0.45)", "rgba(130,173,202,0.22)");
+          const leadText = chapter.lead[state.leadIndex] || "";
+          drawWrappedText(`碎片导读\n${leadText}`, mainX + 44, mainY + 138, mainW - 88, 34, "#d8ebf9", "19px PingFang SC");
+
+          const bx = mainX + mainW - 228;
+          const by = mainY + mainH - 76;
+          drawRoundedRect(bx, by, 196, 44, 11, "rgba(124,195,255,0.82)", "rgba(224,246,255,0.5)");
+          ctx.fillStyle = "#0d2537";
+          ctx.font = "bold 17px PingFang SC";
+          ctx.fillText("Enter 继续导读", bx + 34, by + 29);
+          ui.continueRect = { x: bx, y: by, w: 196, h: 44 };
+          return;
+        }
+
+        if (state.phase === "task") {
+          const task = activeTask();
+          if (!task) return;
+
+          drawRoundedRect(mainX + 26, mainY + 94, mainW - 52, 132, 16, "rgba(20,39,56,0.45)", "rgba(130,173,202,0.22)");
+          drawWrappedText(`互动任务 ${state.taskIndex + 1}/${chapter.tasks.length}\n${task.prompt}`, mainX + 44, mainY + 130, mainW - 88, 31, "#d8ebf9", "18px PingFang SC");
+
+          const baseY = mainY + 248;
+          const gap = 16;
+          const optH = 84;
+          for (let i = 0; i < task.options.length; i += 1) {
+            const ox = mainX + 26;
+            const oy = baseY + i * (optH + gap);
+            const ow = mainW - 52;
+            const isFocus = i === state.focusOption;
+            const fill = isFocus ? "rgba(126,200,255,0.28)" : "rgba(16,31,46,0.58)";
+            const border = isFocus ? "rgba(173,225,255,0.65)" : "rgba(120,168,199,0.24)";
+            drawRoundedRect(ox, oy, ow, optH, 14, fill, border);
+            drawWrappedText(`${i + 1}. ${task.options[i].label}`, ox + 16, oy + 30, ow - 28, 24, isFocus ? "#f4fbff" : "#c4dced", "16px PingFang SC");
+            ui.optionRects.push({ x: ox, y: oy, w: ow, h: optH });
+          }
+
+          const bx = mainX + mainW - 210;
+          const by = mainY + mainH - 62;
+          drawRoundedRect(bx, by, 178, 38, 10, "rgba(123,198,255,0.84)", "rgba(224,246,255,0.5)");
+          ctx.fillStyle = "#0d2537";
+          ctx.font = "bold 15px PingFang SC";
+          ctx.fillText("Space 确认答案", bx + 36, by + 24);
+          return;
+        }
+
+        if (state.phase === "feedback") {
+          const task = chapter.tasks[state.taskIndex];
+          const selected = task?.options[state.selectedOption];
+          const pass = selected?.correct;
+          const tone = pass ? "rgba(120,230,150,0.22)" : "rgba(255,154,154,0.24)";
+          const border = pass ? "rgba(131,236,162,0.58)" : "rgba(255,179,179,0.54)";
+
+          drawRoundedRect(mainX + 26, mainY + 94, mainW - 52, mainH - 170, 16, tone, border);
+          ctx.fillStyle = pass ? "#d8ffe7" : "#ffe1e1";
+          ctx.font = "bold 24px PingFang SC";
+          ctx.fillText(pass ? "判断有效：抓住了章节机制" : "需要校正：概念链条有偏差", mainX + 44, mainY + 140);
+
+          const explain = `${state.feedbackLine}\n\n本题提炼：${state.takeaway}`;
+          drawWrappedText(explain, mainX + 44, mainY + 188, mainW - 88, 32, "#e8f3fb", "18px PingFang SC");
+
+          const bx = mainX + mainW - 210;
+          const by = mainY + mainH - 62;
+          drawRoundedRect(bx, by, 178, 38, 10, "rgba(123,198,255,0.84)", "rgba(224,246,255,0.5)");
+          ctx.fillStyle = "#0d2537";
+          ctx.font = "bold 15px PingFang SC";
+          ctx.fillText("Enter 下一步", bx + 47, by + 24);
+          ui.continueRect = { x: bx, y: by, w: 178, h: 38 };
+          return;
+        }
+
+        if (state.phase === "chapter-summary") {
+          const result = state.chapterResults[state.chapterIndex];
+          drawRoundedRect(mainX + 26, mainY + 94, mainW - 52, mainH - 170, 16, "rgba(20,39,56,0.45)", "rgba(130,173,202,0.22)");
+          ctx.fillStyle = "#dff1ff";
+          ctx.font = "bold 24px PingFang SC";
+          ctx.fillText("本章模型已固化", mainX + 44, mainY + 138);
+          ctx.font = "18px PingFang SC";
+          ctx.fillText(`正确率：${result.correct}/${result.total} | 章节得分：${result.points}`, mainX + 44, mainY + 172);
+
+          ctx.font = "bold 17px PingFang SC";
+          ctx.fillStyle = "#b5dbf5";
+          ctx.fillText("你已吸收的结构节点：", mainX + 44, mainY + 218);
+
+          let y = mainY + 252;
+          for (const node of chapter.modelNodes) {
+            drawRoundedRect(mainX + 44, y - 22, mainW - 88, 38, 10, "rgba(43,83,112,0.44)", "rgba(133,186,221,0.3)");
+            ctx.fillStyle = "#e5f5ff";
+            ctx.font = "16px PingFang SC";
+            ctx.fillText(`• ${node}`, mainX + 58, y + 3);
+            y += 54;
+          }
+
+          const bx = mainX + mainW - 240;
+          const by = mainY + mainH - 62;
+          drawRoundedRect(bx, by, 208, 38, 10, "rgba(123,198,255,0.84)", "rgba(224,246,255,0.5)");
+          ctx.fillStyle = "#0d2537";
+          ctx.font = "bold 15px PingFang SC";
+          ctx.fillText(state.chapterIndex === CHAPTERS.length - 1 ? "Enter 生成总图" : "Enter 下一章", bx + 56, by + 24);
+          ui.continueRect = { x: bx, y: by, w: 208, h: 38 };
+        }
+      }
+
+      function drawFinal(mainX, mainY, mainW, mainH) {
+        drawRoundedRect(mainX, mainY, mainW, mainH, 22, "rgba(7,12,20,0.76)", "rgba(173,218,245,0.24)");
+
+        ctx.fillStyle = "#f2f9ff";
+        ctx.font = "bold 28px PingFang SC";
+        ctx.fillText("学习完成：你的《基因之河》知识模型", mainX + 28, mainY + 46);
+
+        ctx.fillStyle = "#c6e1f4";
+        ctx.font = "17px PingFang SC";
+        ctx.fillText(`总得分 ${state.score} / 48`, mainX + 30, mainY + 74);
+
+        const nodes = CHAPTERS.flatMap((chapter) => chapter.modelNodes.map((node) => ({ chapter: chapter.title, node })));
+        const centerX = mainX + mainW * 0.52;
+        const centerY = mainY + mainH * 0.53;
+        const radius = Math.min(mainW, mainH) * 0.29;
+
+        ctx.strokeStyle = "rgba(131,188,224,0.26)";
+        for (let i = 0; i < nodes.length; i += 1) {
+          const a = (Math.PI * 2 * i) / nodes.length - Math.PI / 2;
+          const x = centerX + Math.cos(a) * radius;
+          const y = centerY + Math.sin(a) * radius;
+          ctx.beginPath();
+          ctx.moveTo(centerX, centerY);
+          ctx.lineTo(x, y);
+          ctx.stroke();
+        }
+
+        drawRoundedRect(centerX - 120, centerY - 30, 240, 60, 12, "rgba(117,196,255,0.34)", "rgba(214,241,255,0.52)");
+        ctx.fillStyle = "#eff9ff";
+        ctx.font = "bold 20px PingFang SC";
+        ctx.fillText("DNA 信息流框架", centerX - 87, centerY + 8);
+
+        for (let i = 0; i < nodes.length; i += 1) {
+          const a = (Math.PI * 2 * i) / nodes.length - Math.PI / 2;
+          const x = centerX + Math.cos(a) * radius;
+          const y = centerY + Math.sin(a) * radius;
+          const done = state.chapterResults[Math.floor(i / 3)]?.finished;
+          drawRoundedRect(x - 110, y - 18, 220, 36, 9, done ? "rgba(105,217,138,0.24)" : "rgba(57,97,126,0.34)", done ? "rgba(154,242,179,0.56)" : "rgba(145,188,214,0.28)");
+          ctx.fillStyle = done ? "#e8ffef" : "#d0e5f4";
+          ctx.font = "14px PingFang SC";
+          ctx.fillText(nodes[i].node, x - 98, y + 5);
+        }
+
+        const bx = mainX + 30;
+        const by = mainY + mainH - 60;
+        drawRoundedRect(bx, by, 280, 40, 10, "rgba(123,198,255,0.84)", "rgba(224,246,255,0.5)");
+        ctx.fillStyle = "#0d2537";
+        ctx.font = "bold 16px PingFang SC";
+        ctx.fillText("按 Enter / Space 重新学习", bx + 54, by + 25);
+      }
+
+      function drawPauseOverlay(w, h) {
+        drawRoundedRect(w * 0.35, h * 0.43, w * 0.3, h * 0.14, 14, "rgba(5,10,16,0.82)", "rgba(176,216,243,0.4)");
+        ctx.fillStyle = "#dff3ff";
+        ctx.font = "bold 28px PingFang SC";
+        ctx.fillText("已暂停", w * 0.46, h * 0.5);
+        ctx.font = "16px PingFang SC";
+        ctx.fillStyle = "#b7d7ed";
+        ctx.fillText("按 P 继续", w * 0.472, h * 0.535);
+      }
+
+      function drawGlobalHUD(w, h) {
+        const text = state.mode === "menu"
+          ? "Space/Enter 开始"
+          : state.mode === "complete"
+            ? "Enter 重新开始 | R 重置"
+            : "←/→ 选项 | Space 确认 | Enter 继续 | P 暂停 | R 重开 | F 全屏";
+        ctx.fillStyle = "rgba(185,214,235,0.9)";
+        ctx.font = "14px PingFang SC";
+        ctx.fillText(text, 24, h - 16);
+      }
+
+      function render() {
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        drawBackground(w, h);
+
+        const left = Math.max(220, Math.min(300, w * 0.23));
+        const margin = Math.max(14, w * 0.015);
+        const mainX = left + margin * 1.5;
+        const mainY = margin;
+        const mainW = w - mainX - margin;
+        const mainH = h - margin * 2;
+
+        drawTimeline(margin, margin, left, h - margin * 2);
+
+        if (state.mode === "menu") {
+          drawMenu(mainX, mainY, mainW, mainH);
+        } else if (state.mode === "learning") {
+          drawLearning(mainX, mainY, mainW, mainH);
+        } else if (state.mode === "complete") {
+          drawFinal(mainX, mainY, mainW, mainH);
+        }
+
+        drawGlobalHUD(w, h);
+
+        if (state.paused) {
+          drawPauseOverlay(w, h);
+        }
+      }
+
+      function update(dt) {
+        if (!state.paused) {
+          state.elapsed += dt;
+          state.cursorPulse += dt;
+        }
+      }
+
+      function loop(ts) {
+        if (!loop.lastTs) loop.lastTs = ts;
+        const dt = clamp((ts - loop.lastTs) / 1000, 0, 0.05);
+        loop.lastTs = ts;
+        update(dt);
+        render();
+        requestAnimationFrame(loop);
+      }
+      loop.lastTs = 0;
+
+      function renderGameToText() {
+        const chapter = activeChapter();
+        const task = activeTask();
+        const options = task
+          ? task.options.map((opt, idx) => ({
+              index: idx,
+              text: opt.label,
+              focused: state.focusOption === idx,
+            }))
+          : [];
+
+        const payload = {
+          coordinate_system: "Canvas origin at top-left (0,0), x increases right, y increases down.",
+          mode: state.mode,
+          paused: state.paused,
+          chapter_index: state.chapterIndex,
+          chapter_title: chapter ? chapter.title : "",
+          phase: state.phase,
+          lead_index: state.leadIndex,
+          task_index: state.taskIndex,
+          focus_option: state.focusOption,
+          selected_option: state.selectedOption,
+          score: state.score,
+          chapter_results: state.chapterResults,
+          prompt: task ? task.prompt : "",
+          options,
+          feedback: state.feedbackLine,
+          takeaway: state.takeaway,
+          fullscreen: Boolean(document.fullscreenElement),
+          controls: {
+            choose: ["ArrowLeft", "ArrowRight"],
+            submit: ["Space"],
+            continue: ["Enter"],
+            pause: ["P"],
+            restart: ["R"],
+            fullscreen: ["F", "Escape"],
+          },
+        };
+
+        return JSON.stringify(payload);
+      }
+
+      window.render_game_to_text = renderGameToText;
+      window.advanceTime = (ms) => {
+        const steps = Math.max(1, Math.round(ms / (1000 / 60)));
+        for (let i = 0; i < steps; i += 1) {
+          update(1 / 60);
+        }
+        render();
+      };
+
+      window.addEventListener("resize", resize);
+      window.addEventListener("keydown", onKeyDown, { passive: false });
+      canvas.addEventListener("click", onCanvasClick);
+
+      resize();
+      requestAnimationFrame(loop);
+    })();
+  </script>
+</body>
+</html>

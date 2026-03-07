@@ -1,0 +1,40 @@
+{
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T10:08:28.977Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "雨林里的消亡（可视化阅读测试-v2）",
+      "author": "Unknown"
+    },
+    "knowledge_block": {
+      "id": "kb-27",
+      "gate_index": 16,
+      "title": "第十章肝脏问题",
+      "summary": "第十章肝脏问题 127 其实是另一个人写给他的女朋友的，那个女朋友叫帕米拉，而他只是 一个传信的，阴差阳错给了贝丝。但随后他就记起来他在信里写了好 几遍自己的爱称“宋特”（夜晚的精灵）。 于是不幸地，这个选项被排除了。",
+      "words": 1793,
+      "keywords": [
+        "第十章肝脏问题",
+        "帕米拉",
+        "雨林里的消亡",
+        "的意思",
+        "尽管如此",
+        "逃跑"
+      ],
+      "density": {
+        "score": 0.6067,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0.2142,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0.0156
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "scholar",
+      "theme_label": "Scholar Atlas",
+      "section_count": 5,
+      "generated_with": "template_runtime"
+    }
+  }
+}

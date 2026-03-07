@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>第十二章险象环生 · 雨林里的消亡（可视化阅读测试-v2）</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b1220;
+      --bg2: #1a2333;
+      --accent: #f59e0b;
+      --accent2: #34d399;
+      --text: #e5edf8;
+      --soft: #9fb1c9;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+      background:
+        radial-gradient(1200px 540px at 85% -8%, color-mix(in srgb, var(--accent2) 24%, transparent), transparent 70%),
+        radial-gradient(980px 460px at -10% 14%, color-mix(in srgb, var(--accent) 24%, transparent), transparent 74%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+      color: var(--text);
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .05;
+      background-image: radial-gradient(circle at 1px 1px, #fff 1px, transparent 0);
+      background-size: 3px 3px;
+      z-index: 0;
+    }
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      z-index: 100;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+    .page { position: relative; z-index: 1; width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 20px 0 48px; }
+    .hero {
+      min-height: 74vh;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 22px;
+      background: linear-gradient(160deg, color-mix(in srgb, var(--bg2) 86%, transparent), color-mix(in srgb, var(--bg) 88%, transparent));
+      padding: 40px 34px;
+      display: grid;
+      align-content: center;
+      gap: 16px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.34);
+    }
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .hero h1 {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(32px, 5.4vw, 68px);
+      line-height: 1.16;
+      letter-spacing: .04em;
+      max-width: 15em;
+      text-wrap: balance;
+    }
+    .hero p {
+      max-width: 66ch;
+      line-height: 1.95;
+      color: color-mix(in srgb, var(--text) 85%, var(--soft));
+      font-size: 16px;
+    }
+    .chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip {
+      border: 1px solid color-mix(in srgb, var(--accent2) 44%, transparent);
+      color: color-mix(in srgb, var(--accent2) 88%, #fff);
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 12px;
+      background: rgba(255,255,255,.03);
+    }
+    .section { margin-top: 18px; border: 1px solid rgba(255,255,255,.13); border-radius: 18px; padding: 22px; background: rgba(2,6,18,.46); }
+    .section h2 {
+      margin-bottom: 12px;
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(22px, 2.8vw, 34px);
+      color: color-mix(in srgb, var(--accent) 86%, #fff);
+      letter-spacing: .03em;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1.1fr 1fr; gap: 14px; }
+    .concept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+    .concept-card {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      background: rgba(255,255,255,.03);
+      padding: 14px;
+      min-height: 128px;
+    }
+    .concept-token { font-size: 14px; letter-spacing: .14em; color: var(--accent2); text-transform: uppercase; margin-bottom: 7px; font-weight: 700; }
+    .concept-note { font-size: 14px; color: color-mix(in srgb, var(--text) 88%, var(--soft)); line-height: 1.8; }
+    .atlas {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      min-height: 440px;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+    .atlas svg { width: 100%; max-width: 440px; height: auto; }
+    .timeline { display: grid; gap: 10px; }
+    .timeline-item {
+      border-left: 2px solid color-mix(in srgb, var(--accent) 66%, transparent);
+      padding: 10px 14px;
+      background: rgba(255,255,255,.02);
+      border-radius: 0 10px 10px 0;
+    }
+    .timeline-no { font-size: 11px; letter-spacing: .22em; color: var(--accent2); display: block; margin-bottom: 6px; }
+    .timeline-item h3 { font-size: 19px; font-family: "Noto Serif SC", serif; line-height: 1.45; margin-bottom: 7px; }
+    .timeline-item p { font-size: 14px; line-height: 1.9; color: color-mix(in srgb, var(--text) 84%, var(--soft)); }
+    .quote-wrap { display: grid; gap: 10px; }
+    .quote {
+      border-left: 2px solid color-mix(in srgb, var(--accent2) 80%, transparent);
+      padding: 10px 12px;
+      background: rgba(255,255,255,.02);
+      color: color-mix(in srgb, var(--text) 92%, #fff);
+      font-family: "Noto Serif SC", serif;
+      line-height: 1.9;
+    }
+    .takeaways { margin-top: 10px; list-style: none; display: grid; gap: 8px; }
+    .takeaways li {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      padding: 10px;
+      background: rgba(255,255,255,.02);
+      align-items: start;
+      line-height: 1.8;
+    }
+    .takeaways span {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: color-mix(in srgb, var(--accent2) 26%, transparent);
+      color: var(--accent2);
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+    .nav { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,.26);
+      border-radius: 999px;
+      padding: 8px 13px;
+      font-size: 12px;
+      color: var(--text);
+      background: rgba(255,255,255,.04);
+    }
+    .btn:hover { border-color: var(--accent2); color: var(--accent2); }
+    .dot-nav {
+      position: fixed;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: grid;
+      gap: 10px;
+      z-index: 50;
+    }
+    .dot-nav button {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.35);
+      background: transparent;
+      cursor: pointer;
+      transition: all .24s ease;
+    }
+    .dot-nav button.active { transform: scale(1.34); border-color: var(--accent); background: var(--accent); }
+    .reveal { opacity: 0; transform: translateY(16px); transition: opacity .55s ease, transform .55s ease; }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+    @media (max-width: 940px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .dot-nav { display: none; }
+      .hero { min-height: auto; padding: 30px 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+  <nav class="dot-nav" id="dotNav">
+    <button data-target="hero" class="active" aria-label="Hero"></button>
+    <button data-target="atlas" aria-label="Atlas"></button>
+    <button data-target="concepts" aria-label="Concepts"></button>
+    <button data-target="reading" aria-label="Reading"></button>
+    <button data-target="takeaways" aria-label="Takeaways"></button>
+  </nav>
+  <main class="page">
+    <section class="hero reveal in" id="hero">
+      <p class="eyebrow">Scholar Atlas · Gate 18</p>
+      <h1>第十二章险象环生</h1>
+      <p>第十二章险象环生 161 通常只要一个小时的行程花了两个多小时。我们乘着木筏，静静地划 了一个小时，先是过了一条通往红树林湖的小河，然后穿过湖， 直到抵达邻近的旺安村。从那里我们沿着海滩走了四个小时，到达了 瓦当村，那里的人有一个马力够足的舷外马达支撑我们走六个小时海 路到达韦瓦克。 我们离开的时候是黎明时分。我想我可能永远不会再来迦普 恩了。</p>
+      <div class="chip-row">
+        <span class="chip">雨林里的消亡（可视化阅读测试-v2）</span>
+        <span class="chip">作者：Unknown</span>
+        <span class="chip">Module 18/24</span>
+        <span class="tag">第十二章险象环生</span><span class="tag">西斯塔</span><span class="tag">雨林里的消亡</span><span class="tag">然而</span><span class="tag">年底</span><span class="tag">当然</span>
+      </div>
+    </section>
+
+    <section class="section grid-2 reveal" id="atlas">
+      <article>
+        <h2>知识结构图谱</h2>
+        <p style="color:var(--soft);line-height:1.9;margin-bottom:10px;">围绕本关卡核心概念构建关系图。阅读时先抓主轴，再理解每个概念如何驱动判断与行动。</p>
+        <div class="quote-wrap"><blockquote class="quote reveal">“在我计划坐飞机离开迦普恩的那天上午，我告诉村民们，夜里 我接到一个电话通知我，我的政府在将自己的公民撤出巴布亚新几内 亚，因为他们已经察觉到某些迫在眉睫的危险。我得立即离开。这么 骗人让我不好受，但我不知道还能怎么办。如果告诉任何人我想逃离 的真实原因，就会有人认为我是在公然挑卡里的亲戚，这一举动会 让本来已经很糟糕的局势演变成使我的处境更加危险的境地。我知道 导演一场直升机惊险救援只会强化村民们的认知，让他们深信我可以 接触到我拒绝承”</blockquote><blockquote class="quote reveal">“在韦瓦克，我向警方提交了报告。然后我去了机场，离开了巴 布亚新几内亚。我飞去了澳大利亚国立大学，当时我在那儿受聘为博 士后研究员。我提交了保险索赔，解释说卡里是我做田野调查的那个 村子的村民，因为我的存在而遇害。大学的保险公司同意支付一笔赔 偿金，我把这笔钱寄给了一个修女，她在塞皮克河上的玛利恩堡传教 站。这个修女叫西斯塔·玛莲娜，头发灰白，没有一句废话，是一个 来自瑞士的暴脾气老太太，已经在这个传教站生活了几十年。没人能 记起来她不在”</blockquote><blockquote class="quote reveal">“当我第一次听说卡里的亲戚们可能涉嫌参与那起将他置于死地的 袭击时，我拒绝相信。但在我2009年待在迦普恩期间，同样这些亲 戚一直坚持向我传达一种低度威胁，让我支付超过整个村子收入二十 倍的钱来补偿卡里的死。我通过西斯塔·玛莲娜寄来的钱完全是杯水 车薪。他们否认听说鲁尼（死于1993年）有收到任何钱的信息。而 西斯塔·玛莲娜声称的给了卡里遗婧的兄弟们的那些钱则不是他们关 心的范畴。他们对那笔钱一无所知，他们说。不管怎么说，那笔钱都 应该给”</blockquote></div>
+      </article>
+      <article class="atlas">
+        <svg viewBox="0 0 440 440" aria-label="concept atlas">
+          <defs>
+            <radialGradient id="g" cx="50%" cy="50%" r="56%">
+              <stop offset="0%" stop-color="#f59e0b" stop-opacity=".24"></stop>
+              <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"></stop>
+            </radialGradient>
+          </defs>
+          <circle cx="220" cy="220" r="190" fill="none" stroke="rgba(255,255,255,.08)" stroke-dasharray="5 6"></circle>
+          <circle cx="220" cy="220" r="84" fill="url(#g)"></circle>
+          <circle cx="220" cy="220" r="10" fill="#f59e0b"></circle>
+          <text x="220" y="252" text-anchor="middle" fill="#e5edf8" font-size="13">第十二章险象环生</text>
+          <g><line x1="220" y1="220" x2="370" y2="220" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="370" cy="220" r="8" fill="#34d399"/><text x="382" y="224" fill="#e5edf8" font-size="12">第十二章险象环生</text></g><g><line x1="220" y1="220" x2="266" y2="363" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="266" cy="363" r="8" fill="#34d399"/><text x="278" y="367" fill="#e5edf8" font-size="12">西斯塔</text></g><g><line x1="220" y1="220" x2="99" y2="308" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="99" cy="308" r="8" fill="#34d399"/><text x="111" y="312" fill="#e5edf8" font-size="12">雨林里的消亡</text></g><g><line x1="220" y1="220" x2="99" y2="132" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="99" cy="132" r="8" fill="#34d399"/><text x="111" y="136" fill="#e5edf8" font-size="12">然而</text></g><g><line x1="220" y1="220" x2="266" y2="77" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="266" cy="77" r="8" fill="#34d399"/><text x="278" y="81" fill="#e5edf8" font-size="12">年底</text></g>
+        </svg>
+      </article>
+    </section>
+
+    <section class="section reveal" id="concepts">
+      <h2>核心概念与解释</h2>
+      <div class="concept-grid">
+      <article class="concept-card reveal">
+        <p class="concept-token">第十二章险象环生</p>
+        <p class="concept-note">第十二章险象环生 161 通常只要一个小时的行程花了两个多小时。我们乘着木筏，静静地划 了一个小时，先是过了一条通往红树林湖的小河，然后穿过湖， 直到抵达邻近的旺安村。从那里我们沿着海滩走了四个小时，到达了 瓦当村，那里的人有一个马力够足的舷外马达支撑我们走六个小时海 路到达韦瓦克。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">西斯塔</p>
+        <p class="concept-note">在韦瓦克，我向警方提交了报告。然后我去了机场，离开了巴 布亚新几内亚。我飞去了澳大利亚国立大学，当时我在那儿受聘为博 士后研究员。我提交了保险索赔，解释说卡里是我做田野调查的那个 村子的村民，因为我的存在而遇害。大学的保险公司同意支付一笔赔 偿金，我把这笔钱寄给了一个修女，她在塞皮克河上的玛利恩堡传教 站。这个修女叫西斯塔·玛莲娜，头发灰白，没有一句废话，是</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">雨林里的消亡</p>
+        <p class="concept-note">162 雨林里的消亡 她还告诉我，我离开后，警方把愤怒发泄到了整个塞皮克河下游的村 民身上。他们人侵村子，无差别地野蛮殴打村民。他们射杀了猪，毁 坏了槟榔树，威胁要把房子烧掉，除非村民揭露袭击我和杀害卡里的 那伙人的身份和行踪。这些暴行起到了效果：西斯塔·玛莲娜告诉我 说那伙人中的大多数都被警察逮捕了，正在监狱里等待审判。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">然而</p>
+        <p class="concept-note">然而，几个月后，西斯塔·玛莲娜就去世了，我和迦普恩之间的 沟通渠道被切断了。我从来没有作为证人被传唤出庭做证。我所有联 系警察弄清楚发生了什么的努力都付诸东流了。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">年底</p>
+        <p class="concept-note">跟我当时的大多数人类学同行一样，我的结论是巴布亚新几内亚 已经太危险，不适合再去做田野调查了。1991年底，我决定放弃在 那里的研究，再也不回去。我甘愿为我的专业作出很大牺牲，但我不 愿献出我的生命。我也不想危及更多村民的生命。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">当然</p>
+        <p class="concept-note">“当然，我认识他。”他高兴地答道。</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="reading">
+      <h2>渐进式阅读路径</h2>
+      <div class="timeline">
+      <article class="timeline-item reveal">
+        <span class="timeline-no">01</span>
+        <h3>第十二章险象环生 161 通常只要一个小时的行程花了两个多小时。我们乘着木筏，静静地划 了一个小时，先是过了一条通往红树林湖的小河，然后穿过湖， 直到抵达邻</h3>
+        <p>第十二章险象环生 161 通常只要一个小时的行程花了两个多小时。我们乘着木筏，静静地划 了一个小时，先是过了一条通往红树林湖的小河，然后穿过湖， 直到抵达邻近的旺安村。从那里我们沿着海滩走了四个小时，到达了 瓦当村，那里的人有一个马力够足的舷外马达支撑我们走六个小时海 路到达韦瓦克。 我们离开的时候是黎明时分。我想我可能永远不会再来迦普 恩了。 在韦瓦克，我向警方提交了报告。然后我去了机场，离开了巴 布亚新几内亚。我飞去了澳大利亚国立大学，当时我在那儿受聘为博 士后研究员。我提交了保险索赔，解释说卡里是我做田野调查的那个 村子的村民，因为我的存在而遇害。大学的保险公司同意支付一笔赔 偿金，我把这笔钱寄给了一个修女，她在塞皮克河上的玛利恩堡传教 站。这个修女叫西斯塔·玛莲娜，头发灰白，没有一句废话，是一个 来自瑞士的暴脾气老太太，已经在这个传教站生活了几十年。没人能 记起来她不在那里是什么时候。她一定已经有一百三十岁了。 西斯塔·玛莲娜是我认识的最接近仁善圣徒的人。她是整个塞皮克 河下游地区所有人获得医疗卫生服务的唯一渠道。每隔六到八个月，她 和其他几个年轻护士就会连着几周乘着马达划艇去这一带的每一个村 子，给婴儿接种疫苗，派发药品，注射抗生素。在那儿住了几十年，定 期走访，意味着西斯塔·玛莲娜认识每个人。每个人也都认识她。 我知道我可以靠她把钱送到对的人手上。我嘱咐她把一部分给鲁 尼，其他的给卡里的遗罗莎，她来自一个从迦普恩要步行一天才能 到的村子。 西斯塔·玛莲娜写信告知我，她按照我的要求办好了。鲁尼收到 了钱。不过，她没找到罗莎，所以把我给罗莎的钱给了她的兄弟们。 162 雨林里的消亡 她还告诉我，我离开后，警方把愤怒发泄到了整个塞皮克河下游的村 民身上。他们人侵村子，无差别地野蛮殴打村民。他们射杀了猪，毁 坏了槟榔树，威胁要把房子烧掉，除非村民揭露袭击我和杀害卡里的 那伙人的身份和行踪。这些暴行起到了效果：西斯塔·玛莲娜告诉我 说那伙人中的大多数都被警察逮捕了，正在监狱里等待审判。 然而，几个月后，西斯塔·玛莲娜就去世了，我和迦普恩之间的 沟通渠道被切断了。我从来没有作为证人被传唤出庭做证。我所有联 系警察弄清楚发生了什么的努力都付诸东流了。 跟我当时的大多数人类学同行一样，我的结论是巴布亚新几内亚 已经太危险，不适合再去做田野调查了。1991年底，我决定放弃在 那里的研究，再也不回去。我甘愿为我的专业作出很大牺牲，但我不 愿献出我的生命。我也不想危及更多村民的生命。 在那之后，我有十四年没有再听到任何关于迦普恩的消息。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">02</span>
+        <h3>然后，到了2005年底，我在瑞典的家中意外收到了一封来自澳 大利亚的信。这封信是一个叫比尔·福雷的语言学家寄来的，他是一 位知名的巴布亚语言专家，退休前一直</h3>
+        <p>然后，到了2005年底，我在瑞典的家中意外收到了一封来自澳 大利亚的信。这封信是一个叫比尔·福雷的语言学家寄来的，他是一 位知名的巴布亚语言专家，退休前一直担任悉尼大学的教授。我认识 比尔的时候是1987年，那时我刚从迦普恩第一次长待之后回来短暂 经过澳大利亚。直到1991年我离开太平洋地区一去不返（我当时真 是这么想的），每次去悉尼，我都会跟他喝上一杯。 在信中，福雷告诉我，我离开迦普恩几年后，他开始在瓦当村研 究当地的同名语言一—我离开迦普恩的夜里到过的那个村子。他在瓦 当做田野调查那段时间，一直没去过迦普恩。但2005年初，一个在 巴布亚新几内亚采集样本做DNA分析的研究团队跟他签了合同，让 他带着团队到塞皮克河下游一带，让村民们充许他们采血，在孩子嘴 里做拭子采集。 团队去过的村子里就有迦普恩。 第十二章险象环生 163 我住在迦普恩的时候，要花大量时间向村民们解释，世界上的白 人并不都互相认识。他们以为白人是这样的。我会说，不是，那些国 家比迦普恩和周边的村庄大多了。白人那么多，我们不可能都认识。 比尔·福雷是我十四年前离开迦普恩后，第一个到过这个村子的 白人。村民们问他的第一个问题就是他认不认识我。 “当然，我认识他。”他高兴地答道。 福雷和德国研究团队只在迦普恩待了几个小时。他们离开村子后 在瓦当待了几天，那个村子在海边，相比迦普恩所在的恶臭难闻的西 米沼泽地，那个地方更宜居。两天后，一个年轻的迦普恩村民出现在 瓦当，给了比尔·福雷一封写给我的信，写信人是温和的莫内。 在福雷的信里，他附上了莫内那封信。 这封信让我既惊讶又感动。我也好奇，自从我离开后，村民们怎 么样了一—还有他们的语言怎么样了。于是，第二年夏天，我回到迦 普恩待了六周，想看看回去待更长的时间是否可行。 在这次行程中，我最终发现那起导致我离开迦普恩的命案当夜到 底发生了什么，我一直百思不解。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">03</span>
+        <h3>1991年我一到村子不久，整个塞皮克河下游地区就开始传言我 到迦普恩时身上带了四万基纳（在当时，基纳和美元汇率相当，所 以就是四万美元）。这个传言是如何开始</h3>
+        <p>1991年我一到村子不久，整个塞皮克河下游地区就开始传言我 到迦普恩时身上带了四万基纳（在当时，基纳和美元汇率相当，所 以就是四万美元）。这个传言是如何开始的就更难知道了。有村民 1巴布亚新几内亚的货币叫基纳，在我去这个国家的几十年里，它的币值剧烈波动。文中 提到的换算成美元的这个数字代表了事件发生时基纳的币值。 164 雨林里的消亡 告诉我，是两个迦普恩村民造的谣，因为他们恨我没有给他们带足 够多的东西。这两个村民和他们的亲戚则声称是另一个村的人传出 去的。我永远都无法确切知道到底哪一个版本是真的。直到今天， 我还是想不通那些信了这个谣言的人怎么想得出来，我在一个雨林 深处的沼泽地里带着相当于四万美元的现金能干吗。我也不知道如 果真的从巡逻箱里翻出了我认为他们想要的那三十基纳，他们会把 我怎么样。 那五个涉案的人都是巴布亚新几内亚的小罪犯一也就是一帮无 赖（olraskol）。这个可爱的听上去像小乞一样的叫法具有欺骗性。 无赖一点都不迷人。他们是心怀怨气的暴力年轻人，通常携带有自制 火枪，上过小学后他们开始对自己的人生感到不满，跟那些迦普恩的 孩子上了旺安的小学后对自己的人生感到幻灭出于相同原因一小学 里教给了他们缺乏汽车、房子、衣服和财富，而他们在教室里传阅到 破烂的澳大利亚人捐的课本上描绘的都是那样的生活。无赖们拉帮结 派，占领城市中心，定期抢劫商店，劫持武装的交通汽车。他们堵住 道路桥梁，抢劫当地公交车上的乘客，偷走他们所有随身物品，在这 个过程中还轮奸儿个不幸的女人。 从1980年代末起，年轻人的临时帮派就在塞皮克河下游地区这 样的农村里兴风作浪，袭击村里的商店和任何看上去有点钱的人，向 任何挡道的人开枪。在这个国家的首都莫尔兹比港之外的地方，无赖 们基本能逍遥法外，部分是因为没有警察来制止他们或抓捕他们，也 因为即便有警察，他们中的许多人不在岗的时候自己就是无赖。 一个孤立的村子里没有保护地放着四万基纳，在这样的诱惑下， 这五个来自塞皮克河一带不同村子，在之前的作案过程中取得松散联 系的人决定聚到一起，他们觉得这一票唾手可得。他们之前没人来过 迦普恩。案子发生之后的几天里，村民们知道了，有认识路的人给他 第十二章险象环生 165 们指了路。他们坚信已经弄清楚了那个人是谁，向我悄声透露了那个 人的名字。 还沉浸在卡里被害的创伤中的我离开迦普恩几天后，一个村民遇 上了在雨林中徘徊的五个无赖之一，他因为饥饿而身体虚弱，急着想 逃出去。那个村民把他绑了起来，带回了鲁尼的男人房子里，随后发 生了一场激烈讨论，核心问题是卡里的兄弟们要不要把他刺死。由于 害怕擅自处理会遭到警方的惩罚，村民们决定饶他一命。他们把他放 到一个木筏上，带去了瓦当等候警方发落。 几天后警察总算来了，拘捕了他。但西斯塔·玛莲娜说得没错： 他们也在瓦当的村子里恐吓了一番。一到迦普恩，他们</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">04</span>
+        <h3>在迦普恩待了六周快接近尾声时，我拿定了主意，这个地方似乎 足够安全了，可以回来待更长时间，于是两年后的2009年我就回来 了，想在村子里待十个月。然而，那次</h3>
+        <p>在迦普恩待了六周快接近尾声时，我拿定了主意，这个地方似乎 足够安全了，可以回来待更长时间，于是两年后的2009年我就回来 了，想在村子里待十个月。然而，那次行程最后还是缩短了几周，因 为我开始听到传言说，我会在离开的时候再一次被无赖抢劫，他们会 在村民们背着我的行李穿过雨林抵达要带我走的木筏的路上劫持我。 人们开始窃窃私语，说在我穿过雨林的路上无赖们会ensapim我， “把我的手绑起来”一也就是伏击抢劫我。 166 雨林里的消亡 我打死也不愿意失去我在村里待的这九个月里积累的所有录音材 料和由野笔记。尽管在村子里已经待得足够久，不会轻易对村民们报 告或捏造用来互相娱乐的流言买账，但我还是很警惕某些村民。有人 告诉我，那些人异想天开地捏造萨拉奇身上有四万基纳这样的谣言。 据说传播谣言的人，以及村民们告诉我的那个给无赖们来迦普恩指路 的人，都是卡里的近亲一也是所有人的近亲。 当我第一次听说卡里的亲戚们可能涉嫌参与那起将他置于死地的 袭击时，我拒绝相信。但在我2009年待在迦普恩期间，同样这些亲 戚一直坚持向我传达一种低度威胁，让我支付超过整个村子收入二十 倍的钱来补偿卡里的死。我通过西斯塔·玛莲娜寄来的钱完全是杯水 车薪。他们否认听说鲁尼（死于1993年）有收到任何钱的信息。而 西斯塔·玛莲娜声称的给了卡里遗婧的兄弟们的那些钱则不是他们关 心的范畴。他们对那笔钱一无所知，他们说。不管怎么说，那笔钱都 应该给他们，而不是分给另一个村的不熟的人。 那些认为我应该为卡里的死提供赔偿给他亲戚的说法有一套自 已的逻辑。在迦普恩，跟在很多其他巴布亚新几内亚的社群一样，一 个人是否想让某件事发生，或是否要为发生的事情负责，通常是完全 不重要的。这部分是因为在人们的想象中，他们经常受外在的力量驱 使：我可以偷走我舅舅新买的电池，如果被发现，我可以说，是“某 个东西”（wanpelasamting）让我盗窃的，尽管我自己不想这么做。 这“某个东西”可以是心血来潮或其他人的贪欲和嫉妒，促使我做 出了违背我自已利益的事情。我是那个行为的工具或中介，而不是源 头。我依然要为我舅舅被偷的事情负责，不是因为是我犯的事，而是 因为那个被偷的电池引发的“不幸”。即便我和这起盗窃无关，如果每 个人深信是我拿走了电池，那我还是得赔一点钱，因为就像村民们说 的，“那个不幸是因我而起”（haviikammaplongnembilongmi）。 第十二章险象环生 167 显然，卡里之死的“不幸”是因我而起。所以我理应赔偿。 但是，我理解这些要求背后的逻辑不代表我有必要接受它们。对 我来说很明显，那些对我提出这类要求的村民就是在化诈我，那就更 没有接受的道理了：交钱，他们语带威胁地暗示，要不就赔其他的。 我还意识到，他们的文化剧本是高度选择性的：在一起冷血的谋杀案 里，毫不奇怪，那个要为此支付大部分赔偿</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">05</span>
+        <h3>有一次和卡里母亲那边的亲戚就这个话题激烈讨论时，我提出了 这一点。我提醒那个人，我已经支付了赔偿，而那些凶手们半毛钱都 没赔过。为什么他不去找那个开枪打死卡</h3>
+        <p>有一次和卡里母亲那边的亲戚就这个话题激烈讨论时，我提出了 这一点。我提醒那个人，我已经支付了赔偿，而那些凶手们半毛钱都 没赔过。为什么他不去找那个开枪打死卡里的人，要求他们赔偿，而 要来找我？你知道那些人是谁，我对他说。去找他们给你钱。是我开 枪打死卡里的吗？我问他，很久之前我就掌握了村民们那一套答案明 显的提问话术。是我扣动了杀他的扳机吗？ 这些村民锲而不舍地追着我赔钱，让我改变了对他们牵涉进这起 袭击的想法。我毫不怀疑，不管他们想让我怎么样都是非常错误的， 卡里的死是一场悲剧性的错误。但那些威胁越明显，我就越坚信，开 始传播谣言把无赖引进迦普恩的人就是卡里的那几个亲戚。他们坚持 要我为卡里的死赔偿，可能就是缓解内心愧疚的方式，他们的计划搞 砸了，造成了可怕的后果。 我想，这也让他们变得危险。 因此，当我听说无赖们计划在我在村子的最后一天伏击我的传言 时，我决定先下手为强。我利用自己带的卫星电话（真是了不起的发 明），和一大笔银行存款，偷偷包了一架直升机，在我原计划离开村 168 雨林里的消亡 子两周前就坐飞机逃走。村民们夷平了旧村子，重建得就像一个大大 的机场跑道。很好，我想，我会给他们弄来一架飞机。 在我计划坐飞机离开迦普恩的那天上午，我告诉村民们，夜里 我接到一个电话通知我，我的政府在将自己的公民撤出巴布亚新几内 亚，因为他们已经察觉到某些迫在眉睫的危险。我得立即离开。这么 骗人让我不好受，但我不知道还能怎么办。如果告诉任何人我想逃离 的真实原因，就会有人认为我是在公然挑卡里的亲戚，这一举动会 让本来已经很糟糕的局势演变成使我的处境更加危险的境地。我知道 导演一场直升机惊险救援只会强化村民们的认知，让他们深信我可以 接触到我拒绝承认的权力和大量资源。我知道他们会问他们自己：如 果我的政府能够派一架直升机过来把我运出村子，为什么不能给他们 派来一艘潜水艇？ 当然，那个时候我已经不在乎了。我脑子里一直盘桓着这样的想 法，即一旦那些从我身边暴力夺走我九个月来研究心血的人意识到这 些东西对他们来说毫无价值，这些东西就会被粗暴地扔到沼泽地里， 因此我得出结论，与不能安全逃出迦普恩的风险相比，为村民们已经 发酵的关于我如何神通广大、人脉广阔的传言再怎么添油加醋都不那 么要紧了。我寻思着，在我把所有的田野笔记和录音存放到一个远离 这个村子的安全地方后，我会回来，处理好我匆匆一别带来的后果。 于是，在那个约定好的上午，提前安排好的直升机从天而降，把 我带出了迦普恩，村民们一脸困惑惊讶。 2010年，也就是第二年，我回来了，在城里买了一袋巨大的两 百磅的槟榔带了过来。村民们告诉我，我的突然离开让他们困惑惊 愣，但他们对我知道他们的不满表示赞许，我送了他们槟榔，这被解 读成kup，一份和解的礼物，就像摩西送给萨梅克的礼物，用来缓解 那些年轻人遵循他的旨意砍掉了所有村民的</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="takeaways">
+      <h2>本关关键收获</h2>
+      <ul class="takeaways"><li><span>1</span>第十二章险象环生 161 通常只要一个小时的行程花了两个多小时。我们乘着木筏，静静地划 了一个小时，先是过了一条通往红树林湖的小河，然后穿过湖， 直到抵达邻</li><li><span>2</span>然后，到了2005年底，我在瑞典的家中意外收到了一封来自澳 大利亚的信。这封信是一个叫比尔·福雷的语言学家寄来的，他是一 位知名的巴布亚语言专家，退休前一直</li><li><span>3</span>1991年我一到村子不久，整个塞皮克河下游地区就开始传言我 到迦普恩时身上带了四万基纳（在当时，基纳和美元汇率相当，所 以就是四万美元）。这个传言是如何开始</li><li><span>4</span>在迦普恩待了六周快接近尾声时，我拿定了主意，这个地方似乎 足够安全了，可以回来待更长时间，于是两年后的2009年我就回来 了，想在村子里待十个月。然而，那次</li></ul>
+      <nav class="nav">
+        <a class="btn" href="/experiences/user-book-v2-g5unsh-2f9c-g17-chapter-17.html">上一关</a>
+        <a class="btn" href="/experiences/user-book-v2-g5unsh-2f9c-g19-chapter-19.html">下一关</a>
+      </nav>
+    </section>
+  </main>
+  <script>
+    (() => {
+      const progress = document.getElementById("progress");
+      const dots = Array.from(document.querySelectorAll("#dotNav button[data-target]"));
+      const sections = dots
+        .map((dot) => document.getElementById(dot.getAttribute("data-target")))
+        .filter(Boolean);
+      const reveals = Array.from(document.querySelectorAll(".reveal"));
+      const onScroll = () => {
+        const h = document.documentElement;
+        const total = Math.max(1, h.scrollHeight - window.innerHeight);
+        const pct = Math.max(0, Math.min(100, (window.scrollY / total) * 100));
+        if (progress) progress.style.width = pct + "%";
+      };
+      const io = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) entry.target.classList.add("in");
+        }
+      }, { threshold: .14 });
+      reveals.forEach((el) => io.observe(el));
+      const secIo = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const id = entry.target.id;
+          dots.forEach((dot) => dot.classList.toggle("active", dot.getAttribute("data-target") === id));
+        });
+      }, { threshold: .4 });
+      sections.forEach((s) => secIo.observe(s));
+      dots.forEach((dot) => {
+        dot.addEventListener("click", () => {
+          const target = document.getElementById(dot.getAttribute("data-target"));
+          if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+      window.addEventListener("scroll", onScroll, { passive: true });
+      onScroll();
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>第十四章 · 雨林里的消亡（可视化阅读测试）</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b1220;
+      --bg2: #1a2333;
+      --accent: #f59e0b;
+      --accent2: #34d399;
+      --text: #e5edf8;
+      --soft: #9fb1c9;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+      background:
+        radial-gradient(1200px 540px at 85% -8%, color-mix(in srgb, var(--accent2) 24%, transparent), transparent 70%),
+        radial-gradient(980px 460px at -10% 14%, color-mix(in srgb, var(--accent) 24%, transparent), transparent 74%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+      color: var(--text);
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .05;
+      background-image: radial-gradient(circle at 1px 1px, #fff 1px, transparent 0);
+      background-size: 3px 3px;
+      z-index: 0;
+    }
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      z-index: 100;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+    .page { position: relative; z-index: 1; width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 20px 0 48px; }
+    .hero {
+      min-height: 74vh;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 22px;
+      background: linear-gradient(160deg, color-mix(in srgb, var(--bg2) 86%, transparent), color-mix(in srgb, var(--bg) 88%, transparent));
+      padding: 40px 34px;
+      display: grid;
+      align-content: center;
+      gap: 16px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.34);
+    }
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .hero h1 {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(32px, 5.4vw, 68px);
+      line-height: 1.16;
+      letter-spacing: .04em;
+      max-width: 15em;
+      text-wrap: balance;
+    }
+    .hero p {
+      max-width: 66ch;
+      line-height: 1.95;
+      color: color-mix(in srgb, var(--text) 85%, var(--soft));
+      font-size: 16px;
+    }
+    .chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip {
+      border: 1px solid color-mix(in srgb, var(--accent2) 44%, transparent);
+      color: color-mix(in srgb, var(--accent2) 88%, #fff);
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 12px;
+      background: rgba(255,255,255,.03);
+    }
+    .section { margin-top: 18px; border: 1px solid rgba(255,255,255,.13); border-radius: 18px; padding: 22px; background: rgba(2,6,18,.46); }
+    .section h2 {
+      margin-bottom: 12px;
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(22px, 2.8vw, 34px);
+      color: color-mix(in srgb, var(--accent) 86%, #fff);
+      letter-spacing: .03em;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1.1fr 1fr; gap: 14px; }
+    .concept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+    .concept-card {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      background: rgba(255,255,255,.03);
+      padding: 14px;
+      min-height: 128px;
+    }
+    .concept-token { font-size: 14px; letter-spacing: .14em; color: var(--accent2); text-transform: uppercase; margin-bottom: 7px; font-weight: 700; }
+    .concept-note { font-size: 14px; color: color-mix(in srgb, var(--text) 88%, var(--soft)); line-height: 1.8; }
+    .atlas {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      min-height: 440px;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+    .atlas svg { width: 100%; max-width: 440px; height: auto; }
+    .timeline { display: grid; gap: 10px; }
+    .timeline-item {
+      border-left: 2px solid color-mix(in srgb, var(--accent) 66%, transparent);
+      padding: 10px 14px;
+      background: rgba(255,255,255,.02);
+      border-radius: 0 10px 10px 0;
+    }
+    .timeline-no { font-size: 11px; letter-spacing: .22em; color: var(--accent2); display: block; margin-bottom: 6px; }
+    .timeline-item h3 { font-size: 19px; font-family: "Noto Serif SC", serif; line-height: 1.45; margin-bottom: 7px; }
+    .timeline-item p { font-size: 14px; line-height: 1.9; color: color-mix(in srgb, var(--text) 84%, var(--soft)); }
+    .quote-wrap { display: grid; gap: 10px; }
+    .quote {
+      border-left: 2px solid color-mix(in srgb, var(--accent2) 80%, transparent);
+      padding: 10px 12px;
+      background: rgba(255,255,255,.02);
+      color: color-mix(in srgb, var(--text) 92%, #fff);
+      font-family: "Noto Serif SC", serif;
+      line-height: 1.9;
+    }
+    .takeaways { margin-top: 10px; list-style: none; display: grid; gap: 8px; }
+    .takeaways li {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      padding: 10px;
+      background: rgba(255,255,255,.02);
+      align-items: start;
+      line-height: 1.8;
+    }
+    .takeaways span {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: color-mix(in srgb, var(--accent2) 26%, transparent);
+      color: var(--accent2);
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+    .nav { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,.26);
+      border-radius: 999px;
+      padding: 8px 13px;
+      font-size: 12px;
+      color: var(--text);
+      background: rgba(255,255,255,.04);
+    }
+    .btn:hover { border-color: var(--accent2); color: var(--accent2); }
+    .dot-nav {
+      position: fixed;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: grid;
+      gap: 10px;
+      z-index: 50;
+    }
+    .dot-nav button {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.35);
+      background: transparent;
+      cursor: pointer;
+      transition: all .24s ease;
+    }
+    .dot-nav button.active { transform: scale(1.34); border-color: var(--accent); background: var(--accent); }
+    .reveal { opacity: 0; transform: translateY(16px); transition: opacity .55s ease, transform .55s ease; }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+    @media (max-width: 940px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .dot-nav { display: none; }
+      .hero { min-height: auto; padding: 30px 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+  <nav class="dot-nav" id="dotNav">
+    <button data-target="hero" class="active" aria-label="Hero"></button>
+    <button data-target="atlas" aria-label="Atlas"></button>
+    <button data-target="concepts" aria-label="Concepts"></button>
+    <button data-target="reading" aria-label="Reading"></button>
+    <button data-target="takeaways" aria-label="Takeaways"></button>
+  </nav>
+  <main class="page">
+    <section class="hero reveal in" id="hero">
+      <p class="eyebrow">Scholar Atlas · Gate 15</p>
+      <h1>第十四章</h1>
+      <p>第十四章 LukeWritesaLetter 卢克写了一封信 在热带雨林里，日出日落总是一瞬间的 事。就在早上六点之前，夜晚浓稠的黑褪成白 蒙蒙的灰，十五分钟之后，太阳就突然升空， 光芒万丈。到了晚上，就是十二个小时之后， 分秒不差，太阳似乎还没来得及下山就掉了下 去，就好像它有约已经迟到，赶不及地要把自 已挤到地平线以下。 太阳一消失，村子里就漆黑一片了。村民 们映着灰暗的月光（如果有的话）走来走去， 或者拿着手电筒，大部分成年村民都有，哪怕 灯泡常常灭掉，电池经常没电。</p>
+      <div class="chip-row">
+        <span class="chip">雨林里的消亡（可视化阅读测试）</span>
+        <span class="chip">作者：Unknown</span>
+        <span class="chip">Module 15/18</span>
+        <span class="tag">page</span><span class="tag">image</span><span class="tag">content</span><span class="tag">ocr</span><span class="tag">雨林里的消亡</span><span class="tag">到了九点半</span>
+      </div>
+    </section>
+
+    <section class="section grid-2 reveal" id="atlas">
+      <article>
+        <h2>知识结构图谱</h2>
+        <p style="color:var(--soft);line-height:1.9;margin-bottom:10px;">围绕本关卡核心概念构建关系图。阅读时先抓主轴，再理解每个概念如何驱动判断与行动。</p>
+        <div class="quote-wrap"><blockquote class="quote reveal">“大多数时候，夜里的社交差不多九点结束，那个时候天已经黑了 将近三个小时了。到了九点半，大多数成年人会抱起他们的孩子一 他们经常会在地板上睡着一—爬进蚊帐睡觉。男人通常会和家里五岁 以上的男孩一起睡，而女人则跟女儿和小孩子一起睡。到了睡觉的时 候，母亲们有时会猛然间发现她们落掉了一个孩子，那个孩子在他们 刚去过的那户人家的地板上“岩机”了，按照村民的说法就是katop， 太黑所以家长们没看见。“，卡玛去哪儿了？”房子里会传出一个 声音，叫”</blockquote><blockquote class="quote reveal">“192 雨林里的消亡 [PAGE 202 IMAGE 1 CONTENT (OCR)]: 一开始，他们转向传统神话寻求解释。村民们有一个神话，主角 是一对叫阿瑞纳和安迪纳的兄弟。兄弟俩手足情深，直到一个女人进 人了他们的生活：哥哥阿瑞纳娶了她，她却背叛了他，转头勾引小叔 子安迪纳。哥哥发现了妻子的不忠，预谋杀掉安迪纳报复。一天，阿 瑞纳找安迪纳帮他挖一个坑，用来支撑他想造的男人房子的巨大主 柱。他怂惠弟弟下到洞里挖深一点，安迪纳下去了，”</blockquote><blockquote class="quote reveal">“到了九点半，我的一天也结束了。我会回到房子里，关上身后的 门。关上门就是一个信号。只有在和别人一起眷录录音素材，和一个 老人讨论泰雅博语细节，或者当我想晚上睡觉前坐下来写田野调查笔 记的时候，我才会关上门。否则的话，我家的门永远是散开的，就像 村里其他有门的房子那样。星星越发闪耀，银河连成了光带，照亮了 漆黑的夜空，此刻的村子静了下来。剩下的声音只是蟋蟀有规律的鸣 叫，狗吠，狐蝠刺耳的尖啸，你永远见不到的青蛙的和鸣，还有婴儿 偶尔的蹄哭”</blockquote></div>
+      </article>
+      <article class="atlas">
+        <svg viewBox="0 0 440 440" aria-label="concept atlas">
+          <defs>
+            <radialGradient id="g" cx="50%" cy="50%" r="56%">
+              <stop offset="0%" stop-color="#f59e0b" stop-opacity=".24"></stop>
+              <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"></stop>
+            </radialGradient>
+          </defs>
+          <circle cx="220" cy="220" r="190" fill="none" stroke="rgba(255,255,255,.08)" stroke-dasharray="5 6"></circle>
+          <circle cx="220" cy="220" r="84" fill="url(#g)"></circle>
+          <circle cx="220" cy="220" r="10" fill="#f59e0b"></circle>
+          <text x="220" y="252" text-anchor="middle" fill="#e5edf8" font-size="13">第十四章</text>
+          <g><line x1="220" y1="220" x2="370" y2="220" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="370" cy="220" r="8" fill="#34d399"/><text x="382" y="224" fill="#e5edf8" font-size="12">page</text></g><g><line x1="220" y1="220" x2="266" y2="363" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="266" cy="363" r="8" fill="#34d399"/><text x="278" y="367" fill="#e5edf8" font-size="12">image</text></g><g><line x1="220" y1="220" x2="99" y2="308" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="99" cy="308" r="8" fill="#34d399"/><text x="111" y="312" fill="#e5edf8" font-size="12">content</text></g><g><line x1="220" y1="220" x2="99" y2="132" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="99" cy="132" r="8" fill="#34d399"/><text x="111" y="136" fill="#e5edf8" font-size="12">ocr</text></g><g><line x1="220" y1="220" x2="266" y2="77" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="266" cy="77" r="8" fill="#34d399"/><text x="278" y="81" fill="#e5edf8" font-size="12">雨林里的消亡</text></g>
+        </svg>
+      </article>
+    </section>
+
+    <section class="section reveal" id="concepts">
+      <h2>核心概念与解释</h2>
+      <div class="concept-grid">
+      <article class="concept-card reveal">
+        <p class="concept-token">page</p>
+        <p class="concept-note">在他们的房子里，村民们要不就坐在用 来准备晚餐的小火堆旁（女人会努力在夜幕降 临，还能看清在做什么东西前把食物准备好）， 或者走到走廊外面，坐在一个大的金属盆边 上，里面的柴堆还烧着余火。这些柴火发出微 187 [PAGE 197 IMAGE 1 CONTENT (OCR)]: 弱的亮光，但主要是用来随手点燃村民们随处可及的报纸卷烟。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">image</p>
+        <p class="concept-note">在他们的房子里，村民们要不就坐在用 来准备晚餐的小火堆旁（女人会努力在夜幕降 临，还能看清在做什么东西前把食物准备好）， 或者走到走廊外面，坐在一个大的金属盆边 上，里面的柴堆还烧着余火。这些柴火发出微 187 [PAGE 197 IMAGE 1 CONTENT (OCR)]: 弱的亮光，但主要是用来随手点燃村民们随处可及的报纸卷烟。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">content</p>
+        <p class="concept-note">在他们的房子里，村民们要不就坐在用 来准备晚餐的小火堆旁（女人会努力在夜幕降 临，还能看清在做什么东西前把食物准备好）， 或者走到走廊外面，坐在一个大的金属盆边 上，里面的柴堆还烧着余火。这些柴火发出微 187 [PAGE 197 IMAGE 1 CONTENT (OCR)]: 弱的亮光，但主要是用来随手点燃村民们随处可及的报纸卷烟。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">ocr</p>
+        <p class="concept-note">在他们的房子里，村民们要不就坐在用 来准备晚餐的小火堆旁（女人会努力在夜幕降 临，还能看清在做什么东西前把食物准备好）， 或者走到走廊外面，坐在一个大的金属盆边 上，里面的柴堆还烧着余火。这些柴火发出微 187 [PAGE 197 IMAGE 1 CONTENT (OCR)]: 弱的亮光，但主要是用来随手点燃村民们随处可及的报纸卷烟。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">雨林里的消亡</p>
+        <p class="concept-note">当我回到自已的房子时，一个孩子通常很快会在天黑前出现，叫 我去他们母亲的房子里吃她们做的东西。不管谁邀请，我都会过去， 坐下来跟他们聊天，然后找个机会走人，出去溜达。有时候，我有 明确的目的一一去见某个人，要么是因为我已经好一阵没有见过他们 188 雨林里的消亡 [PAGE 198 IMAGE 1 CONTENT (OCR)]: 了，想问他们一些事情，要么是</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">到了九点半</p>
+        <p class="concept-note">大多数时候，夜里的社交差不多九点结束，那个时候天已经黑了 将近三个小时了。到了九点半，大多数成年人会抱起他们的孩子一 他们经常会在地板上睡着一—爬进蚊帐睡觉。男人通常会和家里五岁 以上的男孩一起睡，而女人则跟女儿和小孩子一起睡。到了睡觉的时 候，母亲们有时会猛然间发现她们落掉了一个孩子，那个孩子在他们 刚去过的那户人家的地板上“岩机”了，按照村民的说法就是k</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="reading">
+      <h2>渐进式阅读路径</h2>
+      <div class="timeline">
+      <article class="timeline-item reveal">
+        <span class="timeline-no">01</span>
+        <h3>第十四章 LukeWritesaLetter 卢克写了一封信 在热带雨林里，日出日落总是一瞬间的 事。就在早上六点之前，夜晚浓稠的黑褪成白 蒙蒙的灰，十五分</h3>
+        <p>第十四章 LukeWritesaLetter 卢克写了一封信 在热带雨林里，日出日落总是一瞬间的 事。就在早上六点之前，夜晚浓稠的黑褪成白 蒙蒙的灰，十五分钟之后，太阳就突然升空， 光芒万丈。到了晚上，就是十二个小时之后， 分秒不差，太阳似乎还没来得及下山就掉了下 去，就好像它有约已经迟到，赶不及地要把自 已挤到地平线以下。 太阳一消失，村子里就漆黑一片了。村民 们映着灰暗的月光（如果有的话）走来走去， 或者拿着手电筒，大部分成年村民都有，哪怕 灯泡常常灭掉，电池经常没电。 在他们的房子里，村民们要不就坐在用 来准备晚餐的小火堆旁（女人会努力在夜幕降 临，还能看清在做什么东西前把食物准备好）， 或者走到走廊外面，坐在一个大的金属盆边 上，里面的柴堆还烧着余火。这些柴火发出微 187 [PAGE 197 IMAGE 1 CONTENT (OCR)]: 弱的亮光，但主要是用来随手点燃村民们随处可及的报纸卷烟。 在村子里的时候，我用煤油来点灯，大部分村民利用这一点，把 一根小绳作为灯芯插在旧罐头里，做一盏简易的小灯。他们用我的煤 油提供的那一点闪烁的黄色微光点亮了夜晚。我不在迦普恩的时候， 有的人就点起中国制造的廉价电池节能灯笼，这是一个有商业头脑的 村民从城里买回来的，再卖给迦普恩人赚钱。这些灯照出的蓝色冷光 十分扎眼。灯笼只够持续几天，因为电池很快就会耗尽，而电池在雨 林里是稀缺物资。 入夜时分是社交的好时机。有的男人就在屋前搭起露天棚子，夜 里，他们就坐下来，等其他男人过来坐到炭火盆边，抽着烟，嚼着槟 榔，讲讲故事，分享八卦。女人们则大摇大摆地走过整个村子，手里 抱着一个还在吃奶的婴儿，后面跟着一群孩子，他们跟着妈妈踩着有 叉的杆子爬到房子里，在地板上坐下，自顾自欢声笑语，而女人们坐 着，抽烟，嚼槟榔，扯闲篇。 我的夜间日常和村民们是一致的。天黑前，村民们就把自已泡 在齐胸的沼泽水注里，努力洗去一天的汗水和污垢，那片水就在村外 穿过一个有长“桥”的地方，或者就找个水坑洗一洗。我不走那个 “桥”，因为那就是随随便便用一些又滑又不稳固的杆子搭起来的。村 民们光着宽大的脚板，脚趾也很有抓地力，走起来好像没什么问题， 但我每次必定会掉下去。我会去年轻男村民们去的那个水坑，就在村 子另一端。我用跟一根杆子绑在一起的半个椰子壳汲水，举过头顶淋 下来，假装这就是淋浴。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">02</span>
+        <h3>当我回到自已的房子时，一个孩子通常很快会在天黑前出现，叫 我去他们母亲的房子里吃她们做的东西。不管谁邀请，我都会过去， 坐下来跟他们聊天，然后找个机会走人，</h3>
+        <p>当我回到自已的房子时，一个孩子通常很快会在天黑前出现，叫 我去他们母亲的房子里吃她们做的东西。不管谁邀请，我都会过去， 坐下来跟他们聊天，然后找个机会走人，出去溜达。有时候，我有 明确的目的一一去见某个人，要么是因为我已经好一阵没有见过他们 188 雨林里的消亡 [PAGE 198 IMAGE 1 CONTENT (OCR)]: 了，想问他们一些事情，要么是单纯因为我喜欢他们的陪伴。但我常 常逛着逛着，只要看到谁坐在阳台上或露天棚里，就会过去跟他们聊 天，他们好像也不介意我临时造访。 大多数时候，夜里的社交差不多九点结束，那个时候天已经黑了 将近三个小时了。到了九点半，大多数成年人会抱起他们的孩子一 他们经常会在地板上睡着一—爬进蚊帐睡觉。男人通常会和家里五岁 以上的男孩一起睡，而女人则跟女儿和小孩子一起睡。到了睡觉的时 候，母亲们有时会猛然间发现她们落掉了一个孩子，那个孩子在他们 刚去过的那户人家的地板上“岩机”了，按照村民的说法就是katop， 太黑所以家长们没看见。“，卡玛去哪儿了？”房子里会传出一个 声音，叫着那个五岁女儿的名字。“我在万迪家的时候，她跟我在一 起，难道不是吗？她跑哪儿去了？卡玛哦哦哦哦哦！”找到之前，母 亲会满村子地叫着她那个不见了的孩子的名字。这个孩子要不就被叫 醒，手上举一个点着的柴火在她面前给她照明，把她送回家，要不就 把她抱进蚊帐里，让她在刚刚睡过去的那户人家过夜。 到了九点半，我的一天也结束了。我会回到房子里，关上身后的 门。关上门就是一个信号。只有在和别人一起眷录录音素材，和一个 老人讨论泰雅博语细节，或者当我想晚上睡觉前坐下来写田野调查笔 记的时候，我才会关上门。否则的话，我家的门永远是散开的，就像 村里其他有门的房子那样。星星越发闪耀，银河连成了光带，照亮了 漆黑的夜空，此刻的村子静了下来。剩下的声音只是蟋蟀有规律的鸣 叫，狗吠，狐蝠刺耳的尖啸，你永远见不到的青蛙的和鸣，还有婴儿 偶尔的蹄哭。在这个夜深人静的时刻，我差不多确定终于可以就着灯 光，把一天里发生的事情写下来，不用担心任何人会像白天那样，时 不时问我要这要那打扰我。 当然，有时在夜深时分，我的竹门上也会响起一阵轻微的敲门 第十四章卢克写了一封信 189 [PAGE 199 IMAGE 1 CONTENT (OCR)]: 声。这个时候，我就会绷紧神经，因为我知道不管站在门另一侧的那 个人是谁，一定是来问我要什么特殊东西的。 莫内下葬两周后的一个深夜，我听到门上传来了一阵短促单调的 叩门声。 当我打开门的时候，莫内最小的孩子，十九岁的卢克站在门外， 脸上挂着詹姆斯·迪恩一般楚楚动人的笑容。卢克的哥哥最近给他 剪了个发型，他哥哥在村子充当理发师的角色，因为他是村里唯一有 剪刀的人。他哥哥给他剪了一个平头，两边和后面的头发都剪得很 新发型让卢克显得老派而纯真。他穿</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">03</span>
+        <h3>我让卢克进来，关上身后的门，坐在那把蓝色塑料椅子里。他跟 着我，坐在了我对面一把一模一样的椅子里。我把正在写的笔记本合 上，放在一边，对卢克笑着，问出了我的</h3>
+        <p>我让卢克进来，关上身后的门，坐在那把蓝色塑料椅子里。他跟 着我，坐在了我对面一把一模一样的椅子里。我把正在写的笔记本合 上，放在一边，对卢克笑着，问出了我的标准开场问题：“你有什么 麻烦吗？” 卢克说他想知道我什么时候走。我想他的意思是问我下一次什 么时候离开村子去马当，我每隔六周就会去这个镇上采购东西。我告 诉他我也不知道。但回答了他的问题后，他提问的方式让我停顿了一 下，说：“你是问我什么时候去马当吗？” 他说不是，他的意思是我什么时候回国。 这让我意外。这个问题的答案是常识。几个月前我刚回到迦普恩 的时候，我就通知了每个人我计划待多久，而且每次有人问起，我都 1詹姆斯·迪恩（JamesDean，1931—1955），已故美国男演员，代表作有《无因的反叛》 《伊甸园之东》等。 2殖民时代的词语，指的是给白人殖民者做饭的年轻人。一译者注 190 雨林里的消亡 [PAGE 200 IMAGE 1 CONTENT (OCR)]: 会重复这个时间。我很确定卢克知道我什么时候回瑞典，因此我的大 脑开始飞速运转：为什么他大半夜私下跑来问我这个？难道他想跟我 一起走？他要让我给他买张机票带他一起回去？ 我紧张了起来，寻思着我该怎么告诉他，我离开的时候没法把他 一起带走，这超出了我的能力范围。我跟他说了我一直跟每个人都说 的话：我会在十二月也就是四个月后离开，但具体哪天走还没确定。 卢克点了点头。他问我，如果他写了一封信，能不能让我把这封 信带回瑞典？ 我松了口气，心想：“！卢克想要个笔友。”在过去的几周里， 像萨拉冈之类的村民一直在说一个现象，他们从沿海村子的年轻人那 里听说有一艘装满游客的游轮差不多每隔六个月就会登岸一次。显 然，有的年轻人问游客要了地址，这样他们就可以成为“笔友”（pen pren），游客们答应了。这个事情让村民们很兴奋，他们发现了一条 新的通往变革的道路。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">04</span>
+        <h3>“好的，没问题，”我告诉他，“我会把这封信带回去的。” 卢克笑了。</h3>
+        <p>“好的，没问题，”我告诉他，“我会把这封信带回去的。” 卢克笑了。 对话似乎结束了。但卢克没有要走的意思，这让我不安，好像他 还有什么要说。于是我问他：“你想把信带给谁？” 他的回答让我的血液瞬间冷却。 “爸爸，”他说，“我想寄封信给莫内。” 在1985年那个狂风暴雨的夜里，当村民们向我透露说，在他们 眼里，我是一个刚还阳的死人的时候，我就觉得很不安。那个时候， 我还不懂他们所持的信仰会导致他们把我看成一个复活的村民，此 外，我也有一点害怕这样一个角色会有什么后果。他们觉得自己死去 的父老乡亲会作何反应呢？他们期待我做什么呢？ 事实证明，我作为一个刚复活的过世村民这一身份，并没有对 第十四章卢克写了一封信 191 [PAGE 201 IMAGE 1 CONTENT (OCR)]: 我和村民的关系造成任何戏剧性的影响。恰恰相反，他们把我看成另 一个状态的自已人的想法，反倒更容易让他们以热情温暖的态度接受 我，直到今天我还对此心存感念。 在那些年里，部分通过问一些很谨慎的问题，但大部分是无意间 听到村民们互相间的交谈，我拼凑出了他们认为我是一个复活的过世 村民的原因一以及他们眼中的巴布亚新几内亚以外的世界是什么样 的，他们在世界上处于什么样的位置。 想象一下突然间不知道从哪里冒出了几个外星人。他们看上去像 人，但说着一种没人听过的陌生语言。他们的头发是不同的，皮肤是 不同的一—他们的表皮里有小袋子，能从里面取出神秘的东西（巴布 亚新几内亚人之前从没见过衬衫或裤子，他们最初见到欧洲人的时候 以为这些衣服是那些人的皮肤）。想象一下他们是坐着豪华飞船来的， 村里人甚至从来都想象不出有这样的东西存在。这些人还有让村里人 叹为观止的奇异装置，如果他们不高兴或生气的时候，还会置你于死 地，给村子带来灭顶之灾。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">05</span>
+        <h3>上述就是巴布亚新几内亚人第一次和欧洲白人探险家、殖民者 相遇时的情景。这样的初次相遇在这个国家的历史上发生过多次，从 19世纪中期开始，一直到1930年代才</h3>
+        <p>上述就是巴布亚新几内亚人第一次和欧洲白人探险家、殖民者 相遇时的情景。这样的初次相遇在这个国家的历史上发生过多次，从 19世纪中期开始，一直到1930年代才结束。20世纪的头十年，迦普 恩人听说了白人的存在。第一个遇见白人的村里人叫达尔，他跑去一 个沿海村子想一睹外星人的风采。他带了四个大山药，跟对方换了一 把钢子。 村民们一旦亲眼见到白人不只是传言或某人的想象，就开始问自 在来这里？” 以及“他们可以给我们什么？” 这四个问题是迦普恩的村民依然有待破解的谜。 192 雨林里的消亡 [PAGE 202 IMAGE 1 CONTENT (OCR)]: 一开始，他们转向传统神话寻求解释。村民们有一个神话，主角 是一对叫阿瑞纳和安迪纳的兄弟。兄弟俩手足情深，直到一个女人进 人了他们的生活：哥哥阿瑞纳娶了她，她却背叛了他，转头勾引小叔 子安迪纳。哥哥发现了妻子的不忠，预谋杀掉安迪纳报复。一天，阿 瑞纳找安迪纳帮他挖一个坑，用来支撑他想造的男人房子的巨大主 柱。他怂惠弟弟下到洞里挖深一点，安迪纳下去了，一直挖啊挖。安 迪纳刚挖到洞底，哥哥就搬起了那根硕大的柱子猛插下去，他觉得安 迪纳这下肯定被压死了。然而，安迪纳比他哥哥聪明。他对哥哥的预 谋早有预感，就挖了一条逃生通道。当抬头看到那根柱子落下来直逼 头顶的时候，他就逃进了隧道里。后来他从雨林里另一个离哥哥很远 的地方爬了出来。 在这个极具创造精神的弟弟的事迹之后，神话仍旧继续。故事讲 的是某个时候他造出了两类人：黑皮肤的人，用木头造的，浅皮肤的 人，用西米棕榈树的粉色的髓造的。最终，那个妒火中烧的哥哥发现 了安迪纳侥幸没死，就去找他了。神话的结局是兄弟俩重归于好，乘 着一条施了法的木筏永远离开了巴布亚新几内亚。他们把安迪纳用西 米棕榈树的髓造出来的浅皮肤的人带走了，抛下了黑皮肤的人，还有 阿瑞纳那个出轨的妻子。 兄弟俩扬帆远航，浪迹天涯，从此再无音讯。 迦普恩知道这个神话的老人们推论说，兄弟俩去“各国”了。显 然，村民们都认同，白人是安迪纳在巴布亚新几内亚造出来的粉色人 的后代。更进一步，他们推论说安迪纳把他的技术带去了那些国家， 发明了工厂，生产出了所有的钱币、飞机、地铁隧道、外马达、衣 服以及白人能得到的其他商品。然后村民们开始填补空白：不知怎么 的他们就得出结论说，最终安迪纳觉得自己对不起生他养他的巴布亚 新几内亚，想回那儿“修补”（stretim）被他抛下的可怜的黑人物种。</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="takeaways">
+      <h2>本关关键收获</h2>
+      <ul class="takeaways"><li><span>1</span>第十四章 LukeWritesaLetter 卢克写了一封信 在热带雨林里，日出日落总是一瞬间的 事。就在早上六点之前，夜晚浓稠的黑褪成白 蒙蒙的灰，十五分</li><li><span>2</span>当我回到自已的房子时，一个孩子通常很快会在天黑前出现，叫 我去他们母亲的房子里吃她们做的东西。不管谁邀请，我都会过去， 坐下来跟他们聊天，然后找个机会走人，</li><li><span>3</span>我让卢克进来，关上身后的门，坐在那把蓝色塑料椅子里。他跟 着我，坐在了我对面一把一模一样的椅子里。我把正在写的笔记本合 上，放在一边，对卢克笑着，问出了我的</li><li><span>4</span>“好的，没问题，”我告诉他，“我会把这封信带回去的。” 卢克笑了。</li></ul>
+      <nav class="nav">
+        <a class="btn" href="/experiences/user-book-visual-reading-g5gyju-195f-g14-chapter-14.html">上一关</a>
+        <a class="btn" href="/experiences/user-book-visual-reading-g5gyju-195f-g16-chapter-16.html">下一关</a>
+      </nav>
+    </section>
+  </main>
+  <script>
+    (() => {
+      const progress = document.getElementById("progress");
+      const dots = Array.from(document.querySelectorAll("#dotNav button[data-target]"));
+      const sections = dots
+        .map((dot) => document.getElementById(dot.getAttribute("data-target")))
+        .filter(Boolean);
+      const reveals = Array.from(document.querySelectorAll(".reveal"));
+      const onScroll = () => {
+        const h = document.documentElement;
+        const total = Math.max(1, h.scrollHeight - window.innerHeight);
+        const pct = Math.max(0, Math.min(100, (window.scrollY / total) * 100));
+        if (progress) progress.style.width = pct + "%";
+      };
+      const io = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) entry.target.classList.add("in");
+        }
+      }, { threshold: .14 });
+      reveals.forEach((el) => io.observe(el));
+      const secIo = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const id = entry.target.id;
+          dots.forEach((dot) => dot.classList.toggle("active", dot.getAttribute("data-target") === id));
+        });
+      }, { threshold: .4 });
+      sections.forEach((s) => secIo.observe(s));
+      dots.forEach((dot) => {
+        dot.addEventListener("click", () => {
+          const target = document.getElementById(dot.getAttribute("data-target"));
+          if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+      window.addEventListener("scroll", onScroll, { passive: true });
+      onScroll();
+    })();
+  </script>
+</body>
+</html>

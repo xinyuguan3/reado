@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>第十二章 · 雨林里的消亡（可视化阅读测试）</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b1220;
+      --bg2: #1a2333;
+      --accent: #f59e0b;
+      --accent2: #34d399;
+      --text: #e5edf8;
+      --soft: #9fb1c9;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+      background:
+        radial-gradient(1200px 540px at 85% -8%, color-mix(in srgb, var(--accent2) 24%, transparent), transparent 70%),
+        radial-gradient(980px 460px at -10% 14%, color-mix(in srgb, var(--accent) 24%, transparent), transparent 74%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+      color: var(--text);
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .05;
+      background-image: radial-gradient(circle at 1px 1px, #fff 1px, transparent 0);
+      background-size: 3px 3px;
+      z-index: 0;
+    }
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      z-index: 100;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+    .page { position: relative; z-index: 1; width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 20px 0 48px; }
+    .hero {
+      min-height: 74vh;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 22px;
+      background: linear-gradient(160deg, color-mix(in srgb, var(--bg2) 86%, transparent), color-mix(in srgb, var(--bg) 88%, transparent));
+      padding: 40px 34px;
+      display: grid;
+      align-content: center;
+      gap: 16px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.34);
+    }
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .hero h1 {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(32px, 5.4vw, 68px);
+      line-height: 1.16;
+      letter-spacing: .04em;
+      max-width: 15em;
+      text-wrap: balance;
+    }
+    .hero p {
+      max-width: 66ch;
+      line-height: 1.95;
+      color: color-mix(in srgb, var(--text) 85%, var(--soft));
+      font-size: 16px;
+    }
+    .chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip {
+      border: 1px solid color-mix(in srgb, var(--accent2) 44%, transparent);
+      color: color-mix(in srgb, var(--accent2) 88%, #fff);
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 12px;
+      background: rgba(255,255,255,.03);
+    }
+    .section { margin-top: 18px; border: 1px solid rgba(255,255,255,.13); border-radius: 18px; padding: 22px; background: rgba(2,6,18,.46); }
+    .section h2 {
+      margin-bottom: 12px;
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(22px, 2.8vw, 34px);
+      color: color-mix(in srgb, var(--accent) 86%, #fff);
+      letter-spacing: .03em;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1.1fr 1fr; gap: 14px; }
+    .concept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+    .concept-card {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      background: rgba(255,255,255,.03);
+      padding: 14px;
+      min-height: 128px;
+    }
+    .concept-token { font-size: 14px; letter-spacing: .14em; color: var(--accent2); text-transform: uppercase; margin-bottom: 7px; font-weight: 700; }
+    .concept-note { font-size: 14px; color: color-mix(in srgb, var(--text) 88%, var(--soft)); line-height: 1.8; }
+    .atlas {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      min-height: 440px;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+    .atlas svg { width: 100%; max-width: 440px; height: auto; }
+    .timeline { display: grid; gap: 10px; }
+    .timeline-item {
+      border-left: 2px solid color-mix(in srgb, var(--accent) 66%, transparent);
+      padding: 10px 14px;
+      background: rgba(255,255,255,.02);
+      border-radius: 0 10px 10px 0;
+    }
+    .timeline-no { font-size: 11px; letter-spacing: .22em; color: var(--accent2); display: block; margin-bottom: 6px; }
+    .timeline-item h3 { font-size: 19px; font-family: "Noto Serif SC", serif; line-height: 1.45; margin-bottom: 7px; }
+    .timeline-item p { font-size: 14px; line-height: 1.9; color: color-mix(in srgb, var(--text) 84%, var(--soft)); }
+    .quote-wrap { display: grid; gap: 10px; }
+    .quote {
+      border-left: 2px solid color-mix(in srgb, var(--accent2) 80%, transparent);
+      padding: 10px 12px;
+      background: rgba(255,255,255,.02);
+      color: color-mix(in srgb, var(--text) 92%, #fff);
+      font-family: "Noto Serif SC", serif;
+      line-height: 1.9;
+    }
+    .takeaways { margin-top: 10px; list-style: none; display: grid; gap: 8px; }
+    .takeaways li {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      padding: 10px;
+      background: rgba(255,255,255,.02);
+      align-items: start;
+      line-height: 1.8;
+    }
+    .takeaways span {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: color-mix(in srgb, var(--accent2) 26%, transparent);
+      color: var(--accent2);
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+    .nav { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,.26);
+      border-radius: 999px;
+      padding: 8px 13px;
+      font-size: 12px;
+      color: var(--text);
+      background: rgba(255,255,255,.04);
+    }
+    .btn:hover { border-color: var(--accent2); color: var(--accent2); }
+    .dot-nav {
+      position: fixed;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: grid;
+      gap: 10px;
+      z-index: 50;
+    }
+    .dot-nav button {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.35);
+      background: transparent;
+      cursor: pointer;
+      transition: all .24s ease;
+    }
+    .dot-nav button.active { transform: scale(1.34); border-color: var(--accent); background: var(--accent); }
+    .reveal { opacity: 0; transform: translateY(16px); transition: opacity .55s ease, transform .55s ease; }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+    @media (max-width: 940px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .dot-nav { display: none; }
+      .hero { min-height: auto; padding: 30px 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+  <nav class="dot-nav" id="dotNav">
+    <button data-target="hero" class="active" aria-label="Hero"></button>
+    <button data-target="atlas" aria-label="Atlas"></button>
+    <button data-target="concepts" aria-label="Concepts"></button>
+    <button data-target="reading" aria-label="Reading"></button>
+    <button data-target="takeaways" aria-label="Takeaways"></button>
+  </nav>
+  <main class="page">
+    <section class="hero reveal in" id="hero">
+      <p class="eyebrow">Scholar Atlas · Gate 13</p>
+      <h1>第十二章</h1>
+      <p>第十二章 LivingDangerously 险象环生 1986年，我开始第一次在迦普恩长待时， 戴彼得以及其他坐着一起喝酒的年轻人都还是 小朋友或是婴儿一—其中有几个甚至还没出 生。1987年我离开了村子，回到瑞典写我的博 士论文，那个时候戴彼得只是一个害羞的足内 翻的三岁娃娃，长了一双好奇的大眼晴。四年 后我回来了，那是1991年。 村民们热情地欢迎我，立即给我造了一个 房子让我住进去。他们说，五年前给我造的那 个房子“冷了”，已经破损不堪。他们花了三 个月造新房，比所有人的都大，高出地面四英 尺。我的新房子就像一艘盘桓的母舰一样耸立 在村子里，看上去要不就像在保卫一方村民， 要不就像在威胁众人，这取决于你的观看视 角。我觉得有</p>
+      <div class="chip-row">
+        <span class="chip">雨林里的消亡（可视化阅读测试）</span>
+        <span class="chip">作者：Unknown</span>
+        <span class="chip">Module 13/18</span>
+        <span class="tag">page</span><span class="tag">image</span><span class="tag">content</span><span class="tag">ocr</span><span class="tag">雨林里的消亡</span><span class="tag">我说</span>
+      </div>
+    </section>
+
+    <section class="section grid-2 reveal" id="atlas">
+      <article>
+        <h2>知识结构图谱</h2>
+        <p style="color:var(--soft);line-height:1.9;margin-bottom:10px;">围绕本关卡核心概念构建关系图。阅读时先抓主轴，再理解每个概念如何驱动判断与行动。</p>
+        <div class="quote-wrap"><blockquote class="quote reveal">“村民们热情地欢迎我，立即给我造了一个 房子让我住进去。他们说，五年前给我造的那 个房子“冷了”，已经破损不堪。他们花了三 个月造新房，比所有人的都大，高出地面四英 尺。我的新房子就像一艘盘桓的母舰一样耸立 在村子里，看上去要不就像在保卫一方村民， 要不就像在威胁众人，这取决于你的观看视 角。我觉得有点尴尬。当结构柱子开始搭起来 的时候，我就明白了村民们脑子里在想什么， 151 [PAGE 161 IMAGE 1 CONTENT (OCR”</blockquote><blockquote class="quote reveal">“这两个男人戴着遮脸盔式帽。持枪的那个人用英语冲我吼：“给 我们钱！给我们钱！” 比起惊恐，我更感到迷糊，因为搞不清楚发生了什么。这些人是 从哪里来的？什么钱？我在新几内亚的一片沼泽中间，不是刚从银行 走出来的路上。而且村民们怎么样了？一分钟之前，我还能听到他们 第十二章险象环生 153 [PAGE 163 IMAGE 1 CONTENT (OCR)]: 唱着聊着笑着。现在一切都诡异地安静了下来。他们跑哪儿去了？他 们不知道发生了什么吗？”</blockquote><blockquote class="quote reveal">“这样的混乱状况一定持续了有五分钟，这时候那个人开始紧张 了。他们显然计划了一场速战速决的盗窃，没想到遇上了一个近视眼 傻瓜在一个巡逻箱里乱翻。在房子外面，村民们也开始骚动。我可以 听到他们走来走去，低声急促地说着泰雅博语。也许感觉到自已快要 控制不住场面了，强盗们拉着我的肩膀让我站起来，又把我推出门到 阳台上。一个人站在我身边抓着我的手臂，拿枪的那个人站在我另一 侧，用枪指着我的脑袋。”</blockquote></div>
+      </article>
+      <article class="atlas">
+        <svg viewBox="0 0 440 440" aria-label="concept atlas">
+          <defs>
+            <radialGradient id="g" cx="50%" cy="50%" r="56%">
+              <stop offset="0%" stop-color="#f59e0b" stop-opacity=".24"></stop>
+              <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"></stop>
+            </radialGradient>
+          </defs>
+          <circle cx="220" cy="220" r="190" fill="none" stroke="rgba(255,255,255,.08)" stroke-dasharray="5 6"></circle>
+          <circle cx="220" cy="220" r="84" fill="url(#g)"></circle>
+          <circle cx="220" cy="220" r="10" fill="#f59e0b"></circle>
+          <text x="220" y="252" text-anchor="middle" fill="#e5edf8" font-size="13">第十二章</text>
+          <g><line x1="220" y1="220" x2="370" y2="220" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="370" cy="220" r="8" fill="#34d399"/><text x="382" y="224" fill="#e5edf8" font-size="12">page</text></g><g><line x1="220" y1="220" x2="266" y2="363" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="266" cy="363" r="8" fill="#34d399"/><text x="278" y="367" fill="#e5edf8" font-size="12">image</text></g><g><line x1="220" y1="220" x2="99" y2="308" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="99" cy="308" r="8" fill="#34d399"/><text x="111" y="312" fill="#e5edf8" font-size="12">content</text></g><g><line x1="220" y1="220" x2="99" y2="132" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="99" cy="132" r="8" fill="#34d399"/><text x="111" y="136" fill="#e5edf8" font-size="12">ocr</text></g><g><line x1="220" y1="220" x2="266" y2="77" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="266" cy="77" r="8" fill="#34d399"/><text x="278" y="81" fill="#e5edf8" font-size="12">雨林里的消亡</text></g>
+        </svg>
+      </article>
+    </section>
+
+    <section class="section reveal" id="concepts">
+      <h2>核心概念与解释</h2>
+      <div class="concept-grid">
+      <article class="concept-card reveal">
+        <p class="concept-token">page</p>
+        <p class="concept-note">村民们热情地欢迎我，立即给我造了一个 房子让我住进去。他们说，五年前给我造的那 个房子“冷了”，已经破损不堪。他们花了三 个月造新房，比所有人的都大，高出地面四英 尺。我的新房子就像一艘盘桓的母舰一样耸立 在村子里，看上去要不就像在保卫一方村民， 要不就像在威胁众人，这取决于你的观看视 角。我觉得有点尴尬。当结构柱子开始搭起来 的时候，我就明白了村民们脑子里</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">image</p>
+        <p class="concept-note">村民们热情地欢迎我，立即给我造了一个 房子让我住进去。他们说，五年前给我造的那 个房子“冷了”，已经破损不堪。他们花了三 个月造新房，比所有人的都大，高出地面四英 尺。我的新房子就像一艘盘桓的母舰一样耸立 在村子里，看上去要不就像在保卫一方村民， 要不就像在威胁众人，这取决于你的观看视 角。我觉得有点尴尬。当结构柱子开始搭起来 的时候，我就明白了村民们脑子里</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">content</p>
+        <p class="concept-note">村民们热情地欢迎我，立即给我造了一个 房子让我住进去。他们说，五年前给我造的那 个房子“冷了”，已经破损不堪。他们花了三 个月造新房，比所有人的都大，高出地面四英 尺。我的新房子就像一艘盘桓的母舰一样耸立 在村子里，看上去要不就像在保卫一方村民， 要不就像在威胁众人，这取决于你的观看视 角。我觉得有点尴尬。当结构柱子开始搭起来 的时候，我就明白了村民们脑子里</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">ocr</p>
+        <p class="concept-note">村民们热情地欢迎我，立即给我造了一个 房子让我住进去。他们说，五年前给我造的那 个房子“冷了”，已经破损不堪。他们花了三 个月造新房，比所有人的都大，高出地面四英 尺。我的新房子就像一艘盘桓的母舰一样耸立 在村子里，看上去要不就像在保卫一方村民， 要不就像在威胁众人，这取决于你的观看视 角。我觉得有点尴尬。当结构柱子开始搭起来 的时候，我就明白了村民们脑子里</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">雨林里的消亡</p>
+        <p class="concept-note">然而，不管我或任何其他人怎么看欣欣，很显然，年纪大的村民 很喜欢。尤其老鲁尼似乎怎么都玩不够。他能在一个沙漏形的鼓上保 持一个稳定的敲打节奏，唱上几个钟头，而且他还是一个身手灵活不 152 雨林里的消亡 [PAGE 162 IMAGE 1 CONTENT (OCR)]: 知疲倦的舞者。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">我说</p>
+        <p class="concept-note">“在这里。”我说，伸出手去。但是袋子里只有录音机备用的东 西，一分钱都没有。我放了回去。</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="reading">
+      <h2>渐进式阅读路径</h2>
+      <div class="timeline">
+      <article class="timeline-item reveal">
+        <span class="timeline-no">01</span>
+        <h3>第十二章 LivingDangerously 险象环生 1986年，我开始第一次在迦普恩长待时， 戴彼得以及其他坐着一起喝酒的年轻人都还是 小朋友或是婴儿一</h3>
+        <p>第十二章 LivingDangerously 险象环生 1986年，我开始第一次在迦普恩长待时， 戴彼得以及其他坐着一起喝酒的年轻人都还是 小朋友或是婴儿一—其中有几个甚至还没出 生。1987年我离开了村子，回到瑞典写我的博 士论文，那个时候戴彼得只是一个害羞的足内 翻的三岁娃娃，长了一双好奇的大眼晴。四年 后我回来了，那是1991年。 村民们热情地欢迎我，立即给我造了一个 房子让我住进去。他们说，五年前给我造的那 个房子“冷了”，已经破损不堪。他们花了三 个月造新房，比所有人的都大，高出地面四英 尺。我的新房子就像一艘盘桓的母舰一样耸立 在村子里，看上去要不就像在保卫一方村民， 要不就像在威胁众人，这取决于你的观看视 角。我觉得有点尴尬。当结构柱子开始搭起来 的时候，我就明白了村民们脑子里在想什么， 151 [PAGE 161 IMAGE 1 CONTENT (OCR)]: 我反对了好多次。他们无视了我。我的房子显然要造成一个值得夸耀 的浮夸建筑，迦普恩版齐奥塞斯库议会大厦或特朗普大楼。村民们想 向可能路过的任何人广而告之，他们村里那个白人回来了，他们能让 他住上体面的房子。 每次像造男人房子（或给白人居民造一个房子）这样的集体项目 完工时，村民们通常会举行彻夜的欣欣（Singsing）活动庆祝乔迁之 喜。欣欣是一种庆祝活动，每个人都会参加，不光因为从来不乏大量 佳肴一通常是由新建成的房屋主人提供—也因为有传统的唱歌跳 舞。欣欣在村子的中心举行。在暮色降临之前开始，持续一整夜直到 天亮。 上一次待在村子里时，我参加了好几次欣欣。我对这个活动感到 恐惧。这些活动总是让我觉得自已是一个糟糕的人类学家，因为我觉 得无聊。男人女人用刺耳的从鼻腔发出的假声唱出来的歌既单调又重 复。歌词主要就是祖先们路过村子周围的景物时所过之地的地名。舞 蹈就是围成圈拖着脚走，挥舞着西米叶，偶尔来一个单脚跳。 我有瑞典同行被这些东西给迷住了：他们很认真地研究舞步，在 地图上记下地名，然后很热情地写了书，里面全是晦涩的分析和流程 图，密密麻麻的表格里全都是箭头。 跟这些活动一样，这些书也让我昏昏欲睡。 在迦普恩，我不是唯一一个对整宿坐着参加欣欣感到兴致寥寥的 人。在之前几次欣欣活动里，我留意到夜里某个时候，许多年轻村民 的身影就不见了。他们就像每个地方的年轻人那样：趁父母不注意， 就抓住机会溜到黑漆漆的地方会情人。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">02</span>
+        <h3>然而，不管我或任何其他人怎么看欣欣，很显然，年纪大的村民 很喜欢。尤其老鲁尼似乎怎么都玩不够。他能在一个沙漏形的鼓上保 持一个稳定的敲打节奏，唱上几个钟头，</h3>
+        <p>然而，不管我或任何其他人怎么看欣欣，很显然，年纪大的村民 很喜欢。尤其老鲁尼似乎怎么都玩不够。他能在一个沙漏形的鼓上保 持一个稳定的敲打节奏，唱上几个钟头，而且他还是一个身手灵活不 152 雨林里的消亡 [PAGE 162 IMAGE 1 CONTENT (OCR)]: 知疲倦的舞者。 在庆祝我乔迁新居时，我提供了五十磅大米，六磅白糖，几大罐 雀巢速溶咖啡，一箱咸牛肉罐头。村民们捕杀了几头猪，西米充足， 每个人都吃得肚子撑，沉浸在喜乐的氛围里。我提议用我的煤油灯来 照明，村民们从我上次出现在村子时起就一直住的房子的立柱扯了一 条藤来把灯固定住。那个房子距离作乐场地六码远。 在昏暗的煤油灯下，我坐着看了几个小时的欣欣活动，但到了半 夜，我撑不住了。我在村子里待得足够久，知道没人会认为找借口打 个小吨几是多么失礼的事情。我这么做了，去了我第二天就要搬去的 那个房子。我蜷缩在蚊帐里，躺在席子上，想努力睡着。 就在我快要睡着的时候，一声尖厉的爆裂声打到了房子的竹墙 上，就像一个小石头重重地敲了一下。随后又是一记。又一记。在我 屋外跳舞的人们也听到了击打声，有几个人冲黑夜里看不见的孩子们 喊，警告他们夜里不要玩弹弓冲人射石头。 我一定是睡着了几分钟，因为我能记起的下一件事情就是一声巨 大的轰鸣一—一声炸裂一—一道白色闪电。我警觉地坐了起来，赶 紧摸到脚边，嗖地穿上了裤子。 就在我回身要找眼镜的时候，我的前门被人端开了。 两个男人冲进了我的屋子。他们径直冲我跑过来，穿着厚重的靴 子，树皮地板都跟着震动。他们一把拉开了我的蚊帐，电筒光直射进 我眼晴里，其中一个人拿一把短管猎枪顶在我的脸上。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">03</span>
+        <h3>这两个男人戴着遮脸盔式帽。持枪的那个人用英语冲我吼：“给 我们钱！给我们钱！” 比起惊恐，我更感到迷糊，因为搞不清楚发生了什么。这些人是 从哪里来的？什么钱</h3>
+        <p>这两个男人戴着遮脸盔式帽。持枪的那个人用英语冲我吼：“给 我们钱！给我们钱！” 比起惊恐，我更感到迷糊，因为搞不清楚发生了什么。这些人是 从哪里来的？什么钱？我在新几内亚的一片沼泽中间，不是刚从银行 走出来的路上。而且村民们怎么样了？一分钟之前，我还能听到他们 第十二章险象环生 153 [PAGE 163 IMAGE 1 CONTENT (OCR)]: 唱着聊着笑着。现在一切都诡异地安静了下来。他们跑哪儿去了？他 们不知道发生了什么吗？ 我用英语回答了枪那一端的蒙面人的话，我之前从来没有在迦 普恩使用过这门语言。我让他等一等，让我先把眼镜戴上，找到手 电筒，因为我得看得见东西才能把钱给他。他喊着“快点！”，还 挥拳打我，弄折了我的眼镜，我举起手试图保护脸部，他还扭伤了 我的大拇指。 我跌跌撞撞地走到金属巡逻箱前，里面放着我的贵重物品。我有 相当于三十美元的买汽油离开迦普恩的钱，我去镇上采购补给时要用 到。我想找到它，给这些闯进来的人，好让他们走。但那个人不让我 找我的手电筒。拿枪的那个一直吼我让我快一点，而他的同伙一直打 我的头。 这个时候我才发现屋子里不止这两个人。我听到远处的那个角落 里传来模糊不清的声音，然后是硬物碰撞的声音，我放在架子上的卡 带和笔记本被翻了下来，丢在了地上。 我打开了巡逻箱的盖子，拿枪的那个人的同伙抓住我的录音机， 丢进我其中一个装衣服的包里。作为研究者我从没这么有种过，我居 然说：“我会把钱给你，但你能不能把那个留下？”现在看来这多么 荒谬。我得到的回答是一声响亮的命令“闭嘴！”，一记重拳打在我 脸上，我的眼镜都被打飞了。 “钱在哪里？！”拿枪的那个人又冲我吼。 “我需要我的眼镜，”我告诉他，“如果没有眼镜，我就看不见找 不到钱。”他又打我。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">04</span>
+        <h3>我在巡逻箱里盲人摸象地一通乱翻：关于巴布亚语言的学术论 文、空的卡带、电池、几盒橡皮筋、饼干、几袋麦片、美极方便面， 还有其他一些我偷偷藏起来的小食品，没人</h3>
+        <p>我在巡逻箱里盲人摸象地一通乱翻：关于巴布亚语言的学术论 文、空的卡带、电池、几盒橡皮筋、饼干、几袋麦片、美极方便面， 还有其他一些我偷偷藏起来的小食品，没人请我去家里吃饭或给我送 154 雨林里的消亡 [PAGE 164 IMAGE 1 CONTENT (OCR)]: 食物的时候，我就背着村民们偷偷吃。我最终找到了一个小塑料袋， 提了起来。 “在这里。”我说，伸出手去。但是袋子里只有录音机备用的东 西，一分钱都没有。我放了回去。 “不，等我一下。”我说。 那个人猛地从我手里夺过了袋子。 这样的混乱状况一定持续了有五分钟，这时候那个人开始紧张 了。他们显然计划了一场速战速决的盗窃，没想到遇上了一个近视眼 傻瓜在一个巡逻箱里乱翻。在房子外面，村民们也开始骚动。我可以 听到他们走来走去，低声急促地说着泰雅博语。也许感觉到自已快要 控制不住场面了，强盗们拉着我的肩膀让我站起来，又把我推出门到 阳台上。一个人站在我身边抓着我的手臂，拿枪的那个人站在我另一 侧，用枪指着我的脑袋。 我不知道那个蒙面人到底想对我做什么，因为那个时候发生了一 件分散大家注意力的事。 老鲁尼四十岁的儿子卡里从屋前跑过。没人知道为什么卡里要 这么做，但他是一个冲动的暴脾气的人，长着一把大胡子，很容易发 火。也许他觉得他可以伏击这些人，让他们缴械。不管在想什么，他 一定忘了他穿着白短裤。在黑夜里，白裤子让他很容易成为目标。就 在卡里加速从我阳台下经过的时候，那个抓着我臂膀的人把他的手电 筒转过去对准了他。持枪的人则把枪绕过我的头，瞄准，射击。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">05</span>
+        <h3>卡里闷哼一声后倒在地上。</h3>
+        <p>卡里闷哼一声后倒在地上。 枪一响，洗劫我屋子的人就慌了，他们跳下阳台，四散逃窜进了 雨林。 到了那一刻我才真正开始感到害怕。我孤身一人，在漆黑一片的 夜里晕头转向。一切又再次陷人寂静。甚至连无处不在的青蛙都停止</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="takeaways">
+      <h2>本关关键收获</h2>
+      <ul class="takeaways"><li><span>1</span>第十二章 LivingDangerously 险象环生 1986年，我开始第一次在迦普恩长待时， 戴彼得以及其他坐着一起喝酒的年轻人都还是 小朋友或是婴儿一</li><li><span>2</span>然而，不管我或任何其他人怎么看欣欣，很显然，年纪大的村民 很喜欢。尤其老鲁尼似乎怎么都玩不够。他能在一个沙漏形的鼓上保 持一个稳定的敲打节奏，唱上几个钟头，</li><li><span>3</span>这两个男人戴着遮脸盔式帽。持枪的那个人用英语冲我吼：“给 我们钱！给我们钱！” 比起惊恐，我更感到迷糊，因为搞不清楚发生了什么。这些人是 从哪里来的？什么钱</li><li><span>4</span>我在巡逻箱里盲人摸象地一通乱翻：关于巴布亚语言的学术论 文、空的卡带、电池、几盒橡皮筋、饼干、几袋麦片、美极方便面， 还有其他一些我偷偷藏起来的小食品，没人</li></ul>
+      <nav class="nav">
+        <a class="btn" href="/experiences/user-book-visual-reading-g5gyju-195f-g12-chapter-12.html">上一关</a>
+        <a class="btn" href="/experiences/user-book-visual-reading-g5gyju-195f-g14-chapter-14.html">下一关</a>
+      </nav>
+    </section>
+  </main>
+  <script>
+    (() => {
+      const progress = document.getElementById("progress");
+      const dots = Array.from(document.querySelectorAll("#dotNav button[data-target]"));
+      const sections = dots
+        .map((dot) => document.getElementById(dot.getAttribute("data-target")))
+        .filter(Boolean);
+      const reveals = Array.from(document.querySelectorAll(".reveal"));
+      const onScroll = () => {
+        const h = document.documentElement;
+        const total = Math.max(1, h.scrollHeight - window.innerHeight);
+        const pct = Math.max(0, Math.min(100, (window.scrollY / total) * 100));
+        if (progress) progress.style.width = pct + "%";
+      };
+      const io = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) entry.target.classList.add("in");
+        }
+      }, { threshold: .14 });
+      reveals.forEach((el) => io.observe(el));
+      const secIo = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const id = entry.target.id;
+          dots.forEach((dot) => dot.classList.toggle("active", dot.getAttribute("data-target") === id));
+        });
+      }, { threshold: .4 });
+      sections.forEach((s) => secIo.observe(s));
+      dots.forEach((dot) => {
+        dot.addEventListener("click", () => {
+          const target = document.getElementById(dot.getAttribute("data-target"));
+          if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+      window.addEventListener("scroll", onScroll, { passive: true });
+      onScroll();
+    })();
+  </script>
+</body>
+</html>

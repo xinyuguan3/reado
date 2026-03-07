@@ -1,0 +1,45 @@
+{
+  "slug": "u-book-edf803-18-dba6b8",
+  "order": 18,
+  "title": "Module 18 · 00元 [ERROR processing PA",
+  "generatedBy": "playable-content-engine",
+  "generatedAt": "2026-03-07T09:27:51.295Z",
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T09:28:01.325Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "雨林里的消亡：一种语言和生活方式在巴布亚新几内亚的终结",
+      "author": ""
+    },
+    "knowledge_block": {
+      "id": "kb-35",
+      "gate_index": 18,
+      "title": "第十三章谁杀死了莫内 175 [PAGE 185 IMAGE 1 CONTENT (OCR)]: 于是村里的祷告队被叫来给他祈祷。",
+      "summary": "第十三章谁杀死了莫内 175 [PAGE 185 IMAGE 1 CONTENT (OCR)]: 于是村里的祷告队被叫来给他祈祷。 莫内的祷告会在手电筒昏黄的灯光下开始，手电筒用一根藤条从 屋顶挂下来，电池快没电了。就像祷告会一直以来的开场那样，一个 村民带着另外两个村民向圣父解释为什么他们聚在这里，祈求神向他 们的信徒弟兄（这里指莫内）大发慈悲，用仁慈的力量保护他，为他 驱走苦痛。紧接着的永远是讲巫师们如何不信上帝，他们多么邪恶， 用带毒的铁丝、生姜根还有微不足道的法术乱射无辜，让人生病。他 们请圣父来祛除受害者体内的这些坏东西。",
+      "words": 2448,
+      "keywords": [
+        "page",
+        "image",
+        "content",
+        "ocr",
+        "第十三章谁杀死了莫内",
+        "雨林里的消亡"
+      ],
+      "density": {
+        "score": 0.6428,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0.3529,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0.0229
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "anthro",
+      "theme_label": "Field Narrative",
+      "section_count": 5,
+      "generated_with": "template_runtime"
+    }
+  }
+}

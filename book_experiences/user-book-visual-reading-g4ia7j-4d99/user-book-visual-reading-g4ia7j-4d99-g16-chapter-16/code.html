@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>第十六章语言消亡时 · 雨林里的消亡：一种语言和生活方式在巴布亚新几内亚的终结</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #16120f;
+      --bg2: #2a1f18;
+      --accent: #d97706;
+      --accent2: #2dd4bf;
+      --text: #f5f1ea;
+      --soft: #c7b8a2;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+      background:
+        radial-gradient(1200px 540px at 85% -8%, color-mix(in srgb, var(--accent2) 24%, transparent), transparent 70%),
+        radial-gradient(980px 460px at -10% 14%, color-mix(in srgb, var(--accent) 24%, transparent), transparent 74%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+      color: var(--text);
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .05;
+      background-image: radial-gradient(circle at 1px 1px, #fff 1px, transparent 0);
+      background-size: 3px 3px;
+      z-index: 0;
+    }
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      z-index: 100;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+    .page { position: relative; z-index: 1; width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 20px 0 48px; }
+    .hero {
+      min-height: 74vh;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 22px;
+      background: linear-gradient(160deg, color-mix(in srgb, var(--bg2) 86%, transparent), color-mix(in srgb, var(--bg) 88%, transparent));
+      padding: 40px 34px;
+      display: grid;
+      align-content: center;
+      gap: 16px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.34);
+    }
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .hero h1 {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(32px, 5.4vw, 68px);
+      line-height: 1.16;
+      letter-spacing: .04em;
+      max-width: 15em;
+      text-wrap: balance;
+    }
+    .hero p {
+      max-width: 66ch;
+      line-height: 1.95;
+      color: color-mix(in srgb, var(--text) 85%, var(--soft));
+      font-size: 16px;
+    }
+    .chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip {
+      border: 1px solid color-mix(in srgb, var(--accent2) 44%, transparent);
+      color: color-mix(in srgb, var(--accent2) 88%, #fff);
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 12px;
+      background: rgba(255,255,255,.03);
+    }
+    .section { margin-top: 18px; border: 1px solid rgba(255,255,255,.13); border-radius: 18px; padding: 22px; background: rgba(2,6,18,.46); }
+    .section h2 {
+      margin-bottom: 12px;
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(22px, 2.8vw, 34px);
+      color: color-mix(in srgb, var(--accent) 86%, #fff);
+      letter-spacing: .03em;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1.1fr 1fr; gap: 14px; }
+    .concept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+    .concept-card {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      background: rgba(255,255,255,.03);
+      padding: 14px;
+      min-height: 128px;
+    }
+    .concept-token { font-size: 14px; letter-spacing: .14em; color: var(--accent2); text-transform: uppercase; margin-bottom: 7px; font-weight: 700; }
+    .concept-note { font-size: 14px; color: color-mix(in srgb, var(--text) 88%, var(--soft)); line-height: 1.8; }
+    .atlas {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      min-height: 440px;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+    .atlas svg { width: 100%; max-width: 440px; height: auto; }
+    .timeline { display: grid; gap: 10px; }
+    .timeline-item {
+      border-left: 2px solid color-mix(in srgb, var(--accent) 66%, transparent);
+      padding: 10px 14px;
+      background: rgba(255,255,255,.02);
+      border-radius: 0 10px 10px 0;
+    }
+    .timeline-no { font-size: 11px; letter-spacing: .22em; color: var(--accent2); display: block; margin-bottom: 6px; }
+    .timeline-item h3 { font-size: 19px; font-family: "Noto Serif SC", serif; line-height: 1.45; margin-bottom: 7px; }
+    .timeline-item p { font-size: 14px; line-height: 1.9; color: color-mix(in srgb, var(--text) 84%, var(--soft)); }
+    .quote-wrap { display: grid; gap: 10px; }
+    .quote {
+      border-left: 2px solid color-mix(in srgb, var(--accent2) 80%, transparent);
+      padding: 10px 12px;
+      background: rgba(255,255,255,.02);
+      color: color-mix(in srgb, var(--text) 92%, #fff);
+      font-family: "Noto Serif SC", serif;
+      line-height: 1.9;
+    }
+    .takeaways { margin-top: 10px; list-style: none; display: grid; gap: 8px; }
+    .takeaways li {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      padding: 10px;
+      background: rgba(255,255,255,.02);
+      align-items: start;
+      line-height: 1.8;
+    }
+    .takeaways span {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: color-mix(in srgb, var(--accent2) 26%, transparent);
+      color: var(--accent2);
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+    .nav { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,.26);
+      border-radius: 999px;
+      padding: 8px 13px;
+      font-size: 12px;
+      color: var(--text);
+      background: rgba(255,255,255,.04);
+    }
+    .btn:hover { border-color: var(--accent2); color: var(--accent2); }
+    .dot-nav {
+      position: fixed;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: grid;
+      gap: 10px;
+      z-index: 50;
+    }
+    .dot-nav button {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.35);
+      background: transparent;
+      cursor: pointer;
+      transition: all .24s ease;
+    }
+    .dot-nav button.active { transform: scale(1.34); border-color: var(--accent); background: var(--accent); }
+    .reveal { opacity: 0; transform: translateY(16px); transition: opacity .55s ease, transform .55s ease; }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+    @media (max-width: 940px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .dot-nav { display: none; }
+      .hero { min-height: auto; padding: 30px 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+  <nav class="dot-nav" id="dotNav">
+    <button data-target="hero" class="active" aria-label="Hero"></button>
+    <button data-target="atlas" aria-label="Atlas"></button>
+    <button data-target="concepts" aria-label="Concepts"></button>
+    <button data-target="reading" aria-label="Reading"></button>
+    <button data-target="takeaways" aria-label="Takeaways"></button>
+  </nav>
+  <main class="page">
+    <section class="hero reveal in" id="hero">
+      <p class="eyebrow">Field Narrative · Gate 16</p>
+      <h1>第十六章语言消亡时</h1>
+      <p>第十六章语言消亡时，实际消亡的是什么？ 213 [PAGE 223 IMAGE 1 CONTENT (OCR)]: 有种植食物的园子。没错，像鲁尼和拉雅这样的老人了解的传统故事的 失落，会让迦普恩人在其他村民的虎视面前更加脆弱，如果那些地 方的村民声称传统上属于迦普恩的土地应该属于他们。但是，关于土地 的争议丝毫不会让村民们变得不像，或不再是迦普恩人。</p>
+      <div class="chip-row">
+        <span class="chip">雨林里的消亡：一种语言和生活方式在巴布亚新几内亚的终结</span>
+        
+        <span class="chip">Module 16/18</span>
+        <span class="tag">page</span><span class="tag">image</span><span class="tag">content</span><span class="tag">ocr</span><span class="tag">第十六章语言消亡时</span><span class="tag">实际消亡的是什么</span>
+      </div>
+    </section>
+
+    <section class="section grid-2 reveal" id="atlas">
+      <article>
+        <h2>知识结构图谱</h2>
+        <p style="color:var(--soft);line-height:1.9;margin-bottom:10px;">围绕本关卡核心概念构建关系图。阅读时先抓主轴，再理解每个概念如何驱动判断与行动。</p>
+        <div class="quote-wrap"><blockquote class="quote reveal">“就关于世界和历史的具体知识而言，很多过去在迦普恩特有的 东西，早在泰雅博语开始衰落之前就消失了。20世纪就像一个巨大 的无情的推土机，把迦普恩人一一乃至巴布亚新几内亚大部分地方的 人一的生活从他们曾经相信或掌握的一切连根拔起。20世纪初那 几十年，招劳力的人把年轻人带走，运去遥远岛屿上的种植园做工， 几年后把他们送回来，带回一堆引人入胜的故事和一门新的语言，一 个文化重塑的过程就开启了。第二次世界大战迫使村民逃离家园躲进 雨林，他们在那”</blockquote><blockquote class="quote reveal">“整个20世纪，一直延续到今天，村民们都在被几乎每个和他们 有联系的外面的人、实体或组织剥削、误导、撒谎、羞辱、蒙骗和掠 夺。在这个过程中，他们并不是被动的任人宰割的羔羊一一他们积极 214 雨林里的消亡 [PAGE 224 IMAGE 1 CONTENT (OCR)]: 热情地追逐，渴望着改变。但卡尔·马克思的名言“人们自己创造自 已的历史，但是他们并不是随心所欲地创造，并不是在他们自己选定 的条件下创造，而是在直接碰到的、既定的、从过”</blockquote><blockquote class="quote reveal">“与其哀叹泰雅博语的失落一在这样的情况下，近乎在哀怨一 个秃头的男人丢了一把梳子一一或许我们应该感到欣慰的是，毕竟村 民们还活着一还在繁衍。他们还在计划着、行动着，还在骂着、笑 着、爱着、希望着。像鲁尼和莫内这样的大人物喜欢抱怨今天的村 民“往下长”一他们长得比祖先们更弱，更慢，也更愚笨了，实际 上到了体型萎缩的程度。或许他们是对的。村民们当然被这个见证他 们放弃一切最终一无所获的变革的世纪给压跨了。但即便村民们在缩 小，他们还是那么得意”</blockquote></div>
+      </article>
+      <article class="atlas">
+        <svg viewBox="0 0 440 440" aria-label="concept atlas">
+          <defs>
+            <radialGradient id="g" cx="50%" cy="50%" r="56%">
+              <stop offset="0%" stop-color="#d97706" stop-opacity=".24"></stop>
+              <stop offset="100%" stop-color="#d97706" stop-opacity="0"></stop>
+            </radialGradient>
+          </defs>
+          <circle cx="220" cy="220" r="190" fill="none" stroke="rgba(255,255,255,.08)" stroke-dasharray="5 6"></circle>
+          <circle cx="220" cy="220" r="84" fill="url(#g)"></circle>
+          <circle cx="220" cy="220" r="10" fill="#d97706"></circle>
+          <text x="220" y="252" text-anchor="middle" fill="#f5f1ea" font-size="13">第十六章语言消亡时</text>
+          <g><line x1="220" y1="220" x2="370" y2="220" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="370" cy="220" r="8" fill="#2dd4bf"/><text x="382" y="224" fill="#f5f1ea" font-size="12">page</text></g><g><line x1="220" y1="220" x2="266" y2="363" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="266" cy="363" r="8" fill="#2dd4bf"/><text x="278" y="367" fill="#f5f1ea" font-size="12">image</text></g><g><line x1="220" y1="220" x2="99" y2="308" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="99" cy="308" r="8" fill="#2dd4bf"/><text x="111" y="312" fill="#f5f1ea" font-size="12">content</text></g><g><line x1="220" y1="220" x2="99" y2="132" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="99" cy="132" r="8" fill="#2dd4bf"/><text x="111" y="136" fill="#f5f1ea" font-size="12">ocr</text></g><g><line x1="220" y1="220" x2="266" y2="77" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="266" cy="77" r="8" fill="#2dd4bf"/><text x="278" y="81" fill="#f5f1ea" font-size="12">第十六章语言消亡时</text></g>
+        </svg>
+      </article>
+    </section>
+
+    <section class="section reveal" id="concepts">
+      <h2>核心概念与解释</h2>
+      <div class="concept-grid">
+      <article class="concept-card reveal">
+        <p class="concept-token">page</p>
+        <p class="concept-note">213 [PAGE 223 IMAGE 1 CONTENT (OCR)]: 有种植食物的园子。没错，像鲁尼和拉雅这样的老人了解的传统故事的 失落，会让迦普恩人在其他村民的虎视面前更加脆弱，如果那些地 方的村民声称传统上属于迦普恩的土地应该属于他们。但是，关于土地 的争议丝毫不会让村民们变得不像，或不再是迦普恩人。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">image</p>
+        <p class="concept-note">213 [PAGE 223 IMAGE 1 CONTENT (OCR)]: 有种植食物的园子。没错，像鲁尼和拉雅这样的老人了解的传统故事的 失落，会让迦普恩人在其他村民的虎视面前更加脆弱，如果那些地 方的村民声称传统上属于迦普恩的土地应该属于他们。但是，关于土地 的争议丝毫不会让村民们变得不像，或不再是迦普恩人。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">content</p>
+        <p class="concept-note">213 [PAGE 223 IMAGE 1 CONTENT (OCR)]: 有种植食物的园子。没错，像鲁尼和拉雅这样的老人了解的传统故事的 失落，会让迦普恩人在其他村民的虎视面前更加脆弱，如果那些地 方的村民声称传统上属于迦普恩的土地应该属于他们。但是，关于土地 的争议丝毫不会让村民们变得不像，或不再是迦普恩人。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">ocr</p>
+        <p class="concept-note">213 [PAGE 223 IMAGE 1 CONTENT (OCR)]: 有种植食物的园子。没错，像鲁尼和拉雅这样的老人了解的传统故事的 失落，会让迦普恩人在其他村民的虎视面前更加脆弱，如果那些地 方的村民声称传统上属于迦普恩的土地应该属于他们。但是，关于土地 的争议丝毫不会让村民们变得不像，或不再是迦普恩人。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">第十六章语言消亡时</p>
+        <p class="concept-note">第十六章语言消亡时，实际消亡的是什么？</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">实际消亡的是什么</p>
+        <p class="concept-note">第十六章语言消亡时，实际消亡的是什么？</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="reading">
+      <h2>渐进式阅读路径</h2>
+      <div class="timeline">
+      <article class="timeline-item reveal">
+        <span class="timeline-no">01</span>
+        <h3>第十六章语言消亡时，实际消亡的是什么？</h3>
+        <p>第十六章语言消亡时，实际消亡的是什么？ 213 [PAGE 223 IMAGE 1 CONTENT (OCR)]: 有种植食物的园子。没错，像鲁尼和拉雅这样的老人了解的传统故事的 失落，会让迦普恩人在其他村民的虎视面前更加脆弱，如果那些地 方的村民声称传统上属于迦普恩的土地应该属于他们。但是，关于土地 的争议丝毫不会让村民们变得不像，或不再是迦普恩人。 就关于世界和历史的具体知识而言，很多过去在迦普恩特有的 东西，早在泰雅博语开始衰落之前就消失了。20世纪就像一个巨大 的无情的推土机，把迦普恩人一一乃至巴布亚新几内亚大部分地方的 人一的生活从他们曾经相信或掌握的一切连根拔起。20世纪初那 几十年，招劳力的人把年轻人带走，运去遥远岛屿上的种植园做工， 几年后把他们送回来，带回一堆引人入胜的故事和一门新的语言，一 个文化重塑的过程就开启了。第二次世界大战迫使村民逃离家园躲进 雨林，他们在那儿悲惨地生活了至少一年。可能是日本大兵带来的痢 疾爆发，导致村子人口锐减。战争一结束，天主教传教士开始涌现， 村民们纷纷皈依基督教，被劝说他们古老的生活方式需要被抛弃，因 为那是邪恶的。货物崇拜放大了基督教这一说法，规劝村民们毁灭他 们保留下来的传统神圣的东西，阻止他们把传统的故事传给孩子，同 时为基督的第二次到来做准备，他会把他们的皮肤从黑色变成白色， 奖励他们上帝的荣光，比如金钱、舷外马达、铁皮盖的房子。一个学 校短暂地出现了一阵，村里的孩子们学会了识字后，就用来写情书， 写信给许诺他们快钱和财富的海外邮购产品目录。政府官员们出现 了，敦促村民们种经济作物，却鲜有买家出手。非政府组织的代表敦 促村民们砍掉所有的树。腐败的政客带着张口闭口拼发展的热情许诺 来了，再窃笑地数着他们成功从王著村民那里骗来的钱离开。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">02</span>
+        <h3>整个20世纪，一直延续到今天，村民们都在被几乎每个和他们 有联系的外面的人、实体或组织剥削、误导、撒谎、羞辱、蒙骗和掠 夺。在这个过程中，他们并不是被动的任</h3>
+        <p>整个20世纪，一直延续到今天，村民们都在被几乎每个和他们 有联系的外面的人、实体或组织剥削、误导、撒谎、羞辱、蒙骗和掠 夺。在这个过程中，他们并不是被动的任人宰割的羔羊一一他们积极 214 雨林里的消亡 [PAGE 224 IMAGE 1 CONTENT (OCR)]: 热情地追逐，渴望着改变。但卡尔·马克思的名言“人们自己创造自 已的历史，但是他们并不是随心所欲地创造，并不是在他们自己选定 的条件下创造，而是在直接碰到的、既定的、从过去继承下来的条件 下创造”用在迦普恩这个例子里极其准确，因为村民们创造的历史实 际上是在开倒车，抹除了他们共同的生活。他们丧失了自已的文化， 对自已的传统无知，控制暴力的能力被削弱一一最终让他们再也无法 说出自己祖先的语言。 在这样的情况下，当一门语言死亡的时候，实际上已经凋零得七 零八落的文化也一并死去了。那些抹平和破坏这一文化的力量远远超 过了五十来个硕果仅存的泰雅博语使用者的掌控范围，让我觉得去哀 叹是村民们抛弃了他们的语言，是麻木不仁甚至居高临下的。没错， 这一关于人类思想如何运作的独特表达不再能够继续丰富人类的宝 库，令人悲痛万分。但谁知道呢？或许村民们指给我看的雨林里某个 难以分辨的植物就是医治癌症的解药。 与其哀叹泰雅博语的失落一在这样的情况下，近乎在哀怨一 个秃头的男人丢了一把梳子一一或许我们应该感到欣慰的是，毕竟村 民们还活着一还在繁衍。他们还在计划着、行动着，还在骂着、笑 着、爱着、希望着。像鲁尼和莫内这样的大人物喜欢抱怨今天的村 民“往下长”一他们长得比祖先们更弱，更慢，也更愚笨了，实际 上到了体型萎缩的程度。或许他们是对的。村民们当然被这个见证他 们放弃一切最终一无所获的变革的世纪给压跨了。但即便村民们在缩 小，他们还是那么得意，脾气还是那么暴躁一他们还在这片沼泽地 里的雨林家园中顽强生存。他们的社会变得越来越暴力，越来越失 调，没准儿在不久的将来它就内爆分裂了。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">03</span>
+        <h3>但当然，同样的话我们也可以用来说我们自己的社会，和我们 第十六章语言消亡时，实际消亡的是什么？</h3>
+        <p>但当然，同样的话我们也可以用来说我们自己的社会，和我们 第十六章语言消亡时，实际消亡的是什么？ 215 [PAGE 225 IMAGE 1 CONTENT (OCR)]: 自己。 1980年代中期，当我住在迦普恩时，老拉雅告诉我，在他祖 父的那个年代，雨林里到处都是形形色色的超自然生物。从被称为 emari的长得像巨大鳄鱼的精灵，一直到生活在树冠上的调皮捣蛋的 小矮人，什么都有。拉雅的祖父那代人会在雨林里和这些生物不期而 遇，他们听从这些生物，用泰雅博语和它们聊天以示尊敬，每当感觉 到它们在近旁，就送它们一些槟榔或烟草作为小小的供奉。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">04</span>
+        <h3>当拉雅还是一个小男孩的时候，有一次他见到了一个小精灵。在 雨林里散步的时候，他和朋友撞见了一个小人，那人吹着奇怪的口 哨，隔膜和耳朵上打着长长的绳结作为装饰</h3>
+        <p>当拉雅还是一个小男孩的时候，有一次他见到了一个小精灵。在 雨林里散步的时候，他和朋友撞见了一个小人，那人吹着奇怪的口 哨，隔膜和耳朵上打着长长的绳结作为装饰。拉雅和他朋友以为遇到 了跟他们一样的小男孩，就追了上去一直到它直接跑上了一棵树。 那个时候，两个小男孩才意识到他们追赶着的生物不是人类。他们转 过身，以八岁小孩的极速逃回了村子。 回忆起这一次相遇时，拉雅怀念地笑了，然后开始严肃起来。今 天没人见过森林里的精灵了，他用一种安静的困惑的语气跟我说。他 猜，它们一定撤退了，要不就搬去了雨林的更深处，要不就划船去了 海上。拉雅推测，森林里精灵们的离开是因为白人来到了巴布亚新几 内亚。鳄鱼精灵和栖息在树上的小矮人感觉到村民们不再对他们感兴 趣，也不再注意它们或向它们表达尊敬，就卷起包裹离开了。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">05</span>
+        <h3>那些曾经让村民们的雨林热热闹闹的超自然生物退场了，每当想 到拉雅的这个故事时，我就会想到泰雅博语。</h3>
+        <p>那些曾经让村民们的雨林热热闹闹的超自然生物退场了，每当想 到拉雅的这个故事时，我就会想到泰雅博语。 有的时候，我在想，也许终有一天迦普恩的村民完全没有抛弃 泰雅博语。也许泰雅博语一一经过几十年的无人问津、备受冷落而 疲惫受伤，为未来的模样而郁郁寡欢···.也许最终，是泰雅博语抛 弃了他们。 216 雨林里的消亡 [PAGE 226 IMAGE 1 CONTENT (OCR)]:</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="takeaways">
+      <h2>本关关键收获</h2>
+      <ul class="takeaways"><li><span>1</span>第十六章语言消亡时，实际消亡的是什么？</li><li><span>2</span>整个20世纪，一直延续到今天，村民们都在被几乎每个和他们 有联系的外面的人、实体或组织剥削、误导、撒谎、羞辱、蒙骗和掠 夺。在这个过程中，他们并不是被动的任</li><li><span>3</span>但当然，同样的话我们也可以用来说我们自己的社会，和我们 第十六章语言消亡时，实际消亡的是什么？</li><li><span>4</span>当拉雅还是一个小男孩的时候，有一次他见到了一个小精灵。在 雨林里散步的时候，他和朋友撞见了一个小人，那人吹着奇怪的口 哨，隔膜和耳朵上打着长长的绳结作为装饰</li></ul>
+      <nav class="nav">
+        <a class="btn" href="/experiences/user-book-visual-reading-g4ia7j-4d99-g15-chapter-15.html">上一关</a>
+        <a class="btn" href="/experiences/user-book-visual-reading-g4ia7j-4d99-g17-chapter-17.html">下一关</a>
+      </nav>
+    </section>
+  </main>
+  <script>
+    (() => {
+      const progress = document.getElementById("progress");
+      const dots = Array.from(document.querySelectorAll("#dotNav button[data-target]"));
+      const sections = dots
+        .map((dot) => document.getElementById(dot.getAttribute("data-target")))
+        .filter(Boolean);
+      const reveals = Array.from(document.querySelectorAll(".reveal"));
+      const onScroll = () => {
+        const h = document.documentElement;
+        const total = Math.max(1, h.scrollHeight - window.innerHeight);
+        const pct = Math.max(0, Math.min(100, (window.scrollY / total) * 100));
+        if (progress) progress.style.width = pct + "%";
+      };
+      const io = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) entry.target.classList.add("in");
+        }
+      }, { threshold: .14 });
+      reveals.forEach((el) => io.observe(el));
+      const secIo = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const id = entry.target.id;
+          dots.forEach((dot) => dot.classList.toggle("active", dot.getAttribute("data-target") === id));
+        });
+      }, { threshold: .4 });
+      sections.forEach((s) => secIo.observe(s));
+      dots.forEach((dot) => {
+        dot.addEventListener("click", () => {
+          const target = document.getElementById(dot.getAttribute("data-target"));
+          if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+      window.addEventListener("scroll", onScroll, { passive: true });
+      onScroll();
+    })();
+  </script>
+</body>
+</html>

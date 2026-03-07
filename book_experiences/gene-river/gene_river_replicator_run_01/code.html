@@ -1,0 +1,901 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>River of Replicators</title>
+  <style>
+    :root {
+      color-scheme: light;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #0b1320;
+      font-family: "Trebuchet MS", "Avenir Next", "Segoe UI", sans-serif;
+    }
+
+    #stage {
+      width: 100%;
+      height: 100%;
+      display: block;
+      touch-action: manipulation;
+      cursor: pointer;
+      background: radial-gradient(circle at 20% 10%, #1d3552 0%, #0b1320 55%, #070c16 100%);
+    }
+  </style>
+</head>
+<body>
+  <canvas id="stage" aria-label="River of Replicators game"></canvas>
+
+  <script>
+    (() => {
+      const canvas = document.getElementById("stage");
+      const ctx = canvas.getContext("2d");
+
+      const ALLOC_NAMES = ["Survival", "Reproduction", "Sensing"];
+
+      const ERA_CONFIG = [
+        { name: "Digital River", generations: 4, targetFitness: 0.52, targetPopulation: 80 },
+        { name: "Ancestry Web", generations: 4, targetFitness: 0.56, targetPopulation: 95 },
+        { name: "Gradual Adaptation", generations: 4, targetFitness: 0.6, targetPopulation: 120 },
+        { name: "Utility Tradeoffs", generations: 4, targetFitness: 0.65, targetPopulation: 140 },
+        { name: "Replication Bomb", generations: 4, targetFitness: 0.7, targetPopulation: 170 }
+      ];
+
+      const PRESSURE_DECK = [
+        { type: "Predator Swarm", bias: [0.55, 0.15, 0.3], intensity: 1.15 },
+        { type: "Resource Crash", bias: [0.25, 0.55, 0.2], intensity: 1.2 },
+        { type: "Signal Noise", bias: [0.2, 0.2, 0.6], intensity: 1.1 },
+        { type: "Mimic Trap", bias: [0.35, 0.2, 0.45], intensity: 1.18 },
+        { type: "Rival Lineage", bias: [0.35, 0.45, 0.2], intensity: 1.22 }
+      ];
+
+      const STATE = {
+        mode: "menu",
+        phase: "planning",
+        paused: false,
+        eraIndex: 0,
+        generationInEra: 1,
+        globalGeneration: 1,
+        selectedAlloc: 0,
+        allocations: [34, 33, 33],
+        fitness: 0.5,
+        population: 90,
+        integrity: 1,
+        diversity: 0.24,
+        failStrikes: 0,
+        pressure: null,
+        pressureTimer: 0,
+        resolutionTimer: 0,
+        flashTimer: 0,
+        particles: [],
+        eventLog: [],
+        lastOutcome: "",
+        lastDelta: { fitness: 0, population: 0, integrity: 0 },
+        elapsed: 0,
+        hint: "Press Space/Enter to begin.",
+        seed: 7
+      };
+
+      const UI = {
+        buttons: [],
+        layout: null
+      };
+
+      function clamp(v, min, max) {
+        return Math.max(min, Math.min(max, v));
+      }
+
+      function rand() {
+        STATE.seed = (STATE.seed * 1664525 + 1013904223) >>> 0;
+        return STATE.seed / 4294967295;
+      }
+
+      function resize() {
+        const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        canvas.width = Math.round(w * dpr);
+        canvas.height = Math.round(h * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        makeLayout();
+        initParticles();
+      }
+
+      function makeLayout() {
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        const mobile = w < 900;
+
+        if (mobile) {
+          const pad = 12;
+          UI.layout = {
+            mobile,
+            pad,
+            stats: { x: pad, y: pad, w: w - pad * 2, h: 132 },
+            river: { x: pad, y: 154, w: w - pad * 2, h: Math.max(170, h - 350) },
+            controls: { x: pad, y: h - 184, w: w - pad * 2, h: 172 }
+          };
+        } else {
+          const pad = 16;
+          const leftW = clamp(w * 0.34, 300, 430);
+          UI.layout = {
+            mobile,
+            pad,
+            stats: { x: pad, y: pad, w: leftW, h: h - pad * 2 },
+            river: { x: leftW + pad * 2, y: pad, w: w - leftW - pad * 3, h: h - 270 },
+            controls: { x: leftW + pad * 2, y: h - 240, w: w - leftW - pad * 3, h: 224 }
+          };
+        }
+      }
+
+      function initParticles() {
+        const rect = UI.layout ? UI.layout.river : { x: 0, y: 0, w: 600, h: 300 };
+        const target = clamp(Math.round(STATE.population * 0.22), 28, 110);
+        const arr = [];
+        for (let i = 0; i < target; i += 1) {
+          arr.push({
+            x: rect.x + 24 + rand() * Math.max(10, rect.w - 48),
+            y: rect.y + 24 + rand() * Math.max(10, rect.h - 48),
+            vx: -16 + rand() * 32,
+            vy: -16 + rand() * 32,
+            r: 2.5 + rand() * 2.8
+          });
+        }
+        STATE.particles = arr;
+      }
+
+      function resetRun() {
+        STATE.mode = "playing";
+        STATE.phase = "planning";
+        STATE.paused = false;
+        STATE.eraIndex = 0;
+        STATE.generationInEra = 1;
+        STATE.globalGeneration = 1;
+        STATE.selectedAlloc = 0;
+        STATE.allocations = [34, 33, 33];
+        STATE.fitness = 0.5;
+        STATE.population = 90;
+        STATE.integrity = 1;
+        STATE.diversity = 0.24;
+        STATE.failStrikes = 0;
+        STATE.pressure = nextPressure();
+        STATE.pressureTimer = 0;
+        STATE.resolutionTimer = 0;
+        STATE.flashTimer = 0;
+        STATE.eventLog = [];
+        STATE.lastOutcome = "Run started.";
+        STATE.lastDelta = { fitness: 0, population: 0, integrity: 0 };
+        STATE.hint = "Adjust allocations, then run generation.";
+        initParticles();
+      }
+
+      function restartMenu() {
+        STATE.mode = "menu";
+        STATE.phase = "planning";
+        STATE.paused = false;
+        STATE.hint = "Press Space/Enter to begin.";
+      }
+
+      function currentEra() {
+        return ERA_CONFIG[Math.min(STATE.eraIndex, ERA_CONFIG.length - 1)];
+      }
+
+      function nextPressure() {
+        const eraShift = STATE.eraIndex * 0.03;
+        const index = Math.floor(rand() * PRESSURE_DECK.length);
+        const p = PRESSURE_DECK[index];
+        return {
+          type: p.type,
+          bias: p.bias.slice(),
+          intensity: clamp(p.intensity + eraShift, 1, 1.35)
+        };
+      }
+
+      function normalizeAllocations() {
+        let total = STATE.allocations[0] + STATE.allocations[1] + STATE.allocations[2];
+        if (total <= 0) {
+          STATE.allocations = [34, 33, 33];
+          total = 100;
+        }
+        const scale = 100 / total;
+        STATE.allocations = STATE.allocations.map((v) => Math.round(v * scale));
+        let diff = 100 - (STATE.allocations[0] + STATE.allocations[1] + STATE.allocations[2]);
+        while (diff !== 0) {
+          const idx = diff > 0 ? STATE.selectedAlloc : STATE.allocations.findIndex((v) => v > 0);
+          if (idx < 0) break;
+          STATE.allocations[idx] += diff > 0 ? 1 : -1;
+          diff += diff > 0 ? -1 : 1;
+        }
+      }
+
+      function adjustAllocation(index, delta) {
+        if (STATE.mode !== "playing" || STATE.phase !== "planning" || STATE.paused) return;
+        STATE.allocations[index] = clamp(STATE.allocations[index] + delta, 5, 90);
+        normalizeAllocations();
+      }
+
+      function startGeneration() {
+        if (STATE.mode !== "playing" || STATE.phase !== "planning" || STATE.paused) return;
+        STATE.phase = "resolution";
+        STATE.resolutionTimer = 2.8;
+        STATE.flashTimer = 0.5;
+        STATE.hint = "Generation resolving...";
+      }
+
+      function pushLog(line) {
+        STATE.eventLog.unshift(line);
+        if (STATE.eventLog.length > 8) STATE.eventLog.length = 8;
+      }
+
+      function resolveGeneration() {
+        const p = STATE.pressure;
+        const s = STATE.allocations[0] / 100;
+        const r = STATE.allocations[1] / 100;
+        const n = STATE.allocations[2] / 100;
+
+        const pressureDefense = s * p.bias[0] + r * p.bias[1] + n * p.bias[2];
+        const pressureDamage = (1 - pressureDefense) * p.intensity * (0.12 + STATE.eraIndex * 0.015);
+
+        const fitnessDelta = (s * 0.03 + r * 0.018 + n * 0.026) - pressureDamage * 0.62 + (rand() - 0.5) * 0.01;
+        const growthRate = 1 + STATE.fitness * 0.17 + r * 0.2 - pressureDamage * 0.36;
+        const integrityDelta = -0.014 - r * 0.016 + n * 0.013 - pressureDamage * 0.04;
+        const diversityDelta = 0.01 + n * 0.018 - s * 0.004 + (rand() - 0.5) * 0.006;
+
+        const prevPop = STATE.population;
+
+        STATE.fitness = clamp(STATE.fitness + fitnessDelta, 0.3, 0.95);
+        STATE.population = clamp(Math.round(STATE.population * growthRate), 12, 280);
+        STATE.integrity = clamp(STATE.integrity + integrityDelta, 0.12, 1);
+        STATE.diversity = clamp(STATE.diversity + diversityDelta, 0.08, 0.95);
+
+        STATE.lastDelta = {
+          fitness: STATE.fitness - clamp(STATE.fitness - fitnessDelta, 0.3, 0.95),
+          population: STATE.population - prevPop,
+          integrity: integrityDelta
+        };
+
+        const popArrow = STATE.lastDelta.population >= 0 ? "+" : "";
+        STATE.lastOutcome = `${p.type}: fitness ${(fitnessDelta >= 0 ? "+" : "")}${fitnessDelta.toFixed(3)}, pop ${popArrow}${STATE.lastDelta.population}`;
+        pushLog(`G${STATE.globalGeneration} · ${STATE.lastOutcome}`);
+
+        if (STATE.population < 30 || STATE.integrity < 0.22) {
+          STATE.failStrikes += 1;
+          pushLog(`Warning: instability strike ${STATE.failStrikes}/2`);
+        } else {
+          STATE.failStrikes = Math.max(0, STATE.failStrikes - 1);
+        }
+
+        if (STATE.failStrikes >= 2 || STATE.population <= 15 || STATE.integrity <= 0.14) {
+          STATE.mode = "gameover";
+          STATE.phase = "result";
+          STATE.hint = "Lineage collapsed. Press R/Space to retry.";
+          return;
+        }
+
+        const era = currentEra();
+        if (STATE.generationInEra >= era.generations) {
+          const pass = STATE.fitness >= era.targetFitness && STATE.population >= era.targetPopulation;
+          if (!pass) {
+            STATE.mode = "gameover";
+            STATE.phase = "result";
+            STATE.hint = `Era target missed (${era.name}). Press R/Space to retry.`;
+            pushLog(`Era failed: target fitness ${era.targetFitness.toFixed(2)}, population ${era.targetPopulation}`);
+            return;
+          }
+
+          STATE.eraIndex += 1;
+          if (STATE.eraIndex >= ERA_CONFIG.length) {
+            STATE.mode = "victory";
+            STATE.phase = "result";
+            STATE.hint = "Replication Bomb stabilized. Press R/Space to play again.";
+            pushLog("Victory: all thresholds crossed.");
+            return;
+          }
+
+          STATE.generationInEra = 1;
+          STATE.globalGeneration += 1;
+          STATE.pressure = nextPressure();
+          STATE.phase = "planning";
+          STATE.hint = `Era advanced: ${currentEra().name}`;
+          pushLog(`Era cleared -> ${currentEra().name}`);
+          return;
+        }
+
+        STATE.generationInEra += 1;
+        STATE.globalGeneration += 1;
+        STATE.pressure = nextPressure();
+        STATE.phase = "planning";
+        STATE.hint = "Generation complete. Adjust and run again.";
+      }
+
+      function togglePause() {
+        if (STATE.mode !== "playing") return;
+        STATE.paused = !STATE.paused;
+      }
+
+      function toggleFullscreen() {
+        if (document.fullscreenElement) {
+          document.exitFullscreen().catch(() => {});
+        } else {
+          canvas.requestFullscreen?.().catch(() => {});
+        }
+      }
+
+      function handleButton(id) {
+        if (id === "start") {
+          resetRun();
+          return;
+        }
+        if (id === "restart") {
+          restartMenu();
+          return;
+        }
+        if (id === "pause") {
+          togglePause();
+          return;
+        }
+        if (id === "run") {
+          startGeneration();
+          return;
+        }
+        if (id === "full") {
+          toggleFullscreen();
+          return;
+        }
+        if (id.startsWith("minus-")) {
+          adjustAllocation(Number(id.slice(6)), -4);
+          return;
+        }
+        if (id.startsWith("plus-")) {
+          adjustAllocation(Number(id.slice(5)), 4);
+          return;
+        }
+        if (id.startsWith("row-")) {
+          STATE.selectedAlloc = Number(id.slice(4));
+        }
+      }
+
+      function onKeyDown(event) {
+        const key = event.key;
+
+        if (((key === "ArrowUp") && (STATE.mode === "menu" || STATE.mode === "gameover" || STATE.mode === "victory")) || key === "f" || key === "F") {
+          event.preventDefault();
+          toggleFullscreen();
+          return;
+        }
+
+        if ((key === "Escape" || ((key === "ArrowDown") && (STATE.mode === "menu" || STATE.mode === "gameover" || STATE.mode === "victory"))) && document.fullscreenElement) {
+          event.preventDefault();
+          document.exitFullscreen().catch(() => {});
+          return;
+        }
+
+        if (key === "r" || key === "R" || key === "b" || key === "B") {
+          event.preventDefault();
+          restartMenu();
+          return;
+        }
+
+        if (key === "p" || key === "P" || key === "a" || key === "A") {
+          event.preventDefault();
+          togglePause();
+          return;
+        }
+
+        if (STATE.mode === "menu") {
+          if (key === " " || key === "Enter" || key === "Spacebar") {
+            event.preventDefault();
+            resetRun();
+          }
+          return;
+        }
+
+        if (STATE.mode === "gameover" || STATE.mode === "victory") {
+          if (key === " " || key === "Enter" || key === "Spacebar") {
+            event.preventDefault();
+            restartMenu();
+          }
+          return;
+        }
+
+        if (STATE.mode !== "playing" || STATE.paused) return;
+
+        if (STATE.phase === "planning") {
+          if (key === "ArrowLeft") {
+            event.preventDefault();
+            STATE.selectedAlloc = (STATE.selectedAlloc + 2) % 3;
+          } else if (key === "ArrowRight") {
+            event.preventDefault();
+            STATE.selectedAlloc = (STATE.selectedAlloc + 1) % 3;
+          } else if (key === "ArrowDown") {
+            event.preventDefault();
+            adjustAllocation(STATE.selectedAlloc, -4);
+          } else if (key === "ArrowUp") {
+            event.preventDefault();
+            adjustAllocation(STATE.selectedAlloc, 4);
+          } else if (key === " " || key === "Enter" || key === "Spacebar") {
+            event.preventDefault();
+            startGeneration();
+          }
+        } else if (STATE.phase === "resolution" && (key === " " || key === "Enter" || key === "Spacebar")) {
+          event.preventDefault();
+          STATE.resolutionTimer = 0;
+        }
+      }
+
+      function onPointer(event) {
+        const rect = canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+
+        for (let i = UI.buttons.length - 1; i >= 0; i -= 1) {
+          const b = UI.buttons[i];
+          if (x >= b.x && x <= b.x + b.w && y >= b.y && y <= b.y + b.h) {
+            handleButton(b.id);
+            return;
+          }
+        }
+
+        if (STATE.mode === "menu") {
+          resetRun();
+        } else if (STATE.mode === "gameover" || STATE.mode === "victory") {
+          restartMenu();
+        }
+      }
+
+      function drawRoundRect(x, y, w, h, r, fill, stroke) {
+        const radius = Math.min(r, w * 0.5, h * 0.5);
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.arcTo(x + w, y, x + w, y + h, radius);
+        ctx.arcTo(x + w, y + h, x, y + h, radius);
+        ctx.arcTo(x, y + h, x, y, radius);
+        ctx.arcTo(x, y, x + w, y, radius);
+        ctx.closePath();
+        if (fill) {
+          ctx.fillStyle = fill;
+          ctx.fill();
+        }
+        if (stroke) {
+          ctx.strokeStyle = stroke;
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        }
+      }
+
+      function drawText(text, x, y, color, font, align = "left") {
+        ctx.fillStyle = color;
+        ctx.font = font;
+        ctx.textAlign = align;
+        ctx.fillText(text, x, y);
+      }
+
+      function wrapText(text, x, y, maxWidth, lineHeight, color, font) {
+        ctx.font = font;
+        ctx.fillStyle = color;
+        const words = String(text).split(" ");
+        let line = "";
+        let cursorY = y;
+        for (let i = 0; i < words.length; i += 1) {
+          const word = words[i];
+          const test = line ? `${line} ${word}` : word;
+          if (ctx.measureText(test).width > maxWidth && line) {
+            ctx.fillText(line, x, cursorY);
+            line = word;
+            cursorY += lineHeight;
+          } else {
+            line = test;
+          }
+        }
+        if (line) ctx.fillText(line, x, cursorY);
+        return cursorY;
+      }
+
+      function drawBackground() {
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        const g = ctx.createLinearGradient(0, 0, 0, h);
+        g.addColorStop(0, "#16283f");
+        g.addColorStop(0.5, "#0e1a2d");
+        g.addColorStop(1, "#0a111f");
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, w, h);
+
+        for (let i = 0; i < 20; i += 1) {
+          const y = ((STATE.elapsed * 16 + i * 48) % (h + 100)) - 50;
+          const alpha = 0.05 + (i % 4) * 0.02;
+          ctx.strokeStyle = `rgba(112,173,228,${alpha.toFixed(3)})`;
+          ctx.beginPath();
+          ctx.moveTo(-20, y);
+          ctx.bezierCurveTo(w * 0.28, y + 12, w * 0.72, y - 12, w + 20, y + 6);
+          ctx.stroke();
+        }
+      }
+
+      function addButton(id, x, y, w, h, label, active = false) {
+        const fill = active ? "rgba(118,205,255,0.75)" : "rgba(22,46,70,0.78)";
+        const stroke = active ? "rgba(221,245,255,0.95)" : "rgba(128,184,221,0.4)";
+        drawRoundRect(x, y, w, h, 10, fill, stroke);
+        drawText(label, x + w * 0.5, y + h * 0.62, active ? "#072032" : "#d7eeff", "bold 14px Trebuchet MS", "center");
+        UI.buttons.push({ id, x, y, w, h });
+      }
+
+      function drawMenu(layout) {
+        const cardW = Math.min(760, layout.river.w + (layout.mobile ? 0 : layout.stats.w * 0.5));
+        const cardH = layout.mobile ? 290 : 340;
+        const x = (window.innerWidth - cardW) * 0.5;
+        const y = (window.innerHeight - cardH) * 0.5;
+
+        drawRoundRect(x, y, cardW, cardH, 18, "rgba(8,18,30,0.84)", "rgba(145,206,244,0.45)");
+        drawText("RIVER OF REPLICATORS", x + 34, y + 56, "#e5f7ff", "bold 34px Trebuchet MS");
+        wrapText(
+          "Guide one lineage across 5 evolutionary eras. Reallocate Survival / Reproduction / Sensing each generation, survive pressure events, and hit threshold targets.",
+          x + 34,
+          y + 98,
+          cardW - 68,
+          28,
+          "#b8d8ee",
+          "18px Trebuchet MS"
+        );
+        drawText("Desktop: Arrow keys + Space | Mobile: touch +/- and Run", x + 34, y + cardH - 92, "#98c4df", "16px Trebuchet MS");
+        drawText("P/A Pause · R/B Restart · F/↑ Fullscreen · Esc/↓ Exit", x + 34, y + cardH - 64, "#98c4df", "16px Trebuchet MS");
+
+        const pulse = 0.55 + (Math.sin(STATE.elapsed * 4) + 1) * 0.2;
+        const bw = 236;
+        const bh = 52;
+        drawRoundRect(x + cardW - bw - 34, y + cardH - bh - 28, bw, bh, 12, `rgba(115,206,255,${pulse.toFixed(3)})`, "rgba(227,247,255,0.9)");
+        drawText("Start Run", x + cardW - bw * 0.5 - 34, y + cardH - bh * 0.38 - 28, "#062136", "bold 23px Trebuchet MS", "center");
+        UI.buttons.push({ id: "start", x: x + cardW - bw - 34, y: y + cardH - bh - 28, w: bw, h: bh });
+      }
+
+      function drawStats(layout) {
+        const r = layout.stats;
+        drawRoundRect(r.x, r.y, r.w, r.h, 16, "rgba(8,18,30,0.76)", "rgba(136,190,223,0.35)");
+
+        const era = currentEra();
+        if (!layout.mobile) {
+          drawText("LINEAGE CONTROL", r.x + 20, r.y + 34, "#ecf8ff", "bold 26px Trebuchet MS");
+          drawText(`Era ${STATE.eraIndex + 1}/5 · ${era.name}`, r.x + 20, r.y + 62, "#9fd0ea", "18px Trebuchet MS");
+        } else {
+          drawText(`Era ${STATE.eraIndex + 1}/5 · ${era.name}`, r.x + 14, r.y + 30, "#ecf8ff", "bold 20px Trebuchet MS");
+        }
+
+        const top = layout.mobile ? r.y + 52 : r.y + 98;
+        const colW = layout.mobile ? (r.w - 26) / 3 : r.w - 40;
+
+        if (layout.mobile) {
+          const labels = [
+            `Pop ${STATE.population}`,
+            `Fit ${STATE.fitness.toFixed(2)}`,
+            `Int ${STATE.integrity.toFixed(2)}`
+          ];
+          for (let i = 0; i < 3; i += 1) {
+            const x = r.x + 10 + i * (colW + 3);
+            drawRoundRect(x, top, colW, 42, 8, "rgba(20,40,62,0.75)", "rgba(130,188,224,0.35)");
+            drawText(labels[i], x + colW * 0.5, top + 27, "#e3f4ff", "bold 17px Trebuchet MS", "center");
+          }
+          drawText(`Gen ${STATE.generationInEra}/${era.generations} · Target fit ${era.targetFitness.toFixed(2)} / pop ${era.targetPopulation}`, r.x + 12, r.y + r.h - 16, "#9fd0ea", "14px Trebuchet MS");
+          return;
+        }
+
+        const metrics = [
+          { k: "Population", v: String(STATE.population), color: "#dff6ff" },
+          { k: "Fitness", v: STATE.fitness.toFixed(3), color: "#b6f0cf" },
+          { k: "Integrity", v: STATE.integrity.toFixed(3), color: "#ffd9b3" },
+          { k: "Diversity", v: STATE.diversity.toFixed(3), color: "#d9c8ff" },
+          { k: "Generation", v: `${STATE.generationInEra}/${era.generations}`, color: "#c5e7ff" },
+          { k: "Global Gen", v: String(STATE.globalGeneration), color: "#c5e7ff" }
+        ];
+
+        for (let i = 0; i < metrics.length; i += 1) {
+          const y = top + i * 48;
+          drawRoundRect(r.x + 20, y, r.w - 40, 40, 9, "rgba(17,34,54,0.64)", "rgba(117,171,203,0.25)");
+          drawText(metrics[i].k, r.x + 34, y + 25, "#9fc7de", "16px Trebuchet MS");
+          drawText(metrics[i].v, r.x + r.w - 34, y + 25, metrics[i].color, "bold 18px Trebuchet MS", "right");
+        }
+
+        drawText(`Target this era: fitness >= ${era.targetFitness.toFixed(2)}, population >= ${era.targetPopulation}`, r.x + 20, r.y + r.h - 78, "#8ec0db", "15px Trebuchet MS");
+        drawText(`Pressure: ${STATE.pressure ? STATE.pressure.type : "-"}`, r.x + 20, r.y + r.h - 54, "#b0ddf3", "16px Trebuchet MS");
+        drawText(`Hint: ${STATE.hint}`, r.x + 20, r.y + r.h - 26, "#9bcce5", "14px Trebuchet MS");
+
+        for (let i = 0; i < STATE.eventLog.length; i += 1) {
+          const y = r.y + r.h - 110 - i * 22;
+          if (y < r.y + 390) break;
+          drawText(STATE.eventLog[i], r.x + 22, y, "rgba(173,218,246,0.78)", "13px Trebuchet MS");
+        }
+      }
+
+      function drawRiver(layout) {
+        const r = layout.river;
+        drawRoundRect(r.x, r.y, r.w, r.h, 16, "rgba(10,24,40,0.75)", "rgba(135,193,231,0.35)");
+
+        const glow = STATE.phase === "resolution" ? 0.25 + Math.sin(STATE.elapsed * 18) * 0.08 : 0.11;
+        drawRoundRect(r.x + 10, r.y + 10, r.w - 20, r.h - 20, 14, `rgba(80,170,220,${glow.toFixed(3)})`, null);
+
+        const type = STATE.pressure ? STATE.pressure.type : "No Pressure";
+        drawText(type, r.x + 16, r.y + 30, "#d8f0ff", "bold 18px Trebuchet MS");
+        if (STATE.phase === "resolution") {
+          drawText(`Resolving... ${STATE.resolutionTimer.toFixed(1)}s`, r.x + r.w - 18, r.y + 30, "#ffe9c7", "bold 16px Trebuchet MS", "right");
+        } else {
+          drawText("Planning", r.x + r.w - 18, r.y + 30, "#b9dff4", "bold 16px Trebuchet MS", "right");
+        }
+
+        const waveBands = 5;
+        for (let i = 0; i < waveBands; i += 1) {
+          const y = r.y + 46 + i * ((r.h - 78) / waveBands);
+          ctx.strokeStyle = `rgba(156,214,248,${(0.08 + i * 0.02).toFixed(3)})`;
+          ctx.beginPath();
+          ctx.moveTo(r.x + 12, y);
+          ctx.bezierCurveTo(
+            r.x + r.w * 0.34,
+            y + Math.sin(STATE.elapsed * 1.8 + i) * 6,
+            r.x + r.w * 0.68,
+            y - Math.cos(STATE.elapsed * 2 + i) * 5,
+            r.x + r.w - 12,
+            y + Math.sin(STATE.elapsed + i) * 3
+          );
+          ctx.stroke();
+        }
+
+        for (const particle of STATE.particles) {
+          const hue = 180 + STATE.allocations[2] * 0.6;
+          ctx.fillStyle = `hsla(${hue.toFixed(1)}, 85%, ${(55 + STATE.allocations[1] * 0.25).toFixed(1)}%, 0.88)`;
+          ctx.beginPath();
+          ctx.arc(particle.x, particle.y, particle.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        if (STATE.mode === "gameover" || STATE.mode === "victory") {
+          const tone = STATE.mode === "victory" ? "rgba(105,214,153,0.24)" : "rgba(255,137,137,0.25)";
+          const border = STATE.mode === "victory" ? "rgba(162,244,191,0.7)" : "rgba(255,182,182,0.7)";
+          const w = Math.min(580, r.w - 40);
+          const h = 154;
+          const x = r.x + (r.w - w) * 0.5;
+          const y = r.y + (r.h - h) * 0.5;
+          drawRoundRect(x, y, w, h, 14, tone, border);
+          drawText(STATE.mode === "victory" ? "Replication Bomb Stabilized" : "Lineage Collapsed", x + 24, y + 50, "#f4fbff", "bold 34px Trebuchet MS");
+          drawText(STATE.hint, x + 24, y + 88, "#d2ebfb", "18px Trebuchet MS");
+          drawText(`Outcome: ${STATE.lastOutcome}`, x + 24, y + 120, "#b5d9ef", "16px Trebuchet MS");
+        }
+      }
+
+      function drawControls(layout) {
+        const r = layout.controls;
+        drawRoundRect(r.x, r.y, r.w, r.h, 16, "rgba(8,18,30,0.76)", "rgba(136,190,223,0.35)");
+
+        const rowH = layout.mobile ? 26 : 34;
+        const actionH = layout.mobile ? 32 : 36;
+        const startY = r.y + 14;
+        const rowsBottom = r.y + r.h - actionH - 18;
+        const freeH = rowsBottom - startY - rowH * 3;
+        const rowGap = Math.max(6, Math.floor(freeH / 2));
+        const barX = layout.mobile ? r.x + 94 : r.x + 118;
+        const pmW = layout.mobile ? 26 : 32;
+        const rightX = r.x + r.w - (pmW * 2 + 14);
+        const barW = Math.max(64, rightX - barX - 8);
+
+        for (let i = 0; i < 3; i += 1) {
+          const y = startY + i * (rowH + rowGap);
+          const selected = i === STATE.selectedAlloc;
+          drawText(
+            ALLOC_NAMES[i],
+            r.x + (layout.mobile ? 10 : 14),
+            y + rowH * 0.68,
+            selected ? "#ebf9ff" : "#a8d0e6",
+            selected ? (layout.mobile ? "bold 14px Trebuchet MS" : "bold 16px Trebuchet MS") : (layout.mobile ? "13px Trebuchet MS" : "15px Trebuchet MS")
+          );
+
+          const innerH = rowH - 8;
+          drawRoundRect(barX, y + 6, barW, innerH, 8, "rgba(18,36,57,0.68)", "rgba(115,171,204,0.3)");
+
+          const fillW = Math.max(6, barW * (STATE.allocations[i] / 100));
+          const fillColor = i === 0 ? "rgba(114,219,174,0.78)" : i === 1 ? "rgba(250,205,128,0.78)" : "rgba(126,198,255,0.8)";
+          drawRoundRect(barX + 2, y + 8, fillW - 4, innerH - 4, 6, fillColor, null);
+
+          if (!layout.mobile) {
+            drawText(`${STATE.allocations[i]}%`, barX + barW + 10, y + rowH * 0.67, "#dff4ff", "bold 14px Trebuchet MS");
+          }
+
+          addButton(`minus-${i}`, rightX, y + 2, pmW, rowH - 2, "-");
+          addButton(`plus-${i}`, rightX + pmW + 6, y + 2, pmW, rowH - 2, "+");
+          UI.buttons.push({ id: `row-${i}`, x: barX, y: y + 6, w: barW, h: innerH });
+        }
+
+        const by = r.y + r.h - actionH - 10;
+        if (layout.mobile) {
+          const gap = 6;
+          const btnW = Math.floor((r.w - 20 - gap * 3) / 4);
+          addButton("run", r.x + 10, by, btnW, actionH, STATE.phase === "resolution" ? "Skip" : "Run", STATE.phase !== "resolution");
+          addButton("pause", r.x + 10 + (btnW + gap) * 1, by, btnW, actionH, STATE.paused ? "Resume" : "Pause");
+          addButton("restart", r.x + 10 + (btnW + gap) * 2, by, btnW, actionH, "Restart");
+          addButton("full", r.x + 10 + (btnW + gap) * 3, by, btnW, actionH, "Full");
+        } else {
+          addButton("run", r.x + 14, by, 120, actionH, STATE.phase === "resolution" ? "Skip" : "Run", STATE.phase !== "resolution");
+          addButton("pause", r.x + 146, by, 92, actionH, STATE.paused ? "Resume" : "Pause");
+          addButton("restart", r.x + 248, by, 98, actionH, "Restart");
+          addButton("full", r.x + 356, by, 112, actionH, "Fullscreen");
+          drawText(`Last: ${STATE.lastOutcome || "-"}`, r.x + 478, by + 24, "#a8d4ec", "14px Trebuchet MS");
+        }
+      }
+
+      function drawHUD() {
+        if (UI.layout && UI.layout.mobile) return;
+        const text = STATE.mode === "menu"
+          ? "Space/Enter start"
+          : "Arrows tune allocations · Space run · P pause · R restart · F fullscreen";
+        drawText(text, 16, window.innerHeight - 12, "rgba(182,220,243,0.88)", "14px Trebuchet MS");
+      }
+
+      function drawPauseOverlay() {
+        if (!STATE.paused || STATE.mode !== "playing") return;
+        const w = 280;
+        const h = 90;
+        const x = (window.innerWidth - w) * 0.5;
+        const y = (window.innerHeight - h) * 0.5;
+        drawRoundRect(x, y, w, h, 14, "rgba(5,10,18,0.86)", "rgba(169,214,241,0.56)");
+        drawText("Paused", x + w * 0.5, y + 38, "#e5f7ff", "bold 32px Trebuchet MS", "center");
+        drawText("Press P/A or tap Pause", x + w * 0.5, y + 64, "#b8d9ef", "14px Trebuchet MS", "center");
+      }
+
+      function render() {
+        UI.buttons = [];
+        const layout = UI.layout;
+        drawBackground();
+
+        if (STATE.mode === "menu") {
+          drawMenu(layout);
+        } else {
+          drawStats(layout);
+          drawRiver(layout);
+          drawControls(layout);
+        }
+
+        drawHUD();
+        drawPauseOverlay();
+      }
+
+      function updateParticles(dt) {
+        const r = UI.layout.river;
+        const speed = STATE.phase === "resolution" ? 1.8 : 1;
+        for (const p of STATE.particles) {
+          p.x += p.vx * dt * speed;
+          p.y += p.vy * dt * speed;
+          p.vx += Math.sin(STATE.elapsed + p.y * 0.01) * dt * 1.6;
+          p.vy += Math.cos(STATE.elapsed * 0.7 + p.x * 0.008) * dt * 1.6;
+
+          if (p.x < r.x + 12 || p.x > r.x + r.w - 12) p.vx *= -1;
+          if (p.y < r.y + 40 || p.y > r.y + r.h - 12) p.vy *= -1;
+
+          p.x = clamp(p.x, r.x + 12, r.x + r.w - 12);
+          p.y = clamp(p.y, r.y + 40, r.y + r.h - 12);
+        }
+      }
+
+      function update(dt) {
+        STATE.elapsed += dt;
+        if (STATE.mode !== "playing" || STATE.paused) {
+          updateParticles(dt);
+          return;
+        }
+
+        updateParticles(dt);
+
+        if (STATE.phase === "resolution") {
+          STATE.resolutionTimer -= dt;
+          STATE.pressureTimer += dt;
+          if (STATE.resolutionTimer <= 0) {
+            resolveGeneration();
+          }
+        }
+
+        const targetCount = clamp(Math.round(STATE.population * 0.22), 28, 120);
+        if (STATE.particles.length < targetCount) {
+          const r = UI.layout.river;
+          for (let i = 0; i < 2 && STATE.particles.length < targetCount; i += 1) {
+            STATE.particles.push({
+              x: r.x + 24 + rand() * (r.w - 48),
+              y: r.y + 24 + rand() * (r.h - 48),
+              vx: -16 + rand() * 32,
+              vy: -16 + rand() * 32,
+              r: 2.2 + rand() * 2.5
+            });
+          }
+        } else if (STATE.particles.length > targetCount && rand() < 0.4) {
+          STATE.particles.pop();
+        }
+      }
+
+      function loop(ts) {
+        if (!loop.last) loop.last = ts;
+        const dt = clamp((ts - loop.last) / 1000, 0, 0.05);
+        loop.last = ts;
+        update(dt);
+        render();
+        requestAnimationFrame(loop);
+      }
+      loop.last = 0;
+
+      function renderGameToText() {
+        const era = currentEra();
+        const payload = {
+          coordinate_system: "Canvas origin at top-left (0,0); x increases right; y increases down.",
+          mode: STATE.mode,
+          phase: STATE.phase,
+          paused: STATE.paused,
+          era_index: STATE.eraIndex,
+          era_name: era.name,
+          generation_in_era: STATE.generationInEra,
+          era_generations: era.generations,
+          global_generation: STATE.globalGeneration,
+          targets: {
+            fitness: era.targetFitness,
+            population: era.targetPopulation
+          },
+          stats: {
+            population: STATE.population,
+            fitness: Number(STATE.fitness.toFixed(3)),
+            integrity: Number(STATE.integrity.toFixed(3)),
+            diversity: Number(STATE.diversity.toFixed(3)),
+            fail_strikes: STATE.failStrikes
+          },
+          allocations: {
+            survival: STATE.allocations[0],
+            reproduction: STATE.allocations[1],
+            sensing: STATE.allocations[2],
+            selected: ALLOC_NAMES[STATE.selectedAlloc]
+          },
+          pressure: STATE.pressure,
+          resolution_timer: Number(STATE.resolutionTimer.toFixed(2)),
+          hint: STATE.hint,
+          last_outcome: STATE.lastOutcome,
+          last_delta: {
+            fitness: Number(STATE.lastDelta.fitness.toFixed(4)),
+            population: STATE.lastDelta.population,
+            integrity: Number(STATE.lastDelta.integrity.toFixed(4))
+          },
+          event_log: STATE.eventLog,
+          entities: STATE.particles.slice(0, 24).map((p) => ({ x: Math.round(p.x), y: Math.round(p.y), r: Number(p.r.toFixed(2)) })),
+          ui_buttons: UI.buttons.map((b) => ({ id: b.id, x: Math.round(b.x), y: Math.round(b.y), w: Math.round(b.w), h: Math.round(b.h) })),
+          fullscreen: Boolean(document.fullscreenElement),
+          controls: {
+            desktop: ["ArrowLeft/ArrowRight select", "ArrowUp/ArrowDown adjust", "Space run/skip", "P pause", "R restart", "F fullscreen"],
+            mobile: ["Tap +/-", "Tap Run", "Tap Pause", "Tap Restart", "Tap Fullscreen"]
+          }
+        };
+        return JSON.stringify(payload);
+      }
+
+      window.render_game_to_text = renderGameToText;
+      window.advanceTime = (ms) => {
+        const steps = Math.max(1, Math.round(ms / (1000 / 60)));
+        for (let i = 0; i < steps; i += 1) {
+          update(1 / 60);
+        }
+        render();
+      };
+
+      window.addEventListener("resize", resize);
+      window.addEventListener("keydown", onKeyDown, { passive: false });
+      canvas.addEventListener("click", onPointer);
+      canvas.addEventListener("touchstart", (event) => {
+        const touch = event.changedTouches && event.changedTouches[0];
+        if (!touch) return;
+        onPointer({ clientX: touch.clientX, clientY: touch.clientY });
+      }, { passive: true });
+
+      resize();
+      requestAnimationFrame(loop);
+    })();
+  </script>
+</body>
+</html>

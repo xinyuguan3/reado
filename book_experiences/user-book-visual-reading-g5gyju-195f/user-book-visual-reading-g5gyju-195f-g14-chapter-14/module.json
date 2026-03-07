@@ -1,0 +1,40 @@
+{
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T09:57:49.686Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "雨林里的消亡（可视化阅读测试）",
+      "author": "Unknown"
+    },
+    "knowledge_block": {
+      "id": "kb-34",
+      "gate_index": 14,
+      "title": "第十三章",
+      "summary": "第十三章 Who Killed Monei? 谁杀死了莫内 莫内的一纸邀约把我带了回来，在我重新 在迦普恩安顿下来几个月后一在直升机运我 出去之前的那九个月里一莫内死了。那场导 致他死亡的疾病似乎开始得没有任何预兆。一 天夜里，莫内揉了揉太阳穴，向他妻子抱怨说 他头痛。三周后，他就不会走路了。然后他就 停止进食了，再过了两周，人就没了。",
+      "words": 1438,
+      "keywords": [
+        "page",
+        "image",
+        "content",
+        "ocr",
+        "斧头",
+        "sanguma"
+      ],
+      "density": {
+        "score": 0.6042,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0.217,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "scholar",
+      "theme_label": "Scholar Atlas",
+      "section_count": 5,
+      "generated_with": "template_runtime"
+    }
+  }
+}

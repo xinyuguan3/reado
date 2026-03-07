@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>第五章 The Burden of Giving 给予的负担 我经常… · 雨林里的消亡：一种语言和生活方式在巴布亚新几内亚的终结</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #16120f;
+      --bg2: #2a1f18;
+      --accent: #d97706;
+      --accent2: #2dd4bf;
+      --text: #f5f1ea;
+      --soft: #c7b8a2;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+      background:
+        radial-gradient(1200px 540px at 85% -8%, color-mix(in srgb, var(--accent2) 24%, transparent), transparent 70%),
+        radial-gradient(980px 460px at -10% 14%, color-mix(in srgb, var(--accent) 24%, transparent), transparent 74%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+      color: var(--text);
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .05;
+      background-image: radial-gradient(circle at 1px 1px, #fff 1px, transparent 0);
+      background-size: 3px 3px;
+      z-index: 0;
+    }
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      z-index: 100;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+    .page { position: relative; z-index: 1; width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 20px 0 48px; }
+    .hero {
+      min-height: 74vh;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 22px;
+      background: linear-gradient(160deg, color-mix(in srgb, var(--bg2) 86%, transparent), color-mix(in srgb, var(--bg) 88%, transparent));
+      padding: 40px 34px;
+      display: grid;
+      align-content: center;
+      gap: 16px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.34);
+    }
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .hero h1 {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(32px, 5.4vw, 68px);
+      line-height: 1.16;
+      letter-spacing: .04em;
+      max-width: 15em;
+      text-wrap: balance;
+    }
+    .hero p {
+      max-width: 66ch;
+      line-height: 1.95;
+      color: color-mix(in srgb, var(--text) 85%, var(--soft));
+      font-size: 16px;
+    }
+    .chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip {
+      border: 1px solid color-mix(in srgb, var(--accent2) 44%, transparent);
+      color: color-mix(in srgb, var(--accent2) 88%, #fff);
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 12px;
+      background: rgba(255,255,255,.03);
+    }
+    .section { margin-top: 18px; border: 1px solid rgba(255,255,255,.13); border-radius: 18px; padding: 22px; background: rgba(2,6,18,.46); }
+    .section h2 {
+      margin-bottom: 12px;
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(22px, 2.8vw, 34px);
+      color: color-mix(in srgb, var(--accent) 86%, #fff);
+      letter-spacing: .03em;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1.1fr 1fr; gap: 14px; }
+    .concept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+    .concept-card {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      background: rgba(255,255,255,.03);
+      padding: 14px;
+      min-height: 128px;
+    }
+    .concept-token { font-size: 14px; letter-spacing: .14em; color: var(--accent2); text-transform: uppercase; margin-bottom: 7px; font-weight: 700; }
+    .concept-note { font-size: 14px; color: color-mix(in srgb, var(--text) 88%, var(--soft)); line-height: 1.8; }
+    .atlas {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      min-height: 440px;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+    .atlas svg { width: 100%; max-width: 440px; height: auto; }
+    .timeline { display: grid; gap: 10px; }
+    .timeline-item {
+      border-left: 2px solid color-mix(in srgb, var(--accent) 66%, transparent);
+      padding: 10px 14px;
+      background: rgba(255,255,255,.02);
+      border-radius: 0 10px 10px 0;
+    }
+    .timeline-no { font-size: 11px; letter-spacing: .22em; color: var(--accent2); display: block; margin-bottom: 6px; }
+    .timeline-item h3 { font-size: 19px; font-family: "Noto Serif SC", serif; line-height: 1.45; margin-bottom: 7px; }
+    .timeline-item p { font-size: 14px; line-height: 1.9; color: color-mix(in srgb, var(--text) 84%, var(--soft)); }
+    .quote-wrap { display: grid; gap: 10px; }
+    .quote {
+      border-left: 2px solid color-mix(in srgb, var(--accent2) 80%, transparent);
+      padding: 10px 12px;
+      background: rgba(255,255,255,.02);
+      color: color-mix(in srgb, var(--text) 92%, #fff);
+      font-family: "Noto Serif SC", serif;
+      line-height: 1.9;
+    }
+    .takeaways { margin-top: 10px; list-style: none; display: grid; gap: 8px; }
+    .takeaways li {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      padding: 10px;
+      background: rgba(255,255,255,.02);
+      align-items: start;
+      line-height: 1.8;
+    }
+    .takeaways span {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: color-mix(in srgb, var(--accent2) 26%, transparent);
+      color: var(--accent2);
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+    .nav { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,.26);
+      border-radius: 999px;
+      padding: 8px 13px;
+      font-size: 12px;
+      color: var(--text);
+      background: rgba(255,255,255,.04);
+    }
+    .btn:hover { border-color: var(--accent2); color: var(--accent2); }
+    .dot-nav {
+      position: fixed;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: grid;
+      gap: 10px;
+      z-index: 50;
+    }
+    .dot-nav button {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.35);
+      background: transparent;
+      cursor: pointer;
+      transition: all .24s ease;
+    }
+    .dot-nav button.active { transform: scale(1.34); border-color: var(--accent); background: var(--accent); }
+    .reveal { opacity: 0; transform: translateY(16px); transition: opacity .55s ease, transform .55s ease; }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+    @media (max-width: 940px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .dot-nav { display: none; }
+      .hero { min-height: auto; padding: 30px 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+  <nav class="dot-nav" id="dotNav">
+    <button data-target="hero" class="active" aria-label="Hero"></button>
+    <button data-target="atlas" aria-label="Atlas"></button>
+    <button data-target="concepts" aria-label="Concepts"></button>
+    <button data-target="reading" aria-label="Reading"></button>
+    <button data-target="takeaways" aria-label="Takeaways"></button>
+  </nav>
+  <main class="page">
+    <section class="hero reveal in" id="hero">
+      <p class="eyebrow">Field Narrative · Gate 7</p>
+      <h1>第五章 The Burden of Giving 给予的负担 我经常…</h1>
+      <p>第五章 The Burden of Giving 给予的负担 我经常好奇，为什么迦普恩人对我这个住 在他们村子里多管闲事的人类学家这么宽容？ 从我突然来到这里的第一天起，也不知道我是 从哪里冒出来的，村民们欢迎了我。即便他们 逐渐意识到，我那些神秘兮兮的活动，即所谓 的工作主要就是插手他们的事务，搜集闲言碎 语，以及温柔地怂惠他们把秘密讲给我听，他 们还是那么好心仁慈。</p>
+      <div class="chip-row">
+        <span class="chip">雨林里的消亡：一种语言和生活方式在巴布亚新几内亚的终结</span>
+        
+        <span class="chip">Module 7/18</span>
+        <span class="tag">一次是</span><span class="tag">page</span><span class="tag">image</span><span class="tag">content</span><span class="tag">ocr</span><span class="tag">第五章</span>
+      </div>
+    </section>
+
+    <section class="section grid-2 reveal" id="atlas">
+      <article>
+        <h2>知识结构图谱</h2>
+        <p style="color:var(--soft);line-height:1.9;margin-bottom:10px;">围绕本关卡核心概念构建关系图。阅读时先抓主轴，再理解每个概念如何驱动判断与行动。</p>
+        <div class="quote-wrap"><blockquote class="quote reveal">“尤其是我刚来的那几周（在那之后即便是他们也麻木了），一群 小伙子会涌进我家里，最强壮的那两个会把其他人推走，挨挤着坐进 我正对面的另一把蓝色椅子，面向着我。（椅子的用处是在我誉录和 村民的语音聊天记录时，给他们一个地方坐。）那两个胜利的男孩坐 在了这把椅子上，隔着桌子盯着我看。其他几个被阻止坐上这把蓝色 椅子的男孩在地板上散开，盘腿坐下或朝天躺着，调整好姿势，这样 他们也能得到一个观赏我的角度。他们也盯着我看。： 渐渐地，我也习惯了被当”</blockquote><blockquote class="quote reveal">“年轻人和孩子们最喜欢的消遣就是看我干活。这听上去很无聊， 无疑确实如此。他们喜欢看我干的活就是我坐在一把蓝色塑料椅上， 面前是一张一边高一边低、很潦草地钉在一起的木板桌（是我自己 做的），在屋子中央写作：要不就是在电脑上打字，又或者更多时候 （因为给电脑供能的太阳能接线经常出问题），手里拿着一支钢笔在笔 记本和日记本上写东西。这个活动实在平淡无奇。就我个人来说，我 宁愿无聊地干等。但我安安静静地弯腰坐在电脑或笔记本前写东西的 样子，似乎”</blockquote><blockquote class="quote reveal">“为了招待我，在我三次（一次是1986年， 一次是1991年，还有一次是2009年）造访他 们村子的那些年里，村民们为我造了一个屋 子。每次我到的时候，许多村民就在木筏不能 再往前开的地方集合，帮我卸下行李，背在背 上或顶在头顶上，在潮湿的雨林里跋涉一个小 时，走过树干和树皮做成的滑溜溜的桥。在村 里，他们给我食物吃一女人和女孩们总是主 65 [PAGE 75 IMAGE 1 CONTENT (OCR)]: 动给我送来一碟碟食物，又或者她”</blockquote></div>
+      </article>
+      <article class="atlas">
+        <svg viewBox="0 0 440 440" aria-label="concept atlas">
+          <defs>
+            <radialGradient id="g" cx="50%" cy="50%" r="56%">
+              <stop offset="0%" stop-color="#d97706" stop-opacity=".24"></stop>
+              <stop offset="100%" stop-color="#d97706" stop-opacity="0"></stop>
+            </radialGradient>
+          </defs>
+          <circle cx="220" cy="220" r="190" fill="none" stroke="rgba(255,255,255,.08)" stroke-dasharray="5 6"></circle>
+          <circle cx="220" cy="220" r="84" fill="url(#g)"></circle>
+          <circle cx="220" cy="220" r="10" fill="#d97706"></circle>
+          <text x="220" y="252" text-anchor="middle" fill="#f5f1ea" font-size="13">第五章 The Burden of Giving</text>
+          <g><line x1="220" y1="220" x2="370" y2="220" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="370" cy="220" r="8" fill="#2dd4bf"/><text x="382" y="224" fill="#f5f1ea" font-size="12">一次是</text></g><g><line x1="220" y1="220" x2="266" y2="363" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="266" cy="363" r="8" fill="#2dd4bf"/><text x="278" y="367" fill="#f5f1ea" font-size="12">page</text></g><g><line x1="220" y1="220" x2="99" y2="308" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="99" cy="308" r="8" fill="#2dd4bf"/><text x="111" y="312" fill="#f5f1ea" font-size="12">image</text></g><g><line x1="220" y1="220" x2="99" y2="132" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="99" cy="132" r="8" fill="#2dd4bf"/><text x="111" y="136" fill="#f5f1ea" font-size="12">content</text></g><g><line x1="220" y1="220" x2="266" y2="77" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="266" cy="77" r="8" fill="#2dd4bf"/><text x="278" y="81" fill="#f5f1ea" font-size="12">ocr</text></g>
+        </svg>
+      </article>
+    </section>
+
+    <section class="section reveal" id="concepts">
+      <h2>核心概念与解释</h2>
+      <div class="concept-grid">
+      <article class="concept-card reveal">
+        <p class="concept-token">一次是</p>
+        <p class="concept-note">为了招待我，在我三次（一次是1986年， 一次是1991年，还有一次是2009年）造访他 们村子的那些年里，村民们为我造了一个屋 子。每次我到的时候，许多村民就在木筏不能 再往前开的地方集合，帮我卸下行李，背在背 上或顶在头顶上，在潮湿的雨林里跋涉一个小 时，走过树干和树皮做成的滑溜溜的桥。在村 里，他们给我食物吃一女人和女孩们总是主 65 [PAGE 75</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">page</p>
+        <p class="concept-note">为了招待我，在我三次（一次是1986年， 一次是1991年，还有一次是2009年）造访他 们村子的那些年里，村民们为我造了一个屋 子。每次我到的时候，许多村民就在木筏不能 再往前开的地方集合，帮我卸下行李，背在背 上或顶在头顶上，在潮湿的雨林里跋涉一个小 时，走过树干和树皮做成的滑溜溜的桥。在村 里，他们给我食物吃一女人和女孩们总是主 65 [PAGE 75</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">image</p>
+        <p class="concept-note">为了招待我，在我三次（一次是1986年， 一次是1991年，还有一次是2009年）造访他 们村子的那些年里，村民们为我造了一个屋 子。每次我到的时候，许多村民就在木筏不能 再往前开的地方集合，帮我卸下行李，背在背 上或顶在头顶上，在潮湿的雨林里跋涉一个小 时，走过树干和树皮做成的滑溜溜的桥。在村 里，他们给我食物吃一女人和女孩们总是主 65 [PAGE 75</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">content</p>
+        <p class="concept-note">为了招待我，在我三次（一次是1986年， 一次是1991年，还有一次是2009年）造访他 们村子的那些年里，村民们为我造了一个屋 子。每次我到的时候，许多村民就在木筏不能 再往前开的地方集合，帮我卸下行李，背在背 上或顶在头顶上，在潮湿的雨林里跋涉一个小 时，走过树干和树皮做成的滑溜溜的桥。在村 里，他们给我食物吃一女人和女孩们总是主 65 [PAGE 75</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">ocr</p>
+        <p class="concept-note">为了招待我，在我三次（一次是1986年， 一次是1991年，还有一次是2009年）造访他 们村子的那些年里，村民们为我造了一个屋 子。每次我到的时候，许多村民就在木筏不能 再往前开的地方集合，帮我卸下行李，背在背 上或顶在头顶上，在潮湿的雨林里跋涉一个小 时，走过树干和树皮做成的滑溜溜的桥。在村 里，他们给我食物吃一女人和女孩们总是主 65 [PAGE 75</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">第五章</p>
+        <p class="concept-note">第五章 The Burden of Giving 给予的负担 我经常好奇，为什么迦普恩人对我这个住 在他们村子里多管闲事的人类学家这么宽容？</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="reading">
+      <h2>渐进式阅读路径</h2>
+      <div class="timeline">
+      <article class="timeline-item reveal">
+        <span class="timeline-no">01</span>
+        <h3>第五章 The Burden of Giving 给予的负担 我经常好奇，为什么迦普恩人对我这个住 在他们村子里多管闲事的人类学家这么宽容？</h3>
+        <p>第五章 The Burden of Giving 给予的负担 我经常好奇，为什么迦普恩人对我这个住 在他们村子里多管闲事的人类学家这么宽容？ 从我突然来到这里的第一天起，也不知道我是 从哪里冒出来的，村民们欢迎了我。即便他们 逐渐意识到，我那些神秘兮兮的活动，即所谓 的工作主要就是插手他们的事务，搜集闲言碎 语，以及温柔地怂惠他们把秘密讲给我听，他 们还是那么好心仁慈。 为了招待我，在我三次（一次是1986年， 一次是1991年，还有一次是2009年）造访他 们村子的那些年里，村民们为我造了一个屋 子。每次我到的时候，许多村民就在木筏不能 再往前开的地方集合，帮我卸下行李，背在背 上或顶在头顶上，在潮湿的雨林里跋涉一个小 时，走过树干和树皮做成的滑溜溜的桥。在村 里，他们给我食物吃一女人和女孩们总是主 65 [PAGE 75 IMAGE 1 CONTENT (OCR)]: 动给我送来一碟碟食物，又或者她们做了一大锅新鲜的西米啫喱或炖 香蕉的时候，就叫我去她们家里一起吃。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">02</span>
+        <h3>要是我真的同意让她们帮忙，想必她们会帮我从浅井里打水，还 会帮我洗衣服。（因为挑水和洗衣服是我唯二能在雨林里独自完成的 事情，我就没好意思让她们帮我。）村民</h3>
+        <p>要是我真的同意让她们帮忙，想必她们会帮我从浅井里打水，还 会帮我洗衣服。（因为挑水和洗衣服是我唯二能在雨林里独自完成的 事情，我就没好意思让她们帮我。）村民们要保证我干净整洁，每当 他们看到我腿上哪怕溅了一丁点泥巴，他们就会忙不迭地劝我赶紧去 洗掉，尽管他们自己光着的脚上和腿上还沾着泥。有一次我坐下来和 一个女人闲聊，她留意到我手指甲脏了的时候还责备了我。 “你为什么不洗掉呢，这样就白了。”她关切地问我。 我告诉她，因为我生活在雨林里，手指甲免不了会弄脏，就跟他 们一样。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">03</span>
+        <h3>她不喜欢这个回答。“我们想让你身上每个地方都是白的。”她耐 心地解释道。意思很明确，如果不弄干净我的手指甲，我要不就是傻 子，要不就是没有为他们着想。</h3>
+        <p>她不喜欢这个回答。“我们想让你身上每个地方都是白的。”她耐 心地解释道。意思很明确，如果不弄干净我的手指甲，我要不就是傻 子，要不就是没有为他们着想。 当然，村民们对我的健康这么热心的一个原因是，他们觉得我是 他们如此渴求的变革的一个预兆。但也不可能只有这一个原因，因为 尽管村民们有许多美德，耐心一定不在其中。如果他们对我的存在表 示宽容的唯一理由就是盼着我快点显神通，招来天堂的宝物，他们肯 定早就放弃了。 这些年来，我得出结论，村民们忍受我这样一个帮不上什么忙还 爱多管闲事的存在，也有其他的原因。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">04</span>
+        <h3>首先是因为我提供了可靠的娱乐价值。迦普恩人并不无聊（也许 他们没有书、收音机、电视或电影，但他们有巫术和雨林里的探险故 事、有彼此的流言语可以自娱自乐），然</h3>
+        <p>首先是因为我提供了可靠的娱乐价值。迦普恩人并不无聊（也许 他们没有书、收音机、电视或电影，但他们有巫术和雨林里的探险故 事、有彼此的流言语可以自娱自乐），然而，他们的人生里往往缺 少许多新意。我一到村子里，就给他们带来了新鲜感。因为我的白皮 66 雨林里的消亡 [PAGE 76 IMAGE 1 CONTENT (OCR)]: 肤，我那些他们不熟悉的习惯，我过多的行李，我那些叫人捉摸不透 的小物件，对他们来说，我是那么陌生，可能我是天外来客。 年轻人和孩子们最喜欢的消遣就是看我干活。这听上去很无聊， 无疑确实如此。他们喜欢看我干的活就是我坐在一把蓝色塑料椅上， 面前是一张一边高一边低、很潦草地钉在一起的木板桌（是我自己 做的），在屋子中央写作：要不就是在电脑上打字，又或者更多时候 （因为给电脑供能的太阳能接线经常出问题），手里拿着一支钢笔在笔 记本和日记本上写东西。这个活动实在平淡无奇。就我个人来说，我 宁愿无聊地干等。但我安安静静地弯腰坐在电脑或笔记本前写东西的 样子，似乎对于村民来说拥有无法阻挡的吸引力。显然他们看我时觉 得很怪异，就跟我看他们时也觉得他们很怪异一样。 尤其是我刚来的那几周（在那之后即便是他们也麻木了），一群 小伙子会涌进我家里，最强壮的那两个会把其他人推走，挨挤着坐进 我正对面的另一把蓝色椅子，面向着我。（椅子的用处是在我誉录和 村民的语音聊天记录时，给他们一个地方坐。）那两个胜利的男孩坐 在了这把椅子上，隔着桌子盯着我看。其他几个被阻止坐上这把蓝色 椅子的男孩在地板上散开，盘腿坐下或朝天躺着，调整好姿势，这样 他们也能得到一个观赏我的角度。他们也盯着我看。： 渐渐地，我也习惯了被当成一只动物园里的猴子被人盯着看，然 后学会接受它。有时候，我沉浸在写作中，就忘了有男孩们在场。我 会突然拾头，就撞上一屋子少年热切盯着我的目光，仿佛我是一出电 影。我经常觉得我应该卖点爆米花。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">05</span>
+        <h3>小孩子们也一样，只要有机会就会溜进我的房里，坐在蓝色塑 料椅上盯着我看。他们够小，可以在我房子下面走来走去，跟其他房 子一样，我的房子也建在桩子上。在房子下</h3>
+        <p>小孩子们也一样，只要有机会就会溜进我的房里，坐在蓝色塑 料椅上盯着我看。他们够小，可以在我房子下面走来走去，跟其他房 子一样，我的房子也建在桩子上。在房子下面，孩子们会透过树根做 的地板缝隙往上窥视我的一举一动。他们像体育解说一样不断彼此交</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="takeaways">
+      <h2>本关关键收获</h2>
+      <ul class="takeaways"><li><span>1</span>第五章 The Burden of Giving 给予的负担 我经常好奇，为什么迦普恩人对我这个住 在他们村子里多管闲事的人类学家这么宽容？</li><li><span>2</span>要是我真的同意让她们帮忙，想必她们会帮我从浅井里打水，还 会帮我洗衣服。（因为挑水和洗衣服是我唯二能在雨林里独自完成的 事情，我就没好意思让她们帮我。）村民</li><li><span>3</span>她不喜欢这个回答。“我们想让你身上每个地方都是白的。”她耐 心地解释道。意思很明确，如果不弄干净我的手指甲，我要不就是傻 子，要不就是没有为他们着想。</li><li><span>4</span>首先是因为我提供了可靠的娱乐价值。迦普恩人并不无聊（也许 他们没有书、收音机、电视或电影，但他们有巫术和雨林里的探险故 事、有彼此的流言语可以自娱自乐），然</li></ul>
+      <nav class="nav">
+        <a class="btn" href="/experiences/user-book-visual-reading-g4ia7j-4d99-g06-chapter-6.html">上一关</a>
+        <a class="btn" href="/experiences/user-book-visual-reading-g4ia7j-4d99-g08-chapter-8.html">下一关</a>
+      </nav>
+    </section>
+  </main>
+  <script>
+    (() => {
+      const progress = document.getElementById("progress");
+      const dots = Array.from(document.querySelectorAll("#dotNav button[data-target]"));
+      const sections = dots
+        .map((dot) => document.getElementById(dot.getAttribute("data-target")))
+        .filter(Boolean);
+      const reveals = Array.from(document.querySelectorAll(".reveal"));
+      const onScroll = () => {
+        const h = document.documentElement;
+        const total = Math.max(1, h.scrollHeight - window.innerHeight);
+        const pct = Math.max(0, Math.min(100, (window.scrollY / total) * 100));
+        if (progress) progress.style.width = pct + "%";
+      };
+      const io = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) entry.target.classList.add("in");
+        }
+      }, { threshold: .14 });
+      reveals.forEach((el) => io.observe(el));
+      const secIo = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const id = entry.target.id;
+          dots.forEach((dot) => dot.classList.toggle("active", dot.getAttribute("data-target") === id));
+        });
+      }, { threshold: .4 });
+      sections.forEach((s) => secIo.observe(s));
+      dots.forEach((dot) => {
+        dot.addEventListener("click", () => {
+          const target = document.getElementById(dot.getAttribute("data-target"));
+          if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+      window.addEventListener("scroll", onScroll, { passive: true });
+      onScroll();
+    })();
+  </script>
+</body>
+</html>

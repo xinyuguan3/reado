@@ -1,0 +1,42 @@
+{
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T10:24:44.180Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "Datre Partial Visual Test",
+      "author": ""
+    },
+    "knowledge_block": {
+      "id": "kb-02",
+      "gate_index": 2,
+      "title": "Knowledge Chunk 4",
+      "summary": "6 个源头。 你们所有的宗教，似乎都认为这基于一个单独的源头。比如：你们的科学中有大 爆炸理论。你们认为：那儿有一个 “ 源头或神 ” 照顾着这一切。这只是你们地球的概 念，不是宇宙的观点。",
+      "words": 768,
+      "keywords": [
+        "datre",
+        "真正的你",
+        "东西",
+        "存在体",
+        "的扩展",
+        "问题",
+        "体觉知",
+        "我不关心"
+      ],
+      "density": {
+        "score": 0.6479,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0.1875,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0.2552
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "scholar",
+      "theme_label": "Scholar Atlas",
+      "section_count": 5,
+      "generated_with": "template_runtime"
+    }
+  }
+}

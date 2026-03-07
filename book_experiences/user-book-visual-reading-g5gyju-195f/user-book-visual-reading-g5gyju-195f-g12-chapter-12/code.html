@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>第十一章 · 雨林里的消亡（可视化阅读测试）</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #16120f;
+      --bg2: #2a1f18;
+      --accent: #d97706;
+      --accent2: #2dd4bf;
+      --text: #f5f1ea;
+      --soft: #c7b8a2;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+      background:
+        radial-gradient(1200px 540px at 85% -8%, color-mix(in srgb, var(--accent2) 24%, transparent), transparent 70%),
+        radial-gradient(980px 460px at -10% 14%, color-mix(in srgb, var(--accent) 24%, transparent), transparent 74%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+      color: var(--text);
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .05;
+      background-image: radial-gradient(circle at 1px 1px, #fff 1px, transparent 0);
+      background-size: 3px 3px;
+      z-index: 0;
+    }
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      z-index: 100;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+    .page { position: relative; z-index: 1; width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 20px 0 48px; }
+    .hero {
+      min-height: 74vh;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 22px;
+      background: linear-gradient(160deg, color-mix(in srgb, var(--bg2) 86%, transparent), color-mix(in srgb, var(--bg) 88%, transparent));
+      padding: 40px 34px;
+      display: grid;
+      align-content: center;
+      gap: 16px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.34);
+    }
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .hero h1 {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(32px, 5.4vw, 68px);
+      line-height: 1.16;
+      letter-spacing: .04em;
+      max-width: 15em;
+      text-wrap: balance;
+    }
+    .hero p {
+      max-width: 66ch;
+      line-height: 1.95;
+      color: color-mix(in srgb, var(--text) 85%, var(--soft));
+      font-size: 16px;
+    }
+    .chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip {
+      border: 1px solid color-mix(in srgb, var(--accent2) 44%, transparent);
+      color: color-mix(in srgb, var(--accent2) 88%, #fff);
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 12px;
+      background: rgba(255,255,255,.03);
+    }
+    .section { margin-top: 18px; border: 1px solid rgba(255,255,255,.13); border-radius: 18px; padding: 22px; background: rgba(2,6,18,.46); }
+    .section h2 {
+      margin-bottom: 12px;
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(22px, 2.8vw, 34px);
+      color: color-mix(in srgb, var(--accent) 86%, #fff);
+      letter-spacing: .03em;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1.1fr 1fr; gap: 14px; }
+    .concept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+    .concept-card {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      background: rgba(255,255,255,.03);
+      padding: 14px;
+      min-height: 128px;
+    }
+    .concept-token { font-size: 14px; letter-spacing: .14em; color: var(--accent2); text-transform: uppercase; margin-bottom: 7px; font-weight: 700; }
+    .concept-note { font-size: 14px; color: color-mix(in srgb, var(--text) 88%, var(--soft)); line-height: 1.8; }
+    .atlas {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      min-height: 440px;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+    .atlas svg { width: 100%; max-width: 440px; height: auto; }
+    .timeline { display: grid; gap: 10px; }
+    .timeline-item {
+      border-left: 2px solid color-mix(in srgb, var(--accent) 66%, transparent);
+      padding: 10px 14px;
+      background: rgba(255,255,255,.02);
+      border-radius: 0 10px 10px 0;
+    }
+    .timeline-no { font-size: 11px; letter-spacing: .22em; color: var(--accent2); display: block; margin-bottom: 6px; }
+    .timeline-item h3 { font-size: 19px; font-family: "Noto Serif SC", serif; line-height: 1.45; margin-bottom: 7px; }
+    .timeline-item p { font-size: 14px; line-height: 1.9; color: color-mix(in srgb, var(--text) 84%, var(--soft)); }
+    .quote-wrap { display: grid; gap: 10px; }
+    .quote {
+      border-left: 2px solid color-mix(in srgb, var(--accent2) 80%, transparent);
+      padding: 10px 12px;
+      background: rgba(255,255,255,.02);
+      color: color-mix(in srgb, var(--text) 92%, #fff);
+      font-family: "Noto Serif SC", serif;
+      line-height: 1.9;
+    }
+    .takeaways { margin-top: 10px; list-style: none; display: grid; gap: 8px; }
+    .takeaways li {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      padding: 10px;
+      background: rgba(255,255,255,.02);
+      align-items: start;
+      line-height: 1.8;
+    }
+    .takeaways span {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: color-mix(in srgb, var(--accent2) 26%, transparent);
+      color: var(--accent2);
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+    .nav { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,.26);
+      border-radius: 999px;
+      padding: 8px 13px;
+      font-size: 12px;
+      color: var(--text);
+      background: rgba(255,255,255,.04);
+    }
+    .btn:hover { border-color: var(--accent2); color: var(--accent2); }
+    .dot-nav {
+      position: fixed;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: grid;
+      gap: 10px;
+      z-index: 50;
+    }
+    .dot-nav button {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.35);
+      background: transparent;
+      cursor: pointer;
+      transition: all .24s ease;
+    }
+    .dot-nav button.active { transform: scale(1.34); border-color: var(--accent); background: var(--accent); }
+    .reveal { opacity: 0; transform: translateY(16px); transition: opacity .55s ease, transform .55s ease; }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+    @media (max-width: 940px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .dot-nav { display: none; }
+      .hero { min-height: auto; padding: 30px 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+  <nav class="dot-nav" id="dotNav">
+    <button data-target="hero" class="active" aria-label="Hero"></button>
+    <button data-target="atlas" aria-label="Atlas"></button>
+    <button data-target="concepts" aria-label="Concepts"></button>
+    <button data-target="reading" aria-label="Reading"></button>
+    <button data-target="takeaways" aria-label="Takeaways"></button>
+  </nav>
+  <main class="page">
+    <section class="hero reveal in" id="hero">
+      <p class="eyebrow">Field Narrative · Gate 12</p>
+      <h1>第十一章</h1>
+      <p>第十一章 YoungPeople&#39;sTayap 年轻人的泰雅博语 做了那么多年人类学田野工作后，我得出 了一个结论，成为一个成功人类学家的要诀就 是坚持逗留到让人生厌。因为人类学的整个目 的就是试图不光理解人们说了什么，还要理解 人们实际上做了什么（要搞清楚这两项活动往 往是不同甚至矛盾的），一个人类学家很少只 是采访一个人或递出一张问卷，然后就走人。 相反，我们会待上一会儿。为了做好这项工 作，人类学家得具备一项天赋一或发展出一 项技能一不招人眼目地逗留。</p>
+      <div class="chip-row">
+        <span class="chip">雨林里的消亡（可视化阅读测试）</span>
+        <span class="chip">作者：Unknown</span>
+        <span class="chip">Module 12/18</span>
+        <span class="tag">page</span><span class="tag">image</span><span class="tag">content</span><span class="tag">ocr</span><span class="tag">雨林里的消亡</span><span class="tag">第十一章</span>
+      </div>
+    </section>
+
+    <section class="section grid-2 reveal" id="atlas">
+      <article>
+        <h2>知识结构图谱</h2>
+        <p style="color:var(--soft);line-height:1.9;margin-bottom:10px;">围绕本关卡核心概念构建关系图。阅读时先抓主轴，再理解每个概念如何驱动判断与行动。</p>
+        <div class="quote-wrap"><blockquote class="quote reveal">“对于身涉其中的每个人来说，逾期逗留 到让人生厌是一个痛苦的过程。想象一下跟一 个人类学家交朋友，有一天他突然出现在你家 附近，广而告之说他要写一本关于你这样的人 的书。出于礼貌、好奇或同情，你也许会邀请 他某天下午一起吃顿饭。人类学家会早早就到 139 [PAGE 149 IMAGE 1 CONTENT (OCR)]: 了，把一顿午饭拉长到一个下午，留神专注地听你讲你自已的故事或 任何其他事情。突然，你会发现你不知怎么就把他邀请到你家吃”</blockquote><blockquote class="quote reveal">“1980年代我第一次长待迦普恩的那十五个月里，我有上百个小 时都在逾期停留，大部分时候都在记录母亲及其他人是怎样和婴儿说 话的。我遵循一个严格的日程安排：一周三天，我会天不亮就到五个 140 雨林里的消亡 [PAGE 150 IMAGE 1 CONTENT (OCR)]: 感到困惑的家庭之一那里，他们同意我录音，我就带着我的录音设备 和笔记本坐到一个不招人眼自的角落里。有时我跟着妈妈们和她们的 孩子一起去其他人家里或园子里，有好几次，我”</blockquote><blockquote class="quote reveal">“这一角色一一用这个学科的术语来说，美其名日参与式观察 建立的过程不是那么令人愉悦，田野工作最糟糕的部分永远是最初那 几个月，那时每个人都在探测哪些是可以被接受的边界。我记得很多 很多次在不同的做田野调查的地方，我和素不相识的人坐在一起，在 一个空咖啡杯或一盘被扫荡一空的食物面前寻思着，“现在他们真的 很想让我走吧”—而且会刻意抗拒发现这一点后正常明智礼貌的后 果。我知道如果我再多逗留哪怕一会儿，就能更快向不知所措的招待 我的人传达，我不”</blockquote></div>
+      </article>
+      <article class="atlas">
+        <svg viewBox="0 0 440 440" aria-label="concept atlas">
+          <defs>
+            <radialGradient id="g" cx="50%" cy="50%" r="56%">
+              <stop offset="0%" stop-color="#d97706" stop-opacity=".24"></stop>
+              <stop offset="100%" stop-color="#d97706" stop-opacity="0"></stop>
+            </radialGradient>
+          </defs>
+          <circle cx="220" cy="220" r="190" fill="none" stroke="rgba(255,255,255,.08)" stroke-dasharray="5 6"></circle>
+          <circle cx="220" cy="220" r="84" fill="url(#g)"></circle>
+          <circle cx="220" cy="220" r="10" fill="#d97706"></circle>
+          <text x="220" y="252" text-anchor="middle" fill="#f5f1ea" font-size="13">第十一章</text>
+          <g><line x1="220" y1="220" x2="370" y2="220" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="370" cy="220" r="8" fill="#2dd4bf"/><text x="382" y="224" fill="#f5f1ea" font-size="12">page</text></g><g><line x1="220" y1="220" x2="266" y2="363" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="266" cy="363" r="8" fill="#2dd4bf"/><text x="278" y="367" fill="#f5f1ea" font-size="12">image</text></g><g><line x1="220" y1="220" x2="99" y2="308" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="99" cy="308" r="8" fill="#2dd4bf"/><text x="111" y="312" fill="#f5f1ea" font-size="12">content</text></g><g><line x1="220" y1="220" x2="99" y2="132" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="99" cy="132" r="8" fill="#2dd4bf"/><text x="111" y="136" fill="#f5f1ea" font-size="12">ocr</text></g><g><line x1="220" y1="220" x2="266" y2="77" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="266" cy="77" r="8" fill="#2dd4bf"/><text x="278" y="81" fill="#f5f1ea" font-size="12">雨林里的消亡</text></g>
+        </svg>
+      </article>
+    </section>
+
+    <section class="section reveal" id="concepts">
+      <h2>核心概念与解释</h2>
+      <div class="concept-grid">
+      <article class="concept-card reveal">
+        <p class="concept-token">page</p>
+        <p class="concept-note">对于身涉其中的每个人来说，逾期逗留 到让人生厌是一个痛苦的过程。想象一下跟一 个人类学家交朋友，有一天他突然出现在你家 附近，广而告之说他要写一本关于你这样的人 的书。出于礼貌、好奇或同情，你也许会邀请 他某天下午一起吃顿饭。人类学家会早早就到 139 [PAGE 149 IMAGE 1 CONTENT (OCR)]: 了，把一顿午饭拉长到一个下午，留神专注</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">image</p>
+        <p class="concept-note">对于身涉其中的每个人来说，逾期逗留 到让人生厌是一个痛苦的过程。想象一下跟一 个人类学家交朋友，有一天他突然出现在你家 附近，广而告之说他要写一本关于你这样的人 的书。出于礼貌、好奇或同情，你也许会邀请 他某天下午一起吃顿饭。人类学家会早早就到 139 [PAGE 149 IMAGE 1 CONTENT (OCR)]: 了，把一顿午饭拉长到一个下午，留神专注</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">content</p>
+        <p class="concept-note">对于身涉其中的每个人来说，逾期逗留 到让人生厌是一个痛苦的过程。想象一下跟一 个人类学家交朋友，有一天他突然出现在你家 附近，广而告之说他要写一本关于你这样的人 的书。出于礼貌、好奇或同情，你也许会邀请 他某天下午一起吃顿饭。人类学家会早早就到 139 [PAGE 149 IMAGE 1 CONTENT (OCR)]: 了，把一顿午饭拉长到一个下午，留神专注</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">ocr</p>
+        <p class="concept-note">对于身涉其中的每个人来说，逾期逗留 到让人生厌是一个痛苦的过程。想象一下跟一 个人类学家交朋友，有一天他突然出现在你家 附近，广而告之说他要写一本关于你这样的人 的书。出于礼貌、好奇或同情，你也许会邀请 他某天下午一起吃顿饭。人类学家会早早就到 139 [PAGE 149 IMAGE 1 CONTENT (OCR)]: 了，把一顿午饭拉长到一个下午，留神专注</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">雨林里的消亡</p>
+        <p class="concept-note">1980年代我第一次长待迦普恩的那十五个月里，我有上百个小 时都在逾期停留，大部分时候都在记录母亲及其他人是怎样和婴儿说 话的。我遵循一个严格的日程安排：一周三天，我会天不亮就到五个 140 雨林里的消亡 [PAGE 150 IMAGE 1 CONTENT (OCR)]: 感到困惑的家庭之一那里，他们同意我录音，我就带着我的录音设备 和笔记本坐到一个不招人眼</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">第十一章</p>
+        <p class="concept-note">第十一章 YoungPeople&#39;sTayap 年轻人的泰雅博语 做了那么多年人类学田野工作后，我得出 了一个结论，成为一个成功人类学家的要诀就 是坚持逗留到让人生厌。因为人类学的整个目 的就是试图不光理解人们说了什么，还要理解 人们实际上做了什么（要搞清楚这两项活动往 往是不同甚至矛盾的），一个人类学家很少只 是采访一个人或递出一张问卷，然后就走人。</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="reading">
+      <h2>渐进式阅读路径</h2>
+      <div class="timeline">
+      <article class="timeline-item reveal">
+        <span class="timeline-no">01</span>
+        <h3>第十一章 YoungPeople&#39;sTayap 年轻人的泰雅博语 做了那么多年人类学田野工作后，我得出 了一个结论，成为一个成功人类学家的要诀就 是坚持逗留</h3>
+        <p>第十一章 YoungPeople&#39;sTayap 年轻人的泰雅博语 做了那么多年人类学田野工作后，我得出 了一个结论，成为一个成功人类学家的要诀就 是坚持逗留到让人生厌。因为人类学的整个目 的就是试图不光理解人们说了什么，还要理解 人们实际上做了什么（要搞清楚这两项活动往 往是不同甚至矛盾的），一个人类学家很少只 是采访一个人或递出一张问卷，然后就走人。 相反，我们会待上一会儿。为了做好这项工 作，人类学家得具备一项天赋一或发展出一 项技能一不招人眼目地逗留。 对于身涉其中的每个人来说，逾期逗留 到让人生厌是一个痛苦的过程。想象一下跟一 个人类学家交朋友，有一天他突然出现在你家 附近，广而告之说他要写一本关于你这样的人 的书。出于礼貌、好奇或同情，你也许会邀请 他某天下午一起吃顿饭。人类学家会早早就到 139 [PAGE 149 IMAGE 1 CONTENT (OCR)]: 了，把一顿午饭拉长到一个下午，留神专注地听你讲你自已的故事或 任何其他事情。突然，你会发现你不知怎么就把他邀请到你家吃饭 了。他会跟你爱人友好地开玩笑，跟你的孩子们玩要，对着你的鹦鹉 咕咕叫，变成你家狗子最好的伙伴。所有的杯盘碗碟都洗好收起来 后，你转过身发现，那个人类学家还在你家厨房里，或客厅里，眼睛 明亮，一脸热情地待着。最终，你会宣布说你累了，得去上床休息 了。人类学家会礼貌地离开。第二天他又会出现在你家门口。 从人类学家的视角来看，这种长毛狗一样的行为的目的就是把 你磨平—帮助你了解一个人类学家不想每次都像客人一样被特别招 待。他想被当成一个不引人注意的平常人：倒不是说要像家人一样， 而是更像一件舒服的家具或一株盆栽棕榈。 这一角色一一用这个学科的术语来说，美其名日参与式观察 建立的过程不是那么令人愉悦，田野工作最糟糕的部分永远是最初那 几个月，那时每个人都在探测哪些是可以被接受的边界。我记得很多 很多次在不同的做田野调查的地方，我和素不相识的人坐在一起，在 一个空咖啡杯或一盘被扫荡一空的食物面前寻思着，“现在他们真的 很想让我走吧”—而且会刻意抗拒发现这一点后正常明智礼貌的后 果。我知道如果我再多逗留哪怕一会儿，就能更快向不知所措的招待 我的人传达，我不需要他们照顾，我人畜无害，如果他们继续该干吗 干吗，完全不注意我，我也丝毫不会介意。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">02</span>
+        <h3>事实上，这就是全部的要点所在。</h3>
+        <p>事实上，这就是全部的要点所在。 1980年代我第一次长待迦普恩的那十五个月里，我有上百个小 时都在逾期停留，大部分时候都在记录母亲及其他人是怎样和婴儿说 话的。我遵循一个严格的日程安排：一周三天，我会天不亮就到五个 140 雨林里的消亡 [PAGE 150 IMAGE 1 CONTENT (OCR)]: 感到困惑的家庭之一那里，他们同意我录音，我就带着我的录音设备 和笔记本坐到一个不招人眼自的角落里。有时我跟着妈妈们和她们的 孩子一起去其他人家里或园子里，有好几次，我跟着一对已婚夫妇， 他们带着孩子去雨林里砍西米棕榈树，加工西米粉。不过大部分时 候，我会在屋子角落里坐上一整天，一有什么有意思的事情，我就打 开录音器，做好记录，比如孩子和来来去去的大人的名字，他们说话 的时候和他人的关系和所处的位置。 坐在房间里时，我并不会假装自己是趴在墙上的苍蝇一一一整 天里，我和他们一起吃饭，和妈妈、她的孩子以及任何路过或过来串 门的人聊天。有小孩子或往往连着孩子母亲一起在午后的烈日下睡着 时，我也会蜷缩在地板上打个吨儿。 我会待到天黑，屋里什么都看不清时才离开。第二天早上天不亮 我又来了。 通过几百个小时和照顾婴儿的人以及孩子们待在一起，我所做的 记录和观察让我得以理解泰雅博语是如何消亡的。在我1980年代末 写的那本关于村里语言情况的书里，我讨论了泰雅博语向孩子传输的 渠道是如何无可避免地被割断的。我预测我所认识的十岁以下的孩子 这一代人永远不会学泰雅博语，我也预见到了除非有什么奇迹发生， 泰雅博语很快就会永远消失。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">03</span>
+        <h3>2009年，自我1980年代末第一次长待后，我回到了迦普恩， 自然很好奇地想看看，我做过的关于泰雅博语消亡的预言有没有应 验。1980年代我记录了语言掌握程</h3>
+        <p>2009年，自我1980年代末第一次长待后，我回到了迦普恩， 自然很好奇地想看看，我做过的关于泰雅博语消亡的预言有没有应 验。1980年代我记录了语言掌握程度的那些孩子现在已经是成年人， 他们中许多人也有了自己的孩子。在我离开这个村子后，这些孩子 有学习掌握泰雅博语吗？这门语言真的在消亡吗？还是比我所预测 的更顽强？ 第十一章年轻人的泰雅博语 141 [PAGE 151 IMAGE 1 CONTENT (OCR)]: 多数研究者往往把自已学术事业的赌注押在永远正确上，跟他们 不同，我则抱有很高的希望，巴不得自己关于泰雅博语的预测是完全 错误的。如果发现我误判了村子里的情况，泰雅博语这门极小的语言 不仅没有消失，反而壮大了，那将给我带来巨大的喜悦。我甚至幻想 过在我要写的这本书的标题里就宣告我的错误。现在我已经忘了那个 标题是什么，但我记得里面有“弹性”或更烂的“浴火重生”这样无 病呻吟的词语。 当我再次在村子里安顿下来，我想着应该很容易就能发现年轻人 到底还说不说泰雅博语。然而，即便过了三个多月，我发现我还是无 法准确判断年轻人到底有没有掌握这门语言。 每当我问年轻人他们说不说泰雅博语，他们都告诉我他们是说 的。问题是，我从来没听任何人真的说过。偶尔，我会听到一个年轻 人蹦出一两个泰雅博语里的习语，像“让开”或“你要尿了”（因为 我要打你）。这些话通常让一个场景显得很滑稽，而且经常伴随着欢 笑。我好像还感觉到，每当二十五岁以下的村民用泰雅博语哪怕只说 一句简短的习语时，他们就会转变声调，仿佛在暗示他们是在引述或 模仿另外一个人，通常是在嘲笑他们（比如一个大男人的权威腔）。 每当有年轻人告诉我他们会说泰雅博语时，我就会让他们告诉我 用这门语言互相说些什么，他们会列出一些词，比如mum和tamwai （分别是“西米啫喱”和“西米饼”），以及一些基础的习语，比如命 令别人给他们递槟榔或烟过来。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">04</span>
+        <h3>迦普恩到处还是能听到泰雅博语。上了五十岁的男人和女人会习 惯性地用这门语言（即便他们还是会在泰雅博语和皮金语之间切换）， 有几个三十几岁或年纪再大一点的男人</h3>
+        <p>迦普恩到处还是能听到泰雅博语。上了五十岁的男人和女人会习 惯性地用这门语言（即便他们还是会在泰雅博语和皮金语之间切换）， 有几个三十几岁或年纪再大一点的男人和女人还会频繁运用泰雅博 语，和他们的孩子说话时也包括在内。甚至村子里的小孩子也能听懂 142 雨林里的消亡 [PAGE 152 IMAGE 1 CONTENT (OCR)]: 大人一如既往呼来喝去的命令，让他们去取东西、打狗、让路、停止 哭泣，诸如此类。 很显然，2000年代末期，泰雅博语还在迦普恩使用，同样显而 易见的是，年轻人都能听懂这门语言，因此很长一段时间，我以为年 轻人的泰雅博语水平真的很不错，就像他们声称的那样。我懊恼的是 似乎从来没有在对的时间和对的地点听到他们真的说这门语言。 我开始好奇，我没有听过年轻人互相之间用泰雅博语讲故事或 问问题的原因是，他们大部分时候都在年纪大的说得更流利的人听不 到时才说这门语言。我猜测，也许他们很惭愧，觉得自已说得不够完 美。又或许对于他们来说，泰雅博语已经和特定的社会事件绑定在一 起，比如同性间说八卦或在雨林里闲逛的时候一这类说话场景出现 在只有一群年轻人，远离爱管闲事还爱品头论足的父母和老人时。 为了验证情况是不是这样，那次长待时，我花了很长时间和十四 到二十五岁的年轻人待在一起。我经常陪着小伙子们去雨林里用弹弓 打鸟，他们一群人出去完成各种秘密仪式时，我也跟着，他们说这类 仪式可以洗涤他们的身体，让他们变得更强壮、更迷人。 我也花大量时间和姑娘们待在产房里一那种小小的不结实的草 草搭起来的茅草房，建在村子的边缘地带。一个女人待在产房期间， 没有男人能过来看她们，甚至看一眼她或她刚生的孩子也不行。不 过，一整天里都会有女人来访，通常陪伴她们的是她们的妹妹和她们 自已的宝宝。她们会带来食物、水，还会带来村子里正在发生但新晋 妈妈被排除在外的大事小情。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">05</span>
+        <h3>就性别来说，我不方便跟新妈妈和其他年轻女人一起坐在产房 里，但村里人把我这么做的热情视为那不过是一个白人男子的怪癖。</h3>
+        <p>就性别来说，我不方便跟新妈妈和其他年轻女人一起坐在产房 里，但村里人把我这么做的热情视为那不过是一个白人男子的怪癖。 迦普恩的每个人都深信，我和女人的“热量”有如此近距离的接触， 一定会染上致命的哮喘。女人分娩的时候，在村里人看来，会喷出无</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="takeaways">
+      <h2>本关关键收获</h2>
+      <ul class="takeaways"><li><span>1</span>第十一章 YoungPeople&#39;sTayap 年轻人的泰雅博语 做了那么多年人类学田野工作后，我得出 了一个结论，成为一个成功人类学家的要诀就 是坚持逗留</li><li><span>2</span>事实上，这就是全部的要点所在。</li><li><span>3</span>2009年，自我1980年代末第一次长待后，我回到了迦普恩， 自然很好奇地想看看，我做过的关于泰雅博语消亡的预言有没有应 验。1980年代我记录了语言掌握程</li><li><span>4</span>迦普恩到处还是能听到泰雅博语。上了五十岁的男人和女人会习 惯性地用这门语言（即便他们还是会在泰雅博语和皮金语之间切换）， 有几个三十几岁或年纪再大一点的男人</li></ul>
+      <nav class="nav">
+        <a class="btn" href="/experiences/user-book-visual-reading-g5gyju-195f-g11-mattersoftheliver.html">上一关</a>
+        <a class="btn" href="/experiences/user-book-visual-reading-g5gyju-195f-g13-chapter-13.html">下一关</a>
+      </nav>
+    </section>
+  </main>
+  <script>
+    (() => {
+      const progress = document.getElementById("progress");
+      const dots = Array.from(document.querySelectorAll("#dotNav button[data-target]"));
+      const sections = dots
+        .map((dot) => document.getElementById(dot.getAttribute("data-target")))
+        .filter(Boolean);
+      const reveals = Array.from(document.querySelectorAll(".reveal"));
+      const onScroll = () => {
+        const h = document.documentElement;
+        const total = Math.max(1, h.scrollHeight - window.innerHeight);
+        const pct = Math.max(0, Math.min(100, (window.scrollY / total) * 100));
+        if (progress) progress.style.width = pct + "%";
+      };
+      const io = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) entry.target.classList.add("in");
+        }
+      }, { threshold: .14 });
+      reveals.forEach((el) => io.observe(el));
+      const secIo = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const id = entry.target.id;
+          dots.forEach((dot) => dot.classList.toggle("active", dot.getAttribute("data-target") === id));
+        });
+      }, { threshold: .4 });
+      sections.forEach((s) => secIo.observe(s));
+      dots.forEach((dot) => {
+        dot.addEventListener("click", () => {
+          const target = document.getElementById(dot.getAttribute("data-target"));
+          if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+      window.addEventListener("scroll", onScroll, { passive: true });
+      onScroll();
+    })();
+  </script>
+</body>
+</html>

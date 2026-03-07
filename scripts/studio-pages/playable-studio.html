@@ -1046,7 +1046,7 @@
             <p class="generate-title" data-i18n="studio.generate_title">Generate</p>
             <p id="generate-hint" class="generate-hint" data-i18n="studio.generate_need_source">Add a website URL or upload files first.</p>
           </div>
-          <button id="generate-btn" class="btn primary generate-btn" data-i18n="studio.generate">Generate Playable Web</button>
+          <button id="generate-btn" class="btn primary generate-btn" data-i18n="studio.generate">Generate Visual Reading Experience</button>
         </div>
 
         <input
@@ -1144,10 +1144,12 @@
     <div class="pipeline-viewer-card" role="dialog" aria-modal="true" aria-labelledby="pipeline-viewer-title">
       <header class="pipeline-viewer-head">
         <div>
-          <h3 id="pipeline-viewer-title" class="pipeline-viewer-title">Knowledge Blocks Explorer</h3>
+          <h3 id="pipeline-viewer-title" class="pipeline-viewer-title">Knowledge Model Explorer</h3>
           <p id="pipeline-viewer-sub" class="pipeline-viewer-sub">Loading…</p>
         </div>
         <div class="pipeline-viewer-actions">
+          <button id="pipeline-generate-btn" class="pipeline-tab" type="button">Generate</button>
+          <button id="pipeline-download-btn" class="pipeline-tab" type="button">Download</button>
           <button id="pipeline-tab-code" class="pipeline-tab active" type="button">Code</button>
           <button id="pipeline-tab-preview" class="pipeline-tab" type="button">Preview</button>
           <button id="pipeline-viewer-close" class="pipeline-close" type="button" aria-label="Close">×</button>
@@ -1155,7 +1157,7 @@
       </header>
       <div class="pipeline-viewer-body">
         <aside class="pipeline-tree">
-          <p class="pipeline-tree-title">SKILLS 目录</p>
+          <p class="pipeline-tree-title">MODEL FILES</p>
           <div id="pipeline-tree-list" class="pipeline-tree-list"></div>
         </aside>
         <section class="pipeline-main">
@@ -1213,6 +1215,8 @@
     const pipelineViewerEl = document.getElementById("pipeline-viewer");
     const pipelineViewerSubEl = document.getElementById("pipeline-viewer-sub");
     const pipelineViewerCloseEl = document.getElementById("pipeline-viewer-close");
+    const pipelineGenerateBtnEl = document.getElementById("pipeline-generate-btn");
+    const pipelineDownloadBtnEl = document.getElementById("pipeline-download-btn");
     const pipelineTabCodeEl = document.getElementById("pipeline-tab-code");
     const pipelineTabPreviewEl = document.getElementById("pipeline-tab-preview");
     const pipelineTreeListEl = document.getElementById("pipeline-tree-list");
@@ -1242,6 +1246,7 @@
       pipelineViewer: {
         open: false,
         loading: false,
+        generating: false,
         tab: "code",
         workId: "",
         bookId: "",
@@ -1400,6 +1405,10 @@
     }
 
     function getWorkOpenHref(work) {
+      const mode = String(work?.generation_mode || work?.mode || "").trim().toLowerCase();
+      if (mode === "knowledge_model_parse" || mode === "knowledge_model") {
+        return "";
+      }
       const safeBookId = String(work?.book_id || "").trim();
       const catalogBook = getCatalogBook(safeBookId);
       if (catalogBook) {
@@ -1432,7 +1441,7 @@
               <h4 class="book-title">${esc(title || "Untitled")}</h4>
               <p class="book-desc">${esc(desc || "已生成，可随时继续学习。")}</p>
               <div class="book-actions">
-                <button class="tiny" data-act="open-owned" data-id="${esc(safeBookId)}" data-href="${esc(openHref)}">打开</button>
+                <button class="tiny" data-act="open-owned" data-id="${esc(safeBookId)}" data-work-id="${esc(String(work?.id || ""))}" data-work-title="${esc(title || "Knowledge Model")}" data-href="${esc(openHref)}">${esc(openHref ? "打开" : "知识模型")}</button>
               </div>
             </div>
           </article>`;
@@ -1586,7 +1595,19 @@
           const btn = event.target && event.target.closest ? event.target.closest('button[data-act="open-owned"]') : null;
           if (!btn) return;
           const href = btn.getAttribute("data-href") || "";
-          openBookHref(href);
+          if (href) {
+            openBookHref(href);
+            return;
+          }
+          const workId = btn.getAttribute("data-work-id") || "";
+          const title = btn.getAttribute("data-work-title") || "Knowledge Model";
+          if (!workId) {
+            setError("当前条目没有可用体验或知识模型。");
+            return;
+          }
+          openPipelineViewerByWork(workId, title).catch((error) => {
+            setError(error?.message || "Failed to open knowledge model.");
+          });
         });
       }
       if (publicBooksEl) {
@@ -1796,16 +1817,51 @@
       const rows = Array.isArray(sources) ? sources : [];
       if (!rows.length) return false;
       let ingestCount = 0;
-      let pdfLikeCount = 0;
+      let bookLikeCount = 0;
       for (const item of rows) {
         const parsedBy = String(item?.parsedBy || "").toLowerCase();
         const urlText = String(item?.url || "");
+        const uploadName = String(item?.__bookFile?.name || "").toLowerCase();
         if (parsedBy.startsWith("ingest.")) ingestCount += 1;
-        if (parsedBy.includes("pdf") || /\.pdf(?:$|[?#])/i.test(urlText)) pdfLikeCount += 1;
+        if (
+          parsedBy.includes("pdf")
+          || parsedBy.includes("epub")
+          || /\.(pdf|epub)(?:$|[?#])/i.test(urlText)
+          || /\.(pdf|epub)$/.test(uploadName)
+        ) {
+          bookLikeCount += 1;
+        }
       }
-      if (pdfLikeCount > 0) return true;
+      if (bookLikeCount > 0) return true;
       if (ingestCount > 0) return true;
       return false;
+    }
+
+    function pickBookFilePayload(sources) {
+      const rows = Array.isArray(sources) ? sources : [];
+      for (const row of rows) {
+        const file = row?.__bookFile && typeof row.__bookFile === "object" ? row.__bookFile : null;
+        if (!file) continue;
+        const fileToken = String(file?.fileToken || row?.fileToken || row?.__bookFileToken || "").trim();
+        const name = String(file?.name || "uploaded-book.pdf").trim() || "uploaded-book.pdf";
+        const type = String(file?.type || "application/octet-stream").trim() || "application/octet-stream";
+        if (fileToken) {
+          return {
+            name,
+            type,
+            fileToken
+          };
+        }
+        const contentBase64 = String(file?.contentBase64 || "").trim();
+        if (contentBase64) {
+          return {
+            name,
+            type,
+            contentBase64
+          };
+        }
+      }
+      return null;
     }
 
     function buildKnowledgeBlocksDigest(job) {
@@ -1930,16 +1986,37 @@
       `).join("");
     }
 
-    function normalizeViewerBlock(block, index = 0, moduleSlug = "") {
+    function getViewerKnowledgeModel(data) {
+      const raw = data && typeof data === "object" ? data : {};
+      return raw?.knowledgeModel && typeof raw.knowledgeModel === "object"
+        ? raw.knowledgeModel
+        : null;
+    }
+
+    function getViewerModelDocs(data) {
+      const model = getViewerKnowledgeModel(data);
+      return Array.isArray(model?.docs) ? model.docs : [];
+    }
+
+    function normalizeViewerBlock(block, index = 0, moduleSlug = "", doc = null) {
       const row = block && typeof block === "object" ? block : {};
-      const gate = Math.max(1, Number(row.gateIndex || row.gate_index || row.index || index + 1) || (index + 1));
+      const docRow = doc && typeof doc === "object" ? doc : null;
+      const gate = Math.max(
+        1,
+        Number(row.gateIndex || row.gate_index || row.index || docRow?.gate || index + 1) || (index + 1)
+      );
+      const docMarkdown = String(docRow?.markdown || "").trim();
+      const summary = String(row.summary || row.content || "").trim().slice(0, 1200)
+        || String(docMarkdown.split("\n").slice(0, 10).join(" ").replace(/\s+/g, " ")).trim().slice(0, 1200);
       return {
-        id: String(row.id || ("kb-" + String(gate).padStart(2, "0"))).trim(),
+        id: String(row.id || docRow?.id || ("kb-" + String(gate).padStart(2, "0"))).trim(),
         gate,
-        title: String(row.title || ("Knowledge Block " + gate)).trim(),
-        summary: String(row.summary || row.content || "").trim().slice(0, 1200),
+        title: String(row.title || docRow?.title || ("Knowledge Block " + gate)).trim(),
+        path: String(docRow?.path || "").trim(),
+        markdown: docMarkdown,
         keywords: Array.isArray(row.keywords) ? row.keywords.slice(0, 12) : [],
         words: Number(row.words || 0),
+        summary,
         densityScore: Number(row?.densityScore || row?.density?.score || 0),
         moduleSlug: String(moduleSlug || "").trim()
       };
@@ -1947,6 +2024,12 @@
 
     function getViewerNormalizedRows(data) {
       const raw = data && typeof data === "object" ? data : {};
+      const model = getViewerKnowledgeModel(raw);
+      const systems = Array.isArray(model?.systems) ? model.systems : [];
+      const docs = getViewerModelDocs(raw);
+      const gateDocs = docs
+        .filter((doc) => String(doc?.kind || "").toLowerCase() === "gate")
+        .sort((a, b) => Number(a?.gate || 0) - Number(b?.gate || 0));
       const blocks = Array.isArray(raw.knowledgeBlocks) ? raw.knowledgeBlocks : [];
       const moduleMap = Array.isArray(raw.moduleMap) ? raw.moduleMap : [];
       const moduleByBlockId = new Map();
@@ -1955,23 +2038,54 @@
         const moduleSlug = String(row?.module_slug || "").trim();
         if (blockId && moduleSlug) moduleByBlockId.set(blockId, moduleSlug);
       }
+      if (gateDocs.length) {
+        return gateDocs.map((doc, index) => {
+          const gate = Number(doc?.gate || index + 1) || (index + 1);
+          const system = systems.find((item) => Number(item?.gate || 0) === gate) || blocks[index] || {};
+          const blockId = String(system?.id || doc?.id || "").trim();
+          const fallbackModule = String(moduleMap[index]?.module_slug || "").trim();
+          const moduleSlug = moduleByBlockId.get(blockId) || fallbackModule;
+          return normalizeViewerBlock(
+            {
+              id: blockId || String(doc?.id || "").trim(),
+              gateIndex: gate,
+              title: String(system?.title || doc?.title || ("Gate " + gate)).trim(),
+              summary: String(system?.summary || "").trim(),
+              keywords: Array.isArray(system?.keywords) ? system.keywords : [],
+              words: Number(system?.words || 0)
+            },
+            index,
+            moduleSlug,
+            doc
+          );
+        });
+      }
       return blocks.map((block, index) => {
         const blockId = String(block?.id || "").trim();
         const fallbackModule = String(moduleMap[index]?.module_slug || "").trim();
         const moduleSlug = moduleByBlockId.get(blockId) || fallbackModule;
-        return normalizeViewerBlock(block, index, moduleSlug);
+        return normalizeViewerBlock(block, index, moduleSlug, null);
       });
     }
 
     function buildViewerIndexMarkdown(data, rows) {
+      const model = getViewerKnowledgeModel(data);
+      const docs = getViewerModelDocs(data);
+      const indexDoc = docs.find((row) => String(row?.id || "").trim() === "__index__")
+        || docs.find((row) => String(row?.path || "").trim().toLowerCase() === "index.md")
+        || null;
+      const indexMarkdown = String(indexDoc?.markdown || "").trim();
+      if (indexMarkdown) return indexMarkdown;
       const diagnostics = data?.splitDiagnostics && typeof data.splitDiagnostics === "object"
         ? data.splitDiagnostics
         : null;
       const lines = [];
-      lines.push("# Knowledge Blocks Index");
+      lines.push("# Knowledge Model Index");
       lines.push("");
       lines.push(`- book_id: ${String(data?.bookId || "").trim()}`);
-      lines.push(`- total_blocks: ${Number(data?.totalKnowledgeBlocks || rows.length)}`);
+      lines.push(`- systems: ${Number(model?.systems?.length || rows.length)}`);
+      lines.push(`- concepts: ${Number(model?.concepts?.length || 0)}`);
+      lines.push(`- relations: ${Number(model?.relations?.length || 0)}`);
       lines.push(`- generated_at: ${String(data?.generatedAt || data?.regeneration?.at || "").trim()}`);
       if (diagnostics) {
         lines.push(`- candidates: ${Number(diagnostics.candidates || rows.length)}`);
@@ -1980,19 +2094,22 @@
         lines.push(`- min_density_score: ${Number(diagnostics.minDensityScore || 0).toFixed(2)}`);
       }
       lines.push("");
-      lines.push("## Blocks");
+      lines.push("## System Files");
       lines.push("");
       for (const row of rows) {
-        lines.push(`- [gate-${row.gate}] ${row.title} (${row.moduleSlug || "unmapped"})`);
+        lines.push(`- ${row.path || ("gate-" + String(row.gate).padStart(2, "0") + ".md")} · ${row.title}`);
       }
       lines.push("");
       lines.push("## Notes");
       lines.push("");
-      lines.push("This page mirrors parser output and is intended for QA/inspection before gameplay publish.");
+      lines.push("Review this model before generating the interactive runtime.");
       return lines.join("\n");
     }
 
     function buildViewerBlockMarkdown(block, total) {
+      if (String(block?.markdown || "").trim()) {
+        return String(block.markdown).trim();
+      }
       const lines = [];
       lines.push(`# Gate ${block.gate} / ${total}`);
       lines.push(`${block.title}`);
@@ -2025,16 +2142,27 @@
       }
       pipelineViewerEl.hidden = false;
       const data = viewer.data && typeof viewer.data === "object" ? viewer.data : {};
+      const model = getViewerKnowledgeModel(data);
       const rows = getViewerNormalizedRows(data);
       const total = Number(data?.totalKnowledgeBlocks || rows.length || 0);
-      const title = String(viewer.title || data?.bookId || "Knowledge Blocks Explorer").trim();
+      const title = String(viewer.title || model?.title || data?.bookId || "Knowledge Model Explorer").trim();
       if (pipelineViewerSubEl) {
         pipelineViewerSubEl.textContent = viewer.loading
-          ? "Loading pipeline data..."
-          : `${title} · ${rows.length}/${total} blocks`;
+          ? "Loading knowledge model..."
+          : model
+            ? `${title} · ${Number(model?.systems?.length || rows.length)} systems / ${Number(model?.concepts?.length || 0)} concepts / ${Number(model?.relations?.length || 0)} relations`
+            : `${title} · ${rows.length}/${total} blocks`;
       }
       if (pipelineTabCodeEl) pipelineTabCodeEl.classList.toggle("active", viewer.tab === "code");
       if (pipelineTabPreviewEl) pipelineTabPreviewEl.classList.toggle("active", viewer.tab === "preview");
+      if (pipelineGenerateBtnEl) {
+        const disabled = viewer.loading || viewer.generating || !viewer.workId || !rows.length;
+        pipelineGenerateBtnEl.disabled = disabled;
+        pipelineGenerateBtnEl.textContent = viewer.generating ? "Generating..." : "Generate";
+      }
+      if (pipelineDownloadBtnEl) {
+        pipelineDownloadBtnEl.disabled = viewer.loading || !viewer.workId;
+      }
 
       const selectedId = String(viewer.selectedId || "__index__");
       const hasSelected = selectedId === "__index__" || rows.some((row) => row.id === selectedId);
@@ -2044,9 +2172,9 @@
         const indexActive = viewer.selectedId === "__index__" ? " active" : "";
         const rowsHtml = rows.map((row) => {
           const active = viewer.selectedId === row.id ? " active" : "";
-          return `<button class="pipeline-tree-item${active}" data-viewer-id="${esc(row.id)}" type="button">📁 gate-${esc(String(row.gate))}<small>${esc(row.title)}</small></button>`;
+          return `<button class="pipeline-tree-item${active}" data-viewer-id="${esc(row.id)}" type="button">📄 ${esc(row.path || ("gate-" + String(row.gate).padStart(2, "0") + ".md"))}<small>${esc(row.title)}</small></button>`;
         }).join("");
-        pipelineTreeListEl.innerHTML = `<button class="pipeline-tree-item${indexActive}" data-viewer-id="__index__" type="button">📄 index.md<small>Knowledge blocks overview</small></button>${rowsHtml}`;
+        pipelineTreeListEl.innerHTML = `<button class="pipeline-tree-item${indexActive}" data-viewer-id="__index__" type="button">📄 index.md<small>Knowledge model overview</small></button>${rowsHtml}`;
         pipelineTreeListEl.querySelectorAll("button[data-viewer-id]").forEach((btn) => {
           btn.addEventListener("click", () => {
             state.pipelineViewer.selectedId = String(btn.getAttribute("data-viewer-id") || "__index__");
@@ -2069,12 +2197,13 @@
         if (!selectedBlock) {
           pipelinePreviewEl.innerHTML = `
             <article class="pipeline-preview-card">
-              <h4>Knowledge Blocks Overview</h4>
+              <h4>Knowledge Model Overview</h4>
               <div class="pipeline-preview-meta">
-                <span class="pipeline-chip">Total ${esc(String(total))}</span>
-                <span class="pipeline-chip">Visible ${esc(String(rows.length))}</span>
+                <span class="pipeline-chip">Systems ${esc(String(model?.systems?.length || rows.length))}</span>
+                <span class="pipeline-chip">Concepts ${esc(String(model?.concepts?.length || 0))}</span>
+                <span class="pipeline-chip">Relations ${esc(String(model?.relations?.length || 0))}</span>
               </div>
-              <p class="pipeline-empty">Select a block from the left tree to inspect summary, keywords, density score, and mapped module.</p>
+              <p class="pipeline-empty">Select a file from the left tree to inspect parsed markdown and structure.</p>
             </article>
           `;
         } else {
@@ -2083,12 +2212,12 @@
               <h4>${esc(selectedBlock.title)}</h4>
               <div class="pipeline-preview-meta">
                 <span class="pipeline-chip">Gate ${esc(String(selectedBlock.gate))}/${esc(String(total))}</span>
-                <span class="pipeline-chip">Density ${esc(Number(selectedBlock.densityScore || 0).toFixed(3))}</span>
                 <span class="pipeline-chip">Words ${esc(String(selectedBlock.words || 0))}</span>
+                ${selectedBlock.path ? `<span class="pipeline-chip">${esc(selectedBlock.path)}</span>` : ""}
               </div>
               <p>${esc(selectedBlock.summary || "No summary available.")}</p>
               <div class="pipeline-kws">${selectedBlock.keywords.length ? selectedBlock.keywords.map((item) => `<span>${esc(item)}</span>`).join("") : `<span>(none)</span>`}</div>
-              ${selectedBlock.moduleSlug ? `<a class="tiny" href="/experiences/${esc(encodeURIComponent(selectedBlock.moduleSlug))}.html" target="_blank" rel="noreferrer">Open mapped module</a>` : `<p class="pipeline-empty">This block is not mapped to a module yet.</p>`}
+              ${selectedBlock.moduleSlug ? `<a class="tiny" href="/experiences/${esc(encodeURIComponent(selectedBlock.moduleSlug))}.html" target="_blank" rel="noreferrer">Open mapped module</a>` : `<p class="pipeline-empty">No mapped module yet. Click Generate to build the interactive runtime.</p>`}
             </article>
           `;
         }
@@ -2097,6 +2226,7 @@
 
     function closePipelineViewer() {
       state.pipelineViewer.open = false;
+      state.pipelineViewer.generating = false;
       renderPipelineViewer();
     }
 
@@ -2107,6 +2237,7 @@
         ...state.pipelineViewer,
         open: true,
         loading: true,
+        generating: false,
         tab: "code",
         selectedId: "__index__",
         workId: safeWorkId,
@@ -2120,19 +2251,48 @@
           ...state.pipelineViewer,
           open: true,
           loading: false,
+          generating: false,
           workId: safeWorkId,
           bookId: String(data?.bookId || "").trim(),
-          title: String(fallbackTitle || data?.bookId || "").trim(),
-          data: {
-            ...data,
-            generatedAt: new Date().toISOString()
-          }
+          title: String(fallbackTitle || data?.knowledgeModel?.title || data?.bookId || "").trim(),
+          data: { ...data }
         };
       } catch (error) {
         state.pipelineViewer.loading = false;
+        state.pipelineViewer.generating = false;
         setError(error?.message || "Failed to load pipeline blocks.");
       }
       renderPipelineViewer();
+    }
+
+    async function generateFromKnowledgeModelViewer() {
+      const workId = String(state.pipelineViewer?.workId || "").trim();
+      if (!workId) return;
+      if (state.pipelineViewer.generating) return;
+      state.pipelineViewer.generating = true;
+      renderPipelineViewer();
+      setError("");
+      setMeta("Starting interactive runtime generation from knowledge model...");
+      try {
+        const data = await request("POST", "/api/studio/works/" + encodeURIComponent(workId) + "/model/generate", {});
+        const job = data?.job && typeof data.job === "object" ? data.job : null;
+        if (!job?.id) throw new Error("Failed to create generation job");
+        try { localStorage.setItem(ACTIVE_JOB_KEY, job.id); } catch {}
+        applyJobSnapshot(job);
+        attachJobStream(job.id);
+      } catch (error) {
+        setError(error?.message || "Failed to generate from knowledge model.");
+      } finally {
+        state.pipelineViewer.generating = false;
+        renderPipelineViewer();
+      }
+    }
+
+    function downloadKnowledgeModelViewer() {
+      const workId = String(state.pipelineViewer?.workId || "").trim();
+      if (!workId) return;
+      const href = "/api/studio/works/" + encodeURIComponent(workId) + "/model/download?format=md";
+      window.open(href, "_blank", "noopener,noreferrer");
     }
 
     function openPipelineViewerFromJob(job) {
@@ -2140,11 +2300,15 @@
       const preview = Array.isArray(row?.pipeline?.knowledgeBlocksPreview)
         ? row.pipeline.knowledgeBlocksPreview
         : [];
-      if (!preview.length) return;
+      const pipelineModel = row?.pipeline?.knowledgeModel && typeof row.pipeline.knowledgeModel === "object"
+        ? row.pipeline.knowledgeModel
+        : null;
+      if (!preview.length && !pipelineModel) return;
       state.pipelineViewer = {
         ...state.pipelineViewer,
         open: true,
         loading: false,
+        generating: false,
         tab: "code",
         workId: String(row?.work?.id || "").trim(),
         bookId: String(row?.work?.book_id || "").trim(),
@@ -2162,7 +2326,8 @@
             keywords: Array.isArray(item?.keywords) ? item.keywords.slice(0, 8) : [],
             densityScore: Number(item?.densityScore || 0)
           })),
-          moduleMap: []
+          moduleMap: [],
+          knowledgeModel: pipelineModel
         }
       };
       renderPipelineViewer();
@@ -2460,8 +2625,46 @@
       });
     }
 
+    function uploadFileBinary(file, onProgress) {
+      return new Promise((resolve, reject) => {
+        const qs = new URLSearchParams({
+          name: String(file?.name || "uploaded-book.bin"),
+          type: String(file?.type || "application/octet-stream")
+        });
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "/api/studio/files/ingest-binary?" + qs.toString(), true);
+        xhr.setRequestHeader("Content-Type", "application/octet-stream");
+        xhr.responseType = "json";
+        xhr.upload.onprogress = (event) => {
+          if (!event.lengthComputable) return;
+          if (typeof onProgress === "function") {
+            onProgress(Math.max(0, Math.min(1, event.loaded / Math.max(event.total, 1))));
+          }
+        };
+        xhr.onerror = () => reject(new Error("Binary upload failed: " + file.name));
+        xhr.onload = () => {
+          const data = xhr.response && typeof xhr.response === "object"
+            ? xhr.response
+            : (() => {
+              try {
+                return JSON.parse(xhr.responseText || "{}");
+              } catch {
+                return {};
+              }
+            })();
+          if (xhr.status >= 200 && xhr.status < 300 && data?.ok !== false) {
+            resolve(data);
+            return;
+          }
+          reject(new Error((data && data.error) || ("Upload failed with " + xhr.status)));
+        };
+        xhr.send(file);
+      });
+    }
+
     async function ingestFile(file, index, total, pendingId = "") {
-      const maxMb = 12;
+      const maxMb = 120;
+      const binaryThresholdBytes = 8 * 1024 * 1024;
       if (!file) return;
       if (file.size > maxMb * 1024 * 1024) {
         throw new Error(file.name + " exceeds " + maxMb + "MB");
@@ -2473,23 +2676,41 @@
         status: t("studio.pending_reading", "Reading local file..."),
         progress: baseStart
       });
-      const contentBase64 = await readFileAsBase64(file, (ratio) => {
-        const pct = baseStart + Math.round((100 / Math.max(total, 1)) * ratio * 0.6);
-        setProgress(pct, "Uploading: " + file.name);
-        patchPendingSource(pendingId, {
-          status: t("studio.pending_uploading", "Uploading and parsing..."),
-          progress: pct
-        });
-      });
       patchPendingSource(pendingId, {
         status: t("studio.pending_server", "Server parsing file..."),
         progress: Math.max(baseStart + 62, 62)
       });
-      const data = await request("POST", "/api/studio/files/ingest", {
-        name: file.name,
-        type: file.type,
-        contentBase64
-      });
+      let data = null;
+      let contentBase64 = "";
+      if (file.size >= binaryThresholdBytes) {
+        patchPendingSource(pendingId, {
+          status: t("studio.pending_uploading", "Uploading large file in binary mode..."),
+          progress: baseStart + 8
+        });
+        data = await uploadFileBinary(file, (ratio) => {
+          const pct = baseStart + Math.round((100 / Math.max(total, 1)) * ratio * 0.7);
+          setProgress(pct, "Uploading binary: " + file.name);
+          patchPendingSource(pendingId, {
+            status: t("studio.pending_uploading", "Uploading and parsing..."),
+            progress: pct
+          });
+        });
+      } else {
+        contentBase64 = await readFileAsBase64(file, (ratio) => {
+          const pct = baseStart + Math.round((100 / Math.max(total, 1)) * ratio * 0.6);
+          setProgress(pct, "Uploading: " + file.name);
+          patchPendingSource(pendingId, {
+            status: t("studio.pending_uploading", "Uploading and parsing..."),
+            progress: pct
+          });
+        });
+        data = await request("POST", "/api/studio/files/ingest", {
+          name: file.name,
+          type: file.type,
+          contentBase64
+        });
+      }
+      const fileToken = String(data?.fileToken || data?.source?.fileToken || "").trim();
       const events = Array.isArray(data.events) ? data.events : [];
       for (const event of events) {
         pushClientLog(event.message || "Processing file", event.step || "ingest", event.progress);
@@ -2505,7 +2726,16 @@
         status: t("studio.pending_done", "Parsed, adding to source list..."),
         progress: 100
       });
-      return data.source;
+      return {
+        ...(data.source && typeof data.source === "object" ? data.source : {}),
+        __bookFileToken: fileToken,
+        __bookFile: {
+          name: file.name,
+          type: file.type,
+          fileToken,
+          contentBase64: fileToken ? "" : (contentBase64.length <= 4 * 1024 * 1024 ? contentBase64 : "")
+        }
+      };
     }
 
     async function ingestFileList(files) {
@@ -2600,7 +2830,7 @@
           <p>${esc("Mode: " + (item.html_generation_mode || "unknown") + (item.html_generation_error ? (" · " + item.html_generation_error) : ""))}</p>
           <div class="ops">
             <a class="tiny" href="${esc(item.book_href || "#")}" target="_blank" rel="noreferrer">${esc(t("studio.open_book", "Open Book"))}</a>
-            <button class="tiny" data-act="blocks" data-id="${esc(item.id)}">Knowledge Blocks</button>
+            <button class="tiny" data-act="blocks" data-id="${esc(item.id)}">Knowledge Model</button>
             <button class="tiny" data-act="rename" data-id="${esc(item.id)}">${esc(t("studio.rename", "Rename"))}</button>
             <button class="tiny" data-act="publish" data-id="${esc(item.id)}">${esc(item.is_public ? t("studio.unpublish", "Unpublish") : t("studio.publish", "Publish to Library"))}</button>
             <button class="tiny" data-act="delete" data-id="${esc(item.id)}">${esc(t("studio.delete", "Delete"))}</button>
@@ -2615,9 +2845,9 @@
           if (!id || !row) return;
           btn.disabled = true;
           try {
-            await openPipelineViewerByWork(id, row.title || row.book_id || "Knowledge Blocks");
+            await openPipelineViewerByWork(id, row.title || row.book_id || "Knowledge Model");
           } catch (error) {
-            setError(error?.message || "Failed to open knowledge blocks.");
+            setError(error?.message || "Failed to open knowledge model.");
           } finally {
             btn.disabled = false;
           }
@@ -2697,7 +2927,7 @@
       renderLogs();
       const blocksDigest = buildKnowledgeBlocksDigest(state.job);
       renderKnowledgeBlocks();
-      if (step === "knowledge_blocks" && state.job?.id && state.viewerAutoOpenedJobId !== state.job.id) {
+      if ((step === "knowledge_blocks" || step === "knowledge_model") && state.job?.id && state.viewerAutoOpenedJobId !== state.job.id) {
         state.viewerAutoOpenedJobId = state.job.id;
         openPipelineViewerFromJob(state.job);
       }
@@ -2709,7 +2939,7 @@
         const etaText = eta && Number.isFinite(Number(eta.etaMin))
           ? `ETA ${Number(eta.etaMin)}-${Number(eta.etaMax || eta.etaMin)} min`
           : "";
-        setMeta([etaText, "Knowledge blocks:", blocksDigest].filter(Boolean).join("\n"));
+        setMeta([etaText, "Knowledge model blocks:", blocksDigest].filter(Boolean).join("\n"));
       }
 
       if (status === "error") {
@@ -2732,11 +2962,14 @@
         const work = state.job?.work || {};
         const charge = state.job?.creditCharge || null;
         const creditSnapshot = state.job?.creditSnapshot || null;
+        const generationMode = String(work?.generation_mode || "").trim().toLowerCase();
+        const pipelineType = String(state.job?.pipeline?.type || "").trim().toLowerCase();
+        const isKnowledgeModelDone = generationMode === "knowledge_model_parse" || pipelineType === "knowledge_model";
         const href = "/books/" + encodeURIComponent(work.book_id || "") + ".html";
         const blocksDigestDone = buildKnowledgeBlocksDigest(state.job);
         const info = [
-          t("studio.info_done", "Generation completed"),
-          t("studio.info_book_url", "Book URL: {value}", { value: href }),
+          isKnowledgeModelDone ? "Knowledge model parsed successfully." : t("studio.info_done", "Generation completed"),
+          isKnowledgeModelDone ? "You can review the model and click Generate in the explorer to build the interactive runtime." : t("studio.info_book_url", "Book URL: {value}", { value: href }),
           t("studio.info_generation_mode", "Generation mode: {value}", { value: work.generation_mode || "unknown" }),
           t("studio.info_html_mode", "HTML mode: {value}", { value: work.html_generation_mode || "unknown" }),
           charge && Number(charge.amount || 0) > 0
@@ -2745,7 +2978,7 @@
           creditSnapshot && Number.isFinite(Number(creditSnapshot.available))
             ? `Credits available: ${Number(creditSnapshot.available)}`
             : "",
-          blocksDigestDone ? ("Knowledge blocks:\n" + blocksDigestDone) : "",
+          blocksDigestDone ? ("Knowledge model blocks:\n" + blocksDigestDone) : "",
           work.html_generation_error ? t("studio.info_html_error", "HTML generation issue: {value}", { value: work.html_generation_error }) : "",
           work.llm_error ? t("studio.info_fallback_reason", "Fallback reason: {value}", { value: work.llm_error }) : ""
         ].filter(Boolean).join("\n");
@@ -2754,9 +2987,9 @@
         loadMyWorks().catch(() => {});
         if (work?.id && state.viewerAutoOpenedJobId !== `${state.job.id}:done`) {
           state.viewerAutoOpenedJobId = `${state.job.id}:done`;
-          openPipelineViewerByWork(work.id, work.title || work.book_id || "Knowledge Blocks").catch(() => {});
+          openPipelineViewerByWork(work.id, work.title || work.book_id || "Knowledge Model").catch(() => {});
         }
-        if (state.job.id && state.openedJobId !== state.job.id && href) {
+        if (!isKnowledgeModelDone && state.job.id && state.openedJobId !== state.job.id && href) {
           state.openedJobId = state.job.id;
           window.open(href, "_blank", "noopener,noreferrer");
         }
@@ -2824,21 +3057,23 @@
         return;
       }
       setError("");
-      setMeta(t("studio.meta_generating", "Generating playable web, please wait..."));
+      setMeta("Generating visual reading experience, please wait...");
       state.submittingJob = true;
       updateGenerateCtaState();
       setStatus("queued");
       setProgress(2, t("studio.progress_job_submitted", "Job submitted, waiting..."));
-      pushClientLog(t("studio.log_generate_start", "Start generating playable web"), "job", 2);
+      pushClientLog("Start generating visual reading experience", "job", 2);
       pushClientLog(t("studio.warn_active_job", "Generation keeps running in background. You can switch sections and come back later."), "job", 4);
       try {
         const estimatedModules = estimateModuleCountFromSources(state.selectedSources);
-        setMeta(`Submitting job. Credits will be settled after completion based on token usage (auto modules ${estimatedModules}).`);
+        setMeta(`Submitting parse job. Credits will be settled after completion based on token usage (estimated blocks ${estimatedModules}).`);
         const useBookPipeline = detectBookPipelineIntent(state.selectedSources);
+        const bookFilePayload = useBookPipeline ? pickBookFilePayload(state.selectedSources) : null;
         const payload = {
           mode: "sources",
           input: (searchInput.value || websiteInput?.value || "custom sources"),
           sources: state.selectedSources,
+          ...(bookFilePayload ? { bookFile: bookFilePayload } : {}),
           ...(useBookPipeline ? {
             bookPipeline: true,
             pipelineMode: "book_pipeline",
@@ -2847,7 +3082,7 @@
           } : {})
         };
         if (useBookPipeline) {
-          pushClientLog("Detected file/book sources. Use book pipeline mode.", "job", 6);
+          pushClientLog("Detected file/book sources. Launching visual reading pipeline.", "job", 6);
         }
         await startGenerationJob(payload);
       } catch (error) {
@@ -3005,6 +3240,18 @@
 
     if (pipelineViewerCloseEl) {
       pipelineViewerCloseEl.addEventListener("click", () => closePipelineViewer());
+    }
+    if (pipelineGenerateBtnEl) {
+      pipelineGenerateBtnEl.addEventListener("click", () => {
+        generateFromKnowledgeModelViewer().catch((error) => {
+          setError(error?.message || "Failed to generate from knowledge model.");
+        });
+      });
+    }
+    if (pipelineDownloadBtnEl) {
+      pipelineDownloadBtnEl.addEventListener("click", () => {
+        downloadKnowledgeModelViewer();
+      });
     }
     if (pipelineTabCodeEl) {
       pipelineTabCodeEl.addEventListener("click", () => {

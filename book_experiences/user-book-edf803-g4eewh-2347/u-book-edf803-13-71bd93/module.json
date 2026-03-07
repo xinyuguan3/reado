@@ -1,0 +1,45 @@
+{
+  "slug": "u-book-edf803-13-71bd93",
+  "order": 13,
+  "title": "Module 13 · ## 📚 源内容归档 --- ### 来源 1",
+  "generatedBy": "playable-content-engine",
+  "generatedAt": "2026-03-07T09:27:51.293Z",
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T09:28:01.319Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "雨林里的消亡：一种语言和生活方式在巴布亚新几内亚的终结",
+      "author": ""
+    },
+    "knowledge_block": {
+      "id": "kb-25",
+      "gate_index": 13,
+      "title": "第十章 MattersoftheLiver 肝脏问题 在巴布亚新几内亚人遭遇白人以前，他 们是没有文字的。他们的历史和传统（及他们 的语言）都是",
+      "summary": "第十章 MattersoftheLiver 肝脏问题 在巴布亚新几内亚人遭遇白人以前，他 们是没有文字的。他们的历史和传统（及他们 的语言）都是口述的。这些历史和传统体现在 艺术和仪式里，由老人们记着，通过故事和祭 祀活动代代相传。与识字伴随而来的是殖民主 义，尤其是传教士给够多的人说的当地语言发 明的正字法——字母表、书写方式一—从而使 传教士从零开始学当地语言的艰苦努力正当 化。他们学习这些语言是为了翻译《圣经》， 促成当地人改信基督教。此后，殖民政府在全 国各地广设学堂，学生们被教会了如何用英语 读书写字，这是巴布亚新几内亚的殖民宗主国 澳大利亚的国语。 多数迦普恩村民从来没识过字，他们生活 在传教士或殖民政府的关心焦点千里之",
+      "words": 1433,
+      "keywords": [
+        "page",
+        "image",
+        "content",
+        "ocr",
+        "雨林里的消亡",
+        "第十章"
+      ],
+      "density": {
+        "score": 0.6544,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0.402,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0.0195
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "anthro",
+      "theme_label": "Field Narrative",
+      "section_count": 5,
+      "generated_with": "template_runtime"
+    }
+  }
+}

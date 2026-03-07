@@ -1,1 +1,0 @@
-这是《Railway Pipeline Smoke Test》的知识块复盘。 本关重点：Chapter 3 Error Correction.。 Chapter 3 Error Correction. Common mistakes include overgeneralization, missing constraints, and weak causal links; correction requires explicit criteria, iteration, and verification. 请重点记住：correction、chapter、error、common。 现在暂停 10 秒，回忆一个你可以马上使用的场景。

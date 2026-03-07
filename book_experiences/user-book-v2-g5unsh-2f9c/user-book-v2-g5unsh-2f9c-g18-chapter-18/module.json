@@ -1,0 +1,40 @@
+{
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T10:08:28.990Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "雨林里的消亡（可视化阅读测试-v2）",
+      "author": "Unknown"
+    },
+    "knowledge_block": {
+      "id": "kb-34",
+      "gate_index": 18,
+      "title": "第十二章险象环生",
+      "summary": "第十二章险象环生 161 通常只要一个小时的行程花了两个多小时。我们乘着木筏，静静地划 了一个小时，先是过了一条通往红树林湖的小河，然后穿过湖， 直到抵达邻近的旺安村。从那里我们沿着海滩走了四个小时，到达了 瓦当村，那里的人有一个马力够足的舷外马达支撑我们走六个小时海 路到达韦瓦克。 我们离开的时候是黎明时分。我想我可能永远不会再来迦普 恩了。",
+      "words": 2625,
+      "keywords": [
+        "第十二章险象环生",
+        "西斯塔",
+        "雨林里的消亡",
+        "然而",
+        "年底",
+        "当然"
+      ],
+      "density": {
+        "score": 0.6207,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0.2743,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0.0107
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "scholar",
+      "theme_label": "Scholar Atlas",
+      "section_count": 5,
+      "generated_with": "template_runtime"
+    }
+  }
+}

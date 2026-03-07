@@ -1,0 +1,40 @@
+{
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T09:30:51.831Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "雨林里的消亡：一种语言和生活方式在巴布亚新几内亚的终结",
+      "author": ""
+    },
+    "knowledge_block": {
+      "id": "kb-02",
+      "gate_index": 1,
+      "title": "第一章我们呼吸的空气",
+      "summary": "第一章我们呼吸的空气 13 [PAGE 23 IMAGE 1 CONTENT (OCR)]: （在皮金语里是olbikman，泰雅博语里是munjenumsuman）一用 羽毛和野猪长牙为我盛装打扮，然后指引我喝掉他们倒在一张芋叶里 的开过光的水。他们解释说，这些神水可以让我打开话匣子，从而学 会泰雅博语，我前世因为英年早逝没来得及学会。 在同一个场合，男人们宣布说他们赐予了我一个泰雅博语名字。",
+      "words": 903,
+      "keywords": [
+        "page",
+        "image",
+        "content",
+        "ocr",
+        "第一章我们呼吸的空气",
+        "康庄大道"
+      ],
+      "density": {
+        "score": 0.6962,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0.5847,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "anthro",
+      "theme_label": "Field Narrative",
+      "section_count": 4,
+      "generated_with": "template_runtime"
+    }
+  }
+}

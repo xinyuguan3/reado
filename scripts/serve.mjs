@@ -234,6 +234,10 @@ const runtimeBookCatalog = new RuntimeBookCatalog({ rootDir });
 const studioJobs = new Map();
 const STUDIO_JOB_LOG_LIMIT = 180;
 const STUDIO_JOB_RETENTION_MS = 45 * 60 * 1000;
+const STUDIO_MAX_UPLOAD_JSON_BYTES = Math.max(32 * 1024 * 1024, toInt(process.env.READO_STUDIO_MAX_UPLOAD_JSON_BYTES || 220 * 1024 * 1024));
+const STUDIO_FILE_TOKEN_TTL_MS = Math.max(10 * 60 * 1000, toInt(process.env.READO_STUDIO_FILE_TOKEN_TTL_MS || 6 * 60 * 60 * 1000) || 6 * 60 * 60 * 1000);
+const STUDIO_FILE_TOKEN_DIR = path.join(dataDir, "tmp", "studio-file-tokens");
+const studioFileTokens = new Map();
 const BOOK_PIPELINE_MIN_BLOCKS = 6;
 const BOOK_PIPELINE_MAX_BLOCKS = 36;
 const BOOK_PIPELINE_QA_RETRIES = 2;
@@ -279,6 +283,25 @@ const BOOF_SCRIPT_PATH = String(
   process.env.READO_BOOK_PIPELINE_BOOF_SCRIPT
   || (BOOF_SKILL_DIR ? path.join(BOOF_SKILL_DIR, "scripts", "boof.sh") : "")
 ).trim();
+const BOOK_READER_SKILL_DIR = String(
+  process.env.READO_BOOK_PIPELINE_BOOK_READER_SKILL_DIR
+  || path.join(rootDir, "studio_skills", "book-reader")
+  || path.join(CODEX_HOME || "", "skills", "book-reader")
+).trim();
+const BOOK_READER_SCRIPT_PATH = String(
+  process.env.READO_BOOK_PIPELINE_BOOK_READER_SCRIPT
+  || (BOOK_READER_SKILL_DIR ? path.join(BOOK_READER_SKILL_DIR, "book-reader.sh") : "")
+).trim();
+const BOOK_PIPELINE_USE_BOOK_READER = String(
+  process.env.READO_BOOK_PIPELINE_USE_BOOK_READER
+  || process.env.READO_BOOK_PIPELINE_ENABLE_BOOK_READER
+  || "on"
+).trim().toLowerCase() !== "off";
+const BOOK_PIPELINE_BOOK_READER_TIMEOUT_MS = Math.max(60_000, toInt(process.env.READO_BOOK_PIPELINE_BOOK_READER_TIMEOUT_MS || 14 * 60 * 1000) || 14 * 60 * 1000);
+const BOOK_PIPELINE_BOOK_READER_MIN_CHARS = Math.max(800, toInt(process.env.READO_BOOK_PIPELINE_BOOK_READER_MIN_CHARS || 1800) || 1800);
+const BOOK_PIPELINE_BOOK_READER_CHUNK_CHARS = Math.max(800, toInt(process.env.READO_BOOK_PIPELINE_BOOK_READER_CHUNK_CHARS || 2200) || 2200);
+const BOOK_PIPELINE_BOOK_READER_MIN_CHUNK_CHARS = Math.max(300, toInt(process.env.READO_BOOK_PIPELINE_BOOK_READER_MIN_CHUNK_CHARS || 760) || 760);
+const BOOK_PIPELINE_BOOK_READER_MAX_CHUNKS = Math.max(6, Math.min(220, toInt(process.env.READO_BOOK_PIPELINE_BOOK_READER_MAX_CHUNKS || 120) || 120));
 const BOOK_PIPELINE_USE_BOOF = String(
   process.env.READO_BOOK_PIPELINE_USE_BOOF
   || process.env.READO_BOOK_PIPELINE_ENABLE_BOOF
@@ -286,7 +309,7 @@ const BOOK_PIPELINE_USE_BOOF = String(
 ).trim().toLowerCase() !== "off";
 const BOOK_PIPELINE_REQUIRE_BOOF = String(
   process.env.READO_BOOK_PIPELINE_REQUIRE_BOOF
-  || "on"
+  || "off"
 ).trim().toLowerCase() !== "off";
 const BOOK_PIPELINE_BOOF_TIMEOUT_MS = Math.max(45_000, toInt(process.env.READO_BOOK_PIPELINE_BOOF_TIMEOUT_MS || 12 * 60 * 1000) || 12 * 60 * 1000);
 const BOOK_PIPELINE_BOOF_MIN_CHARS = Math.max(600, toInt(process.env.READO_BOOK_PIPELINE_BOOF_MIN_CHARS || 1800) || 1800);
@@ -341,6 +364,7 @@ const BOOK_PIPELINE_STRUCTURED_MIN_SECTIONS = Math.max(2, Math.min(24, toInt(pro
 const BOOK_PIPELINE_STRUCTURED_MAX_SECTIONS = Math.max(8, Math.min(240, toInt(process.env.READO_BOOK_PIPELINE_STRUCTURED_MAX_SECTIONS || 120) || 120));
 const BOOK_PIPELINE_STRUCTURED_SECTION_MIN_CHARS = Math.max(80, toInt(process.env.READO_BOOK_PIPELINE_STRUCTURED_SECTION_MIN_CHARS || 220) || 220);
 let boofRunLock = Promise.resolve();
+let bookReaderRunLock = Promise.resolve();
 let knowledgeAbsorberRunLock = Promise.resolve();
 
 function nowIso() {
@@ -1603,7 +1627,22 @@ function isBookPipelinePayload(payload = {}) {
   }
   if (payload?.bookPipeline === true) return true;
   if (payload?.bookFile && typeof payload.bookFile === "object") return true;
-  if (payload?.file && typeof payload.file === "object" && cleanText(payload.file.contentBase64)) return true;
+  if (payload?.file && typeof payload.file === "object" && (cleanText(payload.file.contentBase64) || cleanText(payload.file.fileToken || payload.file.token))) return true;
+  if (cleanText(payload?.bookFileToken || payload?.fileToken)) return true;
+  return false;
+}
+
+function isKnowledgeModelParsePayload(payload = {}) {
+  const mode = cleanText(payload?.pipelineMode || payload?.generationType || payload?.mode).toLowerCase();
+  if (
+    mode === "knowledge_model"
+    || mode === "knowledge-model"
+    || mode === "knowledge_model_parse"
+    || mode === "knowledge-model-parse"
+  ) {
+    return true;
+  }
+  if (payload?.parseOnlyModel === true) return true;
   return false;
 }
 
@@ -1630,8 +1669,23 @@ function shouldAutoBookPipelinePayload(payload = {}) {
   return false;
 }
 
+function shouldAutoKnowledgeModelPayload(payload = {}) {
+  if (!payload || typeof payload !== "object") return false;
+  return isKnowledgeModelParsePayload(payload);
+}
+
 function normalizeStudioJobPayload(payload = {}) {
   const body = payload && typeof payload === "object" ? { ...payload } : {};
+  if (isKnowledgeModelParsePayload(body) || shouldAutoKnowledgeModelPayload(body)) {
+    return {
+      ...body,
+      bookPipeline: true,
+      knowledgeModel: true,
+      parseOnlyModel: true,
+      pipelineMode: "book_pipeline",
+      mode: "book_pipeline"
+    };
+  }
   if (isBookPipelinePayload(body) || shouldAutoBookPipelinePayload(body)) {
     return {
       ...body,
@@ -1702,7 +1756,12 @@ function estimateBookPipelineFromPayload(payload = {}, options = {}) {
     .join("\n");
   const directText = cleanText(payload?.contextText || payload?.input || "");
   const fileBase64 = cleanText(payload?.bookFile?.contentBase64 || payload?.file?.contentBase64 || "");
-  const fileBytes = fileBase64 ? Math.floor((fileBase64.length * 3) / 4) : 0;
+  const fileBytes = fileBase64
+    ? Math.floor((fileBase64.length * 3) / 4)
+    : Math.max(
+      0,
+      toInt(payload?.bookFile?.size || payload?.bookFile?.fileSizeBytes || payload?.file?.size || payload?.file?.fileSizeBytes || sourceRows[0]?.fileSizeBytes)
+    );
   const textForEstimate = sourceText || directText;
   const words = roughWordCount(textForEstimate);
   const pagesApprox = Math.max(1, estimateSourcePageCount(payload, words, fileBytes));
@@ -1742,6 +1801,27 @@ function estimateBookPipelineFromPayload(payload = {}, options = {}) {
   };
 }
 
+function estimateKnowledgeModelParseFromPayload(payload = {}, options = {}) {
+  const base = estimateBookPipelineFromPayload(payload, options);
+  const queueWaitSec = Math.max(0, Number(base.queueDepth || 0) * 30);
+  const parseSec = Math.max(20, Number(base.parseSec || 0) * 0.95);
+  const modelSec = Math.max(28, Number(base.blockCount || BOOK_PIPELINE_MIN_BLOCKS) * 5.2);
+  const etaSec = Math.ceil((queueWaitSec + parseSec + modelSec + 24) * 1.1);
+  const etaMin = Math.max(1, Math.ceil(etaSec * 0.85 / 60));
+  const etaMax = Math.max(etaMin, Math.ceil(etaSec * 1.25 / 60));
+  return {
+    ...base,
+    parseSec,
+    modelSec,
+    parallelSec: 0,
+    qaSec: 0,
+    etaSec,
+    etaMin,
+    etaMax,
+    returnAt: new Date(Date.now() + etaSec * 1000).toISOString()
+  };
+}
+
 function estimateBookPipelineCreditCost(payload = {}) {
   const metrics = estimateBookPipelineFromPayload(payload, { queueDepth: 0 });
   const sourceRows = Array.isArray(payload?.sources) ? payload.sources : [];
@@ -1770,6 +1850,7 @@ function extractConceptKeywords(text, maxCount = 6) {
   const stopWords = new Set([
     "that", "this", "with", "from", "have", "were", "which", "about", "into", "their", "there", "then", "than",
     "the", "and", "for", "are", "was", "you", "your", "our", "but", "not", "can", "will", "would", "should",
+    "page", "pages", "image", "images", "content", "ocr", "error", "processing", "stream", "endobj", "flate", "flatedecode",
     "我们", "你们", "他们", "以及", "因为", "所以", "可以", "需要", "然后", "通过", "这个", "那个", "一个"
   ]);
   const counts = new Map();
@@ -1998,6 +2079,18 @@ function stripLeadingPageMarker(text = "") {
   return next;
 }
 
+function stripOcrArtifactsForPipeline(text = "") {
+  return String(text || "")
+    .replace(/\[ERROR\s+processing\s+PAGE[^\]]*\]/gi, "\n")
+    .replace(/\[PAGE\s*\d+[^\]]*\]\s*:?/gi, "\n")
+    .replace(/\bIMAGE\s+CONTENT\s*\(OCR\)\b/gi, " ")
+    .replace(/\bOCR\b/gi, " ")
+    .replace(/endobj|stream/gi, " ")
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
 function normalizeKnowledgeBlockTitle(title, fallback = "") {
   let next = stripLeadingPageMarker(cleanText(title));
   if (!next) next = stripLeadingPageMarker(cleanText(fallback));
@@ -2042,7 +2135,7 @@ function splitMarkdownSectionsForPipeline(markdownRaw = "", opts = {}) {
     const raw = buffer.join("\n").trim();
     buffer = [];
     if (!raw) return;
-    const content = cleanText(stripMarkdownForPipeline(raw));
+    const content = cleanText(stripOcrArtifactsForPipeline(stripMarkdownForPipeline(raw)));
     if (content.length < minChars) return;
     const title = normalizeKnowledgeBlockTitle(sectionTitle, `Section ${rows.length + 1}`) || `Section ${rows.length + 1}`;
     const summary = cleanText(
@@ -2095,7 +2188,7 @@ function splitMarkdownSectionsForPipeline(markdownRaw = "", opts = {}) {
 }
 
 function resolveBookPipelinePlanningInput({ sourceText = "", skeletonMdText = "", targetBlocks = 0 } = {}) {
-  const plainSource = cleanText(sourceText);
+  const plainSource = cleanText(stripOcrArtifactsForPipeline(sourceText));
   const markdownText = String(skeletonMdText || "").trim();
   const base = {
     text: plainSource,
@@ -2145,7 +2238,7 @@ function resolveBookPipelinePlanningInput({ sourceText = "", skeletonMdText = ""
       markdownChars: markdownText.length
     };
   }
-  const markdownLinear = cleanText(stripMarkdownForPipeline(markdownText));
+  const markdownLinear = cleanText(stripOcrArtifactsForPipeline(stripMarkdownForPipeline(markdownText)));
   if (markdownLinear.length >= Math.max(1200, Math.floor(plainSource.length * 0.45))) {
     return {
       text: clampText(markdownLinear, BOOK_PIPELINE_INGEST_MAX_TEXT),
@@ -2304,6 +2397,210 @@ function splitKnowledgeBlocksFromText(text, opts = {}) {
       anchorCount: anchorPreview.length,
       anchorPreview: anchorPreview.slice(0, 24)
     }
+  };
+}
+
+function slugifyKnowledgeModelId(value = "", fallback = "node") {
+  const base = cleanText(value)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return (base || fallback).slice(0, 56);
+}
+
+function toTitleCaseForKnowledgeModel(value = "", fallback = "") {
+  const text = cleanText(value, fallback);
+  if (!text) return "";
+  const normalized = text.replace(/\s+/g, " ").trim();
+  return normalized.slice(0, 88);
+}
+
+function buildKnowledgeModelFromBlocks(options = {}) {
+  const bookTitle = cleanText(options?.bookTitle, "Knowledge Model");
+  const bookAuthor = cleanText(options?.bookAuthor);
+  const planningInput = options?.planningInput && typeof options.planningInput === "object" ? options.planningInput : {};
+  const sourceEnhancer = options?.sourceEnhancer && typeof options.sourceEnhancer === "object" ? options.sourceEnhancer : {};
+  const sourceMode = cleanText(options?.sourceMode, "file");
+  const rows = normalizeManifestKnowledgeBlocks(Array.isArray(options?.knowledgeBlocks) ? options.knowledgeBlocks : []);
+  const conceptPool = new Map();
+  for (const row of rows) {
+    const keywords = Array.isArray(row?.keywords) ? row.keywords : [];
+    for (const token of keywords) {
+      const normalized = toTitleCaseForKnowledgeModel(token);
+      if (!normalized || normalized.length < 2) continue;
+      const next = conceptPool.get(normalized) || { name: normalized, count: 0, gates: new Set() };
+      next.count += 1;
+      next.gates.add(toInt(row?.gateIndex));
+      conceptPool.set(normalized, next);
+    }
+  }
+  const concepts = [...conceptPool.values()]
+    .sort((a, b) => (b.count - a.count) || a.name.localeCompare(b.name))
+    .slice(0, 36)
+    .map((row, index) => ({
+      id: `concept-${String(index + 1).padStart(2, "0")}-${slugifyKnowledgeModelId(row.name, "topic")}`,
+      name: row.name,
+      weight: row.count,
+      gate_refs: [...row.gates].filter((item) => item > 0).sort((a, b) => a - b)
+    }));
+
+  const conceptByName = new Map(concepts.map((row) => [row.name, row.id]));
+  const systems = rows.map((row) => ({
+    id: cleanText(row?.id, `kb-${String(toInt(row?.gateIndex) || 1).padStart(2, "0")}`),
+    gate: toInt(row?.gateIndex) || 1,
+    title: toTitleCaseForKnowledgeModel(row?.title, `Knowledge Block ${toInt(row?.gateIndex) || 1}`),
+    summary: cleanText(row?.summary),
+    keywords: (Array.isArray(row?.keywords) ? row.keywords : [])
+      .map((item) => toTitleCaseForKnowledgeModel(item))
+      .filter(Boolean),
+    words: toInt(row?.words)
+  }));
+
+  const relations = [];
+  for (let i = 0; i < systems.length; i += 1) {
+    const current = systems[i];
+    const next = systems[i + 1];
+    if (next) {
+      relations.push({
+        id: `edge-seq-${String(i + 1).padStart(2, "0")}`,
+        from: current.id,
+        to: next.id,
+        type: "sequence",
+        strength: 0.72
+      });
+    }
+    for (let j = i + 1; j < systems.length; j += 1) {
+      const target = systems[j];
+      const overlap = current.keywords.filter((key) => target.keywords.includes(key));
+      if (overlap.length >= 2) {
+        relations.push({
+          id: `edge-overlap-${String(i + 1).padStart(2, "0")}-${String(j + 1).padStart(2, "0")}`,
+          from: current.id,
+          to: target.id,
+          type: "semantic_overlap",
+          strength: Number(Math.min(0.95, 0.45 + overlap.length * 0.12).toFixed(3)),
+          overlap
+        });
+      }
+    }
+  }
+
+  const stateVariables = concepts.slice(0, 10).map((row, index) => ({
+    id: `sv-${String(index + 1).padStart(2, "0")}`,
+    label: row.name,
+    source_concept_id: row.id,
+    range: [0, 100],
+    init: 50
+  }));
+  const actions = systems.slice(0, 12).map((row, index) => ({
+    id: `act-${String(index + 1).padStart(2, "0")}`,
+    label: `Apply ${row.title}`,
+    target_system_id: row.id,
+    expected_effect: `Drive ${row.keywords.slice(0, 2).join(" / ") || "key concepts"} from theory to scenario.`
+  }));
+
+  const docs = [];
+  const indexLines = [
+    "# Knowledge Model Index",
+    "",
+    `- title: ${bookTitle}`,
+    bookAuthor ? `- author: ${bookAuthor}` : "",
+    `- systems: ${systems.length}`,
+    `- concepts: ${concepts.length}`,
+    `- relations: ${relations.length}`,
+    `- source_mode: ${sourceMode}`,
+    `- parse_strategy: ${cleanText(planningInput?.strategy, "source_text")}`,
+    sourceEnhancer?.provider ? `- parser_provider: ${cleanText(sourceEnhancer?.provider)}` : "",
+    "",
+    "## Systems",
+    "",
+    ...systems.map((row) => `- [gate-${String(row.gate).padStart(2, "0")}.md](gates/gate-${String(row.gate).padStart(2, "0")}.md) · ${row.title}`),
+    "",
+    "## Concepts",
+    "",
+    ...concepts.slice(0, 20).map((row) => `- ${row.name} (weight ${row.weight})`)
+  ].filter(Boolean);
+  docs.push({
+    id: "__index__",
+    path: "index.md",
+    title: "index.md",
+    kind: "index",
+    markdown: indexLines.join("\n")
+  });
+
+  const overviewLines = [
+    "# Model Overview",
+    "",
+    "## Runtime Schema",
+    "",
+    "```json",
+    JSON.stringify(
+      {
+        state_variables: stateVariables,
+        actions: actions,
+        relation_count: relations.length
+      },
+      null,
+      2
+    ),
+    "```",
+    "",
+    "## Key Relations",
+    "",
+    ...relations.slice(0, 48).map((row) => `- ${row.from} -> ${row.to} (${row.type}, strength=${Number(row.strength || 0).toFixed(3)})`)
+  ];
+  docs.push({
+    id: "model-overview",
+    path: "model/overview.md",
+    title: "overview.md",
+    kind: "model",
+    markdown: overviewLines.join("\n")
+  });
+
+  for (const row of systems) {
+    const gateStr = String(row.gate).padStart(2, "0");
+    const sourceBlock = rows.find((item) => cleanText(item?.id) === cleanText(row?.id)) || {};
+    const blockLines = [
+      `# Gate ${gateStr}: ${row.title}`,
+      "",
+      `- id: ${row.id}`,
+      `- words: ${toInt(row.words)}`,
+      `- keywords: ${row.keywords.join(", ") || "(none)"}`,
+      "",
+      "## Summary",
+      "",
+      cleanText(row.summary, "No summary available."),
+      "",
+      "## Source Excerpt",
+      "",
+      cleanText(sourceBlock?.content).slice(0, 4000) || "(source excerpt unavailable)"
+    ];
+    docs.push({
+      id: row.id,
+      path: `gates/gate-${gateStr}.md`,
+      title: `gate-${gateStr}.md`,
+      kind: "gate",
+      gate: row.gate,
+      markdown: blockLines.join("\n")
+    });
+  }
+
+  return {
+    version: 1,
+    generated_at: nowIso(),
+    title: bookTitle,
+    author: bookAuthor,
+    summary: `${systems.length} systems, ${concepts.length} concepts, ${relations.length} relations.`,
+    parse_strategy: cleanText(planningInput?.strategy, "source_text"),
+    parse_structured: planningInput?.usedStructured === true,
+    source_mode: sourceMode,
+    parser_provider: cleanText(sourceEnhancer?.provider),
+    systems,
+    concepts,
+    relations,
+    state_variables: stateVariables,
+    actions,
+    docs
   };
 }
 
@@ -2559,9 +2856,38 @@ async function pathExists(targetPath) {
   return Boolean(await fs.stat(targetPath).catch(() => null));
 }
 
+async function prepareScriptForBash(scriptPath, cacheName = "script") {
+  const safePath = cleanText(scriptPath);
+  if (!safePath || !(await pathExists(safePath))) {
+    return { ok: false, scriptPath: "", sanitized: false, reason: "script_missing" };
+  }
+  const raw = await fs.readFile(safePath, "utf8").catch(() => "");
+  if (!raw) {
+    return { ok: false, scriptPath: "", sanitized: false, reason: "script_unreadable" };
+  }
+  if (!raw.includes("\r")) {
+    return { ok: true, scriptPath: safePath, sanitized: false };
+  }
+  const sanitized = raw.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+  const scriptDir = path.join(dataDir, "tmp", "scripts");
+  await fs.mkdir(scriptDir, { recursive: true });
+  const outPath = path.join(
+    scriptDir,
+    `${cacheName}-${path.basename(safePath).replace(/[^a-z0-9._-]+/gi, "-").toLowerCase() || "runner.sh"}`
+  );
+  await fs.writeFile(outPath, sanitized, { encoding: "utf8", mode: 0o755 });
+  return { ok: true, scriptPath: outPath, sanitized: true };
+}
+
 function withBoofLock(task) {
   const run = boofRunLock.then(() => task(), () => task());
   boofRunLock = run.catch(() => {});
+  return run;
+}
+
+function withBookReaderLock(task) {
+  const run = bookReaderRunLock.then(() => task(), () => task());
+  bookReaderRunLock = run.catch(() => {});
   return run;
 }
 
@@ -2592,7 +2918,7 @@ async function resolvePythonCommand() {
 }
 
 function normalizeKnowledgeAbsorberOutput(raw = "", maxChars = BOOK_PIPELINE_INGEST_MAX_TEXT) {
-  const text = String(raw || "").replace(/\r\n/g, "\n");
+  const text = stripOcrArtifactsForPipeline(String(raw || "").replace(/\r\n/g, "\n"));
   if (!text.trim()) return "";
   const cleaned = [];
   for (const line of text.split("\n")) {
@@ -2606,6 +2932,8 @@ function normalizeKnowledgeAbsorberOutput(raw = "", maxChars = BOOK_PIPELINE_ING
     if (/^(title|author|source|date):\s+/i.test(trimmed)) continue;
     if (/^===\s*content\s*===$/i.test(trimmed)) continue;
     if (/^generated by lcs knowledge absorber/i.test(trimmed)) continue;
+    if (/^\[?page\s*\d+[^\]]*\]?$/i.test(trimmed)) continue;
+    if (/^\[\s*error\s+processing\s+page/i.test(trimmed)) continue;
     cleaned.push(line);
   }
   return clampText(
@@ -2638,6 +2966,23 @@ function parseKnowledgeAbsorberMetadata(raw = "") {
     source: pick(sourceRows, ""),
     date: pick(dateRows, "")
   };
+}
+
+function detectBookReaderInputKind(filePayload = {}) {
+  const name = cleanText(filePayload?.name).toLowerCase();
+  const mime = cleanText(filePayload?.type).toLowerCase();
+  if (name.endsWith(".pdf") || mime.includes("pdf")) return "pdf";
+  if (name.endsWith(".epub") || mime.includes("epub")) return "epub";
+  if (name.endsWith(".txt") || name.endsWith(".md") || mime.startsWith("text/")) return "text";
+  return "generic";
+}
+
+function isBookReaderCandidateFile(filePayload = {}) {
+  const name = cleanText(filePayload?.name).toLowerCase();
+  const mime = cleanText(filePayload?.type).toLowerCase();
+  if (!name && !mime) return false;
+  if (name.endsWith(".pdf") || name.endsWith(".epub") || name.endsWith(".txt") || name.endsWith(".md")) return true;
+  return mime.includes("pdf") || mime.includes("epub") || mime.startsWith("text/");
 }
 
 function detectKnowledgeAbsorberInputKind(filePayload = {}) {
@@ -2770,6 +3115,236 @@ function normalizeBoofMarkdown(raw = "", maxChars = BOOK_PIPELINE_INGEST_MAX_TEX
   );
 }
 
+function normalizeBookReaderChunks(rawChunks = []) {
+  const rows = Array.isArray(rawChunks) ? rawChunks : [];
+  const out = [];
+  for (let i = 0; i < rows.length; i += 1) {
+    const row = rows[i] && typeof rows[i] === "object" ? rows[i] : {};
+    const title = normalizeKnowledgeBlockTitle(cleanText(row?.title), `Knowledge Block ${i + 1}`) || `Knowledge Block ${i + 1}`;
+    const summary = cleanText(stripOcrArtifactsForPipeline(cleanText(row?.summary))).slice(0, 420);
+    const content = cleanText(stripOcrArtifactsForPipeline(cleanText(row?.content)));
+    if (content.length < 80) continue;
+    const keywords = Array.isArray(row?.keywords)
+      ? row.keywords.map((item) => cleanText(item)).filter(Boolean).slice(0, 12)
+      : extractConceptKeywords(`${title} ${summary} ${content}`, 10);
+    const coreIdeas = Array.isArray(row?.core_ideas)
+      ? row.core_ideas.map((item) => cleanText(stripOcrArtifactsForPipeline(item))).filter(Boolean).slice(0, 6)
+      : [];
+    out.push({
+      chunkId: cleanText(row?.chunk_id, `kb-${String(out.length + 1).padStart(3, "0")}`),
+      title,
+      summary,
+      content,
+      keywords,
+      coreIdeas,
+      charCount: Math.max(content.length, toInt(row?.char_count)),
+      estimatedReadingMinutes: Math.max(1, toInt(row?.estimated_reading_minutes) || Math.ceil(Math.max(content.length, 1) / 650))
+    });
+  }
+  return out;
+}
+
+function buildBookReaderMarkdown(bookTitle = "", chunks = []) {
+  const rows = Array.isArray(chunks) ? chunks : [];
+  const title = cleanText(bookTitle, "Uploaded Book");
+  const lines = [`# ${title}`];
+  rows.forEach((row, idx) => {
+    const sectionTitle = normalizeKnowledgeBlockTitle(cleanText(row?.title), `Knowledge Block ${idx + 1}`) || `Knowledge Block ${idx + 1}`;
+    const summary = cleanText(row?.summary);
+    const content = cleanText(row?.content);
+    const coreIdeas = Array.isArray(row?.coreIdeas) ? row.coreIdeas.map((item) => cleanText(item)).filter(Boolean).slice(0, 4) : [];
+    lines.push("", `## ${sectionTitle}`);
+    if (summary) lines.push("", summary);
+    if (coreIdeas.length) {
+      lines.push("", "Key ideas:");
+      coreIdeas.forEach((idea) => lines.push(`- ${idea}`));
+    }
+    if (content) lines.push("", content);
+  });
+  return clampText(lines.join("\n").trim(), Math.max(16_000, BOOK_PIPELINE_INGEST_MAX_TEXT * 2));
+}
+
+async function runBookReaderIngest(inputValue, hooks = null, options = {}) {
+  const startedAt = Date.now();
+  if (!BOOK_PIPELINE_USE_BOOK_READER) {
+    return {
+      used: false,
+      status: "disabled",
+      reason: "BOOK_PIPELINE_USE_BOOK_READER=off",
+      elapsedMs: 0
+    };
+  }
+  const scriptPath = cleanText(BOOK_READER_SCRIPT_PATH);
+  if (!scriptPath || !(await pathExists(scriptPath))) {
+    return {
+      used: false,
+      status: "skipped",
+      reason: "book_reader_script_missing",
+      elapsedMs: 0
+    };
+  }
+  const timeoutMs = Math.max(60_000, toInt(options?.timeoutMs) || BOOK_PIPELINE_BOOK_READER_TIMEOUT_MS);
+  const maxChars = Math.max(12_000, toInt(options?.maxChars) || BOOK_PIPELINE_INGEST_MAX_TEXT);
+  const inputKind = cleanText(options?.inputKind, "generic").toLowerCase();
+  const sourceName = cleanText(options?.sourceName, path.basename(cleanText(inputValue)));
+  const chunkChars = Math.max(800, toInt(options?.chunkChars) || BOOK_PIPELINE_BOOK_READER_CHUNK_CHARS);
+  const minChars = Math.max(300, toInt(options?.minChars) || BOOK_PIPELINE_BOOK_READER_MIN_CHUNK_CHARS);
+  const maxChunks = Math.max(6, Math.min(220, toInt(options?.maxChunks) || BOOK_PIPELINE_BOOK_READER_MAX_CHUNKS));
+  const preparedScript = await prepareScriptForBash(scriptPath, "book-reader").catch(() => ({ ok: false, scriptPath: "" }));
+  if (!preparedScript?.ok || !preparedScript?.scriptPath) {
+    return {
+      used: false,
+      status: "error",
+      reason: "book_reader_script_prepare_failed",
+      elapsedMs: Date.now() - startedAt
+    };
+  }
+  const scriptToRun = cleanText(preparedScript.scriptPath);
+  const outputDir = path.join(dataDir, "tmp", "book-reader");
+  const outputPath = path.join(outputDir, `chunks-${Date.now()}-${crypto.randomUUID().slice(0, 8)}.json`);
+  return withBookReaderLock(async () => {
+    if (hooks && typeof hooks.onProgress === "function") {
+      hooks.onProgress({
+        step: "ingest_skill",
+        progress: 41,
+        message: `Running book-reader parser (route=${inputKind || "generic"})`
+      });
+    }
+    await fs.mkdir(outputDir, { recursive: true }).catch(() => {});
+    let stdout = "";
+    let stderr = "";
+    try {
+      const run = await execFileAsync(
+        "bash",
+        [
+          scriptToRun,
+          "chunk",
+          cleanText(inputValue),
+          "--output",
+          outputPath,
+          "--chunk-chars",
+          String(chunkChars),
+          "--min-chars",
+          String(minChars),
+          "--max-chunks",
+          String(maxChunks),
+          "--book-title",
+          sourceName.replace(/\.[^.]+$/, "")
+        ],
+        {
+          cwd: rootDir,
+          timeout: timeoutMs,
+          maxBuffer: 64 * 1024 * 1024
+        }
+      );
+      stdout = cleanText(run?.stdout);
+      stderr = cleanText(run?.stderr);
+    } catch (error) {
+      const reason = cleanText(
+        error?.stderr,
+        cleanText(error?.stdout, cleanText(error?.message, "book_reader_exec_failed"))
+      ).slice(0, 400);
+      return {
+        used: false,
+        status: "error",
+        reason,
+        elapsedMs: Date.now() - startedAt,
+        inputKind,
+        outputPath,
+        scriptPath: cleanText(BOOK_READER_SCRIPT_PATH)
+      };
+    }
+    const rawJson = await fs.readFile(outputPath, "utf8").catch(() => "");
+    if (!rawJson.trim()) {
+      return {
+        used: false,
+        status: "fallback",
+        reason: "book_reader_output_missing",
+        elapsedMs: Date.now() - startedAt,
+        inputKind,
+        outputPath,
+        scriptPath: cleanText(BOOK_READER_SCRIPT_PATH)
+      };
+    }
+    let parsed = null;
+    try {
+      parsed = JSON.parse(rawJson);
+    } catch {
+      parsed = null;
+    }
+    const normalizedChunks = normalizeBookReaderChunks(parsed?.chunks);
+    const joinedText = clampText(
+      normalizedChunks
+        .map((row, idx) => `Section ${idx + 1}: ${cleanText(row?.title)}\n${cleanText(row?.content)}`)
+        .join("\n\n"),
+      maxChars
+    );
+    if (!normalizedChunks.length || joinedText.length < BOOK_PIPELINE_BOOK_READER_MIN_CHARS) {
+      return {
+        used: false,
+        status: "fallback",
+        reason: !normalizedChunks.length
+          ? "book_reader_no_chunks"
+          : `book_reader_output_too_short(${joinedText.length})`,
+        elapsedMs: Date.now() - startedAt,
+        inputKind,
+        outputPath,
+        scriptPath: cleanText(BOOK_READER_SCRIPT_PATH),
+        chunkCount: normalizedChunks.length,
+        chars: joinedText.length
+      };
+    }
+    const bookTitle = cleanText(parsed?.book_title, sourceName.replace(/\.[^.]+$/, "") || "Uploaded Book");
+    const markdownText = buildBookReaderMarkdown(bookTitle, normalizedChunks);
+    let snapshotPath = "";
+    let markdownSnapshotPath = "";
+    let chunksSnapshotPath = "";
+    try {
+      const snapshotDir = path.join(dataDir, "book-reader");
+      await fs.mkdir(snapshotDir, { recursive: true });
+      const snapshotBase = `${new Date().toISOString().replace(/[:.]/g, "-")}-${crypto.randomUUID().slice(0, 8)}`;
+      snapshotPath = path.join(snapshotDir, `${snapshotBase}.txt`);
+      await fs.writeFile(snapshotPath, joinedText, "utf8");
+      markdownSnapshotPath = path.join(snapshotDir, `${snapshotBase}.md`);
+      await fs.writeFile(markdownSnapshotPath, markdownText, "utf8");
+      chunksSnapshotPath = path.join(snapshotDir, `${snapshotBase}.json`);
+      await fs.writeFile(
+        chunksSnapshotPath,
+        JSON.stringify({
+          book_title: bookTitle,
+          chunk_count: normalizedChunks.length,
+          total_chars: toInt(parsed?.total_chars),
+          chunking: parsed?.chunking && typeof parsed.chunking === "object" ? parsed.chunking : {},
+          chunks: normalizedChunks
+        }, null, 2),
+        "utf8"
+      );
+    } catch {}
+    return {
+      used: true,
+      status: "ok",
+      reason: "",
+      elapsedMs: Date.now() - startedAt,
+      chars: joinedText.length,
+      inputKind,
+      outputPath,
+      markdownPath: markdownSnapshotPath,
+      markdownChars: markdownText.length,
+      snapshotPath,
+      chunksSnapshotPath,
+      chunkCount: normalizedChunks.length,
+      totalChars: Math.max(joinedText.length, toInt(parsed?.total_chars)),
+      chunking: parsed?.chunking && typeof parsed.chunking === "object" ? parsed.chunking : {},
+      bookTitle,
+      scriptPath: cleanText(BOOK_READER_SCRIPT_PATH),
+      chunks: normalizedChunks,
+      text: joinedText,
+      stdout,
+      stderr
+    };
+  });
+}
+
 async function runBoofIngest(inputValue, hooks = null, options = {}) {
   const startedAt = Date.now();
   if (!BOOK_PIPELINE_USE_BOOF) {
@@ -2797,6 +3372,19 @@ async function runBoofIngest(inputValue, hooks = null, options = {}) {
   const collectionName = sanitizeBoofCollectionName(
     cleanText(options?.collectionName, sourceName.replace(/\.[^.]+$/, ""))
   );
+  const preparedScript = await prepareScriptForBash(scriptPath, "boof").catch(() => ({ ok: false, scriptPath: "" }));
+  if (!preparedScript?.ok || !preparedScript?.scriptPath) {
+    return {
+      used: false,
+      status: "error",
+      reason: "boof_script_prepare_failed",
+      elapsedMs: Date.now() - startedAt,
+      outputDir,
+      inputKind,
+      collectionName
+    };
+  }
+  const scriptToRun = cleanText(preparedScript.scriptPath);
   return withBoofLock(async () => {
     if (hooks && typeof hooks.onProgress === "function") {
       hooks.onProgress({
@@ -2825,7 +3413,7 @@ async function runBoofIngest(inputValue, hooks = null, options = {}) {
     try {
       const run = await execFileAsync(
         "bash",
-        [scriptPath, cleanText(inputValue), "--collection", collectionName, "--output-dir", outputDir],
+        [scriptToRun, cleanText(inputValue), "--collection", collectionName, "--output-dir", outputDir],
         {
           cwd: rootDir,
           timeout: timeoutMs,
@@ -3297,149 +3885,447 @@ function buildSilentWavBuffer(durationSeconds = 2) {
   return buffer;
 }
 
+function resolveVisualReadingTheme({ bookTitle = "", moduleTitle = "", keywords = [], summary = "" }) {
+  const text = `${bookTitle} ${moduleTitle} ${summary} ${(Array.isArray(keywords) ? keywords.join(" ") : "")}`.toLowerCase();
+  if (/(经济|金融|宏观|货币|市场|资本|policy|econom|finance)/i.test(text)) {
+    return {
+      key: "macro",
+      label: "Macro Dynamics",
+      palette: { bg: "#0f172a", bg2: "#1e293b", accent: "#f59e0b", accent2: "#38bdf8", text: "#e2e8f0", soft: "#94a3b8" }
+    };
+  }
+  if (/(人类学|社区|文化|民族|语言|田野|society|community|anthrop|culture)/i.test(text)) {
+    return {
+      key: "anthro",
+      label: "Field Narrative",
+      palette: { bg: "#16120f", bg2: "#2a1f18", accent: "#d97706", accent2: "#2dd4bf", text: "#f5f1ea", soft: "#c7b8a2" }
+    };
+  }
+  if (/(心理|认知|行为|哲学|意识|decision|mind|cognitive|bias)/i.test(text)) {
+    return {
+      key: "cognition",
+      label: "Cognitive Lens",
+      palette: { bg: "#111827", bg2: "#1f2937", accent: "#22c55e", accent2: "#f97316", text: "#f3f4f6", soft: "#9ca3af" }
+    };
+  }
+  return {
+    key: "scholar",
+    label: "Scholar Atlas",
+    palette: { bg: "#0b1220", bg2: "#1a2333", accent: "#f59e0b", accent2: "#34d399", text: "#e5edf8", soft: "#9fb1c9" }
+  };
+}
+
+function buildNarrativeSlices(content = "", maxSlices = 5) {
+  const sentences = splitSentencesForPipeline(content);
+  if (!sentences.length) return [];
+  const sliceCount = Math.max(2, Math.min(maxSlices, Math.ceil(sentences.length / 3)));
+  const chunk = Math.max(1, Math.ceil(sentences.length / sliceCount));
+  const out = [];
+  for (let i = 0; i < sliceCount; i += 1) {
+    const part = sentences.slice(i * chunk, (i + 1) * chunk);
+    if (!part.length) continue;
+    out.push({
+      index: i + 1,
+      title: cleanText(part[0]).slice(0, 78) || `Slice ${i + 1}`,
+      text: cleanText(part.join(" ")).slice(0, 1200)
+    });
+  }
+  return out;
+}
+
+function buildConceptNotes(keywords = [], sentences = [], fallback = "") {
+  const keys = (Array.isArray(keywords) ? keywords : [])
+    .map((item) => cleanText(item))
+    .filter(Boolean)
+    .slice(0, 8);
+  return keys.map((token, idx) => {
+    const matched = sentences.find((line) => line.toLowerCase().includes(token.toLowerCase()));
+    return {
+      token,
+      note: cleanText(matched, fallback).slice(0, 180) || `Key concept #${idx + 1}`
+    };
+  });
+}
+
+function pickReadingQuotes(sentences = [], maxCount = 3) {
+  return [...(Array.isArray(sentences) ? sentences : [])]
+    .sort((a, b) => b.length - a.length)
+    .slice(0, Math.max(1, Math.min(4, toInt(maxCount) || 3)))
+    .map((line) => cleanText(line).slice(0, 220))
+    .filter(Boolean);
+}
+
 function buildPipelineModuleHtml({
   bookId = "",
   bookTitle,
   bookAuthor = "",
   moduleTitle,
   moduleSummary,
+  moduleContent = "",
   keywords = [],
-  quizSet = [],
   gateIndex = 1,
   moduleSlug = "",
   moduleIndex = 1,
   moduleCount = 1,
   prevSlug = "",
-  nextSlug = "",
-  audioHref = "",
-  transcriptHref = "",
-  fragments = [],
-  badge = null
+  nextSlug = ""
 }) {
-  const keywordHtml = (Array.isArray(keywords) ? keywords : [])
+  const content = cleanText(moduleContent, cleanText(moduleSummary));
+  const sentences = splitSentencesForPipeline(content);
+  const slices = buildNarrativeSlices(content, 5);
+  const concepts = buildConceptNotes(keywords, sentences, moduleSummary);
+  const quotes = pickReadingQuotes(sentences, 3);
+  const takeaways = slices.slice(0, 4).map((item, idx) => ({
+    idx: idx + 1,
+    text: cleanText(item?.title, item?.text).slice(0, 140)
+  }));
+  const theme = resolveVisualReadingTheme({
+    bookTitle,
+    moduleTitle,
+    keywords,
+    summary: moduleSummary
+  });
+  const palette = theme.palette || {};
+  const conceptTagsHtml = concepts
     .slice(0, 8)
-    .map((item) => `<span class="tag">${escapeHtml(String(item || ""))}</span>`)
+    .map((item) => `<span class="tag">${escapeHtml(item.token)}</span>`)
     .join("");
-  const quizRows = (Array.isArray(quizSet) ? quizSet : [])
-    .slice(0, 10)
-    .map((item, idx) => `
-      <article class="quiz">
-        <h3>Q${idx + 1} · ${escapeHtml(cleanText(item?.type, "application"))}</h3>
-        <p>${escapeHtml(cleanText(item?.prompt, "Read, reason, and decide."))}</p>
+  const conceptCardsHtml = concepts.length
+    ? concepts.map((item) => `
+      <article class="concept-card reveal">
+        <p class="concept-token">${escapeHtml(item.token)}</p>
+        <p class="concept-note">${escapeHtml(item.note)}</p>
       </article>
-    `)
-    .join("");
-  const tasks = Array.from({ length: BOOK_PIPELINE_MICRO_TASKS }, (_, idx) => `
-    <label class="task"><input type="checkbox" /> <span>Task ${idx + 1} · ${BOOK_PIPELINE_MICRO_SECONDS}s</span></label>
-  `).join("");
-  const fragmentsHtml = (Array.isArray(fragments) ? fragments : [])
-    .slice(0, 6)
-    .map((item, idx) => `
-      <figure class="asset">
-        <img src="${escapeHtml(cleanText(item?.image, buildGeneratedCoverDataUri({
-          title: `Fragment ${idx + 1}`,
-          subtitle: moduleTitle,
-          seed: `${moduleSlug}:fragment:${idx + 1}`
-        })))}" alt="${escapeHtml(cleanText(item?.title, `Fragment ${idx + 1}`))}" loading="lazy" />
-        <figcaption>${escapeHtml(cleanText(item?.title, `Fragment ${idx + 1}`))}</figcaption>
-      </figure>
-    `)
-    .join("");
-  const badgeHtml = badge && typeof badge === "object" ? `
-    <figure class="asset badge">
-      <img src="${escapeHtml(cleanText(badge.image, buildGeneratedCoverDataUri({
-        title: cleanText(badge.title, "Badge"),
-        subtitle: moduleTitle,
-        seed: `${moduleSlug}:badge`
-      })))}" alt="${escapeHtml(cleanText(badge.title, "Mastery Badge"))}" loading="lazy" />
-      <figcaption>${escapeHtml(cleanText(badge.title, "Mastery Badge"))}</figcaption>
-    </figure>
-  ` : "";
+    `).join("")
+    : `<article class="concept-card reveal"><p class="concept-token">Core Idea</p><p class="concept-note">${escapeHtml(cleanText(moduleSummary, "Key knowledge distilled from the source text."))}</p></article>`;
+  const timelineHtml = (slices.length ? slices : [{ index: 1, title: moduleTitle, text: moduleSummary }])
+    .map((item) => `
+      <article class="timeline-item reveal">
+        <span class="timeline-no">0${escapeHtml(String(item.index))}</span>
+        <h3>${escapeHtml(item.title)}</h3>
+        <p>${escapeHtml(item.text)}</p>
+      </article>
+    `).join("");
+  const quoteHtml = quotes.length
+    ? quotes.map((line) => `<blockquote class="quote reveal">“${escapeHtml(line)}”</blockquote>`).join("")
+    : `<blockquote class="quote reveal">“${escapeHtml(cleanText(moduleSummary, moduleTitle))}”</blockquote>`;
+  const takeawayHtml = takeaways.length
+    ? takeaways.map((item) => `<li><span>${escapeHtml(String(item.idx))}</span>${escapeHtml(item.text)}</li>`).join("")
+    : `<li><span>1</span>${escapeHtml(cleanText(moduleSummary, moduleTitle))}</li>`;
+  const orbitNodes = concepts.slice(0, 5);
+  const orbitHtml = orbitNodes.length
+    ? orbitNodes.map((item, idx) => {
+        const angle = (Math.PI * 2 * idx) / orbitNodes.length;
+        const x = Math.round(220 + Math.cos(angle) * 150);
+        const y = Math.round(220 + Math.sin(angle) * 150);
+        return `<g><line x1="220" y1="220" x2="${x}" y2="${y}" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="${x}" cy="${y}" r="8" fill="${escapeHtml(palette.accent2 || "#34d399")}"/><text x="${x + 12}" y="${y + 4}" fill="${escapeHtml(palette.text || "#e2e8f0")}" font-size="12">${escapeHtml(item.token)}</text></g>`;
+      }).join("")
+    : "";
 
   return `<!doctype html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>${escapeHtml(moduleTitle)} · ${escapeHtml(bookTitle)}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet" />
   <style>
-    :root { color-scheme: dark; }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background: radial-gradient(circle at 15% 12%, rgba(56, 189, 248, 0.18), transparent 36%), #020617;
-      color: #e2e8f0;
-      font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+    :root {
+      color-scheme: dark;
+      --bg: ${escapeHtml(palette.bg || "#0b1220")};
+      --bg2: ${escapeHtml(palette.bg2 || "#1a2333")};
+      --accent: ${escapeHtml(palette.accent || "#f59e0b")};
+      --accent2: ${escapeHtml(palette.accent2 || "#34d399")};
+      --text: ${escapeHtml(palette.text || "#e5edf8")};
+      --soft: ${escapeHtml(palette.soft || "#9fb1c9")};
     }
-    .page { width: min(1100px, calc(100% - 24px)); margin: 0 auto; padding: 24px 0 36px; }
-    .hero, .panel { border: 1px solid rgba(148, 163, 184, 0.26); border-radius: 14px; background: rgba(15, 23, 42, 0.78); }
-    .hero { padding: 16px; }
-    .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
-    .chip { border: 1px solid rgba(148, 163, 184, 0.3); border-radius: 999px; padding: 4px 10px; font-size: 12px; color: #cbd5e1; }
-    h1 { margin: 0; font-size: clamp(28px, 4vw, 40px); line-height: 1.1; letter-spacing: -0.02em; }
-    .summary { margin-top: 10px; font-size: 14px; line-height: 1.7; color: #cbd5e1; }
-    .tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-    .tag { border: 1px solid rgba(56, 189, 248, 0.46); border-radius: 999px; padding: 4px 10px; font-size: 12px; color: #bae6fd; }
-    .grid { margin-top: 12px; display: grid; grid-template-columns: 1.4fr 1fr; gap: 12px; }
-    .panel { padding: 12px; }
-    .panel h2 { margin: 0 0 8px; font-size: 16px; }
-    .tasks { display: grid; gap: 6px; }
-    .task { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #dbeafe; }
-    .quiz-list { display: grid; gap: 8px; }
-    .quiz { border: 1px solid rgba(148, 163, 184, 0.24); border-radius: 10px; background: rgba(2, 6, 23, 0.55); padding: 9px; }
-    .quiz h3 { margin: 0; font-size: 13px; color: #93c5fd; text-transform: capitalize; }
-    .quiz p { margin: 6px 0 0; font-size: 13px; line-height: 1.6; color: #dbeafe; }
-    .assets { margin-top: 10px; display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
-    .asset { margin: 0; border: 1px solid rgba(148, 163, 184, 0.22); border-radius: 10px; overflow: hidden; background: rgba(15, 23, 42, 0.72); }
-    .asset img { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; }
-    .asset figcaption { padding: 6px; font-size: 11px; color: #cbd5e1; line-height: 1.4; }
-    .audio { margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap; }
-    .btn { border: 1px solid rgba(148, 163, 184, 0.34); border-radius: 999px; padding: 7px 11px; font-size: 12px; color: #e2e8f0; text-decoration: none; background: rgba(15, 23, 42, 0.72); }
-    .nav { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
-    @media (max-width: 940px) { .grid { grid-template-columns: 1fr; } }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+      background:
+        radial-gradient(1200px 540px at 85% -8%, color-mix(in srgb, var(--accent2) 24%, transparent), transparent 70%),
+        radial-gradient(980px 460px at -10% 14%, color-mix(in srgb, var(--accent) 24%, transparent), transparent 74%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+      color: var(--text);
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .05;
+      background-image: radial-gradient(circle at 1px 1px, #fff 1px, transparent 0);
+      background-size: 3px 3px;
+      z-index: 0;
+    }
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      z-index: 100;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+    .page { position: relative; z-index: 1; width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 20px 0 48px; }
+    .hero {
+      min-height: 74vh;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 22px;
+      background: linear-gradient(160deg, color-mix(in srgb, var(--bg2) 86%, transparent), color-mix(in srgb, var(--bg) 88%, transparent));
+      padding: 40px 34px;
+      display: grid;
+      align-content: center;
+      gap: 16px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.34);
+    }
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .hero h1 {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(32px, 5.4vw, 68px);
+      line-height: 1.16;
+      letter-spacing: .04em;
+      max-width: 15em;
+      text-wrap: balance;
+    }
+    .hero p {
+      max-width: 66ch;
+      line-height: 1.95;
+      color: color-mix(in srgb, var(--text) 85%, var(--soft));
+      font-size: 16px;
+    }
+    .chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip {
+      border: 1px solid color-mix(in srgb, var(--accent2) 44%, transparent);
+      color: color-mix(in srgb, var(--accent2) 88%, #fff);
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 12px;
+      background: rgba(255,255,255,.03);
+    }
+    .section { margin-top: 18px; border: 1px solid rgba(255,255,255,.13); border-radius: 18px; padding: 22px; background: rgba(2,6,18,.46); }
+    .section h2 {
+      margin-bottom: 12px;
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(22px, 2.8vw, 34px);
+      color: color-mix(in srgb, var(--accent) 86%, #fff);
+      letter-spacing: .03em;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1.1fr 1fr; gap: 14px; }
+    .concept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+    .concept-card {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      background: rgba(255,255,255,.03);
+      padding: 14px;
+      min-height: 128px;
+    }
+    .concept-token { font-size: 14px; letter-spacing: .14em; color: var(--accent2); text-transform: uppercase; margin-bottom: 7px; font-weight: 700; }
+    .concept-note { font-size: 14px; color: color-mix(in srgb, var(--text) 88%, var(--soft)); line-height: 1.8; }
+    .atlas {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      min-height: 440px;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+    .atlas svg { width: 100%; max-width: 440px; height: auto; }
+    .timeline { display: grid; gap: 10px; }
+    .timeline-item {
+      border-left: 2px solid color-mix(in srgb, var(--accent) 66%, transparent);
+      padding: 10px 14px;
+      background: rgba(255,255,255,.02);
+      border-radius: 0 10px 10px 0;
+    }
+    .timeline-no { font-size: 11px; letter-spacing: .22em; color: var(--accent2); display: block; margin-bottom: 6px; }
+    .timeline-item h3 { font-size: 19px; font-family: "Noto Serif SC", serif; line-height: 1.45; margin-bottom: 7px; }
+    .timeline-item p { font-size: 14px; line-height: 1.9; color: color-mix(in srgb, var(--text) 84%, var(--soft)); }
+    .quote-wrap { display: grid; gap: 10px; }
+    .quote {
+      border-left: 2px solid color-mix(in srgb, var(--accent2) 80%, transparent);
+      padding: 10px 12px;
+      background: rgba(255,255,255,.02);
+      color: color-mix(in srgb, var(--text) 92%, #fff);
+      font-family: "Noto Serif SC", serif;
+      line-height: 1.9;
+    }
+    .takeaways { margin-top: 10px; list-style: none; display: grid; gap: 8px; }
+    .takeaways li {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      padding: 10px;
+      background: rgba(255,255,255,.02);
+      align-items: start;
+      line-height: 1.8;
+    }
+    .takeaways span {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: color-mix(in srgb, var(--accent2) 26%, transparent);
+      color: var(--accent2);
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+    .nav { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,.26);
+      border-radius: 999px;
+      padding: 8px 13px;
+      font-size: 12px;
+      color: var(--text);
+      background: rgba(255,255,255,.04);
+    }
+    .btn:hover { border-color: var(--accent2); color: var(--accent2); }
+    .dot-nav {
+      position: fixed;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: grid;
+      gap: 10px;
+      z-index: 50;
+    }
+    .dot-nav button {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.35);
+      background: transparent;
+      cursor: pointer;
+      transition: all .24s ease;
+    }
+    .dot-nav button.active { transform: scale(1.34); border-color: var(--accent); background: var(--accent); }
+    .reveal { opacity: 0; transform: translateY(16px); transition: opacity .55s ease, transform .55s ease; }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+    @media (max-width: 940px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .dot-nav { display: none; }
+      .hero { min-height: auto; padding: 30px 22px; }
+    }
   </style>
 </head>
 <body>
-  <main class="page" data-book-pipeline-module="1">
-    <section class="hero">
-      <div class="chips">
+  <div class="progress" id="progress"></div>
+  <nav class="dot-nav" id="dotNav">
+    <button data-target="hero" class="active" aria-label="Hero"></button>
+    <button data-target="atlas" aria-label="Atlas"></button>
+    <button data-target="concepts" aria-label="Concepts"></button>
+    <button data-target="reading" aria-label="Reading"></button>
+    <button data-target="takeaways" aria-label="Takeaways"></button>
+  </nav>
+  <main class="page">
+    <section class="hero reveal in" id="hero">
+      <p class="eyebrow">${escapeHtml(theme.label)} · Gate ${escapeHtml(String(gateIndex))}</p>
+      <h1>${escapeHtml(moduleTitle)}</h1>
+      <p>${escapeHtml(cleanText(moduleSummary, cleanText(content).slice(0, 260)))}</p>
+      <div class="chip-row">
         <span class="chip">${escapeHtml(bookTitle)}</span>
         ${bookAuthor ? `<span class="chip">作者：${escapeHtml(bookAuthor)}</span>` : ""}
-        <span class="chip">Gate ${escapeHtml(String(gateIndex))}</span>
         <span class="chip">Module ${escapeHtml(String(moduleIndex))}/${escapeHtml(String(moduleCount))}</span>
+        ${conceptTagsHtml}
       </div>
-      <h1>${escapeHtml(moduleTitle)}</h1>
-      <p class="summary">${escapeHtml(moduleSummary)}</p>
-      <div class="tags">${keywordHtml}</div>
     </section>
 
-    <section class="grid">
-      <article class="panel">
-        <h2>Micro Tasks (10 x 30s)</h2>
-        <div class="tasks">${tasks}</div>
-        <div class="audio">
-          ${audioHref ? `<a class="btn" href="${escapeHtml(audioHref)}" target="_blank" rel="noopener">Play recap audio</a>` : ""}
-          ${transcriptHref ? `<a class="btn" href="${escapeHtml(transcriptHref)}" target="_blank" rel="noopener">Read transcript</a>` : ""}
-        </div>
+    <section class="section grid-2 reveal" id="atlas">
+      <article>
+        <h2>知识结构图谱</h2>
+        <p style="color:var(--soft);line-height:1.9;margin-bottom:10px;">围绕本关卡核心概念构建关系图。阅读时先抓主轴，再理解每个概念如何驱动判断与行动。</p>
+        <div class="quote-wrap">${quoteHtml}</div>
       </article>
-      <article class="panel">
-        <h2>Quiz Set</h2>
-        <div class="quiz-list">${quizRows}</div>
+      <article class="atlas">
+        <svg viewBox="0 0 440 440" aria-label="concept atlas">
+          <defs>
+            <radialGradient id="g" cx="50%" cy="50%" r="56%">
+              <stop offset="0%" stop-color="${escapeHtml(palette.accent || "#f59e0b")}" stop-opacity=".24"></stop>
+              <stop offset="100%" stop-color="${escapeHtml(palette.accent || "#f59e0b")}" stop-opacity="0"></stop>
+            </radialGradient>
+          </defs>
+          <circle cx="220" cy="220" r="190" fill="none" stroke="rgba(255,255,255,.08)" stroke-dasharray="5 6"></circle>
+          <circle cx="220" cy="220" r="84" fill="url(#g)"></circle>
+          <circle cx="220" cy="220" r="10" fill="${escapeHtml(palette.accent || "#f59e0b")}"></circle>
+          <text x="220" y="252" text-anchor="middle" fill="${escapeHtml(palette.text || "#e5edf8")}" font-size="13">${escapeHtml(cleanText(moduleTitle).slice(0, 24))}</text>
+          ${orbitHtml}
+        </svg>
       </article>
     </section>
 
-    <section class="panel" style="margin-top:12px">
-      <h2>Collectibles</h2>
-      <div class="assets">
-        ${fragmentsHtml}
-        ${badgeHtml}
-      </div>
+    <section class="section reveal" id="concepts">
+      <h2>核心概念与解释</h2>
+      <div class="concept-grid">${conceptCardsHtml}</div>
+    </section>
+
+    <section class="section reveal" id="reading">
+      <h2>渐进式阅读路径</h2>
+      <div class="timeline">${timelineHtml}</div>
+    </section>
+
+    <section class="section reveal" id="takeaways">
+      <h2>本关关键收获</h2>
+      <ul class="takeaways">${takeawayHtml}</ul>
       <nav class="nav">
-        ${prevSlug ? `<a class="btn" href="/experiences/${encodeURIComponent(prevSlug)}.html">Previous</a>` : `<a class="btn" href="/books/${encodeURIComponent(cleanText(bookId))}.html">Back to Hub</a>`}
-        ${nextSlug ? `<a class="btn" href="/experiences/${encodeURIComponent(nextSlug)}.html">Next</a>` : ""}
+        ${prevSlug ? `<a class="btn" href="/experiences/${encodeURIComponent(prevSlug)}.html">上一关</a>` : `<a class="btn" href="/books/${encodeURIComponent(cleanText(bookId))}.html">返回目录</a>`}
+        ${nextSlug ? `<a class="btn" href="/experiences/${encodeURIComponent(nextSlug)}.html">下一关</a>` : ""}
       </nav>
     </section>
   </main>
+  <script>
+    (() => {
+      const progress = document.getElementById("progress");
+      const dots = Array.from(document.querySelectorAll("#dotNav button[data-target]"));
+      const sections = dots
+        .map((dot) => document.getElementById(dot.getAttribute("data-target")))
+        .filter(Boolean);
+      const reveals = Array.from(document.querySelectorAll(".reveal"));
+      const onScroll = () => {
+        const h = document.documentElement;
+        const total = Math.max(1, h.scrollHeight - window.innerHeight);
+        const pct = Math.max(0, Math.min(100, (window.scrollY / total) * 100));
+        if (progress) progress.style.width = pct + "%";
+      };
+      const io = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) entry.target.classList.add("in");
+        }
+      }, { threshold: .14 });
+      reveals.forEach((el) => io.observe(el));
+      const secIo = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const id = entry.target.id;
+          dots.forEach((dot) => dot.classList.toggle("active", dot.getAttribute("data-target") === id));
+        });
+      }, { threshold: .4 });
+      sections.forEach((s) => secIo.observe(s));
+      dots.forEach((dot) => {
+        dot.addEventListener("click", () => {
+          const target = document.getElementById(dot.getAttribute("data-target"));
+          if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+      window.addEventListener("scroll", onScroll, { passive: true });
+      onScroll();
+    })();
+  </script>
 </body>
 </html>`;
 }
@@ -3712,12 +4598,13 @@ async function parseRawBody(req, maxBytes = 2 * 1024 * 1024) {
   let size = 0;
   return await new Promise((resolve, reject) => {
     req.on("data", (chunk) => {
-      size += chunk.length;
+      const safeChunk = Buffer.isBuffer(chunk) ? Buffer.from(chunk) : Buffer.from(chunk || "");
+      size += safeChunk.length;
       if (size > maxBytes) {
         reject(new Error("Request body too large"));
         return;
       }
-      chunks.push(chunk);
+      chunks.push(safeChunk);
     });
     req.on("error", reject);
     req.on("end", () => {
@@ -4365,17 +5252,270 @@ function settleStudioJobChargeFromUsage(sessionId, job, work, reason = "studio_g
   return settled;
 }
 
-function resolveBookPipelineFilePayload(payload = {}) {
+function sanitizeStudioFileToken(value = "") {
+  const text = cleanText(value);
+  if (!text) return "";
+  return /^[a-z0-9_-]{12,128}$/i.test(text) ? text : "";
+}
+
+function sanitizeStudioUploadName(name = "", fallback = "uploaded-book.bin") {
+  const base = cleanText(name, fallback)
+    .replace(/[/\\]+/g, "-")
+    .replace(/\s+/g, " ")
+    .trim();
+  return base.slice(0, 220) || fallback;
+}
+
+function resolveStudioUploadExt(name = "", fallback = ".bin") {
+  const extRaw = path.extname(cleanText(name)).toLowerCase();
+  if (/^[.][a-z0-9]{1,8}$/.test(extRaw)) return extRaw;
+  return fallback;
+}
+
+async function cleanupExpiredStudioFileTokens(nowMs = Date.now()) {
+  const stale = [];
+  for (const [token, entry] of studioFileTokens.entries()) {
+    const expiresAtMs = Date.parse(cleanText(entry?.expiresAt));
+    if (!Number.isFinite(expiresAtMs) || expiresAtMs <= nowMs) {
+      stale.push({ token, path: cleanText(entry?.filePath) });
+    }
+  }
+  for (const row of stale) {
+    studioFileTokens.delete(row.token);
+    if (row.path) {
+      await fs.unlink(row.path).catch(() => {});
+    }
+  }
+}
+
+async function storeStudioFileTokenForSession(sessionId = "", file = {}) {
+  const ownerSessionId = cleanText(sessionId);
+  if (!ownerSessionId) {
+    throw new Error("Missing session for file token storage.");
+  }
+  const payloadBuffer = Buffer.isBuffer(file?.buffer) ? file.buffer : null;
+  const contentBase64 = cleanText(file?.contentBase64);
+  if (!payloadBuffer && !contentBase64) {
+    throw new Error("contentBase64 or buffer is required");
+  }
+  await cleanupExpiredStudioFileTokens();
+  const buffer = payloadBuffer || Buffer.from(contentBase64, "base64");
+  if (!buffer || buffer.length <= 0) {
+    throw new Error("file is empty");
+  }
+  const token = `f-${Date.now().toString(36)}-${crypto.randomUUID().replace(/-/g, "").slice(0, 14)}`;
+  const name = sanitizeStudioUploadName(file?.name, "uploaded-book.bin");
+  const type = cleanText(file?.type, "application/octet-stream");
+  const ext = resolveStudioUploadExt(name, ".bin");
+  const fileName = `${token}${ext}`;
+  const filePath = path.join(STUDIO_FILE_TOKEN_DIR, fileName);
+  await fs.mkdir(STUDIO_FILE_TOKEN_DIR, { recursive: true });
+  await fs.writeFile(filePath, buffer);
+  const expiresAt = new Date(Date.now() + STUDIO_FILE_TOKEN_TTL_MS).toISOString();
+  studioFileTokens.set(token, {
+    token,
+    ownerSessionId,
+    name,
+    type,
+    size: buffer.length,
+    filePath,
+    createdAt: nowIso(),
+    expiresAt
+  });
+  return {
+    token,
+    name,
+    type,
+    size: buffer.length,
+    expiresAt
+  };
+}
+
+async function loadStudioFilePayloadFromToken(fileToken = "", sessionId = "") {
+  const token = sanitizeStudioFileToken(fileToken);
+  if (!token) return null;
+  await cleanupExpiredStudioFileTokens();
+  const entry = studioFileTokens.get(token);
+  if (!entry) {
+    throw new Error("Uploaded file token expired. Please upload the book again.");
+  }
+  const ownerSessionId = cleanText(entry?.ownerSessionId);
+  const requesterSessionId = cleanText(sessionId);
+  if (ownerSessionId && requesterSessionId && ownerSessionId !== requesterSessionId) {
+    throw new Error("Uploaded file token does not belong to current session.");
+  }
+  const filePath = cleanText(entry?.filePath);
+  if (!filePath) {
+    throw new Error("Uploaded file token payload missing path.");
+  }
+  const buffer = await fs.readFile(filePath).catch(() => null);
+  if (!buffer || !buffer.length) {
+    throw new Error("Uploaded file token payload missing data.");
+  }
+  return {
+    name: sanitizeStudioUploadName(entry?.name, "uploaded-book.bin"),
+    type: cleanText(entry?.type, "application/octet-stream"),
+    contentBase64: buffer.toString("base64")
+  };
+}
+
+function resolveBookPipelineFileTokenFromPayload(payload = {}) {
   const file = payload?.bookFile && typeof payload.bookFile === "object"
     ? payload.bookFile
     : (payload?.file && typeof payload.file === "object" ? payload.file : null);
-  if (!file) return null;
-  const contentBase64 = cleanText(file.contentBase64);
-  if (!contentBase64) return null;
+  const directToken = sanitizeStudioFileToken(file?.fileToken || file?.token || payload?.bookFileToken || payload?.fileToken);
+  if (directToken) return directToken;
+  const sourceRows = Array.isArray(payload?.sources) ? payload.sources : [];
+  for (const row of sourceRows) {
+    const token = sanitizeStudioFileToken(row?.fileToken || row?.bookFileToken || row?.__bookFileToken || row?.__bookFile?.fileToken);
+    if (token) return token;
+  }
+  return "";
+}
+
+async function resolveBookPipelineFilePayload(payload = {}, sessionId = "") {
+  const file = payload?.bookFile && typeof payload.bookFile === "object"
+    ? payload.bookFile
+    : (payload?.file && typeof payload.file === "object" ? payload.file : null);
+  const contentBase64 = cleanText(file?.contentBase64);
+  if (contentBase64) {
+    return {
+      name: cleanText(file?.name, "uploaded-book.pdf"),
+      type: cleanText(file?.type, "application/octet-stream"),
+      contentBase64
+    };
+  }
+  const token = resolveBookPipelineFileTokenFromPayload(payload);
+  if (!token) return null;
+  const tokenPayload = await loadStudioFilePayloadFromToken(token, sessionId);
+  if (!tokenPayload) return null;
+  return tokenPayload;
+}
+
+async function enhanceBookPipelineFileSourceWithBookReaderPrimary(filePayload, source, hooks = null) {
+  const baseSource = source && typeof source === "object" ? { ...source } : {};
+  const baseContent = cleanText(baseSource?.content, cleanText(baseSource?.snippet));
+  const baseChars = baseContent.length;
+  const inputKind = detectBookReaderInputKind(filePayload);
+  if (!isBookReaderCandidateFile(filePayload)) {
+    return {
+      source: baseSource,
+      enhancer: {
+        provider: "book-reader",
+        used: false,
+        status: "skipped",
+        reason: "unsupported_file_for_book_reader",
+        baseChars,
+        inputKind
+      }
+    };
+  }
+  const extRaw = path.extname(cleanText(filePayload?.name)).toLowerCase();
+  const safeExt = /^[.][a-z0-9]{1,8}$/.test(extRaw) ? extRaw : ".txt";
+  const tempDir = path.join(dataDir, "tmp", "book-reader");
+  const tempPath = path.join(tempDir, `ingest-${Date.now()}-${crypto.randomUUID().slice(0, 8)}${safeExt}`);
+  let runResult = null;
+  try {
+    await fs.mkdir(tempDir, { recursive: true });
+    const buffer = Buffer.from(cleanText(filePayload?.contentBase64), "base64");
+    await fs.writeFile(tempPath, buffer);
+    runResult = await runBookReaderIngest(tempPath, hooks, {
+      maxChars: BOOK_PIPELINE_INGEST_MAX_TEXT,
+      timeoutMs: BOOK_PIPELINE_BOOK_READER_TIMEOUT_MS,
+      inputKind,
+      sourceName: cleanText(filePayload?.name, "uploaded-book"),
+      chunkChars: BOOK_PIPELINE_BOOK_READER_CHUNK_CHARS,
+      minChars: BOOK_PIPELINE_BOOK_READER_MIN_CHUNK_CHARS,
+      maxChunks: BOOK_PIPELINE_BOOK_READER_MAX_CHUNKS
+    });
+  } catch (error) {
+    runResult = {
+      used: false,
+      status: "error",
+      reason: cleanText(error?.message, "book_reader_temp_file_failed"),
+      elapsedMs: 0,
+      inputKind
+    };
+  } finally {
+    await fs.unlink(tempPath).catch(() => {});
+  }
+  const enhancedText = cleanText(runResult?.text);
+  const extractedTitle = cleanText(runResult?.bookTitle);
+  const shouldAdopt = Boolean(
+    runResult?.used
+    && enhancedText.length >= Math.max(BOOK_PIPELINE_BOOK_READER_MIN_CHARS, Math.floor(baseChars * 0.35))
+  );
+  const chunkRows = Array.isArray(runResult?.chunks) ? runResult.chunks : [];
+  const preferredChunks = chunkRows.map((row, idx) => ({
+    content: cleanText(row?.content),
+    anchor: `## ${normalizeKnowledgeBlockTitle(cleanText(row?.title), `Knowledge Block ${idx + 1}`) || `Knowledge Block ${idx + 1}`}`,
+    anchorType: "book_reader_chunk",
+    blockTitle: normalizeKnowledgeBlockTitle(cleanText(row?.title), `Knowledge Block ${idx + 1}`) || `Knowledge Block ${idx + 1}`,
+    blockSummary: cleanText(row?.summary),
+    keywords: Array.isArray(row?.keywords) ? row.keywords.map((item) => cleanText(item)).filter(Boolean).slice(0, 12) : []
+  })).filter((row) => row.content.length >= 80);
+
+  if (!shouldAdopt) {
+    return {
+      source: {
+        ...baseSource,
+        title: cleanText(extractedTitle, cleanText(baseSource?.title, cleanText(filePayload?.name, "Uploaded Book")))
+      },
+      enhancer: {
+        provider: "book-reader",
+        used: false,
+        status: cleanText(runResult?.status, "fallback"),
+        reason: cleanText(runResult?.reason, "book_reader_no_adoption"),
+        elapsedMs: toInt(runResult?.elapsedMs),
+        chars: toInt(runResult?.chars),
+        baseChars,
+        inputKind,
+        title: extractedTitle,
+        chunkCount: toInt(runResult?.chunkCount),
+        totalChars: toInt(runResult?.totalChars),
+        chunking: runResult?.chunking && typeof runResult.chunking === "object" ? runResult.chunking : {},
+        outputPath: cleanText(runResult?.outputPath),
+        markdownPath: cleanText(runResult?.markdownPath),
+        markdownChars: toInt(runResult?.markdownChars),
+        snapshotPath: cleanText(runResult?.snapshotPath),
+        chunksSnapshotPath: cleanText(runResult?.chunksSnapshotPath),
+        preferredChunks,
+        scriptPath: cleanText(BOOK_READER_SCRIPT_PATH)
+      }
+    };
+  }
+  const mergedParsedBy = [cleanText(baseSource?.parsedBy), "skill.book-reader"]
+    .filter(Boolean)
+    .join("+");
   return {
-    name: cleanText(file.name, "uploaded-book.pdf"),
-    type: cleanText(file.type, "application/octet-stream"),
-    contentBase64
+    source: {
+      ...baseSource,
+      title: cleanText(extractedTitle, cleanText(baseSource?.title, cleanText(filePayload?.name, "Uploaded Book"))),
+      snippet: clampText(enhancedText, 1200),
+      content: clampText(enhancedText, BOOK_PIPELINE_INGEST_MAX_TEXT),
+      parsedBy: mergedParsedBy || "skill.book-reader"
+    },
+    enhancer: {
+      provider: "book-reader",
+      used: true,
+      status: "applied",
+      reason: "",
+      elapsedMs: toInt(runResult?.elapsedMs),
+      chars: enhancedText.length,
+      baseChars,
+      inputKind,
+      title: extractedTitle,
+      chunkCount: toInt(runResult?.chunkCount),
+      totalChars: toInt(runResult?.totalChars),
+      chunking: runResult?.chunking && typeof runResult.chunking === "object" ? runResult.chunking : {},
+      outputPath: cleanText(runResult?.outputPath),
+      markdownPath: cleanText(runResult?.markdownPath),
+      markdownChars: toInt(runResult?.markdownChars),
+      snapshotPath: cleanText(runResult?.snapshotPath),
+      chunksSnapshotPath: cleanText(runResult?.chunksSnapshotPath),
+      preferredChunks,
+      scriptPath: cleanText(BOOK_READER_SCRIPT_PATH)
+    }
   };
 }
 
@@ -4606,19 +5746,96 @@ async function enhanceBookPipelineFileSourceWithBoofPrimary(filePayload, source,
   };
 }
 
-async function resolveBookPipelineSource(payload = {}, hooks = {}) {
-  const filePayload = resolveBookPipelineFilePayload(payload);
+async function resolveBookPipelineSource(payload = {}, hooks = {}, sessionId = "") {
+  const filePayload = await resolveBookPipelineFilePayload(payload, sessionId);
   if (filePayload) {
-    const source = await playableContentEngine.ingestFileSource(
-      filePayload,
-      hooks,
-      {
-        maxTextLen: BOOK_PIPELINE_INGEST_MAX_TEXT,
-        maxPages: BOOK_PIPELINE_INGEST_MAX_PAGES
+    const sourceSeed = {
+      title: cleanText(payload?.title, cleanText(filePayload?.name, "Uploaded Book")),
+      author: cleanText(payload?.author),
+      url: "",
+      snippet: "",
+      content: "",
+      parsedBy: "ingest.file-token-only"
+    };
+    const enhanced = await enhanceBookPipelineFileSourceWithBookReaderPrimary(filePayload, sourceSeed, hooks);
+    let finalSource = enhanced?.source && typeof enhanced.source === "object"
+      ? { ...enhanced.source }
+      : { ...sourceSeed };
+    let ingestError = "";
+    if (!cleanText(finalSource?.content, cleanText(finalSource?.snippet))) {
+      try {
+        if (hooks?.onProgress && typeof hooks.onProgress === "function") {
+          hooks.onProgress({
+            at: nowIso(),
+            step: "ingest_parser_fallback",
+            progress: 13,
+            message: "book-reader did not return valid content, switching to native parser fallback."
+          });
+        }
+        const nativeSource = await playableContentEngine.ingestFileSource(
+          filePayload,
+          hooks,
+          {
+            maxTextLen: BOOK_PIPELINE_INGEST_MAX_TEXT,
+            maxPages: BOOK_PIPELINE_INGEST_MAX_PAGES
+          }
+        );
+        finalSource = nativeSource && typeof nativeSource === "object"
+          ? { ...nativeSource }
+          : finalSource;
+        if (enhanced?.enhancer && typeof enhanced.enhancer === "object") {
+          enhanced.enhancer.nativeFallbackUsed = true;
+          enhanced.enhancer.provider = "book-reader-native-fallback";
+          enhanced.enhancer.nativeParsedBy = cleanText(nativeSource?.parsedBy);
+          const nativeText = cleanText(nativeSource?.content, cleanText(nativeSource?.snippet));
+          const existingPreferred = Array.isArray(enhanced.enhancer.preferredChunks) ? enhanced.enhancer.preferredChunks : [];
+          if (!existingPreferred.length && nativeText.length >= 1200) {
+            const seedBlocks = splitKnowledgeBlocksFromText(nativeText, {
+              targetBlocks: estimateKnowledgeBlockCount(roughWordCount(nativeText))
+            }).slice(0, BOOK_PIPELINE_BOOK_READER_MAX_CHUNKS);
+            const fallbackChunks = seedBlocks.map((row, idx) => ({
+              title: normalizeKnowledgeBlockTitle(cleanText(row?.title), `Knowledge Block ${idx + 1}`) || `Knowledge Block ${idx + 1}`,
+              summary: cleanText(row?.summary),
+              content: cleanText(row?.content),
+              keywords: Array.isArray(row?.keywords) ? row.keywords.map((item) => cleanText(item)).filter(Boolean).slice(0, 12) : [],
+              coreIdeas: []
+            })).filter((row) => row.content.length >= 80);
+            enhanced.enhancer.preferredChunks = fallbackChunks.map((row, idx) => ({
+              content: cleanText(row?.content),
+              anchor: `## ${cleanText(row?.title, `Knowledge Block ${idx + 1}`)}`,
+              anchorType: "native_fallback_chunk",
+              blockTitle: cleanText(row?.title, `Knowledge Block ${idx + 1}`),
+              blockSummary: cleanText(row?.summary),
+              keywords: Array.isArray(row?.keywords) ? row.keywords : []
+            }));
+            if (fallbackChunks.length) {
+              const markdownText = buildBookReaderMarkdown(
+                cleanText(nativeSource?.title, cleanText(filePayload?.name, "Uploaded Book")),
+                fallbackChunks
+              );
+              try {
+                const snapshotDir = path.join(dataDir, "book-reader");
+                await fs.mkdir(snapshotDir, { recursive: true });
+                const snapshotBase = `${new Date().toISOString().replace(/[:.]/g, "-")}-${crypto.randomUUID().slice(0, 8)}-native`;
+                const markdownSnapshotPath = path.join(snapshotDir, `${snapshotBase}.md`);
+                await fs.writeFile(markdownSnapshotPath, markdownText, "utf8");
+                enhanced.enhancer.markdownPath = markdownSnapshotPath;
+                enhanced.enhancer.markdownChars = markdownText.length;
+              } catch {}
+            }
+          }
+        }
+      } catch (error) {
+        ingestError = cleanText(error?.message, "file_ingest_parser_failed");
       }
-    );
-    const enhanced = await enhanceBookPipelineFileSourceWithBoofPrimary(filePayload, source, hooks);
-    const finalSource = enhanced?.source || source;
+    }
+    if (!cleanText(finalSource?.content, cleanText(finalSource?.snippet))) {
+      const reason = cleanText(enhanced?.enhancer?.reason, ingestError || "unknown_parser_failure");
+      throw new Error(`No readable text extracted from uploaded file (${reason}).`);
+    }
+    if (ingestError && enhanced?.enhancer && typeof enhanced.enhancer === "object" && !enhanced.enhancer.ingestError) {
+      enhanced.enhancer.ingestError = ingestError;
+    }
     return {
       source: finalSource,
       mode: "file",
@@ -4675,50 +5892,34 @@ async function buildModulePipelineArtifacts({ work, moduleSlug, block, bookTitle
   const moduleDir = path.join(rootDir, "book_experiences", cleanText(work?.book_id), moduleSlug);
   const codePath = path.join(moduleDir, "code.html");
   const moduleJsonPath = path.join(moduleDir, "module.json");
-  const { quizSet, qualityReport } = buildQualityGatedQuizSet(block, Math.max(0, toInt(block?.gateIndex) - 1));
-  const fallbackAssetPack = buildAssetPackForBlock(block, Math.max(0, toInt(block?.gateIndex) - 1), bookTitle);
-  const powerUps = buildPowerUpsForBlock(block, Math.max(0, toInt(block?.gateIndex) - 1));
-  const audioScript = buildAudioRecapScript(bookTitle, block);
   await fs.mkdir(moduleDir, { recursive: true });
-  const [assetPack, audioRecap] = await Promise.all([
-    materializeAssetPackImages({
-      moduleDir,
-      moduleSlug,
-      block,
-      bookTitle,
-      assetPack: fallbackAssetPack
-    }),
-    materializeAudioRecap({
-      moduleDir,
-      scriptText: audioScript
-    })
-  ]);
   const allModuleSlugs = Array.isArray(work?.module_slugs) ? work.module_slugs : [];
   const modulePosition = Math.max(0, allModuleSlugs.indexOf(moduleSlug));
   const moduleIndex = modulePosition >= 0 ? modulePosition + 1 : Math.max(1, toInt(block?.gateIndex) || 1);
   const moduleCount = allModuleSlugs.length || Math.max(1, moduleIndex);
   const prevSlug = modulePosition > 0 ? allModuleSlugs[modulePosition - 1] : "";
   const nextSlug = modulePosition >= 0 && modulePosition < allModuleSlugs.length - 1 ? allModuleSlugs[modulePosition + 1] : "";
-  const audioHref = `/experiences/media/${encodeURIComponent(moduleSlug)}/${encodeURIComponent(audioRecap.audioFile)}`;
-  const transcriptHref = `/experiences/media/${encodeURIComponent(moduleSlug)}/${encodeURIComponent(audioRecap.transcriptFile)}`;
+  const theme = resolveVisualReadingTheme({
+    bookTitle,
+    moduleTitle: cleanText(block?.title, `Knowledge Block ${moduleIndex}`),
+    keywords: Array.isArray(block?.keywords) ? block.keywords.slice(0, 8) : [],
+    summary: cleanText(block?.summary, cleanText(block?.content).slice(0, 280))
+  });
+  const narrativeSlices = buildNarrativeSlices(cleanText(block?.content), 5);
   const moduleHtml = buildPipelineModuleHtml({
     bookId: cleanText(work?.book_id),
     bookTitle,
     bookAuthor,
     moduleTitle: cleanText(block?.title, `Knowledge Block ${moduleIndex}`),
     moduleSummary: cleanText(block?.summary, cleanText(block?.content).slice(0, 280)),
+    moduleContent: cleanText(block?.content),
     keywords: Array.isArray(block?.keywords) ? block.keywords.slice(0, 8) : [],
-    quizSet,
     gateIndex: toInt(block?.gateIndex) || moduleIndex,
     moduleSlug,
     moduleIndex,
     moduleCount,
     prevSlug,
-    nextSlug,
-    audioHref,
-    transcriptHref,
-    fragments: Array.isArray(assetPack?.fragments) ? assetPack.fragments : [],
-    badge: assetPack?.badge || null
+    nextSlug
   });
   await fs.writeFile(codePath, moduleHtml, "utf8");
   let moduleMeta = {};
@@ -4726,8 +5927,9 @@ async function buildModulePipelineArtifacts({ work, moduleSlug, block, bookTitle
     moduleMeta = JSON.parse(await fs.readFile(moduleJsonPath, "utf8")) || {};
   } catch {}
   moduleMeta.book_pipeline = {
-    version: 1,
+    version: 2,
     generated_at: nowIso(),
+    mode: "visual_reading",
     source_book: {
       title: cleanText(bookTitle),
       author: cleanText(bookAuthor)
@@ -4741,48 +5943,20 @@ async function buildModulePipelineArtifacts({ work, moduleSlug, block, bookTitle
       keywords: Array.isArray(block?.keywords) ? block.keywords.slice(0, 8) : [],
       density: block?.density || null
     },
-    quality_report: qualityReport,
-    quiz_set: quizSet,
-    rewards: {
-      mystery_box: {
-        functional_powerups: powerUps,
-        collectibles: assetPack,
-        knowledge_shortcuts: [
-          {
-            id: `audio-shortcut-${toInt(block?.gateIndex) || 1}`,
-            title: "音频复盘",
-            href: audioHref
-          }
-        ]
-      }
-    },
-    progress_design: {
-      micro_tasks: BOOK_PIPELINE_MICRO_TASKS,
-      micro_task_seconds: BOOK_PIPELINE_MICRO_SECONDS,
-      completion_signal: "10/10 tasks with mastery feedback"
-    },
-    audio_recap: {
-      title: `${cleanText(block?.title, "Knowledge Block")} 复盘`,
-      script: audioScript,
-      href: audioHref,
-      transcript_href: transcriptHref,
-      duration_seconds: Math.max(2, toInt(audioRecap.durationSeconds)),
-      provider: cleanText(audioRecap.audioProvider, "fallback_silent")
-    },
-    media_generation: {
-      image_provider: shouldUsePipelineImageProvider() ? "nano-banana(auto)" : "fallback_svg",
-      audio_provider: cleanText(audioRecap.audioProvider, "fallback_silent")
+    visual_reading: {
+      style: "scrollytelling_atlas",
+      theme: theme.key,
+      theme_label: theme.label,
+      section_count: narrativeSlices.length || 1,
+      generated_with: "template_runtime"
     }
   };
   await fs.writeFile(moduleJsonPath, JSON.stringify(moduleMeta, null, 2), "utf8");
   return {
     moduleSlug,
     gateIndex: toInt(block?.gateIndex),
-    quizCount: quizSet.length,
-    quizQualityScore: Number(qualityReport?.score || 0),
-    quizQualityPassed: Boolean(qualityReport?.passed),
-    fragmentCount: Array.isArray(assetPack.fragments) ? assetPack.fragments.length : 0,
-    audioHref,
+    theme: theme.key,
+    sectionCount: narrativeSlices.length || 1,
     ok: true
   };
 }
@@ -4796,39 +5970,20 @@ async function detectPipelineModuleFailures({ work, moduleBlockMap }) {
     const moduleDir = path.join(rootDir, "book_experiences", cleanText(work?.book_id), moduleSlug);
     const codePath = path.join(moduleDir, "code.html");
     const moduleJsonPath = path.join(moduleDir, "module.json");
-    const audioPathWav = path.join(moduleDir, "review.wav");
-    const audioPathMp3 = path.join(moduleDir, "review.mp3");
-    const transcriptPath = path.join(moduleDir, "review.txt");
     const hasCode = Boolean(await fs.stat(codePath).catch(() => null));
-    const hasAudio = Boolean(await fs.stat(audioPathWav).catch(() => null))
-      || Boolean(await fs.stat(audioPathMp3).catch(() => null));
-    const hasTranscript = Boolean(await fs.stat(transcriptPath).catch(() => null));
     let moduleMeta = null;
     try {
       moduleMeta = JSON.parse(await fs.readFile(moduleJsonPath, "utf8")) || null;
     } catch {
       moduleMeta = null;
     }
-    const quizCount = Array.isArray(moduleMeta?.book_pipeline?.quiz_set)
-      ? moduleMeta.book_pipeline.quiz_set.length
-      : 0;
-    const quizQualityPassed = moduleMeta?.book_pipeline?.quality_report?.passed === true;
-    const badgeImage = cleanText(moduleMeta?.book_pipeline?.rewards?.mystery_box?.collectibles?.badge?.image);
-    const badgeNeedsFile = badgeImage.startsWith("/experiences/media/");
-    const badgeFile = badgeNeedsFile
-      ? path.join(moduleDir, path.basename(safeDecodeUriComponent(badgeImage)))
-      : "";
-    const hasBadgeAsset = badgeImage
-      ? (badgeNeedsFile ? Boolean(await fs.stat(badgeFile).catch(() => null)) : true)
-      : false;
+    const hasMeta = Boolean(moduleMeta && typeof moduleMeta === "object");
+    const isVisualReading = cleanText(moduleMeta?.book_pipeline?.mode).toLowerCase() === "visual_reading";
     const reasons = [];
     if (!hasCode) reasons.push("missing_code_html");
-    if (!hasAudio) reasons.push("missing_audio");
-    if (!hasTranscript) reasons.push("missing_transcript");
-    if (quizCount < 8) reasons.push("quiz_count_below_8");
-    if (!quizQualityPassed) reasons.push("quiz_quality_failed");
-    if (!hasBadgeAsset) reasons.push("missing_badge_asset");
-    if (!hasCode || !hasAudio || !hasTranscript || quizCount < 8 || !quizQualityPassed || !hasBadgeAsset) {
+    if (!hasMeta) reasons.push("missing_module_meta");
+    if (hasMeta && !isVisualReading) reasons.push("not_visual_reading_mode");
+    if (!hasCode || !hasMeta || !isVisualReading) {
       failed.push({ moduleSlug, block, reasons });
     }
   }
@@ -4862,6 +6017,263 @@ async function verifyAndRepairPipelineModules({ work, moduleBlockMap, bookTitle,
       reasons: Array.isArray(row?.reasons) ? row.reasons : []
     }))
   };
+}
+
+function buildKnowledgeModelMarkdownForGeneration(knowledgeModel = {}, fallbackBlocks = []) {
+  const model = knowledgeModel && typeof knowledgeModel === "object" ? knowledgeModel : {};
+  const docs = Array.isArray(model?.docs) ? model.docs : [];
+  const indexDoc = docs.find((row) => cleanText(row?.id) === "__index__")
+    || docs.find((row) => cleanText(row?.path).toLowerCase() === "index.md")
+    || docs[0];
+  const indexText = cleanText(indexDoc?.markdown);
+  if (indexText.length >= 220) return clampText(indexText, BOOK_PIPELINE_INGEST_MAX_TEXT);
+  const blocks = Array.isArray(fallbackBlocks) ? fallbackBlocks : [];
+  const lines = [
+    `# ${cleanText(model?.title, "Knowledge Model")}`,
+    "",
+    `- systems: ${Array.isArray(model?.systems) ? model.systems.length : blocks.length}`,
+    `- concepts: ${Array.isArray(model?.concepts) ? model.concepts.length : 0}`,
+    `- relations: ${Array.isArray(model?.relations) ? model.relations.length : 0}`,
+    "",
+    "## Systems",
+    ""
+  ];
+  if (blocks.length) {
+    for (const row of blocks.slice(0, 36)) {
+      lines.push(`- ${cleanText(row?.title)}: ${cleanText(row?.summary).slice(0, 220)}`);
+    }
+  } else {
+    lines.push("- (none)");
+  }
+  return clampText(lines.join("\n"), BOOK_PIPELINE_INGEST_MAX_TEXT);
+}
+
+function buildKnowledgeModelCorpusMarkdown(knowledgeModel = {}, fallbackBlocks = []) {
+  const model = knowledgeModel && typeof knowledgeModel === "object" ? knowledgeModel : {};
+  const docs = Array.isArray(model?.docs) ? model.docs : [];
+  if (!docs.length) {
+    return buildKnowledgeModelMarkdownForGeneration(model, fallbackBlocks);
+  }
+  const ordered = [...docs].sort((a, b) => String(a?.path || "").localeCompare(String(b?.path || "")));
+  const lines = [];
+  for (const row of ordered) {
+    const docPath = cleanText(row?.path, cleanText(row?.id, "doc.md"));
+    const markdown = cleanText(row?.markdown);
+    if (!markdown) continue;
+    lines.push(`## File: ${docPath}`);
+    lines.push("");
+    lines.push(markdown);
+    lines.push("");
+  }
+  const merged = lines.join("\n").trim();
+  return clampText(merged || buildKnowledgeModelMarkdownForGeneration(model, fallbackBlocks), BOOK_PIPELINE_INGEST_MAX_TEXT);
+}
+
+function buildKnowledgeModelDownloadMarkdown(knowledgeModel = {}, fallbackBlocks = []) {
+  const model = knowledgeModel && typeof knowledgeModel === "object" ? knowledgeModel : {};
+  const docs = Array.isArray(model?.docs) ? model.docs : [];
+  const title = cleanText(model?.title, "Knowledge Model");
+  const summary = cleanText(model?.summary);
+  const lines = [
+    `# ${title}`,
+    "",
+    summary ? `> ${summary}` : "",
+    `- generated_at: ${cleanText(model?.generated_at, nowIso())}`,
+    `- systems: ${Array.isArray(model?.systems) ? model.systems.length : 0}`,
+    `- concepts: ${Array.isArray(model?.concepts) ? model.concepts.length : 0}`,
+    `- relations: ${Array.isArray(model?.relations) ? model.relations.length : 0}`,
+    "",
+    "## Files",
+    ""
+  ].filter(Boolean);
+  if (docs.length) {
+    for (const row of docs) {
+      const docPath = cleanText(row?.path, cleanText(row?.id, "doc.md"));
+      lines.push(`- ${docPath}`);
+    }
+    lines.push("");
+    for (const row of docs) {
+      const docPath = cleanText(row?.path, cleanText(row?.id, "doc.md"));
+      const markdown = cleanText(row?.markdown);
+      if (!markdown) continue;
+      lines.push(`---`);
+      lines.push("");
+      lines.push(`## ${docPath}`);
+      lines.push("");
+      lines.push(markdown);
+      lines.push("");
+    }
+  } else {
+    lines.push("- index.md");
+    lines.push("");
+    lines.push(buildKnowledgeModelMarkdownForGeneration(model, fallbackBlocks));
+  }
+  return lines.join("\n").replace(/\n{4,}/g, "\n\n\n").trim() + "\n";
+}
+
+async function createKnowledgeModelDraftWork({
+  sessionId,
+  job,
+  resolved,
+  source,
+  knowledgeBlocks,
+  knowledgeModel
+}) {
+  const sourceRow = source && typeof source === "object" ? source : {};
+  const model = knowledgeModel && typeof knowledgeModel === "object" ? knowledgeModel : {};
+  const title = normalizeGeneratedTitle(
+    cleanText(job?.payload?.title, cleanText(model?.title, cleanText(resolved?.title))),
+    "Knowledge Model"
+  );
+  const baseSlug = sanitizeFileName(title, "knowledge-model")
+    .toLowerCase()
+    .replace(/[^a-z0-9-]+/g, "-")
+    .replace(/--+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 40);
+  const bookId = `user-model-${baseSlug || "knowledge"}-${Date.now().toString(36).slice(-6)}-${crypto.randomUUID().slice(0, 4)}`;
+  const work = {
+    id: crypto.randomUUID(),
+    owner_session_id: sessionId,
+    book_id: bookId,
+    title,
+    subtitle: cleanText(model?.summary, "Knowledge model parsed and ready for generation."),
+    hook: "Parse-first interactive knowledge modeling",
+    mode: "knowledge_model",
+    input: cleanText(job?.payload?.input, cleanText(title)),
+    module_count: 0,
+    module_slugs: [],
+    sources: [
+      {
+        title: cleanText(sourceRow?.title, title),
+        url: cleanText(sourceRow?.url),
+        snippet: clampText(cleanText(sourceRow?.snippet, cleanText(sourceRow?.content)), 1200),
+        content: clampText(cleanText(sourceRow?.content), BOOK_PIPELINE_INGEST_MAX_TEXT)
+      }
+    ],
+    generation_mode: "knowledge_model_parse",
+    html_generation_mode: "none",
+    html_generation_error: "",
+    llm_error: "",
+    llm_html_required: false,
+    html_provider: "template",
+    parent_work_id: "",
+    root_work_id: "",
+    modification_prompt: "",
+    is_public: false,
+    public_at: "",
+    token_usage: {
+      inputTokens: 0,
+      outputTokens: 0,
+      totalTokens: 0,
+      calls: 0
+    },
+    knowledge_model: {
+      enabled: true,
+      status: "parsed",
+      concept_count: Array.isArray(model?.concepts) ? model.concepts.length : 0,
+      relation_count: Array.isArray(model?.relations) ? model.relations.length : 0,
+      system_count: Array.isArray(model?.systems) ? model.systems.length : (Array.isArray(knowledgeBlocks) ? knowledgeBlocks.length : 0),
+      updated_at: nowIso()
+    },
+    created_at: nowIso(),
+    updated_at: nowIso()
+  };
+  work.root_work_id = work.id;
+  playableContentEngine.state.works.push(work);
+  await playableContentEngine.persist();
+  return work;
+}
+
+function buildVisualReadingModuleSlugs(bookId, blocks = [], moduleCount = 1) {
+  const safeBookId = sanitizeFileName(cleanText(bookId, "visual-book"), "visual-book");
+  const list = Array.isArray(blocks) ? blocks : [];
+  const target = Math.max(1, Math.min(BOOK_PIPELINE_MAX_MODULES, toInt(moduleCount) || list.length || 1));
+  return Array.from({ length: target }, (_, idx) => {
+    const block = list[idx] || {};
+    const title = sanitizeFileName(cleanText(block?.title), `chapter-${idx + 1}`)
+      .slice(0, 30)
+      .replace(/^-+|-+$/g, "");
+    const gate = String(idx + 1).padStart(2, "0");
+    return `${safeBookId}-g${gate}-${title || "chapter"}`.slice(0, 72);
+  });
+}
+
+async function createVisualReadingWork({
+  sessionId,
+  job,
+  resolved,
+  source,
+  knowledgeBlocks,
+  knowledgeModel,
+  moduleCount = 0
+}) {
+  const sourceRow = source && typeof source === "object" ? source : {};
+  const model = knowledgeModel && typeof knowledgeModel === "object" ? knowledgeModel : {};
+  const title = normalizeGeneratedTitle(
+    cleanText(job?.payload?.title, cleanText(model?.title, cleanText(resolved?.title))),
+    "Visual Reading Experience"
+  );
+  const baseSlug = sanitizeFileName(title, "visual-reading")
+    .toLowerCase()
+    .replace(/[^a-z0-9-]+/g, "-")
+    .replace(/--+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 40);
+  const bookId = `user-book-${baseSlug || "reading"}-${Date.now().toString(36).slice(-6)}-${crypto.randomUUID().slice(0, 4)}`;
+  const blocks = normalizeManifestKnowledgeBlocks(Array.isArray(knowledgeBlocks) ? knowledgeBlocks : []);
+  const moduleSlugs = buildVisualReadingModuleSlugs(bookId, blocks, moduleCount || blocks.length);
+  const work = {
+    id: crypto.randomUUID(),
+    owner_session_id: sessionId,
+    book_id: bookId,
+    title,
+    subtitle: cleanText(model?.summary, "A visual and high-density reading experience generated from your source."),
+    hook: "Visual Reading Experience",
+    mode: "book_pipeline",
+    input: cleanText(job?.payload?.input, cleanText(title)),
+    module_count: moduleSlugs.length,
+    module_slugs: moduleSlugs,
+    sources: [
+      {
+        title: cleanText(sourceRow?.title, title),
+        url: cleanText(sourceRow?.url),
+        snippet: clampText(cleanText(sourceRow?.snippet, cleanText(sourceRow?.content)), 1200),
+        content: clampText(cleanText(sourceRow?.content), BOOK_PIPELINE_INGEST_MAX_TEXT)
+      }
+    ],
+    generation_mode: "visual_reading",
+    html_generation_mode: "template",
+    html_generation_error: "",
+    llm_error: "",
+    llm_html_required: false,
+    html_provider: "template",
+    parent_work_id: cleanText(job?.payload?.parentWorkId),
+    root_work_id: "",
+    modification_prompt: cleanText(job?.payload?.modificationPrompt),
+    is_public: false,
+    public_at: "",
+    token_usage: {
+      inputTokens: 0,
+      outputTokens: 0,
+      totalTokens: 0,
+      calls: 0
+    },
+    knowledge_model: {
+      enabled: true,
+      status: "embedded",
+      concept_count: Array.isArray(model?.concepts) ? model.concepts.length : 0,
+      relation_count: Array.isArray(model?.relations) ? model.relations.length : 0,
+      system_count: Array.isArray(model?.systems) ? model.systems.length : blocks.length,
+      updated_at: nowIso()
+    },
+    created_at: nowIso(),
+    updated_at: nowIso()
+  };
+  work.root_work_id = cleanText(work.root_work_id, cleanText(work.parent_work_id, work.id));
+  playableContentEngine.state.works.push(work);
+  await playableContentEngine.persist();
+  return work;
 }
 
 async function readBookPipelineManifestByBookId(bookId) {
@@ -4914,6 +6326,192 @@ function normalizeManifestKnowledgeBlocks(rows = []) {
       gateIndex: index + 1,
       index: index + 1
     }));
+}
+
+function sanitizeTitleForVisualReading(title = "", fallbackText = "", gateIndex = 1) {
+  let next = cleanText(title);
+  next = next
+    .replace(/\[PAGE[^\]]+\]/gi, " ")
+    .replace(/\bIMAGE\s+CONTENT\s*\(OCR\)\b/gi, " ")
+    .replace(/\bOCR\b/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  const chapterMatch = next.match(/第[一二三四五六七八九十百0-9]+章[^，。！？\s]{0,24}/);
+  if (chapterMatch && chapterMatch[0]) {
+    next = chapterMatch[0].trim();
+  }
+  if (!next || next.length < 4) {
+    const first = cleanText(splitSentencesForPipeline(fallbackText)[0], cleanText(fallbackText));
+    next = first.slice(0, 52).trim();
+  }
+  next = next.replace(/[，。！？;；:：,.\-—\s]+$/g, "").trim();
+  if (next.length > 36) next = `${next.slice(0, 34).trim()}…`;
+  return next || `Knowledge Block ${gateIndex}`;
+}
+
+function computeVisualBlockScore(block = {}) {
+  const content = cleanText(block?.content);
+  const title = cleanText(block?.title);
+  const summary = cleanText(block?.summary);
+  const density = Number(block?.density?.score || 0);
+  const markerCount = (content.match(/\[PAGE|IMAGE\s+CONTENT|OCR|endobj|stream/gi) || []).length;
+  const digitCount = (content.match(/[0-9]/g) || []).length;
+  const charCount = Math.max(1, content.length);
+  const wordCount = Math.max(1, roughWordCount(content));
+  const digitRatio = digitCount / charCount;
+  const markerRatio = markerCount / wordCount;
+  let score = density;
+  score -= Math.min(0.56, markerCount * 0.065);
+  score -= Math.min(0.32, markerRatio * 3.2);
+  score -= Math.max(0, digitRatio - 0.14) * 2.2;
+  if (/\bIMAGE\s+CONTENT\b|\bOCR\b/i.test(`${title} ${summary}`)) score -= 0.18;
+  if (content.length < 180) score -= 0.12;
+  if (title.length <= 2) score -= 0.12;
+  if (summary.length < 28) score -= 0.08;
+  return Number(score.toFixed(4));
+}
+
+function normalizeVisualReadingTitleKey(title = "") {
+  return cleanText(title)
+    .toLowerCase()
+    .replace(/第[一二三四五六七八九十百0-9]+章/g, " ")
+    .replace(/\b(?:chapter|gate|section)\s*[0-9a-zivxlcdm-]*/gi, " ")
+    .replace(/\bpart\s*[0-9a-zivxlcdm-]*/gi, " ")
+    .replace(/\s+/g, " ")
+    .replace(/[^a-z0-9\u4e00-\u9fff]+/g, "")
+    .trim();
+}
+
+function normalizeVisualReadingSummaryKey(summary = "") {
+  return cleanText(summary)
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .replace(/[^a-z0-9\u4e00-\u9fff]+/g, "")
+    .slice(0, 140);
+}
+
+function dedupeVisualReadingBlocks(scoredRows = []) {
+  const rows = Array.isArray(scoredRows) ? scoredRows : [];
+  if (!rows.length) return { rows: [], duplicatesRemoved: 0, renamed: 0 };
+  const groups = new Map();
+  rows.forEach((row, index) => {
+    const titleKey = normalizeVisualReadingTitleKey(row?.title);
+    const key = titleKey || `idx-${index}`;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push({
+      ...row,
+      __originIndex: index,
+      __summaryKey: normalizeVisualReadingSummaryKey(row?.summary),
+      __contentHead: cleanText(row?.content).slice(0, 220).toLowerCase()
+    });
+  });
+  const out = [];
+  let duplicatesRemoved = 0;
+  let renamed = 0;
+  for (const [key, group] of groups.entries()) {
+    if (group.length <= 1 || key.startsWith("idx-")) {
+      out.push(...group);
+      continue;
+    }
+    const sorted = [...group].sort((a, b) => {
+      const byScore = Number(b?.visualScore || 0) - Number(a?.visualScore || 0);
+      if (byScore !== 0) return byScore;
+      return Number(b?.words || 0) - Number(a?.words || 0);
+    });
+    const keeper = sorted[0];
+    out.push(keeper);
+    let part = 2;
+    for (const row of sorted.slice(1)) {
+      const summaryDup = row.__summaryKey && keeper.__summaryKey
+        ? (row.__summaryKey === keeper.__summaryKey || row.__summaryKey.slice(0, 84) === keeper.__summaryKey.slice(0, 84))
+        : false;
+      const bodyDup = Boolean(row.__contentHead && keeper.__contentHead && row.__contentHead === keeper.__contentHead);
+      if (summaryDup || bodyDup) {
+        duplicatesRemoved += 1;
+        continue;
+      }
+      out.push({
+        ...row,
+        title: `${cleanText(keeper?.title, cleanText(row?.title))} · Part ${part}`
+      });
+      part += 1;
+      renamed += 1;
+    }
+  }
+  const normalizedRows = out
+    .sort((a, b) => Number(a.__originIndex || 0) - Number(b.__originIndex || 0))
+    .map((row) => {
+      const next = { ...row };
+      delete next.__originIndex;
+      delete next.__summaryKey;
+      delete next.__contentHead;
+      return next;
+    });
+  return {
+    rows: normalizedRows,
+    duplicatesRemoved,
+    renamed
+  };
+}
+
+function optimizeKnowledgeBlocksForVisualReading(blocks = [], options = {}) {
+  const list = normalizeManifestKnowledgeBlocks(blocks);
+  if (!list.length) return { blocks: [], diagnostics: { applied: false } };
+  const minKeep = Math.max(6, Math.min(24, toInt(options?.minKeep) || 8));
+  const maxKeep = Math.max(minKeep, Math.min(32, toInt(options?.maxKeep) || 16));
+  const scored = list.map((row, idx) => {
+    const visualTitle = sanitizeTitleForVisualReading(
+      cleanText(row?.title),
+      `${cleanText(row?.summary)} ${cleanText(row?.content)}`,
+      idx + 1
+    );
+    return {
+      ...row,
+      title: visualTitle,
+      summary: cleanText(row?.summary, cleanText(row?.content).slice(0, 280)).slice(0, 700),
+      visualScore: computeVisualBlockScore({ ...row, title: visualTitle })
+    };
+  });
+  const deduped = dedupeVisualReadingBlocks(scored);
+  const dedupedRows = Array.isArray(deduped?.rows) ? deduped.rows : scored;
+  let kept = dedupedRows.filter((row) => row.visualScore >= 0.22 && !/\bIMAGE CONTENT\b/i.test(cleanText(row?.title)));
+  if (kept.length < minKeep) {
+    const byScore = [...dedupedRows].sort((a, b) => Number(b.visualScore || 0) - Number(a.visualScore || 0));
+    kept = byScore.slice(0, minKeep);
+  }
+  kept.sort((a, b) => toInt(a.gateIndex) - toInt(b.gateIndex));
+  if (kept.length > maxKeep) {
+    const preferred = kept
+      .map((row, idx) => ({ ...row, __idx: idx }))
+      .sort((a, b) => Number(b.visualScore || 0) - Number(a.visualScore || 0))
+      .slice(0, maxKeep)
+      .sort((a, b) => a.__idx - b.__idx)
+      .map((row) => {
+        const next = { ...row };
+        delete next.__idx;
+        return next;
+      });
+    kept = preferred;
+  }
+  const normalized = normalizeManifestKnowledgeBlocks(kept.map((row) => ({
+    ...row,
+    visualScore: undefined
+  })));
+  return {
+    blocks: normalized,
+    diagnostics: {
+      applied: true,
+      before: list.length,
+      after: normalized.length,
+      minKeep,
+      maxKeep,
+      dedupeDuplicatesRemoved: toInt(deduped?.duplicatesRemoved),
+      dedupeRenamedParts: toInt(deduped?.renamed),
+      averageVisualScore: Number(
+        (dedupedRows.reduce((sum, item) => sum + Number(item?.visualScore || 0), 0) / Math.max(1, dedupedRows.length)).toFixed(4)
+      )
+    }
+  };
 }
 
 function splitKnowledgeBlockForManualEdit(block) {
@@ -5215,11 +6813,14 @@ async function regenerateBookPipelineForWork({ work, target = "failed", moduleSl
 }
 
 async function runBookPipelineGenerationJob(job, sessionId) {
+  const parseOnlyModel = isKnowledgeModelParsePayload(job?.payload || {});
   updateStudioJob(job, {
     status: "running",
     step: "ingest",
     progress: 4,
-    message: "Book pipeline started: ingesting source"
+    message: parseOnlyModel
+      ? "Knowledge model parsing started: ingesting source"
+      : "Visual reading pipeline started: ingesting source"
   });
   const resolved = await resolveBookPipelineSource(job.payload, {
     onProgress: (event) => {
@@ -5230,18 +6831,22 @@ async function runBookPipelineGenerationJob(job, sessionId) {
         message: cleanText(event?.message)
       });
     }
-  });
+  }, sessionId);
   const source = resolved.source || {};
   const sourceText = cleanText(source.content, cleanText(source.snippet));
   const parsedBy = cleanText(source?.parsedBy);
   const sourceEnhancer = resolved?.enhancer && typeof resolved.enhancer === "object"
     ? { ...resolved.enhancer }
     : null;
-  const enhancerLabel = sourceEnhancer?.provider === "boof"
-    ? " + BOOF"
-    : (sourceEnhancer?.provider === "boof_fallback"
-      ? " + fallback parser"
-      : (sourceEnhancer?.used ? " + StudyAnalysis skill" : ""));
+  const enhancerLabel = sourceEnhancer?.provider === "book-reader"
+    ? " + book-reader"
+    : (sourceEnhancer?.provider === "book-reader-native-fallback"
+      ? " + book-reader(native fallback)"
+    : (sourceEnhancer?.provider === "boof"
+      ? " + BOOF"
+      : (sourceEnhancer?.provider === "boof_fallback"
+        ? " + fallback parser"
+        : (sourceEnhancer?.used ? " + parser skill" : ""))));
   const bookAuthor = cleanText(source?.author, cleanText(sourceEnhancer?.author));
   const skeletonMdPath = cleanText(
     sourceEnhancer?.markdownSnapshotPath,
@@ -5255,7 +6860,9 @@ async function runBookPipelineGenerationJob(job, sessionId) {
   const pipelineHtmlProvider = ["template", "llm", "auto"].includes(requestedPipelineHtmlProvider)
     ? requestedPipelineHtmlProvider
     : "template";
-  const eta = estimateBookPipelineFromPayload(
+  const pipelineType = parseOnlyModel ? "knowledge_model" : "book_pipeline";
+  const etaEstimator = parseOnlyModel ? estimateKnowledgeModelParseFromPayload : estimateBookPipelineFromPayload;
+  const eta = etaEstimator(
     {
       ...job.payload,
       sources: [{ title: source.title, url: source.url, content: sourceText, snippet: source.snippet }]
@@ -5263,11 +6870,39 @@ async function runBookPipelineGenerationJob(job, sessionId) {
     { queueDepth: Math.max(0, estimateBookPipelineQueueDepth() - 1) }
   );
   const requestedBlocks = toInt(job.payload?.blockCount);
-  const planningInput = resolveBookPipelinePlanningInput({
+  let planningInput = resolveBookPipelinePlanningInput({
     sourceText,
     skeletonMdText,
     targetBlocks: requestedBlocks || eta.blockCount
   });
+  const enhancerPreferredChunks = Array.isArray(sourceEnhancer?.preferredChunks)
+    ? sourceEnhancer.preferredChunks
+      .map((row) => ({
+        content: cleanText(row?.content),
+        anchor: cleanText(row?.anchor),
+        anchorType: cleanText(row?.anchorType, "book_reader_chunk"),
+        blockTitle: normalizeKnowledgeBlockTitle(cleanText(row?.blockTitle), "Knowledge Block"),
+        blockSummary: cleanText(row?.blockSummary),
+        keywords: Array.isArray(row?.keywords) ? row.keywords.map((item) => cleanText(item)).filter(Boolean).slice(0, 12) : []
+      }))
+      .filter((row) => row.content.length >= 80)
+    : [];
+  if (enhancerPreferredChunks.length >= 2) {
+    const mergedText = clampText(
+      enhancerPreferredChunks
+        .map((row, idx) => `Section ${idx + 1}: ${cleanText(row?.blockTitle, `Knowledge Block ${idx + 1}`)}\nSummary: ${cleanText(row?.blockSummary)}\n${cleanText(row?.content)}`)
+        .join("\n\n"),
+      BOOK_PIPELINE_INGEST_MAX_TEXT
+    );
+    planningInput = {
+      ...planningInput,
+      text: mergedText,
+      preferredChunks: enhancerPreferredChunks,
+      strategy: "book_reader_chunks",
+      usedStructured: true,
+      sectionCount: enhancerPreferredChunks.length
+    };
+  }
   const planningSummary = planningInput.usedStructured
     ? `${planningInput.strategy} (${planningInput.sectionCount} sections)`
     : planningInput.strategy;
@@ -5278,9 +6913,10 @@ async function runBookPipelineGenerationJob(job, sessionId) {
     progress: 12,
     pipeline: {
       ...(job.pipeline || {}),
-      type: "book_pipeline",
+      type: pipelineType,
       eta,
       stage: "planning",
+      parseOnlyModel,
       sourceMode: resolved.mode,
       sourceParsedBy: parsedBy,
       sourceEnhancer,
@@ -5293,7 +6929,9 @@ async function runBookPipelineGenerationJob(job, sessionId) {
         preferredChunkCount: Array.isArray(planningInput.preferredChunks) ? planningInput.preferredChunks.length : 0
       }
     },
-    message: `Parsed source${parsedBy ? ` via ${parsedBy}` : ""}${enhancerLabel}${bookAuthor ? ` (author: ${bookAuthor})` : ""}. Planning strategy: ${planningSummary}. Estimated ${eta.etaMin}-${eta.etaMax} minutes; return around ${new Date(eta.returnAt).toLocaleTimeString()}.`
+    message: parseOnlyModel
+      ? `Parsed source${parsedBy ? ` via ${parsedBy}` : ""}${enhancerLabel}${bookAuthor ? ` (author: ${bookAuthor})` : ""}. Building knowledge model (${planningSummary}). Estimated ${eta.etaMin}-${eta.etaMax} minutes; return around ${new Date(eta.returnAt).toLocaleTimeString()}.`
+      : `Parsed source${parsedBy ? ` via ${parsedBy}` : ""}${enhancerLabel}${bookAuthor ? ` (author: ${bookAuthor})` : ""}. Planning strategy: ${planningSummary}. Estimated ${eta.etaMin}-${eta.etaMax} minutes; return around ${new Date(eta.returnAt).toLocaleTimeString()}.`
   });
 
   const requestedMinScore = Number(job.payload?.minDensityScore);
@@ -5303,10 +6941,26 @@ async function runBookPipelineGenerationJob(job, sessionId) {
     returnDiagnostics: true,
     preferredChunks: planningInput.preferredChunks
   });
-  const knowledgeBlocks = Array.isArray(splitResult?.blocks) ? splitResult.blocks : [];
+  const rawKnowledgeBlocks = Array.isArray(splitResult?.blocks) ? splitResult.blocks : [];
   const splitDiagnostics = splitResult?.diagnostics && typeof splitResult.diagnostics === "object"
     ? splitResult.diagnostics
     : null;
+  const visualMaxKeep = Math.max(
+    12,
+    Math.min(
+      BOOK_PIPELINE_MAX_MODULES,
+      toInt(job.payload?.maxModuleCount) || toInt(job.payload?.moduleCount) || toInt(job.payload?.blockCount) || toInt(eta.blockCount)
+    )
+  );
+  const visualMinKeep = Math.max(10, Math.min(visualMaxKeep, Math.ceil(visualMaxKeep * 0.72)));
+  const visualOptimization = optimizeKnowledgeBlocksForVisualReading(rawKnowledgeBlocks, {
+    minKeep: visualMinKeep,
+    maxKeep: visualMaxKeep
+  });
+  const knowledgeBlocks = Array.isArray(visualOptimization?.blocks) ? visualOptimization.blocks : rawKnowledgeBlocks;
+  if (splitDiagnostics && visualOptimization?.diagnostics?.applied) {
+    splitDiagnostics.visualOptimization = visualOptimization.diagnostics;
+  }
   if (!knowledgeBlocks.length) {
     throw new Error("No valid knowledge blocks after density filtering.");
   }
@@ -5325,9 +6979,10 @@ async function runBookPipelineGenerationJob(job, sessionId) {
     progress: 16,
     pipeline: {
       ...(job.pipeline || {}),
-      type: "book_pipeline",
+      type: pipelineType,
       eta,
       stage: "knowledge_blocks",
+      parseOnlyModel,
       sourceMode: resolved.mode,
       sourceParsedBy: parsedBy,
       sourceEnhancer,
@@ -5345,75 +7000,183 @@ async function runBookPipelineGenerationJob(job, sessionId) {
     },
     message: `Knowledge blocks planned: ${knowledgeBlocks.length}/${splitDiagnostics?.candidates || knowledgeBlocks.length}. ${blockNames || "Generating block names..."}`.trim()
   });
-  const moduleCount = Math.max(3, Math.min(BOOK_PIPELINE_MAX_MODULES, toInt(job.payload?.moduleCount) || knowledgeBlocks.length));
-  const blueprintSource = {
-    title: `${resolved.title} · Knowledge Blueprint`,
-    url: source.url || "",
-    snippet: clampText(
-      knowledgeBlocks.map((item) => `${item.gateIndex}. ${item.title}`).join(" | "),
-      1200
-    ),
-    content: clampText(
-      knowledgeBlocks
-        .map((item) => `Gate ${item.gateIndex}: ${item.title}\nSummary: ${item.summary}\nKeywords: ${(item.keywords || []).join(", ")}`)
-        .join("\n\n"),
-      60000
-    )
+  const knowledgeModel = buildKnowledgeModelFromBlocks({
+    bookTitle: cleanText(job.payload?.title, cleanText(resolved?.title, "Knowledge Model")),
+    bookAuthor,
+    planningInput,
+    sourceEnhancer,
+    sourceMode: resolved.mode,
+    knowledgeBlocks
+  });
+  const knowledgeModelPreview = {
+    title: cleanText(knowledgeModel?.title, cleanText(job.payload?.title, cleanText(resolved?.title))),
+    summary: cleanText(knowledgeModel?.summary),
+    systemCount: Array.isArray(knowledgeModel?.systems) ? knowledgeModel.systems.length : 0,
+    conceptCount: Array.isArray(knowledgeModel?.concepts) ? knowledgeModel.concepts.length : 0,
+    relationCount: Array.isArray(knowledgeModel?.relations) ? knowledgeModel.relations.length : 0,
+    docsCount: Array.isArray(knowledgeModel?.docs) ? knowledgeModel.docs.length : 0
   };
-  const skeletonSource = skeletonMdText
-    ? {
-      title: `${resolved.title} · StudyAnalysis Skeleton (MD)`,
-      url: skeletonMdPath,
-      snippet: clampText(skeletonMdText.replace(/\s+/g, " ").trim(), 1200),
-      content: clampText(skeletonMdText, 90000)
+  updateStudioJob(job, {
+    status: "running",
+    step: "knowledge_model",
+    progress: parseOnlyModel ? 36 : 18,
+    pipeline: {
+      ...(job.pipeline || {}),
+      type: pipelineType,
+      eta,
+      stage: "knowledge_model",
+      parseOnlyModel,
+      sourceMode: resolved.mode,
+      sourceParsedBy: parsedBy,
+      sourceEnhancer,
+      planningInput: {
+        strategy: planningInput.strategy,
+        usedStructured: planningInput.usedStructured,
+        sectionCount: planningInput.sectionCount,
+        markdownChars: planningInput.markdownChars,
+        textChars: planningInput.text.length,
+        preferredChunkCount: Array.isArray(planningInput.preferredChunks) ? planningInput.preferredChunks.length : 0
+      },
+      knowledgeBlockCount: knowledgeBlocks.length,
+      knowledgeBlocksPreview: blockPreview,
+      knowledgeBlockDiagnostics: splitDiagnostics,
+      knowledgeModel: knowledgeModelPreview
+    },
+    message: `Knowledge model synthesized: ${knowledgeModelPreview.systemCount} systems / ${knowledgeModelPreview.conceptCount} concepts / ${knowledgeModelPreview.relationCount} relations.`
+  });
+  if (parseOnlyModel) {
+    const work = await createKnowledgeModelDraftWork({
+      sessionId,
+      job,
+      resolved,
+      source,
+      knowledgeBlocks,
+      knowledgeModel
+    });
+    const bookDir = path.join(rootDir, "book_experiences", cleanText(work?.book_id));
+    await fs.mkdir(bookDir, { recursive: true });
+    await fs.writeFile(
+      path.join(bookDir, "book-pipeline-manifest.json"),
+      JSON.stringify(
+        {
+          version: 2,
+          generated_at: nowIso(),
+          eta,
+          source_mode: resolved.mode,
+          source_ingest: {
+            parsed_by: parsedBy,
+            title: cleanText(source?.title),
+            author: bookAuthor,
+            input_kind: cleanText(sourceEnhancer?.inputKind),
+            skeleton_markdown_path: skeletonMdPath,
+            skeleton_markdown_chars: skeletonMdText.length,
+            planning: {
+              strategy: planningInput.strategy,
+              used_structured: planningInput.usedStructured,
+              section_count: planningInput.sectionCount,
+              markdown_chars: planningInput.markdownChars,
+              planning_text_chars: planningInput.text.length,
+              preferred_chunk_count: Array.isArray(planningInput.preferredChunks) ? planningInput.preferredChunks.length : 0
+            },
+            enhancer: sourceEnhancer
+          },
+          total_knowledge_blocks: knowledgeBlocks.length,
+          split_diagnostics: splitDiagnostics,
+          knowledge_blocks: knowledgeBlocks,
+          module_map: [],
+          knowledge_model: knowledgeModel,
+          generation_mode: "knowledge_model_parse"
+        },
+        null,
+        2
+      ),
+      "utf8"
+    );
+    if (work && typeof work === "object") {
+      work.knowledge_model = {
+        enabled: true,
+        status: "parsed",
+        title: cleanText(knowledgeModel?.title),
+        concept_count: knowledgeModelPreview.conceptCount,
+        relation_count: knowledgeModelPreview.relationCount,
+        system_count: knowledgeModelPreview.systemCount,
+        updated_at: nowIso()
+      };
+      work.updated_at = nowIso();
+      await playableContentEngine.persist();
     }
-    : null;
-  const generationPayload = {
-    mode: "sources",
-    input: cleanText(job.payload?.input, resolved.title),
-    title: cleanText(job.payload?.title, resolved.title),
-    author: bookAuthor,
-    moduleCount,
-    maxModuleCount: BOOK_PIPELINE_MAX_MODULES,
-    htmlProvider: pipelineHtmlProvider,
-    requireLlmHtml: false,
-    sources: [
-      { title: source.title, url: source.url, snippet: source.snippet, content: sourceText },
-      blueprintSource,
-      ...(skeletonSource ? [skeletonSource] : [])
-    ],
-    bookPipeline: true
-  };
-
+    await loadCatalog(true);
+    const settled = settleStudioJobChargeFromUsage(sessionId, job, work, "studio_generation_tokens");
+    const chargedAmount = toInt(settled?.charge?.amount);
+    const requestedAmount = toInt(settled?.charge?.requestedAmount);
+    const unpaidAmount = toInt(settled?.charge?.unpaidAmount);
+    updateStudioJob(job, {
+      status: "done",
+      step: "done",
+      progress: 100,
+      work,
+      pipeline: {
+        ...(job.pipeline || {}),
+        type: "knowledge_model",
+        stage: "knowledge_model_ready",
+        parseOnlyModel: true,
+        sourceMode: resolved.mode,
+        sourceParsedBy: parsedBy,
+        sourceEnhancer,
+        planningInput: {
+          strategy: planningInput.strategy,
+          usedStructured: planningInput.usedStructured,
+          sectionCount: planningInput.sectionCount,
+          markdownChars: planningInput.markdownChars,
+          textChars: planningInput.text.length,
+          preferredChunkCount: Array.isArray(planningInput.preferredChunks) ? planningInput.preferredChunks.length : 0
+        },
+        eta,
+        knowledgeBlockCount: knowledgeBlocks.length,
+        knowledgeBlocksPreview: blockPreview,
+        knowledgeBlockDiagnostics: splitDiagnostics,
+        knowledgeModel: knowledgeModelPreview
+      },
+      creditCharge: settled?.charge || job.creditCharge || null,
+      creditSnapshot: settled?.credits || job.creditSnapshot || null,
+      message: unpaidAmount > 0
+        ? `Knowledge model parsed. Charged ${chargedAmount}/${requestedAmount} credits (token-based, unpaid ${unpaidAmount}).`
+        : `Knowledge model parsed. Charged ${chargedAmount} credits (token-based).`
+    });
+    return;
+  }
+  const moduleCount = Math.max(3, Math.min(BOOK_PIPELINE_MAX_MODULES, toInt(job.payload?.moduleCount) || knowledgeBlocks.length));
   updateStudioJob(job, {
     status: "running",
     step: "generate_core",
     progress: 20,
-    message: `Generating core modules (${moduleCount} gates, html=${pipelineHtmlProvider})`
+    message: `Preparing visual reading workspace (${moduleCount} chapters)`
   });
-  const work = await playableContentEngine.generatePlayableBook(sessionId, generationPayload, {
-    onProgress: (event) => {
-      const p = Number.isFinite(Number(event?.progress)) ? Number(event.progress) : 0;
-      const mapped = 20 + Math.round((Math.max(0, Math.min(100, p)) * 0.50));
-      updateStudioJob(job, {
-        status: "running",
-        step: cleanText(event?.step, "generate_core"),
-        progress: mapped,
-        message: cleanText(event?.message)
-      });
-    }
+  const work = await createVisualReadingWork({
+    sessionId,
+    job,
+    resolved,
+    source,
+    knowledgeBlocks,
+    knowledgeModel,
+    moduleCount
   });
-
   const moduleSlugs = Array.isArray(work?.module_slugs) ? work.module_slugs : [];
   if (!moduleSlugs.length) {
-    throw new Error("Core generation returned no modules.");
+    throw new Error("Visual reading workspace contains no chapter modules.");
   }
+  updateStudioJob(job, {
+    status: "running",
+    step: "render_blueprint",
+    progress: 48,
+    message: `Workspace ready. ${moduleSlugs.length} chapter directories initialized.`
+  });
   const moduleBlockMap = mapBlocksToModules(knowledgeBlocks, moduleSlugs);
   updateStudioJob(job, {
     status: "running",
-    step: "parallel_generation",
+    step: "visual_render",
     progress: 72,
-    message: `Generating quizzes/assets/audio in parallel for ${moduleBlockMap.length} modules`
+    message: `Rendering visual reading pages for ${moduleBlockMap.length} chapters`
   });
 
   const artifacts = await mapLimit(moduleBlockMap, Math.min(moduleBlockMap.length, 8), async (row) => {
@@ -5426,13 +7189,13 @@ async function runBookPipelineGenerationJob(job, sessionId) {
     });
   });
 
-  const easter = buildEasterLevel(cleanText(work?.title, cleanText(resolved?.title, "Playable Book")), knowledgeBlocks);
   const bookDir = path.join(rootDir, "book_experiences", cleanText(work?.book_id));
   await fs.writeFile(
     path.join(bookDir, "book-pipeline-manifest.json"),
     JSON.stringify(
       {
-        version: 1,
+        version: 2,
+        experience_mode: "visual_reading",
         generated_at: nowIso(),
         eta,
         source_mode: resolved.mode,
@@ -5456,8 +7219,8 @@ async function runBookPipelineGenerationJob(job, sessionId) {
         total_knowledge_blocks: knowledgeBlocks.length,
         split_diagnostics: splitDiagnostics,
         knowledge_blocks: knowledgeBlocks,
+        knowledge_model: knowledgeModel,
         module_map: moduleBlockMap.map((row) => ({ module_slug: row.moduleSlug, knowledge_block_id: row.block.id })),
-        easter_level: easter,
         artifacts
       },
       null,
@@ -5470,7 +7233,7 @@ async function runBookPipelineGenerationJob(job, sessionId) {
     status: "running",
     step: "qa",
     progress: 88,
-    message: "Running QA checks and repairing failed modules if needed"
+    message: "Running visual QA checks and repairing failed pages if needed"
   });
   let qaResult = { ok: true, failedCount: 0, repaired: 0 };
   for (let attempt = 0; attempt <= BOOK_PIPELINE_QA_RETRIES; attempt += 1) {
@@ -5496,11 +7259,12 @@ async function runBookPipelineGenerationJob(job, sessionId) {
     await playableContentEngine.setWorkPublic(sessionId, cleanText(work?.id), true);
   }
   if (work && typeof work === "object") {
+    work.generation_mode = "visual_reading";
     work.book_pipeline = {
       enabled: true,
       knowledge_block_count: knowledgeBlocks.length,
-      mystery_box_enabled: true,
-      easter_level_id: easter.id,
+      experience_mode: "visual_reading",
+      visual_ready: true,
       updated_at: nowIso()
     };
     work.updated_at = nowIso();
@@ -5537,13 +7301,14 @@ async function runBookPipelineGenerationJob(job, sessionId) {
       knowledgeBlockCount: knowledgeBlocks.length,
       knowledgeBlocksPreview: blockPreview,
       knowledgeBlockDiagnostics: splitDiagnostics,
-      easter
+      knowledgeModel: knowledgeModelPreview,
+      experienceMode: "visual_reading"
     },
     creditCharge: settled?.charge || job.creditCharge || null,
     creditSnapshot: settled?.credits || job.creditSnapshot || null,
     message: unpaidAmount > 0
-      ? `Book pipeline completed. Charged ${chargedAmount}/${requestedAmount} credits (token-based, unpaid ${unpaidAmount}).`
-      : `Book pipeline completed. Charged ${chargedAmount} credits (token-based).`
+      ? `Visual reading experience completed. Charged ${chargedAmount}/${requestedAmount} credits (token-based, unpaid ${unpaidAmount}).`
+      : `Visual reading experience completed. Charged ${chargedAmount} credits (token-based).`
   });
 }
 
@@ -5646,6 +7411,8 @@ async function buildStudioWorkSummaries(works, sessionId) {
     const book = rawBook ? enrichBookWithWorkMeta(rawBook, sessionId) : null;
     const title = normalizeGeneratedTitle(work?.title, book?.title || "Untitled Playable Book");
     const subtitle = cleanText(work?.subtitle, cleanText(work?.hook));
+    const generationMode = cleanText(work?.generation_mode).toLowerCase();
+    const isKnowledgeModelWork = generationMode === "knowledge_model_parse" || cleanText(work?.mode).toLowerCase() === "knowledge_model";
     out.push({
       id: work.id,
       title,
@@ -5664,7 +7431,7 @@ async function buildStudioWorkSummaries(works, sessionId) {
       created_at: cleanText(work?.created_at),
       updated_at: cleanText(work?.updated_at),
       can_edit: cleanText(work?.owner_session_id) === cleanText(sessionId),
-      book_href: `/books/${encodeURIComponent(bookId)}.html`,
+      book_href: isKnowledgeModelWork ? "" : `/books/${encodeURIComponent(bookId)}.html`,
       first_module_href: cleanText(book?.firstModuleHref),
       cover: cleanText(book?.cover, buildGeneratedCoverDataUri({ title, subtitle, seed: bookId }))
     });
@@ -5782,12 +7549,171 @@ async function handleStudioApi(req, res, url, session) {
         bookId: cleanText(work.book_id),
         generatedAt: cleanText(manifest.generated_at),
         updatedAt: cleanText(manifest.updated_at),
+        sourceIngest: manifest.source_ingest && typeof manifest.source_ingest === "object"
+          ? manifest.source_ingest
+          : null,
         splitDiagnostics: manifest.split_diagnostics || null,
         totalKnowledgeBlocks: toInt(manifest.total_knowledge_blocks),
         knowledgeBlocks: Array.isArray(manifest.knowledge_blocks) ? manifest.knowledge_blocks : [],
+        knowledgeModel: manifest.knowledge_model && typeof manifest.knowledge_model === "object"
+          ? manifest.knowledge_model
+          : null,
         moduleMap: Array.isArray(manifest.module_map) ? manifest.module_map : [],
+        generationMode: cleanText(manifest.generation_mode, cleanText(work?.generation_mode, "book_pipeline")),
         regeneration: manifest.regeneration || null
       });
+      return true;
+    }
+
+    const workModelDownloadMatch = route.match(/^\/api\/studio\/works\/([^/]+)\/model\/download$/);
+    if (method === "GET" && workModelDownloadMatch) {
+      const workId = decodeURIComponent(workModelDownloadMatch[1] || "").trim();
+      const work = getWorkById(workId);
+      if (!work || !canSessionViewWork(session.id, work)) {
+        writeJson(res, 404, { ok: false, error: "Work not found" });
+        return true;
+      }
+      const { manifest } = await readBookPipelineManifestByBookId(cleanText(work.book_id));
+      if (!manifest || !manifest.knowledge_model || typeof manifest.knowledge_model !== "object") {
+        writeJson(res, 404, { ok: false, error: "Knowledge model not found" });
+        return true;
+      }
+      const format = cleanText(url.searchParams.get("format"), "md").toLowerCase();
+      if (format === "json") {
+        writeJson(res, 200, {
+          ok: true,
+          workId: cleanText(work.id),
+          bookId: cleanText(work.book_id),
+          knowledgeModel: manifest.knowledge_model
+        });
+        return true;
+      }
+      const markdown = buildKnowledgeModelDownloadMarkdown(
+        manifest.knowledge_model,
+        Array.isArray(manifest.knowledge_blocks) ? manifest.knowledge_blocks : []
+      );
+      const fileBase = sanitizeFileName(
+        normalizeGeneratedTitle(work.title, cleanText(manifest?.knowledge_model?.title, work.book_id)),
+        cleanText(work.book_id, "knowledge-model")
+      );
+      const fileName = `${fileBase}-knowledge-model.md`;
+      res.writeHead(200, {
+        "Content-Type": "text/markdown; charset=utf-8",
+        "Content-Disposition": `attachment; filename="${fileName}"`,
+        "Cache-Control": "no-store"
+      });
+      res.end(markdown);
+      return true;
+    }
+
+    const workModelGenerateMatch = route.match(/^\/api\/studio\/works\/([^/]+)\/model\/generate$/);
+    if (method === "POST" && workModelGenerateMatch) {
+      const workId = decodeURIComponent(workModelGenerateMatch[1] || "").trim();
+      const work = getWorkById(workId);
+      if (!work || !canSessionViewWork(session.id, work)) {
+        writeJson(res, 404, { ok: false, error: "Work not found" });
+        return true;
+      }
+      if (!canSessionEditWork(session.id, work)) {
+        writeJson(res, 403, { ok: false, error: "Only the owner can generate from this knowledge model" });
+        return true;
+      }
+      const body = await parseJsonBody(req, 512 * 1024).catch((error) => ({ __error: error?.message || "Invalid body" }));
+      if (body.__error) {
+        writeJson(res, 400, { ok: false, error: body.__error });
+        return true;
+      }
+      const { manifest } = await readBookPipelineManifestByBookId(cleanText(work.book_id));
+      const knowledgeModel = manifest?.knowledge_model && typeof manifest.knowledge_model === "object"
+        ? manifest.knowledge_model
+        : null;
+      if (!knowledgeModel) {
+        writeJson(res, 400, { ok: false, error: "Knowledge model missing in manifest" });
+        return true;
+      }
+      const modelMarkdown = buildKnowledgeModelCorpusMarkdown(
+        knowledgeModel,
+        Array.isArray(manifest?.knowledge_blocks) ? manifest.knowledge_blocks : []
+      );
+      const systems = Array.isArray(knowledgeModel?.systems) ? knowledgeModel.systems : [];
+      const moduleCount = Math.max(
+        3,
+        Math.min(BOOK_PIPELINE_MAX_MODULES, toInt(body?.moduleCount) || systems.length || BOOK_PIPELINE_MIN_BLOCKS)
+      );
+      const payload = normalizeStudioJobPayload({
+        mode: "book_pipeline",
+        pipelineMode: "book_pipeline",
+        bookPipeline: true,
+        parseOnlyModel: false,
+        knowledgeModel: false,
+        pipelineHtmlProvider: cleanText(body?.pipelineHtmlProvider, "template"),
+        title: cleanText(body?.title, cleanText(work?.title, cleanText(knowledgeModel?.title, "Interactive Knowledge Runtime"))),
+        input: cleanText(body?.input, `${cleanText(knowledgeModel?.title, cleanText(work?.title, "Knowledge Model"))} interactive runtime`),
+        author: cleanText(knowledgeModel?.author, cleanText(manifest?.source_ingest?.author)),
+        moduleCount,
+        maxModuleCount: BOOK_PIPELINE_MAX_MODULES,
+        parentWorkId: cleanText(work?.id),
+        rootWorkId: cleanText(work?.root_work_id, cleanText(work?.id)),
+        sources: [
+          {
+            title: `${cleanText(knowledgeModel?.title, cleanText(work?.title, "Knowledge Model"))} · Knowledge Model`,
+            url: "model://knowledge-model/index.md",
+            snippet: clampText(modelMarkdown.replace(/\s+/g, " ").trim(), 1200),
+            content: clampText(modelMarkdown, BOOK_PIPELINE_INGEST_MAX_TEXT)
+          }
+        ]
+      });
+      const eta = estimateBookPipelineFromPayload(payload);
+      const startGate = ensureStudioGenerationStartCredit(session.id, 1);
+      if (!startGate.ok) {
+        writeJson(res, 402, {
+          ok: false,
+          code: "INSUFFICIENT_CREDITS",
+          error: `Insufficient credits. Need ${startGate.need}, available ${startGate.available}.`,
+          need: startGate.need,
+          available: startGate.available,
+          eta,
+          credits: startGate.credits
+        });
+        return true;
+      }
+      const newJob = createStudioJob(session.id, payload, {
+        creditSnapshot: startGate.credits,
+        eta,
+        pipeline: {
+          type: "book_pipeline",
+          eta,
+          stage: "queued",
+          sourceWorkId: cleanText(work?.id),
+          sourceBookId: cleanText(work?.book_id)
+        }
+      });
+      updateStudioJob(newJob, {
+        status: "queued",
+        step: "queued",
+        progress: 0,
+        eta,
+        pipeline: {
+          type: "book_pipeline",
+          eta,
+          stage: "queued",
+          sourceWorkId: cleanText(work?.id),
+          sourceBookId: cleanText(work?.book_id)
+        },
+        creditCharge: newJob.creditCharge || null,
+        creditSnapshot: newJob.creditSnapshot || null,
+        message: `Interactive generation from knowledge model queued. ETA ${eta.etaMin}-${eta.etaMax} min.`
+      });
+      runStudioGenerationJob(newJob, session.id).catch((error) => {
+        updateStudioJob(newJob, {
+          status: "error",
+          step: "error",
+          progress: 10,
+          error: error?.message || "Job failed",
+          message: `Generation failed: ${error?.message || "unknown error"}`
+        });
+      });
+      writeJson(res, 200, { ok: true, job: toStudioJobPublic(newJob) });
       return true;
     }
 
@@ -6035,7 +7961,7 @@ async function handleStudioApi(req, res, url, session) {
     }
 
     if (method === "POST" && (route === "/api/studio/books/jobs" || route === "/api/studio/book/jobs")) {
-      const body = await parseJsonBody(req, 24 * 1024 * 1024).catch((error) => ({ __error: error?.message || "Invalid body" }));
+      const body = await parseJsonBody(req, STUDIO_MAX_UPLOAD_JSON_BYTES).catch((error) => ({ __error: error?.message || "Invalid body" }));
       if (body.__error) {
         writeJson(res, 400, { ok: false, error: body.__error });
         return true;
@@ -6046,7 +7972,10 @@ async function handleStudioApi(req, res, url, session) {
         pipelineMode: "book_pipeline",
         mode: "book_pipeline"
       });
-      const eta = estimateBookPipelineFromPayload(payload);
+      const isModelParse = isKnowledgeModelParsePayload(payload);
+      const eta = isModelParse
+        ? estimateKnowledgeModelParseFromPayload(payload)
+        : estimateBookPipelineFromPayload(payload);
       const startGate = ensureStudioGenerationStartCredit(session.id, 1);
       if (!startGate.ok) {
         writeJson(res, 402, {
@@ -6064,7 +7993,7 @@ async function handleStudioApi(req, res, url, session) {
         creditSnapshot: startGate.credits,
         eta,
         pipeline: {
-          type: "book_pipeline",
+          type: isModelParse ? "knowledge_model" : "book_pipeline",
           eta,
           stage: "queued"
         }
@@ -6075,13 +8004,15 @@ async function handleStudioApi(req, res, url, session) {
         progress: 0,
         eta,
         pipeline: {
-          type: "book_pipeline",
+          type: isModelParse ? "knowledge_model" : "book_pipeline",
           eta,
           stage: "queued"
         },
         creditCharge: job.creditCharge || null,
         creditSnapshot: job.creditSnapshot || null,
-        message: `Book pipeline created. ETA ${eta.etaMin}-${eta.etaMax} min; credits will be settled after completion (token-based).`
+        message: isModelParse
+          ? `Knowledge model parsing created. ETA ${eta.etaMin}-${eta.etaMax} min; credits will be settled after completion (token-based).`
+          : `Visual reading pipeline created. ETA ${eta.etaMin}-${eta.etaMax} min; credits will be settled after completion (token-based).`
       });
       runStudioGenerationJob(job, session.id).catch((error) => {
         updateStudioJob(job, {
@@ -6134,14 +8065,17 @@ async function handleStudioApi(req, res, url, session) {
     }
 
     if (method === "POST" && route === "/api/studio/jobs") {
-      const body = await parseJsonBody(req, 24 * 1024 * 1024).catch((error) => ({ __error: error?.message || "Invalid body" }));
+      const body = await parseJsonBody(req, STUDIO_MAX_UPLOAD_JSON_BYTES).catch((error) => ({ __error: error?.message || "Invalid body" }));
       if (body.__error) {
         writeJson(res, 400, { ok: false, error: body.__error });
         return true;
       }
       const payload = normalizeStudioJobPayload(body);
       const isPipeline = isBookPipelinePayload(payload);
-      const eta = isPipeline ? estimateBookPipelineFromPayload(payload) : null;
+      const isModelParse = isKnowledgeModelParsePayload(payload);
+      const eta = isPipeline
+        ? (isModelParse ? estimateKnowledgeModelParseFromPayload(payload) : estimateBookPipelineFromPayload(payload))
+        : null;
       const startGate = ensureStudioGenerationStartCredit(session.id, 1);
       if (!startGate.ok) {
         writeJson(res, 402, {
@@ -6160,7 +8094,7 @@ async function handleStudioApi(req, res, url, session) {
         eta: eta || null,
         pipeline: isPipeline
           ? {
-              type: "book_pipeline",
+              type: isModelParse ? "knowledge_model" : "book_pipeline",
               eta,
               stage: "queued"
             }
@@ -6173,7 +8107,7 @@ async function handleStudioApi(req, res, url, session) {
         eta: eta || null,
         pipeline: isPipeline
           ? {
-              type: "book_pipeline",
+              type: isModelParse ? "knowledge_model" : "book_pipeline",
               eta,
               stage: "queued"
             }
@@ -6181,7 +8115,9 @@ async function handleStudioApi(req, res, url, session) {
         creditCharge: job.creditCharge || null,
         creditSnapshot: job.creditSnapshot || null,
         message: isPipeline
-          ? `Book pipeline created. ETA ${eta?.etaMin}-${eta?.etaMax} min; credits will be settled after completion (token-based).`
+          ? (isModelParse
+              ? `Knowledge model parsing created. ETA ${eta?.etaMin}-${eta?.etaMax} min; credits will be settled after completion (token-based).`
+              : `Visual reading pipeline created. ETA ${eta?.etaMin}-${eta?.etaMax} min; credits will be settled after completion (token-based).`)
           : "Job created. Credits will be settled after completion (token-based)."
       });
       runStudioGenerationJob(job, session.id).catch((error) => {
@@ -6244,24 +8180,162 @@ async function handleStudioApi(req, res, url, session) {
       return true;
     }
 
+    if (method === "POST" && route === "/api/studio/files/ingest-binary") {
+      const fileName = sanitizeStudioUploadName(
+        url.searchParams.get("name")
+        || cleanText(req.headers["x-file-name"])
+        || "uploaded-book.bin",
+        "uploaded-book.bin"
+      );
+      const fileType = cleanText(
+        url.searchParams.get("type")
+        || cleanText(req.headers["x-file-type"])
+        || "application/octet-stream",
+        "application/octet-stream"
+      );
+      const rawBody = await parseRawBody(req, STUDIO_MAX_UPLOAD_JSON_BYTES).catch((error) => ({ __error: error?.message || "Invalid body" }));
+      if (rawBody?.__error) {
+        writeJson(res, 400, { ok: false, error: rawBody.__error });
+        return true;
+      }
+      const ingestEvents = [];
+      let source = null;
+      let ingestError = "";
+      try {
+        source = await playableContentEngine.ingestFileSource(
+          {
+            name: fileName,
+            type: fileType,
+            buffer: rawBody
+          },
+          {
+            onProgress: (event) => {
+              ingestEvents.push({
+                at: event?.at || nowIso(),
+                step: event?.step || "",
+                progress: Number.isFinite(Number(event?.progress)) ? Number(event.progress) : null,
+                message: event?.message || ""
+              });
+            }
+          }
+        );
+      } catch (error) {
+        ingestError = cleanText(error?.message, "file_ingest_parser_failed");
+        ingestEvents.push({
+          at: nowIso(),
+          step: "ingesting_file",
+          progress: 86,
+          message: `Parser fallback to token-only mode: ${ingestError}`
+        });
+      }
+      let fileTokenMeta = null;
+      try {
+        fileTokenMeta = await storeStudioFileTokenForSession(session.id, {
+          name: fileName,
+          type: fileType,
+          buffer: rawBody
+        });
+      } catch (error) {
+        ingestEvents.push({
+          at: nowIso(),
+          step: "ingesting_file",
+          progress: 98,
+          message: `File token cache failed: ${cleanText(error?.message, "unknown")}`
+        });
+      }
+      const fallbackSource = {
+        title: fileName,
+        url: "",
+        snippet: "",
+        content: "",
+        parsedBy: "ingest.file-token-only",
+        ingestError
+      };
+      const sourceWithToken = fileTokenMeta
+        ? {
+            ...((source && typeof source === "object") ? source : fallbackSource),
+            fileToken: cleanText(fileTokenMeta?.token),
+            fileTokenExpiresAt: cleanText(fileTokenMeta?.expiresAt),
+            fileSizeBytes: toInt(fileTokenMeta?.size)
+          }
+        : ((source && typeof source === "object") ? source : fallbackSource);
+      writeJson(res, 200, {
+        ok: true,
+        source: sourceWithToken,
+        fileToken: cleanText(fileTokenMeta?.token),
+        fileTokenExpiresAt: cleanText(fileTokenMeta?.expiresAt),
+        fileSizeBytes: toInt(fileTokenMeta?.size),
+        events: ingestEvents
+      });
+      return true;
+    }
+
     if (method === "POST" && (route === "/api/studio/files/ingest" || route === "/api/studio/upload")) {
-      const body = await parseJsonBody(req, 20 * 1024 * 1024).catch((error) => ({ __error: error?.message || "Invalid body" }));
+      const body = await parseJsonBody(req, STUDIO_MAX_UPLOAD_JSON_BYTES).catch((error) => ({ __error: error?.message || "Invalid body" }));
       if (body.__error) {
         writeJson(res, 400, { ok: false, error: body.__error });
         return true;
       }
       const ingestEvents = [];
-      const source = await playableContentEngine.ingestFileSource(body, {
-        onProgress: (event) => {
-          ingestEvents.push({
-            at: event?.at || nowIso(),
-            step: event?.step || "",
-            progress: Number.isFinite(Number(event?.progress)) ? Number(event.progress) : null,
-            message: event?.message || ""
-          });
+      let source = null;
+      let ingestError = "";
+      try {
+        source = await playableContentEngine.ingestFileSource(body, {
+          onProgress: (event) => {
+            ingestEvents.push({
+              at: event?.at || nowIso(),
+              step: event?.step || "",
+              progress: Number.isFinite(Number(event?.progress)) ? Number(event.progress) : null,
+              message: event?.message || ""
+            });
+          }
+        });
+      } catch (error) {
+        ingestError = cleanText(error?.message, "file_ingest_parser_failed");
+        ingestEvents.push({
+          at: nowIso(),
+          step: "ingesting_file",
+          progress: 86,
+          message: `Parser fallback to token-only mode: ${ingestError}`
+        });
+      }
+      let fileTokenMeta = null;
+      try {
+        if (cleanText(body?.contentBase64)) {
+          fileTokenMeta = await storeStudioFileTokenForSession(session.id, body);
         }
+      } catch (error) {
+        ingestEvents.push({
+          at: nowIso(),
+          step: "ingesting_file",
+          progress: 98,
+          message: `File token cache failed: ${cleanText(error?.message, "unknown")}`
+        });
+      }
+      const fallbackSource = {
+        title: cleanText(body?.name, "uploaded-book.bin"),
+        url: "",
+        snippet: "",
+        content: "",
+        parsedBy: "ingest.file-token-only",
+        ingestError
+      };
+      const sourceWithToken = fileTokenMeta
+        ? {
+            ...((source && typeof source === "object") ? source : fallbackSource),
+            fileToken: cleanText(fileTokenMeta?.token),
+            fileTokenExpiresAt: cleanText(fileTokenMeta?.expiresAt),
+            fileSizeBytes: toInt(fileTokenMeta?.size)
+          }
+        : ((source && typeof source === "object") ? source : fallbackSource);
+      writeJson(res, 200, {
+        ok: true,
+        source: sourceWithToken,
+        fileToken: cleanText(fileTokenMeta?.token),
+        fileTokenExpiresAt: cleanText(fileTokenMeta?.expiresAt),
+        fileSizeBytes: toInt(fileTokenMeta?.size),
+        events: ingestEvents
       });
-      writeJson(res, 200, { ok: true, source, events: ingestEvents });
       return true;
     }
 
@@ -6289,6 +8363,7 @@ async function handleStudioApi(req, res, url, session) {
     writeJson(res, 404, { ok: false, error: "Studio API route not found" });
     return true;
   } catch (error) {
+    console.error("[studio] api error:", error);
     writeJson(res, 400, { ok: false, error: error?.message || "Studio API request failed" });
     return true;
   }
@@ -6591,6 +8666,16 @@ async function buildWorkDetailPayload(work, sessionId) {
           knowledgeBlocksPreview: Array.isArray(manifest.knowledge_blocks)
             ? manifest.knowledge_blocks.slice(0, 24)
             : [],
+          knowledgeModel: manifest.knowledge_model && typeof manifest.knowledge_model === "object"
+            ? {
+                title: cleanText(manifest.knowledge_model.title),
+                summary: cleanText(manifest.knowledge_model.summary),
+                systemCount: Array.isArray(manifest.knowledge_model.systems) ? manifest.knowledge_model.systems.length : 0,
+                conceptCount: Array.isArray(manifest.knowledge_model.concepts) ? manifest.knowledge_model.concepts.length : 0,
+                relationCount: Array.isArray(manifest.knowledge_model.relations) ? manifest.knowledge_model.relations.length : 0,
+                docsCount: Array.isArray(manifest.knowledge_model.docs) ? manifest.knowledge_model.docs.length : 0
+              }
+            : null,
           moduleMap: Array.isArray(manifest.module_map) ? manifest.module_map : [],
           regeneration: manifest.regeneration || null
         }
@@ -7535,12 +9620,13 @@ async function parseJsonBody(req, maxBytes = 1024 * 1024) {
   let size = 0;
   return await new Promise((resolve, reject) => {
     req.on("data", (chunk) => {
-      size += chunk.length;
+      const safeChunk = Buffer.isBuffer(chunk) ? Buffer.from(chunk) : Buffer.from(chunk || "");
+      size += safeChunk.length;
       if (size > maxBytes) {
         reject(new Error("Request body too large"));
         return;
       }
-      chunks.push(chunk);
+      chunks.push(safeChunk);
     });
     req.on("error", reject);
     req.on("end", () => {
@@ -8527,8 +10613,9 @@ server.listen(port, () => {
   console.log(`[studio] skills loaded: ${playableContentEngine.listSkills().length}`);
   console.log(`[studio] book pipeline image provider: ${BOOK_PIPELINE_IMAGE_PROVIDER} (nano script: ${READO_NANO_BANANA_SCRIPT ? "set" : "unset"})`);
   console.log(`[studio] book pipeline audio provider: ${BOOK_PIPELINE_AUDIO_PROVIDER} (elevenlabs: ${ELEVENLABS_API_KEY ? "set" : "unset"})`);
-  console.log(`[studio] book pipeline BOOF: ${BOOK_PIPELINE_USE_BOOF ? "on" : "off"} (required: ${BOOK_PIPELINE_REQUIRE_BOOF ? "yes" : "no"}, script: ${BOOF_SCRIPT_PATH ? "set" : "unset"}, fallback queue depth: ${BOOK_PIPELINE_BOOF_FALLBACK_QUEUE_DEPTH})`);
-  console.log(`[studio] book pipeline StudyAnalysis skill: ${BOOK_PIPELINE_USE_KNOWLEDGE_ABSORBER ? "on" : "off"} (knowledge-absorber script: ${KNOWLEDGE_ABSORBER_SCRIPT_PATH ? "set" : "unset"})`);
+  console.log(`[studio] book pipeline book-reader: ${BOOK_PIPELINE_USE_BOOK_READER ? "on" : "off"} (script: ${BOOK_READER_SCRIPT_PATH ? "set" : "unset"}, chunk chars: ${BOOK_PIPELINE_BOOK_READER_CHUNK_CHARS}, max chunks: ${BOOK_PIPELINE_BOOK_READER_MAX_CHUNKS})`);
+  console.log("[studio] book pipeline BOOF: deprecated in source-ingest main chain");
+  console.log(`[studio] book pipeline StudyAnalysis skill: deprecated (main chain uses book-reader only)`);
   console.log(`[studio] book pipeline structured parse first: ${BOOK_PIPELINE_STRUCTURED_PARSE_FIRST ? "on" : "off"} (min sections: ${BOOK_PIPELINE_STRUCTURED_MIN_SECTIONS})`);
 });
 

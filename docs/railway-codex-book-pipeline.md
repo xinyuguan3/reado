@@ -31,7 +31,9 @@
 
 脚本：
 - [`install-railway-skills.sh`](/Users/guanxinyu/Documents/GitHub/reado/scripts/studio-tools/install-railway-skills.sh)
+- [`install-railway-deps.sh`](/Users/guanxinyu/Documents/GitHub/reado/scripts/studio-tools/install-railway-deps.sh)
 - `npm run skills:railway`
+- `npm run deps:railway`
 
 说明：
 - `banana pro` 对应 skill 已找到：`bex-nano-banana-pro`。
@@ -184,10 +186,11 @@ density_score = 0.35*concept_density
 
 ## 12. 你当前仓库可直接执行的动作
 
-1. 安装技能：`npm run skills:railway`
-2. 在 Railway worker 启动命令前增加技能安装步骤。
-3. 将本工作流接入现有 `studioJobs` 状态机（`queued -> running -> qa -> done/failed`）。
-4. 将最终产物写入 `book_experiences/<book-id>/<module-id>/`，自动出现在个人书库，可选公开。
+1. 安装运行依赖：`npm run deps:railway`
+2. 安装技能（会自动覆盖本地定制版 `book-reader`）：`npm run skills:railway`
+3. Railway 构建已可直接读取仓库根目录 `nixpacks.toml` 自动执行依赖安装。
+4. 将本工作流接入现有 `studioJobs` 状态机（`queued -> running -> qa -> done/failed`）。
+5. 将最终产物写入 `book_experiences/<book-id>/<module-id>/`，自动出现在个人书库，可选公开。
 
 ## 13. 新增 API（已落地）
 

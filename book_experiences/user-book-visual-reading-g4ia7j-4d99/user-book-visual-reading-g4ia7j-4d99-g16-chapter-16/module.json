@@ -1,0 +1,40 @@
+{
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T09:30:51.833Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "雨林里的消亡：一种语言和生活方式在巴布亚新几内亚的终结",
+      "author": ""
+    },
+    "knowledge_block": {
+      "id": "kb-42",
+      "gate_index": 16,
+      "title": "第十六章语言消亡时",
+      "summary": "第十六章语言消亡时，实际消亡的是什么？ 213 [PAGE 223 IMAGE 1 CONTENT (OCR)]: 有种植食物的园子。没错，像鲁尼和拉雅这样的老人了解的传统故事的 失落，会让迦普恩人在其他村民的虎视面前更加脆弱，如果那些地 方的村民声称传统上属于迦普恩的土地应该属于他们。但是，关于土地 的争议丝毫不会让村民们变得不像，或不再是迦普恩人。",
+      "words": 1028,
+      "keywords": [
+        "page",
+        "image",
+        "content",
+        "ocr",
+        "第十六章语言消亡时",
+        "实际消亡的是什么"
+      ],
+      "density": {
+        "score": 0.6605,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0.4202,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0.0272
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "anthro",
+      "theme_label": "Field Narrative",
+      "section_count": 5,
+      "generated_with": "template_runtime"
+    }
+  }
+}

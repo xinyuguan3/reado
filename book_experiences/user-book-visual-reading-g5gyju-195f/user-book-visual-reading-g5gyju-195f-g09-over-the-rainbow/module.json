@@ -1,0 +1,40 @@
+{
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T09:57:49.686Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "雨林里的消亡（可视化阅读测试）",
+      "author": "Unknown"
+    },
+    "knowledge_block": {
+      "id": "kb-23",
+      "gate_index": 9,
+      "title": "第八章 Over the Rainbow 飞越彩虹 一天早晨，一夜暴…",
+      "summary": "第八章 Over the Rainbow 飞越彩虹 一天早晨，一夜暴雨过后，一道宽阔绚 丽的彩虹横跨天际。在我去村子里的一个小水 坑洗衣服的路上，我抬头看到了它，我发现我 不知道彩虹用泰雅博语怎么说，于是就问了我 看到的第一个人一拉法尔，村里负责祷告的 人，我知道他的泰雅博语很流利一—“彩虹” 这个词是什么。 “Renbo。”他回答说，没有丝毫犹豫。",
+      "words": 2056,
+      "keywords": [
+        "彩虹",
+        "page",
+        "image",
+        "content",
+        "ocr",
+        "mamar"
+      ],
+      "density": {
+        "score": 0.6634,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0.4319,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0.0272
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "scholar",
+      "theme_label": "Scholar Atlas",
+      "section_count": 5,
+      "generated_with": "template_runtime"
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T10:08:28.990Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "雨林里的消亡（可视化阅读测试-v2）",
+      "author": "Unknown"
+    },
+    "knowledge_block": {
+      "id": "kb-40",
+      "gate_index": 21,
+      "title": "第十五章地狱走一遭",
+      "summary": "第十五章地狱走一遭 207 “然后她跟我说，‘我们去地狱看看吧”。” 这个白人女人后来被证实是卡克的侄女雅克拉，几年前被一只大 塔兰图拉毒蛛（在巫术中毒液可以致命）咬了之后死的。她带卡克去 地狱绕了一圈。首先，他们回了他之前见过的那个房子。就在这个时 候，我进入了画面里。 “我俩进了那个房子，”卡克说，“房子里面有堆成山的鞋子。其 他什么都没有，就是很多很多鞋子。整个房子里都是鞋子。” “什么样的鞋子？”我问道。",
+      "words": 788,
+      "keywords": [
+        "卡克说",
+        "她说",
+        "第十五章地狱走一遭",
+        "我问道",
+        "我说",
+        "她跟我说"
+      ],
+      "density": {
+        "score": 0.6109,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0.2437,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "scholar",
+      "theme_label": "Scholar Atlas",
+      "section_count": 5,
+      "generated_with": "template_runtime"
+    }
+  }
+}

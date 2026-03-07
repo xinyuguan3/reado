@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>第十章 MattersoftheLiver 肝脏问题 在巴布亚新几内… · 雨林里的消亡：一种语言和生活方式在巴布亚新几内亚的终结</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #16120f;
+      --bg2: #2a1f18;
+      --accent: #d97706;
+      --accent2: #2dd4bf;
+      --text: #f5f1ea;
+      --soft: #c7b8a2;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+      background:
+        radial-gradient(1200px 540px at 85% -8%, color-mix(in srgb, var(--accent2) 24%, transparent), transparent 70%),
+        radial-gradient(980px 460px at -10% 14%, color-mix(in srgb, var(--accent) 24%, transparent), transparent 74%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+      color: var(--text);
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .05;
+      background-image: radial-gradient(circle at 1px 1px, #fff 1px, transparent 0);
+      background-size: 3px 3px;
+      z-index: 0;
+    }
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      z-index: 100;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+    .page { position: relative; z-index: 1; width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 20px 0 48px; }
+    .hero {
+      min-height: 74vh;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 22px;
+      background: linear-gradient(160deg, color-mix(in srgb, var(--bg2) 86%, transparent), color-mix(in srgb, var(--bg) 88%, transparent));
+      padding: 40px 34px;
+      display: grid;
+      align-content: center;
+      gap: 16px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.34);
+    }
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .hero h1 {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(32px, 5.4vw, 68px);
+      line-height: 1.16;
+      letter-spacing: .04em;
+      max-width: 15em;
+      text-wrap: balance;
+    }
+    .hero p {
+      max-width: 66ch;
+      line-height: 1.95;
+      color: color-mix(in srgb, var(--text) 85%, var(--soft));
+      font-size: 16px;
+    }
+    .chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip {
+      border: 1px solid color-mix(in srgb, var(--accent2) 44%, transparent);
+      color: color-mix(in srgb, var(--accent2) 88%, #fff);
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 12px;
+      background: rgba(255,255,255,.03);
+    }
+    .section { margin-top: 18px; border: 1px solid rgba(255,255,255,.13); border-radius: 18px; padding: 22px; background: rgba(2,6,18,.46); }
+    .section h2 {
+      margin-bottom: 12px;
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(22px, 2.8vw, 34px);
+      color: color-mix(in srgb, var(--accent) 86%, #fff);
+      letter-spacing: .03em;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1.1fr 1fr; gap: 14px; }
+    .concept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+    .concept-card {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      background: rgba(255,255,255,.03);
+      padding: 14px;
+      min-height: 128px;
+    }
+    .concept-token { font-size: 14px; letter-spacing: .14em; color: var(--accent2); text-transform: uppercase; margin-bottom: 7px; font-weight: 700; }
+    .concept-note { font-size: 14px; color: color-mix(in srgb, var(--text) 88%, var(--soft)); line-height: 1.8; }
+    .atlas {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      min-height: 440px;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+    .atlas svg { width: 100%; max-width: 440px; height: auto; }
+    .timeline { display: grid; gap: 10px; }
+    .timeline-item {
+      border-left: 2px solid color-mix(in srgb, var(--accent) 66%, transparent);
+      padding: 10px 14px;
+      background: rgba(255,255,255,.02);
+      border-radius: 0 10px 10px 0;
+    }
+    .timeline-no { font-size: 11px; letter-spacing: .22em; color: var(--accent2); display: block; margin-bottom: 6px; }
+    .timeline-item h3 { font-size: 19px; font-family: "Noto Serif SC", serif; line-height: 1.45; margin-bottom: 7px; }
+    .timeline-item p { font-size: 14px; line-height: 1.9; color: color-mix(in srgb, var(--text) 84%, var(--soft)); }
+    .quote-wrap { display: grid; gap: 10px; }
+    .quote {
+      border-left: 2px solid color-mix(in srgb, var(--accent2) 80%, transparent);
+      padding: 10px 12px;
+      background: rgba(255,255,255,.02);
+      color: color-mix(in srgb, var(--text) 92%, #fff);
+      font-family: "Noto Serif SC", serif;
+      line-height: 1.9;
+    }
+    .takeaways { margin-top: 10px; list-style: none; display: grid; gap: 8px; }
+    .takeaways li {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      padding: 10px;
+      background: rgba(255,255,255,.02);
+      align-items: start;
+      line-height: 1.8;
+    }
+    .takeaways span {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: color-mix(in srgb, var(--accent2) 26%, transparent);
+      color: var(--accent2);
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+    .nav { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,.26);
+      border-radius: 999px;
+      padding: 8px 13px;
+      font-size: 12px;
+      color: var(--text);
+      background: rgba(255,255,255,.04);
+    }
+    .btn:hover { border-color: var(--accent2); color: var(--accent2); }
+    .dot-nav {
+      position: fixed;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: grid;
+      gap: 10px;
+      z-index: 50;
+    }
+    .dot-nav button {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.35);
+      background: transparent;
+      cursor: pointer;
+      transition: all .24s ease;
+    }
+    .dot-nav button.active { transform: scale(1.34); border-color: var(--accent); background: var(--accent); }
+    .reveal { opacity: 0; transform: translateY(16px); transition: opacity .55s ease, transform .55s ease; }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+    @media (max-width: 940px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .dot-nav { display: none; }
+      .hero { min-height: auto; padding: 30px 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+  <nav class="dot-nav" id="dotNav">
+    <button data-target="hero" class="active" aria-label="Hero"></button>
+    <button data-target="atlas" aria-label="Atlas"></button>
+    <button data-target="concepts" aria-label="Concepts"></button>
+    <button data-target="reading" aria-label="Reading"></button>
+    <button data-target="takeaways" aria-label="Takeaways"></button>
+  </nav>
+  <main class="page">
+    <section class="hero reveal in" id="hero">
+      <p class="eyebrow">Field Narrative · Gate 11</p>
+      <h1>第十章 MattersoftheLiver 肝脏问题 在巴布亚新几内…</h1>
+      <p>第十章 MattersoftheLiver 肝脏问题 在巴布亚新几内亚人遭遇白人以前，他 们是没有文字的。他们的历史和传统（及他们 的语言）都是口述的。这些历史和传统体现在 艺术和仪式里，由老人们记着，通过故事和祭 祀活动代代相传。与识字伴随而来的是殖民主 义，尤其是传教士给够多的人说的当地语言发 明的正字法——字母表、书写方式一—从而使 传教士从零开始学当地语言的艰苦努力正当 化。他们学习这些语言是为了翻译《圣经》， 促成当地人改信基督教。此后，殖民政府在全 国各地广设学堂，学生们被教会了如何用英语 读书写字，这是巴布亚新几内亚的殖民宗主国 澳大利亚的国语。 多数迦普恩村民从来没识过字，他们生活 在传教士或殖民政府的关心焦点千里之</p>
+      <div class="chip-row">
+        <span class="chip">雨林里的消亡：一种语言和生活方式在巴布亚新几内亚的终结</span>
+        
+        <span class="chip">Module 11/18</span>
+        <span class="tag">page</span><span class="tag">image</span><span class="tag">content</span><span class="tag">ocr</span><span class="tag">雨林里的消亡</span><span class="tag">第十章</span>
+      </div>
+    </section>
+
+    <section class="section grid-2 reveal" id="atlas">
+      <article>
+        <h2>知识结构图谱</h2>
+        <p style="color:var(--soft);line-height:1.9;margin-bottom:10px;">围绕本关卡核心概念构建关系图。阅读时先抓主轴，再理解每个概念如何驱动判断与行动。</p>
+        <div class="quote-wrap"><blockquote class="quote reveal">“多数迦普恩村民从来没识过字，他们生活 在传教士或殖民政府的关心焦点千里之外的地 方。拉雅等少数几个老人1950年代在种植园 123 [PAGE 133 IMAGE 1 CONTENT (OCR)]: 当劳工时学过读书写字。从1970年代末到1990年代中期的十五年 里，一个政府设立的很小的学校确实在旺安村存在过，距离迦普恩有 两个小时的路程一一一个小时步行穿过沼泽地，再加一个小时划木筏 渡过红树林湖。在1980年代中期的鼎盛时期，也就是”</blockquote><blockquote class="quote reveal">“与大多数万人迷一样，萨拉冈算不上传统意义上的美男子。他长 了一个宽大的鼻子，还有点往上翘，一双小眼晴对他那张木头似的大 脸来说显得过于靠近。那双眼睛以及他看人时的锐利锋芒给了他恐怖 的威严之感。但他有一张又宽又性感的嘴，笑起来的时候，牙齿会一 路闪亮到白齿。他这么笑的时候，脸就会从嘴唇边往上起皱，眼睛会 皱成两颗闪亮的顽皮的扣子。顽皮与威严的结合赋予了萨拉岗强烈的 情欲气质。他会随性又自信地走动，那个神气十足的样子很明显，他 随时随地都”</blockquote><blockquote class="quote reveal">“第十章 MattersoftheLiver 肝脏问题 在巴布亚新几内亚人遭遇白人以前，他 们是没有文字的。他们的历史和传统（及他们 的语言）都是口述的。这些历史和传统体现在 艺术和仪式里，由老人们记着，通过故事和祭 祀活动代代相传。与识字伴随而来的是殖民主 义，尤其是传教士给够多的人说的当地语言发 明的正字法——字母表、书写方式一—从而使 传教士从零开始学当地语言的艰苦努力正当 化。他们学习这些语言是为了翻译《圣经》， 促成当地人改信基”</blockquote></div>
+      </article>
+      <article class="atlas">
+        <svg viewBox="0 0 440 440" aria-label="concept atlas">
+          <defs>
+            <radialGradient id="g" cx="50%" cy="50%" r="56%">
+              <stop offset="0%" stop-color="#d97706" stop-opacity=".24"></stop>
+              <stop offset="100%" stop-color="#d97706" stop-opacity="0"></stop>
+            </radialGradient>
+          </defs>
+          <circle cx="220" cy="220" r="190" fill="none" stroke="rgba(255,255,255,.08)" stroke-dasharray="5 6"></circle>
+          <circle cx="220" cy="220" r="84" fill="url(#g)"></circle>
+          <circle cx="220" cy="220" r="10" fill="#d97706"></circle>
+          <text x="220" y="252" text-anchor="middle" fill="#f5f1ea" font-size="13">第十章 MattersoftheLiver 肝脏</text>
+          <g><line x1="220" y1="220" x2="370" y2="220" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="370" cy="220" r="8" fill="#2dd4bf"/><text x="382" y="224" fill="#f5f1ea" font-size="12">page</text></g><g><line x1="220" y1="220" x2="266" y2="363" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="266" cy="363" r="8" fill="#2dd4bf"/><text x="278" y="367" fill="#f5f1ea" font-size="12">image</text></g><g><line x1="220" y1="220" x2="99" y2="308" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="99" cy="308" r="8" fill="#2dd4bf"/><text x="111" y="312" fill="#f5f1ea" font-size="12">content</text></g><g><line x1="220" y1="220" x2="99" y2="132" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="99" cy="132" r="8" fill="#2dd4bf"/><text x="111" y="136" fill="#f5f1ea" font-size="12">ocr</text></g><g><line x1="220" y1="220" x2="266" y2="77" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="266" cy="77" r="8" fill="#2dd4bf"/><text x="278" y="81" fill="#f5f1ea" font-size="12">雨林里的消亡</text></g>
+        </svg>
+      </article>
+    </section>
+
+    <section class="section reveal" id="concepts">
+      <h2>核心概念与解释</h2>
+      <div class="concept-grid">
+      <article class="concept-card reveal">
+        <p class="concept-token">page</p>
+        <p class="concept-note">多数迦普恩村民从来没识过字，他们生活 在传教士或殖民政府的关心焦点千里之外的地 方。拉雅等少数几个老人1950年代在种植园 123 [PAGE 133 IMAGE 1 CONTENT (OCR)]: 当劳工时学过读书写字。从1970年代末到1990年代中期的十五年 里，一个政府设立的很小的学校确实在旺安村存在过，距离迦普恩有 两个小时的路程一一一个小时步行穿</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">image</p>
+        <p class="concept-note">多数迦普恩村民从来没识过字，他们生活 在传教士或殖民政府的关心焦点千里之外的地 方。拉雅等少数几个老人1950年代在种植园 123 [PAGE 133 IMAGE 1 CONTENT (OCR)]: 当劳工时学过读书写字。从1970年代末到1990年代中期的十五年 里，一个政府设立的很小的学校确实在旺安村存在过，距离迦普恩有 两个小时的路程一一一个小时步行穿</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">content</p>
+        <p class="concept-note">多数迦普恩村民从来没识过字，他们生活 在传教士或殖民政府的关心焦点千里之外的地 方。拉雅等少数几个老人1950年代在种植园 123 [PAGE 133 IMAGE 1 CONTENT (OCR)]: 当劳工时学过读书写字。从1970年代末到1990年代中期的十五年 里，一个政府设立的很小的学校确实在旺安村存在过，距离迦普恩有 两个小时的路程一一一个小时步行穿</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">ocr</p>
+        <p class="concept-note">多数迦普恩村民从来没识过字，他们生活 在传教士或殖民政府的关心焦点千里之外的地 方。拉雅等少数几个老人1950年代在种植园 123 [PAGE 133 IMAGE 1 CONTENT (OCR)]: 当劳工时学过读书写字。从1970年代末到1990年代中期的十五年 里，一个政府设立的很小的学校确实在旺安村存在过，距离迦普恩有 两个小时的路程一一一个小时步行穿</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">雨林里的消亡</p>
+        <p class="concept-note">一些更勤奋的孩子在学校里学到的第二件事就是基础的文字技 能。他们学会了读书写字。在学校里被命令朗读课文时，他们从来没 124 雨林里的消亡 [PAGE 134 IMAGE 1 CONTENT (OCR)]: 有学会课文的意思是什么，因为这些课文都是用英语书写的，而且老 师只是要求学生跟着他们重复朗诵，却并不要求他们理解任何张口说 出的词是什么意思。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">第十章</p>
+        <p class="concept-note">第十章 MattersoftheLiver 肝脏问题 在巴布亚新几内亚人遭遇白人以前，他 们是没有文字的。他们的历史和传统（及他们 的语言）都是口述的。这些历史和传统体现在 艺术和仪式里，由老人们记着，通过故事和祭 祀活动代代相传。与识字伴随而来的是殖民主 义，尤其是传教士给够多的人说的当地语言发 明的正字法——字母表、书写方式一—从而使 传教士从零开始学当</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="reading">
+      <h2>渐进式阅读路径</h2>
+      <div class="timeline">
+      <article class="timeline-item reveal">
+        <span class="timeline-no">01</span>
+        <h3>第十章 MattersoftheLiver 肝脏问题 在巴布亚新几内亚人遭遇白人以前，他 们是没有文字的。他们的历史和传统（及他们 的语言）都是口述的。这些</h3>
+        <p>第十章 MattersoftheLiver 肝脏问题 在巴布亚新几内亚人遭遇白人以前，他 们是没有文字的。他们的历史和传统（及他们 的语言）都是口述的。这些历史和传统体现在 艺术和仪式里，由老人们记着，通过故事和祭 祀活动代代相传。与识字伴随而来的是殖民主 义，尤其是传教士给够多的人说的当地语言发 明的正字法——字母表、书写方式一—从而使 传教士从零开始学当地语言的艰苦努力正当 化。他们学习这些语言是为了翻译《圣经》， 促成当地人改信基督教。此后，殖民政府在全 国各地广设学堂，学生们被教会了如何用英语 读书写字，这是巴布亚新几内亚的殖民宗主国 澳大利亚的国语。 多数迦普恩村民从来没识过字，他们生活 在传教士或殖民政府的关心焦点千里之外的地 方。拉雅等少数几个老人1950年代在种植园 123 [PAGE 133 IMAGE 1 CONTENT (OCR)]: 当劳工时学过读书写字。从1970年代末到1990年代中期的十五年 里，一个政府设立的很小的学校确实在旺安村存在过，距离迦普恩有 两个小时的路程一一一个小时步行穿过沼泽地，再加一个小时划木筏 渡过红树林湖。在1980年代中期的鼎盛时期，也就是我第一次生 活在迦普恩的时候，这个学校有三名教师，从一年级教到六年级。我 在这个学校里待了几周，观察教学情况，走的时候倍感沮丧。这些老 师—都是塞皮克河沿岸村子的男人一几乎不会说作为教学语言的 英语，而他们使用的教学法完全就是翻来覆去的死记硬背。他们把句 子（往往不合语法，意思也是错的）写在教室前面的小黑板上，教室 是用柱子和茅草搭起来的。他们会大声念出写的板书，命令那些心不 在焉地坐在树皮椅子上的学生重复念一遍他们刚讲过的内容。 迦普恩来的孩子只会偶尔去学校，因为他们看不出上学有什么意 义。我也认同他们一很显然他们在雨林里玩乐嬉戏都能比无聊地坐 在拥挤黑暗的教室里学到更多有用的知识。在教室里，品行不端的老 师们会冲他们吼，会拿一根硬藤条以“不听话”为由任意鞭打他们。 还有，这些老师会因为一些和学校无关的事情与诸多村民产生冲突而 频频罢工。在1990年代的大部分时候，他们都没有教书，然后两个 老师走了。剩下一个因为娶了当地女人而留在旺安的老师自2009年 起就一天都没教过书。 就我所能判断的来看，在旺安社区学校还存在的那些年里上了 这所学校的孩子们只学会了两件事情。第一件就是对村子里的生活不 满。他们在教室里争相传阅澳大利亚人编写的教材，残破的书本里是 高速公路和城市的图画及照片一这些小学生对从中窥见的富足生活 甚至无从想象，但他们相信一定有什么地方就是这样的。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">02</span>
+        <h3>一些更勤奋的孩子在学校里学到的第二件事就是基础的文字技 能。他们学会了读书写字。在学校里被命令朗读课文时，他们从来没 124 雨林里的消亡 [PAGE 13</h3>
+        <p>一些更勤奋的孩子在学校里学到的第二件事就是基础的文字技 能。他们学会了读书写字。在学校里被命令朗读课文时，他们从来没 124 雨林里的消亡 [PAGE 134 IMAGE 1 CONTENT (OCR)]: 有学会课文的意思是什么，因为这些课文都是用英语书写的，而且老 师只是要求学生跟着他们重复朗诵，却并不要求他们理解任何张口说 出的词是什么意思。 尽管从来没有受到正式的指导，一些年轻学生还是学会了用他 们的读写技能来读写皮金语。村子里没有太多东西好读，除了一本叫 《NiuLaip》（新生活）的天主教小册子，这是一个曾经来访过的神父带 来分发给大部分村民的。但获得了读写技能后，一些村民开始给其他 人写小条要东西。有几个还会像拉雅那样零星记下发生过的重大事件， 尤其是标注上那些参与大型殴斗的村民的名字（记下这些事情可以让 他们更容易地记清楚之后谁要用猪来赔偿给谁）。在1990年代的某个 时候，一些聪敏的年轻人还给他们的读写技能发明了新的创造性用途： 他们开始写情书了。这些信件开创了年轻人追求对方的全新方式。 但也正是因为情书里的字是写下来的，当搞混或出状况的时候， 就很难再收回或拒绝。 在红树林湖中央，划船回家的路上，萨拉冈突然意识到，他给 女朋友贝丝的那封情书是错的。他停了下来，伸手去短裤的后面口袋 里核实。果不其然，他取出了写给贝丝的那封信。这意味着他送给贝 丝的那封情书是写给另一个女朋友帕米拉的。 Kaikaikano 萨拉冈把写给贝丝的情书放回了口袋，寻思着：“我该怎么摆 平这个事儿呢？”他再次拿起桨，开始轻声唱起《梅里·莫罗贝》 （《莫罗贝的女人》），一个叫斯瓦塔斯的流行组合唱的一首皮金语歌 曲。他复盘了早上的事情，怎么都想不通怎么这么不小心，情书还能 送错人。“Yubelhatlongmi/nayubinkolimmiclown”（“你生了我的 气/你叫我小丑”），他唱着，既困惑又自怜，冲自己苦笑。在纯净的 第十章肝脏问题 125 [PAGE 135 IMAGE 1 CONTENT (OCR)]: 午后日光下，他的独木舟滑过红树林湖的平静水面。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">03</span>
+        <h3>萨拉冈究竟要怎么摆平这个事情呢？他得参考在不同女友间周旋 的经验。当然，他在这方面经验丰富。</h3>
+        <p>萨拉冈究竟要怎么摆平这个事情呢？他得参考在不同女友间周旋 的经验。当然，他在这方面经验丰富。 萨拉冈是村子里的风流汉。他是一个大众情人，据说十九岁的时 候就已经是两个孩子的父亲了，尽管他自已拒不承认。迦普恩的好几 个年轻姑娘把萨拉冈当成男朋友。他随每一个姑娘自顾自喜欢，每次 私下见面时，都让对方觉得自己是独一无二的那一个，尽管在公众场 合他会傲慢地无视她们。 与大多数万人迷一样，萨拉冈算不上传统意义上的美男子。他长 了一个宽大的鼻子，还有点往上翘，一双小眼晴对他那张木头似的大 脸来说显得过于靠近。那双眼睛以及他看人时的锐利锋芒给了他恐怖 的威严之感。但他有一张又宽又性感的嘴，笑起来的时候，牙齿会一 路闪亮到白齿。他这么笑的时候，脸就会从嘴唇边往上起皱，眼睛会 皱成两颗闪亮的顽皮的扣子。顽皮与威严的结合赋予了萨拉岗强烈的 情欲气质。他会随性又自信地走动，那个神气十足的样子很明显，他 随时随地都可以跟人上床。但他是一个以自我为中心又百般挑剔的 人，因此很显然，他会有各种各样稀奇古怪的想法和规矩，使得和他 做爱的经验既奇怪又费劲，但同时也让人如痴如醉。 萨拉冈是村里少数几个读完旺安社区小学的人之一。之后他人读 塞皮克河上一个叫安戈拉的小镇里的一所高中。他上高中那一年，老 师们大部分时间都在罢工，因为包括萨拉冈在内的大部分学生一直没 有交学费。因此，萨拉冈在安戈拉的时间没有用来上学，而是都花在 了泡妞上。 第一个学期过去没几个月，萨拉冈就从安戈拉走人了，因为他 搞大了一个年轻姑娘的肚子，姑娘父母要他娶她。他逃回了雨林里的 家，指望着女孩的父母不会在迦普恩找到他。回到村子里，他还继续 126 雨林里的消亡 [PAGE 136 IMAGE 1 CONTENT (OCR)]: 跟安戈拉的其中一个女友（这个人就是贝丝）鱼雁往还，中间人是在 塞皮克河用划上下运输槟榔的朋友。这些年轻人会来回传递贝丝 和萨拉岗写给对方的信，把他的信捎给在安戈拉的她，把她的信送 给萨拉冈在沿岸瓦当村的亲戚。这些亲戚最后会把信件带给在迦普 恩的萨拉冈。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">04</span>
+        <h3>然而，即便萨拉风的这把安戈拉爱火烧得如火如茶，他很快又找 到了新欢—帕米拉—在邻村旺安那里。</h3>
+        <p>然而，即便萨拉风的这把安戈拉爱火烧得如火如茶，他很快又找 到了新欢—帕米拉—在邻村旺安那里。 命中注定阴差阳错的那一天，萨拉冈去瓦当参加村里新建教堂的 开幕式，从远方的玛利恩堡传教站来的神父答应要来主持祝圣仪式。 贝丝在信中告诉萨拉冈她会从安戈拉到瓦当和他见面。他知道帕米拉 也会去，参加教堂祝圣仪式只是一个借口，其实是准备和男友享受鱼 水之欢。萨拉冈知道，如果他在公开场合跟任何一个女友说话，都有 被另一个发现的风险，结果就会很尴尬。于是，他给两个人去了信， 建议之后私下约会一一用那个有点离经叛道的短语来说就是“爱的邂 逅”一此处应当有巴里·怀特的歌声。 萨拉冈划了三个小时的木筏穿过红树林湖，一大早来瓦当参加 祝圣仪式不久，他就突然撞见了贝丝。他无动于衷地从她身边经过， 鬼鬼票票地把他以为是写给她的信递给了她。这一任务完成后，他意 识到跟贝丝见面让他觉得紧张，不想多做停留，万一她坚持要跟他厮 缠，没准这个时候他的另一个女友帕米拉会突然出现。 于是他就回到木筏上，划回了家。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">05</span>
+        <h3>回到迦普恩的家时，他认真思考了一番他的处境。他想到了有几 种谎言也许能骗过贝丝。第一个想到的就是告诉她，这封给她的情书 1巴里·怀特（BarryWhite，</h3>
+        <p>回到迦普恩的家时，他认真思考了一番他的处境。他想到了有几 种谎言也许能骗过贝丝。第一个想到的就是告诉她，这封给她的情书 1巴里·怀特（BarryWhite，1944—2003）.已故美国灵歌歌手。一译者注</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="takeaways">
+      <h2>本关关键收获</h2>
+      <ul class="takeaways"><li><span>1</span>第十章 MattersoftheLiver 肝脏问题 在巴布亚新几内亚人遭遇白人以前，他 们是没有文字的。他们的历史和传统（及他们 的语言）都是口述的。这些</li><li><span>2</span>一些更勤奋的孩子在学校里学到的第二件事就是基础的文字技 能。他们学会了读书写字。在学校里被命令朗读课文时，他们从来没 124 雨林里的消亡 [PAGE 13</li><li><span>3</span>萨拉冈究竟要怎么摆平这个事情呢？他得参考在不同女友间周旋 的经验。当然，他在这方面经验丰富。</li><li><span>4</span>然而，即便萨拉风的这把安戈拉爱火烧得如火如茶，他很快又找 到了新欢—帕米拉—在邻村旺安那里。</li></ul>
+      <nav class="nav">
+        <a class="btn" href="/experiences/user-book-visual-reading-g4ia7j-4d99-g10-chapter-10.html">上一关</a>
+        <a class="btn" href="/experiences/user-book-visual-reading-g4ia7j-4d99-g12-chapter-12.html">下一关</a>
+      </nav>
+    </section>
+  </main>
+  <script>
+    (() => {
+      const progress = document.getElementById("progress");
+      const dots = Array.from(document.querySelectorAll("#dotNav button[data-target]"));
+      const sections = dots
+        .map((dot) => document.getElementById(dot.getAttribute("data-target")))
+        .filter(Boolean);
+      const reveals = Array.from(document.querySelectorAll(".reveal"));
+      const onScroll = () => {
+        const h = document.documentElement;
+        const total = Math.max(1, h.scrollHeight - window.innerHeight);
+        const pct = Math.max(0, Math.min(100, (window.scrollY / total) * 100));
+        if (progress) progress.style.width = pct + "%";
+      };
+      const io = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) entry.target.classList.add("in");
+        }
+      }, { threshold: .14 });
+      reveals.forEach((el) => io.observe(el));
+      const secIo = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const id = entry.target.id;
+          dots.forEach((dot) => dot.classList.toggle("active", dot.getAttribute("data-target") === id));
+        });
+      }, { threshold: .4 });
+      sections.forEach((s) => secIo.observe(s));
+      dots.forEach((dot) => {
+        dot.addEventListener("click", () => {
+          const target = document.getElementById(dot.getAttribute("data-target"));
+          if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+      window.addEventListener("scroll", onScroll, { passive: true });
+      onScroll();
+    })();
+  </script>
+</body>
+</html>

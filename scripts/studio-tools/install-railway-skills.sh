@@ -1,9 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+DEPS_INSTALLER="$ROOT_DIR/scripts/studio-tools/install-railway-deps.sh"
+LOCAL_BOOK_READER_DIR="$ROOT_DIR/studio_skills/book-reader"
+
 CODEX_HOME_DIR="${CODEX_HOME:-$HOME/.codex}"
 INSTALLER="$CODEX_HOME_DIR/skills/.system/skill-installer/scripts/install-skill-from-github.py"
 DEST_DIR="$CODEX_HOME_DIR/skills"
+
+if [[ -x "$DEPS_INSTALLER" ]]; then
+  echo "installing runtime dependencies"
+  "$DEPS_INSTALLER"
+fi
 
 if [[ ! -f "$INSTALLER" ]]; then
   echo "skill installer not found: $INSTALLER" >&2
@@ -32,5 +41,16 @@ for path in "${SKILL_PATHS[@]}"; do
   echo "installing skill: $name"
   python3 "$INSTALLER" --repo openclaw/skills --path "$path" --method git
 done
+
+if [[ -d "$LOCAL_BOOK_READER_DIR" ]]; then
+  target="$DEST_DIR/book-reader"
+  mkdir -p "$target"
+  cp "$LOCAL_BOOK_READER_DIR/SKILL.md" "$target/SKILL.md"
+  cp "$LOCAL_BOOK_READER_DIR/book-reader.sh" "$target/book-reader.sh"
+  cp "$LOCAL_BOOK_READER_DIR/book-to-chunks.py" "$target/book-to-chunks.py"
+  cp "$LOCAL_BOOK_READER_DIR/skill.json" "$target/skill.json"
+  chmod +x "$target/book-reader.sh" "$target/book-to-chunks.py"
+  echo "overrode book-reader with local chunking edition"
+fi
 
 echo "done. restart codex to load new skills."

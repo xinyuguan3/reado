@@ -1,0 +1,40 @@
+{
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T09:57:49.686Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "雨林里的消亡（可视化阅读测试）",
+      "author": "Unknown"
+    },
+    "knowledge_block": {
+      "id": "kb-28",
+      "gate_index": 12,
+      "title": "第十一章",
+      "summary": "第十一章 YoungPeople'sTayap 年轻人的泰雅博语 做了那么多年人类学田野工作后，我得出 了一个结论，成为一个成功人类学家的要诀就 是坚持逗留到让人生厌。因为人类学的整个目 的就是试图不光理解人们说了什么，还要理解 人们实际上做了什么（要搞清楚这两项活动往 往是不同甚至矛盾的），一个人类学家很少只 是采访一个人或递出一张问卷，然后就走人。 相反，我们会待上一会儿。为了做好这项工 作，人类学家得具备一项天赋一或发展出一 项技能一不招人眼目地逗留。",
+      "words": 1443,
+      "keywords": [
+        "page",
+        "image",
+        "content",
+        "ocr",
+        "雨林里的消亡",
+        "第十一章"
+      ],
+      "density": {
+        "score": 0.637,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0.3326,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0.0194
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "anthro",
+      "theme_label": "Field Narrative",
+      "section_count": 5,
+      "generated_with": "template_runtime"
+    }
+  }
+}

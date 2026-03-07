@@ -1,0 +1,40 @@
+{
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T10:08:28.950Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "雨林里的消亡（可视化阅读测试-v2）",
+      "author": "Unknown"
+    },
+    "knowledge_block": {
+      "id": "kb-10",
+      "gate_index": 8,
+      "title": "第三章拜师学艺",
+      "summary": "第三章拜师学艺 43 这门语言对应的音素系统。每一种语言都会有限并特别地利用人类所 能发出的所有声音。世界上有的语言在这方面很慷慨（有一种叫！X60 的非洲语言有一百一十二个对比音或音位），有的语言则更朴素（巴布 亚新几内亚的布干维尔岛上的罗托卡特语只有十二个对比音） 英语有四十个音位。比如英语区分s和z（因此“sip”和“zip 意味着两种不同的事物）。泰雅博语里的对比音是什么？这门语言也 区分长元音和短元音吗？它有一些不寻常的音，比如喉塞音吗？它有 音调吗（老天保佑千万不要）？我得把所有这些找出来，唯一的办法 就是问一个人一连串无聊问题。 首先，我会引出一个单音节的词，比如nam，我发现这个词的意 思是“说话”。继而我会打开我的",
+      "words": 1667,
+      "keywords": [
+        "第三章拜师学艺",
+        "比如",
+        "nam",
+        "雨林里的消亡",
+        "gutpela",
+        "因此"
+      ],
+      "density": {
+        "score": 0.6316,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0.2591,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0.084
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "anthro",
+      "theme_label": "Field Narrative",
+      "section_count": 5,
+      "generated_with": "template_runtime"
+    }
+  }
+}

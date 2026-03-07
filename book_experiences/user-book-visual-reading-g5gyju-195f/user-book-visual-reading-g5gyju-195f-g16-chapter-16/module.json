@@ -1,0 +1,40 @@
+{
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T09:57:49.686Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "雨林里的消亡（可视化阅读测试）",
+      "author": "Unknown"
+    },
+    "knowledge_block": {
+      "id": "kb-41",
+      "gate_index": 16,
+      "title": "第十六章",
+      "summary": "第十六章 WhatActuallyDiesWhen 语言消亡时，实际消亡的是 什么？ 我编了一本泰雅博语词典，但当中还有诸 多空白。完全空缺的是这门语言里大量关于花 草树木的词语。我不是植物学家，尽管有一度 我真的把像《巴布亚新几内亚植物手册》这样 的专业书籍运来了迦普恩，但我几乎完全分不 清—更不用说识别或描述—存在于雨林里 的那些形形色色的藤蔓、灌木、树根、树和草 的区别。走在雨林里的时候，村民们经常远远 指着随便什么碰巧看到的树或藤，然后就能叫 出它们的名字。我通常也不知道他们到底在指 哪个一在一双没有受过训练的眼晴里，雨林 里的植物都长一个样。告诉我他们指的树叫什 么之后，村民们经常会补充说，这个他们让我 注意一下的树和之前",
+      "words": 823,
+      "keywords": [
+        "page",
+        "image",
+        "content",
+        "ocr",
+        "第十六章",
+        "whatactuallydieswhen"
+      ],
+      "density": {
+        "score": 0.6229,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0.2916,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "anthro",
+      "theme_label": "Field Narrative",
+      "section_count": 4,
+      "generated_with": "template_runtime"
+    }
+  }
+}

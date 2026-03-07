@@ -1,0 +1,40 @@
+{
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T10:08:28.995Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "雨林里的消亡（可视化阅读测试-v2）",
+      "author": "Unknown"
+    },
+    "knowledge_block": {
+      "id": "kb-42",
+      "gate_index": 22,
+      "title": "第十六章语言消亡时",
+      "summary": "第十六章语言消亡时，实际消亡的是什么？ 213 有种植食物的园子。没错，像鲁尼和拉雅这样的老人了解的传统故事的 失落，会让迦普恩人在其他村民的虎视面前更加脆弱，如果那些地 方的村民声称传统上属于迦普恩的土地应该属于他们。但是，关于土地 的争议丝毫不会让村民们变得不像，或不再是迦普恩人。",
+      "words": 1004,
+      "keywords": [
+        "第十六章语言消亡时",
+        "实际消亡的是什么",
+        "没错",
+        "雨林里的消亡",
+        "有种植食物的园子",
+        "像鲁尼和拉雅这样的老人了解的传统故事的"
+      ],
+      "density": {
+        "score": 0.6153,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0.239,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0.0279
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "anthro",
+      "theme_label": "Field Narrative",
+      "section_count": 5,
+      "generated_with": "template_runtime"
+    }
+  }
+}

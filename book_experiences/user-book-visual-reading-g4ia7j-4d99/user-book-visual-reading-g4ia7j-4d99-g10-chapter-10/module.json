@@ -1,0 +1,40 @@
+{
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T09:30:51.832Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "雨林里的消亡：一种语言和生活方式在巴布亚新几内亚的终结",
+      "author": ""
+    },
+    "knowledge_block": {
+      "id": "kb-22",
+      "gate_index": 10,
+      "title": "第七章“我要离开这里",
+      "summary": "第七章“我要离开这里 101 [PAGE 111 IMAGE 1 CONTENT (OCR)]: （和其他女人）的责备，说她们是旧思想的蓄水池一阻碍这个村子 的人改变肤色变成白人。 皮金语开始标志着所有对于美好生活的欲望，而泰雅博语则越来 越代表非理性、负面的特质一村民们异口同声认为这些特质需要被 压抑，这样他们或许才能改头换面。",
+      "words": 1024,
+      "keywords": [
+        "page",
+        "image",
+        "content",
+        "ocr",
+        "第七章",
+        "我要离开这里"
+      ],
+      "density": {
+        "score": 0.6605,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0.3984,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0.0547
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "anthro",
+      "theme_label": "Field Narrative",
+      "section_count": 5,
+      "generated_with": "template_runtime"
+    }
+  }
+}

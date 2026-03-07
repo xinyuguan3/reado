@@ -1,0 +1,40 @@
+{
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T09:30:51.832Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "雨林里的消亡：一种语言和生活方式在巴布亚新几内亚的终结",
+      "author": ""
+    },
+    "knowledge_block": {
+      "id": "kb-30",
+      "gate_index": 12,
+      "title": "第十一章年轻人的泰雅博语",
+      "summary": "第十一章年轻人的泰雅博语 147 [PAGE 157 IMAGE 1 CONTENT (OCR)]: 嘲笑我，会说“哦，你们都只会说皮金语，不懂泰雅博语’之类的 话。所以我就觉得很丢脸不说了。” 其他年轻人也跟我说了同样的情况。“他们嘲笑我们，”年轻人 说，指的是那些四十来岁和年纪更大的村民，“他们会说，“哦，他是 别的村子里长大的”，或者“哦！这个不懂村里土话的白人小孩”。他 们会嘲笑我们。所以很难用土话回答，我们就混着说。” 我一次又一次发现，年轻人跟我说的是真的。父母依旧会指责孩 子们不会说泰雅博语。他们的声音里带着一丝讽刺意味，说他们的孩 子都变成白人了，因此他们只会说白人的语言一—皮金语。当被这样 讥讽时，年轻人会反唇相讥",
+      "words": 812,
+      "keywords": [
+        "page",
+        "image",
+        "content",
+        "ocr",
+        "第十一章年轻人的泰雅博语",
+        "雨林里的消亡"
+      ],
+      "density": {
+        "score": 0.6534,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0.4138,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "anthro",
+      "theme_label": "Field Narrative",
+      "section_count": 4,
+      "generated_with": "template_runtime"
+    }
+  }
+}

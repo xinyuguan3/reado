@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>19 问题：是什么将宇宙区分开的？每一个宇宙，是否都保持了一定的频率… · Datre Partial Visual Test</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b1220;
+      --bg2: #1a2333;
+      --accent: #f59e0b;
+      --accent2: #34d399;
+      --text: #e5edf8;
+      --soft: #9fb1c9;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+      background:
+        radial-gradient(1200px 540px at 85% -8%, color-mix(in srgb, var(--accent2) 24%, transparent), transparent 70%),
+        radial-gradient(980px 460px at -10% 14%, color-mix(in srgb, var(--accent) 24%, transparent), transparent 74%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+      color: var(--text);
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .05;
+      background-image: radial-gradient(circle at 1px 1px, #fff 1px, transparent 0);
+      background-size: 3px 3px;
+      z-index: 0;
+    }
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      z-index: 100;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+    .page { position: relative; z-index: 1; width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 20px 0 48px; }
+    .hero {
+      min-height: 74vh;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 22px;
+      background: linear-gradient(160deg, color-mix(in srgb, var(--bg2) 86%, transparent), color-mix(in srgb, var(--bg) 88%, transparent));
+      padding: 40px 34px;
+      display: grid;
+      align-content: center;
+      gap: 16px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.34);
+    }
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .hero h1 {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(32px, 5.4vw, 68px);
+      line-height: 1.16;
+      letter-spacing: .04em;
+      max-width: 15em;
+      text-wrap: balance;
+    }
+    .hero p {
+      max-width: 66ch;
+      line-height: 1.95;
+      color: color-mix(in srgb, var(--text) 85%, var(--soft));
+      font-size: 16px;
+    }
+    .chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip {
+      border: 1px solid color-mix(in srgb, var(--accent2) 44%, transparent);
+      color: color-mix(in srgb, var(--accent2) 88%, #fff);
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 12px;
+      background: rgba(255,255,255,.03);
+    }
+    .section { margin-top: 18px; border: 1px solid rgba(255,255,255,.13); border-radius: 18px; padding: 22px; background: rgba(2,6,18,.46); }
+    .section h2 {
+      margin-bottom: 12px;
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(22px, 2.8vw, 34px);
+      color: color-mix(in srgb, var(--accent) 86%, #fff);
+      letter-spacing: .03em;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1.1fr 1fr; gap: 14px; }
+    .concept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+    .concept-card {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      background: rgba(255,255,255,.03);
+      padding: 14px;
+      min-height: 128px;
+    }
+    .concept-token { font-size: 14px; letter-spacing: .14em; color: var(--accent2); text-transform: uppercase; margin-bottom: 7px; font-weight: 700; }
+    .concept-note { font-size: 14px; color: color-mix(in srgb, var(--text) 88%, var(--soft)); line-height: 1.8; }
+    .atlas {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      min-height: 440px;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+    .atlas svg { width: 100%; max-width: 440px; height: auto; }
+    .timeline { display: grid; gap: 10px; }
+    .timeline-item {
+      border-left: 2px solid color-mix(in srgb, var(--accent) 66%, transparent);
+      padding: 10px 14px;
+      background: rgba(255,255,255,.02);
+      border-radius: 0 10px 10px 0;
+    }
+    .timeline-no { font-size: 11px; letter-spacing: .22em; color: var(--accent2); display: block; margin-bottom: 6px; }
+    .timeline-item h3 { font-size: 19px; font-family: "Noto Serif SC", serif; line-height: 1.45; margin-bottom: 7px; }
+    .timeline-item p { font-size: 14px; line-height: 1.9; color: color-mix(in srgb, var(--text) 84%, var(--soft)); }
+    .quote-wrap { display: grid; gap: 10px; }
+    .quote {
+      border-left: 2px solid color-mix(in srgb, var(--accent2) 80%, transparent);
+      padding: 10px 12px;
+      background: rgba(255,255,255,.02);
+      color: color-mix(in srgb, var(--text) 92%, #fff);
+      font-family: "Noto Serif SC", serif;
+      line-height: 1.9;
+    }
+    .takeaways { margin-top: 10px; list-style: none; display: grid; gap: 8px; }
+    .takeaways li {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      padding: 10px;
+      background: rgba(255,255,255,.02);
+      align-items: start;
+      line-height: 1.8;
+    }
+    .takeaways span {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: color-mix(in srgb, var(--accent2) 26%, transparent);
+      color: var(--accent2);
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+    .nav { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,.26);
+      border-radius: 999px;
+      padding: 8px 13px;
+      font-size: 12px;
+      color: var(--text);
+      background: rgba(255,255,255,.04);
+    }
+    .btn:hover { border-color: var(--accent2); color: var(--accent2); }
+    .dot-nav {
+      position: fixed;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: grid;
+      gap: 10px;
+      z-index: 50;
+    }
+    .dot-nav button {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.35);
+      background: transparent;
+      cursor: pointer;
+      transition: all .24s ease;
+    }
+    .dot-nav button.active { transform: scale(1.34); border-color: var(--accent); background: var(--accent); }
+    .reveal { opacity: 0; transform: translateY(16px); transition: opacity .55s ease, transform .55s ease; }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+    @media (max-width: 940px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .dot-nav { display: none; }
+      .hero { min-height: auto; padding: 30px 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+  <nav class="dot-nav" id="dotNav">
+    <button data-target="hero" class="active" aria-label="Hero"></button>
+    <button data-target="atlas" aria-label="Atlas"></button>
+    <button data-target="concepts" aria-label="Concepts"></button>
+    <button data-target="reading" aria-label="Reading"></button>
+    <button data-target="takeaways" aria-label="Takeaways"></button>
+  </nav>
+  <main class="page">
+    <section class="hero reveal in" id="hero">
+      <p class="eyebrow">Scholar Atlas · Gate 5</p>
+      <h1>19 问题：是什么将宇宙区分开的？每一个宇宙，是否都保持了一定的频率…</h1>
+      <p>19 问题：是什么将宇宙区分开的？每一个宇宙，是否都保持了一定的频率范围呢？ DATRE ： 我不知道 。</p>
+      <div class="chip-row">
+        <span class="chip">Datre Partial Visual Test</span>
+        
+        <span class="chip">Module 5/9</span>
+        <span class="tag">datre</span><span class="tag">问题</span><span class="tag">现在</span><span class="tag">完形概念</span><span class="tag">是的</span><span class="tag">金属罐</span>
+      </div>
+    </section>
+
+    <section class="section grid-2 reveal" id="atlas">
+      <article>
+        <h2>知识结构图谱</h2>
+        <p style="color:var(--soft);line-height:1.9;margin-bottom:10px;">围绕本关卡核心概念构建关系图。阅读时先抓主轴，再理解每个概念如何驱动判断与行动。</p>
+        <div class="quote-wrap"><blockquote class="quote reveal">“22 然后你进入博物馆的另一边，那儿有着各种圆圈与方块的抽象画，有着你们现阶 段开发出的具有一定强度的色彩。你们的颜色甚至还会被涂抹在盒子上。我看到 Joh n 有那些带着明亮颜色的盒子，比如亮黄色，亮红色，亮紫色，亮蓝色和绿色等等。这 些颜色都是你们以前所没有的。”</blockquote><blockquote class="quote reveal">“这也是为什么你们的时间已经 “ 结束 ” 了 - 线性时间结束 ， “ 暂时的时间 ” 被放 入。时间被放入你们的泡泡中。现在，我们期待它该结束了。我们希望你至少能去一 个别的地方，而不是永远坐在这里。因为：你们没有胆量，没有勇气让自己出来！”</blockquote><blockquote class="quote reveal">“你们正在运行一个被我们称之的 “ 伪造 / 暂时时间 ” ，是因为与宇宙时间相关的其 他的事件需要符合一致。然后，当所有的一切符合一致后，一切就都会改变，一切也 都将同时发生。那与你们没有任何关系，但属于你个人的时间是你自己的。”</blockquote></div>
+      </article>
+      <article class="atlas">
+        <svg viewBox="0 0 440 440" aria-label="concept atlas">
+          <defs>
+            <radialGradient id="g" cx="50%" cy="50%" r="56%">
+              <stop offset="0%" stop-color="#f59e0b" stop-opacity=".24"></stop>
+              <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"></stop>
+            </radialGradient>
+          </defs>
+          <circle cx="220" cy="220" r="190" fill="none" stroke="rgba(255,255,255,.08)" stroke-dasharray="5 6"></circle>
+          <circle cx="220" cy="220" r="84" fill="url(#g)"></circle>
+          <circle cx="220" cy="220" r="10" fill="#f59e0b"></circle>
+          <text x="220" y="252" text-anchor="middle" fill="#e5edf8" font-size="13">19 问题：是什么将宇宙区分开的？每一个宇宙，是</text>
+          <g><line x1="220" y1="220" x2="370" y2="220" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="370" cy="220" r="8" fill="#34d399"/><text x="382" y="224" fill="#e5edf8" font-size="12">datre</text></g><g><line x1="220" y1="220" x2="266" y2="363" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="266" cy="363" r="8" fill="#34d399"/><text x="278" y="367" fill="#e5edf8" font-size="12">问题</text></g><g><line x1="220" y1="220" x2="99" y2="308" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="99" cy="308" r="8" fill="#34d399"/><text x="111" y="312" fill="#e5edf8" font-size="12">现在</text></g><g><line x1="220" y1="220" x2="99" y2="132" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="99" cy="132" r="8" fill="#34d399"/><text x="111" y="136" fill="#e5edf8" font-size="12">完形概念</text></g><g><line x1="220" y1="220" x2="266" y2="77" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="266" cy="77" r="8" fill="#34d399"/><text x="278" y="81" fill="#e5edf8" font-size="12">是的</text></g>
+        </svg>
+      </article>
+    </section>
+
+    <section class="section reveal" id="concepts">
+      <h2>核心概念与解释</h2>
+      <div class="concept-grid">
+      <article class="concept-card reveal">
+        <p class="concept-token">datre</p>
+        <p class="concept-note">DATRE ： 我不知道 。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">问题</p>
+        <p class="concept-note">19 问题：是什么将宇宙区分开的？每一个宇宙，是否都保持了一定的频率范围呢？</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">现在</p>
+        <p class="concept-note">这也是为什么你们的时间已经 “ 结束 ” 了 - 线性时间结束 ， “ 暂时的时间 ” 被放 入。时间被放入你们的泡泡中。现在，我们期待它该结束了。我们希望你至少能去一 个别的地方，而不是永远坐在这里。因为：你们没有胆量，没有勇气让自己出来！</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">完形概念</p>
+        <p class="concept-note">你们的泡泡内有着大量的观念 （ 完形概念 ） 。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">是的</p>
+        <p class="concept-note">你们已经非常沮丧，事实上，甚至已经达到不想再在这个星球上做任何更多事情 的那点了。所以你们需要改变。是的，你们确实需要改变。这就是新世纪（千禧年） 的到来。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">金属罐</p>
+        <p class="concept-note">首先 ， 你们必须让你们的 “ 金属罐 ” 能 航行那么远。</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="reading">
+      <h2>渐进式阅读路径</h2>
+      <div class="timeline">
+      <article class="timeline-item reveal">
+        <span class="timeline-no">01</span>
+        <h3>19 问题：是什么将宇宙区分开的？每一个宇宙，是否都保持了一定的频率范围呢？</h3>
+        <p>19 问题：是什么将宇宙区分开的？每一个宇宙，是否都保持了一定的频率范围呢？ DATRE ： 我不知道 。 最后一个我曾去过的宇宙 ， 已经不记得 了 。 而你才是那个唯一有记忆的 “ 东西 ” 。 物质身体拥有记忆 ， 我们没 有。 这才是我们所说的 ： “ 完完全全的自由 ” ，因为你不需要记忆任何事情。 问题：请问所有的宇宙都来源于同一个本源吗？或者说每一个宇宙的本源都是不 一样的？ DATRE ： 每一样事物都是不同的 。 没有 “ 本源 ” 这个东西 ， 好吗？为什么你们总是 想重复呢？ 只有在物质层，你们才会重复做某事。不幸的是，就是因为这样，你们才 无法改变。一生，一生，又一生，一直保持着同样的运作模式。 我的天啊！这多无聊 啊！你们活了一辈子又一辈子，永远做着同样的事情。这就好像我们以前谈论过的那 个可怜的农民。在前世回溯中，他几乎每一辈子都是穷苦的农民，从来没有改变过。 这也是为什么你们的时间已经 “ 结束 ” 了 - 线性时间结束 ， “ 暂时的时间 ” 被放 入。时间被放入你们的泡泡中。现在，我们期待它该结束了。我们希望你至少能去一 个别的地方，而不是永远坐在这里。因为：你们没有胆量，没有勇气让自己出来！ 当 “ 时间 ” 真正完结的时候，你们就没有任何 “ 东西 ” 可供运作了。你们就会获 得一个新的体验 。 这也是我们现在正尝试做的 ， 希望能够帮助你们从昏睡中清醒过来 。 你们每一个人都对宇宙感兴趣，因为它能够扩展你自己，将你自己延伸进入更大，更 刺激的存在体验中。 20 第 3 章 你们的泡泡 问题 ： Datre 所说的术语 － “ 我们的泡泡宇宙 ” 是什么意思呢？ DATRE ：你们的泡泡是一个 “ 能量容器 ” 。这个容器没有具体的形状或大小。它能 为你们提供你们想在物质层中探索的 “ 一切需要 ” 。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">02</span>
+        <h3>你们的泡泡还包括所有在这个粒子现实世界中探索的物种，那个被称为人类的物 种 。</h3>
+        <p>你们的泡泡还包括所有在这个粒子现实世界中探索的物种，那个被称为人类的物 种 。 为了让你们的物质结构保持稳定 ， 你们还创造出了有阳光的白天和有星星的夜晚 。 这些都是为了让你们的物质头脑和所有在你们泡泡内的个体感觉舒适的心理结构。 你们的泡泡内有着大量的观念 （ 完形概念 ） 。 这些观念 （ 完形概念 ） 被称为几率与 可能性 。 除非你能采取一个观念 （ 完形概念 ） ， 通过与你互相作用的物质结构使之成为 一个可行的东西 ， 并形成你的现实世界 ； 否则 ， 这些能量就会在 “ 所有的意图与目的 ” 上保持一致（不会分化 ） 。 当你拥有与之工作的物质结构时，你感到它是如此受限。可是，你们才刚刚开始 使用几率与可能性的能量，使它们在现实世界中变得可行。 你们已经非常沮丧，事实上，甚至已经达到不想再在这个星球上做任何更多事情 的那点了。所以你们需要改变。是的，你们确实需要改变。这就是新世纪（千禧年） 的到来。 你看，泡泡内能量模式的改变将帮助你们扩展你们的觉知与你们的知晓。 现在 ， 能量该如何在泡泡内被改变呢？谁知道如何改变一个泡泡内的能量？显然 ， 这不是物质层面的事情。物质层面并不知道如何把新能量放入你们泡泡的存在中。 这也是为什么那些组成 Datre 的很多成员来到你们的泡泡里协助能量流的分布。 通过调整能量流的几率与可能性，以便使你们继续进化下去。 接着 ，就能带给你们一 个更为多样的，可与之工作的观念群（完形概念群 ） 。 只有改变能量，才能让观念群（完形概念群）改变，这样你们才能与不同的材料 工作。 21 问题 ：如果科学家们真的把人送到火星上去，那儿会有什么事情发生吗？ DATRE ： 那是迄今为止很难被告知的未来 。 首先 ， 你们必须让你们的 “ 金属罐 ” 能 航行那么远。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">03</span>
+        <h3>让你们的 “ 金属罐 ” 航行那么远 ， 然后再返航且不能解体 ， 这将需要做很多事情 。</h3>
+        <p>让你们的 “ 金属罐 ” 航行那么远 ， 然后再返航且不能解体 ， 这将需要做很多事情 。 然后直到你们能够做到这点后 ， 你们才能考虑把人放到 “ 金属罐 ” 里 。 我不认为你们 已经做到了，不是吗？ JOHN ：是的，他们只是把卫星发送出去，但都是单向的旅行。 DATRE ：什么都没有返回吗？ DATRE ：这就是为什么人类还没有去过了。哈哈！非常简单。 问题 ：与其他的星球相比，地球是一个特别美丽的星球吗？ DATRE ： 你们在这个星球上的发展情形与这个星球本身都是伟大与美丽的 。 你们还 不知道这个星球上个体发展的美妙之处，是因为你们没有比较。 这个星球已经开始了它的许多变化，而作为个人的你，你们当中也有很多人开始 了你们的个人变化。 无论怎样 ， 地球相当迷人 。 你们拥有能让我们享受的 ， 被称之的 “ 时间 ” 。 同时随 着时间的继续，你们的颜色也都在改变中。要知道，在不久之前，你们当中的一些颜 色都是不存在的。 你们无法意识到当时没有颜色或只有很少颜色的地球体验。现在，你们与这个星 球都进化到了拥有极为美丽颜色的这一点。 你们甚至可以回头去看看那些旧的画作。我想你们称那为文艺复兴时期的绘画。 我们曾在网上看到过。你可以看看它们的色调与颜色。当你在博物馆欣赏这些画时， 它们的颜色确实很漂亮，但却不是明亮灿烂的颜色。 22 然后你进入博物馆的另一边，那儿有着各种圆圈与方块的抽象画，有着你们现阶 段开发出的具有一定强度的色彩。你们的颜色甚至还会被涂抹在盒子上。我看到 Joh n 有那些带着明亮颜色的盒子，比如亮黄色，亮红色，亮紫色，亮蓝色和绿色等等。这 些颜色都是你们以前所没有的。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">04</span>
+        <h3>然后你们会问 ： “ 好吧 ， 若我们以前没有这样的颜色 ， 那么是谁发明出我们今天所 使用的颜料的呢？</h3>
+        <p>然后你们会问 ： “ 好吧 ， 若我们以前没有这样的颜色 ， 那么是谁发明出我们今天所 使用的颜料的呢？ ” － 是你们自己，就这么简单。 接着你们又说 ： “ 嗯，这显而易见嘛 ” 是的，但你要知道：这也是进化。 进化始于任何不明显的细小的方式。当你能够意识到你们所称之的时间范围时， 你就能够知道你们的颜色已经被改变了。 从普遍的角度看，你们的进化是相当快速的。你们现阶段的文明已经走的相当远 了。 他们加快了发展的速度，而这总会发生在一个周期的结束和另一个新周期的开始 之前。 问题 ：关于地球的清理，地球是否会在原子或分子的水平上改变？或者说，这种 清理只局限于地球运动的轨迹？ DATRE ： 地球是一个表达形式 。 如以前所讲 ， 地球有意识 。 无论你们是否居住在地 球上，地球都能做出任何它想做的事。地球不断变化，且会持续变化下去。 但目前它会从这里开始，并持续加速。 可是地球的进化与你们无关 。 无论你们是否在地球上 ， 地球都有属于自己的进化 。 那无关紧要。地球将改变，无需考虑，因为地球已经发生了很多变化，它将回到 一个完全不同的结构中。 这并不意味着那儿不会有树或草之类的东西，但地球将洁净自己。它会打扫自己 的房屋。你们所在的地球有它自己的进化。 这也是 “ 一个星球 ” 与 “ 空间中一块岩石 ” 之间的不同，若一定要这么说的话。 23 一个星球的构造是完全不同的。可以这么讲：有的（物质）聚集物无法维持任何 被你们称之的生命存在。但有一些元素则能使（物质）聚集物变得适宜居住。就好像 其它的一切，那儿有可供居住的物质，也有不可供居住的物质。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">05</span>
+        <h3>而你们所说的那种可供居住的星球，是拥有一个独特的不同构造的。它们 … 我认 为我们只能这样解释了 … 总之，它们是独特的。</h3>
+        <p>而你们所说的那种可供居住的星球，是拥有一个独特的不同构造的。它们 … 我认 为我们只能这样解释了 … 总之，它们是独特的。 无论怎样，这与要呆在这个星球上的人或要离开这个星球的人而言，都不重要。 地球会照顾它自己。人类无法影响到真实的地球本身。 一个星球本身并不是你们全息现实世界的一部分。它是属于宇宙的一个真实的东 西。 它与你们使用属于地球材料填充身体全息图的方式是一样的。 问题 ：请问 “ 概率和时间同步系统 ” 的想法是否不可能由头脑来构思？或者我们 只是缩窄了头脑思维的使用范围？ DATRE ： 宇宙时间 / 事件 / 安排并不由你们来管理 。 那是一个宇宙通用的时机 ， 与你 们没有任何关系。你们的线性时间曾有过许多跨度，但这个跨度已经结束。现在，你 们正在与一种伪造 / 暂时的时间工作。这也是为什么你们的日子没有一天是一样的。 你会说 ： “ 今天发生什么了？怎么一下子就过完了？太短了 ” － 接着你旁边的人 又会说 ： “ 这可是我经历过最长的一天 ” 。 你们现在已经在为自己设置时间了。 你们正在运行一个被我们称之的 “ 伪造 / 暂时时间 ” ，是因为与宇宙时间相关的其 他的事件需要符合一致。然后，当所有的一切符合一致后，一切就都会改变，一切也 都将同时发生。那与你们没有任何关系，但属于你个人的时间是你自己的。 问题 ：如果处于同一个泡泡内的现实世界，比如：在我们的地球与太阳系中，一 切都被振动所区分。那么一个泡泡与另一个泡泡，或一个宇宙与另一个宇宙也是被振 动所区分的吗？ DATRE ： 基本上是的 。 那是唯一一个可被区分的方式 。 振动是唯一一个可以区分任 何事物的东西 。 但振动并不是一个十分合适的词语 ， 可这是你们的语言中唯一所有的 。 所以在现阶段，那儿也没有其它的区分方式能够让你们的大脑去设想或构思。</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="takeaways">
+      <h2>本关关键收获</h2>
+      <ul class="takeaways"><li><span>1</span>19 问题：是什么将宇宙区分开的？每一个宇宙，是否都保持了一定的频率范围呢？</li><li><span>2</span>你们的泡泡还包括所有在这个粒子现实世界中探索的物种，那个被称为人类的物 种 。</li><li><span>3</span>让你们的 “ 金属罐 ” 航行那么远 ， 然后再返航且不能解体 ， 这将需要做很多事情 。</li><li><span>4</span>然后你们会问 ： “ 好吧 ， 若我们以前没有这样的颜色 ， 那么是谁发明出我们今天所 使用的颜料的呢？</li></ul>
+      <nav class="nav">
+        <a class="btn" href="/experiences/user-book-datre-partial-visual-test-g6fkaz-7d5a-g04-15.html">上一关</a>
+        <a class="btn" href="/experiences/user-book-datre-partial-visual-test-g6fkaz-7d5a-g06-24-datre.html">下一关</a>
+      </nav>
+    </section>
+  </main>
+  <script>
+    (() => {
+      const progress = document.getElementById("progress");
+      const dots = Array.from(document.querySelectorAll("#dotNav button[data-target]"));
+      const sections = dots
+        .map((dot) => document.getElementById(dot.getAttribute("data-target")))
+        .filter(Boolean);
+      const reveals = Array.from(document.querySelectorAll(".reveal"));
+      const onScroll = () => {
+        const h = document.documentElement;
+        const total = Math.max(1, h.scrollHeight - window.innerHeight);
+        const pct = Math.max(0, Math.min(100, (window.scrollY / total) * 100));
+        if (progress) progress.style.width = pct + "%";
+      };
+      const io = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) entry.target.classList.add("in");
+        }
+      }, { threshold: .14 });
+      reveals.forEach((el) => io.observe(el));
+      const secIo = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const id = entry.target.id;
+          dots.forEach((dot) => dot.classList.toggle("active", dot.getAttribute("data-target") === id));
+        });
+      }, { threshold: .4 });
+      sections.forEach((s) => secIo.observe(s));
+      dots.forEach((dot) => {
+        dot.addEventListener("click", () => {
+          const target = document.getElementById(dot.getAttribute("data-target"));
+          if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+      window.addEventListener("scroll", onScroll, { passive: true });
+      onScroll();
+    })();
+  </script>
+</body>
+</html>

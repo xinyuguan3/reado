@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>第七章“我要离开这里 · 雨林里的消亡：一种语言和生活方式在巴布亚新几内亚的终结</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #16120f;
+      --bg2: #2a1f18;
+      --accent: #d97706;
+      --accent2: #2dd4bf;
+      --text: #f5f1ea;
+      --soft: #c7b8a2;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+      background:
+        radial-gradient(1200px 540px at 85% -8%, color-mix(in srgb, var(--accent2) 24%, transparent), transparent 70%),
+        radial-gradient(980px 460px at -10% 14%, color-mix(in srgb, var(--accent) 24%, transparent), transparent 74%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+      color: var(--text);
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .05;
+      background-image: radial-gradient(circle at 1px 1px, #fff 1px, transparent 0);
+      background-size: 3px 3px;
+      z-index: 0;
+    }
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      z-index: 100;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+    .page { position: relative; z-index: 1; width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 20px 0 48px; }
+    .hero {
+      min-height: 74vh;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 22px;
+      background: linear-gradient(160deg, color-mix(in srgb, var(--bg2) 86%, transparent), color-mix(in srgb, var(--bg) 88%, transparent));
+      padding: 40px 34px;
+      display: grid;
+      align-content: center;
+      gap: 16px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.34);
+    }
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .hero h1 {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(32px, 5.4vw, 68px);
+      line-height: 1.16;
+      letter-spacing: .04em;
+      max-width: 15em;
+      text-wrap: balance;
+    }
+    .hero p {
+      max-width: 66ch;
+      line-height: 1.95;
+      color: color-mix(in srgb, var(--text) 85%, var(--soft));
+      font-size: 16px;
+    }
+    .chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip {
+      border: 1px solid color-mix(in srgb, var(--accent2) 44%, transparent);
+      color: color-mix(in srgb, var(--accent2) 88%, #fff);
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 12px;
+      background: rgba(255,255,255,.03);
+    }
+    .section { margin-top: 18px; border: 1px solid rgba(255,255,255,.13); border-radius: 18px; padding: 22px; background: rgba(2,6,18,.46); }
+    .section h2 {
+      margin-bottom: 12px;
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(22px, 2.8vw, 34px);
+      color: color-mix(in srgb, var(--accent) 86%, #fff);
+      letter-spacing: .03em;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1.1fr 1fr; gap: 14px; }
+    .concept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+    .concept-card {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      background: rgba(255,255,255,.03);
+      padding: 14px;
+      min-height: 128px;
+    }
+    .concept-token { font-size: 14px; letter-spacing: .14em; color: var(--accent2); text-transform: uppercase; margin-bottom: 7px; font-weight: 700; }
+    .concept-note { font-size: 14px; color: color-mix(in srgb, var(--text) 88%, var(--soft)); line-height: 1.8; }
+    .atlas {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      min-height: 440px;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+    .atlas svg { width: 100%; max-width: 440px; height: auto; }
+    .timeline { display: grid; gap: 10px; }
+    .timeline-item {
+      border-left: 2px solid color-mix(in srgb, var(--accent) 66%, transparent);
+      padding: 10px 14px;
+      background: rgba(255,255,255,.02);
+      border-radius: 0 10px 10px 0;
+    }
+    .timeline-no { font-size: 11px; letter-spacing: .22em; color: var(--accent2); display: block; margin-bottom: 6px; }
+    .timeline-item h3 { font-size: 19px; font-family: "Noto Serif SC", serif; line-height: 1.45; margin-bottom: 7px; }
+    .timeline-item p { font-size: 14px; line-height: 1.9; color: color-mix(in srgb, var(--text) 84%, var(--soft)); }
+    .quote-wrap { display: grid; gap: 10px; }
+    .quote {
+      border-left: 2px solid color-mix(in srgb, var(--accent2) 80%, transparent);
+      padding: 10px 12px;
+      background: rgba(255,255,255,.02);
+      color: color-mix(in srgb, var(--text) 92%, #fff);
+      font-family: "Noto Serif SC", serif;
+      line-height: 1.9;
+    }
+    .takeaways { margin-top: 10px; list-style: none; display: grid; gap: 8px; }
+    .takeaways li {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      padding: 10px;
+      background: rgba(255,255,255,.02);
+      align-items: start;
+      line-height: 1.8;
+    }
+    .takeaways span {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: color-mix(in srgb, var(--accent2) 26%, transparent);
+      color: var(--accent2);
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+    .nav { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,.26);
+      border-radius: 999px;
+      padding: 8px 13px;
+      font-size: 12px;
+      color: var(--text);
+      background: rgba(255,255,255,.04);
+    }
+    .btn:hover { border-color: var(--accent2); color: var(--accent2); }
+    .dot-nav {
+      position: fixed;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: grid;
+      gap: 10px;
+      z-index: 50;
+    }
+    .dot-nav button {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.35);
+      background: transparent;
+      cursor: pointer;
+      transition: all .24s ease;
+    }
+    .dot-nav button.active { transform: scale(1.34); border-color: var(--accent); background: var(--accent); }
+    .reveal { opacity: 0; transform: translateY(16px); transition: opacity .55s ease, transform .55s ease; }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+    @media (max-width: 940px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .dot-nav { display: none; }
+      .hero { min-height: auto; padding: 30px 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+  <nav class="dot-nav" id="dotNav">
+    <button data-target="hero" class="active" aria-label="Hero"></button>
+    <button data-target="atlas" aria-label="Atlas"></button>
+    <button data-target="concepts" aria-label="Concepts"></button>
+    <button data-target="reading" aria-label="Reading"></button>
+    <button data-target="takeaways" aria-label="Takeaways"></button>
+  </nav>
+  <main class="page">
+    <section class="hero reveal in" id="hero">
+      <p class="eyebrow">Field Narrative · Gate 10</p>
+      <h1>第七章“我要离开这里</h1>
+      <p>第七章“我要离开这里 101 [PAGE 111 IMAGE 1 CONTENT (OCR)]: （和其他女人）的责备，说她们是旧思想的蓄水池一阻碍这个村子 的人改变肤色变成白人。 皮金语开始标志着所有对于美好生活的欲望，而泰雅博语则越来 越代表非理性、负面的特质一村民们异口同声认为这些特质需要被 压抑，这样他们或许才能改头换面。</p>
+      <div class="chip-row">
+        <span class="chip">雨林里的消亡：一种语言和生活方式在巴布亚新几内亚的终结</span>
+        
+        <span class="chip">Module 10/18</span>
+        <span class="tag">page</span><span class="tag">image</span><span class="tag">content</span><span class="tag">ocr</span><span class="tag">第七章</span><span class="tag">我要离开这里</span>
+      </div>
+    </section>
+
+    <section class="section grid-2 reveal" id="atlas">
+      <article>
+        <h2>知识结构图谱</h2>
+        <p style="color:var(--soft);line-height:1.9;margin-bottom:10px;">围绕本关卡核心概念构建关系图。阅读时先抓主轴，再理解每个概念如何驱动判断与行动。</p>
+        <div class="quote-wrap"><blockquote class="quote reveal">“每天结束的时候，我的小保镖阿玛尼睡觉前，他的妈妈，也就是 我的邻居达莫总会试图哄骗他，让她往他身上倒一桶水给他洗澡。达 第七章“我要离开这里” 103 [PAGE 113 IMAGE 1 CONTENT (OCR)]: 莫坚持要给儿子洗澡的一个原因是，洗完澡后汗水和嵌在他小小身体 上的大部分泥渍就不会沾到睡毯上了，再就是村里人认为洗澡有助于 孩子成长。达莫几乎每天都要对阿玛尼崂叨，每每会提到我的名字： “如果你想长得像萨拉奇那么高，就得”</blockquote><blockquote class="quote reveal">“因此家长们开始潜移默化地鼓励他们的孩子说皮金语。他们这么 做的第一步就是，不指望孩子们会说泰雅博语。只要父母们识别出孩 子们说的头三个泰雅博语里的单词——oki、minda和ayata—他们 就再也不把孩子发出的其他声音作泰雅博语来解读。相反（就家长们 所能注意到孩子说的话的程度来看），他们听什么都觉得是在说皮金 语。因此，一个一岁的婴儿含混不清地说了个“tatai”这样的词，就 会被解读成皮金语“Tataigo”（“姐姐要走了”）一—”</blockquote><blockquote class="quote reveal">“阿玛尼对他妈妈每一个威胁都作出了回应，喊着：“Giaman！” （“你骗人！”） 达莫放弃了试图哄骗阿玛尼从我房子下面出来的企图，对坐在近 旁走廊的一个侄子悄声低语，告诉阿玛尼他的妈妈不带他了，准备自 已去他叔叔那里哭丧了。侄子重复了这个谎言，戳中了要害。阿玛尼 担心达莫可能要抛下他一个人待在这个黑漆漆的地方，就从我房子下 面探出头来，找寻自己的母亲。当他出现时，达莫正等着他。她冲了 上去，想一把抓住他。但他逃过了她的掌心，跑开了，又回”</blockquote></div>
+      </article>
+      <article class="atlas">
+        <svg viewBox="0 0 440 440" aria-label="concept atlas">
+          <defs>
+            <radialGradient id="g" cx="50%" cy="50%" r="56%">
+              <stop offset="0%" stop-color="#d97706" stop-opacity=".24"></stop>
+              <stop offset="100%" stop-color="#d97706" stop-opacity="0"></stop>
+            </radialGradient>
+          </defs>
+          <circle cx="220" cy="220" r="190" fill="none" stroke="rgba(255,255,255,.08)" stroke-dasharray="5 6"></circle>
+          <circle cx="220" cy="220" r="84" fill="url(#g)"></circle>
+          <circle cx="220" cy="220" r="10" fill="#d97706"></circle>
+          <text x="220" y="252" text-anchor="middle" fill="#f5f1ea" font-size="13">第七章“我要离开这里</text>
+          <g><line x1="220" y1="220" x2="370" y2="220" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="370" cy="220" r="8" fill="#2dd4bf"/><text x="382" y="224" fill="#f5f1ea" font-size="12">page</text></g><g><line x1="220" y1="220" x2="266" y2="363" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="266" cy="363" r="8" fill="#2dd4bf"/><text x="278" y="367" fill="#f5f1ea" font-size="12">image</text></g><g><line x1="220" y1="220" x2="99" y2="308" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="99" cy="308" r="8" fill="#2dd4bf"/><text x="111" y="312" fill="#f5f1ea" font-size="12">content</text></g><g><line x1="220" y1="220" x2="99" y2="132" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="99" cy="132" r="8" fill="#2dd4bf"/><text x="111" y="136" fill="#f5f1ea" font-size="12">ocr</text></g><g><line x1="220" y1="220" x2="266" y2="77" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="266" cy="77" r="8" fill="#2dd4bf"/><text x="278" y="81" fill="#f5f1ea" font-size="12">第七章</text></g>
+        </svg>
+      </article>
+    </section>
+
+    <section class="section reveal" id="concepts">
+      <h2>核心概念与解释</h2>
+      <div class="concept-grid">
+      <article class="concept-card reveal">
+        <p class="concept-token">page</p>
+        <p class="concept-note">第七章“我要离开这里 101 [PAGE 111 IMAGE 1 CONTENT (OCR)]: （和其他女人）的责备，说她们是旧思想的蓄水池一阻碍这个村子 的人改变肤色变成白人。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">image</p>
+        <p class="concept-note">第七章“我要离开这里 101 [PAGE 111 IMAGE 1 CONTENT (OCR)]: （和其他女人）的责备，说她们是旧思想的蓄水池一阻碍这个村子 的人改变肤色变成白人。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">content</p>
+        <p class="concept-note">第七章“我要离开这里 101 [PAGE 111 IMAGE 1 CONTENT (OCR)]: （和其他女人）的责备，说她们是旧思想的蓄水池一阻碍这个村子 的人改变肤色变成白人。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">ocr</p>
+        <p class="concept-note">第七章“我要离开这里 101 [PAGE 111 IMAGE 1 CONTENT (OCR)]: （和其他女人）的责备，说她们是旧思想的蓄水池一阻碍这个村子 的人改变肤色变成白人。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">第七章</p>
+        <p class="concept-note">第七章“我要离开这里 101 [PAGE 111 IMAGE 1 CONTENT (OCR)]: （和其他女人）的责备，说她们是旧思想的蓄水池一阻碍这个村子 的人改变肤色变成白人。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">我要离开这里</p>
+        <p class="concept-note">第七章“我要离开这里 101 [PAGE 111 IMAGE 1 CONTENT (OCR)]: （和其他女人）的责备，说她们是旧思想的蓄水池一阻碍这个村子 的人改变肤色变成白人。</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="reading">
+      <h2>渐进式阅读路径</h2>
+      <div class="timeline">
+      <article class="timeline-item reveal">
+        <span class="timeline-no">01</span>
+        <h3>第七章“我要离开这里 101 [PAGE 111 IMAGE 1 CONTENT (OCR)]: （和其他女人）的责备，说她们是旧思想的蓄水池一阻碍这个村子</h3>
+        <p>第七章“我要离开这里 101 [PAGE 111 IMAGE 1 CONTENT (OCR)]: （和其他女人）的责备，说她们是旧思想的蓄水池一阻碍这个村子 的人改变肤色变成白人。 皮金语开始标志着所有对于美好生活的欲望，而泰雅博语则越来 越代表非理性、负面的特质一村民们异口同声认为这些特质需要被 压抑，这样他们或许才能改头换面。 其他人与小孩子互动的过程中。尽管在迦普恩，没有父母会认为怎样 和孩子说话需要任何总体的方向或规划，在我看来，很显然把孩子带 大的目标从来都是抑制住他们的“头”，从而展现他们的“知识”。这 一目标一直都是劝说或逼迫孩子超越自身对于自己应该得到什么的婴 儿式思维以及不满情绪，成熟地和其他人互动。 “二战”后在迦普恩变得根深蒂固的新世界里，孩子们如何能做 到这些？他们该如何表达自己的“知识”？</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">02</span>
+        <h3>因此家长们开始潜移默化地鼓励他们的孩子说皮金语。他们这么 做的第一步就是，不指望孩子们会说泰雅博语。只要父母们识别出孩 子们说的头三个泰雅博语里的单词——o</h3>
+        <p>因此家长们开始潜移默化地鼓励他们的孩子说皮金语。他们这么 做的第一步就是，不指望孩子们会说泰雅博语。只要父母们识别出孩 子们说的头三个泰雅博语里的单词——oki、minda和ayata—他们 就再也不把孩子发出的其他声音作泰雅博语来解读。相反（就家长们 所能注意到孩子说的话的程度来看），他们听什么都觉得是在说皮金 语。因此，一个一岁的婴儿含混不清地说了个“tatai”这样的词，就 会被解读成皮金语“Tataigo”（“姐姐要走了”）一—即便那个要走的 姐姐根本不在场，而不是被解读成明显的泰雅博语词组“Tataitukun （“把刀拿着”）—即便也没有刀。 与此同时，家长们在和孩子说话时，要顺应他们认为孩子更喜欢 的语言，以及强调那些被孩子无视的用泰雅博语表达的命令时，就用 皮金语。 102 雨林里的消亡 [PAGE 112 IMAGE 1 CONTENT (OCR)]: 到了1980年代中期，分水岭到了。第一代不再学习家乡语言的 孩子被生产出来了：当我1985年来到迦普恩时，没有一个十岁以下 的孩子会主动说泰雅博语，有一些年纪最小的小朋友甚至都不太听 得懂。 事实证明，有几个孩子最后还是学了泰雅博语。但这些未成年人 从不和任何人说这门语言，生怕村里吹毛求藏的大人会因为他们说错 了一个词或弄错了一个动词变形而羞辱他们。我在1980年代中期认 识的大多数孩子只掌握了被动运用这门语言的能力。今天已为人父母 的他们在和自己的孩子说话时，说的全是皮金语。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">03</span>
+        <h3>被一堆谎言喂养长大的后果之一是，迦普恩的孩子们很快就 意识到了他们身边的每个人都在说谎一他们的妈妈说谎，他们最 心爱的姐姐说谎，他们的父亲说谎，他们的姑姑说</h3>
+        <p>被一堆谎言喂养长大的后果之一是，迦普恩的孩子们很快就 意识到了他们身边的每个人都在说谎一他们的妈妈说谎，他们最 心爱的姐姐说谎，他们的父亲说谎，他们的姑姑说谎。早在第一次 被习惯性转移注意力时，一个母亲让她还没学会说话的婴儿朝向外 面，热情地指着雨林里某头不存在的猪时，孩子们就已经习以为常 了，人们说的关于世界的东西和世界的实际状态之间有一道难以弥 合的鸿沟。 孩子们最终意识到了，那头时不时被指给他们的猪实际上不存 在。他们看到了妈妈声称被偷偷运出村然后死掉的婴儿。他们意识 到，那些他们将像猪一样被绑起来然后被萨内巫师绑架的威胁不过是 虚张声势。等到了两岁的时候，孩子们就会发现村里人和他们说的大 部分话都是谎言。他们学会了要认真观察，仔细聆听，密切注意人们 所做的一而不是他们所说的一这样才能对世界的状态作出自己的 判断。 每天结束的时候，我的小保镖阿玛尼睡觉前，他的妈妈，也就是 我的邻居达莫总会试图哄骗他，让她往他身上倒一桶水给他洗澡。达 第七章“我要离开这里” 103 [PAGE 113 IMAGE 1 CONTENT (OCR)]: 莫坚持要给儿子洗澡的一个原因是，洗完澡后汗水和嵌在他小小身体 上的大部分泥渍就不会沾到睡毯上了，再就是村里人认为洗澡有助于 孩子成长。达莫几乎每天都要对阿玛尼崂叨，每每会提到我的名字： “如果你想长得像萨拉奇那么高，就得洗澡。如果你洗了澡，就会长 得又大又快。” 然而，就像大多数四岁的孩子一样，阿玛尼有其他想法。妈妈拿 着一个桶出来呼唤他的时候，他经常逃跑躲起来，常常是躲在我房子 下面的阴暗中。 一天夜里，达莫上演了全套的谎言试图让阿玛尼露面。她告诉他 说萨内的巫师要用施了咒的钩子射死他；说他死去祖父的灵魂从雨林 里出来找他；说他得病的叔叔死了，整个村子的人都去他家哭丧了。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">04</span>
+        <h3>阿玛尼对他妈妈每一个威胁都作出了回应，喊着：“Giaman！” （“你骗人！”） 达莫放弃了试图哄骗阿玛尼从我房子下面出来的企图，对坐在近 旁走廊的一个侄子</h3>
+        <p>阿玛尼对他妈妈每一个威胁都作出了回应，喊着：“Giaman！” （“你骗人！”） 达莫放弃了试图哄骗阿玛尼从我房子下面出来的企图，对坐在近 旁走廊的一个侄子悄声低语，告诉阿玛尼他的妈妈不带他了，准备自 已去他叔叔那里哭丧了。侄子重复了这个谎言，戳中了要害。阿玛尼 担心达莫可能要抛下他一个人待在这个黑漆漆的地方，就从我房子下 面探出头来，找寻自己的母亲。当他出现时，达莫正等着他。她冲了 上去，想一把抓住他。但他逃过了她的掌心，跑开了，又回到我的房 子下面。 这个时候，我也加人到了“讨好”（grisim）阿玛尼的队伍中。 我用像抹了黄油一样的声音引诱他说，我也要跟他的母亲去他叔叔家 给这个据说刚过世的人哭丧。我知道这个小男孩有多么喜欢在夜里帮 我打手电筒，就告诉阿玛尼，如果他从我家底下出来，他就可以拿着 手电筒，引导我们穿过黑暗去他叔叔家。 阿玛尼用皮金语说出的那句清澈透明的回答从我房子底下传出 104 雨林里的消亡 [PAGE 114 IMAGE 1 CONTENT (OCR)]: 来，那是一句脏话：“Opimwulbilongyu！”（“爆你菊花！”） 阿玛尼的妈妈站在我旁边听到这句话后，瞬间就被震惊到了。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">05</span>
+        <h3>“阿玛尼对萨拉奇说爆他菊花。”达莫目结舌地对每个坐在她家隔壁 的人说道。</h3>
+        <p>“阿玛尼对萨拉奇说爆他菊花。”达莫目结舌地对每个坐在她家隔壁 的人说道。 然后她和所有其他人都爆发出了一阵歇斯底里的笑声。 听到这一阵欢呼声后，阿玛尼笑容满面地从我家底下出来了。达 莫跑了过去，紧紧拥抱他。她把他举起，拥入怀中，然后一直狂笑不 止地重复说他要爆我菊花。她为自己这个小儿子感到骄傲。阿玛尼不 仅分辨出我骗了他这一事实，还告诉我该怎样用谎话骗人。 阿玛尼表现出了他的智识。</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="takeaways">
+      <h2>本关关键收获</h2>
+      <ul class="takeaways"><li><span>1</span>第七章“我要离开这里 101 [PAGE 111 IMAGE 1 CONTENT (OCR)]: （和其他女人）的责备，说她们是旧思想的蓄水池一阻碍这个村子</li><li><span>2</span>因此家长们开始潜移默化地鼓励他们的孩子说皮金语。他们这么 做的第一步就是，不指望孩子们会说泰雅博语。只要父母们识别出孩 子们说的头三个泰雅博语里的单词——o</li><li><span>3</span>被一堆谎言喂养长大的后果之一是，迦普恩的孩子们很快就 意识到了他们身边的每个人都在说谎一他们的妈妈说谎，他们最 心爱的姐姐说谎，他们的父亲说谎，他们的姑姑说</li><li><span>4</span>阿玛尼对他妈妈每一个威胁都作出了回应，喊着：“Giaman！” （“你骗人！”） 达莫放弃了试图哄骗阿玛尼从我房子下面出来的企图，对坐在近 旁走廊的一个侄子</li></ul>
+      <nav class="nav">
+        <a class="btn" href="/experiences/user-book-visual-reading-g4ia7j-4d99-g09-dining-in-gapun.html">上一关</a>
+        <a class="btn" href="/experiences/user-book-visual-reading-g4ia7j-4d99-g11-mattersoftheliver.html">下一关</a>
+      </nav>
+    </section>
+  </main>
+  <script>
+    (() => {
+      const progress = document.getElementById("progress");
+      const dots = Array.from(document.querySelectorAll("#dotNav button[data-target]"));
+      const sections = dots
+        .map((dot) => document.getElementById(dot.getAttribute("data-target")))
+        .filter(Boolean);
+      const reveals = Array.from(document.querySelectorAll(".reveal"));
+      const onScroll = () => {
+        const h = document.documentElement;
+        const total = Math.max(1, h.scrollHeight - window.innerHeight);
+        const pct = Math.max(0, Math.min(100, (window.scrollY / total) * 100));
+        if (progress) progress.style.width = pct + "%";
+      };
+      const io = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) entry.target.classList.add("in");
+        }
+      }, { threshold: .14 });
+      reveals.forEach((el) => io.observe(el));
+      const secIo = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const id = entry.target.id;
+          dots.forEach((dot) => dot.classList.toggle("active", dot.getAttribute("data-target") === id));
+        });
+      }, { threshold: .4 });
+      sections.forEach((s) => secIo.observe(s));
+      dots.forEach((dot) => {
+        dot.addEventListener("click", () => {
+          const target = document.getElementById(dot.getAttribute("data-target"));
+          if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+      window.addEventListener("scroll", onScroll, { passive: true });
+      onScroll();
+    })();
+  </script>
+</body>
+</html>

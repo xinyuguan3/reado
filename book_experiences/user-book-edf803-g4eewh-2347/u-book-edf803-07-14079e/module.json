@@ -1,0 +1,45 @@
+{
+  "slug": "u-book-edf803-07-14079e",
+  "order": 7,
+  "title": "Module 7 · pdf > 📅 审计时间: 2026-03-0",
+  "generatedBy": "playable-content-engine",
+  "generatedAt": "2026-03-07T09:27:51.290Z",
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T09:28:01.314Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "雨林里的消亡：一种语言和生活方式在巴布亚新几内亚的终结",
+      "author": ""
+    },
+    "knowledge_block": {
+      "id": "kb-13",
+      "gate_index": 7,
+      "title": "第四章摩西的计划 59 [PAGE 69 IMAGE 1 CONTENT (OCR)]: 把村子的三分之一都破坏掉的年轻人就后退了。他们转过身，",
+      "summary": "第四章摩西的计划 59 [PAGE 69 IMAGE 1 CONTENT (OCR)]: 把村子的三分之一都破坏掉的年轻人就后退了。他们转过身，走到村 子的末端，一开始砍树的地方。 摩西等在那儿，旁边是那几个盛满白汤的塑料桶。",
+      "words": 1127,
+      "keywords": [
+        "page",
+        "image",
+        "content",
+        "ocr",
+        "第四章摩西的计划",
+        "雨林里的消亡"
+      ],
+      "density": {
+        "score": 0.6348,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0.3194,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0.0248
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "anthro",
+      "theme_label": "Field Narrative",
+      "section_count": 5,
+      "generated_with": "template_runtime"
+    }
+  }
+}

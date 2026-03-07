@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>第二章 A Village in the Swamp 沼泽里的村庄 唐·雷考克建议我去迦普恩做田野调查的 时候，我在任何地图上都找不到这个地方， · 雨林里的消亡：一种语言和生活方式在巴布亚新几内亚的终结</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #16120f;
+      --bg2: #2a1f18;
+      --accent: #d97706;
+      --accent2: #2dd4bf;
+      --text: #f5f1ea;
+      --soft: #c7b8a2;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+      background:
+        radial-gradient(1200px 540px at 85% -8%, color-mix(in srgb, var(--accent2) 24%, transparent), transparent 70%),
+        radial-gradient(980px 460px at -10% 14%, color-mix(in srgb, var(--accent) 24%, transparent), transparent 74%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+      color: var(--text);
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .05;
+      background-image: radial-gradient(circle at 1px 1px, #fff 1px, transparent 0);
+      background-size: 3px 3px;
+      z-index: 0;
+    }
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      z-index: 100;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+    .page { position: relative; z-index: 1; width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 20px 0 48px; }
+    .hero {
+      min-height: 74vh;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 22px;
+      background: linear-gradient(160deg, color-mix(in srgb, var(--bg2) 86%, transparent), color-mix(in srgb, var(--bg) 88%, transparent));
+      padding: 40px 34px;
+      display: grid;
+      align-content: center;
+      gap: 16px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.34);
+    }
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .hero h1 {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(32px, 5.4vw, 68px);
+      line-height: 1.16;
+      letter-spacing: .04em;
+      max-width: 15em;
+      text-wrap: balance;
+    }
+    .hero p {
+      max-width: 66ch;
+      line-height: 1.95;
+      color: color-mix(in srgb, var(--text) 85%, var(--soft));
+      font-size: 16px;
+    }
+    .chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip {
+      border: 1px solid color-mix(in srgb, var(--accent2) 44%, transparent);
+      color: color-mix(in srgb, var(--accent2) 88%, #fff);
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 12px;
+      background: rgba(255,255,255,.03);
+    }
+    .section { margin-top: 18px; border: 1px solid rgba(255,255,255,.13); border-radius: 18px; padding: 22px; background: rgba(2,6,18,.46); }
+    .section h2 {
+      margin-bottom: 12px;
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(22px, 2.8vw, 34px);
+      color: color-mix(in srgb, var(--accent) 86%, #fff);
+      letter-spacing: .03em;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1.1fr 1fr; gap: 14px; }
+    .concept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+    .concept-card {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      background: rgba(255,255,255,.03);
+      padding: 14px;
+      min-height: 128px;
+    }
+    .concept-token { font-size: 14px; letter-spacing: .14em; color: var(--accent2); text-transform: uppercase; margin-bottom: 7px; font-weight: 700; }
+    .concept-note { font-size: 14px; color: color-mix(in srgb, var(--text) 88%, var(--soft)); line-height: 1.8; }
+    .atlas {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      min-height: 440px;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+    .atlas svg { width: 100%; max-width: 440px; height: auto; }
+    .timeline { display: grid; gap: 10px; }
+    .timeline-item {
+      border-left: 2px solid color-mix(in srgb, var(--accent) 66%, transparent);
+      padding: 10px 14px;
+      background: rgba(255,255,255,.02);
+      border-radius: 0 10px 10px 0;
+    }
+    .timeline-no { font-size: 11px; letter-spacing: .22em; color: var(--accent2); display: block; margin-bottom: 6px; }
+    .timeline-item h3 { font-size: 19px; font-family: "Noto Serif SC", serif; line-height: 1.45; margin-bottom: 7px; }
+    .timeline-item p { font-size: 14px; line-height: 1.9; color: color-mix(in srgb, var(--text) 84%, var(--soft)); }
+    .quote-wrap { display: grid; gap: 10px; }
+    .quote {
+      border-left: 2px solid color-mix(in srgb, var(--accent2) 80%, transparent);
+      padding: 10px 12px;
+      background: rgba(255,255,255,.02);
+      color: color-mix(in srgb, var(--text) 92%, #fff);
+      font-family: "Noto Serif SC", serif;
+      line-height: 1.9;
+    }
+    .takeaways { margin-top: 10px; list-style: none; display: grid; gap: 8px; }
+    .takeaways li {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      padding: 10px;
+      background: rgba(255,255,255,.02);
+      align-items: start;
+      line-height: 1.8;
+    }
+    .takeaways span {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: color-mix(in srgb, var(--accent2) 26%, transparent);
+      color: var(--accent2);
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+    .nav { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,.26);
+      border-radius: 999px;
+      padding: 8px 13px;
+      font-size: 12px;
+      color: var(--text);
+      background: rgba(255,255,255,.04);
+    }
+    .btn:hover { border-color: var(--accent2); color: var(--accent2); }
+    .dot-nav {
+      position: fixed;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: grid;
+      gap: 10px;
+      z-index: 50;
+    }
+    .dot-nav button {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.35);
+      background: transparent;
+      cursor: pointer;
+      transition: all .24s ease;
+    }
+    .dot-nav button.active { transform: scale(1.34); border-color: var(--accent); background: var(--accent); }
+    .reveal { opacity: 0; transform: translateY(16px); transition: opacity .55s ease, transform .55s ease; }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+    @media (max-width: 940px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .dot-nav { display: none; }
+      .hero { min-height: auto; padding: 30px 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+  <nav class="dot-nav" id="dotNav">
+    <button data-target="hero" class="active" aria-label="Hero"></button>
+    <button data-target="atlas" aria-label="Atlas"></button>
+    <button data-target="concepts" aria-label="Concepts"></button>
+    <button data-target="reading" aria-label="Reading"></button>
+    <button data-target="takeaways" aria-label="Takeaways"></button>
+  </nav>
+  <main class="page">
+    <section class="hero reveal in" id="hero">
+      <p class="eyebrow">Field Narrative · Gate 2</p>
+      <h1>第二章 A Village in the Swamp 沼泽里的村庄 唐·雷考克建议我去迦普恩做田野调查的 时候，我在任何地图上都找不到这个地方，</h1>
+      <p>第二章 A Village in the Swamp 沼泽里的村庄 唐·雷考克建议我去迦普恩做田野调查的 时候，我在任何地图上都找不到这个地方，但 好像也用不着戴着软木遮阳帽，怀揣指南针和 地形图那样深人雨林才能找到。 迦普恩（依然如此）人迹罕至，从韦瓦 克，也就是东塞皮克省的首府，或邻近一个叫 马当的省的同名首府出发，要花三天时间才能 到。但许多生活在距离这个村庄约三十英里的 人大致知道在哪里，也有一些有外马达的人 最远可以把你载到塞皮克河河口处不远的那一 大片红树林湖，然后你得穿过那里抵达迦普 恩。一到湖，就开始有点诡异了，因为你得 从密密麻麻的红树林里找到通往雨林的那条浅 浅婉蜓的小溪。乘约半小时木筏，终点就在眼 前。你下了木</p>
+      <div class="chip-row">
+        <span class="chip">雨林里的消亡：一种语言和生活方式在巴布亚新几内亚的终结</span>
+        
+        <span class="chip">Module 2/24</span>
+        <span class="tag">page</span><span class="tag">image</span><span class="tag">content</span><span class="tag">ocr</span><span class="tag">第二章</span><span class="tag">village</span>
+      </div>
+    </section>
+
+    <section class="section grid-2 reveal" id="atlas">
+      <article>
+        <h2>知识结构图谱</h2>
+        <p style="color:var(--soft);line-height:1.9;margin-bottom:10px;">围绕本关卡核心概念构建关系图。阅读时先抓主轴，再理解每个概念如何驱动判断与行动。</p>
+        <div class="quote-wrap"><blockquote class="quote reveal">“大多数村民（就像巴布亚新几内亚内地人）都不高，不足5英 尺，许多人在4英尺左右。让人惊讶的是，我在离开村子，开始处理 我的照片时（别忘了，我第一次去还是1980年代中期，还处在要把 照片送到冲印店，等着洗出来寄还给你的原始阶段），才意识到他们 原来这么矮。看到我教几个年轻人给我拍照时，我简直不敢相信大部 分村民只到我胸口。我之前的印象是他们高出我许多。的确，和村民 待在一起的大多数时候，我都坐在地上，以横鞍的尴尬姿势身体前 倾，我猜，这”</blockquote><blockquote class="quote reveal">“除了家人生活的房屋外，他们还有男人房子。男人房子是村民 的传统宗教信仰和政治组织遗留下来的。直到第二次世界大战不可逆 转地打乱了当地人的生活（1942年，日军入侵巴布亚新几内亚北部， 在那儿建立了基地，其中一个就离迦普恩不远）之前，迦普恩的宗教 和政治生活都围绕着男性票拜展开。这类崇拜的对象是令人生畏的嗜 血的神，每当男人在葬礼、成人礼和庆祝打胜仗的场合吹响巨大的 竹笛时，神们就会应约而来。对于这些神祗的崇拜一一在这一带非 22 雨林里”</blockquote><blockquote class="quote reveal">“村民们叽叽喳喳着赶过来看一眼这个新来的白人，他们都戴着整 洁的圆帽，一头黑发毛茸茸的，牙齿有红的也有黑的。每个人嚼的槟 椰散发出一种让人眩晕的浓烈薄荷味，村民自已身上散发的汗味则清 新干净又沁人心脾。七岁以下的孩童都光着身子。大一点的男孩和男 人们则穿着程度不一的破布做成的短裤。女人不准进入架起的男人房 子，但她们能自由站在地上，把手肘搭在抬高的露天地板上。她们中 多数人祖胸露乳，一块长布松散地系在腰间。没人穿鞋子，我注意到 的第一件事”</blockquote></div>
+      </article>
+      <article class="atlas">
+        <svg viewBox="0 0 440 440" aria-label="concept atlas">
+          <defs>
+            <radialGradient id="g" cx="50%" cy="50%" r="56%">
+              <stop offset="0%" stop-color="#d97706" stop-opacity=".24"></stop>
+              <stop offset="100%" stop-color="#d97706" stop-opacity="0"></stop>
+            </radialGradient>
+          </defs>
+          <circle cx="220" cy="220" r="190" fill="none" stroke="rgba(255,255,255,.08)" stroke-dasharray="5 6"></circle>
+          <circle cx="220" cy="220" r="84" fill="url(#g)"></circle>
+          <circle cx="220" cy="220" r="10" fill="#d97706"></circle>
+          <text x="220" y="252" text-anchor="middle" fill="#f5f1ea" font-size="13">第二章 A Village in the Swa</text>
+          <g><line x1="220" y1="220" x2="370" y2="220" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="370" cy="220" r="8" fill="#2dd4bf"/><text x="382" y="224" fill="#f5f1ea" font-size="12">page</text></g><g><line x1="220" y1="220" x2="266" y2="363" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="266" cy="363" r="8" fill="#2dd4bf"/><text x="278" y="367" fill="#f5f1ea" font-size="12">image</text></g><g><line x1="220" y1="220" x2="99" y2="308" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="99" cy="308" r="8" fill="#2dd4bf"/><text x="111" y="312" fill="#f5f1ea" font-size="12">content</text></g><g><line x1="220" y1="220" x2="99" y2="132" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="99" cy="132" r="8" fill="#2dd4bf"/><text x="111" y="136" fill="#f5f1ea" font-size="12">ocr</text></g><g><line x1="220" y1="220" x2="266" y2="77" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="266" cy="77" r="8" fill="#2dd4bf"/><text x="278" y="81" fill="#f5f1ea" font-size="12">第二章</text></g>
+        </svg>
+      </article>
+    </section>
+
+    <section class="section reveal" id="concepts">
+      <h2>核心概念与解释</h2>
+      <div class="concept-grid">
+      <article class="concept-card reveal">
+        <p class="concept-token">page</p>
+        <p class="concept-note">17 [PAGE 27 IMAGE 1 CONTENT (OCR)]: 第一次去迦普恩的时候，我先去了韦瓦克。在澳大利亚，别人给 了我韦瓦克的一个澳大利亚男人的名字，那人的太太是巴布亚新几内 亚人。那个男人好心安排他的小舅子带我去了塞皮克河一个叫塔威的 村子，在那儿我雇了一条舷外马达驱动的木筏带我去迦普恩。我雇的 这两个带我去迦普恩的男人知道去村子的路，因为</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">image</p>
+        <p class="concept-note">17 [PAGE 27 IMAGE 1 CONTENT (OCR)]: 第一次去迦普恩的时候，我先去了韦瓦克。在澳大利亚，别人给 了我韦瓦克的一个澳大利亚男人的名字，那人的太太是巴布亚新几内 亚人。那个男人好心安排他的小舅子带我去了塞皮克河一个叫塔威的 村子，在那儿我雇了一条舷外马达驱动的木筏带我去迦普恩。我雇的 这两个带我去迦普恩的男人知道去村子的路，因为</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">content</p>
+        <p class="concept-note">17 [PAGE 27 IMAGE 1 CONTENT (OCR)]: 第一次去迦普恩的时候，我先去了韦瓦克。在澳大利亚，别人给 了我韦瓦克的一个澳大利亚男人的名字，那人的太太是巴布亚新几内 亚人。那个男人好心安排他的小舅子带我去了塞皮克河一个叫塔威的 村子，在那儿我雇了一条舷外马达驱动的木筏带我去迦普恩。我雇的 这两个带我去迦普恩的男人知道去村子的路，因为</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">ocr</p>
+        <p class="concept-note">17 [PAGE 27 IMAGE 1 CONTENT (OCR)]: 第一次去迦普恩的时候，我先去了韦瓦克。在澳大利亚，别人给 了我韦瓦克的一个澳大利亚男人的名字，那人的太太是巴布亚新几内 亚人。那个男人好心安排他的小舅子带我去了塞皮克河一个叫塔威的 村子，在那儿我雇了一条舷外马达驱动的木筏带我去迦普恩。我雇的 这两个带我去迦普恩的男人知道去村子的路，因为</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">第二章</p>
+        <p class="concept-note">第二章 A Village in the Swamp 沼泽里的村庄 唐·雷考克建议我去迦普恩做田野调查的 时候，我在任何地图上都找不到这个地方，但 好像也用不着戴着软木遮阳帽，怀揣指南针和 地形图那样深人雨林才能找到。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">village</p>
+        <p class="concept-note">第二章 A Village in the Swamp 沼泽里的村庄 唐·雷考克建议我去迦普恩做田野调查的 时候，我在任何地图上都找不到这个地方，但 好像也用不着戴着软木遮阳帽，怀揣指南针和 地形图那样深人雨林才能找到。</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="reading">
+      <h2>渐进式阅读路径</h2>
+      <div class="timeline">
+      <article class="timeline-item reveal">
+        <span class="timeline-no">01</span>
+        <h3>第二章 A Village in the Swamp 沼泽里的村庄 唐·雷考克建议我去迦普恩做田野调查的 时候，我在任何地图上都找不到这个地方，但 好像也用</h3>
+        <p>第二章 A Village in the Swamp 沼泽里的村庄 唐·雷考克建议我去迦普恩做田野调查的 时候，我在任何地图上都找不到这个地方，但 好像也用不着戴着软木遮阳帽，怀揣指南针和 地形图那样深人雨林才能找到。 迦普恩（依然如此）人迹罕至，从韦瓦 克，也就是东塞皮克省的首府，或邻近一个叫 马当的省的同名首府出发，要花三天时间才能 到。但许多生活在距离这个村庄约三十英里的 人大致知道在哪里，也有一些有外马达的人 最远可以把你载到塞皮克河河口处不远的那一 大片红树林湖，然后你得穿过那里抵达迦普 恩。一到湖，就开始有点诡异了，因为你得 从密密麻麻的红树林里找到通往雨林的那条浅 浅婉蜓的小溪。乘约半小时木筏，终点就在眼 前。你下了木，把腰束紧，再花一个钟头穿 过一片沼泽地。 17 [PAGE 27 IMAGE 1 CONTENT (OCR)]: 第一次去迦普恩的时候，我先去了韦瓦克。在澳大利亚，别人给 了我韦瓦克的一个澳大利亚男人的名字，那人的太太是巴布亚新几内 亚人。那个男人好心安排他的小舅子带我去了塞皮克河一个叫塔威的 村子，在那儿我雇了一条舷外马达驱动的木筏带我去迦普恩。我雇的 这两个带我去迦普恩的男人知道去村子的路，因为他们有一个远房亲 戚娶了一个迦普恩女人。他们去迦普恩看过他一次。 天刚亮我们就出发，下午晚些时候到了迦普恩。抵达村子的时 候，我已经被这趟沼泽之行搞得筋疲力尽，也因为饥饿和方向迷失处 于恍恍愧惚的状态。我的两个向导把我放在了露天的男人房子里，然 后叫了一个小孩去找他们的亲戚。 那个时候，我才在巴布亚新几内亚待了差不多两周，皮金语水平 非常有限。我能对那些赶来围观我的好奇村民说的话只有不，我不是 一个神父，这是他们所有人问我的第一个问题。我呆呆地待在原地， 我的向导跟村民们解释我是谁，我来干什么，以及我想待在这里。这 个事情首先讲给那些聚在那个男人房子周围的男男女女们听，当我的 向导的亲戚出现后，再详细复述给他听。我的向导们决定让这个亲戚 在我留在迦普恩期间照应我。 这个唐·雷考克从未到过也一无所知的村子，其实是雨林里一处 风平浪静的裂缝。它的周遭被根植在广表无琅的沼泽地里的大片植被 环绕。穿过那一片黏糊糊又臭烘烘的沼泽到达村子后，我可算是意识 到了许多人对雨林抱持的那种浪漫想象一—用外交辞令来说—是有 误导性的。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">02</span>
+        <h3>雨林，过去的叫法是丛林。我不清楚从什么时候开始突然要用政 所唤起的那种生猛感和威胁感更好地传达了进人这样一个环境的感受。</h3>
+        <p>雨林，过去的叫法是丛林。我不清楚从什么时候开始突然要用政 所唤起的那种生猛感和威胁感更好地传达了进人这样一个环境的感受。 18 雨林里的消亡 [PAGE 28 IMAGE 1 CONTENT (OCR)]: 雨林听上去颇有点田园牧歌的味道。常有人告知我们，它们是 地球的肺。这个被净化后的比喻让人联想起新鲜的空气、美丽的花 朵、翩跃的蝴蝶、温和且笑容满面的土著人，生活一片和谐，周遭 枝繁叶茂。 相反，丛林则不是那么友好的地方。丛林唤起的是深不可测的植 被和毒蛇的形象；是干枯的头颅和食人怪；是一大群凶残的食人鱼几 分钟之内就把一头水牛生吞活剥；是浩浩荡荡的蚂蚁大军像沥青一样 覆盖路上所有的活物，用成千上方小剪刀一样的上颚让它们四分五裂。 丛林是人们被流沙吞没，被鳄鱼蚕食的地方。雨林是人们与自然 和谐共处，与生态圈融为一体的地方。 迦普恩所在的区域更像是丛林而非雨林。那里有蚊疫、有鳄鱼、 有爬到你眼睛上的黑水蛭，还有剧毒无比的蛇（准确的叫法是死亡 蛇）你一转身，到处都是那种满是针刺的树，豌缠绕着有锯齿状 尖头的藤蔓，你走过的时候，会把你绊倒或刺伤你的脸或皮肤。还有 泥，铺天盖地的泥。在泥土的掩盖下，那些尖锐的、带刺的、凹凸不 平的，有时还带毒的生物和残骸就潜伏在那里，你会滑倒一会跌倒 在鳄鱼或死亡蛇头顶，或劈头盖脸撞到一棵带针刺的树上，又或是一 片带锯齿尖头的藤蔓里。 还有那里的炎热，那种压迫着你的没完没了让你疲惫不堪的潮 湿，仿佛要从你身体每个毛孔里拽出汗水，甚至你自已都不知道原来 身上那些地方还有毛孔。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">03</span>
+        <h3>这就是我身处的环境，我就像一个骑着横鞍的女人一样坐在村里 男人房子的树皮地板上，双脚缩在臀部的右侧，微微向我的左手边前 倾。（尽管往后的那些年里，我习惯了坐</h3>
+        <p>这就是我身处的环境，我就像一个骑着横鞍的女人一样坐在村里 男人房子的树皮地板上，双脚缩在臀部的右侧，微微向我的左手边前 倾。（尽管往后的那些年里，我习惯了坐在地板上，但我从来没学会 舒服的盘腿坐姿。）我聆听周围的声音：知了声声刺耳，鹦鹉偶尔发 第二章沼泽里的村庄 19 [PAGE 29 IMAGE 1 CONTENT (OCR)]: 出尖叫，一群飞舞的狐蝠发出的声音像猴子叫，它们白天倒挂在巨大 的无花果树上的巢里，那棵树就在村子外头。时不时地，一丝蝙蝠的 刺鼻尿骚味一—就像烧焦的橡胶伴随着脏袜子的气味一会飘进男人 房子里。它暂时穿透了浓稠和熟透的气息。空气就像一件湿答答的大 衣，被热带的丰饶压得很低很低。 村民们叽叽喳喳着赶过来看一眼这个新来的白人，他们都戴着整 洁的圆帽，一头黑发毛茸茸的，牙齿有红的也有黑的。每个人嚼的槟 椰散发出一种让人眩晕的浓烈薄荷味，村民自已身上散发的汗味则清 新干净又沁人心脾。七岁以下的孩童都光着身子。大一点的男孩和男 人们则穿着程度不一的破布做成的短裤。女人不准进入架起的男人房 子，但她们能自由站在地上，把手肘搭在抬高的露天地板上。她们中 多数人祖胸露乳，一块长布松散地系在腰间。没人穿鞋子，我注意到 的第一件事就是他们的脚硕大无比。那脚宽大、平坦而威严。脚掌慢 慢收窄，然后是厚厚的灵活的脚趾，仿佛能伸展开来住什么。我的 四肢窄窄的，他们则不像我，手指秀气而扁平。看我的脚，我觉得自 已就像一个裹了脚的中国妓女。 大多数村民（就像巴布亚新几内亚内地人）都不高，不足5英 尺，许多人在4英尺左右。让人惊讶的是，我在离开村子，开始处理 我的照片时（别忘了，我第一次去还是1980年代中期，还处在要把 照片送到冲印店，等着洗出来寄还给你的原始阶段），才意识到他们 原来这么矮。看到我教几个年轻人给我拍照时，我简直不敢相信大部 分村民只到我胸口。我之前的印象是他们高出我许多。的确，和村民 待在一起的大多数时候，我都坐在地上，以横鞍的尴尬姿势身体前 倾，我猜，这因此缩小了身高差，如果我站起来，则会更明显。但我 偶尔也站起来，在雨林里和村民走来走去，挨家挨户串门。照片证明 我确实站在他们身边过，但我却对身高差浑然不觉。我的结论是，不 20 雨林里的消亡 [PAGE 30 IMAGE 1 CONTENT (OCR)]: 管他们实际的外形尺寸怎么样，村民们的确高过我，至少就心理层面 是这样，他们关于雨林的知识远胜于我，我也得完全依靠他们才能在 那里生存。 迦普恩是一个大杂烩，二十多个小房子随意地分布在一条狭长的 林中空地中央。房子聚集在一起，各自隔着椰子树、修长的槟榔树和 长着光滑的粉红马六甲蒲桃（皮金语里叫laulaus）的硬皮树。村子 的这一片区域不长草，主要以泥土为主。长着硬鬃毛的黑猪顶着大嘴 吵吵闹闹又优哉游哉地穿过泥地，吞食村民丢弃在路上的食物残</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">04</span>
+        <h3>房子清一色高出地面三英尺多到五英尺不等，因为暴雨（雨林得名于 此）会淹没建房的地面，把它变成一大片泥塘。有的房屋用竹竿或劈 开压平的竹子织成的垫子围起来。但</h3>
+        <p>房子清一色高出地面三英尺多到五英尺不等，因为暴雨（雨林得名于 此）会淹没建房的地面，把它变成一大片泥塘。有的房屋用竹竿或劈 开压平的竹子织成的垫子围起来。但大部分都是露天结构，有一两堵 矮墙为灶台挡风，灶台在屋子的另一端，是屋子里大部分的活动发生 的地方。 房屋的地板让我着迷。地板硬而平坦，但遍布着又长又深的孔 隙。我后来发现地板是用一种棕榈树制成的，男人们先把棕榈树砍 倒，然后沿着树皮的纹理一路剁下来，直到整棵棕榈树都打上孔，再 把整段树砍下来。树皮裂开，里面的木髓用铲子刮掉。余下的外面的 树皮卷成毯子的样子，带回村里，再摊开到用藤蔓固定在支撑柱上的 滑轨上。平均一间房屋的地板需要九卷（每卷5英尺×11英尺）。 随着树皮变干，棕榈树上的凿痕会变粗变硬，地板上的那些宽的 第二章沼泽里的村庄 21 [PAGE 31 IMAGE 1 CONTENT (OCR)]: 裂缝就是这么来的。在清扫残羹剩饭时，这些裂缝就变得很方便。村 民们总是坐在一条裂缝旁边，这样他们坐着嚼槟榔的时候，就能把嘴里 的苦涩红色汁液吐掉。地板上的裂缝也很方便处理小孩子的排泄物，每 当有婴儿把尿或大便排在地板上的时候，用一杯水就能将之一扫而光。 房屋的内部看上去基本如出一辙。房间里什么家具都没有，除了 灶边总放着女人用来烧水煮饭的几个铝锅。这些锅子是村民们用捕杀 鳄鱼卖皮或种植咖啡和可可之类的经济作物赚来的钱买的。这些活动 偶尔也能赚一点小钱，但其他地方的买家很少觉得长途跋涉来一趟迦 普恩有利可图，村民们也没有把种植的作物运给买家的手段。村民用 来营生的大部分作物最后只能在藤蔓里烂掉，或在树上枯死。 尽管村里房屋的内部布局相较我第一次去的时候有了些许改变 （从那时起，有几个村民听说白人的房子里有房间后，也开始把房子 隔成几个房间），一般的房子里还是只有一个大单间，各式各样的活 动在里面同时发生。人们坐着吃西米，吐槟榔汁，往購珊学步的婴 儿身上倒水，去除烟草叶子的中脉，切碎椰子，剥芋头，打狗，卷 烟，一把小刀剥完芋头，随即就若无其事地用来清除指甲或脚趾间的 沙粒一就在同一个地方做完这些之后，一天过完，他们搭起一个蚊 帐，和孩子一起爬进睡垫里，然后进人梦乡。 除了家人生活的房屋外，他们还有男人房子。男人房子是村民 的传统宗教信仰和政治组织遗留下来的。直到第二次世界大战不可逆 转地打乱了当地人的生活（1942年，日军入侵巴布亚新几内亚北部， 在那儿建立了基地，其中一个就离迦普恩不远）之前，迦普恩的宗教 和政治生活都围绕着男性票拜展开。这类崇拜的对象是令人生畏的嗜 血的神，每当男人在葬礼、成人礼和庆祝打胜仗的场合吹响巨大的 竹笛时，神们就会应约而来。对于这些神祗的崇拜一一在这一带非 22 雨林里的消亡 [PAGE 32 IMAGE 1 CONTENT (OCR)]: 常普遍，在皮金语里叫坦巴兰崇拜，人</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">05</span>
+        <h3>在坦巴兰崇拜里，两性的分隔壁垒森严，女人和孩子生活在小房 子里，男人和少年一起住在男人房子里。女人煮饭给男人和男孩吃， 白天男人和妻子去雨林里加工西米粉，打</h3>
+        <p>在坦巴兰崇拜里，两性的分隔壁垒森严，女人和孩子生活在小房 子里，男人和少年一起住在男人房子里。女人煮饭给男人和男孩吃， 白天男人和妻子去雨林里加工西米粉，打理园地。但女人被禁止进入 男人房子，当神圣的笛子吹响时，男人房子会用西米棕榈条封住，女 人则被勒令不准在房子周围活动，违者处死。 “二战”结束后几年，罗马教廷的传教士们来到迦普恩，他们很 快就让村民们皈依了基督教。不论出于何种意图和目的，坦巴兰崇拜 停滞了下来，男人房子的权力也式微了。尽管直至今日，坦巴兰神 依然没有向女人揭开其面目，神圣的笛子还保存在雨林的壁龛里，由 几个男性村民照看。男人房子（在任何时候，村子里都有两到三间） 依然保留着禁忌的光环，女人禁正人内。 1950年代，村民们建了第一座教堂。因为白蚁的蛀蚀和暴风雨 的侵蚀，旧的教堂塌后，他们每隔十年就要建一座新的。我到迦普 恩的时候，就路过了一座最新修建的教堂。它位于村庄郊野，是我出 了沼泽见到的第一座建筑。这座教堂也是当时村子里最大的建筑，可 以容纳一百多人。这也是唯一一座没有被架起来的建筑，这意味着每 到周日，尤其是大雨过后，村民们无法习以为常地坐在低矮的长椅 上。他们得站着做礼拜一一男人站在教堂右侧，女人和孩子站在左 侧一在污浊的水坑里。 当地一个识字的男人每周日做弥撒，村民们在昔日是象牙白，如 今是透着蓝色的耶稣肖像的注视下吟唱祷告，这幅肖像是很久以前一 位来过村子的传教士捐赠的。</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="takeaways">
+      <h2>本关关键收获</h2>
+      <ul class="takeaways"><li><span>1</span>第二章 A Village in the Swamp 沼泽里的村庄 唐·雷考克建议我去迦普恩做田野调查的 时候，我在任何地图上都找不到这个地方，但 好像也用</li><li><span>2</span>雨林，过去的叫法是丛林。我不清楚从什么时候开始突然要用政 所唤起的那种生猛感和威胁感更好地传达了进人这样一个环境的感受。</li><li><span>3</span>这就是我身处的环境，我就像一个骑着横鞍的女人一样坐在村里 男人房子的树皮地板上，双脚缩在臀部的右侧，微微向我的左手边前 倾。（尽管往后的那些年里，我习惯了坐</li><li><span>4</span>房子清一色高出地面三英尺多到五英尺不等，因为暴雨（雨林得名于 此）会淹没建房的地面，把它变成一大片泥塘。有的房屋用竹竿或劈 开压平的竹子织成的垫子围起来。但</li></ul>
+      <nav class="nav">
+        <a class="btn" href="/experiences/u-book-edf803-01-d6140a.html">上一关</a>
+        <a class="btn" href="/experiences/u-book-edf803-03-c81176.html">下一关</a>
+      </nav>
+    </section>
+  </main>
+  <script>
+    (() => {
+      const progress = document.getElementById("progress");
+      const dots = Array.from(document.querySelectorAll("#dotNav button[data-target]"));
+      const sections = dots
+        .map((dot) => document.getElementById(dot.getAttribute("data-target")))
+        .filter(Boolean);
+      const reveals = Array.from(document.querySelectorAll(".reveal"));
+      const onScroll = () => {
+        const h = document.documentElement;
+        const total = Math.max(1, h.scrollHeight - window.innerHeight);
+        const pct = Math.max(0, Math.min(100, (window.scrollY / total) * 100));
+        if (progress) progress.style.width = pct + "%";
+      };
+      const io = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) entry.target.classList.add("in");
+        }
+      }, { threshold: .14 });
+      reveals.forEach((el) => io.observe(el));
+      const secIo = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const id = entry.target.id;
+          dots.forEach((dot) => dot.classList.toggle("active", dot.getAttribute("data-target") === id));
+        });
+      }, { threshold: .4 });
+      sections.forEach((s) => secIo.observe(s));
+      dots.forEach((dot) => {
+        dot.addEventListener("click", () => {
+          const target = document.getElementById(dot.getAttribute("data-target"));
+          if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+      window.addEventListener("scroll", onScroll, { passive: true });
+      onScroll();
+    })();
+  </script>
+</body>
+</html>

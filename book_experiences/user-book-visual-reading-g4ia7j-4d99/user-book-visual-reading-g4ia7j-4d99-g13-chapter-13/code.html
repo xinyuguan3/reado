@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>第十三章谁杀死了莫内 · 雨林里的消亡：一种语言和生活方式在巴布亚新几内亚的终结</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #16120f;
+      --bg2: #2a1f18;
+      --accent: #d97706;
+      --accent2: #2dd4bf;
+      --text: #f5f1ea;
+      --soft: #c7b8a2;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+      background:
+        radial-gradient(1200px 540px at 85% -8%, color-mix(in srgb, var(--accent2) 24%, transparent), transparent 70%),
+        radial-gradient(980px 460px at -10% 14%, color-mix(in srgb, var(--accent) 24%, transparent), transparent 74%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+      color: var(--text);
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .05;
+      background-image: radial-gradient(circle at 1px 1px, #fff 1px, transparent 0);
+      background-size: 3px 3px;
+      z-index: 0;
+    }
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      z-index: 100;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+    .page { position: relative; z-index: 1; width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 20px 0 48px; }
+    .hero {
+      min-height: 74vh;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 22px;
+      background: linear-gradient(160deg, color-mix(in srgb, var(--bg2) 86%, transparent), color-mix(in srgb, var(--bg) 88%, transparent));
+      padding: 40px 34px;
+      display: grid;
+      align-content: center;
+      gap: 16px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.34);
+    }
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .hero h1 {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(32px, 5.4vw, 68px);
+      line-height: 1.16;
+      letter-spacing: .04em;
+      max-width: 15em;
+      text-wrap: balance;
+    }
+    .hero p {
+      max-width: 66ch;
+      line-height: 1.95;
+      color: color-mix(in srgb, var(--text) 85%, var(--soft));
+      font-size: 16px;
+    }
+    .chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip {
+      border: 1px solid color-mix(in srgb, var(--accent2) 44%, transparent);
+      color: color-mix(in srgb, var(--accent2) 88%, #fff);
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 12px;
+      background: rgba(255,255,255,.03);
+    }
+    .section { margin-top: 18px; border: 1px solid rgba(255,255,255,.13); border-radius: 18px; padding: 22px; background: rgba(2,6,18,.46); }
+    .section h2 {
+      margin-bottom: 12px;
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(22px, 2.8vw, 34px);
+      color: color-mix(in srgb, var(--accent) 86%, #fff);
+      letter-spacing: .03em;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1.1fr 1fr; gap: 14px; }
+    .concept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+    .concept-card {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      background: rgba(255,255,255,.03);
+      padding: 14px;
+      min-height: 128px;
+    }
+    .concept-token { font-size: 14px; letter-spacing: .14em; color: var(--accent2); text-transform: uppercase; margin-bottom: 7px; font-weight: 700; }
+    .concept-note { font-size: 14px; color: color-mix(in srgb, var(--text) 88%, var(--soft)); line-height: 1.8; }
+    .atlas {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      min-height: 440px;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+    .atlas svg { width: 100%; max-width: 440px; height: auto; }
+    .timeline { display: grid; gap: 10px; }
+    .timeline-item {
+      border-left: 2px solid color-mix(in srgb, var(--accent) 66%, transparent);
+      padding: 10px 14px;
+      background: rgba(255,255,255,.02);
+      border-radius: 0 10px 10px 0;
+    }
+    .timeline-no { font-size: 11px; letter-spacing: .22em; color: var(--accent2); display: block; margin-bottom: 6px; }
+    .timeline-item h3 { font-size: 19px; font-family: "Noto Serif SC", serif; line-height: 1.45; margin-bottom: 7px; }
+    .timeline-item p { font-size: 14px; line-height: 1.9; color: color-mix(in srgb, var(--text) 84%, var(--soft)); }
+    .quote-wrap { display: grid; gap: 10px; }
+    .quote {
+      border-left: 2px solid color-mix(in srgb, var(--accent2) 80%, transparent);
+      padding: 10px 12px;
+      background: rgba(255,255,255,.02);
+      color: color-mix(in srgb, var(--text) 92%, #fff);
+      font-family: "Noto Serif SC", serif;
+      line-height: 1.9;
+    }
+    .takeaways { margin-top: 10px; list-style: none; display: grid; gap: 8px; }
+    .takeaways li {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      padding: 10px;
+      background: rgba(255,255,255,.02);
+      align-items: start;
+      line-height: 1.8;
+    }
+    .takeaways span {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: color-mix(in srgb, var(--accent2) 26%, transparent);
+      color: var(--accent2);
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+    .nav { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,.26);
+      border-radius: 999px;
+      padding: 8px 13px;
+      font-size: 12px;
+      color: var(--text);
+      background: rgba(255,255,255,.04);
+    }
+    .btn:hover { border-color: var(--accent2); color: var(--accent2); }
+    .dot-nav {
+      position: fixed;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: grid;
+      gap: 10px;
+      z-index: 50;
+    }
+    .dot-nav button {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.35);
+      background: transparent;
+      cursor: pointer;
+      transition: all .24s ease;
+    }
+    .dot-nav button.active { transform: scale(1.34); border-color: var(--accent); background: var(--accent); }
+    .reveal { opacity: 0; transform: translateY(16px); transition: opacity .55s ease, transform .55s ease; }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+    @media (max-width: 940px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .dot-nav { display: none; }
+      .hero { min-height: auto; padding: 30px 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+  <nav class="dot-nav" id="dotNav">
+    <button data-target="hero" class="active" aria-label="Hero"></button>
+    <button data-target="atlas" aria-label="Atlas"></button>
+    <button data-target="concepts" aria-label="Concepts"></button>
+    <button data-target="reading" aria-label="Reading"></button>
+    <button data-target="takeaways" aria-label="Takeaways"></button>
+  </nav>
+  <main class="page">
+    <section class="hero reveal in" id="hero">
+      <p class="eyebrow">Field Narrative · Gate 13</p>
+      <h1>第十三章谁杀死了莫内</h1>
+      <p>第十三章谁杀死了莫内 183 [PAGE 193 IMAGE 1 CONTENT (OCR)]: 在迦普恩，好心没好报，这是真话。 幸运的是，大肚子有办法解决这一令人扼腕叹息的局面，不用 说，肯定要他出面大操大办一顿丧饭。</p>
+      <div class="chip-row">
+        <span class="chip">雨林里的消亡：一种语言和生活方式在巴布亚新几内亚的终结</span>
+        
+        <span class="chip">Module 13/18</span>
+        <span class="tag">page</span><span class="tag">image</span><span class="tag">content</span><span class="tag">ocr</span><span class="tag">第十三章谁杀死了莫内</span><span class="tag">冷却</span>
+      </div>
+    </section>
+
+    <section class="section grid-2 reveal" id="atlas">
+      <article>
+        <h2>知识结构图谱</h2>
+        <p style="color:var(--soft);line-height:1.9;margin-bottom:10px;">围绕本关卡核心概念构建关系图。阅读时先抓主轴，再理解每个概念如何驱动判断与行动。</p>
+        <div class="quote-wrap"><blockquote class="quote reveal">“这一系列事件是很典型的。村民们犹豫不决要不要把生病的人 送去医疗站，部分原因是实在太远了一—距离迦普恩有八个小时的路 程，而且得很辛苦地划未筏过去。但大部分时候，之所以犹豫不决是 因为他们把医疗站和死亡联系在一起。几乎不可避免，被送去玛利恩 堡的患病的村民都是死着回来的。这一高死亡率部分是因为医疗站 的药物极其有限，也没有能做X光或做手术的设备。但大部分时候， 人们死在玛利恩堡是因为当村民们最终决定获取医疗帮助的时候，就 算他们真的这么”</blockquote><blockquote class="quote reveal">“那个时候，一杯放着巴豆叶的水在屋里传递，翁佳尼指示所有在 场的男人、女人和孩子用手指一点水。这是为了“冷却”每个人依 然感受到的怒意。这一步结束了之后，所有人挨个儿一言不发地从我 身边经过，握了握我的手。我则被示意把这杯水拿去莫内的房里，莫 内的妻子索帕克还有几个亲属坐着照顾他。我们到了房里的时候，翁 佳尼让每个人互相握手，以示大家已经达成共识，不再生气。我则被 要求用一个匙子给莫内喂几口水。”</blockquote><blockquote class="quote reveal">“莫内的孩子们仅剩几头猪，又杀了一头，我贡献了一大罐雀巢咖 啡，一磅白糖以及十磅大米。女人们准备了丰盛的煮猪肉和米饭，他 们还煮了好几大壶热水泡咖啡，把每一样东西都送去村子中央的一个 男人房子。不过，在这一桌宴席人口之前，翁佳尼让村民们公开向我 道歉，因为他们没有把我给他们的钱用来给鲁尼办丧饭。我则被要求 讲上几句，说自己完全没有因此生气，并召唤鲁尼的灵魂，请他也不 要再动气。”</blockquote></div>
+      </article>
+      <article class="atlas">
+        <svg viewBox="0 0 440 440" aria-label="concept atlas">
+          <defs>
+            <radialGradient id="g" cx="50%" cy="50%" r="56%">
+              <stop offset="0%" stop-color="#d97706" stop-opacity=".24"></stop>
+              <stop offset="100%" stop-color="#d97706" stop-opacity="0"></stop>
+            </radialGradient>
+          </defs>
+          <circle cx="220" cy="220" r="190" fill="none" stroke="rgba(255,255,255,.08)" stroke-dasharray="5 6"></circle>
+          <circle cx="220" cy="220" r="84" fill="url(#g)"></circle>
+          <circle cx="220" cy="220" r="10" fill="#d97706"></circle>
+          <text x="220" y="252" text-anchor="middle" fill="#f5f1ea" font-size="13">第十三章谁杀死了莫内</text>
+          <g><line x1="220" y1="220" x2="370" y2="220" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="370" cy="220" r="8" fill="#2dd4bf"/><text x="382" y="224" fill="#f5f1ea" font-size="12">page</text></g><g><line x1="220" y1="220" x2="266" y2="363" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="266" cy="363" r="8" fill="#2dd4bf"/><text x="278" y="367" fill="#f5f1ea" font-size="12">image</text></g><g><line x1="220" y1="220" x2="99" y2="308" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="99" cy="308" r="8" fill="#2dd4bf"/><text x="111" y="312" fill="#f5f1ea" font-size="12">content</text></g><g><line x1="220" y1="220" x2="99" y2="132" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="99" cy="132" r="8" fill="#2dd4bf"/><text x="111" y="136" fill="#f5f1ea" font-size="12">ocr</text></g><g><line x1="220" y1="220" x2="266" y2="77" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="266" cy="77" r="8" fill="#2dd4bf"/><text x="278" y="81" fill="#f5f1ea" font-size="12">第十三章谁杀死了莫内</text></g>
+        </svg>
+      </article>
+    </section>
+
+    <section class="section reveal" id="concepts">
+      <h2>核心概念与解释</h2>
+      <div class="concept-grid">
+      <article class="concept-card reveal">
+        <p class="concept-token">page</p>
+        <p class="concept-note">第十三章谁杀死了莫内 183 [PAGE 193 IMAGE 1 CONTENT (OCR)]: 在迦普恩，好心没好报，这是真话。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">image</p>
+        <p class="concept-note">第十三章谁杀死了莫内 183 [PAGE 193 IMAGE 1 CONTENT (OCR)]: 在迦普恩，好心没好报，这是真话。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">content</p>
+        <p class="concept-note">第十三章谁杀死了莫内 183 [PAGE 193 IMAGE 1 CONTENT (OCR)]: 在迦普恩，好心没好报，这是真话。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">ocr</p>
+        <p class="concept-note">第十三章谁杀死了莫内 183 [PAGE 193 IMAGE 1 CONTENT (OCR)]: 在迦普恩，好心没好报，这是真话。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">第十三章谁杀死了莫内</p>
+        <p class="concept-note">第十三章谁杀死了莫内 183 [PAGE 193 IMAGE 1 CONTENT (OCR)]: 在迦普恩，好心没好报，这是真话。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">冷却</p>
+        <p class="concept-note">第二天，翁佳尼就带领村民在莫内的脚边破开了一个椰子，召唤 鲁尼的亡灵，请求亡灵不要对莫内生气。随后村民们排成一列来到我 家。他们在房子外围绕了一圈，像之前那样洒了几滴椰子水，然后爬 进了屋里，在里面走来走去，把椰子水洒在地板上，让房子“冷却”， 切断和鲁尼那个旧的男人房子的联系。</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="reading">
+      <h2>渐进式阅读路径</h2>
+      <div class="timeline">
+      <article class="timeline-item reveal">
+        <span class="timeline-no">01</span>
+        <h3>第十三章谁杀死了莫内 183 [PAGE 193 IMAGE 1 CONTENT (OCR)]: 在迦普恩，好心没好报，这是真话。</h3>
+        <p>第十三章谁杀死了莫内 183 [PAGE 193 IMAGE 1 CONTENT (OCR)]: 在迦普恩，好心没好报，这是真话。 幸运的是，大肚子有办法解决这一令人扼腕叹息的局面，不用 说，肯定要他出面大操大办一顿丧饭。 第二天，翁佳尼就带领村民在莫内的脚边破开了一个椰子，召唤 鲁尼的亡灵，请求亡灵不要对莫内生气。随后村民们排成一列来到我 家。他们在房子外围绕了一圈，像之前那样洒了几滴椰子水，然后爬 进了屋里，在里面走来走去，把椰子水洒在地板上，让房子“冷却”， 切断和鲁尼那个旧的男人房子的联系。 莫内的孩子们仅剩几头猪，又杀了一头，我贡献了一大罐雀巢咖 啡，一磅白糖以及十磅大米。女人们准备了丰盛的煮猪肉和米饭，他 们还煮了好几大壶热水泡咖啡，把每一样东西都送去村子中央的一个 男人房子。不过，在这一桌宴席人口之前，翁佳尼让村民们公开向我 道歉，因为他们没有把我给他们的钱用来给鲁尼办丧饭。我则被要求 讲上几句，说自己完全没有因此生气，并召唤鲁尼的灵魂，请他也不 要再动气。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">02</span>
+        <h3>那个时候，一杯放着巴豆叶的水在屋里传递，翁佳尼指示所有在 场的男人、女人和孩子用手指一点水。这是为了“冷却”每个人依 然感受到的怒意。这一步结束了之后，所有</h3>
+        <p>那个时候，一杯放着巴豆叶的水在屋里传递，翁佳尼指示所有在 场的男人、女人和孩子用手指一点水。这是为了“冷却”每个人依 然感受到的怒意。这一步结束了之后，所有人挨个儿一言不发地从我 身边经过，握了握我的手。我则被示意把这杯水拿去莫内的房里，莫 内的妻子索帕克还有几个亲属坐着照顾他。我们到了房里的时候，翁 佳尼让每个人互相握手，以示大家已经达成共识，不再生气。我则被 要求用一个匙子给莫内喂几口水。 莫内的一个子扶他坐了起来，我尽量轻轻地在他凸起的牙齿和 肿胀的古头旁滴了几滴水。然后我被要求用杯子里的叶子在房子各处 洒水，我照办了。然后我把这杯水放在莫内旁边的一个木台上，仪式 结束了。 184 雨林里的消亡 [PAGE 194 IMAGE 1 CONTENT (OCR)]: 鲁尼的亡灵得到了安抚，我的怒意消退，大肚子心满意足地拍了 拍自己的啤酒肚，热情洋溢地宣布说，我们所有人都可以回男人房子 饱餐一顿，当然菜肯定凉了，就等着大家下肚了。 莫内的身体没有好转，最后他被送去了塞皮克河上的玛利恩堡 医疗站。做完了每一件他们认为能劝服巫师解除巫术的事情，让祖 先的灵魂消去了怒意之后，莫内的孩子们现在终于决定把他带去玛 利恩堡。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">03</span>
+        <h3>这一系列事件是很典型的。村民们犹豫不决要不要把生病的人 送去医疗站，部分原因是实在太远了一—距离迦普恩有八个小时的路 程，而且得很辛苦地划未筏过去。但大部分</h3>
+        <p>这一系列事件是很典型的。村民们犹豫不决要不要把生病的人 送去医疗站，部分原因是实在太远了一—距离迦普恩有八个小时的路 程，而且得很辛苦地划未筏过去。但大部分时候，之所以犹豫不决是 因为他们把医疗站和死亡联系在一起。几乎不可避免，被送去玛利恩 堡的患病的村民都是死着回来的。这一高死亡率部分是因为医疗站 的药物极其有限，也没有能做X光或做手术的设备。但大部分时候， 人们死在玛利恩堡是因为当村民们最终决定获取医疗帮助的时候，就 算他们真的这么做了，也已经无力回天。 当莫内被固定到一个临时停户架上，放到他儿子肩上的时候，明 显已经快不行了。儿子们得扛着他走上一个小时穿过雨林到河边，再 划木筏去玛利恩堡。他那双已经看不见东西的眼晴里布满珍珠一样的 膜状物，起泡的舌头翻在张开的嘴巴外面，浑身就像起了一阵薄雾， 散发着病态的甜甜的木兰花味的死亡气息。 几天后，莫内的户体被放在离开时的那个停户架上抬回了村子。 他的户体躺在儿子拉法尔的房子里，屋里很快就被哭泣的村民填满。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">04</span>
+        <h3>他们一整夜抚摩着莫内的户体，一边抽泣一边大声念着悼词，哭喊着 说莫内丢下了他们，哀求他醒过来跟他们说话，哀叹着他之前常坐在 阳台的那个地方现在空了。</h3>
+        <p>他们一整夜抚摩着莫内的户体，一边抽泣一边大声念着悼词，哭喊着 说莫内丢下了他们，哀求他醒过来跟他们说话，哀叹着他之前常坐在 阳台的那个地方现在空了。 第十三章谁杀死了莫内 185 [PAGE 195 IMAGE 1 CONTENT (OCR)]: 早上，莫内被送去了村里的坟场，跟所有其他村民一样，被埋在 了一个没有任何标识的坟墓里。他的妻子索帕克是有年纪的人，还尊 重传统的方式，去隔绝了一个月，那之后他的儿子责备她就跟个没有 开化的野蛮人一样，让她不要把自己藏起来。 尘埃落定后，在所有莫内的可能死因中，村民们最后盖棺定论的 一个解释是，萨内的一个巫师本来想用施过法的物体杀掉摩西那个脾 气火暴的妻子玛丽娅，因为她总是看什么都不顺眼，但巫师擦枪走火 了，射中了无辜的莫内。 于是，就像所有其他村民以及耶稣那样，事情就是莫内是因为他 人的“过错”而死的。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">05</span>
+        <h3>186 雨林里的消亡 [PAGE 196 IMAGE 1 CONTENT (OCR)]:</h3>
+        <p>186 雨林里的消亡 [PAGE 196 IMAGE 1 CONTENT (OCR)]:</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="takeaways">
+      <h2>本关关键收获</h2>
+      <ul class="takeaways"><li><span>1</span>第十三章谁杀死了莫内 183 [PAGE 193 IMAGE 1 CONTENT (OCR)]: 在迦普恩，好心没好报，这是真话。</li><li><span>2</span>那个时候，一杯放着巴豆叶的水在屋里传递，翁佳尼指示所有在 场的男人、女人和孩子用手指一点水。这是为了“冷却”每个人依 然感受到的怒意。这一步结束了之后，所有</li><li><span>3</span>这一系列事件是很典型的。村民们犹豫不决要不要把生病的人 送去医疗站，部分原因是实在太远了一—距离迦普恩有八个小时的路 程，而且得很辛苦地划未筏过去。但大部分</li><li><span>4</span>他们一整夜抚摩着莫内的户体，一边抽泣一边大声念着悼词，哭喊着 说莫内丢下了他们，哀求他醒过来跟他们说话，哀叹着他之前常坐在 阳台的那个地方现在空了。</li></ul>
+      <nav class="nav">
+        <a class="btn" href="/experiences/user-book-visual-reading-g4ia7j-4d99-g12-chapter-12.html">上一关</a>
+        <a class="btn" href="/experiences/user-book-visual-reading-g4ia7j-4d99-g14-chapter-14.html">下一关</a>
+      </nav>
+    </section>
+  </main>
+  <script>
+    (() => {
+      const progress = document.getElementById("progress");
+      const dots = Array.from(document.querySelectorAll("#dotNav button[data-target]"));
+      const sections = dots
+        .map((dot) => document.getElementById(dot.getAttribute("data-target")))
+        .filter(Boolean);
+      const reveals = Array.from(document.querySelectorAll(".reveal"));
+      const onScroll = () => {
+        const h = document.documentElement;
+        const total = Math.max(1, h.scrollHeight - window.innerHeight);
+        const pct = Math.max(0, Math.min(100, (window.scrollY / total) * 100));
+        if (progress) progress.style.width = pct + "%";
+      };
+      const io = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) entry.target.classList.add("in");
+        }
+      }, { threshold: .14 });
+      reveals.forEach((el) => io.observe(el));
+      const secIo = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const id = entry.target.id;
+          dots.forEach((dot) => dot.classList.toggle("active", dot.getAttribute("data-target") === id));
+        });
+      }, { threshold: .4 });
+      sections.forEach((s) => secIo.observe(s));
+      dots.forEach((dot) => {
+        dot.addEventListener("click", () => {
+          const target = document.getElementById(dot.getAttribute("data-target"));
+          if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+      window.addEventListener("scroll", onScroll, { passive: true });
+      onScroll();
+    })();
+  </script>
+</body>
+</html>

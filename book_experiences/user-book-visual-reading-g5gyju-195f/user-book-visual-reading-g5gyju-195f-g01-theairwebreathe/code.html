@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>第一章 TheAirWeBreathe 我们呼吸的空气 “你们所要做… · 雨林里的消亡（可视化阅读测试）</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b1220;
+      --bg2: #1a2333;
+      --accent: #f59e0b;
+      --accent2: #34d399;
+      --text: #e5edf8;
+      --soft: #9fb1c9;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+      background:
+        radial-gradient(1200px 540px at 85% -8%, color-mix(in srgb, var(--accent2) 24%, transparent), transparent 70%),
+        radial-gradient(980px 460px at -10% 14%, color-mix(in srgb, var(--accent) 24%, transparent), transparent 74%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+      color: var(--text);
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .05;
+      background-image: radial-gradient(circle at 1px 1px, #fff 1px, transparent 0);
+      background-size: 3px 3px;
+      z-index: 0;
+    }
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      z-index: 100;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+    .page { position: relative; z-index: 1; width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 20px 0 48px; }
+    .hero {
+      min-height: 74vh;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 22px;
+      background: linear-gradient(160deg, color-mix(in srgb, var(--bg2) 86%, transparent), color-mix(in srgb, var(--bg) 88%, transparent));
+      padding: 40px 34px;
+      display: grid;
+      align-content: center;
+      gap: 16px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.34);
+    }
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .hero h1 {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(32px, 5.4vw, 68px);
+      line-height: 1.16;
+      letter-spacing: .04em;
+      max-width: 15em;
+      text-wrap: balance;
+    }
+    .hero p {
+      max-width: 66ch;
+      line-height: 1.95;
+      color: color-mix(in srgb, var(--text) 85%, var(--soft));
+      font-size: 16px;
+    }
+    .chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip {
+      border: 1px solid color-mix(in srgb, var(--accent2) 44%, transparent);
+      color: color-mix(in srgb, var(--accent2) 88%, #fff);
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 12px;
+      background: rgba(255,255,255,.03);
+    }
+    .section { margin-top: 18px; border: 1px solid rgba(255,255,255,.13); border-radius: 18px; padding: 22px; background: rgba(2,6,18,.46); }
+    .section h2 {
+      margin-bottom: 12px;
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(22px, 2.8vw, 34px);
+      color: color-mix(in srgb, var(--accent) 86%, #fff);
+      letter-spacing: .03em;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1.1fr 1fr; gap: 14px; }
+    .concept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+    .concept-card {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      background: rgba(255,255,255,.03);
+      padding: 14px;
+      min-height: 128px;
+    }
+    .concept-token { font-size: 14px; letter-spacing: .14em; color: var(--accent2); text-transform: uppercase; margin-bottom: 7px; font-weight: 700; }
+    .concept-note { font-size: 14px; color: color-mix(in srgb, var(--text) 88%, var(--soft)); line-height: 1.8; }
+    .atlas {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      min-height: 440px;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+    .atlas svg { width: 100%; max-width: 440px; height: auto; }
+    .timeline { display: grid; gap: 10px; }
+    .timeline-item {
+      border-left: 2px solid color-mix(in srgb, var(--accent) 66%, transparent);
+      padding: 10px 14px;
+      background: rgba(255,255,255,.02);
+      border-radius: 0 10px 10px 0;
+    }
+    .timeline-no { font-size: 11px; letter-spacing: .22em; color: var(--accent2); display: block; margin-bottom: 6px; }
+    .timeline-item h3 { font-size: 19px; font-family: "Noto Serif SC", serif; line-height: 1.45; margin-bottom: 7px; }
+    .timeline-item p { font-size: 14px; line-height: 1.9; color: color-mix(in srgb, var(--text) 84%, var(--soft)); }
+    .quote-wrap { display: grid; gap: 10px; }
+    .quote {
+      border-left: 2px solid color-mix(in srgb, var(--accent2) 80%, transparent);
+      padding: 10px 12px;
+      background: rgba(255,255,255,.02);
+      color: color-mix(in srgb, var(--text) 92%, #fff);
+      font-family: "Noto Serif SC", serif;
+      line-height: 1.9;
+    }
+    .takeaways { margin-top: 10px; list-style: none; display: grid; gap: 8px; }
+    .takeaways li {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      padding: 10px;
+      background: rgba(255,255,255,.02);
+      align-items: start;
+      line-height: 1.8;
+    }
+    .takeaways span {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: color-mix(in srgb, var(--accent2) 26%, transparent);
+      color: var(--accent2);
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+    .nav { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,.26);
+      border-radius: 999px;
+      padding: 8px 13px;
+      font-size: 12px;
+      color: var(--text);
+      background: rgba(255,255,255,.04);
+    }
+    .btn:hover { border-color: var(--accent2); color: var(--accent2); }
+    .dot-nav {
+      position: fixed;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: grid;
+      gap: 10px;
+      z-index: 50;
+    }
+    .dot-nav button {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.35);
+      background: transparent;
+      cursor: pointer;
+      transition: all .24s ease;
+    }
+    .dot-nav button.active { transform: scale(1.34); border-color: var(--accent); background: var(--accent); }
+    .reveal { opacity: 0; transform: translateY(16px); transition: opacity .55s ease, transform .55s ease; }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+    @media (max-width: 940px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .dot-nav { display: none; }
+      .hero { min-height: auto; padding: 30px 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+  <nav class="dot-nav" id="dotNav">
+    <button data-target="hero" class="active" aria-label="Hero"></button>
+    <button data-target="atlas" aria-label="Atlas"></button>
+    <button data-target="concepts" aria-label="Concepts"></button>
+    <button data-target="reading" aria-label="Reading"></button>
+    <button data-target="takeaways" aria-label="Takeaways"></button>
+  </nav>
+  <main class="page">
+    <section class="hero reveal in" id="hero">
+      <p class="eyebrow">Scholar Atlas · Gate 1</p>
+      <h1>第一章 TheAirWeBreathe 我们呼吸的空气 “你们所要做…</h1>
+      <p>第一章 TheAirWeBreathe 我们呼吸的空气 “你们所要做的就是填好这张表，公司就 会过来，抽走你们的空气。”大腹便便的腐败 政客东施先生向村民们解释道。他坐在一个村 民家的地上：这是一个架在桩子上的露天房 子，用树皮做成，西米棕榈叶做屋顶。 这个东施先生四十五岁左右，谢了顶，来 自邻近的一个村子。他已经竞选过多次省议会 的席位，但每每都会败给一个竞选前夕到来的 人，那个人许诺要比东施先生给村民们更多钱 和外马达。那人赢了选举之后近水楼台先得 月，把政府和非政府组织用来发展的资金中饱 私囊，然后消失得无影无踪。</p>
+      <div class="chip-row">
+        <span class="chip">雨林里的消亡（可视化阅读测试）</span>
+        <span class="chip">作者：Unknown</span>
+        <span class="chip">Module 1/18</span>
+        <span class="tag">page</span><span class="tag">image</span><span class="tag">content</span><span class="tag">ocr</span><span class="tag">各国</span><span class="tag">他说</span>
+      </div>
+    </section>
+
+    <section class="section grid-2 reveal" id="atlas">
+      <article>
+        <h2>知识结构图谱</h2>
+        <p style="color:var(--soft);line-height:1.9;margin-bottom:10px;">围绕本关卡核心概念构建关系图。阅读时先抓主轴，再理解每个概念如何驱动判断与行动。</p>
+        <div class="quote-wrap"><blockquote class="quote reveal">“在靠近汹涌的塞皮克河河口处的一个村子里，雷考克认识了两个 人，了解到雨林深处有一个村子，那里有一小群人说着一种与其他语 言都无法互通的语言。那个村子叫迦普恩。雷考克自己从未造访过迦 普恩，那地方太难去了。事实上，在我去之前，只有大约十个白人去 过那个村子。1930年代及“二战”后的几十年里，只有几个澳大利 亚巡警和德国传教士路过迦普恩。他们都表示那个村子太难到达了， 而且几乎没有人回去过。此外，自从1940年代末以来，成功到达迦 普恩的”</blockquote><blockquote class="quote reveal">“相比之下，巴布亚新几内亚则植被繁茂。翁佳尼的身子前倾越 过蜷曲的双腿，把一口红唾沫吐进地板间的缝隙。他用手背抹了一把 嘴巴，脸颊上散开一片猩红的印子。他大臂一挥，指向大家周遭的雨 林。“看看你们周围，”他说，“你看到的都是树。巴布亚新几内亚到 处都是树。我们可是有源源不断（obaplo）的空气啊。” “各国”发现巴布亚新几内亚有丰富的空气资源后，纷纷派遗使 者到这里来寻找空气。翁佳尼告诉村民们，巴布亚新几内亚对“各 国”深表同情，然后达”</blockquote><blockquote class="quote reveal">““你付多少钱，就能得到多少空气。”翁佳尼笑了，想让村民们 见识见识自已多么见多识广，对“各国”的情况了如指掌。“如果 你没足够多的钱，你就得不到足够多的空气，一会儿你就会上气不 接下气。” 生活在这片与世隔绝的沼泽地里的村民们之所以关心这件事情， 是因为这片尚未开发的雨林是祖先留下来的土地，而这里是空气储气 罐的首选目标。翁佳尼一再重复说，这是一个千载难逢的好机会一 村民们飞黄腾达的时刻到了，碳贸易会让他们赚得盆满钵满。翁佳尼 也不清楚”</blockquote></div>
+      </article>
+      <article class="atlas">
+        <svg viewBox="0 0 440 440" aria-label="concept atlas">
+          <defs>
+            <radialGradient id="g" cx="50%" cy="50%" r="56%">
+              <stop offset="0%" stop-color="#f59e0b" stop-opacity=".24"></stop>
+              <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"></stop>
+            </radialGradient>
+          </defs>
+          <circle cx="220" cy="220" r="190" fill="none" stroke="rgba(255,255,255,.08)" stroke-dasharray="5 6"></circle>
+          <circle cx="220" cy="220" r="84" fill="url(#g)"></circle>
+          <circle cx="220" cy="220" r="10" fill="#f59e0b"></circle>
+          <text x="220" y="252" text-anchor="middle" fill="#e5edf8" font-size="13">第一章 TheAirWeBreathe 我们呼吸</text>
+          <g><line x1="220" y1="220" x2="370" y2="220" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="370" cy="220" r="8" fill="#34d399"/><text x="382" y="224" fill="#e5edf8" font-size="12">page</text></g><g><line x1="220" y1="220" x2="266" y2="363" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="266" cy="363" r="8" fill="#34d399"/><text x="278" y="367" fill="#e5edf8" font-size="12">image</text></g><g><line x1="220" y1="220" x2="99" y2="308" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="99" cy="308" r="8" fill="#34d399"/><text x="111" y="312" fill="#e5edf8" font-size="12">content</text></g><g><line x1="220" y1="220" x2="99" y2="132" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="99" cy="132" r="8" fill="#34d399"/><text x="111" y="136" fill="#e5edf8" font-size="12">ocr</text></g><g><line x1="220" y1="220" x2="266" y2="77" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="266" cy="77" r="8" fill="#34d399"/><text x="278" y="81" fill="#e5edf8" font-size="12">各国</text></g>
+        </svg>
+      </article>
+    </section>
+
+    <section class="section reveal" id="concepts">
+      <h2>核心概念与解释</h2>
+      <div class="concept-grid">
+      <article class="concept-card reveal">
+        <p class="concept-token">page</p>
+        <p class="concept-note">东施先生的野心就是想成为那样的政客， 而且他自信总有一天能如愿以偿。与此同时， 他奉承巴结那些拿下议席的腐败政客，然后开 始更多当地的征地项目。他那个啤酒肚就 [PAGE 17 IMAGE 1 CONTENT (OCR)]: 是他成功哄骗村民的见证，他说服他们这些项目将能给他们带来改 变。唯一的变化就是他们发现自己的腰包比他来之前更了。充诺的 改变不过是竹篮</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">image</p>
+        <p class="concept-note">东施先生的野心就是想成为那样的政客， 而且他自信总有一天能如愿以偿。与此同时， 他奉承巴结那些拿下议席的腐败政客，然后开 始更多当地的征地项目。他那个啤酒肚就 [PAGE 17 IMAGE 1 CONTENT (OCR)]: 是他成功哄骗村民的见证，他说服他们这些项目将能给他们带来改 变。唯一的变化就是他们发现自己的腰包比他来之前更了。充诺的 改变不过是竹篮</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">content</p>
+        <p class="concept-note">东施先生的野心就是想成为那样的政客， 而且他自信总有一天能如愿以偿。与此同时， 他奉承巴结那些拿下议席的腐败政客，然后开 始更多当地的征地项目。他那个啤酒肚就 [PAGE 17 IMAGE 1 CONTENT (OCR)]: 是他成功哄骗村民的见证，他说服他们这些项目将能给他们带来改 变。唯一的变化就是他们发现自己的腰包比他来之前更了。充诺的 改变不过是竹篮</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">ocr</p>
+        <p class="concept-note">东施先生的野心就是想成为那样的政客， 而且他自信总有一天能如愿以偿。与此同时， 他奉承巴结那些拿下议席的腐败政客，然后开 始更多当地的征地项目。他那个啤酒肚就 [PAGE 17 IMAGE 1 CONTENT (OCR)]: 是他成功哄骗村民的见证，他说服他们这些项目将能给他们带来改 变。唯一的变化就是他们发现自己的腰包比他来之前更了。充诺的 改变不过是竹篮</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">各国</p>
+        <p class="concept-note">翁佳尼告诉村民们，他们应该了解一下在“各国”（olkantri）一 他指的是巴布亚新几内亚之外的每个地方一碳贸易已经变成了一桩 大事。他说，“各国”空气资源告急。那些几乎覆盖每一寸土地的工 厂已经把空气消耗殆尽。树也不再有了。翁佳尼提醒大家，树能制造 8 雨林里的消亡 [PAGE 18 IMAGE 1 CONTENT (OCR)]: 空气。没了树，就没有空气</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">他说</p>
+        <p class="concept-note">东施先生的野心就是想成为那样的政客， 而且他自信总有一天能如愿以偿。与此同时， 他奉承巴结那些拿下议席的腐败政客，然后开 始更多当地的征地项目。他那个啤酒肚就 [PAGE 17 IMAGE 1 CONTENT (OCR)]: 是他成功哄骗村民的见证，他说服他们这些项目将能给他们带来改 变。唯一的变化就是他们发现自己的腰包比他来之前更了。充诺的 改变不过是竹篮</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="reading">
+      <h2>渐进式阅读路径</h2>
+      <div class="timeline">
+      <article class="timeline-item reveal">
+        <span class="timeline-no">01</span>
+        <h3>第一章 TheAirWeBreathe 我们呼吸的空气 “你们所要做的就是填好这张表，公司就 会过来，抽走你们的空气。”大腹便便的腐败 政客东施先生向村民们</h3>
+        <p>第一章 TheAirWeBreathe 我们呼吸的空气 “你们所要做的就是填好这张表，公司就 会过来，抽走你们的空气。”大腹便便的腐败 政客东施先生向村民们解释道。他坐在一个村 民家的地上：这是一个架在桩子上的露天房 子，用树皮做成，西米棕榈叶做屋顶。 这个东施先生四十五岁左右，谢了顶，来 自邻近的一个村子。他已经竞选过多次省议会 的席位，但每每都会败给一个竞选前夕到来的 人，那个人许诺要比东施先生给村民们更多钱 和外马达。那人赢了选举之后近水楼台先得 月，把政府和非政府组织用来发展的资金中饱 私囊，然后消失得无影无踪。 东施先生的野心就是想成为那样的政客， 而且他自信总有一天能如愿以偿。与此同时， 他奉承巴结那些拿下议席的腐败政客，然后开 始更多当地的征地项目。他那个啤酒肚就 [PAGE 17 IMAGE 1 CONTENT (OCR)]: 是他成功哄骗村民的见证，他说服他们这些项目将能给他们带来改 变。唯一的变化就是他们发现自己的腰包比他来之前更了。充诺的 改变不过是竹篮打水一场空，但他总能找到替罪羊：腐败的政客撒谎 啦，有人偷了钱啦，巫师作法然后一切都消失啦之类的。 东施先生坐在一个村民家里，背靠着角落里的一根柱子挠痒，大 汗淋漓。他不是因为紧张。他之前已经来过多次，也知道怎样给村民 们灌迷魂汤。他流汗是因为他太胖，而且午后骄阳似火；还因为他嘴 里塞满了槟榔，那玩意儿就像咖啡因一样刺激你，让你出汗不止，还 会把你的嘴巴染得鲜红，牙齿黑得像烂掉了似的。 来开会的村民们没有多说什么。他们只是听着那个叫翁佳尼的 （他们在背后管他叫“大肚子”）告诉他们他为什么要来。 二十来个男村民就像大肚子那样盘着腿，分散开坐在屋子里。他 们组成了一个半圆形的圈子，也嚼着槟榔，偶尔腰部前倾，然后准确 无误地把鲜血一般的唾沫吐进树皮地板的缝隙里。女人们散坐在近旁 的门厅口。她们也嚼着槟榔，一只耳朵听着屋子里的交谈，另一只耳 朵听着邻居们在翁佳尼说话时的窃窃私语和尖酸刻薄的评论。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">02</span>
+        <h3>“我今天来是让大家提高认识。”翁佳尼宣称。他操着一口皮金 语，巴布亚新几内亚的国语，还抛出了一个新词ewenes，是他从非 政府组织或教会又或者是什么政府资</h3>
+        <p>“我今天来是让大家提高认识。”翁佳尼宣称。他操着一口皮金 语，巴布亚新几内亚的国语，还抛出了一个新词ewenes，是他从非 政府组织或教会又或者是什么政府资助的课程里学来的，还不厌其烦 地广而告之他参加了遥远首府里的课程的事，去过那个地方的村民屈 指可数。他说，他刚从首府回来。他在那儿参加了一个为期三天的新 课程，与所谓的碳贸易有关。 翁佳尼告诉村民们，他们应该了解一下在“各国”（olkantri）一 他指的是巴布亚新几内亚之外的每个地方一碳贸易已经变成了一桩 大事。他说，“各国”空气资源告急。那些几乎覆盖每一寸土地的工 厂已经把空气消耗殆尽。树也不再有了。翁佳尼提醒大家，树能制造 8 雨林里的消亡 [PAGE 18 IMAGE 1 CONTENT (OCR)]: 空气。没了树，就没有空气。“各国”老百姓越来越难呼吸了。 相比之下，巴布亚新几内亚则植被繁茂。翁佳尼的身子前倾越 过蜷曲的双腿，把一口红唾沫吐进地板间的缝隙。他用手背抹了一把 嘴巴，脸颊上散开一片猩红的印子。他大臂一挥，指向大家周遭的雨 林。“看看你们周围，”他说，“你看到的都是树。巴布亚新几内亚到 处都是树。我们可是有源源不断（obaplo）的空气啊。” “各国”发现巴布亚新几内亚有丰富的空气资源后，纷纷派遗使 者到这里来寻找空气。翁佳尼告诉村民们，巴布亚新几内亚对“各 国”深表同情，然后达成了交易。一家受政府许可的公司会把大型储 气罐运到雨林里，然后抽满空气。满载空气的储气罐之后会被运往 “各国”，空气会被装进瓶子里，在商店里出售。他解释说，这就是碳 贸易。 “你付多少钱，就能得到多少空气。”翁佳尼笑了，想让村民们 见识见识自已多么见多识广，对“各国”的情况了如指掌。“如果 你没足够多的钱，你就得不到足够多的空气，一会儿你就会上气不 接下气。” 生活在这片与世隔绝的沼泽地里的村民们之所以关心这件事情， 是因为这片尚未开发的雨林是祖先留下来的土地，而这里是空气储气 罐的首选目标。翁佳尼一再重复说，这是一个千载难逢的好机会一 村民们飞黄腾达的时刻到了，碳贸易会让他们赚得盆满钵满。翁佳尼 也不清楚他们能得到几百万基纳（巴布亚新几内亚的法定货市），但 想必是一笔不菲的收入。此外，那家公司会为村子带来发展的机遇。 为此，许多树得被砍掉（毕竟，储气罐很大，需要空间），村民们将 被禁止打猎或在自家土地上造花园。但他们不用再打猎，也不用再种 植食物了一那家公司会给钱，数字多少不知道，还会修一条高速公 路和一条机场跑道，给他们造钢筋水泥的房子、商店和一个游客中 第一章我们呼吸的空气 9 [PAGE 19 IMAGE 1 CONTENT (OCR)]: 心，还会给他们建一所大学。 村民们只需要把翁佳尼从网兜里拿出来摊开在他面前地板上的表 格填了。表格用英文打印，没有村民会这种语言。条文规定，从碳贸 有。这家公司的</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">03</span>
+        <h3>他们是多么渴望改变啊！如果说除了巫术之外，还有哪个话题 会萦绕在他们的对话和脑海中，那就是改变。他们想要改变，迫不及 待。但村民们不仅仅想要改变一一他们想变</h3>
+        <p>他们是多么渴望改变啊！如果说除了巫术之外，还有哪个话题 会萦绕在他们的对话和脑海中，那就是改变。他们想要改变，迫不及 待。但村民们不仅仅想要改变一一他们想变成另外的人。我慢慢才发 现，他们想要从黑人（跟澳大利亚土著一样，大部分巴布亚新几内亚 人是黑皮肤）变成白人。 我是一个白人。我在美国出生长大，但十九岁那年移居到了 瑞典。1985年，我第一次来到巴布亚新几内亚的时候，还是一个 二十四岁的博士生，一腔热情，天真无邪，涉世未深。我对巴布亚 新几内亚知之甚少，而且对于热带雨林中的生活一无所知。但我漂 洋过海穿越大半个地球来到巴布亚新几内亚，为的是研究一门语言 是如何消亡的。 巴布亚新几内亚的语言比世界上任何国家都多。在这片面积与加 利福尼亚相当的土地上只有八百多万人口，却有近一千种语言一注 意哦，是互不相通的语言，而非方言或变体一它们中的大多数依然 没有被记录，许多语言的使用者只有五百人，甚至更少。 我来这个村子是受澳大利亚一位叫唐·雷考克的语言学家的指 引。雷考克开朗健谈，喜好饮酒，有点轻微洁癖。1970年代初，他 乘一艘独木舟游遍了巴布亚新几内亚北部塞皮克河的整个下游区域， 10 雨林里的消亡 [PAGE 20 IMAGE 1 CONTENT (OCR)]: 从那一带许多语言的使用者那里收集词汇，以便绘图、分类。 在靠近汹涌的塞皮克河河口处的一个村子里，雷考克认识了两个 人，了解到雨林深处有一个村子，那里有一小群人说着一种与其他语 言都无法互通的语言。那个村子叫迦普恩。雷考克自己从未造访过迦 普恩，那地方太难去了。事实上，在我去之前，只有大约十个白人去 过那个村子。1930年代及“二战”后的几十年里，只有几个澳大利 亚巡警和德国传教士路过迦普恩。他们都表示那个村子太难到达了， 而且几乎没有人回去过。此外，自从1940年代末以来，成功到达迦 普恩的白人主要是一些天主教神父，但他们通常也只去过一次。他们 往往到了那个村子后，草草做一场弥撒，给几个婴儿施洗，然后就离 开了，再也没回去过。只有玛利恩堡一个天主教传教站的一位健朗的 老修女一乘着木筏跋涉八小时一—风雨无阻，几十年里，出于医疗 的目的，每年去一两次。她会待上一晚，搭一个小诊室，分发用于治 疗疤疾的氯喹丸，给村民挤脓疮，并为任何看上去有需要的人注射抗 生素。 在去巴布亚新几内亚的路上，我造访了位于堪培拉的澳大利亚国 立大学，敲开了雷考克教授办公室的门，向他咨询在哪里可以做关于 语言消亡的博士论文研究，他建议我去迦普恩。他说他对那个村子一 无所知，也不知道那里会发生什么，但他记得听人说起过，那里的语 言非常迷你。“这个语言太小了，应该就快没了，”他推断说，“为什 么你不过去看看情况呢。” 我遵循了他的建议，启程前往迦普恩。我第一次去是在1985年， 在那儿待了一个月，想看看能否在那里生活更久的时间。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">04</span>
+        <h3>当然，迦普恩的村民们会困惑，一天下午，一个不知从哪里冒 出来的陌生白人男子用整脚的皮金语一一当地村民放弃母语后说的语 言一一声称他想和他们一起生活，写一本关</h3>
+        <p>当然，迦普恩的村民们会困惑，一天下午，一个不知从哪里冒 出来的陌生白人男子用整脚的皮金语一一当地村民放弃母语后说的语 言一一声称他想和他们一起生活，写一本关于他们语言的书。他们唯 第一章我们呼吸的空气 11 [PAGE 21 IMAGE 1 CONTENT (OCR)]: 一见过的书就是1975年巴布亚新几内亚获得独立前，澳大利亚巡警 们巡访当地时带的《圣经》和笔记本。一个村民听说存在一种神秘的 叫漫画书的东西。村民们相信，所有这些书都有神奇的魔力，能变出 金钱、飞机、外马达和其他货物，这些东西白人们拥有，而像他们 这样的巴布亚新儿内亚人没有。 现在一个年轻白人男子突然出现在他们面前，跟他们谈起一本 书，这件事本身就耐人寻味。机会要来了。但我究竟为什么要来这 里？我为什么来迦普恩，而不是什么别的村庄？ 村民们思考了一会儿这个问题，很快得出一致结论。在我抵达 的几周后，他们向我分享了结论，揭示了我到这儿来的真实原因。他 们告诉我，我是已经死去的村民，回到迦普恩来引领他们走上变革的 “康庄大道”。 他们选择向我透露这一消息的时机远非理想：这是一个雷声大作 的夜里。大雨砸在我房子的茅草屋顶，我正和不知几个人一起坐在地 上。唯一可见的光亮是村民们抽用报纸卷成的烟时闪烁的橙色的光， 就像不见其人的眼睛一样在黑暗中明明灭灭。闪电不时划过，每个人 仿佛瞬间僵住，变成一张面无血色的蓝汪汪的画片。这整个场景让我 寒毛直竖，不禁想起了小时候在深夜看过的许多阴森的廉价恐怖片。 此刻，在这样一个永远以一声凄厉的惨叫画上尾声的场景里，我置身 于一片茂密的热带雨林深处，三更半夜，无处脱身，这些环绕我周遭 的人，他们的祖辈们曾砍下其他人的头颅当作战利品，煞有介事地告 知我是个幽魂。 尽管他们说我是一个幽魂，尽管这个村子的一切让人一言难 尽一—无处不在的泥巴；如滚滚云烟一般的蚊子（村民们给八种不同 的蚊子都起了名字）；布满疥疮、毛发稀疏、蓝皮肤的土狗，我偶尔 12 雨林里的消亡 [PAGE 22 IMAGE 1 CONTENT (OCR)]: 能看到它们在浅浅的水井里洗澡纳凉，而村民们从同一个地方获取饮 用和煮饭所需的水；还有当地的食物真叫人欲哭无泪，村民们按照自 已的方式，几乎完全用一种黏性淀粉做成的东西，粉色，有一种浓浓 的黏液一般的紧实度一但我最终还是决定会再来迦普恩。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">05</span>
+        <h3>当地的语言状况就像唐·雷考克所描述的那么饶有趣味。就我 所知，十岁以下的孩子似乎没人会说当地的土著语言，也就是泰雅博 语。他们似乎都能听懂，但没有小孩说这种</h3>
+        <p>当地的语言状况就像唐·雷考克所描述的那么饶有趣味。就我 所知，十岁以下的孩子似乎没人会说当地的土著语言，也就是泰雅博 语。他们似乎都能听懂，但没有小孩说这种语言。他们说话用的是国 语，也就是皮金语。我意识到，这是一个关键时刻，跟其他研究语言 消亡的学者们描述的情况都不同。其他研究一般把焦点放在消亡语言 的最后发言者身上一一他们考察的是处于濒危阶段的语言，赶在这些 语言消失之前赶快将其记录在案。在迦普恩，我得以见证这一转变过 程的开端。出于某种理由，村民们养育了第一代一在该语言的历史 里，这还是第一次一一突然不再学习泰雅博语作为母语的孩子。 更吸引人的是村民们对于这一突如其来的转变的解释。当我们问 他们为什么他们的孩子不再说泰雅博语，父亲母亲们都坚称他们是想 让孩子们说的一一而且他们按照他们的父母养育他们的方式养育自己 的孩子。这些父母告诉我，是孩子们自己变了。孩子们不再想学泰雅 博语。大人们告诉我，他们太自大了，意思是说他们的孩子太任性固 执，不想学说泰雅博语。一个谜凝固了：自大的小屁孩们。 我决定回到迦普恩，还因为我喜欢生活在村里的那百十来号 人一我觉得他们好客、有趣、滑稽。他们不用我其实是死人这样的 鬼话把我搞得紧张兮兮时，也能把我逗得捧腹大笑。 除此之外，显然村民们也想让我回去。在我头一次去的一个月快 结束时，他们向我保证要给我造一个房子，还向我打包票，我的物品 可以安心存放，不用担心会消失在没心没肺的毛孩子或垂涎欲滴的访 客手里。就在我要离开前，一个知识渊博的老人一被称作“大人”</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="takeaways">
+      <h2>本关关键收获</h2>
+      <ul class="takeaways"><li><span>1</span>第一章 TheAirWeBreathe 我们呼吸的空气 “你们所要做的就是填好这张表，公司就 会过来，抽走你们的空气。”大腹便便的腐败 政客东施先生向村民们</li><li><span>2</span>“我今天来是让大家提高认识。”翁佳尼宣称。他操着一口皮金 语，巴布亚新几内亚的国语，还抛出了一个新词ewenes，是他从非 政府组织或教会又或者是什么政府资</li><li><span>3</span>他们是多么渴望改变啊！如果说除了巫术之外，还有哪个话题 会萦绕在他们的对话和脑海中，那就是改变。他们想要改变，迫不及 待。但村民们不仅仅想要改变一一他们想变</li><li><span>4</span>当然，迦普恩的村民们会困惑，一天下午，一个不知从哪里冒 出来的陌生白人男子用整脚的皮金语一一当地村民放弃母语后说的语 言一一声称他想和他们一起生活，写一本关</li></ul>
+      <nav class="nav">
+        <a class="btn" href="/books/user-book-visual-reading-g5gyju-195f.html">返回目录</a>
+        <a class="btn" href="/experiences/user-book-visual-reading-g5gyju-195f-g02-chapter-2.html">下一关</a>
+      </nav>
+    </section>
+  </main>
+  <script>
+    (() => {
+      const progress = document.getElementById("progress");
+      const dots = Array.from(document.querySelectorAll("#dotNav button[data-target]"));
+      const sections = dots
+        .map((dot) => document.getElementById(dot.getAttribute("data-target")))
+        .filter(Boolean);
+      const reveals = Array.from(document.querySelectorAll(".reveal"));
+      const onScroll = () => {
+        const h = document.documentElement;
+        const total = Math.max(1, h.scrollHeight - window.innerHeight);
+        const pct = Math.max(0, Math.min(100, (window.scrollY / total) * 100));
+        if (progress) progress.style.width = pct + "%";
+      };
+      const io = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) entry.target.classList.add("in");
+        }
+      }, { threshold: .14 });
+      reveals.forEach((el) => io.observe(el));
+      const secIo = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const id = entry.target.id;
+          dots.forEach((dot) => dot.classList.toggle("active", dot.getAttribute("data-target") === id));
+        });
+      }, { threshold: .4 });
+      sections.forEach((s) => secIo.observe(s));
+      dots.forEach((dot) => {
+        dot.addEventListener("click", () => {
+          const target = document.getElementById(dot.getAttribute("data-target"));
+          if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+      window.addEventListener("scroll", onScroll, { passive: true });
+      onScroll();
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+[phases.setup]
+nixPkgs = ["nodejs", "python3"]
+aptPkgs = ["pandoc", "poppler-utils"]
+
+[phases.install]
+cmds = [
+  "npm ci",
+  "bash scripts/studio-tools/install-railway-deps.sh"
+]
+
+[start]
+cmd = "npm run start"

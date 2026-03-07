@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>第二章沼泽里的村庄 · 雨林里的消亡（可视化阅读测试-v2）</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #16120f;
+      --bg2: #2a1f18;
+      --accent: #d97706;
+      --accent2: #2dd4bf;
+      --text: #f5f1ea;
+      --soft: #c7b8a2;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+      background:
+        radial-gradient(1200px 540px at 85% -8%, color-mix(in srgb, var(--accent2) 24%, transparent), transparent 70%),
+        radial-gradient(980px 460px at -10% 14%, color-mix(in srgb, var(--accent) 24%, transparent), transparent 74%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+      color: var(--text);
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .05;
+      background-image: radial-gradient(circle at 1px 1px, #fff 1px, transparent 0);
+      background-size: 3px 3px;
+      z-index: 0;
+    }
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      z-index: 100;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+    .page { position: relative; z-index: 1; width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 20px 0 48px; }
+    .hero {
+      min-height: 74vh;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 22px;
+      background: linear-gradient(160deg, color-mix(in srgb, var(--bg2) 86%, transparent), color-mix(in srgb, var(--bg) 88%, transparent));
+      padding: 40px 34px;
+      display: grid;
+      align-content: center;
+      gap: 16px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.34);
+    }
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .hero h1 {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(32px, 5.4vw, 68px);
+      line-height: 1.16;
+      letter-spacing: .04em;
+      max-width: 15em;
+      text-wrap: balance;
+    }
+    .hero p {
+      max-width: 66ch;
+      line-height: 1.95;
+      color: color-mix(in srgb, var(--text) 85%, var(--soft));
+      font-size: 16px;
+    }
+    .chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip {
+      border: 1px solid color-mix(in srgb, var(--accent2) 44%, transparent);
+      color: color-mix(in srgb, var(--accent2) 88%, #fff);
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 12px;
+      background: rgba(255,255,255,.03);
+    }
+    .section { margin-top: 18px; border: 1px solid rgba(255,255,255,.13); border-radius: 18px; padding: 22px; background: rgba(2,6,18,.46); }
+    .section h2 {
+      margin-bottom: 12px;
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(22px, 2.8vw, 34px);
+      color: color-mix(in srgb, var(--accent) 86%, #fff);
+      letter-spacing: .03em;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1.1fr 1fr; gap: 14px; }
+    .concept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+    .concept-card {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      background: rgba(255,255,255,.03);
+      padding: 14px;
+      min-height: 128px;
+    }
+    .concept-token { font-size: 14px; letter-spacing: .14em; color: var(--accent2); text-transform: uppercase; margin-bottom: 7px; font-weight: 700; }
+    .concept-note { font-size: 14px; color: color-mix(in srgb, var(--text) 88%, var(--soft)); line-height: 1.8; }
+    .atlas {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      min-height: 440px;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+    .atlas svg { width: 100%; max-width: 440px; height: auto; }
+    .timeline { display: grid; gap: 10px; }
+    .timeline-item {
+      border-left: 2px solid color-mix(in srgb, var(--accent) 66%, transparent);
+      padding: 10px 14px;
+      background: rgba(255,255,255,.02);
+      border-radius: 0 10px 10px 0;
+    }
+    .timeline-no { font-size: 11px; letter-spacing: .22em; color: var(--accent2); display: block; margin-bottom: 6px; }
+    .timeline-item h3 { font-size: 19px; font-family: "Noto Serif SC", serif; line-height: 1.45; margin-bottom: 7px; }
+    .timeline-item p { font-size: 14px; line-height: 1.9; color: color-mix(in srgb, var(--text) 84%, var(--soft)); }
+    .quote-wrap { display: grid; gap: 10px; }
+    .quote {
+      border-left: 2px solid color-mix(in srgb, var(--accent2) 80%, transparent);
+      padding: 10px 12px;
+      background: rgba(255,255,255,.02);
+      color: color-mix(in srgb, var(--text) 92%, #fff);
+      font-family: "Noto Serif SC", serif;
+      line-height: 1.9;
+    }
+    .takeaways { margin-top: 10px; list-style: none; display: grid; gap: 8px; }
+    .takeaways li {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      padding: 10px;
+      background: rgba(255,255,255,.02);
+      align-items: start;
+      line-height: 1.8;
+    }
+    .takeaways span {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: color-mix(in srgb, var(--accent2) 26%, transparent);
+      color: var(--accent2);
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+    .nav { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,.26);
+      border-radius: 999px;
+      padding: 8px 13px;
+      font-size: 12px;
+      color: var(--text);
+      background: rgba(255,255,255,.04);
+    }
+    .btn:hover { border-color: var(--accent2); color: var(--accent2); }
+    .dot-nav {
+      position: fixed;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: grid;
+      gap: 10px;
+      z-index: 50;
+    }
+    .dot-nav button {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.35);
+      background: transparent;
+      cursor: pointer;
+      transition: all .24s ease;
+    }
+    .dot-nav button.active { transform: scale(1.34); border-color: var(--accent); background: var(--accent); }
+    .reveal { opacity: 0; transform: translateY(16px); transition: opacity .55s ease, transform .55s ease; }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+    @media (max-width: 940px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .dot-nav { display: none; }
+      .hero { min-height: auto; padding: 30px 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+  <nav class="dot-nav" id="dotNav">
+    <button data-target="hero" class="active" aria-label="Hero"></button>
+    <button data-target="atlas" aria-label="Atlas"></button>
+    <button data-target="concepts" aria-label="Concepts"></button>
+    <button data-target="reading" aria-label="Reading"></button>
+    <button data-target="takeaways" aria-label="Takeaways"></button>
+  </nav>
+  <main class="page">
+    <section class="hero reveal in" id="hero">
+      <p class="eyebrow">Field Narrative · Gate 5</p>
+      <h1>第二章沼泽里的村庄</h1>
+      <p>第二章沼泽里的村庄 31 来的村民懂一点皮金语，许多幸存的男人这门语言说得相对流利。 战后，皮金语的地位在村里巩固了。除了许多说泰雅博语的村民 离世，这一语言取得牢固地位的一个主要原因是基督教的到来。村民 们至少从1930年代起就已经知道基督教，但直到战后才有神父来到 迦普恩，那个时候这个地方要比现在更难进人。战后，村民们再也没 有回过山顶的村子，部分原因是村子不复存在了：发现村民逃跑后， 日军恼羞成怒，烧毁了所有被荒弃的房屋。村民们在山下平坦的平原 上重新定居，就离日军建立大本营的地方不远。但这个地方还是很偏 远：因为它与最近的可以通行的溪流相距甚远，到达那里要艰苦跋涉 三到五个小时穿过沼泽：那里水深齐胸，都是泥，还到处是巨型淡</p>
+      <div class="chip-row">
+        <span class="chip">雨林里的消亡（可视化阅读测试-v2）</span>
+        <span class="chip">作者：Unknown</span>
+        <span class="chip">Module 5/24</span>
+        <span class="tag">战后</span><span class="tag">第二章沼泽里的村庄</span><span class="tag">到了</span><span class="tag">年代</span><span class="tag">壮大</span><span class="tag">雨林里的消亡</span>
+      </div>
+    </section>
+
+    <section class="section grid-2 reveal" id="atlas">
+      <article>
+        <h2>知识结构图谱</h2>
+        <p style="color:var(--soft);line-height:1.9;margin-bottom:10px;">围绕本关卡核心概念构建关系图。阅读时先抓主轴，再理解每个概念如何驱动判断与行动。</p>
+        <div class="quote-wrap"><blockquote class="quote reveal">“战后，皮金语的地位在村里巩固了。除了许多说泰雅博语的村民 离世，这一语言取得牢固地位的一个主要原因是基督教的到来。村民 们至少从1930年代起就已经知道基督教，但直到战后才有神父来到 迦普恩，那个时候这个地方要比现在更难进人。战后，村民们再也没 有回过山顶的村子，部分原因是村子不复存在了：发现村民逃跑后， 日军恼羞成怒，烧毁了所有被荒弃的房屋。村民们在山下平坦的平原 上重新定居，就离日军建立大本营的地方不远。但这个地方还是很偏 远：因为”</blockquote><blockquote class="quote reveal">“但当孩子们，尤其是女孩开始被要求帮母亲照看新生的婴儿时， 母亲们就开始向她们发号施令。这些命令一去捡柴火、递给婴儿哭 第二章沼泽里的村庄 33 着要的任何东西、爬到树上摘槟榔一逐渐用皮金语发出。女人开始 对她们的小孩子做男人们几十年来对男孩和年轻男人（以及他们的妻 子）做的事一—用皮金语差遣他们。事实上，那些用皮金语让儿子、 侄子和妻子干这干那的男人，就是被海外的白人用皮金语呼来喝去才 学会这门语言的。”</blockquote><blockquote class="quote reveal">“上述每一变化都导致越来越多的皮金语被越来越多的人在村子里 越来越多的场景中使用。村民们说，战后皮金语“开始壮大”，而这 一“壮大”也让女人和女孩们习得了这门语言，到了1950年代后期， 她们已经把它融人了自己的交流中。1980年代时，我和一个妇女谈 到皮金语，她告诉我，“战后，皮金语再也不少见了。它到了外面， 32 雨林里的消亡 变成了我们自己的土话。我们所有这些战后出生的女人就是说这个话 长大的”。”</blockquote></div>
+      </article>
+      <article class="atlas">
+        <svg viewBox="0 0 440 440" aria-label="concept atlas">
+          <defs>
+            <radialGradient id="g" cx="50%" cy="50%" r="56%">
+              <stop offset="0%" stop-color="#d97706" stop-opacity=".24"></stop>
+              <stop offset="100%" stop-color="#d97706" stop-opacity="0"></stop>
+            </radialGradient>
+          </defs>
+          <circle cx="220" cy="220" r="190" fill="none" stroke="rgba(255,255,255,.08)" stroke-dasharray="5 6"></circle>
+          <circle cx="220" cy="220" r="84" fill="url(#g)"></circle>
+          <circle cx="220" cy="220" r="10" fill="#d97706"></circle>
+          <text x="220" y="252" text-anchor="middle" fill="#f5f1ea" font-size="13">第二章沼泽里的村庄</text>
+          <g><line x1="220" y1="220" x2="370" y2="220" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="370" cy="220" r="8" fill="#2dd4bf"/><text x="382" y="224" fill="#f5f1ea" font-size="12">战后</text></g><g><line x1="220" y1="220" x2="266" y2="363" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="266" cy="363" r="8" fill="#2dd4bf"/><text x="278" y="367" fill="#f5f1ea" font-size="12">第二章沼泽里的村庄</text></g><g><line x1="220" y1="220" x2="99" y2="308" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="99" cy="308" r="8" fill="#2dd4bf"/><text x="111" y="312" fill="#f5f1ea" font-size="12">到了</text></g><g><line x1="220" y1="220" x2="99" y2="132" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="99" cy="132" r="8" fill="#2dd4bf"/><text x="111" y="136" fill="#f5f1ea" font-size="12">年代</text></g><g><line x1="220" y1="220" x2="266" y2="77" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="266" cy="77" r="8" fill="#2dd4bf"/><text x="278" y="81" fill="#f5f1ea" font-size="12">壮大</text></g>
+        </svg>
+      </article>
+    </section>
+
+    <section class="section reveal" id="concepts">
+      <h2>核心概念与解释</h2>
+      <div class="concept-grid">
+      <article class="concept-card reveal">
+        <p class="concept-token">战后</p>
+        <p class="concept-note">战后，皮金语的地位在村里巩固了。除了许多说泰雅博语的村民 离世，这一语言取得牢固地位的一个主要原因是基督教的到来。村民 们至少从1930年代起就已经知道基督教，但直到战后才有神父来到 迦普恩，那个时候这个地方要比现在更难进人。战后，村民们再也没 有回过山顶的村子，部分原因是村子不复存在了：发现村民逃跑后， 日军恼羞成怒，烧毁了所有被荒弃的房屋。村民们在山下平</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">第二章沼泽里的村庄</p>
+        <p class="concept-note">第二章沼泽里的村庄 31 来的村民懂一点皮金语，许多幸存的男人这门语言说得相对流利。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">到了</p>
+        <p class="concept-note">第一个来到迦普恩的传教士是一个叫希拉里昂·莫林的加拿大天 主教神父，他于1948年来到村子里。他回来过几次，到了1950年代 中期，他已经为二十五名村民完成施洗。所有关于基督教的言谈都是 用皮金语，村民们学着用那门语言背诵祷词，唱赞美诗，听弥撒。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">年代</p>
+        <p class="concept-note">战后，皮金语的地位在村里巩固了。除了许多说泰雅博语的村民 离世，这一语言取得牢固地位的一个主要原因是基督教的到来。村民 们至少从1930年代起就已经知道基督教，但直到战后才有神父来到 迦普恩，那个时候这个地方要比现在更难进人。战后，村民们再也没 有回过山顶的村子，部分原因是村子不复存在了：发现村民逃跑后， 日军恼羞成怒，烧毁了所有被荒弃的房屋。村民们在山下平</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">壮大</p>
+        <p class="concept-note">上述每一变化都导致越来越多的皮金语被越来越多的人在村子里 越来越多的场景中使用。村民们说，战后皮金语“开始壮大”，而这 一“壮大”也让女人和女孩们习得了这门语言，到了1950年代后期， 她们已经把它融人了自己的交流中。1980年代时，我和一个妇女谈 到皮金语，她告诉我，“战后，皮金语再也不少见了。它到了外面， 32 雨林里的消亡 变成了我们自己的土话。我们所</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">雨林里的消亡</p>
+        <p class="concept-note">上述每一变化都导致越来越多的皮金语被越来越多的人在村子里 越来越多的场景中使用。村民们说，战后皮金语“开始壮大”，而这 一“壮大”也让女人和女孩们习得了这门语言，到了1950年代后期， 她们已经把它融人了自己的交流中。1980年代时，我和一个妇女谈 到皮金语，她告诉我，“战后，皮金语再也不少见了。它到了外面， 32 雨林里的消亡 变成了我们自己的土话。我们所</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="reading">
+      <h2>渐进式阅读路径</h2>
+      <div class="timeline">
+      <article class="timeline-item reveal">
+        <span class="timeline-no">01</span>
+        <h3>第二章沼泽里的村庄 31 来的村民懂一点皮金语，许多幸存的男人这门语言说得相对流利。</h3>
+        <p>第二章沼泽里的村庄 31 来的村民懂一点皮金语，许多幸存的男人这门语言说得相对流利。 战后，皮金语的地位在村里巩固了。除了许多说泰雅博语的村民 离世，这一语言取得牢固地位的一个主要原因是基督教的到来。村民 们至少从1930年代起就已经知道基督教，但直到战后才有神父来到 迦普恩，那个时候这个地方要比现在更难进人。战后，村民们再也没 有回过山顶的村子，部分原因是村子不复存在了：发现村民逃跑后， 日军恼羞成怒，烧毁了所有被荒弃的房屋。村民们在山下平坦的平原 上重新定居，就离日军建立大本营的地方不远。但这个地方还是很偏 远：因为它与最近的可以通行的溪流相距甚远，到达那里要艰苦跋涉 三到五个小时穿过沼泽：那里水深齐胸，都是泥，还到处是巨型淡 水鳄。 第一个来到迦普恩的传教士是一个叫希拉里昂·莫林的加拿大天 主教神父，他于1948年来到村子里。他回来过几次，到了1950年代 中期，他已经为二十五名村民完成施洗。所有关于基督教的言谈都是 用皮金语，村民们学着用那门语言背诵祷词，唱赞美诗，听弥撒。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">02</span>
+        <h3>除了教会的推动之外，离开村子当合约工的年轻人继续学习皮 金语。1950年代早期，迦普恩的几乎每个未婚男性在十几二十岁的 时候（约十七八个年轻男性里有十四个）</h3>
+        <p>除了教会的推动之外，离开村子当合约工的年轻人继续学习皮 金语。1950年代早期，迦普恩的几乎每个未婚男性在十几二十岁的 时候（约十七八个年轻男性里有十四个），在远方的种植园当合约工， 在偏远的莱镇当下级水手或路工。这些人都熟练掌握了皮金语，回到 迦普恩时，他们延续了父辈们建立的传统，彼此之间以及和孩子在一 起时就用这门语言沟通。 上述每一变化都导致越来越多的皮金语被越来越多的人在村子里 越来越多的场景中使用。村民们说，战后皮金语“开始壮大”，而这 一“壮大”也让女人和女孩们习得了这门语言，到了1950年代后期， 她们已经把它融人了自己的交流中。1980年代时，我和一个妇女谈 到皮金语，她告诉我，“战后，皮金语再也不少见了。它到了外面， 32 雨林里的消亡 变成了我们自己的土话。我们所有这些战后出生的女人就是说这个话 长大的”。 村民们日益掌握皮金语后，第一个损失就是他们在其他语言上的 能力。在皮金语到来之前，迦普恩人是一个能说多种语言的民族。周 遭的村子没人花费精力去学习他们这门小语言一一这一情形对迦普恩 人来说正好，因为这意味着他们可以把泰雅博语当成一种没人能懂的 密语。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">03</span>
+        <h3>在和其他村子里的人交流时，迦普恩的男男女女会学习他们说的 土话。1980年代我第一次在这个村子里长期停留时，我听到“二战” 前长大的老人自信地说着两种和泰雅</h3>
+        <p>在和其他村子里的人交流时，迦普恩的男男女女会学习他们说的 土话。1980年代我第一次在这个村子里长期停留时，我听到“二战” 前长大的老人自信地说着两种和泰雅博语无关、彼此也不互通的当地 话，我还看到老人能对一两种其他语言作出回应，他们显然能听懂， 即便不会说。 在战后出生的那代人里，随着皮金语的“壮大”，通晓其他土语 的能力骤降。人们不再需要学习当地语言，因为那个时候用皮金语沟 通更容易。女人落在男人后面，在一代人的时间里，她们还会继续学 习其他土语，因为当地的女人大体上依然不像男人那样能把皮金语说 得那么好。然而到了1970年代，就连迦普恩的女人们在其他土语上 的能力也被皮金语盖过了。 一旦女人开始说皮金语，她们就开始把它向孩子引导。这件事本 身没什么。跟北欧和美国等地的中产父母不同，迦普恩的成年人不会 花费大量时间跟小朋友讲话。他们不会用语言教小孩子任何东西，因 为他们不认为刚学会走路的孩子是能被教会的。而且跟一个婴儿对话 也没有什么意义，因为婴儿不会拾起话头，也不会回嘴。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">04</span>
+        <h3>但当孩子们，尤其是女孩开始被要求帮母亲照看新生的婴儿时， 母亲们就开始向她们发号施令。这些命令一去捡柴火、递给婴儿哭 第二章沼泽里的村庄 33 着要的任何东</h3>
+        <p>但当孩子们，尤其是女孩开始被要求帮母亲照看新生的婴儿时， 母亲们就开始向她们发号施令。这些命令一去捡柴火、递给婴儿哭 第二章沼泽里的村庄 33 着要的任何东西、爬到树上摘槟榔一逐渐用皮金语发出。女人开始 对她们的小孩子做男人们几十年来对男孩和年轻男人（以及他们的妻 子）做的事一—用皮金语差遣他们。事实上，那些用皮金语让儿子、 侄子和妻子干这干那的男人，就是被海外的白人用皮金语呼来喝去才 学会这门语言的。 在语言的消亡史里，个体发育重述了种系发生学。 一门语言就是这样消亡的：在迦普恩，皮金语被整合进了村民的 语言库里，首先被牺牲掉的是其他村子的土语，最终是他们自已的土 语。村民们掌握的语言数量逐步减少，以至于四代人令人称赞的多语 能力弱化成了单一语言。一个过去掌握多种语言的民族现在只能掌握 一种。而这唯一的一种还不是他们祖先的语言泰雅博语，是皮金语。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">05</span>
+        <h3>我在这个村子里待得越久，越充分意识到这一点时，幡然领悟 到自己本来设想的来迦普恩的任务一去理解一门语言是如何消亡 的一事实上，不过是我天真担起的千斤重担的一</h3>
+        <p>我在这个村子里待得越久，越充分意识到这一点时，幡然领悟 到自己本来设想的来迦普恩的任务一去理解一门语言是如何消亡 的一事实上，不过是我天真担起的千斤重担的一小部分。泰雅博语 不只是死了一它完全没有被记录下来。等到它消失的那天，它作为 一门语言的独特天分就会消失得无影无踪。除非我开始行动，也就是 说，开始把它书写下来，录下来，然后弄明白。</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="takeaways">
+      <h2>本关关键收获</h2>
+      <ul class="takeaways"><li><span>1</span>第二章沼泽里的村庄 31 来的村民懂一点皮金语，许多幸存的男人这门语言说得相对流利。</li><li><span>2</span>除了教会的推动之外，离开村子当合约工的年轻人继续学习皮 金语。1950年代早期，迦普恩的几乎每个未婚男性在十几二十岁的 时候（约十七八个年轻男性里有十四个）</li><li><span>3</span>在和其他村子里的人交流时，迦普恩的男男女女会学习他们说的 土话。1980年代我第一次在这个村子里长期停留时，我听到“二战” 前长大的老人自信地说着两种和泰雅</li><li><span>4</span>但当孩子们，尤其是女孩开始被要求帮母亲照看新生的婴儿时， 母亲们就开始向她们发号施令。这些命令一去捡柴火、递给婴儿哭 第二章沼泽里的村庄 33 着要的任何东</li></ul>
+      <nav class="nav">
+        <a class="btn" href="/experiences/user-book-v2-g5unsh-2f9c-g04-part-2.html">上一关</a>
+        <a class="btn" href="/experiences/user-book-v2-g5unsh-2f9c-g06-firstcatchyourteacher.html">下一关</a>
+      </nav>
+    </section>
+  </main>
+  <script>
+    (() => {
+      const progress = document.getElementById("progress");
+      const dots = Array.from(document.querySelectorAll("#dotNav button[data-target]"));
+      const sections = dots
+        .map((dot) => document.getElementById(dot.getAttribute("data-target")))
+        .filter(Boolean);
+      const reveals = Array.from(document.querySelectorAll(".reveal"));
+      const onScroll = () => {
+        const h = document.documentElement;
+        const total = Math.max(1, h.scrollHeight - window.innerHeight);
+        const pct = Math.max(0, Math.min(100, (window.scrollY / total) * 100));
+        if (progress) progress.style.width = pct + "%";
+      };
+      const io = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) entry.target.classList.add("in");
+        }
+      }, { threshold: .14 });
+      reveals.forEach((el) => io.observe(el));
+      const secIo = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const id = entry.target.id;
+          dots.forEach((dot) => dot.classList.toggle("active", dot.getAttribute("data-target") === id));
+        });
+      }, { threshold: .4 });
+      sections.forEach((s) => secIo.observe(s));
+      dots.forEach((dot) => {
+        dot.addEventListener("click", () => {
+          const target = document.getElementById(dot.getAttribute("data-target"));
+          if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+      window.addEventListener("scroll", onScroll, { passive: true });
+      onScroll();
+    })();
+  </script>
+</body>
+</html>

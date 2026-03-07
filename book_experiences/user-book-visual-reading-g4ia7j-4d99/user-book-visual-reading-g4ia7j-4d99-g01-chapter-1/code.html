@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>第一章我们呼吸的空气 · 雨林里的消亡：一种语言和生活方式在巴布亚新几内亚的终结</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #16120f;
+      --bg2: #2a1f18;
+      --accent: #d97706;
+      --accent2: #2dd4bf;
+      --text: #f5f1ea;
+      --soft: #c7b8a2;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+      background:
+        radial-gradient(1200px 540px at 85% -8%, color-mix(in srgb, var(--accent2) 24%, transparent), transparent 70%),
+        radial-gradient(980px 460px at -10% 14%, color-mix(in srgb, var(--accent) 24%, transparent), transparent 74%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+      color: var(--text);
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .05;
+      background-image: radial-gradient(circle at 1px 1px, #fff 1px, transparent 0);
+      background-size: 3px 3px;
+      z-index: 0;
+    }
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      z-index: 100;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+    .page { position: relative; z-index: 1; width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 20px 0 48px; }
+    .hero {
+      min-height: 74vh;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 22px;
+      background: linear-gradient(160deg, color-mix(in srgb, var(--bg2) 86%, transparent), color-mix(in srgb, var(--bg) 88%, transparent));
+      padding: 40px 34px;
+      display: grid;
+      align-content: center;
+      gap: 16px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.34);
+    }
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .hero h1 {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(32px, 5.4vw, 68px);
+      line-height: 1.16;
+      letter-spacing: .04em;
+      max-width: 15em;
+      text-wrap: balance;
+    }
+    .hero p {
+      max-width: 66ch;
+      line-height: 1.95;
+      color: color-mix(in srgb, var(--text) 85%, var(--soft));
+      font-size: 16px;
+    }
+    .chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip {
+      border: 1px solid color-mix(in srgb, var(--accent2) 44%, transparent);
+      color: color-mix(in srgb, var(--accent2) 88%, #fff);
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 12px;
+      background: rgba(255,255,255,.03);
+    }
+    .section { margin-top: 18px; border: 1px solid rgba(255,255,255,.13); border-radius: 18px; padding: 22px; background: rgba(2,6,18,.46); }
+    .section h2 {
+      margin-bottom: 12px;
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(22px, 2.8vw, 34px);
+      color: color-mix(in srgb, var(--accent) 86%, #fff);
+      letter-spacing: .03em;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1.1fr 1fr; gap: 14px; }
+    .concept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+    .concept-card {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      background: rgba(255,255,255,.03);
+      padding: 14px;
+      min-height: 128px;
+    }
+    .concept-token { font-size: 14px; letter-spacing: .14em; color: var(--accent2); text-transform: uppercase; margin-bottom: 7px; font-weight: 700; }
+    .concept-note { font-size: 14px; color: color-mix(in srgb, var(--text) 88%, var(--soft)); line-height: 1.8; }
+    .atlas {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      min-height: 440px;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+    .atlas svg { width: 100%; max-width: 440px; height: auto; }
+    .timeline { display: grid; gap: 10px; }
+    .timeline-item {
+      border-left: 2px solid color-mix(in srgb, var(--accent) 66%, transparent);
+      padding: 10px 14px;
+      background: rgba(255,255,255,.02);
+      border-radius: 0 10px 10px 0;
+    }
+    .timeline-no { font-size: 11px; letter-spacing: .22em; color: var(--accent2); display: block; margin-bottom: 6px; }
+    .timeline-item h3 { font-size: 19px; font-family: "Noto Serif SC", serif; line-height: 1.45; margin-bottom: 7px; }
+    .timeline-item p { font-size: 14px; line-height: 1.9; color: color-mix(in srgb, var(--text) 84%, var(--soft)); }
+    .quote-wrap { display: grid; gap: 10px; }
+    .quote {
+      border-left: 2px solid color-mix(in srgb, var(--accent2) 80%, transparent);
+      padding: 10px 12px;
+      background: rgba(255,255,255,.02);
+      color: color-mix(in srgb, var(--text) 92%, #fff);
+      font-family: "Noto Serif SC", serif;
+      line-height: 1.9;
+    }
+    .takeaways { margin-top: 10px; list-style: none; display: grid; gap: 8px; }
+    .takeaways li {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      padding: 10px;
+      background: rgba(255,255,255,.02);
+      align-items: start;
+      line-height: 1.8;
+    }
+    .takeaways span {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: color-mix(in srgb, var(--accent2) 26%, transparent);
+      color: var(--accent2);
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+    .nav { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,.26);
+      border-radius: 999px;
+      padding: 8px 13px;
+      font-size: 12px;
+      color: var(--text);
+      background: rgba(255,255,255,.04);
+    }
+    .btn:hover { border-color: var(--accent2); color: var(--accent2); }
+    .dot-nav {
+      position: fixed;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: grid;
+      gap: 10px;
+      z-index: 50;
+    }
+    .dot-nav button {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.35);
+      background: transparent;
+      cursor: pointer;
+      transition: all .24s ease;
+    }
+    .dot-nav button.active { transform: scale(1.34); border-color: var(--accent); background: var(--accent); }
+    .reveal { opacity: 0; transform: translateY(16px); transition: opacity .55s ease, transform .55s ease; }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+    @media (max-width: 940px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .dot-nav { display: none; }
+      .hero { min-height: auto; padding: 30px 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+  <nav class="dot-nav" id="dotNav">
+    <button data-target="hero" class="active" aria-label="Hero"></button>
+    <button data-target="atlas" aria-label="Atlas"></button>
+    <button data-target="concepts" aria-label="Concepts"></button>
+    <button data-target="reading" aria-label="Reading"></button>
+    <button data-target="takeaways" aria-label="Takeaways"></button>
+  </nav>
+  <main class="page">
+    <section class="hero reveal in" id="hero">
+      <p class="eyebrow">Field Narrative · Gate 1</p>
+      <h1>第一章我们呼吸的空气</h1>
+      <p>第一章我们呼吸的空气 13 [PAGE 23 IMAGE 1 CONTENT (OCR)]: （在皮金语里是olbikman，泰雅博语里是munjenumsuman）一用 羽毛和野猪长牙为我盛装打扮，然后指引我喝掉他们倒在一张芋叶里 的开过光的水。他们解释说，这些神水可以让我打开话匣子，从而学 会泰雅博语，我前世因为英年早逝没来得及学会。 在同一个场合，男人们宣布说他们赐予了我一个泰雅博语名字。</p>
+      <div class="chip-row">
+        <span class="chip">雨林里的消亡：一种语言和生活方式在巴布亚新几内亚的终结</span>
+        
+        <span class="chip">Module 1/18</span>
+        <span class="tag">page</span><span class="tag">image</span><span class="tag">content</span><span class="tag">ocr</span><span class="tag">第一章我们呼吸的空气</span><span class="tag">康庄大道</span>
+      </div>
+    </section>
+
+    <section class="section grid-2 reveal" id="atlas">
+      <article>
+        <h2>知识结构图谱</h2>
+        <p style="color:var(--soft);line-height:1.9;margin-bottom:10px;">围绕本关卡核心概念构建关系图。阅读时先抓主轴，再理解每个概念如何驱动判断与行动。</p>
+        <div class="quote-wrap"><blockquote class="quote reveal">“从那以后，我回去过五次，算下来，我总共在迦普恩待了近三年 时间。1 村民们一直把我当成是一个鬼魂。我是一个既一无是处又桀骜不 驯的鬼魂，因为尽管那些年来来去去，我却从来没有向村民们透露怎 么走上变革道路的秘密，他们一心觉得我有这样的神通。然而这没阻 止他们仔细观察我的行为举止，掂量我说的话，盼着我总有一天说漏 嘴，露出马脚。他们相信当他们找到了我能通往的那条“康庄大道” 时一—或他们死的时候，不论哪个先发生一他们的黑皮肤就会像蟹 壳一样”</blockquote><blockquote class="quote reveal">“2009年中，就在翁佳尼造访迦普恩的时候，我在村子里已经待 得够久，也接受了我在碳交易这类事情上的看法无足轻重。尽管村民 们对我比他们有更多世界各国的一手经验这一点表示尊重，但我实际 上没有开启他们期待已久的改变之路还是让他们耿耿于怀，因此他们 无视我对于翁佳尼的骗人计划表达的反对意见。仅就我知道的来说， 他们认为我对他们孜孜以求的“康庄大道”一无所知。我初来乍到之 时，我的无知可以归结为我的青春年少，归结为我的国家的大人尚未 第一章我”</blockquote><blockquote class="quote reveal">“但另一方面，像我讲的地铁之类的事情则被他们热情接纳，一再 被想听的人互相转述：当我讲到地下隧道的时候，村民们就心领神会 地微笑，他们对这些已经了然于胸。经由从当地坟场下穿过的隧道， 死去的巴布亚新几内亚人会到达罗马，变成白人。我关于大汽车穿过 地底隧道的描述也验证了村民们之前的发现一一他们会分析那些声称 了解情况的村民们传播的流言，仔细核实那些隔几年来村子里住上一 宿的古怪神父们讲述的故事，也会试着弄明白邻村那所只存在了十来 年的小学里”</blockquote></div>
+      </article>
+      <article class="atlas">
+        <svg viewBox="0 0 440 440" aria-label="concept atlas">
+          <defs>
+            <radialGradient id="g" cx="50%" cy="50%" r="56%">
+              <stop offset="0%" stop-color="#d97706" stop-opacity=".24"></stop>
+              <stop offset="100%" stop-color="#d97706" stop-opacity="0"></stop>
+            </radialGradient>
+          </defs>
+          <circle cx="220" cy="220" r="190" fill="none" stroke="rgba(255,255,255,.08)" stroke-dasharray="5 6"></circle>
+          <circle cx="220" cy="220" r="84" fill="url(#g)"></circle>
+          <circle cx="220" cy="220" r="10" fill="#d97706"></circle>
+          <text x="220" y="252" text-anchor="middle" fill="#f5f1ea" font-size="13">第一章我们呼吸的空气</text>
+          <g><line x1="220" y1="220" x2="370" y2="220" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="370" cy="220" r="8" fill="#2dd4bf"/><text x="382" y="224" fill="#f5f1ea" font-size="12">page</text></g><g><line x1="220" y1="220" x2="266" y2="363" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="266" cy="363" r="8" fill="#2dd4bf"/><text x="278" y="367" fill="#f5f1ea" font-size="12">image</text></g><g><line x1="220" y1="220" x2="99" y2="308" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="99" cy="308" r="8" fill="#2dd4bf"/><text x="111" y="312" fill="#f5f1ea" font-size="12">content</text></g><g><line x1="220" y1="220" x2="99" y2="132" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="99" cy="132" r="8" fill="#2dd4bf"/><text x="111" y="136" fill="#f5f1ea" font-size="12">ocr</text></g><g><line x1="220" y1="220" x2="266" y2="77" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="266" cy="77" r="8" fill="#2dd4bf"/><text x="278" y="81" fill="#f5f1ea" font-size="12">第一章我们呼吸的空气</text></g>
+        </svg>
+      </article>
+    </section>
+
+    <section class="section reveal" id="concepts">
+      <h2>核心概念与解释</h2>
+      <div class="concept-grid">
+      <article class="concept-card reveal">
+        <p class="concept-token">page</p>
+        <p class="concept-note">第一章我们呼吸的空气 13 [PAGE 23 IMAGE 1 CONTENT (OCR)]: （在皮金语里是olbikman，泰雅博语里是munjenumsuman）一用 羽毛和野猪长牙为我盛装打扮，然后指引我喝掉他们倒在一张芋叶里 的开过光的水。他们解释说，这些神水可以让我打开话匣子，从而学 会泰雅博语，我前世因为英年早逝没来得及学会。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">image</p>
+        <p class="concept-note">第一章我们呼吸的空气 13 [PAGE 23 IMAGE 1 CONTENT (OCR)]: （在皮金语里是olbikman，泰雅博语里是munjenumsuman）一用 羽毛和野猪长牙为我盛装打扮，然后指引我喝掉他们倒在一张芋叶里 的开过光的水。他们解释说，这些神水可以让我打开话匣子，从而学 会泰雅博语，我前世因为英年早逝没来得及学会。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">content</p>
+        <p class="concept-note">第一章我们呼吸的空气 13 [PAGE 23 IMAGE 1 CONTENT (OCR)]: （在皮金语里是olbikman，泰雅博语里是munjenumsuman）一用 羽毛和野猪长牙为我盛装打扮，然后指引我喝掉他们倒在一张芋叶里 的开过光的水。他们解释说，这些神水可以让我打开话匣子，从而学 会泰雅博语，我前世因为英年早逝没来得及学会。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">ocr</p>
+        <p class="concept-note">第一章我们呼吸的空气 13 [PAGE 23 IMAGE 1 CONTENT (OCR)]: （在皮金语里是olbikman，泰雅博语里是munjenumsuman）一用 羽毛和野猪长牙为我盛装打扮，然后指引我喝掉他们倒在一张芋叶里 的开过光的水。他们解释说，这些神水可以让我打开话匣子，从而学 会泰雅博语，我前世因为英年早逝没来得及学会。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">第一章我们呼吸的空气</p>
+        <p class="concept-note">第一章我们呼吸的空气 13 [PAGE 23 IMAGE 1 CONTENT (OCR)]: （在皮金语里是olbikman，泰雅博语里是munjenumsuman）一用 羽毛和野猪长牙为我盛装打扮，然后指引我喝掉他们倒在一张芋叶里 的开过光的水。他们解释说，这些神水可以让我打开话匣子，从而学 会泰雅博语，我前世因为英年早逝没来得及学会。</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">康庄大道</p>
+        <p class="concept-note">从那以后，我回去过五次，算下来，我总共在迦普恩待了近三年 时间。1 村民们一直把我当成是一个鬼魂。我是一个既一无是处又桀骜不 驯的鬼魂，因为尽管那些年来来去去，我却从来没有向村民们透露怎 么走上变革道路的秘密，他们一心觉得我有这样的神通。然而这没阻 止他们仔细观察我的行为举止，掂量我说的话，盼着我总有一天说漏 嘴，露出马脚。他们相信当他们找到了我能通往的那条</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="reading">
+      <h2>渐进式阅读路径</h2>
+      <div class="timeline">
+      <article class="timeline-item reveal">
+        <span class="timeline-no">01</span>
+        <h3>第一章我们呼吸的空气 13 [PAGE 23 IMAGE 1 CONTENT (OCR)]: （在皮金语里是olbikman，泰雅博语里是munjenums</h3>
+        <p>第一章我们呼吸的空气 13 [PAGE 23 IMAGE 1 CONTENT (OCR)]: （在皮金语里是olbikman，泰雅博语里是munjenumsuman）一用 羽毛和野猪长牙为我盛装打扮，然后指引我喝掉他们倒在一张芋叶里 的开过光的水。他们解释说，这些神水可以让我打开话匣子，从而学 会泰雅博语，我前世因为英年早逝没来得及学会。 在同一个场合，男人们宣布说他们赐予了我一个泰雅博语名字。 这不是我上辈子的那个名字。那个时候我叫孔吉，只有几个月大的时 候就天折了。大人为轮回转世的我赐予的新名字尊贵高尚一是某位 村庄的创始先祖的名字。 这个名字是萨拉奇。我喜欢这个名字。它的发音，开头蜿蜓曲 折，突然被喉间的停顿打断，继而一路沿着惊心动魄的元音俯冲，这 让我想到托尔金可能会梦见的那种不怎么心地善良的小精灵。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">02</span>
+        <h3>第二年，我回到了迦普恩。我在那儿待了十五个月，住在一个由 柱子撑起的大房子里，是村民们为我建的。我完成了我的博士论文， 写了一本书，讲的是我观察到的泰雅博语</h3>
+        <p>第二年，我回到了迦普恩。我在那儿待了十五个月，住在一个由 柱子撑起的大房子里，是村民们为我建的。我完成了我的博士论文， 写了一本书，讲的是我观察到的泰雅博语以及它为何消亡。 从那以后，我回去过五次，算下来，我总共在迦普恩待了近三年 时间。1 村民们一直把我当成是一个鬼魂。我是一个既一无是处又桀骜不 驯的鬼魂，因为尽管那些年来来去去，我却从来没有向村民们透露怎 么走上变革道路的秘密，他们一心觉得我有这样的神通。然而这没阻 止他们仔细观察我的行为举止，掂量我说的话，盼着我总有一天说漏 嘴，露出马脚。他们相信当他们找到了我能通往的那条“康庄大道” 时一—或他们死的时候，不论哪个先发生一他们的黑皮肤就会像蟹 壳一样裂开，他们会以柔嫩、白皮肤的形象走出来，摇身一变腰缠万 1我去那个村子的时间如下：1985年（1个月），1986一1987年（15个月），1991年（两 14 雨林里的消亡 [PAGE 24 IMAGE 1 CONTENT (OCR)]: 贯。因为有了白皮肤，他们就能立即得到白人拥有的金钱和商品。 “大肚子”翁佳尼被喂了个饱，然后离开迦普恩回到自已的村庄 （步行两小时才能到），村民们开始悄声议论他说的话。女人们纷纷表 示不屑。“万一这个公司来了，然后把我们的空气都抽光了，我们咋 办？”她们想知道。翁佳尼关于巴布亚新几内亚空气资源充裕的说辞 没能让她们安下心。“空气全没了之后，林子里的猪咋办？”她们问 道。“我们的西米棕榈咋办？我们的香蕉园，我们的芋头，我们的烟 叶咋办？”“我们的孩子吸什么空气？” 男人们承认或许这些顾虑绝非无足轻重，但他们的态度更温和。 一百亿基纳是一笔天大的巨款。一条公路和一条机场跑道也价值连 城。一所大学则更加值钱了。他们知道翁佳尼就是一个居心回测的大 话精，之前好几次骗过他们的钱，但他们不希望想都不想就放弃这一 提案。诚然，他给的表格没人看得懂，他声称下个礼拜就会来回收村 民签好名字的表格。但这毕竞是一张表格，是在机器上打字，然后印 出来的。看上去像个官方文件。他们拿给我看，让我解释给他们听。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">03</span>
+        <h3>我翻译了纸上的文字，告诉他们翁佳尼又想欺骗他们。就像每次我试 图说服他们不要相信某个骗局时那样，我得到的回应是：他们完全无 视了我。</h3>
+        <p>我翻译了纸上的文字，告诉他们翁佳尼又想欺骗他们。就像每次我试 图说服他们不要相信某个骗局时那样，我得到的回应是：他们完全无 视了我。 2009年中，就在翁佳尼造访迦普恩的时候，我在村子里已经待 得够久，也接受了我在碳交易这类事情上的看法无足轻重。尽管村民 们对我比他们有更多世界各国的一手经验这一点表示尊重，但我实际 上没有开启他们期待已久的改变之路还是让他们耿耿于怀，因此他们 无视我对于翁佳尼的骗人计划表达的反对意见。仅就我知道的来说， 他们认为我对他们孜孜以求的“康庄大道”一无所知。我初来乍到之 时，我的无知可以归结为我的青春年少，归结为我的国家的大人尚未 第一章我们呼吸的空气 15 [PAGE 25 IMAGE 1 CONTENT (OCR)]: 将所有的秘密向我和盘托出。 我想在我之后几次回去的时候，村民们的结论是我是一个冥顽不 化的人。 又或者我在狡猾地蓄意阻挠。不论是何种情况，他们已经把我牢 牢地固定在了先人为主的对于周遭世界的理解中，每每我提出他们关 于“各国”生活的想法是并不准确的，都被轻描淡写地搁在一边，随 后就被遗忘了。我一直告诉他们“各国”的大多数老百姓其实也要靠 工作赚钱，那里也有穷人，或者白人有时也是走路的（而不是坐在汽 车里由司机接送），但只换来面无表情的注视。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">04</span>
+        <h3>但另一方面，像我讲的地铁之类的事情则被他们热情接纳，一再 被想听的人互相转述：当我讲到地下隧道的时候，村民们就心领神会 地微笑，他们对这些已经了然于胸。经由</h3>
+        <p>但另一方面，像我讲的地铁之类的事情则被他们热情接纳，一再 被想听的人互相转述：当我讲到地下隧道的时候，村民们就心领神会 地微笑，他们对这些已经了然于胸。经由从当地坟场下穿过的隧道， 死去的巴布亚新几内亚人会到达罗马，变成白人。我关于大汽车穿过 地底隧道的描述也验证了村民们之前的发现一一他们会分析那些声称 了解情况的村民们传播的流言，仔细核实那些隔几年来村子里住上一 宿的古怪神父们讲述的故事，也会试着弄明白邻村那所只存在了十来 年的小学里的老澳大利亚课本里的照片和图画。 这就是我和村民保持长久关系的信条：我会听他们说的每句话， 把大部分记下来，然后逐字眷录进大的线装笔记本。 这一关系并不是互惠的。对我说的话，他们更多时候是选择性 地在听。 16 雨林里的消亡 [PAGE 26 IMAGE 1 CONTENT (OCR)]:</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="takeaways">
+      <h2>本关关键收获</h2>
+      <ul class="takeaways"><li><span>1</span>第一章我们呼吸的空气 13 [PAGE 23 IMAGE 1 CONTENT (OCR)]: （在皮金语里是olbikman，泰雅博语里是munjenums</li><li><span>2</span>第二年，我回到了迦普恩。我在那儿待了十五个月，住在一个由 柱子撑起的大房子里，是村民们为我建的。我完成了我的博士论文， 写了一本书，讲的是我观察到的泰雅博语</li><li><span>3</span>我翻译了纸上的文字，告诉他们翁佳尼又想欺骗他们。就像每次我试 图说服他们不要相信某个骗局时那样，我得到的回应是：他们完全无 视了我。</li><li><span>4</span>但另一方面，像我讲的地铁之类的事情则被他们热情接纳，一再 被想听的人互相转述：当我讲到地下隧道的时候，村民们就心领神会 地微笑，他们对这些已经了然于胸。经由</li></ul>
+      <nav class="nav">
+        <a class="btn" href="/books/user-book-visual-reading-g4ia7j-4d99.html">返回目录</a>
+        <a class="btn" href="/experiences/user-book-visual-reading-g4ia7j-4d99-g02-a-village-in-the-swamp.html">下一关</a>
+      </nav>
+    </section>
+  </main>
+  <script>
+    (() => {
+      const progress = document.getElementById("progress");
+      const dots = Array.from(document.querySelectorAll("#dotNav button[data-target]"));
+      const sections = dots
+        .map((dot) => document.getElementById(dot.getAttribute("data-target")))
+        .filter(Boolean);
+      const reveals = Array.from(document.querySelectorAll(".reveal"));
+      const onScroll = () => {
+        const h = document.documentElement;
+        const total = Math.max(1, h.scrollHeight - window.innerHeight);
+        const pct = Math.max(0, Math.min(100, (window.scrollY / total) * 100));
+        if (progress) progress.style.width = pct + "%";
+      };
+      const io = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) entry.target.classList.add("in");
+        }
+      }, { threshold: .14 });
+      reveals.forEach((el) => io.observe(el));
+      const secIo = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const id = entry.target.id;
+          dots.forEach((dot) => dot.classList.toggle("active", dot.getAttribute("data-target") === id));
+        });
+      }, { threshold: .4 });
+      sections.forEach((s) => secIo.observe(s));
+      dots.forEach((dot) => {
+        dot.addEventListener("click", () => {
+          const target = document.getElementById(dot.getAttribute("data-target"));
+          if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+      window.addEventListener("scroll", onScroll, { passive: true });
+      onScroll();
+    })();
+  </script>
+</body>
+</html>

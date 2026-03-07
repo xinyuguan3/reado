@@ -1,0 +1,45 @@
+{
+  "slug": "u-book-edf803-16-68b248",
+  "order": 16,
+  "title": "Module 16 · pdf Author: Unknown Sour",
+  "generatedBy": "playable-content-engine",
+  "generatedAt": "2026-03-07T09:27:51.294Z",
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T09:28:01.320Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "雨林里的消亡：一种语言和生活方式在巴布亚新几内亚的终结",
+      "author": ""
+    },
+    "knowledge_block": {
+      "id": "kb-31",
+      "gate_index": 16,
+      "title": "第十二章 LivingDangerously 险象环生 1986年，我开始第一次在迦普恩长待时， 戴彼得以及其他坐着一起喝酒的年轻人都还是 小朋",
+      "summary": "第十二章 LivingDangerously 险象环生 1986年，我开始第一次在迦普恩长待时， 戴彼得以及其他坐着一起喝酒的年轻人都还是 小朋友或是婴儿一—其中有几个甚至还没出 生。1987年我离开了村子，回到瑞典写我的博 士论文，那个时候戴彼得只是一个害羞的足内 翻的三岁娃娃，长了一双好奇的大眼晴。四年 后我回来了，那是1991年。 村民们热情地欢迎我，立即给我造了一个 房子让我住进去。他们说，五年前给我造的那 个房子“冷了”，已经破损不堪。他们花了三 个月造新房，比所有人的都大，高出地面四英 尺。我的新房子就像一艘盘桓的母舰一样耸立 在村子里，看上去要不就像在保卫一方村民， 要不就像在威胁众人，这取决于你的观看视 角。我觉得有",
+      "words": 1353,
+      "keywords": [
+        "page",
+        "image",
+        "content",
+        "ocr",
+        "雨林里的消亡",
+        "我说"
+      ],
+      "density": {
+        "score": 0.634,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0.3193,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0.0207
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "anthro",
+      "theme_label": "Field Narrative",
+      "section_count": 5,
+      "generated_with": "template_runtime"
+    }
+  }
+}

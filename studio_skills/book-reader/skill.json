@@ -1,0 +1,38 @@
+{
+  "name": "book-reader",
+  "version": "1.1.0",
+  "description": "Convert EPUB/PDF/TXT books into structured knowledge chunks for learning pipelines.",
+  "author": "Friday (@fridayjoshi), adapted for Reado",
+  "keywords": [
+    "books",
+    "reading",
+    "epub",
+    "pdf",
+    "knowledge-chunks",
+    "chunking",
+    "learning",
+    "education"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "system": [
+      "pandoc"
+    ],
+    "optional": [
+      "pdftotext (poppler-utils)"
+    ],
+    "python": [
+      "ebooklib",
+      "beautifulsoup4",
+      "lxml",
+      "pypdf",
+      "pdfplumber"
+    ]
+  },
+  "files": [
+    "book-reader.sh",
+    "book-to-chunks.py",
+    "SKILL.md"
+  ],
+  "executable": "book-reader.sh"
+}

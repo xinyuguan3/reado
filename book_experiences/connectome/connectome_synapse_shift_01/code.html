@@ -1,0 +1,807 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>连接组：突触迁移实验</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #08111f;
+      font-family: "Trebuchet MS", "Segoe UI", "PingFang SC", sans-serif;
+      color: #e8f6ff;
+    }
+    #game {
+      width: 100%;
+      height: 100%;
+      display: block;
+      touch-action: none;
+      background: radial-gradient(circle at 18% 8%, #1d3f67 0%, #0d1f36 58%, #07101e 100%);
+      cursor: crosshair;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="game" aria-label="Connectome game canvas"></canvas>
+  <script>
+    (() => {
+      const canvas = document.getElementById("game");
+      const ctx = canvas.getContext("2d");
+
+      const LEVELS = [
+        { key: "尺寸", title: "第一部分 尺寸重要吗", subtitle: "仅看体积不够，去收集结构线索", required: 4, enemies: 2, time: 45, tint: "#5fb8ff" },
+        { key: "连接", title: "第二部分 连接主义", subtitle: "连接模式决定功能", required: 5, enemies: 3, time: 44, tint: "#74f1d4" },
+        { key: "先后", title: "第三部分 先天与后天", subtitle: "在约束中塑形连接", required: 5, enemies: 4, time: 42, tint: "#ffd370" },
+        { key: "组学", title: "第四部分 连接组学", subtitle: "测绘、追踪、破译、对比", required: 6, enemies: 4, time: 40, tint: "#b99bff" },
+        { key: "未来", title: "第五部分 超级人类", subtitle: "技术与身份边界", required: 6, enemies: 5, time: 38, tint: "#ff8db3" }
+      ];
+
+      const state = {
+        mode: "menu",
+        paused: false,
+        level: 0,
+        timer: 0,
+        score: 0,
+        health: 3,
+        player: { x: 110, y: 300, r: 12, vx: 0, vy: 0, speed: 220, invuln: 0 },
+        door: { x: 0, y: 0, w: 46, h: 126, unlocked: false },
+        nodes: [],
+        enemies: [],
+        particles: [],
+        selected: 0,
+        pulseCooldown: 0,
+        pulseActive: 0,
+        pulseCount: 0,
+        touchButtons: [],
+        moveTouch: { left: false, right: false, up: false, down: false },
+        message: "按 Space 开始",
+        seed: 42,
+        cameraShake: 0,
+        completedLevels: 0,
+        maxHealth: 3,
+      };
+
+      const keys = new Set();
+      const pointers = new Map();
+      let width = 0;
+      let height = 0;
+      let lastTs = 0;
+      const FIXED_STEP = 1 / 60;
+
+      function rand() {
+        state.seed = (state.seed * 1664525 + 1013904223) >>> 0;
+        return state.seed / 4294967295;
+      }
+
+      function clamp(v, min, max) {
+        return Math.max(min, Math.min(max, v));
+      }
+
+      function resize() {
+        const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = Math.round(width * dpr);
+        canvas.height = Math.round(height * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        setupTouchButtons();
+        if (state.mode === "menu") {
+          centerPlayer();
+          placeDoor();
+        }
+      }
+
+      function centerPlayer() {
+        state.player.x = Math.max(60, Math.min(width * 0.17, 190));
+        state.player.y = height * 0.5;
+        state.player.vx = 0;
+        state.player.vy = 0;
+      }
+
+      function placeDoor() {
+        state.door.w = 48;
+        state.door.h = Math.max(90, Math.min(130, height * 0.22));
+        state.door.x = width - state.door.w - 34;
+        state.door.y = height * 0.5 - state.door.h * 0.5;
+      }
+
+      function setupTouchButtons() {
+        const mobile = width < 920;
+        const buttons = [];
+        if (mobile) {
+          const size = 56;
+          const gap = 10;
+          const baseX = 20;
+          const baseY = height - size * 2 - gap - 20;
+          buttons.push({ id: "left", x: baseX, y: baseY + size + gap, w: size, h: size, label: "←" });
+          buttons.push({ id: "right", x: baseX + size * 2 + gap * 2, y: baseY + size + gap, w: size, h: size, label: "→" });
+          buttons.push({ id: "up", x: baseX + size + gap, y: baseY, w: size, h: size, label: "↑" });
+          buttons.push({ id: "down", x: baseX + size + gap, y: baseY + size * 2 + gap * 2, w: size, h: size, label: "↓" });
+
+          const rx = width - 92;
+          const sy = height - 188;
+          buttons.push({ id: "pulse", x: rx, y: sy, w: 72, h: 72, label: "Pulse" });
+          buttons.push({ id: "pause", x: rx - 82, y: sy + 8, w: 62, h: 30, label: "Pause" });
+          buttons.push({ id: "restart", x: rx - 82, y: sy + 44, w: 62, h: 30, label: "Reset" });
+        }
+        state.touchButtons = buttons;
+      }
+
+      function levelConfig() {
+        return LEVELS[Math.min(LEVELS.length - 1, state.level)];
+      }
+
+      function makeNodes(config) {
+        const nodes = [];
+        const startX = 230;
+        const endX = width - 260;
+        const span = Math.max(120, endX - startX);
+        const midY = height * 0.5;
+
+        for (let i = 0; i < config.required; i += 1) {
+          const t = config.required === 1 ? 0.5 : i / (config.required - 1);
+          nodes.push({
+            id: i + 1,
+            x: startX + span * t,
+            y: clamp(midY + (i % 2 === 0 ? -24 : 24), 96, height - 96),
+            r: 11,
+            hit: false,
+            word: ["可塑性", "连接", "编码", "记忆", "因果", "身份", "映射"][i % 7],
+          });
+        }
+        return nodes;
+      }
+
+      function makeEnemies(config) {
+        const enemies = [];
+        for (let i = 0; i < config.enemies; i += 1) {
+          const angle = rand() * Math.PI * 2;
+          const speed = 64 + rand() * 74 + state.level * 6;
+          enemies.push({
+            x: width * 0.4 + rand() * width * 0.45,
+            y: 90 + rand() * (height - 180),
+            r: 12 + rand() * 7,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            spin: rand() * Math.PI * 2,
+            name: ["偏见", "噪声", "误读", "过拟合", "焦虑"][i % 5],
+          });
+        }
+        return enemies;
+      }
+
+      function resetForRun() {
+        const config = levelConfig();
+        state.mode = "playing";
+        state.paused = false;
+        state.timer = config.time;
+        centerPlayer();
+        placeDoor();
+        state.door.unlocked = false;
+        state.nodes = makeNodes(config);
+        state.enemies = makeEnemies(config);
+        state.pulseCooldown = 0;
+        state.pulseActive = 0;
+        state.pulseCount = 0;
+        state.message = config.subtitle;
+        state.cameraShake = 0;
+      }
+
+      function startNewGame() {
+        state.level = 0;
+        state.score = 0;
+        state.health = state.maxHealth;
+        state.completedLevels = 0;
+        resetForRun();
+      }
+
+      function nextLevel() {
+        state.completedLevels += 1;
+        state.level += 1;
+        if (state.level >= LEVELS.length) {
+          state.mode = "win";
+          state.message = "你完成了连接组五阶段，建立了独特性模型。";
+          return;
+        }
+        state.health = clamp(state.health + 1, 1, state.maxHealth);
+        resetForRun();
+      }
+
+      function loseGame(reason) {
+        state.mode = "lose";
+        state.message = reason;
+      }
+
+      function distance(a, b) {
+        const dx = a.x - b.x;
+        const dy = a.y - b.y;
+        return Math.hypot(dx, dy);
+      }
+
+      function handleMovement(dt) {
+        let mx = 0;
+        let my = 0;
+        if (keys.has("ArrowLeft") || state.moveTouch.left) mx -= 1;
+        if (keys.has("ArrowRight") || keys.has("KeyD") || state.moveTouch.right) mx += 1;
+        if (keys.has("ArrowUp") || keys.has("KeyW") || state.moveTouch.up) my -= 1;
+        if (keys.has("ArrowDown") || keys.has("KeyS") || state.moveTouch.down) my += 1;
+        if (mx !== 0 && my !== 0) {
+          mx *= 0.7071;
+          my *= 0.7071;
+        }
+        state.player.vx = mx * state.player.speed;
+        state.player.vy = my * state.player.speed;
+
+        state.player.x += state.player.vx * dt;
+        state.player.y += state.player.vy * dt;
+
+        state.player.x = clamp(state.player.x, state.player.r + 12, width - state.player.r - 12);
+        state.player.y = clamp(state.player.y, state.player.r + 12, height - state.player.r - 12);
+      }
+
+      function triggerPulse() {
+        if (state.mode !== "playing" || state.paused) return;
+        if (state.pulseCooldown > 0) return;
+        state.pulseCooldown = 6;
+        state.pulseActive = 0.8;
+        state.pulseCount += 1;
+      }
+
+      function resolveContacts() {
+        for (const node of state.nodes) {
+          if (!node.hit && distance(state.player, node) <= state.player.r + node.r + 4) {
+            node.hit = true;
+            state.score += 18;
+            state.message = "已收集概念节点：" + node.word;
+          }
+        }
+
+        const done = state.nodes.filter((n) => n.hit).length;
+        if (done >= state.nodes.length) {
+          state.door.unlocked = true;
+        }
+
+        for (const e of state.enemies) {
+          const d = distance(state.player, e);
+          if (d <= state.player.r + e.r + 2 && state.player.invuln <= 0) {
+            state.player.invuln = 1.2;
+            state.health -= 1;
+            state.cameraShake = 0.18;
+            const nx = (state.player.x - e.x) / Math.max(0.001, d);
+            const ny = (state.player.y - e.y) / Math.max(0.001, d);
+            state.player.x += nx * 20;
+            state.player.y += ny * 20;
+            if (state.health <= 0) {
+              loseGame("完整性耗尽：你在噪声中迷失。按 R 重开");
+              return;
+            }
+          }
+        }
+
+        if (state.door.unlocked) {
+          const doorCenter = { x: state.door.x + state.door.w * 0.5, y: state.door.y + state.door.h * 0.5 };
+          if (distance(state.player, doorCenter) < state.player.r + Math.max(state.door.w, state.door.h) * 0.45) {
+            state.score += 50 + Math.round(state.timer * 1.2);
+            nextLevel();
+          }
+        }
+      }
+
+      function updateEnemies(dt) {
+        const pulseFactor = state.pulseActive > 0 ? 0.18 : 1;
+        for (const e of state.enemies) {
+          e.x += e.vx * dt * pulseFactor;
+          e.y += e.vy * dt * pulseFactor;
+          e.spin += dt * 2;
+
+          const minX = e.r + 10;
+          const maxX = width - e.r - 10;
+          const minY = e.r + 10;
+          const maxY = height - e.r - 10;
+
+          if (e.x < minX) {
+            e.x = minX;
+            e.vx *= -1;
+          } else if (e.x > maxX) {
+            e.x = maxX;
+            e.vx *= -1;
+          }
+
+          if (e.y < minY) {
+            e.y = minY;
+            e.vy *= -1;
+          } else if (e.y > maxY) {
+            e.y = maxY;
+            e.vy *= -1;
+          }
+        }
+      }
+
+      function update(dt) {
+        if (state.mode !== "playing" || state.paused) return;
+
+        state.timer -= dt;
+        if (state.timer <= 0) {
+          state.timer = 0;
+          loseGame("时间耗尽：连接图谱未完成。按 R 重开");
+          return;
+        }
+
+        state.pulseCooldown = Math.max(0, state.pulseCooldown - dt);
+        state.pulseActive = Math.max(0, state.pulseActive - dt);
+        state.player.invuln = Math.max(0, state.player.invuln - dt);
+        state.cameraShake = Math.max(0, state.cameraShake - dt);
+
+        handleMovement(dt);
+        updateEnemies(dt);
+        resolveContacts();
+      }
+
+      function drawGrid() {
+        const step = 36;
+        ctx.save();
+        ctx.globalAlpha = 0.22;
+        ctx.strokeStyle = "#6dc5ff22";
+        ctx.lineWidth = 1;
+        for (let x = 0; x < width; x += step) {
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, height);
+          ctx.stroke();
+        }
+        for (let y = 0; y < height; y += step) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(width, y);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      function drawHud() {
+        const config = levelConfig();
+        ctx.save();
+        const boxW = Math.min(width - 24, 490);
+        const boxH = width < 920 ? 112 : 98;
+        ctx.fillStyle = "#09172af0";
+        ctx.strokeStyle = "#6cd4ff55";
+        ctx.lineWidth = 1.2;
+        roundRect(12, 12, boxW, boxH, 12, true, true);
+
+        ctx.fillStyle = "#eaf8ff";
+        ctx.font = "bold 17px Trebuchet MS, PingFang SC, sans-serif";
+        ctx.fillText(config.title, 24, 36);
+
+        ctx.font = "13px Trebuchet MS, PingFang SC, sans-serif";
+        ctx.fillStyle = "#a9d7f3";
+        ctx.fillText(config.subtitle, 24, 56);
+
+        ctx.fillStyle = "#d7f1ff";
+        const hitCount = state.nodes.filter((n) => n.hit).length;
+        ctx.fillText(`节点 ${hitCount}/${state.nodes.length}`, 24, 78);
+        ctx.fillText(`分数 ${state.score}`, 122, 78);
+        ctx.fillText(`完整性 ${state.health}/${state.maxHealth}`, 204, 78);
+        ctx.fillText(`时间 ${state.timer.toFixed(1)}s`, 324, 78);
+        ctx.fillText(`脉冲 ${state.pulseCooldown <= 0 ? "READY" : state.pulseCooldown.toFixed(1) + "s"}`, 24, 98);
+
+        ctx.fillStyle = "#9de9d0";
+        ctx.fillText(state.message, 174, 98);
+        ctx.restore();
+      }
+
+      function drawDoor() {
+        const d = state.door;
+        ctx.save();
+        const col = state.door.unlocked ? "#79ffd2" : "#ffcb66";
+        ctx.fillStyle = state.door.unlocked ? "#123f35" : "#3f3210";
+        ctx.strokeStyle = col;
+        ctx.lineWidth = 2;
+        roundRect(d.x, d.y, d.w, d.h, 10, true, true);
+
+        ctx.fillStyle = col;
+        ctx.font = "12px Trebuchet MS, PingFang SC, sans-serif";
+        ctx.fillText(state.door.unlocked ? "突触门 OPEN" : "锁定", d.x - 24, d.y - 8);
+        ctx.restore();
+      }
+
+      function drawNodes() {
+        for (const n of state.nodes) {
+          ctx.save();
+          if (n.hit) {
+            ctx.globalAlpha = 0.24;
+            ctx.fillStyle = "#6cffdd";
+          } else {
+            ctx.globalAlpha = 1;
+            ctx.fillStyle = "#7ce1ff";
+          }
+          ctx.beginPath();
+          ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = "#d4f5ff";
+          ctx.lineWidth = 1;
+          ctx.stroke();
+
+          if (!n.hit) {
+            ctx.fillStyle = "#001b2f";
+            ctx.font = "11px Trebuchet MS, PingFang SC, sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText(n.word, n.x, n.y + 4);
+            ctx.textAlign = "left";
+          }
+          ctx.restore();
+        }
+      }
+
+      function drawEnemies() {
+        for (const e of state.enemies) {
+          ctx.save();
+          ctx.translate(e.x, e.y);
+          ctx.rotate(e.spin);
+          ctx.fillStyle = "#ff7699";
+          ctx.strokeStyle = "#ffd0db";
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(e.r, 0);
+          for (let i = 1; i < 7; i += 1) {
+            const a = i * Math.PI * 2 / 7;
+            const rr = i % 2 ? e.r * 0.55 : e.r;
+            ctx.lineTo(Math.cos(a) * rr, Math.sin(a) * rr);
+          }
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+          ctx.restore();
+        }
+      }
+
+      function drawPlayer() {
+        const p = state.player;
+        ctx.save();
+        ctx.translate(p.x, p.y);
+
+        if (state.pulseActive > 0) {
+          ctx.globalAlpha = 0.28 + Math.sin(Date.now() * 0.02) * 0.06;
+          ctx.strokeStyle = "#7ffff2";
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.arc(0, 0, 28 + (0.8 - state.pulseActive) * 42, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        ctx.globalAlpha = p.invuln > 0 ? 0.52 + Math.sin(Date.now() * 0.05) * 0.3 : 1;
+        ctx.fillStyle = "#fff3a6";
+        ctx.beginPath();
+        ctx.arc(0, 0, p.r, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "#19324f";
+        ctx.beginPath();
+        ctx.arc(-4, -3, 2.2, 0, Math.PI * 2);
+        ctx.arc(4, -3, 2.2, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = "#1b2e44";
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.arc(0, 2, 4.5, 0.1, Math.PI - 0.1);
+        ctx.stroke();
+
+        ctx.restore();
+      }
+
+      function drawTouchButtons() {
+        for (const btn of state.touchButtons) {
+          const active = buttonIsActive(btn.id);
+          ctx.save();
+          ctx.fillStyle = active ? "#9effddcc" : "#12263fbb";
+          ctx.strokeStyle = active ? "#bfffe9" : "#80b8db77";
+          ctx.lineWidth = 1.5;
+          roundRect(btn.x, btn.y, btn.w, btn.h, 10, true, true);
+          ctx.fillStyle = active ? "#003624" : "#d7edff";
+          ctx.font = btn.id === "pulse" ? "bold 12px Trebuchet MS, sans-serif" : "bold 18px Trebuchet MS, sans-serif";
+          ctx.textAlign = "center";
+          ctx.fillText(btn.label, btn.x + btn.w * 0.5, btn.y + btn.h * 0.58);
+          ctx.textAlign = "left";
+          ctx.restore();
+        }
+      }
+
+      function drawOverlay() {
+        if (state.mode === "menu") {
+          shade(0.48);
+          headline("连接组：突触迁移实验", "五阶段可玩体验，玩懂《连接组》核心命题", "Space / Enter / 点击开始");
+          return;
+        }
+
+        if (state.mode === "win") {
+          shade(0.52);
+          headline("实验完成", `总分 ${state.score} | 完成阶段 ${state.completedLevels}/${LEVELS.length}`, "按 R 重开，或继续移动回顾画面");
+          return;
+        }
+
+        if (state.mode === "lose") {
+          shade(0.52);
+          headline("连接失稳", state.message, "按 R 重开");
+          return;
+        }
+
+        if (state.paused) {
+          shade(0.36);
+          headline("已暂停", "按 P 继续", "F 全屏 / Esc 退出全屏");
+        }
+      }
+
+      function draw() {
+        ctx.save();
+        if (state.cameraShake > 0) {
+          const amt = state.cameraShake * 8;
+          ctx.translate((rand() - 0.5) * amt, (rand() - 0.5) * amt);
+        }
+
+        ctx.clearRect(0, 0, width, height);
+        drawGrid();
+        drawDoor();
+        drawNodes();
+        drawEnemies();
+        drawPlayer();
+        drawHud();
+
+        if (state.touchButtons.length) drawTouchButtons();
+
+        ctx.restore();
+        drawOverlay();
+      }
+
+      function shade(alpha) {
+        ctx.save();
+        ctx.fillStyle = `rgba(2, 8, 18, ${alpha})`;
+        ctx.fillRect(0, 0, width, height);
+        ctx.restore();
+      }
+
+      function headline(title, subtitle, hint) {
+        ctx.save();
+        const w = Math.min(width - 30, 620);
+        const h = Math.min(height - 30, 260);
+        const x = (width - w) * 0.5;
+        const y = (height - h) * 0.5;
+
+        ctx.fillStyle = "#09172de8";
+        ctx.strokeStyle = "#9ed8ff99";
+        ctx.lineWidth = 2;
+        roundRect(x, y, w, h, 14, true, true);
+
+        ctx.fillStyle = "#f2fbff";
+        ctx.textAlign = "center";
+        ctx.font = "bold 32px Trebuchet MS, PingFang SC, sans-serif";
+        ctx.fillText(title, x + w * 0.5, y + 78);
+
+        ctx.font = "16px Trebuchet MS, PingFang SC, sans-serif";
+        ctx.fillStyle = "#c7eaff";
+        wrapCenterText(subtitle, x + w * 0.5, y + 116, w - 72, 26);
+
+        ctx.font = "bold 18px Trebuchet MS, PingFang SC, sans-serif";
+        ctx.fillStyle = "#8ff8d9";
+        ctx.fillText(hint, x + w * 0.5, y + h - 42);
+        ctx.textAlign = "left";
+        ctx.restore();
+      }
+
+      function wrapCenterText(text, cx, y, maxW, lineHeight) {
+        const chars = [...text];
+        let line = "";
+        let drawY = y;
+        for (const ch of chars) {
+          const next = line + ch;
+          if (ctx.measureText(next).width > maxW && line) {
+            ctx.fillText(line, cx, drawY);
+            line = ch;
+            drawY += lineHeight;
+          } else {
+            line = next;
+          }
+        }
+        if (line) ctx.fillText(line, cx, drawY);
+      }
+
+      function roundRect(x, y, w, h, r, fill, stroke) {
+        const rr = Math.min(r, w * 0.5, h * 0.5);
+        ctx.beginPath();
+        ctx.moveTo(x + rr, y);
+        ctx.arcTo(x + w, y, x + w, y + h, rr);
+        ctx.arcTo(x + w, y + h, x, y + h, rr);
+        ctx.arcTo(x, y + h, x, y, rr);
+        ctx.arcTo(x, y, x + w, y, rr);
+        ctx.closePath();
+        if (fill) ctx.fill();
+        if (stroke) ctx.stroke();
+      }
+
+      function toggleFullscreen() {
+        if (!document.fullscreenElement) {
+          canvas.requestFullscreen?.().catch(() => {});
+        } else {
+          document.exitFullscreen?.().catch(() => {});
+        }
+      }
+
+      function buttonIsActive(id) {
+        if (id === "left") return state.moveTouch.left;
+        if (id === "right") return state.moveTouch.right;
+        if (id === "up") return state.moveTouch.up;
+        if (id === "down") return state.moveTouch.down;
+        return false;
+      }
+
+      function handleActionButton(id) {
+        if (id === "pulse") triggerPulse();
+        if (id === "pause") state.paused = !state.paused;
+        if (id === "restart") startNewGame();
+      }
+
+      function hitButton(px, py) {
+        return state.touchButtons.find((b) => px >= b.x && px <= b.x + b.w && py >= b.y && py <= b.y + b.h) || null;
+      }
+
+      function onPointerDown(ev) {
+        const rect = canvas.getBoundingClientRect();
+        const x = ev.clientX - rect.left;
+        const y = ev.clientY - rect.top;
+        const hit = hitButton(x, y);
+
+        if (hit) {
+          pointers.set(ev.pointerId, hit.id);
+          if (hit.id === "left" || hit.id === "right" || hit.id === "up" || hit.id === "down") {
+            state.moveTouch[hit.id] = true;
+          } else {
+            handleActionButton(hit.id);
+          }
+          return;
+        }
+
+        if (state.mode === "menu") {
+          startNewGame();
+          return;
+        }
+
+        if (state.mode === "win" || state.mode === "lose") {
+          startNewGame();
+          return;
+        }
+
+        triggerPulse();
+      }
+
+      function onPointerUp(ev) {
+        const id = pointers.get(ev.pointerId);
+        if (!id) return;
+        if (id === "left" || id === "right" || id === "up" || id === "down") {
+          state.moveTouch[id] = false;
+        }
+        pointers.delete(ev.pointerId);
+      }
+
+      function handleKeyDown(ev) {
+        keys.add(ev.code);
+
+        if (ev.code === "Space" || ev.code === "Enter") {
+          if (state.mode === "menu") {
+            startNewGame();
+          } else if (state.mode === "playing") {
+            triggerPulse();
+          }
+        }
+
+        if (ev.code === "KeyP" || ev.code === "KeyA") {
+          if (state.mode === "playing") state.paused = !state.paused;
+        }
+
+        if (ev.code === "KeyR" || ev.code === "KeyB") {
+          startNewGame();
+        }
+
+        if (ev.code === "KeyF") {
+          toggleFullscreen();
+        }
+
+        if (ev.code === "Escape") {
+          if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {});
+        }
+      }
+
+      function handleKeyUp(ev) {
+        keys.delete(ev.code);
+      }
+
+      function tick(ts) {
+        if (!lastTs) lastTs = ts;
+        const delta = Math.min(0.05, (ts - lastTs) / 1000);
+        lastTs = ts;
+
+        let acc = delta;
+        while (acc > 0) {
+          const step = Math.min(FIXED_STEP, acc);
+          update(step);
+          acc -= step;
+        }
+
+        draw();
+        requestAnimationFrame(tick);
+      }
+
+      function advanceTime(ms) {
+        const steps = Math.max(1, Math.round(ms / (1000 / 60)));
+        for (let i = 0; i < steps; i += 1) {
+          update(FIXED_STEP);
+        }
+        draw();
+      }
+
+      function renderGameToText() {
+        const activeNodes = state.nodes.filter((n) => !n.hit).slice(0, 8).map((n) => ({ x: round(n.x), y: round(n.y), r: n.r, word: n.word }));
+        const enemies = state.enemies.slice(0, 8).map((e) => ({ x: round(e.x), y: round(e.y), r: round(e.r), tag: e.name }));
+        const payload = {
+          mode: state.mode,
+          paused: state.paused,
+          coord_system: "origin_top_left, +x_right, +y_down, canvas_pixels",
+          viewport: { width: round(width), height: round(height) },
+          level_index: state.level,
+          level_title: LEVELS[Math.min(state.level, LEVELS.length - 1)].title,
+          timer_sec: round(state.timer),
+          score: state.score,
+          health: state.health,
+          pulse: { active_sec: round(state.pulseActive), cooldown_sec: round(state.pulseCooldown), used: state.pulseCount },
+          door: {
+            x: round(state.door.x),
+            y: round(state.door.y),
+            w: round(state.door.w),
+            h: round(state.door.h),
+            unlocked: state.door.unlocked
+          },
+          player: {
+            x: round(state.player.x),
+            y: round(state.player.y),
+            vx: round(state.player.vx),
+            vy: round(state.player.vy),
+            r: state.player.r,
+            invuln_sec: round(state.player.invuln)
+          },
+          remaining_nodes: activeNodes,
+          enemies,
+          message: state.message
+        };
+        return JSON.stringify(payload);
+      }
+
+      function round(v) {
+        return Math.round(v * 100) / 100;
+      }
+
+      window.render_game_to_text = renderGameToText;
+      window.advanceTime = advanceTime;
+
+      window.addEventListener("resize", resize);
+      document.addEventListener("fullscreenchange", () => {
+        setTimeout(resize, 20);
+      });
+
+      window.addEventListener("keydown", handleKeyDown);
+      window.addEventListener("keyup", handleKeyUp);
+
+      canvas.addEventListener("pointerdown", onPointerDown);
+      canvas.addEventListener("pointerup", onPointerUp);
+      canvas.addEventListener("pointercancel", onPointerUp);
+      canvas.addEventListener("pointerleave", onPointerUp);
+
+      resize();
+      centerPlayer();
+      placeDoor();
+      requestAnimationFrame(tick);
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+{
+  "slug": "u-book-edf803-19-b87817",
+  "order": 19,
+  "title": "Module 19 · 00元 [ERROR processing PA",
+  "generatedBy": "playable-content-engine",
+  "generatedAt": "2026-03-07T09:27:51.296Z",
+  "book_pipeline": {
+    "version": 2,
+    "generated_at": "2026-03-07T09:28:01.325Z",
+    "mode": "visual_reading",
+    "source_book": {
+      "title": "雨林里的消亡：一种语言和生活方式在巴布亚新几内亚的终结",
+      "author": ""
+    },
+    "knowledge_block": {
+      "id": "kb-37",
+      "gate_index": 19,
+      "title": "第十四章 LukeWritesaLetter 卢克写了一封信 在热带雨林里，日出日落总是一瞬间的 事。就在早上六点之前，夜晚浓稠的黑褪成白 蒙蒙",
+      "summary": "第十四章 LukeWritesaLetter 卢克写了一封信 在热带雨林里，日出日落总是一瞬间的 事。就在早上六点之前，夜晚浓稠的黑褪成白 蒙蒙的灰，十五分钟之后，太阳就突然升空， 光芒万丈。到了晚上，就是十二个小时之后， 分秒不差，太阳似乎还没来得及下山就掉了下 去，就好像它有约已经迟到，赶不及地要把自 已挤到地平线以下。 太阳一消失，村子里就漆黑一片了。村民 们映着灰暗的月光（如果有的话）走来走去， 或者拿着手电筒，大部分成年村民都有，哪怕 灯泡常常灭掉，电池经常没电。",
+      "words": 2026,
+      "keywords": [
+        "page",
+        "image",
+        "content",
+        "ocr",
+        "雨林里的消亡",
+        "到了九点半"
+      ],
+      "density": {
+        "score": 0.63,
+        "conceptDensity": 1,
+        "claimEvidenceRatio": 0.3198,
+        "noveltyRatio": 1,
+        "actionabilityRatio": 0
+      }
+    },
+    "visual_reading": {
+      "style": "scrollytelling_atlas",
+      "theme": "anthro",
+      "theme_label": "Field Narrative",
+      "section_count": 5,
+      "generated_with": "template_runtime"
+    }
+  }
+}

@@ -19,6 +19,7 @@ const DEFAULT_HTTP_HEADERS = {
 const INGEST_TEXT_LIMIT_DEFAULT = Math.max(60_000, Number(process.env.READO_INGEST_TEXT_LIMIT || 240_000) || 240_000);
 const PDF_EXTRACT_MAX_CHARS_DEFAULT = Math.max(80_000, Number(process.env.READO_PDF_EXTRACT_MAX_CHARS || 320_000) || 320_000);
 const PDF_EXTRACT_MAX_PAGES_DEFAULT = Math.max(16, Number(process.env.READO_PDF_EXTRACT_MAX_PAGES || 480) || 480);
+const INGEST_FILE_MAX_BYTES = Math.max(8 * 1024 * 1024, Number(process.env.READO_INGEST_FILE_MAX_BYTES || 120 * 1024 * 1024) || 120 * 1024 * 1024);
 const BROWSER_EXECUTABLE_CANDIDATES = [
   toText(process.env.READO_BROWSER_EXECUTABLE_PATH),
   toText(process.env.READO_CHROME_EXECUTABLE_PATH),
@@ -520,7 +521,8 @@ async function extractTextFromPdfBuffer(buffer, options = {}) {
   }
   const maxChars = Math.max(20_000, Number(options?.maxChars) || PDF_EXTRACT_MAX_CHARS_DEFAULT);
   const maxPagesLimit = Math.max(1, Number(options?.maxPages) || PDF_EXTRACT_MAX_PAGES_DEFAULT);
-  const data = new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength);
+  // Copy bytes into a standalone typed array to avoid detached-buffer issues on large uploads.
+  const data = Uint8Array.from(buffer);
   const task = pdfjs.getDocument({
     data,
     disableWorker: true,
@@ -3288,13 +3290,17 @@ export class PlayableContentEngine {
   async ingestFileSource(payload, hooks = null, options = {}) {
     const name = clamp(toText(payload?.name, "untitled.txt"), 240);
     const mimeType = toText(payload?.type).toLowerCase();
+    const payloadBuffer = Buffer.isBuffer(payload?.buffer) ? payload.buffer : null;
     const contentBase64 = toText(payload?.contentBase64);
-    if (!contentBase64) {
-      throw new Error("contentBase64 is required");
+    if (!payloadBuffer && !contentBase64) {
+      throw new Error("contentBase64 or buffer is required");
     }
-    const buffer = Buffer.from(contentBase64, "base64");
+    const buffer = payloadBuffer || Buffer.from(contentBase64, "base64");
     if (!buffer || buffer.length === 0) throw new Error("file is empty");
-    if (buffer.length > 12 * 1024 * 1024) throw new Error("file too large (>12MB)");
+    if (buffer.length > INGEST_FILE_MAX_BYTES) {
+      const mb = Math.max(1, Math.floor(INGEST_FILE_MAX_BYTES / (1024 * 1024)));
+      throw new Error(`file too large (>${mb}MB)`);
+    }
 
     const lowerName = name.toLowerCase();
     const maxTextLen = Math.max(60_000, Number(options?.maxTextLen) || INGEST_TEXT_LIMIT_DEFAULT);

@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>第三章 FirstCatchYourTeacher 拜师学艺 怎么学… · 雨林里的消亡：一种语言和生活方式在巴布亚新几内亚的终结</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #16120f;
+      --bg2: #2a1f18;
+      --accent: #d97706;
+      --accent2: #2dd4bf;
+      --text: #f5f1ea;
+      --soft: #c7b8a2;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+      background:
+        radial-gradient(1200px 540px at 85% -8%, color-mix(in srgb, var(--accent2) 24%, transparent), transparent 70%),
+        radial-gradient(980px 460px at -10% 14%, color-mix(in srgb, var(--accent) 24%, transparent), transparent 74%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+      color: var(--text);
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .05;
+      background-image: radial-gradient(circle at 1px 1px, #fff 1px, transparent 0);
+      background-size: 3px 3px;
+      z-index: 0;
+    }
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      z-index: 100;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+    .page { position: relative; z-index: 1; width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 20px 0 48px; }
+    .hero {
+      min-height: 74vh;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 22px;
+      background: linear-gradient(160deg, color-mix(in srgb, var(--bg2) 86%, transparent), color-mix(in srgb, var(--bg) 88%, transparent));
+      padding: 40px 34px;
+      display: grid;
+      align-content: center;
+      gap: 16px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.34);
+    }
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .hero h1 {
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(32px, 5.4vw, 68px);
+      line-height: 1.16;
+      letter-spacing: .04em;
+      max-width: 15em;
+      text-wrap: balance;
+    }
+    .hero p {
+      max-width: 66ch;
+      line-height: 1.95;
+      color: color-mix(in srgb, var(--text) 85%, var(--soft));
+      font-size: 16px;
+    }
+    .chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip {
+      border: 1px solid color-mix(in srgb, var(--accent2) 44%, transparent);
+      color: color-mix(in srgb, var(--accent2) 88%, #fff);
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 12px;
+      background: rgba(255,255,255,.03);
+    }
+    .section { margin-top: 18px; border: 1px solid rgba(255,255,255,.13); border-radius: 18px; padding: 22px; background: rgba(2,6,18,.46); }
+    .section h2 {
+      margin-bottom: 12px;
+      font-family: "Noto Serif SC", serif;
+      font-size: clamp(22px, 2.8vw, 34px);
+      color: color-mix(in srgb, var(--accent) 86%, #fff);
+      letter-spacing: .03em;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1.1fr 1fr; gap: 14px; }
+    .concept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+    .concept-card {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      background: rgba(255,255,255,.03);
+      padding: 14px;
+      min-height: 128px;
+    }
+    .concept-token { font-size: 14px; letter-spacing: .14em; color: var(--accent2); text-transform: uppercase; margin-bottom: 7px; font-weight: 700; }
+    .concept-note { font-size: 14px; color: color-mix(in srgb, var(--text) 88%, var(--soft)); line-height: 1.8; }
+    .atlas {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 12px;
+      min-height: 440px;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+    .atlas svg { width: 100%; max-width: 440px; height: auto; }
+    .timeline { display: grid; gap: 10px; }
+    .timeline-item {
+      border-left: 2px solid color-mix(in srgb, var(--accent) 66%, transparent);
+      padding: 10px 14px;
+      background: rgba(255,255,255,.02);
+      border-radius: 0 10px 10px 0;
+    }
+    .timeline-no { font-size: 11px; letter-spacing: .22em; color: var(--accent2); display: block; margin-bottom: 6px; }
+    .timeline-item h3 { font-size: 19px; font-family: "Noto Serif SC", serif; line-height: 1.45; margin-bottom: 7px; }
+    .timeline-item p { font-size: 14px; line-height: 1.9; color: color-mix(in srgb, var(--text) 84%, var(--soft)); }
+    .quote-wrap { display: grid; gap: 10px; }
+    .quote {
+      border-left: 2px solid color-mix(in srgb, var(--accent2) 80%, transparent);
+      padding: 10px 12px;
+      background: rgba(255,255,255,.02);
+      color: color-mix(in srgb, var(--text) 92%, #fff);
+      font-family: "Noto Serif SC", serif;
+      line-height: 1.9;
+    }
+    .takeaways { margin-top: 10px; list-style: none; display: grid; gap: 8px; }
+    .takeaways li {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 10px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      padding: 10px;
+      background: rgba(255,255,255,.02);
+      align-items: start;
+      line-height: 1.8;
+    }
+    .takeaways span {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: color-mix(in srgb, var(--accent2) 26%, transparent);
+      color: var(--accent2);
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+    .nav { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,.26);
+      border-radius: 999px;
+      padding: 8px 13px;
+      font-size: 12px;
+      color: var(--text);
+      background: rgba(255,255,255,.04);
+    }
+    .btn:hover { border-color: var(--accent2); color: var(--accent2); }
+    .dot-nav {
+      position: fixed;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: grid;
+      gap: 10px;
+      z-index: 50;
+    }
+    .dot-nav button {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.35);
+      background: transparent;
+      cursor: pointer;
+      transition: all .24s ease;
+    }
+    .dot-nav button.active { transform: scale(1.34); border-color: var(--accent); background: var(--accent); }
+    .reveal { opacity: 0; transform: translateY(16px); transition: opacity .55s ease, transform .55s ease; }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+    @media (max-width: 940px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .dot-nav { display: none; }
+      .hero { min-height: auto; padding: 30px 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+  <nav class="dot-nav" id="dotNav">
+    <button data-target="hero" class="active" aria-label="Hero"></button>
+    <button data-target="atlas" aria-label="Atlas"></button>
+    <button data-target="concepts" aria-label="Concepts"></button>
+    <button data-target="reading" aria-label="Reading"></button>
+    <button data-target="takeaways" aria-label="Takeaways"></button>
+  </nav>
+  <main class="page">
+    <section class="hero reveal in" id="hero">
+      <p class="eyebrow">Field Narrative · Gate 5</p>
+      <h1>第三章 FirstCatchYourTeacher 拜师学艺 怎么学…</h1>
+      <p>第三章 FirstCatchYourTeacher 拜师学艺 怎么学习一门没有被记录在案的语言？ 纵观绝大部分人类史，对于大多数人来 说，这一问题总是自行就解决了。你身处说着 你不懂的语言的人群之中一一因为你远嫁他 乡，得和你丈夫的宗亲共同生活，或者你被一 伙盗匪劫持，或者你的国家被殖民，你被送到 一个种植园当契约工，又或者你搬到了一个新 地方—你被迫学会了一门新语言。一个音一 个音，一个字一个字，一个词组一个词组，你 渐渐掌握了，就像一只鹊捡拾细枝、绒毛和鲜 亮的东西，希望筑起一个巢。小孩子不费吹灰 之力就拾起了一门语言的吉光片羽——把一个 三岁的孩子带到一个新的国家，不出几个月她 就能自信地说一门新语言。</p>
+      <div class="chip-row">
+        <span class="chip">雨林里的消亡：一种语言和生活方式在巴布亚新几内亚的终结</span>
+        
+        <span class="chip">Module 5/18</span>
+        <span class="tag">page</span><span class="tag">image</span><span class="tag">content</span><span class="tag">ocr</span><span class="tag">雨林里的消亡</span><span class="tag">的人</span>
+      </div>
+    </section>
+
+    <section class="section grid-2 reveal" id="atlas">
+      <article>
+        <h2>知识结构图谱</h2>
+        <p style="color:var(--soft);line-height:1.9;margin-bottom:10px;">围绕本关卡核心概念构建关系图。阅读时先抓主轴，再理解每个概念如何驱动判断与行动。</p>
+        <div class="quote-wrap"><blockquote class="quote reveal">“7）然后就是鲁尼的弟弟拉雅，一个肌肉发达、幽灵一样的老人， 饱受结核病之苦。拉雅不时发出含湿痰的咳嗽，这让他一直情绪很 糟。他相信自已的疾病是前妻跟着另一个男人跑之前传染给他的。拉 雅脾气暴躁，不想和其他人长时间厮混，就命令他的小儿子给他在村 外建了一个小小的没有墙的庇护所。白天，他就坐在那里一—经常是 和阿拉纳一起，他被特许和拉雅在一起一雕刻做工复杂的传统沙漏 鼓和神话故事里的先祖。两个人会坐在那个小庇护所的两侧，彼此背 38 雨林里”</blockquote><blockquote class="quote reveal">“当我开始学泰雅博语的时候，我想到了汉娜·格拉斯的这则菜 谱。我首先需要做的就是拜师。事实证明，说起来容易做起来难，部 分是因为迦普恩住的并非一群闲人，成天除了坐下来和一个来访的白 人嚼点语言残渣就无所事事。村民们卖力劳作。他们每个礼拜总有好 36 雨林里的消亡 [PAGE 46 IMAGE 1 CONTENT (OCR)]: 几天要穿过到处都是蚊子和水蛭的泥地去雨林里砍伐、拍打和淘洗西 米棕榈树做西米粉，这是当地人的主食。女人担柴挑水，”</blockquote><blockquote class="quote reveal">“不能指望老人了 1980年代中期的村子里，老年人屈指可数。在迦普恩或总体来 说在巴布亚新几内亚，男男女女很少能活到天命之年。少数几个能撑 到七十岁的老家伙会让人肃然起敬，仿若老祖宗一般。事实上，人们 称呼他们时，就管他们叫“老祖宗”（皮金语里叫tumbuna，泰雅博 语里叫apa）。大部分当地人死得早的原因，在发展中国家里很稀松 平常：慢性疤疾、脑型疤疾、流感、结核、被毒蛇咬伤，而对于女人 来说一尤其是初次分娩的母亲一就是难产。完全缺乏”</blockquote></div>
+      </article>
+      <article class="atlas">
+        <svg viewBox="0 0 440 440" aria-label="concept atlas">
+          <defs>
+            <radialGradient id="g" cx="50%" cy="50%" r="56%">
+              <stop offset="0%" stop-color="#d97706" stop-opacity=".24"></stop>
+              <stop offset="100%" stop-color="#d97706" stop-opacity="0"></stop>
+            </radialGradient>
+          </defs>
+          <circle cx="220" cy="220" r="190" fill="none" stroke="rgba(255,255,255,.08)" stroke-dasharray="5 6"></circle>
+          <circle cx="220" cy="220" r="84" fill="url(#g)"></circle>
+          <circle cx="220" cy="220" r="10" fill="#d97706"></circle>
+          <text x="220" y="252" text-anchor="middle" fill="#f5f1ea" font-size="13">第三章 FirstCatchYourTeache</text>
+          <g><line x1="220" y1="220" x2="370" y2="220" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="370" cy="220" r="8" fill="#2dd4bf"/><text x="382" y="224" fill="#f5f1ea" font-size="12">page</text></g><g><line x1="220" y1="220" x2="266" y2="363" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="266" cy="363" r="8" fill="#2dd4bf"/><text x="278" y="367" fill="#f5f1ea" font-size="12">image</text></g><g><line x1="220" y1="220" x2="99" y2="308" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="99" cy="308" r="8" fill="#2dd4bf"/><text x="111" y="312" fill="#f5f1ea" font-size="12">content</text></g><g><line x1="220" y1="220" x2="99" y2="132" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="99" cy="132" r="8" fill="#2dd4bf"/><text x="111" y="136" fill="#f5f1ea" font-size="12">ocr</text></g><g><line x1="220" y1="220" x2="266" y2="77" stroke="rgba(255,255,255,.18)" stroke-width="1.2"/><circle cx="266" cy="77" r="8" fill="#2dd4bf"/><text x="278" y="81" fill="#f5f1ea" font-size="12">雨林里的消亡</text></g>
+        </svg>
+      </article>
+    </section>
+
+    <section class="section reveal" id="concepts">
+      <h2>核心概念与解释</h2>
+      <div class="concept-grid">
+      <article class="concept-card reveal">
+        <p class="concept-token">page</p>
+        <p class="concept-note">从另一方面来说，一个成年人通过浸入一 个新环境学习一门没有文字记录的语言则要花 35 [PAGE 45 IMAGE 1 CONTENT (OCR)]: 费更长的时间，常常要很多年。如果你可以有多年时间来学，那也无 所谓。然而我不行。1986年回到迦普恩，我知道自己只有十五个月 的资助来完成研究。我要在那段时间里学会当地的语言和这个村子的 一切。我一到那里，时</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">image</p>
+        <p class="concept-note">从另一方面来说，一个成年人通过浸入一 个新环境学习一门没有文字记录的语言则要花 35 [PAGE 45 IMAGE 1 CONTENT (OCR)]: 费更长的时间，常常要很多年。如果你可以有多年时间来学，那也无 所谓。然而我不行。1986年回到迦普恩，我知道自己只有十五个月 的资助来完成研究。我要在那段时间里学会当地的语言和这个村子的 一切。我一到那里，时</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">content</p>
+        <p class="concept-note">从另一方面来说，一个成年人通过浸入一 个新环境学习一门没有文字记录的语言则要花 35 [PAGE 45 IMAGE 1 CONTENT (OCR)]: 费更长的时间，常常要很多年。如果你可以有多年时间来学，那也无 所谓。然而我不行。1986年回到迦普恩，我知道自己只有十五个月 的资助来完成研究。我要在那段时间里学会当地的语言和这个村子的 一切。我一到那里，时</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">ocr</p>
+        <p class="concept-note">从另一方面来说，一个成年人通过浸入一 个新环境学习一门没有文字记录的语言则要花 35 [PAGE 45 IMAGE 1 CONTENT (OCR)]: 费更长的时间，常常要很多年。如果你可以有多年时间来学，那也无 所谓。然而我不行。1986年回到迦普恩，我知道自己只有十五个月 的资助来完成研究。我要在那段时间里学会当地的语言和这个村子的 一切。我一到那里，时</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">雨林里的消亡</p>
+        <p class="concept-note">当我开始学泰雅博语的时候，我想到了汉娜·格拉斯的这则菜 谱。我首先需要做的就是拜师。事实证明，说起来容易做起来难，部 分是因为迦普恩住的并非一群闲人，成天除了坐下来和一个来访的白 人嚼点语言残渣就无所事事。村民们卖力劳作。他们每个礼拜总有好 36 雨林里的消亡 [PAGE 46 IMAGE 1 CONTENT (OCR)]: 几天要穿过到处都是蚊子和水蛭的泥</p>
+      </article>
+    
+      <article class="concept-card reveal">
+        <p class="concept-token">的人</p>
+        <p class="concept-note">纵观绝大部分人类史，对于大多数人来 说，这一问题总是自行就解决了。你身处说着 你不懂的语言的人群之中一一因为你远嫁他 乡，得和你丈夫的宗亲共同生活，或者你被一 伙盗匪劫持，或者你的国家被殖民，你被送到 一个种植园当契约工，又或者你搬到了一个新 地方—你被迫学会了一门新语言。一个音一 个音，一个字一个字，一个词组一个词组，你 渐渐掌握了，就像一只鹊捡拾细枝、绒</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="reading">
+      <h2>渐进式阅读路径</h2>
+      <div class="timeline">
+      <article class="timeline-item reveal">
+        <span class="timeline-no">01</span>
+        <h3>第三章 FirstCatchYourTeacher 拜师学艺 怎么学习一门没有被记录在案的语言？</h3>
+        <p>第三章 FirstCatchYourTeacher 拜师学艺 怎么学习一门没有被记录在案的语言？ 纵观绝大部分人类史，对于大多数人来 说，这一问题总是自行就解决了。你身处说着 你不懂的语言的人群之中一一因为你远嫁他 乡，得和你丈夫的宗亲共同生活，或者你被一 伙盗匪劫持，或者你的国家被殖民，你被送到 一个种植园当契约工，又或者你搬到了一个新 地方—你被迫学会了一门新语言。一个音一 个音，一个字一个字，一个词组一个词组，你 渐渐掌握了，就像一只鹊捡拾细枝、绒毛和鲜 亮的东西，希望筑起一个巢。小孩子不费吹灰 之力就拾起了一门语言的吉光片羽——把一个 三岁的孩子带到一个新的国家，不出几个月她 就能自信地说一门新语言。 从另一方面来说，一个成年人通过浸入一 个新环境学习一门没有文字记录的语言则要花 35 [PAGE 45 IMAGE 1 CONTENT (OCR)]: 费更长的时间，常常要很多年。如果你可以有多年时间来学，那也无 所谓。然而我不行。1986年回到迦普恩，我知道自己只有十五个月 的资助来完成研究。我要在那段时间里学会当地的语言和这个村子的 一切。我一到那里，时钟就开始嘀嗒作响。 在我来迦普恩之前，外面的人所了解的关于泰雅博语的一切只是 它是一门孤独的小语种。“二战”爆发前几年，一个叫乔治·霍克的 德国传教士在迦普恩逗留了几个小时，从村民那里收集了一个简单的 词汇列表。一年后他出版了这份列表，特别提到这一语言似乎与任何 其他语言都无关。 遍布巴布亚新几内亚的大多数语言被语言学家们称作巴布亚语。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">02</span>
+        <h3>它们是世界上最后被探究（多数语言学研究要到1950年代才真正开 展），也是最不为人所知的语言。关于它们，我们所知的大部分信息 来自传教士，他们研究这些语言的</h3>
+        <p>它们是世界上最后被探究（多数语言学研究要到1950年代才真正开 展），也是最不为人所知的语言。关于它们，我们所知的大部分信息 来自传教士，他们研究这些语言的目的是希望向说这些语言的人传播 福音，让他们皈依基督教。这些前来迦普恩传教的神父里，没人试图 学习泰雅博语。这门语言实在太偏门了，不值得让他们费心劳神。 与神父们不同的是，我待了下来，并决定一探究竟。 18世纪的英国烹饪书作家汉娜·格拉斯在一个罐焖野兔肉菜单 的开头这样告诫道：“先抓只兔子。”显然，这是编造的。格拉斯从没 写过这句话。但它能经久流传或许是因为几个世纪以来，它实际上真 的是一个极佳的建议。对任何不能去街角的肉铺买一包野免肉的人来 说依旧如此。 当我开始学泰雅博语的时候，我想到了汉娜·格拉斯的这则菜 谱。我首先需要做的就是拜师。事实证明，说起来容易做起来难，部 分是因为迦普恩住的并非一群闲人，成天除了坐下来和一个来访的白 人嚼点语言残渣就无所事事。村民们卖力劳作。他们每个礼拜总有好 36 雨林里的消亡 [PAGE 46 IMAGE 1 CONTENT (OCR)]: 几天要穿过到处都是蚊子和水蛭的泥地去雨林里砍伐、拍打和淘洗西 米棕榈树做西米粉，这是当地人的主食。女人担柴挑水，一天里要为 家人和数量不一的亲戚访客们做一两次饭。从五月到十一月的旱季， 女人就在流过雨林的浅溪里捕鱼。男人和女人都会定期打理距离村子 一个小时步程的烟草园、香蕉园和芋园。他们还要打理种在园子里的 任何经济作物（咖啡、香草豆、可可），往往痴心妄想着有什么买家 会来到迦普恩。这样鲜有的情况发生时，村民们就把挣来的钱交给一 个要去镇上的人，托他挡一个新蚊帐、电筒或一口铝锅。 为了学说泰雅博语，我不能像一只蜂鸟一样穿梭在一个又一个 人之间，然后谁碰巧有空，就从他那里获取关于这门语言的信息。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">03</span>
+        <h3>我得找一个愿意跟我一起坐下来更长时间，而不是丢给我几个关于 泰雅博语的事实或扔给我几个荤段子的人。我还需要一个表达流利 的人。当我1980年代中期开始学习泰</h3>
+        <p>我得找一个愿意跟我一起坐下来更长时间，而不是丢给我几个关于 泰雅博语的事实或扔给我几个荤段子的人。我还需要一个表达流利 的人。当我1980年代中期开始学习泰雅博语的时候，任何二十五 岁以上的人都具备这一点。问题是每一个超过二十五岁的人都有农 活要干。 不能指望老人了 1980年代中期的村子里，老年人屈指可数。在迦普恩或总体来 说在巴布亚新几内亚，男男女女很少能活到天命之年。少数几个能撑 到七十岁的老家伙会让人肃然起敬，仿若老祖宗一般。事实上，人们 称呼他们时，就管他们叫“老祖宗”（皮金语里叫tumbuna，泰雅博 语里叫apa）。大部分当地人死得早的原因，在发展中国家里很稀松 平常：慢性疤疾、脑型疤疾、流感、结核、被毒蛇咬伤，而对于女人 来说一尤其是初次分娩的母亲一就是难产。完全缺乏哪怕最基础 的医疗条件，加上村民们坚信所有人的离世（包括那些垂垂老矣的 七十多岁的老祖宗）都是巫师造成的，因此治疗生病的人的方法就是 一边往他身上吐口水，一边轻声反复念起神奇的祷文，然后把钱和猪 第三章拜师学艺 37 [PAGE 47 IMAGE 1 CONTENT (OCR)]: 送给邻村萨内（巫师们都住在那里）的人，求他们解除致命的诅咒。 1986年，当我开始在迦普恩做田野调查的时候，村子里只有 一百人。其中，只有七个人超过六十岁。他们分别是： 1）加岩，一个脾气暴躁的老头，长了一对斗鸡眼，村民们都怕 他，觉得他是个邪恶的疯子，和萨内的巫师一气。加岩的身体会 同时朝相反的方向抽搐，说话含混不清。我认为他已经表现出了亨廷 顿病的晚期症状，但村民们都坚信他的毛病是他给自已和家人招来的 诅咒。1960年代中期的时候，在一次土地纠纷中，他冷血无情地杀 害了当时村子的首领。 2）索邦，加岩的胞姐，与加岩的病如出一辙。 3）阿伊拉吉，加岩和索邦的弟弟，大家都觉得他是个蠢蛋。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">04</span>
+        <h3>4）万有，一个体弱的人，从来不离开他那个烟雾缭绕的灰暗的 房子一一说话时你永远听不见他的声音。</h3>
+        <p>4）万有，一个体弱的人，从来不离开他那个烟雾缭绕的灰暗的 房子一一说话时你永远听不见他的声音。 5）阿拉纳，这个老头有一个饱受垢病的好，窥视年轻女孩 “依然耸立”（也就是小巧玲珑）的胸部，每个人都拿他当傻子。 6）鲁尼，村子的前首领。鲁尼六十岁出头，身材健硕，但弯腰 驼背。那个过去肌肉发达的背已经弯得像脊柱侧弯的甲壳，给人的印 象就是他背着一个大贝壳在走路。 7）然后就是鲁尼的弟弟拉雅，一个肌肉发达、幽灵一样的老人， 饱受结核病之苦。拉雅不时发出含湿痰的咳嗽，这让他一直情绪很 糟。他相信自已的疾病是前妻跟着另一个男人跑之前传染给他的。拉 雅脾气暴躁，不想和其他人长时间厮混，就命令他的小儿子给他在村 外建了一个小小的没有墙的庇护所。白天，他就坐在那里一—经常是 和阿拉纳一起，他被特许和拉雅在一起一雕刻做工复杂的传统沙漏 鼓和神话故事里的先祖。两个人会坐在那个小庇护所的两侧，彼此背 38 雨林里的消亡 [PAGE 48 IMAGE 1 CONTENT (OCR)]: 对着，弓着身子雕刻手头的东西，表情都像在暗自较劲。他们也会聊 天，只是偶尔，话也很简短，说的是科帕语，阿拉纳出生的那个村子 的语言。每当有孩子正好路过，打扰了他的清静，拉雅就会冲他们大 骂脏话，大体和谐的一幕就会被打破一这时常发生，因为拉雅的庇 护所就离村民进出村子的主路不远（拉雅不喜欢任何人，但他想让自 已消息灵通） 面对这一有限的人选，我觉得别无选择。加岩和索邦说话含混 不清，如果我要弄清楚组成泰雅博语的语音，这俩人就不合适。万有 虚弱的声音就像蒸汽从深不可测的裂缝底下渗出来似的，我从来都听 不清他在说什么。阿伊拉吉和阿拉纳，尽管这两个人就像友好的老伙 计，但实在是有点笨。 只剩鲁尼和他那暴脾气的弟弟拉雅了。</p>
+      </article>
+    
+      <article class="timeline-item reveal">
+        <span class="timeline-no">05</span>
+        <h3>不管是在体貌还是脾性上，兄弟俩截然不同，以至于直到今天我 都怀疑他俩到底是不是同一个爹生的。鲁尼比他弟弟矮，但这一印象 可能是因为他有明显的驼背。他有一张温</h3>
+        <p>不管是在体貌还是脾性上，兄弟俩截然不同，以至于直到今天我 都怀疑他俩到底是不是同一个爹生的。鲁尼比他弟弟矮，但这一印象 可能是因为他有明显的驼背。他有一张温柔和善的脸，左眼的乳白色 内障就像霉菌一样，这一颜色与他的银发寸头相得益彰。他还有一个 鹰钩鼻，隔膜间穿了一个大洞一是多年前的仪式留下的，本意是穿 上一个削下来的鹤驼股骨做成的粗织针一样的装饰。鲁尼的耳朵也打 了洞，他有时还把下垂的穿孔当成临时容器，插抽了一半的烟或槟榔 叶。像其他村民一样，鲁尼也有一双大手和大脚，因为布满伴随一生 的老茧而厚实膨胀。当听别人说话时，他的默认表情是一脸惊讶，这 时他的脸会彻底放松，让他的嘴微微张开。 拉雅看着比鲁尼还老得多。1980年代中期的时候，他大概不到 六十岁，但看上去已经老态龙钟了。他骨瘦如柴，头发几乎全白。拉 雅脸上的皮肤薄到连里面的骨骼形状都清晰可见：他的颧骨和眼球上</p>
+      </article>
+    </div>
+    </section>
+
+    <section class="section reveal" id="takeaways">
+      <h2>本关关键收获</h2>
+      <ul class="takeaways"><li><span>1</span>第三章 FirstCatchYourTeacher 拜师学艺 怎么学习一门没有被记录在案的语言？</li><li><span>2</span>它们是世界上最后被探究（多数语言学研究要到1950年代才真正开 展），也是最不为人所知的语言。关于它们，我们所知的大部分信息 来自传教士，他们研究这些语言的</li><li><span>3</span>我得找一个愿意跟我一起坐下来更长时间，而不是丢给我几个关于 泰雅博语的事实或扔给我几个荤段子的人。我还需要一个表达流利 的人。当我1980年代中期开始学习泰</li><li><span>4</span>4）万有，一个体弱的人，从来不离开他那个烟雾缭绕的灰暗的 房子一一说话时你永远听不见他的声音。</li></ul>
+      <nav class="nav">
+        <a class="btn" href="/experiences/user-book-visual-reading-g4ia7j-4d99-g04-chapter-4.html">上一关</a>
+        <a class="btn" href="/experiences/user-book-visual-reading-g4ia7j-4d99-g06-chapter-6.html">下一关</a>
+      </nav>
+    </section>
+  </main>
+  <script>
+    (() => {
+      const progress = document.getElementById("progress");
+      const dots = Array.from(document.querySelectorAll("#dotNav button[data-target]"));
+      const sections = dots
+        .map((dot) => document.getElementById(dot.getAttribute("data-target")))
+        .filter(Boolean);
+      const reveals = Array.from(document.querySelectorAll(".reveal"));
+      const onScroll = () => {
+        const h = document.documentElement;
+        const total = Math.max(1, h.scrollHeight - window.innerHeight);
+        const pct = Math.max(0, Math.min(100, (window.scrollY / total) * 100));
+        if (progress) progress.style.width = pct + "%";
+      };
+      const io = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) entry.target.classList.add("in");
+        }
+      }, { threshold: .14 });
+      reveals.forEach((el) => io.observe(el));
+      const secIo = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const id = entry.target.id;
+          dots.forEach((dot) => dot.classList.toggle("active", dot.getAttribute("data-target") === id));
+        });
+      }, { threshold: .4 });
+      sections.forEach((s) => secIo.observe(s));
+      dots.forEach((dot) => {
+        dot.addEventListener("click", () => {
+          const target = document.getElementById(dot.getAttribute("data-target"));
+          if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+      window.addEventListener("scroll", onScroll, { passive: true });
+      onScroll();
+    })();
+  </script>
+</body>
+</html>
