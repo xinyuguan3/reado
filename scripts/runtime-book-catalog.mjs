@@ -176,6 +176,126 @@ const BOOK_META = {
       "前期章节会解锁永久强化，直接影响后期可用策略上限。",
       "通过史料札记与事件文本增强历史知识密度和代入感。"
     ]
+  },
+  "world-building-methods": {
+    title: "《构建世界的多种方式》",
+    price: 380,
+    category: "science-knowledge",
+    categoryHint: "从模型、叙事与系统视角理解“世界如何被构造”。",
+    tier: "简餐级",
+    tags: ["知识地图", "认知训练"],
+    badgeTitle: "世界建构师",
+    badgeIcon: "hub",
+    highlights: [
+      "同一现实可以被不同理论框架解释与重构。",
+      "概念模型决定了你看见的问题类型和解法路径。",
+      "叙事、制度与认知习惯共同塑造了“世界感”。"
+    ]
+  },
+  "golden-wing": {
+    title: "《金翼》",
+    price: 420,
+    category: "science-knowledge",
+    categoryHint: "在家族兴衰与社会网络中理解地方社会的运作逻辑。",
+    tier: "简餐级",
+    tags: ["人类学", "社会观察"],
+    badgeTitle: "乡土观察者",
+    badgeIcon: "groups",
+    highlights: [
+      "家族命运与社会结构、经济机会高度耦合。",
+      "关系网络既能放大机会，也会放大脆弱性。",
+      "微观家庭史能够折射宏观社会变迁。"
+    ]
+  },
+  "border-crossing-community": {
+    title: "《跨越边界的社区》",
+    price: 360,
+    category: "science-knowledge",
+    categoryHint: "观察流动人口社群如何在制度边界之间自组织。",
+    tier: "简餐级",
+    tags: ["城市研究", "社区"],
+    badgeTitle: "边界行者",
+    badgeIcon: "travel_explore",
+    highlights: [
+      "社区形成依赖迁移链条、信任网络与资源互助。",
+      "制度边界不会消失，而是被日常实践不断协商。",
+      "空间布局、产业分工与身份认同彼此塑造。"
+    ]
+  },
+  "secret-erotic-art-study": {
+    title: "《秘戏图考》",
+    price: 360,
+    category: "lifestyle-creativity",
+    categoryHint: "通过图像与文本解读古代身体观与文化表达。",
+    tier: "简餐级",
+    tags: ["文化史", "视觉解读"],
+    badgeTitle: "图像解码者",
+    badgeIcon: "photo_library",
+    highlights: [
+      "图像不仅记录欲望，也承载时代规范与权力关系。",
+      "审美风格变化映射了社会观念的转型轨迹。",
+      "文本与图像互证能提升历史解释的密度。"
+    ]
+  },
+  "enslaved-people-deep-structure": {
+    title: "《奴化的人：解码中国文化的深层结构》",
+    price: 420,
+    category: "science-knowledge",
+    categoryHint: "从结构层面审视文化心理与社会组织机制。",
+    tier: "简餐级",
+    tags: ["文化分析", "社会心理"],
+    badgeTitle: "结构透视者",
+    badgeIcon: "visibility",
+    highlights: [
+      "个体行为常被长期结构性规则所塑形。",
+      "关系模式会在代际与制度中被重复强化。",
+      "理解深层结构有助于解释表层冲突。"
+    ]
+  },
+  "cognitive-psychology": {
+    title: "《认知心理学》",
+    price: 360,
+    category: "personal-growth",
+    categoryHint: "系统理解注意、记忆、思维与决策的心理机制。",
+    tier: "简餐级",
+    tags: ["心理学", "思维模型"],
+    badgeTitle: "认知升级者",
+    badgeIcon: "psychology",
+    highlights: [
+      "注意资源有限，选择机制决定信息进入深加工的概率。",
+      "记忆不是仓库，而是可塑、会重构的系统。",
+      "决策常受启发式与框架效应影响。"
+    ]
+  },
+  "sociobiology": {
+    title: "《社会生物学》",
+    price: 420,
+    category: "science-knowledge",
+    categoryHint: "从进化视角理解合作、利他与群体行为。",
+    tier: "简餐级",
+    tags: ["进化", "社会科学"],
+    badgeTitle: "进化分析师",
+    badgeIcon: "biotech",
+    highlights: [
+      "社会行为可在生态压力与进化收益中被解释。",
+      "合作与竞争并存，是多层级选择的结果。",
+      "生物基础与社会结构之间存在持续互动。"
+    ]
+  },
+  "death-of-woman-wang": {
+    title: "《王氏之死》",
+    price: 380,
+    category: "science-knowledge",
+    categoryHint: "通过微观史叙事理解清代底层社会的秩序与命运。",
+    tier: "简餐级",
+    tags: ["历史", "微观史"],
+    badgeTitle: "微观史侦探",
+    badgeIcon: "menu_book",
+    highlights: [
+      "个体命运常被制度、灾荒与地方权力结构共同决定。",
+      "微观叙事能补足宏观历史难以呈现的真实细节。",
+      "法律、伦理与生存策略在基层社会中持续博弈。"
+    ]
   }
 };
 
@@ -236,6 +356,31 @@ const BOOK_NAME_TO_ID = new Map([
   ["社交困境", "social-dilemma"],
   ["《社交困境》", "social-dilemma"],
   ["story-circle-theory", "story-circle-theory"],
+  ["world-building-methods", "world-building-methods"],
+  ["构建世界的多种方式", "world-building-methods"],
+  ["《构建世界的多种方式》", "world-building-methods"],
+  ["golden-wing", "golden-wing"],
+  ["金翼", "golden-wing"],
+  ["《金翼》", "golden-wing"],
+  ["border-crossing-community", "border-crossing-community"],
+  ["跨越边界的社区", "border-crossing-community"],
+  ["《跨越边界的社区》", "border-crossing-community"],
+  ["secret-erotic-art-study", "secret-erotic-art-study"],
+  ["秘戏图考", "secret-erotic-art-study"],
+  ["《秘戏图考》", "secret-erotic-art-study"],
+  ["enslaved-people-deep-structure", "enslaved-people-deep-structure"],
+  ["奴化的人", "enslaved-people-deep-structure"],
+  ["奴化的人-解码中国文化的深层结构", "enslaved-people-deep-structure"],
+  ["《奴化的人》", "enslaved-people-deep-structure"],
+  ["cognitive-psychology", "cognitive-psychology"],
+  ["认知心理学", "cognitive-psychology"],
+  ["《认知心理学》", "cognitive-psychology"],
+  ["sociobiology", "sociobiology"],
+  ["社会生物学", "sociobiology"],
+  ["《社会生物学》", "sociobiology"],
+  ["death-of-woman-wang", "death-of-woman-wang"],
+  ["王氏之死", "death-of-woman-wang"],
+  ["《王氏之死》", "death-of-woman-wang"],
   ["ming-dynasty-chronicles", "ming-dynasty-chronicles"],
   ["明朝那些事", "ming-dynasty-chronicles"],
   ["明朝那些事儿", "ming-dynasty-chronicles"],

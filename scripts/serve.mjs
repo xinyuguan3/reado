@@ -9347,53 +9347,116 @@ function buildDynamicExperienceHtml(html, module, book, pipelineMeta = null) {
 <script type="module" src="/shared/shell.js"></script>
 <script src="/shared/experience-runtime.js"></script>
 <reado-app-shell data-page="knowledge-map"></reado-app-shell>`;
+  const moduleCount = Math.max(1, toInt(book?.moduleCount) || 1);
+  const singleModuleBook = moduleCount <= 1;
+  const prevHref = !singleModuleBook && cleanText(module?.prevSlug)
+    ? `/experiences/${encodeURIComponent(cleanText(module.prevSlug))}.html`
+    : "";
+  const nextHref = !singleModuleBook && cleanText(module?.nextSlug)
+    ? `/experiences/${encodeURIComponent(cleanText(module.nextSlug))}.html`
+    : "";
   const modulePagerSnippet = `
 <style>
-  .reado-module-nav {
-    position: fixed;
-    top: 76px;
-    right: 18px;
+  .reado-module-nav-wrap {
+    position: relative;
     z-index: 70;
-    display: inline-flex;
+    width: min(1120px, calc(100% - 24px));
+    margin: 74px auto 10px;
+  }
+  .reado-module-nav {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
     align-items: center;
-    gap: 8px;
-    padding: 8px;
+    gap: 10px;
+    padding: 8px 10px;
     border: 1px solid rgba(148, 163, 184, 0.38);
-    border-radius: 999px;
+    border-radius: 12px;
     background: rgba(8, 15, 32, 0.86);
-    box-shadow: 0 14px 32px rgba(2, 8, 20, 0.35);
+    box-shadow: 0 10px 24px rgba(2, 8, 20, 0.32);
     backdrop-filter: blur(6px);
-    pointer-events: none;
+  }
+  .reado-module-nav .meta {
+    text-align: center;
+    min-width: 0;
   }
   .reado-module-nav .book {
+    display: block;
     color: #cbd5e1;
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.04em;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     opacity: 0.92;
   }
   .reado-module-nav .idx {
+    display: block;
     color: #93c5fd;
     font-size: 12px;
     letter-spacing: 0.02em;
     font-weight: 800;
-    margin: 0 0 0 2px;
+    margin-top: 2px;
     white-space: nowrap;
   }
+  .reado-module-nav .nav-btn {
+    min-width: 72px;
+    text-align: center;
+    text-decoration: none;
+    border: 1px solid rgba(148, 163, 184, 0.42);
+    border-radius: 999px;
+    padding: 6px 10px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #dbeafe;
+    background: rgba(15, 23, 42, 0.68);
+    line-height: 1.2;
+  }
+  .reado-module-nav .nav-btn:hover {
+    border-color: rgba(56, 189, 248, 0.72);
+    color: #7dd3fc;
+  }
+  .reado-module-nav .nav-btn[disabled],
+  .reado-module-nav .nav-btn.disabled {
+    cursor: not-allowed;
+    pointer-events: none;
+    opacity: 0.48;
+    color: #94a3b8;
+    border-color: rgba(148, 163, 184, 0.24);
+    background: rgba(15, 23, 42, 0.4);
+  }
   @media (max-width: 900px) {
+    .reado-module-nav-wrap {
+      margin-top: 68px;
+      width: calc(100% - 16px);
+    }
     .reado-module-nav {
-      top: auto;
-      bottom: 12px;
-      right: 12px;
-      border-radius: 14px;
+      grid-template-columns: 1fr;
+      gap: 7px;
+      text-align: center;
+    }
+    .reado-module-nav .meta {
+      order: -1;
+    }
+    .reado-module-nav .nav-btn {
+      width: 100%;
     }
   }
 </style>
-<nav class="reado-module-nav" aria-label="Module progress">
-  <span class="book">${escapeHtml(book?.title || "Book")}</span>
-  <span class="idx">${escapeHtml(String(module?.index || 1))}/${escapeHtml(String(book?.moduleCount || 1))}</span>
-</nav>`;
+<div class="reado-module-nav-wrap">
+  <nav class="reado-module-nav" aria-label="Module progress">
+    ${prevHref
+      ? `<a class="nav-btn" href="${escapeHtml(prevHref)}">上一页</a>`
+      : `<button class="nav-btn disabled" type="button" disabled>上一页</button>`}
+    <div class="meta">
+      <span class="book">${escapeHtml(book?.title || "Book")}</span>
+      <span class="idx">${escapeHtml(String(module?.index || 1))}/${escapeHtml(String(moduleCount))}</span>
+    </div>
+    ${nextHref
+      ? `<a class="nav-btn" href="${escapeHtml(nextHref)}">下一页</a>`
+      : `<button class="nav-btn disabled" type="button" disabled>下一页</button>`}
+  </nav>
+</div>`;
   const pipelinePanelSnippet = buildPipelinePanelSnippet(module, pipelineMeta);
 
   const completionSnippet = `

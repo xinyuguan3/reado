@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>社会生物学：生命的社会密码</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600;700;900&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        parchment: '#F6F1EB',
+        ink: '#2C2416',
+        sepia: '#8B7355',
+        moss: '#4A6741',
+        deepmoss: '#2D4A2D',
+        amber: '#C8963E',
+        rust: '#A0522D',
+        ocean: '#3B6B7A',
+        bone: '#E8DFD0',
+        sage: '#9CAF88',
+      },
+      fontFamily: {
+        serif: ['Noto Serif SC', 'serif'],
+        display: ['Playfair Display', 'serif'],
+        mono: ['JetBrains Mono', 'monospace'],
+      }
+    }
+  }
+}
+</script>
+<style>
+/* --- BASE & TEXTURE --- */
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: #F6F1EB;
+  color: #2C2416;
+  font-family: 'Noto Serif SC', serif;
+  overflow-x: hidden;
+  position: relative;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 9999;
+}
+
+/* --- PROGRESS BAR --- */
+#progress-bar {
+  position: fixed; top: 0; left: 0; height: 3px;
+  background: linear-gradient(90deg, #4A6741, #C8963E, #A0522D);
+  z-index: 10000; width: 0%; transition: width 0.1s linear;
+}
+
+/* --- HERO CANVAS --- */
+#hero-canvas {
+  position: absolute; inset: 0;
+  z-index: 0;
+}
+
+/* --- SECTION STYLING --- */
+.section-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+.chapter-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #8B7355;
+  border-left: 2px solid #C8963E;
+  padding-left: 12px;
+  margin-bottom: 16px;
+}
+.section-title {
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 900;
+  line-height: 1.2;
+  margin-bottom: 20px;
+}
+.insight-box {
+  background: linear-gradient(135deg, rgba(74,103,65,0.08), rgba(200,150,62,0.08));
+  border-left: 3px solid #4A6741;
+  border-radius: 0 12px 12px 0;
+  padding: 20px 24px;
+  margin: 32px 0;
+  position: relative;
+}
+.insight-box::before {
+  content: '核心洞见';
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  color: #4A6741;
+  position: absolute;
+  top: -10px; left: 16px;
+  background: #F6F1EB;
+  padding: 0 8px;
+}
+.divider-line {
+  width: 60px; height: 2px;
+  background: linear-gradient(90deg, #C8963E, transparent);
+  margin: 48px 0;
+}
+
+/* --- CHART CONTAINERS --- */
+.chart-box {
+  background: rgba(255,255,255,0.5);
+  border: 1px solid rgba(139,115,85,0.15);
+  border-radius: 16px;
+  padding: 24px;
+  margin: 24px 0;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 4px 24px rgba(44,36,22,0.04);
+}
+.chart-title-bar {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(139,115,85,0.1);
+}
+.chart-dot { width:8px; height:8px; border-radius:50%; }
+
+/* --- HAMILTON CARD --- */
+.hamilton-card {
+  background: linear-gradient(145deg, #2D4A2D, #3B6B7A);
+  color: #F6F1EB;
+  border-radius: 20px;
+  padding: 40px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(45,74,45,0.3);
+  position: relative;
+  overflow: hidden;
+}
+.hamilton-card::before {
+  content:'';
+  position:absolute; inset:0;
+  background: radial-gradient(circle at 30% 20%, rgba(200,150,62,0.15), transparent 60%);
+}
+.formula-big {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 0.05em;
+  position: relative;
+  z-index: 1;
+}
+
+/* --- FOUR PINNACLES --- */
+.pinnacle-card {
+  background: rgba(255,255,255,0.6);
+  border: 1px solid rgba(139,115,85,0.12);
+  border-radius: 16px;
+  padding: 28px 24px;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+.pinnacle-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(44,36,22,0.08);
+}
+.pinnacle-icon {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem;
+  margin-bottom: 16px;
+}
+
+/* --- TIMELINE --- */
+.timeline-item {
+  position: relative;
+  padding-left: 32px;
+  padding-bottom: 36px;
+  border-left: 2px solid rgba(139,115,85,0.2);
+}
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -6px; top: 4px;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: #C8963E;
+  border: 2px solid #F6F1EB;
+}
+.timeline-item:last-child { border-left-color: transparent; }
+
+/* --- COMPARISON TABLE --- */
+.comp-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  font-size: 0.9rem;
+}
+.comp-table thead th {
+  background: #2D4A2D;
+  color: #F6F1EB;
+  padding: 14px 16px;
+  font-weight: 600;
+  text-align: left;
+}
+.comp-table tbody td {
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(139,115,85,0.1);
+}
+.comp-table tbody tr:nth-child(even) { background: rgba(74,103,65,0.04); }
+.comp-table tbody tr:hover { background: rgba(200,150,62,0.08); }
+
+/* --- GSAP REVEAL --- */
+.gs-reveal { opacity: 0; transform: translateY(40px); }
+
+/* --- FOOTER --- */
+footer {
+  background: #2C2416;
+  color: rgba(246,241,235,0.6);
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+  .section-title { font-size: 1.8rem !important; }
+  .formula-big { font-size: 2rem !important; }
+  .hamilton-card { padding: 24px 16px; }
+  .chart-box { padding: 16px; }
+  .pinnacle-grid { grid-template-columns: 1fr !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- PROGRESS BAR -->
+<div id="progress-bar"></div>
+
+<!-- ============================================ -->
+<!-- HERO SECTION -->
+<!-- ============================================ -->
+<section id="hero" class="relative min-h-screen flex items-center justify-center overflow-hidden">
+  <canvas id="hero-canvas"></canvas>
+  <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-parchment z-10"></div>
+
+  <div class="relative z-20 text-center px-6">
+    <p class="font-mono text-xs tracking-[0.3em] text-sepia mb-6 gs-reveal">EDWARD O. WILSON &middot; 社会生物学：新的综合</p>
+    <h1 class="font-serif font-black text-ink leading-[1.1] mb-8 gs-reveal" style="font-size:clamp(2.5rem,7vw,5rem);">
+      生命的<br><span class="text-moss">社会密码</span>
+    </h1>
+    <p class="font-serif text-sepia max-w-xl mx-auto text-lg leading-relaxed gs-reveal" style="font-weight:300;">
+      从基因的自私策略到蚁群的无私奉献，<br>从狼群的合作狩猎到人类的文明礼仪——<br>一部横跨所有生命形式的社会行为史诗
+    </p>
+    <div class="mt-12 gs-reveal">
+      <svg class="mx-auto animate-bounce opacity-40" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8B7355" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- SECTION 1: THE SOCIAL MISSION OF GENES -->
+<!-- ============================================ -->
+<section class="py-24">
+  <div class="section-container">
+    <div class="chapter-label gs-reveal">第一章 &mdash; 第五章 &middot; 社会进化</div>
+    <h2 class="section-title text-4xl md:text-5xl gs-reveal">基因的<span class="text-moss">社会使命</span></h2>
+    <p class="text-sepia text-lg leading-relaxed max-w-3xl gs-reveal" style="font-weight:300;">
+      威尔逊提出了一个根本性的问题：如果自然选择奖励的是自私的基因，那么动物世界中普遍存在的利他行为从何而来？工蜂为何放弃繁殖、为蜂后服务？野狗为何将捕获的食物反哺给非亲生的幼崽？
+    </p>
+
+    <div class="divider-line gs-reveal"></div>
+
+    <div class="grid md:grid-cols-2 gap-8 mt-8">
+      <div class="gs-reveal">
+        <h3 class="font-serif font-bold text-xl mb-4 text-ink">自私与利他的悖论</h3>
+        <p class="text-sepia leading-relaxed" style="font-weight:300;font-size:0.95rem;">
+          达尔文的自然选择理论预测个体应当自私——将资源用于自身生存和繁殖。然而自然界充满了看似"违反"这一逻辑的行为：蚂蚁工蚁终生不育、地松鼠发出警报叫声引来捕食者的注意、吸血蝙蝠与同伴分享血液……这些行为如何通过自然选择得以保留？
+        </p>
+        <p class="text-sepia leading-relaxed mt-4" style="font-weight:300;font-size:0.95rem;">
+          威尔逊认为答案藏在不同层次的选择中——个体选择、血缘选择和类群选择之间的张力，正是塑造社会行为多样性的根本力量。
+        </p>
+      </div>
+      <div class="chart-box gs-reveal">
+        <div class="chart-title-bar">
+          <div class="chart-dot" style="background:#4A6741;"></div>
+          <div class="chart-dot" style="background:#C8963E;"></div>
+          <span class="font-mono text-xs text-sepia tracking-wider">自然选择的层次</span>
+        </div>
+        <div id="chart-selection-levels" style="width:100%;height:320px;"></div>
+      </div>
+    </div>
+
+    <div class="insight-box gs-reveal mt-8">
+      <p class="text-ink leading-relaxed" style="font-size:0.95rem;">
+        <strong>基因并非"自私"或"无私"</strong>——它们是盲目的复制子。但当携带相同基因的亲属彼此帮助时，基因通过"间接途径"得以传播。社会行为的进化，本质上是基因复制策略的多样化展现。
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- SECTION 2: MATHEMATICS OF ALTRUISM -->
+<!-- ============================================ -->
+<section class="py-24" style="background: linear-gradient(180deg, rgba(74,103,65,0.03) 0%, #F6F1EB 100%);">
+  <div class="section-container">
+    <div class="chapter-label gs-reveal">第五章 &middot; 类群选择和利他主义</div>
+    <h2 class="section-title text-4xl md:text-5xl gs-reveal">利他主义的<span class="text-amber">数学</span></h2>
+    <p class="text-sepia text-lg leading-relaxed max-w-3xl gs-reveal" style="font-weight:300;">
+      1964年，汉密尔顿（W.D. Hamilton）提出了一个优雅的不等式，从根本上解释了利他行为何时能够进化——这就是著名的汉密尔顿法则。
+    </p>
+
+    <div class="hamilton-card my-12 gs-reveal">
+      <p class="font-mono text-xs tracking-[0.2em] opacity-60 mb-4">HAMILTON'S RULE</p>
+      <div class="formula-big mb-6">r &middot; b &gt; c</div>
+      <div class="grid grid-cols-3 gap-4 max-w-lg mx-auto relative z-10">
+        <div>
+          <div class="text-2xl font-display font-bold italic text-amber">r</div>
+          <div class="text-sm opacity-70 mt-1">亲缘系数</div>
+          <div class="text-xs opacity-50 mt-1">基因共享比例</div>
+        </div>
+        <div>
+          <div class="text-2xl font-display font-bold italic text-sage">b</div>
+          <div class="text-sm opacity-70 mt-1">受益者收益</div>
+          <div class="text-xs opacity-50 mt-1">适合度增量</div>
+        </div>
+        <div>
+          <div class="text-2xl font-display font-bold italic text-rust" style="color:#D4A0A0;">c</div>
+          <div class="text-sm opacity-70 mt-1">利他者代价</div>
+          <div class="text-xs opacity-50 mt-1">适合度损失</div>
+        </div>
+      </div>
+      <p class="text-sm opacity-60 mt-6 max-w-md mx-auto relative z-10">
+        当亲缘系数 × 受益者收益 > 利他者代价时，利他行为就能被自然选择保留
+      </p>
+    </div>
+
+    <div class="chart-box gs-reveal">
+      <div class="chart-title-bar">
+        <div class="chart-dot" style="background:#C8963E;"></div>
+        <div class="chart-dot" style="background:#4A6741;"></div>
+        <span class="font-mono text-xs text-sepia tracking-wider">不同亲缘关系下的利他倾向</span>
+      </div>
+      <div id="chart-hamilton" style="width:100%;height:360px;"></div>
+    </div>
+
+    <div class="insight-box gs-reveal">
+      <p class="text-ink leading-relaxed" style="font-size:0.95rem;">
+        <strong>哈尔代恩的名言</strong>完美诠释了这一法则："我愿意为两个兄弟或八个表亲献出生命。"——因为两个兄弟携带的你的基因副本（2 × 1/2 = 1），恰好等于你自身全部基因。膜翅目昆虫（蜜蜂、蚂蚁）的单倍二倍体遗传体系使姐妹间亲缘系数高达3/4，这正是真社会性在它们中间反复独立进化的关键原因。
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- SECTION 3: FOUR PINNACLES -->
+<!-- ============================================ -->
+<section class="py-24">
+  <div class="section-container">
+    <div class="chapter-label gs-reveal">第十八章 &middot; 社会进化的四个顶峰</div>
+    <h2 class="section-title text-4xl md:text-5xl gs-reveal">社会进化的<span class="text-ocean">四座高峰</span></h2>
+    <p class="text-sepia text-lg leading-relaxed max-w-3xl gs-reveal" style="font-weight:300;">
+      在浩瀚的生命史中，社会性的进化攀上了四座巍峨的高峰。每一座高峰都代表着一种独特的社会组织方式，它们在完全不同的进化路径上独立达到了惊人的复杂程度。
+    </p>
+
+    <div class="pinnacle-grid grid md:grid-cols-2 gap-6 mt-12">
+      <div class="pinnacle-card gs-reveal">
+        <div class="pinnacle-icon" style="background:rgba(59,107,122,0.12);color:#3B6B7A;">🪸</div>
+        <h3 class="font-serif font-bold text-lg mb-2">群体无脊椎动物</h3>
+        <p class="text-sepia text-sm leading-relaxed" style="font-weight:300;">
+          珊瑚、苔藓虫、管水母——通过无性繁殖形成的克隆群体。个体融合为"超级有机体"，分工达到器官级别。管水母的每个"个体"实际上是一个完整生物的一部分。
+        </p>
+        <div class="flex gap-2 mt-3 flex-wrap">
+          <span class="font-mono text-xs px-2 py-1 rounded-full" style="background:rgba(59,107,122,0.1);color:#3B6B7A;">克隆繁殖</span>
+          <span class="font-mono text-xs px-2 py-1 rounded-full" style="background:rgba(59,107,122,0.1);color:#3B6B7A;">器官级分工</span>
+        </div>
+      </div>
+      <div class="pinnacle-card gs-reveal">
+        <div class="pinnacle-icon" style="background:rgba(200,150,62,0.12);color:#C8963E;">🐝</div>
+        <h3 class="font-serif font-bold text-lg mb-2">社会性昆虫</h3>
+        <p class="text-sepia text-sm leading-relaxed" style="font-weight:300;">
+          蚂蚁、蜜蜂、白蚁、社会黄蜂——真社会性的典范。不育工蚁/工蜂放弃自身繁殖，形成严密的职别分工体系。一个切叶蚁巢穴可容纳800万只个体，堪比人类城市。
+        </p>
+        <div class="flex gap-2 mt-3 flex-wrap">
+          <span class="font-mono text-xs px-2 py-1 rounded-full" style="background:rgba(200,150,62,0.1);color:#C8963E;">真社会性</span>
+          <span class="font-mono text-xs px-2 py-1 rounded-full" style="background:rgba(200,150,62,0.1);color:#C8963E;">职别系统</span>
+        </div>
+      </div>
+      <div class="pinnacle-card gs-reveal">
+        <div class="pinnacle-icon" style="background:rgba(74,103,65,0.12);color:#4A6741;">🐺</div>
+        <h3 class="font-serif font-bold text-lg mb-2">非人灵长类</h3>
+        <p class="text-sepia text-sm leading-relaxed" style="font-weight:300;">
+          猴、猿——以智力和复杂的个体关系为基础。母系为核心、长期的社会化学习、联盟策略、异亲抚育。黑猩猩社会展现了惊人的政治智慧，包括欺骗、和解与联盟。
+        </p>
+        <div class="flex gap-2 mt-3 flex-wrap">
+          <span class="font-mono text-xs px-2 py-1 rounded-full" style="background:rgba(74,103,65,0.1);color:#4A6741;">智力驱动</span>
+          <span class="font-mono text-xs px-2 py-1 rounded-full" style="background:rgba(74,103,65,0.1);color:#4A6741;">联盟政治</span>
+        </div>
+      </div>
+      <div class="pinnacle-card gs-reveal">
+        <div class="pinnacle-icon" style="background:rgba(160,82,45,0.12);color:#A0522D;">🧬</div>
+        <h3 class="font-serif font-bold text-lg mb-2">人类</h3>
+        <p class="text-sepia text-sm leading-relaxed" style="font-weight:300;">
+          语言、文化、宗教、伦理——社会复杂度的最高峰。人类独特地发展出符号通讯、互惠利他主义、劳动分工和制度化的社会结构，使得社会组织超越了纯粹的生物学基础。
+        </p>
+        <div class="flex gap-2 mt-3 flex-wrap">
+          <span class="font-mono text-xs px-2 py-1 rounded-full" style="background:rgba(160,82,45,0.1);color:#A0522D;">文化传承</span>
+          <span class="font-mono text-xs px-2 py-1 rounded-full" style="background:rgba(160,82,45,0.1);color:#A0522D;">符号语言</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-box gs-reveal mt-12">
+      <div class="chart-title-bar">
+        <div class="chart-dot" style="background:#3B6B7A;"></div>
+        <div class="chart-dot" style="background:#C8963E;"></div>
+        <div class="chart-dot" style="background:#4A6741;"></div>
+        <span class="font-mono text-xs text-sepia tracking-wider">四座高峰的社会复杂度对比</span>
+      </div>
+      <div id="chart-radar" style="width:100%;height:440px;"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- SECTION 4: COMMUNICATION -->
+<!-- ============================================ -->
+<section class="py-24" style="background: linear-gradient(180deg, #F6F1EB 0%, rgba(59,107,122,0.04) 50%, #F6F1EB 100%);">
+  <div class="section-container">
+    <div class="chapter-label gs-reveal">第十章 &middot; 通讯：起源和进化</div>
+    <h2 class="section-title text-4xl md:text-5xl gs-reveal">通讯与<span class="text-ocean">信号</span></h2>
+    <p class="text-sepia text-lg leading-relaxed max-w-3xl gs-reveal" style="font-weight:300;">
+      社会行为的基石是通讯。从蚂蚁的化学信号到鸟类的歌声，从灵长类的面部表情到人类的语言——感觉通道之间存在着一场持续的"进化竞赛"。
+    </p>
+
+    <div class="chart-box gs-reveal mt-8">
+      <div class="chart-title-bar">
+        <div class="chart-dot" style="background:#4A6741;"></div>
+        <div class="chart-dot" style="background:#3B6B7A;"></div>
+        <span class="font-mono text-xs text-sepia tracking-wider">不同物种群的感觉通道依赖程度</span>
+      </div>
+      <div id="chart-communication" style="width:100%;height:400px;"></div>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-6 mt-8">
+      <div class="chart-box gs-reveal" style="padding:20px;">
+        <div class="text-center">
+          <div class="text-3xl mb-2">🧪</div>
+          <h4 class="font-serif font-bold text-sm mb-2">化学通讯</h4>
+          <p class="text-sepia text-xs leading-relaxed" style="font-weight:300;">
+            信息素是最古老的通讯方式。蚂蚁用10~20种化学物质构建完整的"语言"系统，控制觅食路径、报警、识别巢友。信号可在黑暗中传播，绕过障碍物。
+          </p>
+        </div>
+      </div>
+      <div class="chart-box gs-reveal" style="padding:20px;">
+        <div class="text-center">
+          <div class="text-3xl mb-2">👁️</div>
+          <h4 class="font-serif font-bold text-sm mb-2">视觉通讯</h4>
+          <p class="text-sepia text-xs leading-relaxed" style="font-weight:300;">
+            灵长类动物将视觉通讯发展到极致。面部表情、身体姿态、毛色变化——这些"格式塔信号"允许在一瞥之间传递复杂的社会信息，如地位、意图和情绪状态。
+          </p>
+        </div>
+      </div>
+      <div class="chart-box gs-reveal" style="padding:20px;">
+        <div class="text-center">
+          <div class="text-3xl mb-2">🔊</div>
+          <h4 class="font-serif font-bold text-sm mb-2">声学通讯</h4>
+          <p class="text-sepia text-xs leading-relaxed" style="font-weight:300;">
+            从蛙类的求偶鸣叫到鲸鱼的歌声，声音可以穿透浓密的植被和深海。旧大陆猴的"咕噜声"音调丰富且高度个体化，被认为是人类语言的进化前兆。
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="insight-box gs-reveal mt-6">
+      <p class="text-ink leading-relaxed" style="font-size:0.95rem;">
+        <strong>信号的"军备竞赛"</strong>：通讯通道的进化并非单向的。发送者试图操纵接收者，接收者则进化出更精确的识别能力。寄生物种通过破解宿主的化学密码侵入蚁巢——通讯系统的每一次升级都可能催生新的"黑客"。
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- SECTION 5: POWER, SEX & TERRITORY -->
+<!-- ============================================ -->
+<section class="py-24">
+  <div class="section-container">
+    <div class="chapter-label gs-reveal">第十一章 &mdash; 第十五章 &middot; 社会机制</div>
+    <h2 class="section-title text-4xl md:text-5xl gs-reveal">权力、性<br>与<span class="text-rust">领域</span></h2>
+    <p class="text-sepia text-lg leading-relaxed max-w-3xl gs-reveal" style="font-weight:300;">
+      攻击、优势等级、领域防卫、配偶选择——这些社会行为机制如何在不同物种中以不同方式运作？威尔逊揭示了隐藏在多样性背后的统一原理。
+    </p>
+
+    <div class="chart-box gs-reveal mt-10">
+      <div class="chart-title-bar">
+        <div class="chart-dot" style="background:#A0522D;"></div>
+        <div class="chart-dot" style="background:#C8963E;"></div>
+        <span class="font-mono text-xs text-sepia tracking-wider">配偶制度在不同类群中的分布</span>
+      </div>
+      <div id="chart-mating" style="width:100%;height:380px;"></div>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-8 mt-10">
+      <div class="gs-reveal">
+        <h3 class="font-serif font-bold text-xl mb-4 text-ink">亲本投资理论</h3>
+        <p class="text-sepia leading-relaxed" style="font-weight:300;font-size:0.95rem;">
+          特里弗斯（Trivers）的亲本投资理论是理解性选择的关键：<strong>投资较多的性别</strong>（通常是雌性）成为被选择的对象，而<strong>投资较少的性别</strong>（通常是雄性）则激烈竞争交配机会。
+        </p>
+        <p class="text-sepia leading-relaxed mt-3" style="font-weight:300;font-size:0.95rem;">
+          这解释了为何雄性海象体重是雌性的3倍、雄性孔雀拖着华丽尾羽、雄性红鹿在秋季疯狂决斗——而在海马中，因雄性承担孵卵义务，反而是雌性更为鲜艳、更加主动求偶。
+        </p>
+      </div>
+      <div class="gs-reveal">
+        <h3 class="font-serif font-bold text-xl mb-4 text-ink">领域的经济学</h3>
+        <p class="text-sepia leading-relaxed" style="font-weight:300;font-size:0.95rem;">
+          领域行为遵循严格的成本-收益逻辑：只有当保卫领域的收益（食物、配偶、筑巢地）超过保卫成本（能量消耗、受伤风险）时，领域行为才会进化。
+        </p>
+        <p class="text-sepia leading-relaxed mt-3" style="font-weight:300;font-size:0.95rem;">
+          威尔逊指出，领域大小与体重之间存在幂函数关系。从蜂鸟几平方米的花园到狼群数百平方公里的猎场，领域面积跨越了近七个数量级。
+        </p>
+      </div>
+    </div>
+
+    <div class="chart-box gs-reveal mt-10">
+      <div class="chart-title-bar">
+        <div class="chart-dot" style="background:#4A6741;"></div>
+        <div class="chart-dot" style="background:#A0522D;"></div>
+        <span class="font-mono text-xs text-sepia tracking-wider">不同物种的群体规模与领域面积</span>
+      </div>
+      <div id="chart-territory" style="width:100%;height:380px;"></div>
+    </div>
+
+    <div class="insight-box gs-reveal mt-6">
+      <p class="text-ink leading-relaxed" style="font-size:0.95rem;">
+        <strong>优势并不总意味着暴力</strong>。在许多灵长类社会中，年老体弱但富有经验的首领依然统领群体——因为群体中最"老谋深算"的成员积累的知识对其他个体极为有益。权力的本质不仅仅是武力，更是信息。
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- SECTION 6: FROM ANTS TO HUMANS -->
+<!-- ============================================ -->
+<section class="py-24" style="background: linear-gradient(180deg, #F6F1EB 0%, rgba(74,103,65,0.04) 50%, #F6F1EB 100%);">
+  <div class="section-container">
+    <div class="chapter-label gs-reveal">第十九章 &mdash; 第二十六章 &middot; 社会物种</div>
+    <h2 class="section-title text-4xl md:text-5xl gs-reveal">从蚂蚁<span class="text-deepmoss">到人类</span></h2>
+    <p class="text-sepia text-lg leading-relaxed max-w-3xl gs-reveal" style="font-weight:300;">
+      威尔逊用全书超过一半的篇幅，系统地考察了从微生物到人类的社会行为。以下是这条进化长河中最引人注目的社会物种。
+    </p>
+
+    <!-- COMPARISON TABLE -->
+    <div class="gs-reveal mt-10 overflow-x-auto">
+      <table class="comp-table">
+        <thead>
+          <tr>
+            <th style="width:15%;">物种</th>
+            <th style="width:12%;">群体规模</th>
+            <th style="width:20%;">合作形式</th>
+            <th style="width:18%;">通讯方式</th>
+            <th style="width:35%;">社会特征</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="font-serif font-bold">切叶蚁</td>
+            <td class="font-mono text-sm">~8,000,000</td>
+            <td>农业、育幼、防御</td>
+            <td>化学信号为主</td>
+            <td class="text-sm">真社会性；不育工蚁分为多种体型职别；培育真菌花园；复杂的地下巢穴系统</td>
+          </tr>
+          <tr>
+            <td class="font-serif font-bold">蜜蜂</td>
+            <td class="font-mono text-sm">~60,000</td>
+            <td>采蜜、筑巢、温控</td>
+            <td>舞蹈语言 + 化学</td>
+            <td class="text-sm">摇摆舞传递食物源信息；工蜂在生命中依次担任不同角色；蜂群温度精确控制至35°C</td>
+          </tr>
+          <tr>
+            <td class="font-serif font-bold">非洲野狗</td>
+            <td class="font-mono text-sm">10~30</td>
+            <td>合作狩猎、共同育幼</td>
+            <td>视觉 + 声学</td>
+            <td class="text-sm">利他程度仅次于大象和黑猩猩；病残成员获得喂养；群队狩猎成功率高达80%</td>
+          </tr>
+          <tr>
+            <td class="font-serif font-bold">狼</td>
+            <td class="font-mono text-sm">5~15</td>
+            <td>协作猎杀大型猎物</td>
+            <td>嗥叫 + 体态</td>
+            <td class="text-sm">严格等级制度；首领对配偶有控制；尿液标记领域；合作可猎杀体重十倍的猎物</td>
+          </tr>
+          <tr>
+            <td class="font-serif font-bold">阿拉伯狒狒</td>
+            <td class="font-mono text-sm">30~200</td>
+            <td>联盟、保护、异亲抚育</td>
+            <td>面部表情 + 声音</td>
+            <td class="text-sm">多层社会结构（单雄单元→氏族→群队→群落）；雄性"收养"幼雌建立后宫</td>
+          </tr>
+          <tr>
+            <td class="font-serif font-bold">黑猩猩</td>
+            <td class="font-mono text-sm">20~150</td>
+            <td>联盟政治、工具使用</td>
+            <td>复合信号（视+听+触）</td>
+            <td class="text-sm">裂变-融合社会；雄性联盟争夺地位；制造和使用工具；存在"文化"传统差异</td>
+          </tr>
+          <tr>
+            <td class="font-serif font-bold">人类</td>
+            <td class="font-mono text-sm">150~数十亿</td>
+            <td>制度化分工合作</td>
+            <td>符号语言</td>
+            <td class="text-sm">文化继承系统叠加于遗传系统之上；互惠利他；宗教和伦理制度化；社会组织可塑性极高</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- EVOLUTION TIMELINE -->
+    <h3 class="font-serif font-bold text-2xl mt-16 mb-8 gs-reveal">社会性进化里程碑</h3>
+    <div class="max-w-2xl gs-reveal">
+      <div class="timeline-item">
+        <p class="font-mono text-xs text-sepia">~35亿年前</p>
+        <h4 class="font-serif font-bold mt-1">集群细菌出现</h4>
+        <p class="text-sepia text-sm mt-1" style="font-weight:300;">最早的社会行为——细菌通过群体感应（quorum sensing）协调行为</p>
+      </div>
+      <div class="timeline-item">
+        <p class="font-mono text-xs text-sepia">~6亿年前</p>
+        <h4 class="font-serif font-bold mt-1">多细胞群体生物</h4>
+        <p class="text-sepia text-sm mt-1" style="font-weight:300;">珊瑚、海绵等群体无脊椎动物形成，个体开始融合为"超级有机体"</p>
+      </div>
+      <div class="timeline-item">
+        <p class="font-mono text-xs text-sepia">~1.5亿年前</p>
+        <h4 class="font-serif font-bold mt-1">白蚁真社会性起源</h4>
+        <p class="text-sepia text-sm mt-1" style="font-weight:300;">最古老的真社会性昆虫，不育职别的分化标志着社会复杂度的飞跃</p>
+      </div>
+      <div class="timeline-item">
+        <p class="font-mono text-xs text-sepia">~1亿年前</p>
+        <h4 class="font-serif font-bold mt-1">蚂蚁和社会蜜蜂兴起</h4>
+        <p class="text-sepia text-sm mt-1" style="font-weight:300;">膜翅目昆虫的单倍二倍性遗传体系推动真社会性在多个谱系中独立进化</p>
+      </div>
+      <div class="timeline-item">
+        <p class="font-mono text-xs text-sepia">~6500万年前</p>
+        <h4 class="font-serif font-bold mt-1">灵长类社会的萌芽</h4>
+        <p class="text-sepia text-sm mt-1" style="font-weight:300;">树栖生活驱动视觉优先、大脑增长和复杂社会关系的形成</p>
+      </div>
+      <div class="timeline-item">
+        <p class="font-mono text-xs text-sepia">~200万年前</p>
+        <h4 class="font-serif font-bold mt-1">人属的社会革命</h4>
+        <p class="text-sepia text-sm mt-1" style="font-weight:300;">工具制造、合作狩猎、语言萌芽——生物进化与文化进化开始交织</p>
+      </div>
+      <div class="timeline-item">
+        <p class="font-mono text-xs text-sepia">~1万年前</p>
+        <h4 class="font-serif font-bold mt-1">农业革命与文明</h4>
+        <p class="text-sepia text-sm mt-1" style="font-weight:300;">定居、城市、国家——人类社会组织突破了生物学"邓巴数"的限制</p>
+      </div>
+    </div>
+
+    <div class="chart-box gs-reveal mt-12">
+      <div class="chart-title-bar">
+        <div class="chart-dot" style="background:#4A6741;"></div>
+        <div class="chart-dot" style="background:#C8963E;"></div>
+        <div class="chart-dot" style="background:#A0522D;"></div>
+        <span class="font-mono text-xs text-sepia tracking-wider">合作行为模式对比：蚂蚁 vs 狼 vs 人类</span>
+      </div>
+      <div id="chart-cooperation" style="width:100%;height:380px;"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- SECTION 7: HUMANS - UNFINISHED EVOLUTION -->
+<!-- ============================================ -->
+<section class="py-24">
+  <div class="section-container">
+    <div class="chapter-label gs-reveal">第二十七章 &middot; 人类：从社会生物学到社会学</div>
+    <h2 class="section-title text-4xl md:text-5xl gs-reveal">人类：<span class="text-moss">未完成的进化</span></h2>
+    <p class="text-sepia text-lg leading-relaxed max-w-3xl gs-reveal" style="font-weight:300;">
+      全书的最后一章也是最具争议的一章。威尔逊大胆地将社会生物学的框架延伸至人类，试图从生物学基础出发重新审视人类社会的核心维度。
+    </p>
+
+    <div class="chart-box gs-reveal mt-10">
+      <div class="chart-title-bar">
+        <div class="chart-dot" style="background:#4A6741;"></div>
+        <div class="chart-dot" style="background:#C8963E;"></div>
+        <span class="font-mono text-xs text-sepia tracking-wider">人类社会行为的生物学维度</span>
+      </div>
+      <div id="chart-human" style="width:100%;height:400px;"></div>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-8 mt-10">
+      <div class="gs-reveal">
+        <h3 class="font-serif font-bold text-xl mb-4 text-ink">超越基因的遗产</h3>
+        <p class="text-sepia leading-relaxed" style="font-weight:300;font-size:0.95rem;">
+          威尔逊承认人类社会具有非凡的<strong>可塑性</strong>。文化、宗教、伦理和美学构成了"第二遗传系统"，使人类社会组织的变化速度远超生物进化。不同文化间的巨大差异证明了社会行为并非基因的简单产物。
+        </p>
+        <p class="text-sepia leading-relaxed mt-3" style="font-weight:300;font-size:0.95rem;">
+          然而他同时指出：互惠利他、领域性、优势等级、性别分工、乱伦禁忌——这些跨文化的共同模式暗示着深层的生物学基础。基因决定的不是具体行为，而是<strong>行为的倾向性和可能性空间</strong>。
+        </p>
+      </div>
+      <div class="gs-reveal">
+        <h3 class="font-serif font-bold text-xl mb-4 text-ink">争议与遗产</h3>
+        <p class="text-sepia leading-relaxed" style="font-weight:300;font-size:0.95rem;">
+          此书出版后引发了学术界的激烈论战。批评者担忧"生物决定论"为社会不平等提供辩护。支持者则认为，承认行为的生物学基础并不等于否定人类改变社会的能力。
+        </p>
+        <p class="text-sepia leading-relaxed mt-3" style="font-weight:300;font-size:0.95rem;">
+          半个世纪后回望，社会生物学已经深刻重塑了我们对行为、心理和社会的理解。行为生态学、进化心理学、基因-文化协同进化理论——这些后续发展都站在威尔逊开创的基础之上。
+        </p>
+      </div>
+    </div>
+
+    <div class="insight-box gs-reveal mt-8">
+      <p class="text-ink leading-relaxed" style="font-size:0.95rem;">
+        <strong>威尔逊的核心遗产</strong>：理解人类，不能只看文化的上层建筑，也不能只看基因的底层代码——而是要看两者如何在进化的时间尺度上相互塑造。"如果未对一个人的人生意识产生永久的、戏剧性的扩展，就忘记了威尔逊的书，那是不可能的。"——《大西洋月刊》
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- SECTION 8: THE BOOK'S LEGACY -->
+<!-- ============================================ -->
+<section class="py-24" style="background: linear-gradient(180deg, #F6F1EB, rgba(45,74,45,0.06));">
+  <div class="section-container">
+    <div class="text-center max-w-3xl mx-auto">
+      <div class="chapter-label gs-reveal" style="border:none;text-align:center;padding:0;">全书总结</div>
+      <h2 class="section-title text-4xl md:text-5xl gs-reveal text-center mt-4">新综合的<span class="text-amber">启示</span></h2>
+      <p class="text-sepia text-lg leading-relaxed gs-reveal mt-4" style="font-weight:300;">
+        《社会生物学》不仅是一部百科全书式的学术巨著，更是一种全新的思维方式——它邀请我们用进化的眼光重新审视每一个社会现象。
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-6 mt-12">
+      <div class="chart-box gs-reveal text-center" style="padding:28px;">
+        <div class="text-4xl font-display font-black text-moss">27</div>
+        <p class="font-mono text-xs text-sepia mt-2 tracking-wider">章节</p>
+        <p class="text-sepia text-sm mt-2" style="font-weight:300;">横跨三大部分：社会进化、社会机制、社会物种</p>
+      </div>
+      <div class="chart-box gs-reveal text-center" style="padding:28px;">
+        <div class="text-4xl font-display font-black text-amber">2,500+</div>
+        <p class="font-mono text-xs text-sepia mt-2 tracking-wider">参考文献</p>
+        <p class="text-sepia text-sm mt-2" style="font-weight:300;">综合了当时已知的几乎所有社会行为研究</p>
+      </div>
+      <div class="chart-box gs-reveal text-center" style="padding:28px;">
+        <div class="text-4xl font-display font-black text-ocean">∞</div>
+        <p class="font-mono text-xs text-sepia mt-2 tracking-wider">物种</p>
+        <p class="text-sepia text-sm mt-2" style="font-weight:300;">从细菌到人类，覆盖整个生命树的社会行为</p>
+      </div>
+    </div>
+
+    <div class="mt-16 text-center gs-reveal">
+      <blockquote class="font-serif text-xl md:text-2xl text-ink italic leading-relaxed max-w-2xl mx-auto" style="font-weight:300;">
+        "为一门新科学激动人心的未来贡献出如此辉煌的基石，在我们的世界里是史无前例的。"
+      </blockquote>
+      <p class="font-mono text-xs text-sepia mt-4 tracking-wider">&mdash; 约翰·泰勒·邦纳，《科学美国人》</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="py-12 text-center">
+  <div class="section-container">
+    <p class="font-serif text-sm" style="color:rgba(246,241,235,0.4);">
+      基于 E.O. 威尔逊《社会生物学：新的综合》（1975/2000）制作
+    </p>
+    <p class="font-mono text-xs mt-2" style="color:rgba(246,241,235,0.25);">
+      Sociobiology: The New Synthesis &middot; Interactive Data Narrative
+    </p>
+  </div>
+</footer>
+
+<!-- ============================================ -->
+<!-- JAVASCRIPT -->
+<!-- ============================================ -->
+<script>
+// --- HERO CANVAS: Organic Network Animation ---
+(function(){
+  const canvas = document.getElementById('hero-canvas');
+  const ctx = canvas.getContext('2d');
+  let w, h, particles = [], mouse = {x:0, y:0};
+
+  function resize(){
+    w = canvas.width = canvas.parentElement.offsetWidth;
+    h = canvas.height = canvas.parentElement.offsetHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  class Particle {
+    constructor(){
+      this.x = Math.random()*w;
+      this.y = Math.random()*h;
+      this.vx = (Math.random()-0.5)*0.4;
+      this.vy = (Math.random()-0.5)*0.4;
+      this.r = Math.random()*2.5+1;
+      this.baseAlpha = Math.random()*0.3+0.1;
+    }
+    update(){
+      this.x += this.vx;
+      this.y += this.vy;
+      if(this.x<0||this.x>w) this.vx*=-1;
+      if(this.y<0||this.y>h) this.vy*=-1;
+    }
+    draw(){
+      ctx.beginPath();
+      ctx.arc(this.x,this.y,this.r,0,Math.PI*2);
+      ctx.fillStyle = `rgba(74,103,65,${this.baseAlpha})`;
+      ctx.fill();
+    }
+  }
+
+  for(let i=0;i<80;i++) particles.push(new Particle());
+
+  function animate(){
+    ctx.clearRect(0,0,w,h);
+    particles.forEach(p=>{p.update();p.draw();});
+    for(let i=0;i<particles.length;i++){
+      for(let j=i+1;j<particles.length;j++){
+        const dx=particles[i].x-particles[j].x;
+        const dy=particles[i].y-particles[j].y;
+        const dist=Math.sqrt(dx*dx+dy*dy);
+        if(dist<120){
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x,particles[i].y);
+          ctx.lineTo(particles[j].x,particles[j].y);
+          ctx.strokeStyle=`rgba(139,115,85,${0.08*(1-dist/120)})`;
+          ctx.lineWidth=0.5;
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(animate);
+  }
+  animate();
+})();
+
+// --- PROGRESS BAR ---
+window.addEventListener('scroll',()=>{
+  const h = document.documentElement.scrollHeight - window.innerHeight;
+  document.getElementById('progress-bar').style.width = (window.scrollY/h*100)+'%';
+});
+
+// --- GSAP SCROLL ANIMATIONS ---
+gsap.registerPlugin(ScrollTrigger);
+
+gsap.utils.toArray('.gs-reveal').forEach(el=>{
+  gsap.to(el,{
+    opacity:1, y:0, duration:0.9, ease:'power3.out',
+    scrollTrigger:{trigger:el, start:'top 88%', once:true}
+  });
+});
+
+// --- ECHARTS THEME ---
+const EC_FONT = 'Noto Serif SC, serif';
+const EC_MONO = 'JetBrains Mono, monospace';
+const EC_COLORS = ['#4A6741','#C8963E','#3B6B7A','#A0522D','#9CAF88','#8B7355','#6B8E5B','#D4A35A'];
+const EC_TOOLTIP = {
+  backgroundColor:'rgba(246,241,235,0.96)',
+  borderColor:'rgba(139,115,85,0.2)',
+  borderWidth:1,
+  textStyle:{fontFamily:EC_FONT,fontSize:13,color:'#2C2416'},
+  extraCssText:'border-radius:12px;box-shadow:0 8px 32px rgba(44,36,22,0.1);backdrop-filter:blur(8px);'
+};
+
+function makeChart(id, option){
+  const dom = document.getElementById(id);
+  if(!dom) return null;
+  const chart = echarts.init(dom, null, {renderer:'svg'});
+  chart.setOption(option);
+  window.addEventListener('resize',()=>chart.resize());
+
+  ScrollTrigger.create({
+    trigger: dom,
+    start: 'top 90%',
+    once: true,
+    onEnter: () => {
+      chart.setOption(option);
+      chart.resize();
+    }
+  });
+  return chart;
+}
+
+// --- CHART 1: Selection Levels ---
+makeChart('chart-selection-levels', {
+  tooltip: {...EC_TOOLTIP, trigger:'axis', axisPointer:{type:'shadow',shadowStyle:{color:'rgba(200,150,62,0.06)'}}},
+  grid:{left:'3%',right:'4%',bottom:'3%',top:'12%',containLabel:true},
+  xAxis:{type:'category',data:['个体选择','血缘选择','迁移选择','同类群选择','物种选择'],axisLabel:{fontFamily:EC_FONT,fontSize:12,color:'#8B7355'},axisLine:{lineStyle:{color:'rgba(139,115,85,0.2)'}},axisTick:{show:false}},
+  yAxis:{type:'value',name:'相对影响力',nameTextStyle:{fontFamily:EC_FONT,fontSize:11,color:'#8B7355'},axisLabel:{fontFamily:EC_MONO,fontSize:11,color:'#8B7355'},splitLine:{lineStyle:{color:'rgba(139,115,85,0.08)'}},axisLine:{show:false},axisTick:{show:false}},
+  series:[{
+    type:'bar',
+    data:[
+      {value:95,itemStyle:{color:'#4A6741'}},
+      {value:80,itemStyle:{color:'#6B8E5B'}},
+      {value:45,itemStyle:{color:'#C8963E'}},
+      {value:30,itemStyle:{color:'#3B6B7A'}},
+      {value:10,itemStyle:{color:'#A0522D'}}
+    ],
+    barWidth:'45%',
+    itemStyle:{borderRadius:[6,6,0,0]},
+    label:{show:true,position:'top',fontFamily:EC_MONO,fontSize:11,color:'#8B7355',formatter:'{c}'}
+  }],
+  animationDuration:1200,
+  animationEasing:'cubicOut'
+});
+
+// --- CHART 2: Hamilton's Rule ---
+makeChart('chart-hamilton', {
+  tooltip:{...EC_TOOLTIP,trigger:'axis'},
+  legend:{data:['利他行为有利条件（r×b）','利他行为代价（c）'],textStyle:{fontFamily:EC_FONT,fontSize:12,color:'#8B7355'},top:0,itemGap:20},
+  grid:{left:'3%',right:'4%',bottom:'3%',top:'14%',containLabel:true},
+  xAxis:{type:'category',data:['同卵双胞胎\nr=1.0','亲子/同胞\nr=0.5','祖孙/半同胞\nr=0.25','表亲\nr=0.125','无关个体\nr≈0'],axisLabel:{fontFamily:EC_FONT,fontSize:11,color:'#8B7355',interval:0,lineHeight:16},axisLine:{lineStyle:{color:'rgba(139,115,85,0.2)'}},axisTick:{show:false}},
+  yAxis:{type:'value',name:'适合度收益',nameTextStyle:{fontFamily:EC_FONT,fontSize:11,color:'#8B7355'},axisLabel:{fontFamily:EC_MONO,fontSize:11,color:'#8B7355'},splitLine:{lineStyle:{color:'rgba(139,115,85,0.08)'}},axisLine:{show:false},axisTick:{show:false}},
+  series:[
+    {name:'利他行为有利条件（r×b）',type:'bar',data:[100,50,25,12.5,0],itemStyle:{color:'#4A6741',borderRadius:[6,6,0,0]},barGap:'20%'},
+    {name:'利他行为代价（c）',type:'line',data:[20,20,20,20,20],lineStyle:{color:'#A0522D',width:2,type:'dashed'},symbol:'circle',symbolSize:8,itemStyle:{color:'#A0522D'},
+      markArea:{data:[[{yAxis:20,itemStyle:{color:'rgba(74,103,65,0.06)'}},{yAxis:100}]],silent:true}
+    }
+  ],
+  animationDuration:1500
+});
+
+// --- CHART 3: Radar - Four Pinnacles ---
+makeChart('chart-radar', {
+  tooltip:{...EC_TOOLTIP},
+  legend:{data:['群体无脊椎动物','社会性昆虫','非人灵长类','人类'],textStyle:{fontFamily:EC_FONT,fontSize:12,color:'#8B7355'},top:0,itemGap:16},
+  radar:{
+    indicator:[
+      {name:'分工复杂度',max:100},
+      {name:'通讯精度',max:100},
+      {name:'个体识别',max:100},
+      {name:'学习能力',max:100},
+      {name:'社会可塑性',max:100},
+      {name:'利他程度',max:100}
+    ],
+    shape:'polygon',
+    radius:'65%',
+    axisName:{fontFamily:EC_FONT,fontSize:12,color:'#8B7355'},
+    splitArea:{areaStyle:{color:['rgba(74,103,65,0.02)','rgba(74,103,65,0.04)']}},
+    splitLine:{lineStyle:{color:'rgba(139,115,85,0.1)'}},
+    axisLine:{lineStyle:{color:'rgba(139,115,85,0.15)'}}
+  },
+  series:[{
+    type:'radar',
+    data:[
+      {value:[85,10,5,2,5,95],name:'群体无脊椎动物',lineStyle:{color:'#3B6B7A'},areaStyle:{color:'rgba(59,107,122,0.1)'},itemStyle:{color:'#3B6B7A'}},
+      {value:[95,60,15,20,10,98],name:'社会性昆虫',lineStyle:{color:'#C8963E'},areaStyle:{color:'rgba(200,150,62,0.1)'},itemStyle:{color:'#C8963E'}},
+      {value:[40,75,95,85,70,50],name:'非人灵长类',lineStyle:{color:'#4A6741'},areaStyle:{color:'rgba(74,103,65,0.1)'},itemStyle:{color:'#4A6741'}},
+      {value:[90,98,98,98,95,65],name:'人类',lineStyle:{color:'#A0522D'},areaStyle:{color:'rgba(160,82,45,0.08)'},itemStyle:{color:'#A0522D'}}
+    ],
+    symbol:'circle',symbolSize:5
+  }],
+  animationDuration:1500
+});
+
+// --- CHART 4: Communication Channels ---
+makeChart('chart-communication', {
+  tooltip:{...EC_TOOLTIP,trigger:'axis',axisPointer:{type:'shadow',shadowStyle:{color:'rgba(200,150,62,0.04)'}}},
+  legend:{data:['化学','视觉','听觉','触觉','电感'],textStyle:{fontFamily:EC_FONT,fontSize:12,color:'#8B7355'},top:0},
+  grid:{left:'3%',right:'4%',bottom:'3%',top:'14%',containLabel:true},
+  xAxis:{type:'category',data:['蚂蚁','蜜蜂','鱼类','蛙类','鸟类','狼','灵长类','人类'],axisLabel:{fontFamily:EC_FONT,fontSize:12,color:'#8B7355'},axisLine:{lineStyle:{color:'rgba(139,115,85,0.2)'}},axisTick:{show:false}},
+  yAxis:{type:'value',name:'依赖程度 %',max:100,nameTextStyle:{fontFamily:EC_FONT,fontSize:11,color:'#8B7355'},axisLabel:{fontFamily:EC_MONO,fontSize:11,color:'#8B7355'},splitLine:{lineStyle:{color:'rgba(139,115,85,0.08)'}},axisLine:{show:false}},
+  series:[
+    {name:'化学',type:'bar',stack:'total',data:[80,50,15,5,5,20,5,2],itemStyle:{color:'#8B7355',borderRadius:0}},
+    {name:'视觉',type:'bar',stack:'total',data:[5,20,20,15,50,30,45,40],itemStyle:{color:'#4A6741'}},
+    {name:'听觉',type:'bar',stack:'total',data:[2,15,10,70,40,35,35,50],itemStyle:{color:'#3B6B7A'}},
+    {name:'触觉',type:'bar',stack:'total',data:[12,14,5,5,4,14,14,7],itemStyle:{color:'#C8963E'}},
+    {name:'电感',type:'bar',stack:'total',data:[1,1,50,5,1,1,1,1],itemStyle:{color:'#9CAF88',borderRadius:[4,4,0,0]}}
+  ],
+  animationDuration:1200
+});
+
+// --- CHART 5: Mating Systems ---
+makeChart('chart-mating', {
+  tooltip:{...EC_TOOLTIP,trigger:'axis',axisPointer:{type:'shadow',shadowStyle:{color:'rgba(200,150,62,0.04)'}}},
+  legend:{data:['单配偶','一雄多雌','一雌多雄','混交'],textStyle:{fontFamily:EC_FONT,fontSize:12,color:'#8B7355'},top:0},
+  grid:{left:'3%',right:'4%',bottom:'3%',top:'14%',containLabel:true},
+  xAxis:{type:'value',name:'物种比例 %',max:100,nameTextStyle:{fontFamily:EC_FONT,fontSize:11,color:'#8B7355'},axisLabel:{fontFamily:EC_MONO,fontSize:11,color:'#8B7355'},splitLine:{lineStyle:{color:'rgba(139,115,85,0.08)'}},axisLine:{show:false}},
+  yAxis:{type:'category',data:['鸟类','哺乳动物','灵长类','鱼类','昆虫'],axisLabel:{fontFamily:EC_FONT,fontSize:12,color:'#8B7355'},axisLine:{lineStyle:{color:'rgba(139,115,85,0.2)'}},axisTick:{show:false}},
+  series:[
+    {name:'单配偶',type:'bar',stack:'t',data:[90,5,15,10,5],itemStyle:{color:'#4A6741'},barWidth:'50%'},
+    {name:'一雄多雌',type:'bar',stack:'t',data:[2,80,65,15,10],itemStyle:{color:'#C8963E'}},
+    {name:'一雌多雄',type:'bar',stack:'t',data:[1,2,3,5,2],itemStyle:{color:'#3B6B7A'}},
+    {name:'混交',type:'bar',stack:'t',data:[7,13,17,70,83],itemStyle:{color:'#A0522D',borderRadius:[0,4,4,0]}}
+  ],
+  animationDuration:1200
+});
+
+// --- CHART 6: Territory vs Group Size (Scatter) ---
+makeChart('chart-territory', {
+  tooltip:{...EC_TOOLTIP,formatter:function(p){return '<strong style="font-family:Noto Serif SC,serif;">'+p.data[3]+'</strong><br/><span style="font-family:JetBrains Mono,monospace;font-size:12px;">群体规模: '+p.data[0]+'<br/>领域面积: '+p.data[1]+' km²</span>';}},
+  grid:{left:'4%',right:'4%',bottom:'4%',top:'8%',containLabel:true},
+  xAxis:{type:'log',name:'群体规模（个体数）',nameTextStyle:{fontFamily:EC_FONT,fontSize:11,color:'#8B7355'},axisLabel:{fontFamily:EC_MONO,fontSize:11,color:'#8B7355'},splitLine:{lineStyle:{color:'rgba(139,115,85,0.08)'}},axisLine:{lineStyle:{color:'rgba(139,115,85,0.2)'}}},
+  yAxis:{type:'log',name:'领域面积（km²）',nameTextStyle:{fontFamily:EC_FONT,fontSize:11,color:'#8B7355'},axisLabel:{fontFamily:EC_MONO,fontSize:11,color:'#8B7355'},splitLine:{lineStyle:{color:'rgba(139,115,85,0.08)'}},axisLine:{lineStyle:{color:'rgba(139,115,85,0.2)'}}},
+  series:[{
+    type:'scatter',
+    data:[
+      [15,0.001,8,'蜂鸟'],
+      [2,0.5,10,'猫头鹰'],
+      [8,800,22,'狼群'],
+      [15,200,18,'非洲野狗'],
+      [5,50,14,'豹'],
+      [12,80,16,'狮群'],
+      [50,15,20,'狒狒群'],
+      [40,30,18,'黑猩猩'],
+      [8,20,15,'大猩猩'],
+      [500000,2,30,'切叶蚁'],
+      [150,10,25,'早期人类部落'],
+      [300,3000,26,'游牧部落'],
+      [5000000,50,35,'现代城市']
+    ],
+    symbolSize:function(d){return d[2];},
+    itemStyle:{color:'rgba(74,103,65,0.6)',borderColor:'#4A6741',borderWidth:1.5},
+    label:{show:true,position:'right',fontFamily:EC_FONT,fontSize:10,color:'#8B7355',formatter:function(p){return p.data[3];}}
+  }],
+  animationDuration:1500
+});
+
+// --- CHART 7: Cooperation Patterns ---
+makeChart('chart-cooperation', {
+  tooltip:{...EC_TOOLTIP,trigger:'axis'},
+  legend:{data:['蚂蚁','狼','人类'],textStyle:{fontFamily:EC_FONT,fontSize:12,color:'#8B7355'},top:0},
+  radar:{
+    indicator:[
+      {name:'食物分享',max:100},
+      {name:'合作防御',max:100},
+      {name:'共同育幼',max:100},
+      {name:'劳动分工',max:100},
+      {name:'信息传递',max:100},
+      {name:'冲突调解',max:100},
+      {name:'集体决策',max:100}
+    ],
+    shape:'polygon',
+    radius:'60%',
+    center:['50%','55%'],
+    axisName:{fontFamily:EC_FONT,fontSize:11,color:'#8B7355'},
+    splitArea:{areaStyle:{color:['rgba(200,150,62,0.02)','rgba(200,150,62,0.04)']}},
+    splitLine:{lineStyle:{color:'rgba(139,115,85,0.1)'}},
+    axisLine:{lineStyle:{color:'rgba(139,115,85,0.15)'}}
+  },
+  series:[{
+    type:'radar',
+    data:[
+      {value:[95,98,95,98,60,10,70],name:'蚂蚁',lineStyle:{color:'#C8963E',width:2},areaStyle:{color:'rgba(200,150,62,0.12)'},itemStyle:{color:'#C8963E'}},
+      {value:[85,90,60,40,50,45,55],name:'狼',lineStyle:{color:'#4A6741',width:2},areaStyle:{color:'rgba(74,103,65,0.12)'},itemStyle:{color:'#4A6741'}},
+      {value:[70,80,85,95,98,80,90],name:'人类',lineStyle:{color:'#A0522D',width:2},areaStyle:{color:'rgba(160,82,45,0.08)'},itemStyle:{color:'#A0522D'}}
+    ],
+    symbol:'circle',symbolSize:5
+  }],
+  animationDuration:1500
+});
+
+// --- CHART 8: Human Social Dimensions ---
+makeChart('chart-human', {
+  tooltip:{...EC_TOOLTIP,trigger:'axis',axisPointer:{type:'shadow'}},
+  grid:{left:'3%',right:'4%',bottom:'3%',top:'6%',containLabel:true},
+  xAxis:{type:'value',name:'生物学影响 ← → 文化影响',nameTextStyle:{fontFamily:EC_FONT,fontSize:11,color:'#8B7355'},min:0,max:100,axisLabel:{fontFamily:EC_MONO,fontSize:11,color:'#8B7355',formatter:function(v){return v<=50?'生物 '+(100-v)+'%':'文化 '+v+'%';}},splitLine:{lineStyle:{color:'rgba(139,115,85,0.08)'}},axisLine:{lineStyle:{color:'rgba(139,115,85,0.2)'}}},
+  yAxis:{type:'category',data:['乱伦禁忌','面部表情识别','攻击倾向','亲本抚育','领域/部落意识','性别角色倾向','互惠利他','伦理道德','宗教仪式','美学偏好','语言结构','政治制度'],axisLabel:{fontFamily:EC_FONT,fontSize:11,color:'#8B7355'},axisLine:{lineStyle:{color:'rgba(139,115,85,0.2)'}},axisTick:{show:false}},
+  series:[
+    {type:'bar',data:[
+      {value:25,itemStyle:{color:'#4A6741'}},
+      {value:30,itemStyle:{color:'#4A6741'}},
+      {value:35,itemStyle:{color:'#6B8E5B'}},
+      {value:35,itemStyle:{color:'#6B8E5B'}},
+      {value:40,itemStyle:{color:'#9CAF88'}},
+      {value:45,itemStyle:{color:'#9CAF88'}},
+      {value:50,itemStyle:{color:'#C8963E'}},
+      {value:65,itemStyle:{color:'#C8963E'}},
+      {value:72,itemStyle:{color:'#3B6B7A'}},
+      {value:68,itemStyle:{color:'#3B6B7A'}},
+      {value:78,itemStyle:{color:'#A0522D'}},
+      {value:88,itemStyle:{color:'#A0522D'}}
+    ],barWidth:'55%',itemStyle:{borderRadius:[0,6,6,0]},
+    label:{show:true,position:'right',fontFamily:EC_MONO,fontSize:10,color:'#8B7355',formatter:function(p){return p.value<=50?'生物学主导':'文化主导';}},
+    markLine:{silent:true,symbol:'none',lineStyle:{color:'rgba(200,150,62,0.4)',type:'dashed'},data:[{xAxis:50,label:{formatter:'平衡线',fontFamily:EC_FONT,fontSize:11,color:'#C8963E'}}]}
+    }
+  ],
+  animationDuration:1500
+});
+</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"75124c326cb447fe934cde04713ae013","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>

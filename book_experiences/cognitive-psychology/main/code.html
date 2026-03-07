@@ -1,0 +1,1330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>认知心理学 - 探索你大脑的秘密</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-deep: #0a0a1a;
+  --bg-mid: #0f1029;
+  --bg-card: rgba(18, 18, 45, 0.7);
+  --gold: #e8a838;
+  --gold-light: #f5c96a;
+  --gold-dim: rgba(232, 168, 56, 0.15);
+  --blue: #4a90d9;
+  --blue-light: #7bb8f5;
+  --cyan: #38c8b0;
+  --rose: #e06070;
+  --purple: #9068d0;
+  --text-primary: #e8e4de;
+  --text-secondary: rgba(232, 228, 222, 0.6);
+  --text-dim: rgba(232, 228, 222, 0.35);
+  --border-subtle: rgba(232, 168, 56, 0.12);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  font-family: 'Noto Sans SC', sans-serif;
+  overflow-x: hidden;
+  line-height: 1.8;
+}
+h1,h2,h3,h4 { font-family: 'Noto Serif SC', serif; }
+.mono { font-family: 'JetBrains Mono', monospace; }
+
+/* Reading progress bar */
+#progress-bar {
+  position: fixed; top:0; left:0; height:3px; z-index:9999;
+  background: linear-gradient(90deg, var(--gold), var(--cyan), var(--purple));
+  width:0%; transition: width 0.1s;
+}
+
+/* Noise texture overlay */
+body::before {
+  content:''; position:fixed; top:0; left:0; width:100%; height:100%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events:none; z-index:1; opacity:0.5;
+}
+
+/* Floating neural particles */
+.neural-dot {
+  position:absolute; border-radius:50%;
+  background: radial-gradient(circle, var(--gold) 0%, transparent 70%);
+  animation: float-neural 12s ease-in-out infinite;
+  pointer-events:none;
+}
+@keyframes float-neural {
+  0%,100% { transform: translateY(0) scale(1); opacity:0.3; }
+  50% { transform: translateY(-30px) scale(1.2); opacity:0.6; }
+}
+
+/* Section styling */
+.section-container {
+  max-width: 1100px; margin: 0 auto; padding: 0 24px;
+}
+.content-narrow { max-width: 720px; margin: 0 auto; }
+
+/* Hero */
+#hero {
+  min-height:100vh; display:flex; align-items:center; justify-content:center;
+  position:relative; overflow:hidden;
+}
+#hero .hero-bg {
+  position:absolute; inset:0;
+  background: radial-gradient(ellipse at 30% 40%, rgba(74,144,217,0.08) 0%, transparent 50%),
+              radial-gradient(ellipse at 70% 60%, rgba(232,168,56,0.06) 0%, transparent 50%),
+              radial-gradient(ellipse at 50% 50%, rgba(144,104,208,0.05) 0%, transparent 60%);
+}
+#hero .brain-glow {
+  position:absolute; width:500px; height:500px;
+  top:50%; left:50%; transform:translate(-50%,-50%);
+  background: radial-gradient(circle, rgba(232,168,56,0.06) 0%, transparent 60%);
+  animation: brain-pulse 4s ease-in-out infinite;
+}
+@keyframes brain-pulse {
+  0%,100% { transform:translate(-50%,-50%) scale(1); opacity:0.6; }
+  50% { transform:translate(-50%,-50%) scale(1.15); opacity:1; }
+}
+
+/* Card styles */
+.insight-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  padding: 32px;
+  position: relative;
+  overflow: hidden;
+}
+.insight-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:1px;
+  background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+}
+
+/* Chapter nav pill */
+.chapter-pill {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:6px 16px; border-radius:20px;
+  background: var(--gold-dim);
+  color: var(--gold);
+  font-size:13px; font-weight:500;
+  letter-spacing: 0.5px;
+}
+
+/* Experiment demo boxes */
+.experiment-box {
+  background: linear-gradient(135deg, rgba(74,144,217,0.08), rgba(144,104,208,0.08));
+  border: 1px solid rgba(74,144,217,0.2);
+  border-radius:16px; padding:28px; position:relative;
+  cursor:pointer; transition: all 0.3s;
+}
+.experiment-box:hover {
+  border-color: rgba(74,144,217,0.4);
+  box-shadow: 0 0 30px rgba(74,144,217,0.1);
+}
+
+/* Stroop interactive */
+.stroop-word {
+  font-size:28px; font-weight:700; padding:8px 20px;
+  border-radius:12px; cursor:pointer; transition:all 0.2s;
+  background: rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1);
+  display:inline-block; user-select:none;
+}
+.stroop-word:hover { background:rgba(255,255,255,0.1); transform:scale(1.05); }
+.stroop-word:active { transform:scale(0.95); }
+
+/* Timeline */
+.timeline-line {
+  position:absolute; left:24px; top:0; bottom:0; width:2px;
+  background: linear-gradient(180deg, var(--gold), var(--blue), var(--purple), transparent);
+}
+.timeline-node {
+  position:relative; padding-left:60px; margin-bottom:40px;
+}
+.timeline-node::before {
+  content:''; position:absolute; left:17px; top:8px;
+  width:16px; height:16px; border-radius:50%;
+  background: var(--gold); border:3px solid var(--bg-deep);
+  box-shadow: 0 0 12px rgba(232,168,56,0.4);
+}
+
+/* Chart containers */
+.chart-box {
+  width:100%; height:380px; border-radius:16px;
+  background: rgba(15,16,41,0.5);
+  border:1px solid var(--border-subtle);
+  overflow: hidden;
+}
+
+/* Gorilla experiment */
+.gorilla-grid {
+  display:grid; grid-template-columns: repeat(auto-fill, minmax(60px,1fr));
+  gap:6px; padding:20px;
+}
+.gorilla-item {
+  width:100%; aspect-ratio:1; border-radius:8px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:24px; cursor:pointer; transition:all 0.3s;
+  background: rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08);
+}
+.gorilla-item:hover { background:rgba(255,255,255,0.1); }
+.gorilla-item.found { background:rgba(56,200,176,0.2); border-color:var(--cyan); }
+
+/* Memory test */
+.memory-grid {
+  display:grid; grid-template-columns:repeat(4,1fr); gap:10px;
+}
+.memory-cell {
+  aspect-ratio:1; border-radius:12px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  font-size:20px; font-weight:700; transition:all 0.3s;
+  background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1);
+}
+.memory-cell.active { background:var(--gold-dim); border-color:var(--gold); color:var(--gold); }
+.memory-cell.correct { background:rgba(56,200,176,0.2); border-color:var(--cyan); color:var(--cyan); }
+.memory-cell.wrong { background:rgba(224,96,112,0.2); border-color:var(--rose); color:var(--rose); }
+
+/* Fade in utility */
+.fade-up { opacity:0; transform:translateY(40px); }
+.fade-left { opacity:0; transform:translateX(-40px); }
+.fade-right { opacity:0; transform:translateX(40px); }
+.scale-in { opacity:0; transform:scale(0.9); }
+
+/* Section dividers */
+.section-divider {
+  height:1px; margin:80px auto; max-width:200px;
+  background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+}
+
+/* Quiz styles */
+.quiz-option {
+  padding:16px 20px; border-radius:12px; cursor:pointer;
+  background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1);
+  transition:all 0.3s; margin-bottom:10px;
+}
+.quiz-option:hover { background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.2); }
+.quiz-option.selected { border-color:var(--gold); background:var(--gold-dim); }
+.quiz-option.correct { border-color:var(--cyan); background:rgba(56,200,176,0.15); }
+.quiz-option.incorrect { border-color:var(--rose); background:rgba(224,96,112,0.15); }
+
+/* Brain region highlight */
+.brain-region {
+  display:inline-block; padding:4px 12px; border-radius:8px;
+  font-size:14px; font-weight:500;
+}
+
+/* Wason cards */
+.wason-card {
+  width:80px; height:100px; border-radius:12px; cursor:pointer;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  background:rgba(255,255,255,0.05); border:2px solid rgba(255,255,255,0.15);
+  transition:all 0.3s; user-select:none;
+}
+.wason-card:hover { background:rgba(255,255,255,0.1); transform:translateY(-2px); }
+.wason-card.selected { border-color:var(--cyan); background:rgba(56,200,176,0.15); }
+.wason-card.correct-card { border-color:var(--cyan); background:rgba(56,200,176,0.2); box-shadow:0 0 16px rgba(56,200,176,0.3); }
+.wason-card.wrong-card { border-color:var(--rose); background:rgba(224,96,112,0.15); }
+
+/* Responsive */
+@media(max-width:768px) {
+  .chart-box { height:300px; }
+  .section-container { padding:0 16px; }
+  .insight-card { padding:20px; }
+  .stroop-word { font-size:20px; padding:6px 14px; }
+}
+
+/* Scroll indicator */
+.scroll-hint {
+  position:absolute; bottom:40px; left:50%; transform:translateX(-50%);
+  animation: bounce-down 2s ease-in-out infinite;
+}
+@keyframes bounce-down {
+  0%,100% { transform:translateX(-50%) translateY(0); opacity:0.6; }
+  50% { transform:translateX(-50%) translateY(10px); opacity:1; }
+}
+
+/* Knowledge card grid */
+.knowledge-grid {
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:20px;
+}
+
+/* Tooltip custom */
+.custom-tooltip {
+  background: rgba(15,16,41,0.95) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: 12px !important;
+  padding: 16px !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4) !important;
+}
+</style>
+</head>
+<body>
+<!-- Progress Bar -->
+<div id="progress-bar"></div>
+
+<!-- ========== HERO SECTION ========== -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="brain-glow"></div>
+  <!-- Neural particles -->
+  <div class="neural-dot" style="width:4px;height:4px;top:20%;left:15%;animation-delay:0s;"></div>
+  <div class="neural-dot" style="width:6px;height:6px;top:35%;left:80%;animation-delay:2s;"></div>
+  <div class="neural-dot" style="width:3px;height:3px;top:60%;left:25%;animation-delay:4s;"></div>
+  <div class="neural-dot" style="width:5px;height:5px;top:75%;left:70%;animation-delay:6s;"></div>
+  <div class="neural-dot" style="width:4px;height:4px;top:15%;left:55%;animation-delay:1s;"></div>
+  <div class="neural-dot" style="width:3px;height:3px;top:80%;left:40%;animation-delay:3s;"></div>
+  <div class="neural-dot" style="width:5px;height:5px;top:45%;left:90%;animation-delay:5s;"></div>
+
+  <div class="section-container text-center relative z-10">
+    <div id="hero-content">
+      <p class="mono text-xs tracking-[0.3em] uppercase mb-6" style="color:var(--gold);">Cognitive Psychology</p>
+      <h1 class="text-4xl md:text-6xl lg:text-7xl font-black leading-tight mb-6" style="background:linear-gradient(135deg,var(--text-primary),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
+        探索你大脑的秘密
+      </h1>
+      <p class="text-lg md:text-xl max-w-2xl mx-auto mb-4" style="color:var(--text-secondary);line-height:1.9;">
+        每一秒，你的大脑都在进行数十亿次运算。从看见一朵花到说出它的名字，从记住初恋到做出人生决策 —— 这些看似简单的行为背后，隐藏着令人惊叹的认知奥秘。
+      </p>
+      <p class="text-sm mb-10" style="color:var(--text-dim);">
+        基于《认知心理学：认知科学与你的生活》(第5版) · Kathleen M. Galotti 著
+      </p>
+      <div class="flex flex-wrap justify-center gap-3 mb-16">
+        <span class="chapter-pill">&#x1F9E0; 知觉</span>
+        <span class="chapter-pill">&#x1F441; 注意</span>
+        <span class="chapter-pill">&#x1F4BE; 记忆</span>
+        <span class="chapter-pill">&#x1F4AC; 语言</span>
+        <span class="chapter-pill">&#x1F4A1; 思维</span>
+        <span class="chapter-pill">&#x2696; 决策</span>
+      </div>
+    </div>
+    <div class="scroll-hint">
+      <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--gold);"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+      <p class="mono text-xs mt-2" style="color:var(--text-dim);">向下滚动开始探索</p>
+    </div>
+  </div>
+</section>
+
+<!-- ========== CH1: 认知心理学的诞生 ========== -->
+<section id="ch-history" class="py-24 md:py-32">
+  <div class="section-container">
+    <div class="content-narrow">
+      <div class="chapter-pill mb-6 fade-up">第一章</div>
+      <h2 class="text-3xl md:text-5xl font-bold mb-6 fade-up" style="color:var(--gold-light);">认知革命：<br>一门科学的诞生</h2>
+      <p class="text-base mb-8 fade-up" style="color:var(--text-secondary);">
+        在20世纪大部分时间里，行为主义统治着心理学。它认为只有可观察的行为才值得研究，"思维""意识"这样的概念被排斥在科学之外。直到一场革命改变了一切——认知革命让我们重新关注人的内心世界。
+      </p>
+    </div>
+
+    <!-- Timeline -->
+    <div class="content-narrow relative mt-12 mb-16" style="padding-left:0;">
+      <div class="timeline-line" style="left:24px;"></div>
+      <div class="timeline-node fade-left">
+        <p class="mono text-xs mb-1" style="color:var(--gold);">1879</p>
+        <h4 class="font-bold text-lg mb-1">结构主义 — 冯特</h4>
+        <p class="text-sm" style="color:var(--text-secondary);">建立第一个心理学实验室，试图用内省法分解意识的基本元素</p>
+      </div>
+      <div class="timeline-node fade-left">
+        <p class="mono text-xs mb-1" style="color:var(--blue-light);">1890s</p>
+        <h4 class="font-bold text-lg mb-1">机能主义 — 詹姆斯</h4>
+        <p class="text-sm" style="color:var(--text-secondary);">关注心理活动的目的和功能，而非结构本身</p>
+      </div>
+      <div class="timeline-node fade-left">
+        <p class="mono text-xs mb-1" style="color:var(--cyan);">1913</p>
+        <h4 class="font-bold text-lg mb-1">行为主义 — 华生</h4>
+        <p class="text-sm" style="color:var(--text-secondary);">宣称心理学应只研究可观察的行为，将"意识"逐出心理学</p>
+      </div>
+      <div class="timeline-node fade-left">
+        <p class="mono text-xs mb-1" style="color:var(--rose);">1911</p>
+        <h4 class="font-bold text-lg mb-1">格式塔心理学 — 韦特海默</h4>
+        <p class="text-sm" style="color:var(--text-secondary);">"整体大于部分之和"——知觉不是简单元素的拼凑</p>
+      </div>
+      <div class="timeline-node fade-left">
+        <p class="mono text-xs mb-1" style="color:var(--purple);">1956</p>
+        <h4 class="font-bold text-lg mb-1">认知革命 — 米勒、乔姆斯基等</h4>
+        <p class="text-sm" style="color:var(--text-secondary);">乔治·米勒发表"神奇数字7±2"，乔姆斯基挑战行为主义语言理论，认知科学诞生</p>
+      </div>
+    </div>
+
+    <!-- Insight card -->
+    <div class="content-narrow">
+      <div class="insight-card fade-up">
+        <p class="mono text-xs mb-3" style="color:var(--gold);">&#x26A1; 关键洞见</p>
+        <h3 class="text-xl font-bold mb-3">人是"有限能力加工者"</h3>
+        <p class="text-sm" style="color:var(--text-secondary);">
+          米勒的研究揭示，人在同一时刻能处理的信息数量是有限的——大约 <span class="mono" style="color:var(--gold);font-size:18px;font-weight:700;">7±2</span> 个单元。这意味着我们不能同时做太多事，认知资源是宝贵且有限的。这一发现开启了对人类信息加工局限性的系统研究。
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ========== CH2: 大脑 ========== -->
+<section id="ch-brain" class="py-24 md:py-32">
+  <div class="section-container">
+    <div class="content-narrow">
+      <div class="chapter-pill mb-6 fade-up">第二章</div>
+      <h2 class="text-3xl md:text-5xl font-bold mb-6 fade-up" style="color:var(--blue-light);">大脑：<br>1400克的宇宙</h2>
+      <p class="text-base mb-10 fade-up" style="color:var(--text-secondary);">
+        你的大脑只占体重的2%，却消耗了全身20%的能量。它由约860亿个神经元组成，每个神经元通过多达10000个突触与其他神经元相连——构成了宇宙中已知最复杂的网络。
+      </p>
+    </div>
+
+    <!-- Brain regions chart -->
+    <div class="content-narrow mb-12">
+      <div class="chart-box fade-up" id="chart-brain-regions"></div>
+      <p class="text-xs text-center mt-3" style="color:var(--text-dim);">大脑皮层四叶及其主要功能</p>
+    </div>
+
+    <!-- Brain imaging cards -->
+    <div class="knowledge-grid content-narrow mb-10">
+      <div class="insight-card scale-in">
+        <p class="text-sm font-bold mb-2" style="color:var(--blue-light);">结构成像</p>
+        <p class="mono text-xs mb-2" style="color:var(--gold);">CT · MRI</p>
+        <p class="text-sm" style="color:var(--text-secondary);">提供大脑解剖结构的静态"照片"，可以定位损伤区域</p>
+      </div>
+      <div class="insight-card scale-in">
+        <p class="text-sm font-bold mb-2" style="color:var(--cyan);">功能成像</p>
+        <p class="mono text-xs mb-2" style="color:var(--gold);">PET · fMRI</p>
+        <p class="text-sm" style="color:var(--text-secondary);">显示大脑活动时血流变化，揭示"哪个区域正在工作"</p>
+      </div>
+      <div class="insight-card scale-in">
+        <p class="text-sm font-bold mb-2" style="color:var(--purple);">电活动记录</p>
+        <p class="mono text-xs mb-2" style="color:var(--gold);">EEG · ERP · TMS</p>
+        <p class="text-sm" style="color:var(--text-secondary);">毫秒级精度捕捉大脑电信号变化，研究认知过程的时间进程</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ========== CH3: 知觉 ========== -->
+<section id="ch-perception" class="py-24 md:py-32">
+  <div class="section-container">
+    <div class="content-narrow">
+      <div class="chapter-pill mb-6 fade-up">第三章</div>
+      <h2 class="text-3xl md:text-5xl font-bold mb-6 fade-up" style="color:var(--cyan);">知觉：<br>你"看到"的不是真实</h2>
+      <p class="text-base mb-8 fade-up" style="color:var(--text-secondary);">
+        看见一棵树、认出一张脸——这些看似毫不费力的行为，背后隐藏着极其复杂的计算过程。你的大脑不是一台被动的摄像机，而是一个主动的"解释器"，它会根据经验、期望和上下文来"建构"你所看到的世界。
+      </p>
+    </div>
+
+    <!-- Gestalt principles interactive -->
+    <div class="content-narrow mb-12">
+      <h3 class="text-xl font-bold mb-6 fade-up">格式塔组织原则：大脑的"自动排版"</h3>
+      <div class="knowledge-grid">
+        <div class="experiment-box fade-up" style="text-align:center;">
+          <p class="text-sm font-bold mb-4" style="color:var(--cyan);">接近律</p>
+          <svg width="200" height="80" viewBox="0 0 200 80" class="mx-auto">
+            <circle cx="20" cy="40" r="6" fill="#38c8b0"/><circle cx="38" cy="40" r="6" fill="#38c8b0"/>
+            <circle cx="70" cy="40" r="6" fill="#38c8b0"/><circle cx="88" cy="40" r="6" fill="#38c8b0"/>
+            <circle cx="120" cy="40" r="6" fill="#38c8b0"/><circle cx="138" cy="40" r="6" fill="#38c8b0"/>
+            <circle cx="170" cy="40" r="6" fill="#38c8b0"/><circle cx="188" cy="40" r="6" fill="#38c8b0"/>
+          </svg>
+          <p class="text-xs mt-3" style="color:var(--text-dim);">靠得近的元素被自动归为一组</p>
+        </div>
+        <div class="experiment-box fade-up" style="text-align:center;">
+          <p class="text-sm font-bold mb-4" style="color:var(--cyan);">相似律</p>
+          <svg width="200" height="80" viewBox="0 0 200 80" class="mx-auto">
+            <circle cx="30" cy="25" r="6" fill="#e8a838"/><circle cx="70" cy="25" r="6" fill="#4a90d9"/><circle cx="110" cy="25" r="6" fill="#e8a838"/><circle cx="150" cy="25" r="6" fill="#4a90d9"/>
+            <circle cx="30" cy="55" r="6" fill="#e8a838"/><circle cx="70" cy="55" r="6" fill="#4a90d9"/><circle cx="110" cy="55" r="6" fill="#e8a838"/><circle cx="150" cy="55" r="6" fill="#4a90d9"/>
+          </svg>
+          <p class="text-xs mt-3" style="color:var(--text-dim);">相似的元素被自动归为一组</p>
+        </div>
+        <div class="experiment-box fade-up" style="text-align:center;">
+          <p class="text-sm font-bold mb-4" style="color:var(--cyan);">闭合律</p>
+          <svg width="200" height="80" viewBox="0 0 200 80" class="mx-auto">
+            <path d="M 60 15 L 140 15 L 140 65" stroke="#38c8b0" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            <path d="M 140 65 L 60 65 L 60 15" stroke="#38c8b0" stroke-width="2.5" fill="none" stroke-dasharray="6 8" stroke-linecap="round" opacity="0.4"/>
+          </svg>
+          <p class="text-xs mt-3" style="color:var(--text-dim);">大脑自动"补全"缺失部分</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom-up vs Top-down -->
+    <div class="content-narrow mb-10">
+      <div class="insight-card fade-up">
+        <div class="flex flex-col md:flex-row gap-8">
+          <div class="flex-1">
+            <p class="mono text-xs mb-2" style="color:var(--blue-light);">&#x2B06; 自下而上加工</p>
+            <p class="text-sm" style="color:var(--text-secondary);">从感觉输入的细节出发，逐步组合成整体知觉。就像拼拼图——先看到每一小块，再拼出完整的画面。</p>
+          </div>
+          <div style="width:1px;background:var(--border-subtle);"></div>
+          <div class="flex-1">
+            <p class="mono text-xs mb-2" style="color:var(--gold);">&#x2B07; 自上而下加工</p>
+            <p class="text-sm" style="color:var(--text-secondary);">你的知识、经验和期望引导着你"看见"什么。就像你走进熟悉的教室，不用仔细看就"知道"讲台在哪里。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ========== CH4: 注意 ========== -->
+<section id="ch-attention" class="py-24 md:py-32">
+  <div class="section-container">
+    <div class="content-narrow">
+      <div class="chapter-pill mb-6 fade-up">第四章</div>
+      <h2 class="text-3xl md:text-5xl font-bold mb-6 fade-up" style="color:var(--rose);">注意：<br>"看不见"的大猩猩</h2>
+      <p class="text-base mb-8 fade-up" style="color:var(--text-secondary);">
+        在一项著名实验中，被试被要求数一群人传球的次数。结果，竟有将近一半的人没有注意到一只"大猩猩"从画面中堂而皇之地走过！这就是"非注意盲视"——我们以为自己看到了一切，但事实远非如此。
+      </p>
+    </div>
+
+    <!-- Gorilla experiment interactive -->
+    <div class="content-narrow mb-12">
+      <div class="experiment-box fade-up" id="gorilla-experiment">
+        <p class="text-sm font-bold mb-2" style="color:var(--rose);">&#x1F9EA; 互动实验：找到隐藏的目标</p>
+        <p class="text-sm mb-4" style="color:var(--text-secondary);">在下面的网格中，快速数出所有 <span style="color:var(--gold);font-weight:700;">篮球 &#x1F3C0;</span> 的数量。数完后点击"揭示答案"。</p>
+        <div class="gorilla-grid" id="gorilla-grid"></div>
+        <div class="flex flex-wrap items-center gap-4 mt-4">
+          <button onclick="revealGorilla()" class="px-5 py-2 rounded-full text-sm font-bold transition-all" style="background:var(--gold-dim);color:var(--gold);border:1px solid var(--gold);" onmouseover="this.style.background='rgba(232,168,56,0.3)'" onmouseout="this.style.background='var(--gold-dim)'">揭示答案</button>
+          <p id="gorilla-result" class="text-sm" style="color:var(--text-secondary);"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stroop Effect -->
+    <div class="content-narrow mb-12">
+      <h3 class="text-xl font-bold mb-4 fade-up">斯特鲁普效应：当阅读成为"本能"</h3>
+      <p class="text-sm mb-6 fade-up" style="color:var(--text-secondary);">
+        下面每个词都用与其含义不同的颜色印刷。你的任务是说出<strong>文字的颜色</strong>，而不是读出文字本身。试试看——你会发现这比想象中困难得多！
+      </p>
+      <div class="experiment-box fade-up" id="stroop-box">
+        <div class="flex flex-wrap gap-3 justify-center mb-4" id="stroop-words"></div>
+        <div class="text-center">
+          <p class="text-xs" style="color:var(--text-dim);">点击一个词来查看正确答案</p>
+          <p id="stroop-feedback" class="text-sm mt-2 font-bold" style="min-height:24px;"></p>
+        </div>
+      </div>
+      <div class="insight-card mt-6 fade-up">
+        <p class="text-sm" style="color:var(--text-secondary);">
+          <span style="color:var(--rose);font-weight:700;">为什么这么难？</span> 对于受过教育的成人，阅读已经变成了自动化加工——不需要刻意努力就能完成。而说出颜色需要控制加工——需要你有意识地抑制自动化的阅读反应。这种冲突正是斯特鲁普效应的核心。
+        </p>
+      </div>
+    </div>
+
+    <!-- Attention chart -->
+    <div class="content-narrow">
+      <div class="chart-box fade-up" id="chart-attention"></div>
+      <p class="text-xs text-center mt-3" style="color:var(--text-dim);">非注意盲视实验：不同条件下注意到意外事件的被试百分比</p>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ========== CH5-6: 记忆 ========== -->
+<section id="ch-memory" class="py-24 md:py-32">
+  <div class="section-container">
+    <div class="content-narrow">
+      <div class="chapter-pill mb-6 fade-up">第五 · 六章</div>
+      <h2 class="text-3xl md:text-5xl font-bold mb-6 fade-up" style="color:var(--purple);">记忆：<br>你的大脑不是硬盘</h2>
+      <p class="text-base mb-8 fade-up" style="color:var(--text-secondary);">
+        我们总以为记忆就像录像带，忠实地记录下过去发生的一切。但认知心理学告诉我们：记忆是一个主动的"建构"过程——每次回忆，你都在重新"创造"那段经历。
+      </p>
+    </div>
+
+    <!-- Memory systems chart -->
+    <div class="content-narrow mb-12">
+      <div class="chart-box fade-up" id="chart-memory-systems"></div>
+      <p class="text-xs text-center mt-3" style="color:var(--text-dim);">记忆系统架构：从感觉登记到长时存储</p>
+    </div>
+
+    <!-- Memory test interactive -->
+    <div class="content-narrow mb-12">
+      <div class="experiment-box fade-up" id="memory-experiment">
+        <p class="text-sm font-bold mb-2" style="color:var(--purple);">&#x1F9EA; 互动实验：测试你的工作记忆</p>
+        <p class="text-sm mb-4" style="color:var(--text-secondary);">系统会依次亮起一些格子。请在所有格子亮完后，按照<strong>相同的顺序</strong>点击它们。准备好了吗？</p>
+        <div class="memory-grid mx-auto mb-4" id="memory-grid" style="max-width:280px;"></div>
+        <div class="flex flex-wrap items-center justify-center gap-4">
+          <button onclick="startMemoryTest()" id="memory-start-btn" class="px-5 py-2 rounded-full text-sm font-bold transition-all" style="background:rgba(144,104,208,0.15);color:var(--purple);border:1px solid var(--purple);">开始测试</button>
+          <p id="memory-status" class="text-sm mono" style="color:var(--text-secondary);">按 "开始测试" 启动</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Deep processing -->
+    <div class="content-narrow mb-10">
+      <h3 class="text-xl font-bold mb-4 fade-up">加工水平理论：怎样记得更牢？</h3>
+      <div class="chart-box fade-up" id="chart-processing-levels" style="height:320px;"></div>
+      <p class="text-xs text-center mt-3" style="color:var(--text-dim);">Craik & Tulving (1975)：不同加工深度对记忆保持的影响</p>
+    </div>
+
+    <!-- Flashbulb memory -->
+    <div class="content-narrow">
+      <div class="insight-card fade-up">
+        <p class="mono text-xs mb-3" style="color:var(--purple);">&#x1F4F8; 闪光灯记忆</p>
+        <h3 class="text-lg font-bold mb-3">你还记得听到重大新闻时的场景吗？</h3>
+        <p class="text-sm" style="color:var(--text-secondary);">
+          当你第一次得知某个震惊性事件（如9/11、地震）时，你不仅记住了事件本身，还清晰地记住了自己当时在哪里、和谁在一起、正在做什么。Brown和Kulick将这种现象称为"闪光灯记忆"——强烈的情绪反应会激活大脑的情绪中枢，使大量周边细节也被"照亮"并存储下来。
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ========== CH7-8: 知识与表象 ========== -->
+<section id="ch-knowledge" class="py-24 md:py-32">
+  <div class="section-container">
+    <div class="content-narrow">
+      <div class="chapter-pill mb-6 fade-up">第七 · 八章</div>
+      <h2 class="text-3xl md:text-5xl font-bold mb-6 fade-up" style="color:var(--gold-light);">知识表征：<br>思维的"地图"与"图像"</h2>
+      <p class="text-base mb-8 fade-up" style="color:var(--text-secondary);">
+        你的大脑如何"存放"关于世界的知识？当你想到"鸟"，你想到的是什么？当你想象旋转一个物体，大脑里发生了什么？知识表征与心理表象的研究揭示了思维的内在形式。
+      </p>
+    </div>
+
+    <div class="knowledge-grid content-narrow mb-12">
+      <div class="insight-card fade-up">
+        <p class="text-sm font-bold mb-3" style="color:var(--gold);">语义网络</p>
+        <p class="text-sm" style="color:var(--text-secondary);">概念通过关联相互连接：<br>"金丝雀 → 鸟 → 动物 → 有生命的"<br>激活一个概念会"扩散"到相关概念——这就是为什么看到"面包"会让你更快想到"黄油"。</p>
+      </div>
+      <div class="insight-card fade-up">
+        <p class="text-sm font-bold mb-3" style="color:var(--gold);">原型理论</p>
+        <p class="text-sm" style="color:var(--text-secondary);">你心中的"鸟"可能更像麻雀而非企鹅。我们用最"典型"的例子（原型）来代表一个类别，新事物通过与原型的相似度来归类。</p>
+      </div>
+      <div class="insight-card fade-up">
+        <p class="text-sm font-bold mb-3" style="color:var(--gold);">心理旋转</p>
+        <p class="text-sm" style="color:var(--text-secondary);">Shepard发现，判断两个旋转角度不同的图形是否相同时，角度差越大反应越慢——就好像大脑真的在"旋转"那个图像！</p>
+      </div>
+      <div class="insight-card fade-up">
+        <p class="text-sm font-bold mb-3" style="color:var(--gold);">认知地图</p>
+        <p class="text-sm" style="color:var(--text-secondary);">你能指出学校食堂的方向吗？大脑中的"认知地图"帮助你在空间中导航，但它并不总是准确的——我们常常系统性地"整理"空间布局。</p>
+      </div>
+    </div>
+
+    <!-- Mental rotation chart -->
+    <div class="content-narrow">
+      <div class="chart-box fade-up" id="chart-mental-rotation"></div>
+      <p class="text-xs text-center mt-3" style="color:var(--text-dim);">Shepard & Metzler 心理旋转实验：反应时间随角度线性增长</p>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ========== CH9: 语言 ========== -->
+<section id="ch-language" class="py-24 md:py-32">
+  <div class="section-container">
+    <div class="content-narrow">
+      <div class="chapter-pill mb-6 fade-up">第九章</div>
+      <h2 class="text-3xl md:text-5xl font-bold mb-6 fade-up" style="color:var(--blue-light);">语言：<br>最复杂的"软件"</h2>
+      <p class="text-base mb-8 fade-up" style="color:var(--text-secondary);">
+        一个4岁的孩子已经掌握了数千个词汇和复杂的语法规则，而最先进的AI系统至今仍难以完全理解自然语言。语言是人类最非凡的认知能力之一——它是规则驱动的、有产生性的，并且在很大程度上是自动运行的。
+      </p>
+    </div>
+
+    <!-- Language layers -->
+    <div class="content-narrow mb-12">
+      <div class="chart-box fade-up" id="chart-language-layers"></div>
+      <p class="text-xs text-center mt-3" style="color:var(--text-dim);">语言的层级结构：从声音到意义</p>
+    </div>
+
+    <div class="content-narrow">
+      <div class="insight-card fade-up">
+        <p class="mono text-xs mb-3" style="color:var(--blue-light);">&#x1F4A1; 乔姆斯基的挑战</p>
+        <h3 class="text-lg font-bold mb-3">"没人不会喜欢我"</h3>
+        <p class="text-sm" style="color:var(--text-secondary);">
+          一位母亲反复纠正孩子的语法错误，对话重复了8遍。孩子最后说："噢！没人不会喜欢我。"<br><br>
+          这个经典案例表明：语言习得不是简单的"模仿+强化"。儿童似乎天生就拥有一种"语言获取装置"，能够从有限的输入中提取出无限的语法规则——这正是乔姆斯基挑战行为主义的核心证据。
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ========== CH10-11: 思维与推理 ========== -->
+<section id="ch-thinking" class="py-24 md:py-32">
+  <div class="section-container">
+    <div class="content-narrow">
+      <div class="chapter-pill mb-6 fade-up">第十 · 十一章</div>
+      <h2 class="text-3xl md:text-5xl font-bold mb-6 fade-up" style="color:var(--cyan);">思维与推理：<br>聪明人也会犯蠢</h2>
+      <p class="text-base mb-8 fade-up" style="color:var(--text-secondary);">
+        人类是理性的吗？研究告诉我们：很大程度上不是。我们依赖捷径（启发式），容易被认知偏差所左右，在逻辑推理任务中频繁犯错。但这些"缺陷"也许正是大脑高效运作的代价。
+      </p>
+    </div>
+
+    <!-- Wason card task -->
+    <div class="content-narrow mb-12">
+      <div class="experiment-box fade-up" id="wason-experiment">
+        <p class="text-sm font-bold mb-3" style="color:var(--cyan);">&#x1F9EA; Wason 选择任务：你的逻辑有多好？</p>
+        <p class="text-sm mb-4" style="color:var(--text-secondary);">
+          桌上有4张卡片，每张一面是字母，另一面是数字。请判断：要验证规则 "<strong>如果一面是元音字母，则另一面是偶数</strong>"，你必须翻转哪些卡片？
+        </p>
+        <div class="flex flex-wrap justify-center gap-4 mb-4" id="wason-cards">
+          <div class="wason-card" data-card="A" onclick="toggleWason(this)">
+            <div class="text-3xl font-bold mb-1">A</div>
+            <div class="text-xs" style="color:var(--text-dim);">元音</div>
+          </div>
+          <div class="wason-card" data-card="D" onclick="toggleWason(this)">
+            <div class="text-3xl font-bold mb-1">D</div>
+            <div class="text-xs" style="color:var(--text-dim);">辅音</div>
+          </div>
+          <div class="wason-card" data-card="4" onclick="toggleWason(this)">
+            <div class="text-3xl font-bold mb-1">4</div>
+            <div class="text-xs" style="color:var(--text-dim);">偶数</div>
+          </div>
+          <div class="wason-card" data-card="7" onclick="toggleWason(this)">
+            <div class="text-3xl font-bold mb-1">7</div>
+            <div class="text-xs" style="color:var(--text-dim);">奇数</div>
+          </div>
+        </div>
+        <div class="text-center">
+          <button onclick="checkWason()" class="px-5 py-2 rounded-full text-sm font-bold transition-all" style="background:rgba(56,200,176,0.15);color:var(--cyan);border:1px solid var(--cyan);">检查答案</button>
+          <p id="wason-result" class="text-sm mt-3" style="min-height:48px;color:var(--text-secondary);"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cognitive biases chart -->
+    <div class="content-narrow mb-12">
+      <div class="chart-box fade-up" id="chart-biases"></div>
+      <p class="text-xs text-center mt-3" style="color:var(--text-dim);">常见认知偏差及其影响领域</p>
+    </div>
+
+    <div class="content-narrow">
+      <div class="insight-card fade-up">
+        <p class="mono text-xs mb-3" style="color:var(--cyan);">&#x1F52C; 内容效应</p>
+        <p class="text-sm" style="color:var(--text-secondary);">
+          同样结构的逻辑推理，换成"喝啤酒必须满19岁"的版本后，正确率从几乎0%飙升到75%！这说明我们的推理能力与内容密切相关——我们天生更擅长推理社会规则的违反，而非抽象的逻辑符号。进化心理学家认为，这是因为检测"社会欺骗"对我们祖先的生存至关重要。
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ========== CH12: 决策 ========== -->
+<section id="ch-decision" class="py-24 md:py-32">
+  <div class="section-container">
+    <div class="content-narrow">
+      <div class="chapter-pill mb-6 fade-up">第十二章</div>
+      <h2 class="text-3xl md:text-5xl font-bold mb-6 fade-up" style="color:var(--rose);">决策：<br>非理性的"理性人"</h2>
+      <p class="text-base mb-8 fade-up" style="color:var(--text-secondary);">
+        你以为自己每天做的决定都是理性的？事实上，我们的判断和选择受到大量"隐形力量"的操控——从框架效应到锚定效应，从可得性启发式到代表性启发式。了解这些偏差，是成为更好决策者的第一步。
+      </p>
+    </div>
+
+    <div class="content-narrow mb-12">
+      <div class="chart-box fade-up" id="chart-heuristics"></div>
+      <p class="text-xs text-center mt-3" style="color:var(--text-dim);">三大启发式策略：快速但容易出错的心理捷径</p>
+    </div>
+
+    <!-- Framing effect demo -->
+    <div class="content-narrow mb-10">
+      <div class="experiment-box fade-up" id="framing-demo">
+        <p class="text-sm font-bold mb-3" style="color:var(--rose);">&#x1F9EA; 框架效应体验</p>
+        <p class="text-sm mb-4" style="color:var(--text-secondary);">假设600人感染致命疾病，你必须选择一个方案：</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div class="quiz-option" onclick="selectFrame(this,'A')" id="frame-a">
+            <p class="font-bold mb-1" style="color:var(--gold);">方案A（正面框架）</p>
+            <p class="text-sm" style="color:var(--text-secondary);">"可以确定拯救200人"</p>
+          </div>
+          <div class="quiz-option" onclick="selectFrame(this,'B')" id="frame-b">
+            <p class="font-bold mb-1" style="color:var(--gold);">方案B（正面框架）</p>
+            <p class="text-sm" style="color:var(--text-secondary);">"1/3概率拯救全部600人，2/3概率无人获救"</p>
+          </div>
+        </div>
+        <p id="framing-result" class="text-sm" style="color:var(--text-secondary);min-height:60px;"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ========== CH13: 个体差异 ========== -->
+<section id="ch-individual" class="py-24 md:py-32">
+  <div class="section-container">
+    <div class="content-narrow">
+      <div class="chapter-pill mb-6 fade-up">第十三章</div>
+      <h2 class="text-3xl md:text-5xl font-bold mb-6 fade-up" style="color:var(--gold-light);">个体差异：<br>每个大脑都不同</h2>
+      <p class="text-base mb-8 fade-up" style="color:var(--text-secondary);">
+        认知能力并非千人一面。年龄、专业知识、认知风格甚至社会经济状况都会影响我们处理信息的方式。专家与新手的差异揭示了一个深刻事实：知识不仅仅是被存储的，它从根本上改变了大脑加工信息的方式。
+      </p>
+    </div>
+
+    <!-- Expert vs Novice chart -->
+    <div class="content-narrow mb-12">
+      <div class="chart-box fade-up" id="chart-expert-novice"></div>
+      <p class="text-xs text-center mt-3" style="color:var(--text-dim);">国际象棋实验：专家 vs 新手的记忆表现（棋子位置还原数量）</p>
+    </div>
+
+    <div class="knowledge-grid content-narrow">
+      <div class="insight-card fade-up">
+        <p class="text-sm font-bold mb-2" style="color:var(--gold);">专家的秘密</p>
+        <p class="text-sm" style="color:var(--text-secondary);">专家不是"记忆力更好"，而是能将信息组织成有意义的"组块"（chunks）。在随机棋局中，专家和新手的表现一样差。</p>
+      </div>
+      <div class="insight-card fade-up">
+        <p class="text-sm font-bold mb-2" style="color:var(--gold);">衰老与智慧</p>
+        <p class="text-sm" style="color:var(--text-secondary);">加工速度随年龄下降，但老年人可以通过"选择性最优补偿"策略弥补——钢琴家鲁宾斯坦80岁时仍保持高水平演奏。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ========== FINAL QUIZ ========== -->
+<section id="ch-quiz" class="py-24 md:py-32">
+  <div class="section-container">
+    <div class="content-narrow">
+      <div class="chapter-pill mb-6 fade-up" style="background:rgba(56,200,176,0.15);color:var(--cyan);">知识测验</div>
+      <h2 class="text-3xl md:text-5xl font-bold mb-6 fade-up" style="color:var(--cyan);">你学到了多少？</h2>
+      <p class="text-base mb-10 fade-up" style="color:var(--text-secondary);">回顾以上所有章节，来测试一下你对认知心理学核心概念的理解。</p>
+
+      <div id="quiz-container"></div>
+      <div class="text-center mt-8">
+        <button onclick="submitQuiz()" id="quiz-submit-btn" class="px-8 py-3 rounded-full text-base font-bold transition-all" style="background:rgba(56,200,176,0.15);color:var(--cyan);border:1px solid var(--cyan);">提交答案</button>
+        <p id="quiz-score" class="text-xl font-bold mt-6 mono" style="min-height:32px;"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== FOOTER ========== -->
+<footer class="py-16 text-center" style="border-top:1px solid var(--border-subtle);">
+  <div class="section-container content-narrow">
+    <p class="text-sm mb-3" style="color:var(--text-dim);">基于《认知心理学：认知科学与你的生活》(第5版)</p>
+    <p class="text-sm mb-3" style="color:var(--text-dim);">Kathleen M. Galotti 著 · 机械工业出版社</p>
+    <p class="mono text-xs mt-6" style="color:var(--text-dim);">&#x1F9E0; Cognitive Psychology Visual Experience</p>
+  </div>
+</footer>
+<script>
+// ========== PROGRESS BAR ==========
+window.addEventListener('scroll', () => {
+  const h = document.documentElement;
+  const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+  document.getElementById('progress-bar').style.width = pct + '%';
+});
+
+// ========== GSAP SCROLL ANIMATIONS ==========
+gsap.registerPlugin(ScrollTrigger);
+document.querySelectorAll('.fade-up').forEach(el => {
+  gsap.to(el, { opacity:1, y:0, duration:0.8, ease:'power2.out',
+    scrollTrigger:{ trigger:el, start:'top 88%', toggleActions:'play none none none' }
+  });
+});
+document.querySelectorAll('.fade-left').forEach(el => {
+  gsap.to(el, { opacity:1, x:0, duration:0.7, ease:'power2.out',
+    scrollTrigger:{ trigger:el, start:'top 88%', toggleActions:'play none none none' }
+  });
+});
+document.querySelectorAll('.fade-right').forEach(el => {
+  gsap.to(el, { opacity:1, x:0, duration:0.7, ease:'power2.out',
+    scrollTrigger:{ trigger:el, start:'top 88%', toggleActions:'play none none none' }
+  });
+});
+document.querySelectorAll('.scale-in').forEach(el => {
+  gsap.to(el, { opacity:1, scale:1, duration:0.7, ease:'back.out(1.5)',
+    scrollTrigger:{ trigger:el, start:'top 88%', toggleActions:'play none none none' }
+  });
+});
+
+// Hero entrance
+gsap.from('#hero-content', { opacity:0, y:60, duration:1.2, ease:'power3.out', delay:0.3 });
+
+// ========== ECHARTS THEME ==========
+const cTheme = {
+  bg: 'transparent',
+  textColor: 'rgba(232,228,222,0.6)',
+  gold: '#e8a838', blue: '#4a90d9', cyan: '#38c8b0',
+  rose: '#e06070', purple: '#9068d0', goldLight: '#f5c96a',
+  fontFamily: "'Noto Sans SC', sans-serif",
+  tooltipBg: 'rgba(15,16,41,0.95)',
+  gridLine: 'rgba(232,228,222,0.06)'
+};
+
+function makeTooltip() {
+  return {
+    backgroundColor: cTheme.tooltipBg,
+    borderColor: 'rgba(232,168,56,0.2)',
+    borderRadius: 12, padding: [12,16],
+    textStyle: { color: '#e8e4de', fontFamily: cTheme.fontFamily, fontSize: 13 }
+  };
+}
+
+function initChart(id, option) {
+  const dom = document.getElementById(id);
+  if (!dom) return null;
+  const chart = echarts.init(dom, null, { renderer: 'svg' });
+  chart.setOption(option);
+  // Scroll-triggered animation
+  ScrollTrigger.create({
+    trigger: dom, start: 'top 80%',
+    onEnter: () => chart.resize()
+  });
+  window.addEventListener('resize', () => chart.resize());
+  return chart;
+}
+
+// ========== CHART: Brain Regions ==========
+initChart('chart-brain-regions', {
+  tooltip: Object.assign(makeTooltip(), {
+    trigger: 'item',
+    formatter: p => `<div style="font-weight:700;margin-bottom:4px;">${p.name}</div><div style="font-size:12px;opacity:0.7;">${p.data.desc}</div>`
+  }),
+  series: [{
+    type: 'pie', radius: ['38%','68%'], center: ['50%','50%'],
+    padAngle: 3, itemStyle: { borderRadius: 8 },
+    label: { color: cTheme.textColor, fontFamily: cTheme.fontFamily, fontSize: 13,
+      formatter: '{b}\n{d}%' },
+    emphasis: { itemStyle: { shadowBlur: 20, shadowColor: 'rgba(232,168,56,0.3)' } },
+    data: [
+      { value:30, name:'额叶', desc:'运动控制、计划、推理、决策、人格', itemStyle:{color:cTheme.gold} },
+      { value:25, name:'顶叶', desc:'体感信息整合、空间定位', itemStyle:{color:cTheme.blue} },
+      { value:25, name:'颞叶', desc:'听觉加工、语言理解、记忆', itemStyle:{color:cTheme.cyan} },
+      { value:20, name:'枕叶', desc:'视觉信息加工（占皮层面积最大）', itemStyle:{color:cTheme.purple} }
+    ]
+  }]
+});
+
+// ========== CHART: Attention (Gorilla) ==========
+initChart('chart-attention', {
+  tooltip: Object.assign(makeTooltip(), { trigger:'axis',
+    formatter: ps => ps.map(p => `<span style="color:${p.color};">&#9679;</span> ${p.seriesName}：<b>${p.value}%</b>`).join('<br>')
+  }),
+  grid: { left:60, right:30, top:40, bottom:50 },
+  xAxis: { type:'category', data:['透明/白队','透明/黑队','不透明/白队','不透明/黑队'],
+    axisLabel:{color:cTheme.textColor, fontFamily:cTheme.fontFamily, fontSize:11},
+    axisLine:{lineStyle:{color:cTheme.gridLine}}, axisTick:{show:false} },
+  yAxis: { type:'value', max:100, name:'注意到(%)',
+    nameTextStyle:{color:cTheme.textColor, fontFamily:cTheme.fontFamily},
+    axisLabel:{color:cTheme.textColor, formatter:'{value}%'},
+    splitLine:{lineStyle:{color:cTheme.gridLine}}, axisLine:{show:false} },
+  series: [
+    { name:'撑伞女人', type:'bar', data:[58,33,62,50], barWidth:28,
+      itemStyle:{color:cTheme.rose, borderRadius:[6,6,0,0]} },
+    { name:'大猩猩', type:'bar', data:[42,25,58,42], barWidth:28,
+      itemStyle:{color:cTheme.purple, borderRadius:[6,6,0,0]} }
+  ]
+});
+
+// ========== CHART: Memory Systems ==========
+initChart('chart-memory-systems', {
+  tooltip: Object.assign(makeTooltip(), { trigger:'item' }),
+  series: [{
+    type: 'sankey', layoutIterations: 32, nodeAlign: 'left',
+    nodeWidth: 20, nodeGap: 14,
+    lineStyle: { color: 'gradient', curveness: 0.5, opacity: 0.3 },
+    emphasis: { lineStyle: { opacity: 0.6 } },
+    label: { color: cTheme.textColor, fontFamily: cTheme.fontFamily, fontSize: 12 },
+    data: [
+      {name:'环境刺激',itemStyle:{color:cTheme.textColor}},
+      {name:'感觉记忆',itemStyle:{color:cTheme.rose}},
+      {name:'工作记忆',itemStyle:{color:cTheme.gold}},
+      {name:'长时记忆',itemStyle:{color:cTheme.purple}},
+      {name:'遗忘',itemStyle:{color:'rgba(232,228,222,0.15)'}},
+      {name:'陈述性记忆',itemStyle:{color:cTheme.blue}},
+      {name:'程序性记忆',itemStyle:{color:cTheme.cyan}}
+    ],
+    links: [
+      {source:'环境刺激',target:'感觉记忆',value:10},
+      {source:'感觉记忆',target:'工作记忆',value:6},
+      {source:'感觉记忆',target:'遗忘',value:4},
+      {source:'工作记忆',target:'长时记忆',value:4},
+      {source:'工作记忆',target:'遗忘',value:2},
+      {source:'长时记忆',target:'陈述性记忆',value:2},
+      {source:'长时记忆',target:'程序性记忆',value:2}
+    ]
+  }]
+});
+
+// ========== CHART: Processing Levels ==========
+initChart('chart-processing-levels', {
+  tooltip: Object.assign(makeTooltip(), { trigger:'axis',
+    formatter: ps => `<div style="font-weight:700;margin-bottom:4px;">${ps[0].name}</div>` +
+      ps.map(p => `<span style="color:${p.color};">&#9679;</span> 再认正确率：<b>${p.value}%</b>`).join('<br>')
+  }),
+  grid: { left:60, right:30, top:30, bottom:50 },
+  xAxis: { type:'category', data:['物理加工\n(大小写判断)','语音加工\n(押韵判断)','语义加工\n(句子填充)'],
+    axisLabel:{color:cTheme.textColor, fontFamily:cTheme.fontFamily, fontSize:11, lineHeight:18},
+    axisLine:{lineStyle:{color:cTheme.gridLine}}, axisTick:{show:false} },
+  yAxis: { type:'value', max:100, name:'再认率(%)',
+    nameTextStyle:{color:cTheme.textColor, fontFamily:cTheme.fontFamily},
+    axisLabel:{color:cTheme.textColor, formatter:'{value}%'},
+    splitLine:{lineStyle:{color:cTheme.gridLine}}, axisLine:{show:false} },
+  series: [{
+    type:'bar', data:[
+      {value:18, itemStyle:{color:'rgba(232,228,222,0.25)'}},
+      {value:50, itemStyle:{color:cTheme.blue}},
+      {value:80, itemStyle:{color:cTheme.gold}}
+    ],
+    barWidth:50, itemStyle:{borderRadius:[8,8,0,0]},
+    label:{show:true, position:'top', color:cTheme.textColor, fontFamily:cTheme.fontFamily, formatter:'{c}%'}
+  }]
+});
+
+// ========== CHART: Mental Rotation ==========
+initChart('chart-mental-rotation', {
+  tooltip: Object.assign(makeTooltip(), { trigger:'axis',
+    formatter: ps => `角度差：${ps[0].name}°<br>反应时间：<b>${ps[0].value} ms</b>`
+  }),
+  grid: { left:70, right:30, top:30, bottom:50 },
+  xAxis: { type:'category', name:'角度差 (°)',
+    nameTextStyle:{color:cTheme.textColor, fontFamily:cTheme.fontFamily},
+    data:['0','20','40','60','80','100','120','140','160','180'],
+    axisLabel:{color:cTheme.textColor}, axisLine:{lineStyle:{color:cTheme.gridLine}}, axisTick:{show:false} },
+  yAxis: { type:'value', name:'反应时间 (ms)',
+    nameTextStyle:{color:cTheme.textColor, fontFamily:cTheme.fontFamily},
+    axisLabel:{color:cTheme.textColor}, splitLine:{lineStyle:{color:cTheme.gridLine}}, axisLine:{show:false} },
+  series: [{
+    type:'line', smooth:true, symbol:'circle', symbolSize:8,
+    data:[1000,1200,1500,1800,2200,2600,3100,3500,4000,4500],
+    lineStyle:{color:cTheme.gold, width:3},
+    itemStyle:{color:cTheme.gold},
+    areaStyle:{ color: new echarts.graphic.LinearGradient(0,0,0,1,[
+      {offset:0,color:'rgba(232,168,56,0.2)'},{offset:1,color:'rgba(232,168,56,0)'}
+    ])}
+  }]
+});
+
+// ========== CHART: Language Layers ==========
+initChart('chart-language-layers', {
+  tooltip: Object.assign(makeTooltip(), { trigger:'item',
+    formatter: p => `<div style="font-weight:700;margin-bottom:4px;">${p.name}</div><div style="font-size:12px;opacity:0.7;">${p.data.desc}</div>`
+  }),
+  series: [{
+    type:'funnel', left:'15%', right:'15%', top:20, bottom:20,
+    width:'70%', sort:'ascending', gap:4,
+    label:{ color:'#fff', fontFamily:cTheme.fontFamily, fontSize:14, fontWeight:700 },
+    data:[
+      {value:20,name:'音素 (声音)',desc:'语言的最小声音单元，英语约40个音素',itemStyle:{color:cTheme.purple}},
+      {value:40,name:'词素 (意义单元)',desc:'最小的有意义单元：词根、前缀、后缀',itemStyle:{color:cTheme.blue}},
+      {value:60,name:'句法 (语法结构)',desc:'规则系统掌控词语如何组合成合法句子',itemStyle:{color:cTheme.cyan}},
+      {value:80,name:'语义 (意义)',desc:'句子和词语表达的含义',itemStyle:{color:cTheme.gold}},
+      {value:100,name:'语用 (交流情境)',desc:'语言在真实社交情境中的使用规则',itemStyle:{color:cTheme.rose}}
+    ]
+  }]
+});
+
+// ========== CHART: Cognitive Biases ==========
+initChart('chart-biases', {
+  tooltip: Object.assign(makeTooltip(), { trigger:'axis',
+    formatter: ps => `<div style="font-weight:700;margin-bottom:4px;">${ps[0].name}</div>` +
+      ps.map(p => `<span style="color:${p.color};">&#9679;</span> ${p.seriesName}：<b>${p.value}</b>`).join('<br>')
+  }),
+  grid: { left:120, right:30, top:30, bottom:30 },
+  yAxis: { type:'category',
+    data:['证实偏见','锚定效应','可得性启发','代表性启发','框架效应','后见之明偏差'],
+    axisLabel:{color:cTheme.textColor, fontFamily:cTheme.fontFamily, fontSize:12},
+    axisLine:{show:false}, axisTick:{show:false} },
+  xAxis: { type:'value', name:'影响程度', max:10,
+    nameTextStyle:{color:cTheme.textColor, fontFamily:cTheme.fontFamily},
+    axisLabel:{show:false}, splitLine:{lineStyle:{color:cTheme.gridLine}}, axisLine:{show:false} },
+  series: [{
+    name:'日常决策', type:'bar',
+    data:[9,8,8,7,9,7],
+    barWidth:16, itemStyle:{borderRadius:[0,8,8,0],
+      color: new echarts.graphic.LinearGradient(0,0,1,0,[
+        {offset:0,color:'rgba(224,96,112,0.3)'},{offset:1,color:cTheme.rose}
+      ])}
+  }]
+});
+
+// ========== CHART: Heuristics ==========
+initChart('chart-heuristics', {
+  tooltip: Object.assign(makeTooltip(), { trigger:'item',
+    formatter: p => `<div style="font-weight:700;margin-bottom:4px;">${p.name}</div><div style="font-size:12px;opacity:0.7;">${p.data.desc}</div>`
+  }),
+  radar: {
+    indicator:[
+      {name:'使用频率',max:10},{name:'速度',max:10},{name:'准确性',max:10},
+      {name:'意识程度',max:10},{name:'可纠正性',max:10}
+    ],
+    axisName:{color:cTheme.textColor, fontFamily:cTheme.fontFamily, fontSize:12},
+    splitLine:{lineStyle:{color:cTheme.gridLine}},
+    splitArea:{show:false},
+    axisLine:{lineStyle:{color:cTheme.gridLine}}
+  },
+  series:[{
+    type:'radar',
+    data:[
+      {value:[9,9,4,2,3],name:'可得性启发',desc:'根据容易想到的例子来判断频率/概率',
+        lineStyle:{color:cTheme.rose}, itemStyle:{color:cTheme.rose}, areaStyle:{color:'rgba(224,96,112,0.15)'}},
+      {value:[8,8,5,3,4],name:'代表性启发',desc:'根据事物与典型案例的相似度来判断',
+        lineStyle:{color:cTheme.gold}, itemStyle:{color:cTheme.gold}, areaStyle:{color:'rgba(232,168,56,0.15)'}},
+      {value:[7,7,6,4,5],name:'锚定与调整',desc:'以初始值为锚点进行不充分调整',
+        lineStyle:{color:cTheme.blue}, itemStyle:{color:cTheme.blue}, areaStyle:{color:'rgba(74,144,217,0.15)'}}
+    ]
+  }]
+});
+
+// ========== CHART: Expert vs Novice ==========
+initChart('chart-expert-novice', {
+  tooltip: Object.assign(makeTooltip(), { trigger:'axis',
+    formatter: ps => `<div style="font-weight:700;margin-bottom:4px;">${ps[0].name}</div>` +
+      ps.map(p => `<span style="color:${p.color};">&#9679;</span> ${p.seriesName}：<b>${p.value} 枚棋子</b>`).join('<br>')
+  }),
+  grid: { left:60, right:30, top:40, bottom:50 },
+  xAxis: { type:'category', data:['真实棋局','随机棋局'],
+    axisLabel:{color:cTheme.textColor, fontFamily:cTheme.fontFamily, fontSize:14},
+    axisLine:{lineStyle:{color:cTheme.gridLine}}, axisTick:{show:false} },
+  yAxis: { type:'value', max:20, name:'复现棋子数',
+    nameTextStyle:{color:cTheme.textColor, fontFamily:cTheme.fontFamily},
+    axisLabel:{color:cTheme.textColor}, splitLine:{lineStyle:{color:cTheme.gridLine}}, axisLine:{show:false} },
+  series:[
+    { name:'国际象棋大师', type:'bar', data:[16,3], barWidth:40,
+      itemStyle:{color:cTheme.gold, borderRadius:[8,8,0,0]},
+      label:{show:true, position:'top', color:cTheme.gold, fontFamily:cTheme.fontFamily, fontWeight:700} },
+    { name:'新手', type:'bar', data:[5,2.5], barWidth:40,
+      itemStyle:{color:'rgba(232,228,222,0.25)', borderRadius:[8,8,0,0]},
+      label:{show:true, position:'top', color:cTheme.textColor, fontFamily:cTheme.fontFamily} }
+  ]
+});
+
+// ========== GORILLA EXPERIMENT ==========
+(function(){
+  const grid = document.getElementById('gorilla-grid');
+  const items = [];
+  const emojis = ['&#x1F3C0;','&#x26BD;','&#x1F3BE;','&#x1F3C8;','&#x26BE;'];
+  let basketballs = 0;
+  let gorillaIdx = -1;
+  for(let i=0;i<36;i++){
+    let emoji;
+    if(i===22){ emoji='&#x1F98D;'; gorillaIdx=i; }
+    else if(Math.random()<0.22){ emoji='&#x1F3C0;'; basketballs++; }
+    else { emoji=emojis[Math.floor(Math.random()*emojis.length)]; if(emoji==='&#x1F3C0;') basketballs++; }
+    items.push(emoji);
+  }
+  items.forEach((e,i) => {
+    const d = document.createElement('div');
+    d.className = 'gorilla-item';
+    d.innerHTML = e;
+    d.dataset.idx = i;
+    grid.appendChild(d);
+  });
+  window.gorillaCount = basketballs;
+  window.gorillaIdx = gorillaIdx;
+})();
+
+function revealGorilla(){
+  const items = document.querySelectorAll('.gorilla-item');
+  items[window.gorillaIdx].classList.add('found');
+  items[window.gorillaIdx].style.transform = 'scale(1.2)';
+  items[window.gorillaIdx].style.fontSize = '30px';
+  document.getElementById('gorilla-result').innerHTML =
+    `篮球数量：<b style="color:var(--gold);">${window.gorillaCount}</b> 个。但你注意到那只 <span style="color:var(--cyan);font-weight:700;">大猩猩 &#x1F98D;</span> 了吗？<br><span style="font-size:12px;opacity:0.7;">这就是非注意盲视——当你专注于计数时，显眼的异常目标也可能被完全忽略。</span>`;
+}
+
+// ========== STROOP EFFECT ==========
+(function(){
+  const words = [
+    {text:'红色',color:'#4a90d9',colorName:'蓝色'},
+    {text:'绿色',color:'#e06070',colorName:'红色'},
+    {text:'蓝色',color:'#38c8b0',colorName:'青色'},
+    {text:'黄色',color:'#9068d0',colorName:'紫色'},
+    {text:'紫色',color:'#e8a838',colorName:'金色'},
+    {text:'红色',color:'#38c8b0',colorName:'青色'},
+    {text:'蓝色',color:'#e06070',colorName:'红色'},
+    {text:'绿色',color:'#e8a838',colorName:'金色'}
+  ];
+  const container = document.getElementById('stroop-words');
+  words.forEach(w => {
+    const el = document.createElement('span');
+    el.className = 'stroop-word';
+    el.style.color = w.color;
+    el.textContent = w.text;
+    el.onclick = () => {
+      document.getElementById('stroop-feedback').innerHTML =
+        `正确答案：文字颜色是 <span style="color:${w.color};font-weight:700;">${w.colorName}</span>（不是"${w.text}"！）`;
+    };
+    container.appendChild(el);
+  });
+})();
+
+// ========== MEMORY TEST ==========
+let memorySequence=[], memoryInput=[], memoryLevel=3, memoryPlaying=false;
+(function(){
+  const grid = document.getElementById('memory-grid');
+  for(let i=0;i<16;i++){
+    const cell = document.createElement('div');
+    cell.className = 'memory-cell';
+    cell.dataset.idx = i;
+    cell.textContent = i+1;
+    cell.onclick = () => memoryClick(i);
+    grid.appendChild(cell);
+  }
+})();
+
+function startMemoryTest(){
+  if(memoryPlaying) return;
+  memoryPlaying = true;
+  memoryInput = [];
+  memorySequence = [];
+  const cells = document.querySelectorAll('.memory-cell');
+  cells.forEach(c => { c.className='memory-cell'; });
+  document.getElementById('memory-status').textContent = `等级 ${memoryLevel-2}：记住 ${memoryLevel} 个位置...`;
+  document.getElementById('memory-start-btn').style.opacity = '0.5';
+  // Generate sequence
+  const used = new Set();
+  while(memorySequence.length < memoryLevel){
+    const r = Math.floor(Math.random()*16);
+    if(!used.has(r)){ used.add(r); memorySequence.push(r); }
+  }
+  // Show sequence
+  let delay = 0;
+  memorySequence.forEach((idx,i) => {
+    setTimeout(()=>{
+      cells[idx].classList.add('active');
+      setTimeout(()=>cells[idx].classList.remove('active'), 600);
+    }, delay);
+    delay += 800;
+  });
+  setTimeout(()=>{
+    document.getElementById('memory-status').textContent = '现在按顺序点击！';
+  }, delay);
+}
+
+function memoryClick(idx){
+  if(!memoryPlaying) return;
+  const pos = memoryInput.length;
+  if(pos >= memorySequence.length) return;
+  const cells = document.querySelectorAll('.memory-cell');
+  memoryInput.push(idx);
+  if(idx === memorySequence[pos]){
+    cells[idx].classList.add('correct');
+    if(memoryInput.length === memorySequence.length){
+      memoryPlaying = false;
+      memoryLevel = Math.min(memoryLevel+1, 9);
+      document.getElementById('memory-status').innerHTML = `<span style="color:var(--cyan);">&#x2705; 全部正确！工作记忆广度 ≥ ${memoryInput.length}</span>`;
+      document.getElementById('memory-start-btn').style.opacity = '1';
+      document.getElementById('memory-start-btn').textContent = '下一轮（更难）';
+    }
+  } else {
+    cells[idx].classList.add('wrong');
+    memoryPlaying = false;
+    document.getElementById('memory-status').innerHTML = `<span style="color:var(--rose);">&#x274C; 错误！你的工作记忆广度约为 ${pos} 个单元</span>`;
+    document.getElementById('memory-start-btn').style.opacity = '1';
+    memoryLevel = 3;
+    document.getElementById('memory-start-btn').textContent = '重新开始';
+    // Show correct
+    memorySequence.forEach(s => cells[s].classList.add('active'));
+  }
+}
+
+// ========== WASON CARD TASK ==========
+function toggleWason(el){
+  el.classList.toggle('selected');
+}
+function checkWason(){
+  const cards = document.querySelectorAll('.wason-card');
+  const selected = new Set();
+  cards.forEach(c => { if(c.classList.contains('selected')) selected.add(c.dataset.card); });
+  const correct = new Set(['A','7']);
+  cards.forEach(c => {
+    c.classList.remove('correct-card','wrong-card');
+    if(correct.has(c.dataset.card)) c.classList.add('correct-card');
+    else if(selected.has(c.dataset.card)) c.classList.add('wrong-card');
+  });
+  const isCorrect = selected.size===2 && selected.has('A') && selected.has('7');
+  const resultEl = document.getElementById('wason-result');
+  if(isCorrect){
+    resultEl.innerHTML = '<span style="color:var(--cyan);font-weight:700;">&#x2705; 完全正确！</span><br><span style="font-size:12px;">你需要翻A（验证元音背面是否为偶数 — 肯定式）和7（验证奇数背面是否为元音 — 否定式）。大多数人会错选4，这犯了"肯定结论"的逻辑谬误。</span>';
+  } else {
+    resultEl.innerHTML = '<span style="color:var(--rose);font-weight:700;">&#x274C; 不太对！</span><br><span style="font-size:12px;">正确答案是 <b>A</b> 和 <b>7</b>。翻A是验证"元音→偶数"；翻7是验证"非偶数→非元音"（否定式）。翻4是"肯定结论"谬误，翻D是"否定前提"谬误。研究中几乎没人能一次做对！</span>';
+  }
+}
+
+// ========== FRAMING EFFECT ==========
+function selectFrame(el, choice){
+  document.querySelectorAll('#framing-demo .quiz-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  const result = document.getElementById('framing-result');
+  if(choice==='A'){
+    result.innerHTML = '你选了确定方案。<span style="color:var(--rose);font-weight:700;">在正面框架下，约72%的人做出同样的选择。</span><br><br><span style="font-size:12px;">但如果换成负面框架："方案C：400人确定死亡" vs "方案D：1/3概率无人死亡，2/3概率600人全部死亡"——大多数人会选冒险的方案D！<br><br>两种表述在数学上完全等价，但"框架"不同就导致了截然相反的选择。这就是Tversky和Kahneman发现的框架效应。</span>';
+  } else {
+    result.innerHTML = '你选了冒险方案。<span style="color:var(--rose);font-weight:700;">在正面框架下，只有约28%的人做出这个选择。</span><br><br><span style="font-size:12px;">有趣的是，当换成负面框架表述时，冒险选项反而成了多数人的选择。同样的数学期望值，仅仅因为措辞不同，决策就发生了翻转。</span>';
+  }
+}
+
+// ========== QUIZ ==========
+const quizData = [
+  { q:'乔治·米勒发现的"神奇数字"是什么？', opts:['3±1','5±2','7±2','9±3'], ans:2 },
+  { q:'斯特鲁普效应揭示了哪种加工之间的冲突？', opts:['感觉 vs 知觉','自动化加工 vs 控制加工','短时记忆 vs 长时记忆','左脑 vs 右脑'], ans:1 },
+  { q:'格式塔心理学的核心观点是什么？', opts:['行为是刺激的反应','整体大于部分之和','意识可以分解为基本元素','思维等同于肌肉运动'], ans:1 },
+  { q:'加工水平理论认为，哪种加工能产生最好的记忆效果？', opts:['物理加工','重复背诵','语音加工','语义加工（深加工）'], ans:3 },
+  { q:'Wason选择任务中，正确答案是翻转哪两张卡片？', opts:['A 和 4','A 和 7','D 和 4','D 和 7'], ans:1 },
+  { q:'在国际象棋实验中，专家和新手在什么条件下表现相同？', opts:['真实棋局','随机棋局','简单棋局','速棋比赛'], ans:1 },
+  { q:'非注意盲视实验中，被试没注意到什么？', opts:['球的颜色变化','一位穿大猩猩服装的人','背景音乐停止','有人摔倒'], ans:1 },
+  { q:'闪光灯记忆与什么因素密切相关？', opts:['重复次数','强烈的情绪反应','睡眠时间','智力水平'], ans:1 }
+];
+
+(function(){
+  const container = document.getElementById('quiz-container');
+  quizData.forEach((item, qi) => {
+    const div = document.createElement('div');
+    div.className = 'mb-8 fade-up';
+    div.innerHTML = `<p class="font-bold mb-3" style="color:var(--text-primary);">${qi+1}. ${item.q}</p>`;
+    item.opts.forEach((opt, oi) => {
+      const optDiv = document.createElement('div');
+      optDiv.className = 'quiz-option';
+      optDiv.textContent = opt;
+      optDiv.onclick = () => {
+        div.querySelectorAll('.quiz-option').forEach(o => o.classList.remove('selected'));
+        optDiv.classList.add('selected');
+        optDiv.dataset.chosen = oi;
+      };
+      optDiv.dataset.qi = qi;
+      optDiv.dataset.oi = oi;
+      div.appendChild(optDiv);
+    });
+    container.appendChild(div);
+  });
+  // Apply GSAP to new elements
+  container.querySelectorAll('.fade-up').forEach(el => {
+    gsap.to(el, { opacity:1, y:0, duration:0.8, ease:'power2.out',
+      scrollTrigger:{ trigger:el, start:'top 88%' }
+    });
+  });
+})();
+
+function submitQuiz(){
+  let score = 0;
+  const container = document.getElementById('quiz-container');
+  quizData.forEach((item, qi) => {
+    const qDiv = container.children[qi];
+    const options = qDiv.querySelectorAll('.quiz-option');
+    let chosen = -1;
+    options.forEach((o,oi) => {
+      o.classList.remove('correct','incorrect');
+      if(o.classList.contains('selected')) chosen = oi;
+    });
+    if(chosen === item.ans){ score++; options[chosen].classList.add('correct'); }
+    else {
+      if(chosen >= 0) options[chosen].classList.add('incorrect');
+      options[item.ans].classList.add('correct');
+    }
+  });
+  const pct = Math.round(score/quizData.length*100);
+  let msg = '';
+  if(pct>=90) msg='认知心理学大师！';
+  else if(pct>=70) msg='很好的理解力！';
+  else if(pct>=50) msg='不错，继续学习！';
+  else msg='再回顾一下吧！';
+  document.getElementById('quiz-score').innerHTML =
+    `<span style="color:var(--cyan);">${score}/${quizData.length}</span> <span style="color:var(--text-secondary);font-size:16px;">(${pct}%) ${msg}</span>`;
+}
+</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"75124c326cb447fe934cde04713ae013","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>

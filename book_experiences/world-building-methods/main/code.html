@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>构造世界的多种方式 - 沉浸式科普体验</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+/* === RESET & BASE === */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; overflow-x: hidden; }
+body { font-family: 'Noto Sans SC', sans-serif; background: #0a0a0f; color: #e8e6e3; line-height: 1.8; overflow-x: hidden; }
+
+/* === CUSTOM SCROLLBAR === */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0a0a0f; }
+::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #667eea, #764ba2); border-radius: 3px; }
+
+/* === HERO SECTION === */
+.hero { position: relative; height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.hero-bg { position: absolute; inset: 0; }
+.hero-bg canvas { width: 100%; height: 100%; }
+.hero-content { position: relative; z-index: 2; text-align: center; padding: 0 2rem; max-width: 900px; }
+.hero-subtitle { font-size: clamp(0.85rem, 1.5vw, 1.1rem); letter-spacing: 0.4em; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 1.5rem; font-weight: 300; }
+.hero-title { font-family: 'Noto Serif SC', serif; font-size: clamp(2.2rem, 5vw, 4.5rem); font-weight: 900; line-height: 1.25; background: linear-gradient(135deg, #fff 0%, #c4b5fd 50%, #818cf8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 1.5rem; }
+.hero-author { font-size: 1rem; color: rgba(255,255,255,0.45); margin-bottom: 2.5rem; letter-spacing: 0.15em; }
+.hero-desc { font-size: clamp(0.95rem, 1.5vw, 1.15rem); color: rgba(255,255,255,0.6); line-height: 2; max-width: 650px; margin: 0 auto 3rem; }
+.scroll-hint { position: absolute; bottom: 3rem; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 0.5rem; color: rgba(255,255,255,0.3); font-size: 0.8rem; letter-spacing: 0.15em; animation: float 3s ease-in-out infinite; }
+.scroll-hint svg { width: 24px; height: 24px; stroke: rgba(255,255,255,0.3); }
+@keyframes float { 0%,100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(-10px); } }
+
+/* === NAVIGATION DOTS === */
+.nav-dots { position: fixed; right: 2rem; top: 50%; transform: translateY(-50%); z-index: 100; display: flex; flex-direction: column; gap: 1rem; }
+.nav-dot { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.3); background: transparent; cursor: pointer; transition: all 0.4s ease; position: relative; }
+.nav-dot.active { background: #818cf8; border-color: #818cf8; transform: scale(1.3); }
+.nav-dot:hover { border-color: #818cf8; }
+.nav-dot-label { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); white-space: nowrap; font-size: 0.7rem; color: rgba(255,255,255,0.6); opacity: 0; transition: opacity 0.3s; pointer-events: none; background: rgba(0,0,0,0.7); padding: 2px 8px; border-radius: 4px; }
+.nav-dot:hover .nav-dot-label { opacity: 1; }
+
+/* === SECTION BASE === */
+.section { min-height: 100vh; padding: 8rem 2rem; position: relative; }
+.section-inner { max-width: 1100px; margin: 0 auto; }
+.section-number { font-size: 0.75rem; letter-spacing: 0.3em; color: rgba(255,255,255,0.25); text-transform: uppercase; margin-bottom: 1rem; }
+.section-title { font-family: 'Noto Serif SC', serif; font-size: clamp(1.8rem, 3.5vw, 2.8rem); font-weight: 700; margin-bottom: 1rem; line-height: 1.35; }
+.section-lead { font-size: clamp(1rem, 1.5vw, 1.15rem); color: rgba(255,255,255,0.55); max-width: 700px; margin-bottom: 3.5rem; line-height: 2; }
+
+/* === GRADIENT TEXT UTILITIES === */
+.grad-purple { background: linear-gradient(135deg, #c4b5fd, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.grad-blue { background: linear-gradient(135deg, #93c5fd, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.grad-green { background: linear-gradient(135deg, #86efac, #22c55e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.grad-amber { background: linear-gradient(135deg, #fcd34d, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.grad-rose { background: linear-gradient(135deg, #fda4af, #e11d48); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.grad-cyan { background: linear-gradient(135deg, #67e8f9, #06b6d4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.grad-orange { background: linear-gradient(135deg, #fdba74, #ea580c); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+/* === CARD GRID === */
+.card-grid { display: grid; gap: 1.5rem; }
+.card-grid-2 { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+.card-grid-3 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+
+/* === GLASS CARD === */
+.glass-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 2rem; transition: all 0.5s cubic-bezier(0.4,0,0.2,1); position: relative; overflow: hidden; }
+.glass-card:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.12); transform: translateY(-4px); }
+.glass-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); }
+.card-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.2rem; font-size: 1.4rem; }
+.card-title { font-family: 'Noto Serif SC', serif; font-size: 1.15rem; font-weight: 600; margin-bottom: 0.8rem; }
+.card-text { font-size: 0.9rem; color: rgba(255,255,255,0.5); line-height: 1.9; }
+
+/* === INTERACTIVE CANVAS SECTIONS === */
+.interactive-box { border-radius: 20px; overflow: hidden; position: relative; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); }
+.interactive-box canvas { width: 100%; display: block; }
+.interactive-label { position: absolute; bottom: 1rem; left: 1rem; font-size: 0.75rem; color: rgba(255,255,255,0.35); letter-spacing: 0.1em; }
+
+/* === QUOTE BLOCK === */
+.quote-block { border-left: 2px solid rgba(129,140,248,0.3); padding: 1.5rem 2rem; margin: 2rem 0; background: rgba(129,140,248,0.03); border-radius: 0 12px 12px 0; }
+.quote-text { font-family: 'Noto Serif SC', serif; font-size: 1.1rem; color: rgba(255,255,255,0.7); font-style: italic; line-height: 2; }
+.quote-author { font-size: 0.85rem; color: rgba(255,255,255,0.35); margin-top: 0.8rem; }
+
+/* === TIMELINE === */
+.timeline { position: relative; padding-left: 2rem; }
+.timeline::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: linear-gradient(180deg, rgba(129,140,248,0.3), rgba(129,140,248,0.05)); }
+.timeline-item { position: relative; margin-bottom: 2.5rem; padding-left: 1.5rem; }
+.timeline-item::before { content: ''; position: absolute; left: -2rem; top: 0.5rem; width: 10px; height: 10px; border-radius: 50%; border: 2px solid #818cf8; background: #0a0a0f; }
+.timeline-item-title { font-family: 'Noto Serif SC', serif; font-weight: 600; margin-bottom: 0.4rem; }
+.timeline-item-text { font-size: 0.9rem; color: rgba(255,255,255,0.5); line-height: 1.8; }
+
+/* === DIAGRAM: FIVE METHODS === */
+.methods-wheel { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.5rem; margin: 3rem 0; }
+.method-node { width: 180px; height: 180px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; border: 2px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02); transition: all 0.5s ease; cursor: default; position: relative; }
+.method-node:hover { transform: scale(1.1); }
+.method-node-icon { font-size: 1.8rem; margin-bottom: 0.5rem; }
+.method-node-title { font-family: 'Noto Serif SC', serif; font-size: 0.95rem; font-weight: 600; margin-bottom: 0.3rem; }
+.method-node-sub { font-size: 0.7rem; color: rgba(255,255,255,0.4); max-width: 130px; line-height: 1.5; }
+
+/* === THOUGHT EXPERIMENT === */
+.experiment-box { background: linear-gradient(135deg, rgba(129,140,248,0.08), rgba(168,85,247,0.05)); border: 1px solid rgba(129,140,248,0.15); border-radius: 20px; padding: 2.5rem; margin: 2rem 0; }
+.experiment-title { font-family: 'Noto Serif SC', serif; font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+.experiment-text { font-size: 0.95rem; color: rgba(255,255,255,0.6); line-height: 2; }
+
+/* === TABS === */
+.tabs { display: flex; gap: 0.5rem; margin-bottom: 2rem; flex-wrap: wrap; }
+.tab-btn { padding: 0.6rem 1.2rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background: transparent; color: rgba(255,255,255,0.5); font-size: 0.85rem; cursor: pointer; transition: all 0.3s; font-family: 'Noto Sans SC', sans-serif; }
+.tab-btn.active { background: rgba(129,140,248,0.15); border-color: rgba(129,140,248,0.3); color: #c4b5fd; }
+.tab-content { display: none; animation: fadeIn 0.5s ease; }
+.tab-content.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* === FLOW DIAGRAM === */
+.flow-diagram { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 1rem; margin: 2rem 0; }
+.flow-node { padding: 1rem 1.5rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); text-align: center; min-width: 120px; }
+.flow-node-title { font-family: 'Noto Serif SC', serif; font-size: 0.9rem; font-weight: 600; }
+.flow-node-sub { font-size: 0.75rem; color: rgba(255,255,255,0.4); margin-top: 0.3rem; }
+.flow-arrow { color: rgba(255,255,255,0.2); font-size: 1.2rem; }
+
+/* === COMPARISON TABLE === */
+.compare-table { width: 100%; border-collapse: collapse; margin: 2rem 0; }
+.compare-table th, .compare-table td { padding: 1rem 1.2rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 0.9rem; }
+.compare-table th { font-family: 'Noto Serif SC', serif; font-weight: 600; color: rgba(255,255,255,0.7); font-size: 0.85rem; letter-spacing: 0.05em; }
+.compare-table td { color: rgba(255,255,255,0.5); }
+.compare-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+/* === PARTICLE VISUALIZATION === */
+.particle-vis { position: relative; height: 400px; border-radius: 20px; overflow: hidden; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); margin: 2rem 0; }
+.particle-vis canvas { width: 100%; height: 100%; }
+
+/* === FOOTER === */
+.footer { padding: 4rem 2rem; text-align: center; border-top: 1px solid rgba(255,255,255,0.05); }
+.footer-text { font-size: 0.8rem; color: rgba(255,255,255,0.25); line-height: 1.8; }
+
+/* === SCROLL ANIMATIONS === */
+.reveal { opacity: 0; transform: translateY(40px); transition: all 0.8s cubic-bezier(0.4,0,0.2,1); }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+
+/* === SECTION DIVIDER === */
+.section-divider { width: 60px; height: 2px; background: linear-gradient(90deg, #818cf8, transparent); margin-bottom: 2rem; }
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  .section { padding: 5rem 1.2rem; }
+  .nav-dots { right: 0.8rem; }
+  .method-node { width: 140px; height: 140px; }
+  .flow-diagram { flex-direction: column; }
+  .flow-arrow { transform: rotate(90deg); }
+  .compare-table { font-size: 0.8rem; }
+  .compare-table th, .compare-table td { padding: 0.7rem; }
+}
+
+/* === SUN MOTION DEMO === */
+.sun-demo { position: relative; height: 300px; border-radius: 20px; overflow: hidden; background: linear-gradient(180deg, #0c1445 0%, #1a1a2e 100%); border: 1px solid rgba(255,255,255,0.06); margin: 2rem 0; }
+.sun-demo canvas { width: 100%; height: 100%; }
+.sun-demo-controls { position: absolute; bottom: 1rem; left: 50%; transform: translateX(-50%); display: flex; gap: 0.5rem; }
+.sun-demo-btn { padding: 0.4rem 1rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.5); color: rgba(255,255,255,0.7); font-size: 0.75rem; cursor: pointer; transition: all 0.3s; font-family: 'Noto Sans SC', sans-serif; }
+.sun-demo-btn.active { background: rgba(129,140,248,0.2); border-color: rgba(129,140,248,0.4); color: #c4b5fd; }
+
+/* === WORLD BUILDER INTERACTIVE === */
+.world-builder { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin: 2rem 0; align-items: start; }
+.world-builder-controls { display: flex; flex-direction: column; gap: 1rem; }
+.wb-slider-group label { font-size: 0.8rem; color: rgba(255,255,255,0.5); display: block; margin-bottom: 0.3rem; }
+.wb-slider { width: 100%; -webkit-appearance: none; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.1); outline: none; }
+.wb-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: #818cf8; cursor: pointer; }
+.world-builder-canvas { border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,0.06); }
+.world-builder-canvas canvas { width: 100%; display: block; }
+@media (max-width: 768px) { .world-builder { grid-template-columns: 1fr; } }
+
+/* === KEY INSIGHT BANNER === */
+.insight-banner { background: linear-gradient(135deg, rgba(129,140,248,0.1), rgba(236,72,153,0.08)); border: 1px solid rgba(129,140,248,0.12); border-radius: 16px; padding: 2rem 2.5rem; margin: 2.5rem 0; display: flex; align-items: flex-start; gap: 1.2rem; }
+.insight-icon { font-size: 1.5rem; flex-shrink: 0; margin-top: 0.2rem; }
+.insight-text { font-size: 0.95rem; color: rgba(255,255,255,0.65); line-height: 2; }
+.insight-text strong { color: rgba(255,255,255,0.85); }
+
+/* === GRUE DEMO === */
+.grue-demo { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 2rem; margin: 2rem 0; }
+.grue-gems { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin: 1.5rem 0; }
+.grue-gem { width: 50px; height: 50px; border-radius: 10px; transition: all 0.6s ease; cursor: pointer; border: 2px solid rgba(255,255,255,0.1); }
+.grue-controls { text-align: center; margin-top: 1rem; }
+.grue-label { font-size: 0.8rem; color: rgba(255,255,255,0.4); margin-bottom: 0.5rem; }
+
+/* === PERCEPTION DEMO === */
+.perception-demo { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin: 2rem 0; }
+.perception-box { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; overflow: hidden; }
+.perception-box canvas { width: 100%; display: block; }
+.perception-box-label { padding: 1rem; font-size: 0.8rem; color: rgba(255,255,255,0.4); text-align: center; }
+@media (max-width: 768px) { .perception-demo { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<!-- NAVIGATION DOTS -->
+<nav class="nav-dots" id="navDots"></nav>
+
+<!-- HERO -->
+<section class="hero" id="sec-hero">
+  <div class="hero-bg"><canvas id="heroCanvas"></canvas></div>
+  <div class="hero-content">
+    <div class="hero-subtitle">Nelson Goodman</div>
+    <h1 class="hero-title">构造世界的多种方式</h1>
+    <div class="hero-author">Ways of Worldmaking</div>
+    <p class="hero-desc">世界不是被发现的，而是被构造的。我们用符号、语言、科学、艺术和知觉，构造出了无数个同样真实的世界。</p>
+  </div>
+  <div class="scroll-hint">
+    <span>向下探索</span>
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+  </div>
+</section>
+
+<!-- SEC 1: CORE THESIS -->
+<section class="section" id="sec-core">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-number">01 / 核心命题</div>
+      <div class="section-divider"></div>
+      <h2 class="section-title">世界是 <span class="grad-purple">被构造的</span>，而不是被发现的</h2>
+      <p class="section-lead">古德曼的核心思想打破了我们对"唯一真实世界"的直觉。他认为，存在着多个同样正确的世界样式，它们由我们使用的符号系统所构造。</p>
+    </div>
+
+    <div class="quote-block reveal">
+      <div class="quote-text">"这种现代主流哲学始于康德用心灵的结构取代了世界的结构，继之于刘易斯用概念的结构取代了心灵的结构，现在则进一步用科学、哲学、艺术、知觉以及日常话语的很多种符号系统的结构取代了概念的结构。"</div>
+      <div class="quote-author">-- 纳尔逊 · 古德曼</div>
+    </div>
+
+    <div class="card-grid card-grid-3 reveal">
+      <div class="glass-card">
+        <div class="card-icon" style="background:rgba(129,140,248,0.1);color:#818cf8;">&#9670;</div>
+        <div class="card-title">多元论</div>
+        <div class="card-text">不存在唯一的"真实世界"。物理学描述的世界、画家眼中的世界、日常感知的世界，都是同等真实的世界样式。</div>
+      </div>
+      <div class="glass-card">
+        <div class="card-icon" style="background:rgba(34,197,94,0.1);color:#22c55e;">&#9671;</div>
+        <div class="card-title">构造主义</div>
+        <div class="card-text">世界不是现成的等待我们去发现。构造世界总是从已有的世界开始，是一种"重构"——从其他世界中构造出新的世界。</div>
+      </div>
+      <div class="glass-card">
+        <div class="card-icon" style="background:rgba(245,158,11,0.1);color:#f59e0b;">&#9672;</div>
+        <div class="card-title">受限的相对主义</div>
+        <div class="card-text">虽然世界样式是多元的，但并非"怎样都行"。每种样式都有自己的正确性标准——严格但非绝对的标准。</div>
+      </div>
+    </div>
+
+    <!-- SUN MOTION INTERACTIVE DEMO -->
+    <div class="reveal" style="margin-top:3rem;">
+      <h3 style="font-family:'Noto Serif SC',serif;font-size:1.2rem;font-weight:600;margin-bottom:0.5rem;">互动演示：太阳在运动吗？</h3>
+      <p style="font-size:0.9rem;color:rgba(255,255,255,0.45);margin-bottom:1rem;">"太阳总是运动"和"太阳从不运动"都是正确的——取决于你选择的参照系。点击切换视角。</p>
+      <div class="sun-demo">
+        <canvas id="sunCanvas"></canvas>
+        <div class="sun-demo-controls">
+          <button class="sun-demo-btn active" data-frame="earth">地球视角</button>
+          <button class="sun-demo-btn" data-frame="sun">太阳视角</button>
+          <button class="sun-demo-btn" data-frame="galaxy">银河视角</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SEC 2: FIVE METHODS -->
+<section class="section" id="sec-methods" style="background: linear-gradient(180deg, #0a0a0f 0%, #0d0d1a 50%, #0a0a0f 100%);">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-number">02 / 构造的五种方式</div>
+      <div class="section-divider"></div>
+      <h2 class="section-title">我们如何 <span class="grad-blue">构造</span> 世界？</h2>
+      <p class="section-lead">古德曼归纳了五种基本的世界构造方法。它们往往相互混合使用，共同塑造着我们所认知的世界。</p>
+    </div>
+
+    <div class="methods-wheel reveal">
+      <div class="method-node" style="border-color:rgba(129,140,248,0.3);">
+        <div class="method-node-icon">&#x2702;</div>
+        <div class="method-node-title grad-purple">组合与分解</div>
+        <div class="method-node-sub">把整体分成部分，把部分组合成整体</div>
+      </div>
+      <div class="method-node" style="border-color:rgba(59,130,246,0.3);">
+        <div class="method-node-icon">&#x25C9;</div>
+        <div class="method-node-title grad-blue">强调</div>
+        <div class="method-node-sub">突出某些特征，淡化其他特征</div>
+      </div>
+      <div class="method-node" style="border-color:rgba(34,197,94,0.3);">
+        <div class="method-node-icon">&#x2195;</div>
+        <div class="method-node-title grad-green">排序</div>
+        <div class="method-node-sub">为事物建立不同的先后秩序</div>
+      </div>
+      <div class="method-node" style="border-color:rgba(245,158,11,0.3);">
+        <div class="method-node-icon">&#x2716;</div>
+        <div class="method-node-title grad-amber">删减与补充</div>
+        <div class="method-node-sub">忽略部分信息，填充其他内容</div>
+      </div>
+      <div class="method-node" style="border-color:rgba(236,72,153,0.3);">
+        <div class="method-node-icon">&#x21C4;</div>
+        <div class="method-node-title grad-rose">变形</div>
+        <div class="method-node-sub">对材料进行重塑和转换</div>
+      </div>
+    </div>
+
+    <!-- TABS: Method details -->
+    <div class="reveal">
+      <div class="tabs" id="methodTabs">
+        <button class="tab-btn active" data-tab="t-compose">组合与分解</button>
+        <button class="tab-btn" data-tab="t-emphasis">强调</button>
+        <button class="tab-btn" data-tab="t-ordering">排序</button>
+        <button class="tab-btn" data-tab="t-deletion">删减与补充</button>
+        <button class="tab-btn" data-tab="t-deform">变形</button>
+      </div>
+
+      <div class="tab-content active" id="t-compose">
+        <div class="card-grid card-grid-2">
+          <div class="glass-card">
+            <div class="card-title">分解：将统一体拆分</div>
+            <div class="card-text">爱斯基摩人把我们笼统称为"雪"的东西，分解为几十种不同的类型，每种都有专门的词汇。不同的分类方式创造了不同的世界。同一场比赛的"比赛用球"，可能由一打棒球的时间性部分组成。</div>
+          </div>
+          <div class="glass-card">
+            <div class="card-title">组合：从碎片中建构</div>
+            <div class="card-text">世间多样的事件被聚集在一个名称之下，构成"一个对象"或"一个人"。不同的组合方式产生不同的世界：以"点"为基本元素的世界，和以"体积"为基本元素的世界，是根本不同的。</div>
+          </div>
+        </div>
+      </div>
+      <div class="tab-content" id="t-emphasis">
+        <div class="card-grid card-grid-2">
+          <div class="glass-card">
+            <div class="card-title">艺术中的强调</div>
+            <div class="card-text">杜米埃、安格尔、米开朗琪罗和鲁奥的画作之间的许多差别，其实都是着重点方面的差别。弗兰切斯卡的《耶稣》和伦勃朗的《耶稣》描绘的是同一主题，但强调了完全不同的方面。</div>
+          </div>
+          <div class="glass-card">
+            <div class="card-title">强调创造种类</div>
+            <div class="card-text">"绿蓝"(grue) 不可能在同一个世界中像绿色那样成为归纳的相关种类。就像企图强调所有的音节等于什么也没有强调一样，想把所有种类都视为相关的，就等于什么种类都不是相关的。</div>
+          </div>
+        </div>
+      </div>
+      <div class="tab-content" id="t-ordering">
+        <div class="card-grid card-grid-2">
+          <div class="glass-card">
+            <div class="card-title">排序改变感知</div>
+            <div class="card-text">颜色亮度的排序取决于光的物理强度的线性增加，但色度排序却把波长的直线弯曲成了一个圆。依据十二音阶标准的感知模式不同于依据八音阶标准的感知模式。</div>
+          </div>
+          <div class="glass-card">
+            <div class="card-title">排序即构造</div>
+            <div class="card-text">没有东西是原初性的，如果脱离一个构造系统而言。一幅地图的空间秩序被转化为一次旅行的时间序列。所有测量都建立在排序基础上。</div>
+          </div>
+        </div>
+      </div>
+      <div class="tab-content" id="t-deletion">
+        <div class="experiment-box">
+          <div class="experiment-title">&#128161; 似动现象 (Phi Phenomenon)</div>
+          <div class="experiment-text">如果两个光点在很短间距上快速连续闪现，观察者会"看到"一个光点从一个位置连续移动到另一个位置。更神奇的是，如果第一个刺激是圆形、第二个是正方形，你会看到形状平稳地从圆变成方。知觉不仅删减了间隙，还补充了完整的运动过程。</div>
+        </div>
+      </div>
+      <div class="tab-content" id="t-deform">
+        <div class="card-grid card-grid-2">
+          <div class="glass-card">
+            <div class="card-title">科学中的变形</div>
+            <div class="card-text">物理学家抚平那条符合其所有数据的最简单的不光滑曲线。波义耳为了一条和材料无关的平滑曲线而舍弃了实际观测数据。</div>
+          </div>
+          <div class="glass-card">
+            <div class="card-title">艺术中的变形</div>
+            <div class="card-text">毕加索以贝拉斯克斯的《拉斯·迈尼纳斯》为起点开始变形，勃拉姆斯的变形始于海顿的主题，他们创造了不可思议的变化，揭示了全新的东西。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SEC 3: TRUTH -->
+<section class="section" id="sec-truth">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-number">03 / 真理的困境</div>
+      <div class="section-divider"></div>
+      <h2 class="section-title">真理是 <span class="grad-green">恭顺的仆人</span>，不是严厉的主人</h2>
+      <p class="section-lead">古德曼对真理的重新审视是全书最具颠覆性的部分之一。真理不能脱离世界样式而存在，也不是我们选择样式的唯一标准。</p>
+    </div>
+
+    <div class="insight-banner reveal">
+      <div class="insight-icon">&#128218;</div>
+      <div class="insight-text"><strong>古德曼说：</strong>"一个科学家如果认为自己是在专心致志地致力于真理的探求，那他就是在自欺欺人。他并不关注那些他能无止境探求的微不足道的真理；他期望得到的不是多样无规律的观察结果，而是结构全面、意义重大的概括性结论。"</div>
+    </div>
+
+    <div class="card-grid card-grid-2 reveal">
+      <div class="glass-card">
+        <div class="card-title">真理的相对性</div>
+        <div class="card-text">"雪是白的"是真的——但只在某个世界样式中。在物理学家的世界中，雪反射特定波长的光；在诗人的世界中，雪可能是寂静的象征。真理随样式而变化。我们不能通过将一个样式和一个未被描述的世界相比来检验它。</div>
+      </div>
+      <div class="glass-card">
+        <div class="card-title">超越字面真理</div>
+        <div class="card-text">世界不仅仅由字面上所言说的东西构造，也包括隐喻意义、例证和表达。一首诗中没有出现"悲伤"这个词，却可以深刻地表达悲伤。一个错误的字面陈述，在隐喻意义上可能是真的。</div>
+      </div>
+    </div>
+
+    <div class="reveal" style="margin-top:2rem;">
+      <h3 style="font-family:'Noto Serif SC',serif;font-size:1.1rem;font-weight:600;margin-bottom:1rem;">正确性的多种检验标准</h3>
+      <table class="compare-table">
+        <thead>
+          <tr><th>标准</th><th>含义</th><th>局限</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>效用</strong></td><td>真的陈述能让我们预测和操控自然</td><td>有用的可能不真，真的可能没用</td></tr>
+          <tr><td><strong>可信性</strong></td><td>最可信的信念即真理</td><td>最可信的陈述经常被证伪</td></tr>
+          <tr><td><strong>融贯性</strong></td><td>与其他信念系统一致即为真</td><td>同样融贯的系统可能相互矛盾</td></tr>
+          <tr><td><strong>简单性</strong></td><td>最简单的解释最可能为真</td><td>简单性本身需要被定义</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- SEC 4: ART AS WORLDMAKING -->
+<section class="section" id="sec-art" style="background: linear-gradient(180deg, #0a0a0f 0%, #100d18 50%, #0a0a0f 100%);">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-number">04 / 艺术的认知力量</div>
+      <div class="section-divider"></div>
+      <h2 class="section-title">何时是 <span class="grad-rose">艺术</span>？</h2>
+      <p class="section-lead">古德曼不问"什么是艺术"，而问"何时是艺术"。一块石头在路边时不是艺术品，放进美术馆可能就是。关键不在于物体本身，而在于它何时以艺术的方式发挥符号功能。</p>
+    </div>
+
+    <div class="flow-diagram reveal">
+      <div class="flow-node" style="border-color:rgba(236,72,153,0.2);">
+        <div class="flow-node-title">再现</div>
+        <div class="flow-node-sub">描绘外部对象</div>
+      </div>
+      <div class="flow-arrow">+</div>
+      <div class="flow-node" style="border-color:rgba(168,85,247,0.2);">
+        <div class="flow-node-title">表现</div>
+        <div class="flow-node-sub">传达情感品质</div>
+      </div>
+      <div class="flow-arrow">+</div>
+      <div class="flow-node" style="border-color:rgba(129,140,248,0.2);">
+        <div class="flow-node-title">例证</div>
+        <div class="flow-node-sub">展示自身属性</div>
+      </div>
+      <div class="flow-arrow">=</div>
+      <div class="flow-node" style="border-color:rgba(99,102,241,0.3);background:rgba(99,102,241,0.08);">
+        <div class="flow-node-title" style="color:#a5b4fc;">艺术的符号功能</div>
+        <div class="flow-node-sub">构造世界的方式</div>
+      </div>
+    </div>
+
+    <div class="experiment-box reveal">
+      <div class="experiment-title">&#127912; 布料样本的故事</div>
+      <div class="experiment-text">特里西姬斯夫人用布料样本订购软椅布料，要求"和样本完全一样"。结果收到数百块剪成样本大小的碎布。后来她用杯形蛋糕样本订蛋糕，却收到一个巨型杯形蛋糕。<br><br><strong>寓意：</strong>一个样本只是其某些属性的样本。布样是质地和颜色的样本，但不是大小和形状的样本。作为样本的属性取决于语境——这正是"例证"的本质。即使最"纯粹"的抽象画也在例证其形状、颜色等属性，因此仍然是一个符号。</div>
+    </div>
+
+    <div class="insight-banner reveal">
+      <div class="insight-icon">&#128161;</div>
+      <div class="insight-text"><strong>核心洞见：</strong>"艺术，没有再现或表现或例证，就不是艺术。" 即使最抽象的绘画也在象征——它例证了自己的形式属性。纯粹主义者正确地指出再现并非必要，但错误地认为艺术可以完全脱离符号功能。</div>
+    </div>
+
+    <div class="card-grid card-grid-2 reveal">
+      <div class="glass-card">
+        <div class="card-title">风格即构造</div>
+        <div class="card-text">风格不只是装饰，它是构造世界的一种方式。伦勃朗的风格和莫奈的风格创造了两个不同的视觉世界。风格涉及主题的选择、情感色彩的渲染、结构的安排，以及作为标志的独特识别性。</div>
+      </div>
+      <div class="glass-card">
+        <div class="card-title">引语的多种形式</div>
+        <div class="card-text">古德曼探讨了文字引语、图画引语、音乐引语和跨系统引语。引语不仅仅是复制，它是一种指向关系——从一个符号系统跨越到另一个，创造新的意义联系。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SEC 5: PERCEPTION -->
+<section class="section" id="sec-perception">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-number">05 / 知觉与构造</div>
+      <div class="section-divider"></div>
+      <h2 class="section-title"><span class="grad-cyan">看</span> 不是被动接收，而是主动构造</h2>
+      <p class="section-lead">古德曼认为不存在"纯真的眼睛"。我们的知觉已经被概念、期望、文化和过去的经验深深地塑造了。看见即构造。</p>
+    </div>
+
+    <div class="card-grid card-grid-3 reveal">
+      <div class="glass-card">
+        <div class="card-icon" style="background:rgba(6,182,212,0.1);color:#06b6d4;">&#128065;</div>
+        <div class="card-title">运动的构造</div>
+        <div class="card-text">似动现象证明：知觉不只是被动记录，它主动补充和创造。两个静止光点的快速闪现，被知觉"构造"成了一个连续运动的过程。</div>
+      </div>
+      <div class="glass-card">
+        <div class="card-icon" style="background:rgba(34,197,94,0.1);color:#22c55e;">&#127756;</div>
+        <div class="card-title">形状与大小</div>
+        <div class="card-text">知觉中的"恒常性"并非发现了事物的"真实"形状，而是根据特定规则对视觉输入进行的一种构造。不同文化对大小和形状的知觉方式不同。</div>
+      </div>
+      <div class="glass-card">
+        <div class="card-icon" style="background:rgba(245,158,11,0.1);color:#f59e0b;">&#127912;</div>
+        <div class="card-title">颜色的困惑</div>
+        <div class="card-text">颜色不是物体的"固有属性"——同一物体在不同光线下呈现不同颜色。我们所谓的"真实颜色"只是在某种标准条件下的感知。</div>
+      </div>
+    </div>
+
+    <div class="quote-block reveal" style="margin-top:2rem;">
+      <div class="quote-text">"虽然没有知觉的概念只能流于空洞，但是概念如果没有知觉，就是盲目的。我们可以有脱离世界的语词，但是却不可能有脱离语词或其他符号的世界。"</div>
+      <div class="quote-author">-- 古德曼，改写自康德</div>
+    </div>
+  </div>
+</section>
+
+<!-- SEC 6: FACTS & FICTIONS -->
+<section class="section" id="sec-facts" style="background: linear-gradient(180deg, #0a0a0f 0%, #0f1218 50%, #0a0a0f 100%);">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-number">06 / 事实与虚构</div>
+      <div class="section-divider"></div>
+      <h2 class="section-title">从虚构中 <span class="grad-orange">制造</span> 事实</h2>
+      <p class="section-lead">事实和虚构的界限远没有我们想象的那样清晰。科学法则是"颁布"的而非"发现"的，小说中的隐喻可以揭示真实的洞见。</p>
+    </div>
+
+    <div class="card-grid card-grid-2 reveal">
+      <div class="glass-card">
+        <div class="card-title">现实与人为</div>
+        <div class="card-text">构成世界的原料——物质、能量、波、现象——是在构造世界的过程中和世界一起被构造出来的。它们不是产生于虚无，而是从其他世界中转化而来。构造世界总是从已有的世界开始。</div>
+      </div>
+      <div class="glass-card">
+        <div class="card-title">方法与质料</div>
+        <div class="card-text">脱开所有参照系，世界是怎样的？我们无法回答。我们被局限于对描述对象进行描述的方式之中。宇宙与其说由世界构成，不如说由描述世界的方式构成。</div>
+      </div>
+    </div>
+
+    <!-- GRUE PARADOX DEMO -->
+    <div class="reveal" style="margin-top:2.5rem;">
+      <h3 style="font-family:'Noto Serif SC',serif;font-size:1.15rem;font-weight:600;margin-bottom:0.5rem;">互动演示："绿蓝"悖论 (Grue Paradox)</h3>
+      <p style="font-size:0.9rem;color:rgba(255,255,255,0.45);margin-bottom:1rem;">古德曼的著名思想实验。定义新谓词"绿蓝"(grue)：在某个日期之前检验为绿色，之后为蓝色。拖动时间轴，观察宝石颜色的变化。</p>
+      <div class="grue-demo">
+        <div class="grue-label">拖动时间轴 ——</div>
+        <input type="range" class="wb-slider" id="grueSlider" min="0" max="100" value="30" style="margin:0.5rem 0;">
+        <div style="display:flex;justify-content:space-between;font-size:0.7rem;color:rgba(255,255,255,0.3);margin-bottom:1rem;">
+          <span>过去</span>
+          <span id="grueDate" style="color:rgba(255,255,255,0.5);">&#9650; 临界日期</span>
+          <span>未来</span>
+        </div>
+        <div class="grue-gems" id="grueGems"></div>
+        <div style="display:flex;justify-content:center;gap:2rem;margin-top:1.5rem;">
+          <div style="text-align:center;">
+            <div style="font-size:0.75rem;color:rgba(255,255,255,0.35);margin-bottom:0.3rem;">按"绿色"谓词</div>
+            <div id="greenLabel" style="font-size:0.9rem;font-weight:600;">所有宝石都是绿色的</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:0.75rem;color:rgba(255,255,255,0.35);margin-bottom:0.3rem;">按"绿蓝"谓词</div>
+            <div id="grueLabel" style="font-size:0.9rem;font-weight:600;">所有宝石都是绿蓝的</div>
+          </div>
+        </div>
+        <div class="insight-banner" style="margin-top:1.5rem;">
+          <div class="insight-icon">&#129300;</div>
+          <div class="insight-text"><strong>悖论：</strong>在临界日期之前，"所有绿宝石是绿色的"和"所有绿宝石是绿蓝的"被完全相同的证据所支持。我们凭什么选择"绿色"而不是"绿蓝"？古德曼的回答是：这取决于我们使用的种类系统——是习惯的、传统的，或为新目标而设计的。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SEC 7: THE BIG PICTURE -->
+<section class="section" id="sec-bigpic">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-number">07 / 全景图</div>
+      <div class="section-divider"></div>
+      <h2 class="section-title">哲学、科学、艺术：<span class="grad-amber">殊途同归</span></h2>
+      <p class="section-lead">古德曼最令人惊奇的发现是：在看似不相关的领域之间找到了深刻的关联。哲学、科学和艺术都是构造世界的方式，它们的共同目的是推进我们对世界的理解。</p>
+    </div>
+
+    <div class="reveal">
+      <div class="particle-vis">
+        <canvas id="convergenceCanvas"></canvas>
+        <div class="interactive-label">哲学 · 科学 · 艺术 — 三种构造世界的路径</div>
+      </div>
+    </div>
+
+    <div class="card-grid card-grid-3 reveal" style="margin-top:2rem;">
+      <div class="glass-card" style="border-color:rgba(129,140,248,0.12);">
+        <div class="card-icon" style="background:rgba(129,140,248,0.1);color:#818cf8;">&#128218;</div>
+        <div class="card-title">哲学</div>
+        <div class="card-text">通过概念分析和逻辑构造来组织世界。哲学家创建符号系统，定义种类关系，为世界提供结构性的理解框架。</div>
+      </div>
+      <div class="glass-card" style="border-color:rgba(34,197,94,0.12);">
+        <div class="card-icon" style="background:rgba(34,197,94,0.1);color:#22c55e;">&#128300;</div>
+        <div class="card-title">科学</div>
+        <div class="card-text">通过观察、测量和法则来构造世界样式。科学家并非只是发现规律，而是在有选择地删减和补充中颁布法则，设计他所描绘的样子。</div>
+      </div>
+      <div class="glass-card" style="border-color:rgba(236,72,153,0.12);">
+        <div class="card-icon" style="background:rgba(236,72,153,0.1);color:#ec4899;">&#127912;</div>
+        <div class="card-title">艺术</div>
+        <div class="card-text">通过再现、表现和例证来构造视觉的、听觉的、文学的世界。艺术不是装饰，而是一种独特的认知方式，使用不同于但同等严格的标准。</div>
+      </div>
+    </div>
+
+    <div class="reveal" style="margin-top:3rem;">
+      <h3 style="font-family:'Noto Serif SC',serif;font-size:1.15rem;font-weight:600;margin-bottom:1.5rem;">思想脉络：从康德到古德曼</h3>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-item-title">康德 (Kant)</div>
+          <div class="timeline-item-text">用<strong>心灵的结构</strong>取代了世界的结构。我们认识的世界已经被心灵的范畴所塑造。</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-item-title">C.I. 刘易斯 (C.I. Lewis)</div>
+          <div class="timeline-item-text">用<strong>概念的结构</strong>取代了心灵的结构。不同的概念框架产生不同的经验组织方式。</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-item-title">卡西尔 (Cassirer)</div>
+          <div class="timeline-item-text">通过跨文化研究，揭示了神话、宗教、语言、艺术和科学都是<strong>符号形式</strong>，各自构造着人类的世界。</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-item-title grad-purple" style="font-size:1.1rem;">古德曼 (Goodman)</div>
+          <div class="timeline-item-text">用<strong>多种符号系统的结构</strong>取代了概念的结构。世界从"唯一的真理和一个固定的、被发现的世界"，转变为"构造中的多种正确的甚至冲突的样式或世界"。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SEC 8: TAKEAWAY -->
+<section class="section" id="sec-takeaway" style="background: linear-gradient(180deg, #0a0a0f, #0d0a18);">
+  <div class="section-inner" style="text-align:center;">
+    <div class="reveal">
+      <div class="section-number">08 / 带走的思考</div>
+      <div class="section-divider" style="margin:0 auto 2rem;"></div>
+      <h2 class="section-title" style="max-width:700px;margin:0 auto 2rem;">没有一个世界样式是<br><span class="grad-purple">唯一的真理</span></h2>
+    </div>
+    <div class="reveal" style="max-width:700px;margin:0 auto;">
+      <p style="font-size:1.05rem;color:rgba(255,255,255,0.55);line-height:2.2;margin-bottom:2rem;">古德曼邀请我们放下对"唯一真实世界"的执念。物理学家的世界不比画家的世界更真实，科学的方法不比艺术的方法更高级。它们只是服务于不同目的的构造方式。</p>
+      <p style="font-size:1.05rem;color:rgba(255,255,255,0.55);line-height:2.2;margin-bottom:2rem;">这不是虚无主义——古德曼坚持正确性标准。它是一种智识上的谦逊：承认我们始终是在某个符号系统内部理解世界，而不是从某个"超越一切"的视角俯瞰世界。</p>
+      <div class="quote-block" style="text-align:left;">
+        <div class="quote-text">"正如不存在一个唯一的世界一样，也不存在一个唯一的关于多个世界的世界。"</div>
+        <div class="quote-author">-- 纳尔逊 · 古德曼，《构造世界的多种方式》</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-text">
+    基于纳尔逊 · 古德曼《构造世界的多种方式》(Ways of Worldmaking, 1978)<br>
+    姬志闯 译 · 上海译文出版社<br>
+    本页面为科普可视化体验，旨在帮助读者轻松了解书中核心思想
+  </div>
+</footer>
+
+<!-- PLACEHOLDER FOR JS -->
+<script>
+// === SCROLL REVEAL ===
+const reveals = document.querySelectorAll('.reveal');
+const revealObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+}, { threshold: 0.12 });
+reveals.forEach(el => revealObs.observe(el));
+
+// === NAV DOTS ===
+const sections = [
+  { id: 'sec-hero', label: '首页' },
+  { id: 'sec-core', label: '核心命题' },
+  { id: 'sec-methods', label: '五种方式' },
+  { id: 'sec-truth', label: '真理' },
+  { id: 'sec-art', label: '艺术' },
+  { id: 'sec-perception', label: '知觉' },
+  { id: 'sec-facts', label: '事实与虚构' },
+  { id: 'sec-bigpic', label: '全景图' },
+  { id: 'sec-takeaway', label: '思考' }
+];
+const dotsContainer = document.getElementById('navDots');
+sections.forEach((s, i) => {
+  const dot = document.createElement('button');
+  dot.className = 'nav-dot' + (i === 0 ? ' active' : '');
+  dot.innerHTML = `<span class="nav-dot-label">${s.label}</span>`;
+  dot.onclick = () => document.getElementById(s.id).scrollIntoView({ behavior: 'smooth' });
+  dotsContainer.appendChild(dot);
+});
+const dotEls = dotsContainer.querySelectorAll('.nav-dot');
+const secObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const idx = sections.findIndex(s => s.id === e.target.id);
+      dotEls.forEach((d, i) => d.classList.toggle('active', i === idx));
+    }
+  });
+}, { threshold: 0.35 });
+sections.forEach(s => { const el = document.getElementById(s.id); if (el) secObs.observe(el); });
+
+// === TABS ===
+document.querySelectorAll('.tabs').forEach(tabGroup => {
+  tabGroup.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabGroup.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const parent = tabGroup.parentElement;
+      parent.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+      const target = parent.querySelector('#' + btn.dataset.tab);
+      if (target) target.classList.add('active');
+    });
+  });
+});
+
+// === HERO CANVAS: Particle universe ===
+(function() {
+  const canvas = document.getElementById('heroCanvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [], mouse = { x: -1000, y: -1000 };
+  function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+  canvas.parentElement.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+
+  class P {
+    constructor() { this.reset(); }
+    reset() {
+      this.x = Math.random() * W;
+      this.y = Math.random() * H;
+      this.r = Math.random() * 1.5 + 0.3;
+      this.vx = (Math.random() - 0.5) * 0.3;
+      this.vy = (Math.random() - 0.5) * 0.3;
+      this.alpha = Math.random() * 0.5 + 0.1;
+      this.color = ['129,140,248', '168,85,247', '99,102,241', '196,181,253'][Math.floor(Math.random() * 4)];
+    }
+    update() {
+      this.x += this.vx; this.y += this.vy;
+      const dx = mouse.x - this.x, dy = mouse.y - this.y, dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 150) { this.x -= dx * 0.01; this.y -= dy * 0.01; }
+      if (this.x < 0 || this.x > W || this.y < 0 || this.y > H) this.reset();
+    }
+    draw() {
+      ctx.beginPath(); ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${this.color},${this.alpha})`; ctx.fill();
+    }
+  }
+  for (let i = 0; i < 200; i++) particles.push(new P());
+
+  function animate() {
+    ctx.clearRect(0, 0, W, H);
+    particles.forEach(p => { p.update(); p.draw(); });
+    // Draw connections
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x, dy = particles[i].y - particles[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 100) {
+          ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = `rgba(129,140,248,${0.06 * (1 - dist / 100)})`; ctx.lineWidth = 0.5; ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(animate);
+  }
+  animate();
+})();
+
+// === SUN DEMO ===
+(function() {
+  const canvas = document.getElementById('sunCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H, frame = 'earth', t = 0;
+  function resize() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    W = canvas.width = rect.width; H = canvas.height = rect.height;
+  }
+  resize(); window.addEventListener('resize', resize);
+
+  document.querySelectorAll('.sun-demo-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.sun-demo-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      frame = btn.dataset.frame;
+    });
+  });
+
+  function drawStar(x, y, r, spikes, color) {
+    ctx.beginPath();
+    for (let i = 0; i < spikes * 2; i++) {
+      const angle = (i * Math.PI) / spikes - Math.PI / 2;
+      const radius = i % 2 === 0 ? r : r * 0.5;
+      const px = x + Math.cos(angle) * radius;
+      const py = y + Math.sin(angle) * radius;
+      if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.closePath(); ctx.fillStyle = color; ctx.fill();
+  }
+
+  function animate() {
+    t += 0.008;
+    ctx.clearRect(0, 0, W, H);
+
+    const cx = W / 2, cy = H / 2;
+    let sunX, sunY, earthX, earthY;
+
+    if (frame === 'earth') {
+      // Earth centered, sun orbits
+      earthX = cx; earthY = cy;
+      sunX = cx + Math.cos(t) * 120;
+      sunY = cy + Math.sin(t) * 80;
+      // trail
+      ctx.beginPath(); ctx.ellipse(cx, cy, 120, 80, 0, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(253,224,71,0.1)'; ctx.lineWidth = 1; ctx.stroke();
+      // label
+      ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.font = '12px "Noto Sans SC"';
+      ctx.fillText('地球 (静止)', earthX - 30, earthY + 30);
+      ctx.fillText('太阳在运动 ↻', sunX - 40, sunY - 25);
+    } else if (frame === 'sun') {
+      // Sun centered, earth orbits
+      sunX = cx; sunY = cy;
+      earthX = cx + Math.cos(-t) * 120;
+      earthY = cy + Math.sin(-t) * 80;
+      ctx.beginPath(); ctx.ellipse(cx, cy, 120, 80, 0, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(96,165,250,0.15)'; ctx.lineWidth = 1; ctx.stroke();
+      ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.font = '12px "Noto Sans SC"';
+      ctx.fillText('太阳 (静止)', sunX - 30, sunY + 30);
+      ctx.fillText('地球在运动 ↻', earthX - 40, earthY - 15);
+    } else {
+      // Galaxy: both move
+      const galOffset = t * 40;
+      sunX = cx + Math.sin(t * 0.5) * 60 - 50;
+      sunY = cy + Math.cos(t * 0.7) * 30;
+      earthX = sunX + Math.cos(-t) * 60;
+      earthY = sunY + Math.sin(-t) * 40;
+      // draw some bg stars moving
+      for (let i = 0; i < 30; i++) {
+        const sx = ((i * 73 + galOffset) % W);
+        const sy = ((i * 137) % H);
+        ctx.fillStyle = 'rgba(255,255,255,0.15)';
+        ctx.fillRect(sx, sy, 1, 1);
+      }
+      ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.font = '12px "Noto Sans SC"';
+      ctx.fillText('一切都在运动', cx - 40, H - 40);
+    }
+
+    // Draw sun glow
+    const sg = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, 30);
+    sg.addColorStop(0, 'rgba(253,224,71,0.4)'); sg.addColorStop(1, 'rgba(253,224,71,0)');
+    ctx.fillStyle = sg; ctx.fillRect(sunX - 30, sunY - 30, 60, 60);
+    // Sun
+    drawStar(sunX, sunY, 14, 8, '#fcd34d');
+    // Earth
+    ctx.beginPath(); ctx.arc(earthX, earthY, 8, 0, Math.PI * 2);
+    ctx.fillStyle = '#60a5fa'; ctx.fill();
+    ctx.beginPath(); ctx.arc(earthX, earthY, 8, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(96,165,250,0.3)'; ctx.lineWidth = 2; ctx.stroke();
+
+    requestAnimationFrame(animate);
+  }
+  animate();
+})();
+
+// === GRUE PARADOX DEMO ===
+(function() {
+  const container = document.getElementById('grueGems');
+  const slider = document.getElementById('grueSlider');
+  const greenLabel = document.getElementById('greenLabel');
+  const grueLabel = document.getElementById('grueLabel');
+  const grueDate = document.getElementById('grueDate');
+  if (!container || !slider) return;
+
+  const numGems = 12;
+  const threshold = 60; // the critical date position on slider
+  const gems = [];
+
+  for (let i = 0; i < numGems; i++) {
+    const gem = document.createElement('div');
+    gem.className = 'grue-gem';
+    gem.style.background = '#22c55e';
+    container.appendChild(gem);
+    gems.push(gem);
+  }
+
+  function update() {
+    const val = parseInt(slider.value);
+    const isPast = val < threshold;
+    gems.forEach(gem => {
+      if (isPast) {
+        gem.style.background = '#22c55e';
+        gem.style.borderColor = 'rgba(34,197,94,0.3)';
+      } else {
+        gem.style.background = '#3b82f6';
+        gem.style.borderColor = 'rgba(59,130,246,0.3)';
+      }
+    });
+    if (isPast) {
+      greenLabel.innerHTML = '<span style="color:#22c55e">所有宝石都是绿色的 &#10003;</span>';
+      grueLabel.innerHTML = '<span style="color:#22c55e">所有宝石都是绿蓝的 &#10003;</span>';
+      grueDate.textContent = '&#9664; 临界日期之前';
+    } else {
+      greenLabel.innerHTML = '<span style="color:#ef4444">有些宝石不是绿色的 &#10007;</span>';
+      grueLabel.innerHTML = '<span style="color:#3b82f6">所有宝石仍是绿蓝的 &#10003;</span>';
+      grueDate.textContent = '临界日期之后 &#9654;';
+    }
+  }
+  slider.addEventListener('input', update);
+  update();
+})();
+
+// === CONVERGENCE CANVAS: Three paths ===
+(function() {
+  const canvas = document.getElementById('convergenceCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H, t = 0;
+
+  function resize() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    W = canvas.width = rect.width; H = canvas.height = rect.height;
+  }
+  resize(); window.addEventListener('resize', resize);
+
+  const streams = [
+    { label: '哲学', color: '129,140,248', offset: -1 },
+    { label: '科学', color: '34,197,94', offset: 0 },
+    { label: '艺术', color: '236,72,153', offset: 1 }
+  ];
+
+  class Particle {
+    constructor(stream) {
+      this.stream = stream;
+      this.reset();
+    }
+    reset() {
+      this.progress = Math.random();
+      this.speed = 0.001 + Math.random() * 0.002;
+      this.offset = this.stream.offset * (80 + Math.random() * 40);
+      this.wobble = Math.random() * 20;
+      this.r = Math.random() * 2 + 0.5;
+      this.alpha = Math.random() * 0.6 + 0.2;
+    }
+    update() {
+      this.progress += this.speed;
+      if (this.progress > 1) this.reset();
+    }
+    getPos() {
+      const x = this.progress * W;
+      const convergeFactor = Math.pow(this.progress, 2);
+      const baseY = H / 2;
+      const spread = this.offset * (1 - convergeFactor * 0.85);
+      const y = baseY + spread + Math.sin(this.progress * 8 + t) * this.wobble * (1 - convergeFactor);
+      return { x, y };
+    }
+    draw() {
+      const { x, y } = this.getPos();
+      ctx.beginPath(); ctx.arc(x, y, this.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${this.stream.color},${this.alpha})`; ctx.fill();
+    }
+  }
+
+  const particles = [];
+  streams.forEach(s => {
+    for (let i = 0; i < 80; i++) particles.push(new Particle(s));
+  });
+
+  function animate() {
+    t += 0.02;
+    ctx.clearRect(0, 0, W, H);
+
+    // Draw stream paths
+    streams.forEach(s => {
+      ctx.beginPath();
+      for (let p = 0; p <= 1; p += 0.01) {
+        const x = p * W;
+        const convergeFactor = Math.pow(p, 2);
+        const y = H / 2 + s.offset * 80 * (1 - convergeFactor * 0.85);
+        if (p === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = `rgba(${s.color},0.08)`; ctx.lineWidth = 30; ctx.stroke();
+    });
+
+    particles.forEach(p => { p.update(); p.draw(); });
+
+    // Convergence glow
+    const cg = ctx.createRadialGradient(W - 40, H / 2, 0, W - 40, H / 2, 80);
+    cg.addColorStop(0, 'rgba(255,255,255,0.08)'); cg.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = cg; ctx.beginPath(); ctx.arc(W - 40, H / 2, 80, 0, Math.PI * 2); ctx.fill();
+
+    // Labels
+    ctx.font = '12px "Noto Sans SC"'; ctx.textAlign = 'left';
+    streams.forEach(s => {
+      ctx.fillStyle = `rgba(${s.color},0.6)`;
+      ctx.fillText(s.label, 15, H / 2 + s.offset * 80 + 4);
+    });
+    ctx.textAlign = 'right';
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.fillText('理解', W - 15, H / 2 + 5);
+
+    requestAnimationFrame(animate);
+  }
+  animate();
+})()
+</script>
+
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"75124c326cb447fe934cde04713ae013","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>

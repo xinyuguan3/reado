@@ -174,7 +174,7 @@ html.reado-shell-preload body:not(.reado-shell-applied) > .flex > .flex-1 > asid
 </div>
 </div>
 </nav>
-<main class="flex-1 relative bg-background-dark overflow-hidden cursor-move select-none">
+<main class="flex-1 relative bg-background-dark overflow-hidden">
 <div class="absolute inset-0 bg-map-pattern opacity-30"></div>
 <div class="absolute inset-0 bg-gradient-to-b from-background-dark/20 via-transparent to-background-dark/80 pointer-events-none z-10"></div>
 <div class="w-[140%] h-[140%] absolute -top-[20%] -left-[20%] flex items-center justify-center">
@@ -343,7 +343,7 @@ html.reado-shell-preload body:not(.reado-shell-applied) > .flex > .flex-1 > asid
     return bookId && !hiddenBookIds.has(bookId);
   });
   const storageKey = catalog?.storage?.unlockKey || "reado_unlocked_books_v1";
-  const viewStorageKey = "reado_knowledge_map_view_v1";
+  const filterStorageKey = "reado_knowledge_shelf_category_v1";
   const i18n = window.ReadoI18n || {};
 
   const interpolateText = (template, params) => {
@@ -378,18 +378,18 @@ html.reado-shell-preload body:not(.reado-shell-applied) > .flex > .flex-1 > asid
     const style = document.createElement("style");
     style.id = "reado-knowledge-view-style";
     style.textContent = [
-      "#reado-map-view-toggle { position: absolute; top: 14px; left: 14px; right: 14px; z-index: 90; display: flex; justify-content: space-between; align-items: center; gap: 10px; pointer-events: none; }",
-      "#reado-map-view-toggle .reado-view-chip { pointer-events: auto; background: rgba(15, 23, 42, 0.82); border: 1px solid rgba(148, 163, 184, 0.3); color: #cbd5e1; border-radius: 9999px; padding: 6px 12px; font-size: 11px; letter-spacing: 0.14em; font-weight: 700; text-transform: uppercase; backdrop-filter: blur(8px); }",
-      "#reado-map-view-toggle .reado-view-switch { pointer-events: auto; display: inline-flex; background: rgba(15, 23, 42, 0.82); border: 1px solid rgba(148, 163, 184, 0.3); border-radius: 9999px; padding: 4px; backdrop-filter: blur(8px); }",
-      "#reado-map-view-toggle .reado-view-btn { border: 0; background: transparent; color: #94a3b8; font-size: 12px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; border-radius: 9999px; padding: 7px 12px; cursor: pointer; transition: all .18s ease; }",
-      "#reado-map-view-toggle .reado-view-btn.active { background: linear-gradient(135deg, #1d4ed8, #2563eb); color: #fff; box-shadow: 0 0 18px rgba(37, 99, 235, 0.35); }",
-      "#reado-shelf-view { position: absolute; inset: 0; z-index: 70; overflow-y: auto; overflow-x: hidden; display: none; background: radial-gradient(1100px 420px at 15% -10%, rgba(37, 99, 235, 0.18), transparent), radial-gradient(900px 380px at 85% 0%, rgba(99, 102, 241, 0.2), transparent), linear-gradient(180deg, rgba(2, 6, 23, 0.8), rgba(2, 6, 23, 0.95)); }",
+      "#reado-shelf-view { position: absolute; inset: 0; z-index: 70; overflow-y: auto; overflow-x: hidden; display: block; background: radial-gradient(1100px 420px at 15% -10%, rgba(37, 99, 235, 0.18), transparent), radial-gradient(900px 380px at 85% 0%, rgba(99, 102, 241, 0.2), transparent), linear-gradient(180deg, rgba(2, 6, 23, 0.8), rgba(2, 6, 23, 0.95)); }",
       "#reado-shelf-view .reado-shelf-wrap { max-width: 1200px; margin: 0 auto; padding: 78px 18px 28px; }",
       "#reado-shelf-view .reado-shelf-header { margin-bottom: 14px; }",
       "#reado-shelf-view .reado-shelf-title { font-size: 28px; line-height: 1.2; font-weight: 900; color: #fff; letter-spacing: -0.02em; }",
       "#reado-shelf-view .reado-shelf-sub { margin-top: 6px; color: #93c5fd; font-size: 12px; letter-spacing: 0.14em; font-weight: 700; text-transform: uppercase; }",
       "#reado-shelf-view .reado-shelf-count { margin-top: 10px; color: #94a3b8; font-size: 12px; }",
       "#reado-shelf-view .reado-shelf-status { margin-top: 6px; color: #67e8f9; font-size: 11px; min-height: 16px; }",
+      "#reado-shelf-view .reado-shelf-filter-row { margin: 14px 0 2px; display: flex; flex-wrap: wrap; gap: 8px; }",
+      "#reado-shelf-view .reado-shelf-filter-btn { border: 1px solid rgba(148, 163, 184, 0.3); background: rgba(15, 23, 42, 0.72); color: #cbd5e1; border-radius: 999px; padding: 7px 12px; font-size: 12px; font-weight: 700; letter-spacing: 0.02em; cursor: pointer; transition: all .18s ease; }",
+      "#reado-shelf-view .reado-shelf-filter-btn:hover { border-color: rgba(125, 211, 252, 0.65); color: #ecfeff; }",
+      "#reado-shelf-view .reado-shelf-filter-btn.active { border-color: rgba(59, 130, 246, 0.75); background: linear-gradient(135deg, rgba(37, 99, 235, 0.44), rgba(30, 64, 175, 0.4)); color: #fff; box-shadow: 0 0 18px rgba(37, 99, 235, 0.28); }",
+      "#reado-shelf-view .reado-shelf-filter-count { margin-left: 6px; font-size: 11px; color: #93c5fd; font-weight: 700; }",
       "#reado-shelf-view .reado-shelf-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }",
       "#reado-shelf-view .reado-shelf-card { border: 1px solid rgba(148, 163, 184, 0.22); background: rgba(15, 23, 42, 0.78); border-radius: 18px; overflow: hidden; box-shadow: 0 12px 30px rgba(2, 6, 23, 0.35); transition: border-color .18s ease, transform .18s ease; display: flex; flex-direction: column; }",
       "#reado-shelf-view .reado-shelf-card:hover { border-color: rgba(59, 130, 246, 0.7); transform: translateY(-2px); }",
@@ -410,7 +410,7 @@ html.reado-shell-preload body:not(.reado-shell-applied) > .flex > .flex-1 > asid
       "#reado-shelf-view .reado-shelf-cta { margin-top: auto; border: 1px solid rgba(59, 130, 246, 0.45); background: linear-gradient(135deg, rgba(37, 99, 235, 0.3), rgba(30, 64, 175, 0.4)); color: #fff; border-radius: 10px; font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; padding: 10px; cursor: pointer; transition: all .18s ease; }",
       "#reado-shelf-view .reado-shelf-cta:hover { border-color: rgba(96, 165, 250, 0.8); background: linear-gradient(135deg, rgba(59, 130, 246, 0.45), rgba(37, 99, 235, 0.5)); }",
       "#reado-shelf-view .reado-shelf-empty { border: 1px solid rgba(148, 163, 184, 0.2); border-radius: 12px; background: rgba(15, 23, 42, 0.68); padding: 18px; color: #cbd5e1; font-size: 13px; text-align: center; }",
-      "@media (max-width: 900px) { #reado-map-view-toggle { top: 10px; left: 10px; right: 10px; } #reado-map-view-toggle .reado-view-chip { display: none; } #reado-shelf-view .reado-shelf-wrap { padding-top: 64px; } #reado-shelf-view .reado-shelf-title { font-size: 22px; } }"
+      "@media (max-width: 900px) { #reado-shelf-view .reado-shelf-wrap { padding-top: 64px; } #reado-shelf-view .reado-shelf-title { font-size: 22px; } }"
     ].join("\n");
     document.head.append(style);
   };
@@ -567,15 +567,6 @@ html.reado-shell-preload body:not(.reado-shell-applied) > .flex > .flex-1 > asid
     node.setAttribute("tabindex", "0");
   });
 
-  const toolbar = document.createElement("div");
-  toolbar.id = "reado-map-view-toggle";
-  toolbar.innerHTML = `
-    <span class="reado-view-chip" data-map-chip></span>
-    <div class="reado-view-switch" role="tablist" data-map-view-switch>
-      <button type="button" class="reado-view-btn" data-view="shelf" role="tab" aria-selected="true" data-map-view-label="shelf"></button>
-      <button type="button" class="reado-view-btn" data-view="map" role="tab" aria-selected="false" data-map-view-label="map"></button>
-    </div>`;
-
   const shelfPanel = document.createElement("section");
   shelfPanel.id = "reado-shelf-view";
   shelfPanel.innerHTML = `
@@ -583,26 +574,26 @@ html.reado-shell-preload body:not(.reado-shell-applied) > .flex > .flex-1 > asid
       <div class="reado-shelf-header">
         <h2 class="reado-shelf-title" data-map-shelf-title></h2>
         <p class="reado-shelf-sub" data-map-shelf-subtitle></p>
+        <div class="reado-shelf-filter-row" data-shelf-filters role="tablist" aria-label="Book categories"></div>
         <p class="reado-shelf-count" data-shelf-count></p>
         <p class="reado-shelf-status" data-shelf-status></p>
       </div>
       <div class="reado-shelf-grid" data-shelf-grid></div>
     </div>`;
 
-  main.append(toolbar, shelfPanel);
+  main.append(shelfPanel);
 
   const shelfGrid = shelfPanel.querySelector("[data-shelf-grid]");
   const shelfCount = shelfPanel.querySelector("[data-shelf-count]");
   const shelfStatus = shelfPanel.querySelector("[data-shelf-status]");
-  const mapChipEl = toolbar.querySelector("[data-map-chip]");
-  const mapViewSwitchEl = toolbar.querySelector("[data-map-view-switch]");
+  const shelfFilters = shelfPanel.querySelector("[data-shelf-filters]");
   const mapShelfTitleEl = shelfPanel.querySelector("[data-map-shelf-title]");
   const mapShelfSubtitleEl = shelfPanel.querySelector("[data-map-shelf-subtitle]");
-  const viewButtons = Array.from(toolbar.querySelectorAll("[data-view]"));
   const deletedBookIds = new Set();
   let worksByBookId = new Map();
   let worksLoaded = false;
   let worksLoading = false;
+  let activeCategory = "all";
 
   const getLocalizedBookTitle = (book) => {
     if (!book || typeof book !== "object") return "";
@@ -631,31 +622,88 @@ html.reado-shell-preload body:not(.reado-shell-applied) > .flex > .flex-1 > asid
     return String(book?.categoryHint || tr("map.hint_default", "Tap to enter and start the interactive journey."));
   };
 
+  const getAvailableBooks = () => books.filter((book) => (
+    book
+    && book.id
+    && !deletedBookIds.has(book.id)
+    && (book.firstModuleHref || book.hubHref)
+  ));
+
+  const getCategoryLabelById = (categoryId) => {
+    const localized = localizedCategoryById[String(categoryId || "").trim()];
+    if (localized) {
+      return tr(localized.labelKey, localized.labelFallback);
+    }
+    const sampleBook = books.find((book) => String(book?.category || "") === String(categoryId || ""));
+    return String(sampleBook?.categoryLabel || tr("map.category_default", "Book Module"));
+  };
+
+  const normalizeCategory = (value) => {
+    const raw = String(value || "").trim();
+    if (!raw) return "all";
+    return raw;
+  };
+
+  const restoreActiveCategory = () => {
+    const saved = normalizeCategory(localStorage.getItem(filterStorageKey));
+    const existing = new Set(getAvailableBooks().map((book) => normalizeCategory(book.category)));
+    if (saved === "all" || existing.has(saved)) {
+      activeCategory = saved;
+      return;
+    }
+    activeCategory = "all";
+  };
+
   const syncStaticCopy = () => {
-    if (mapChipEl) {
-      mapChipEl.textContent = tr("map.entry", "Learning Hub");
-    }
-    if (mapViewSwitchEl) {
-      mapViewSwitchEl.setAttribute("aria-label", tr("map.view_switch", "Personal library view switch"));
-    }
-    viewButtons.forEach((button) => {
-      const view = button.getAttribute("data-view");
-      if (view === "map") {
-        button.textContent = tr("map.view_map", "Map View");
-        return;
-      }
-      button.textContent = tr("map.view_shelf", "Shelf View");
-    });
     if (mapShelfTitleEl) {
-      mapShelfTitleEl.textContent = tr("map.shelf_title", "Public Library");
+      mapShelfTitleEl.textContent = tr("map.shelf_title", "Library Shelf");
     }
     if (mapShelfSubtitleEl) {
-      mapShelfSubtitleEl.textContent = tr("map.shelf_subtitle", "Default view · Jump directly into book experiences");
+      mapShelfSubtitleEl.textContent = tr("map.shelf_subtitle", "Shelf view only · Choose a category like in the bookstore");
     }
     categories.forEach((category) => {
       const node = findNodeByIcon(category.icon);
       if (node) applyCategoryMeta(category, node);
     });
+  };
+
+  const renderCategoryFilters = () => {
+    if (!(shelfFilters instanceof HTMLElement)) return;
+    const available = getAvailableBooks();
+    const counts = new Map();
+    for (const book of available) {
+      const categoryId = normalizeCategory(book?.category);
+      if (!categoryId || categoryId === "all") continue;
+      counts.set(categoryId, (counts.get(categoryId) || 0) + 1);
+    }
+
+    const orderedIds = [
+      ...categories.map((item) => item.id),
+      ...Array.from(counts.keys()).filter((id) => !categories.some((item) => item.id === id))
+    ];
+    const options = [{ id: "all", label: tr("map.filter_all", "全部"), count: available.length }];
+    for (const categoryId of orderedIds) {
+      if (!counts.has(categoryId)) continue;
+      options.push({
+        id: categoryId,
+        label: getCategoryLabelById(categoryId),
+        count: counts.get(categoryId) || 0
+      });
+    }
+
+    if (!options.some((option) => option.id === activeCategory)) {
+      activeCategory = "all";
+    }
+
+    shelfFilters.innerHTML = options.map((option) => `
+      <button
+        type="button"
+        class="reado-shelf-filter-btn ${option.id === activeCategory ? "active" : ""}"
+        data-shelf-filter="${option.id}"
+        role="tab"
+        aria-selected="${option.id === activeCategory ? "true" : "false"}"
+      >${option.label}<span class="reado-shelf-filter-count">${option.count}</span></button>
+    `).join("");
   };
 
   const getUnlocked = () => {
@@ -774,22 +822,39 @@ html.reado-shell-preload body:not(.reado-shell-applied) > .flex > .flex-1 > asid
 
   const renderShelf = () => {
     if (!(shelfGrid instanceof HTMLElement)) return;
-    const available = books.filter((book) => (
-      book
-      && book.id
-      && !deletedBookIds.has(book.id)
-      && (book.firstModuleHref || book.hubHref)
-    ));
+    const available = getAvailableBooks();
+    const filtered = activeCategory === "all"
+      ? available
+      : available.filter((book) => normalizeCategory(book?.category) === activeCategory);
     const unlocked = getUnlocked();
+    renderCategoryFilters();
     if (shelfCount instanceof HTMLElement) {
-      shelfCount.textContent = tr("map.shelf_count", "{count} books available", { count: available.length });
+      shelfCount.textContent = tr(
+        "map.shelf_count_filtered",
+        "{visible}/{total} books",
+        { visible: filtered.length, total: available.length }
+      );
     }
-    if (available.length === 0) {
+    if (filtered.length === 0) {
       shelfGrid.innerHTML = `<div class="reado-shelf-empty">${tr("map.shelf_empty", "No books available yet. Please configure book_experiences modules first.")}</div>`;
       return;
     }
-    shelfGrid.innerHTML = available.map((book) => createCard(book, unlocked)).join("");
+    shelfGrid.innerHTML = filtered.map((book) => createCard(book, unlocked)).join("");
   };
+
+  if (shelfFilters instanceof HTMLElement) {
+    shelfFilters.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+      const button = target.closest("button[data-shelf-filter]");
+      if (!(button instanceof HTMLButtonElement)) return;
+      const nextCategory = normalizeCategory(button.getAttribute("data-shelf-filter"));
+      if (nextCategory === activeCategory) return;
+      activeCategory = nextCategory || "all";
+      localStorage.setItem(filterStorageKey, activeCategory);
+      renderShelf();
+    });
+  }
 
   if (shelfGrid instanceof HTMLElement) {
     shelfGrid.addEventListener("click", async (event) => {
@@ -881,28 +946,10 @@ html.reado-shell-preload body:not(.reado-shell-applied) > .flex > .flex-1 > asid
     });
   }
 
-  const setView = (view) => {
-    const nextView = view === "map" ? "map" : "shelf";
-    localStorage.setItem(viewStorageKey, nextView);
-    const mapOn = nextView === "map";
-    mapScene.style.display = mapOn ? "" : "none";
-    shelfPanel.style.display = mapOn ? "none" : "block";
-    main.classList.toggle("cursor-move", mapOn);
-    main.classList.toggle("select-none", mapOn);
-    viewButtons.forEach((button) => {
-      const isActive = button.getAttribute("data-view") === nextView;
-      button.classList.toggle("active", isActive);
-      button.setAttribute("aria-selected", isActive ? "true" : "false");
-    });
-  };
-
-  viewButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-      const view = button.getAttribute("data-view") || "shelf";
-      setView(view);
-    });
-  });
-
+  mapScene.style.display = "none";
+  shelfPanel.style.display = "block";
+  main.classList.remove("cursor-move", "select-none");
+  restoreActiveCategory();
   syncStaticCopy();
   if (typeof i18n.onLanguageChange === "function") {
     i18n.onLanguageChange(() => {
@@ -913,8 +960,6 @@ html.reado-shell-preload body:not(.reado-shell-applied) > .flex > .flex-1 > asid
 
   renderShelf();
   loadMineWorks().catch(() => {});
-  const savedView = localStorage.getItem(viewStorageKey);
-  setView(savedView === "map" || savedView === "shelf" ? savedView : "shelf");
 })();
 </script>
 </body></html>
